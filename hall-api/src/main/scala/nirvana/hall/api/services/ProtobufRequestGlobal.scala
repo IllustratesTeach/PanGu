@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.entities.User
+import nirvana.hall.api.entities.SysUser
 
 /**
  * protobuf request global
@@ -12,7 +12,7 @@ trait ProtobufRequestGlobal {
 
   def store(token: String)
   def isLogin: Boolean
-  def currentUser: Option[User]
-  def userId: Int
+  def currentUser: Option[SysUser]
+  def userId: String
   def logout()
 }

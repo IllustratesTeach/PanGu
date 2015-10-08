@@ -26,6 +26,7 @@ trait BaseServiceTestSupport extends TransactionManagement {
     //新建用户
 
     val userService = registry.getService(classOf[UserService])
+    userService.testCreateUser("jcai","password")
     /*
     val registryRequest = RegistryRequest.newBuilder()
     registryRequest.setLogin("jcai")

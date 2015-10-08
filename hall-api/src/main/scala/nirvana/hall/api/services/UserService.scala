@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.entities.User
+import nirvana.hall.api.entities.SysUser
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * 用户相关的服务类
@@ -8,6 +9,9 @@ import nirvana.hall.api.entities.User
  * @since 2015-06-02
  */
 trait UserService {
-  def login(loginName: String, password: String): (Option[User], Option[String])
+  @Transactional
+  def testCreateUser(login: String, password: String)
+
+  def login(loginName: String, password: String): (Option[SysUser], Option[String])
   def existsLoginName(loginName: String): Boolean
 }

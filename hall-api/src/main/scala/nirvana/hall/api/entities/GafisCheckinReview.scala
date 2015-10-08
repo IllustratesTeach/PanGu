@@ -42,7 +42,9 @@ object GafisCheckinReview extends SQLSyntaxSupport[GafisCheckinReview] {
 
   def find(pkId: String, checkinId: String, result: Option[Short], reviewOrg: Option[String], reviewUser: Option[String], reason: Option[String], reviewTime: Option[DateTime])(implicit session: DBSession = autoSession): Option[GafisCheckinReview] = {
     withSQL {
-      select.from(GafisCheckinReview as gcr).where.eq(gcr.pkId, pkId).and.eq(gcr.checkinId, checkinId).and.eq(gcr.result, result).and.eq(gcr.reviewOrg, reviewOrg).and.eq(gcr.reviewUser, reviewUser).and.eq(gcr.reason, reason).and.eq(gcr.reviewTime, reviewTime)
+      select.from(GafisCheckinReview as gcr).where.eq(gcr.pkId, pkId)
+        .and.eq(gcr.checkinId, checkinId)
+        .and.eq(gcr.selectDynamic("result"), result.get).and.eq(gcr.reviewOrg, reviewOrg).and.eq(gcr.reviewUser, reviewUser).and.eq(gcr.reason, reason).and.eq(gcr.reviewTime, reviewTime)
     }.map(GafisCheckinReview(gcr.resultName)).single.apply()
   }
 

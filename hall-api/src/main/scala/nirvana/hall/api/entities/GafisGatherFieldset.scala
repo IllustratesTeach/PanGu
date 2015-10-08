@@ -27,7 +27,7 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
     pkId = rs.get(ggf.pkId),
     nodeId = rs.get(ggf.nodeId),
     fieldName = rs.get(ggf.fieldName),
-    field = rs.get(ggf.field),
+    field = rs.get(ggf.selectDynamic("field")),
     rule = rs.get(ggf.rule)
   )
 
@@ -37,7 +37,7 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
 
   def find(pkId: String, nodeId: Option[String], fieldName: Option[String], field: Option[String], rule: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherFieldset] = {
     withSQL {
-      select.from(GafisGatherFieldset as ggf).where.eq(ggf.pkId, pkId).and.eq(ggf.nodeId, nodeId).and.eq(ggf.fieldName, fieldName).and.eq(ggf.field, field).and.eq(ggf.rule, rule)
+      select.from(GafisGatherFieldset as ggf).where.eq(ggf.pkId, pkId).and.eq(ggf.nodeId, nodeId).and.eq(ggf.fieldName, fieldName).and.eq(ggf.selectDynamic("field"), field).and.eq(ggf.rule, rule)
     }.map(GafisGatherFieldset(ggf.resultName)).single.apply()
   }
 
@@ -78,7 +78,7 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
         column.pkId,
         column.nodeId,
         column.fieldName,
-        column.field,
+        column.selectDynamic("field"),
         column.rule
       ).values(
         pkId,
@@ -103,15 +103,15 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
         column.pkId -> entity.pkId,
         column.nodeId -> entity.nodeId,
         column.fieldName -> entity.fieldName,
-        column.field -> entity.field,
+        column.selectDynamic("field") -> entity.field,
         column.rule -> entity.rule
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.field, entity.field).and.eq(column.rule, entity.rule)
+      ).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.selectDynamic("field"), entity.field).and.eq(column.rule, entity.rule)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherFieldset)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherFieldset).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.field, entity.field).and.eq(column.rule, entity.rule) }.update.apply()
+    withSQL { delete.from(GafisGatherFieldset).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.selectDynamic("field"), entity.field).and.eq(column.rule, entity.rule) }.update.apply()
   }
 
 }

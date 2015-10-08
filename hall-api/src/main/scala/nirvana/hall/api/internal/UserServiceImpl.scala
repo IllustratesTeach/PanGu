@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.entities.User
+import nirvana.hall.api.entities.SysUser
 import nirvana.hall.api.services.{AuthService, UserService}
 import org.apache.commons.codec.digest.DigestUtils
 import scalikejdbc._
@@ -11,13 +11,18 @@ import scalikejdbc._
  * @since 2015-06-02
  */
 class UserServiceImpl(authService: AuthService) extends UserService {
-  override def existsLoginName(loginName: String): Boolean = {
-    User.countBy(sqls.eq(User.column.login, loginName)) > 0
+
+  override def testCreateUser(login: String, password: String): Unit = {
+    SysUser.create("uuid","jcai",Some(DigestUtils.md5Hex(password)))
   }
-  override def login(loginName: String, password: String): (Option[User], Option[String]) = {
-    val c = User.column
+
+  override def existsLoginName(loginName: String): Boolean = {
+    SysUser.countBy(sqls.eq(SysUser.column.loginName, loginName)) > 0
+  }
+  override def login(loginName: String, password: String): (Option[SysUser], Option[String]) = {
+    val c = SysUser.column
     val passwordEncrypted = DigestUtils.md5Hex(password)
-    val userOpt = User.findBy(sqls.eq(c.login, loginName).and.eq(c.password, passwordEncrypted))
+    val userOpt = SysUser.findBy(sqls.eq(c.loginName, loginName).and.eq(c.password, passwordEncrypted))
     var tokenOpt: Option[String] = None
     userOpt.foreach(x => tokenOpt = Some(authService.login(loginName)))
 

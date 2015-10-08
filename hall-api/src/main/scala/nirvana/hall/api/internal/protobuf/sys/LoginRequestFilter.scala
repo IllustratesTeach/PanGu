@@ -22,7 +22,7 @@ class LoginRequestFilter(userService: UserService)
       val userOpt = userService.login(request.getLogin, request.getPassword)
       userOpt match {
         case (Some(user), Some(token)) =>
-          builder.setCorporateName(user.corporateName)
+          //builder.setCorporateName(user.corporateName)
           builder.setToken(token)
           responseBuilder.setExtension(LoginResponse.cmd, builder.build())
         case _ =>

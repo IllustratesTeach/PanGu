@@ -18,6 +18,5 @@ message LoginResponse {
   extend BaseResponse {
     optional LoginResponse cmd = 101;
   }
-  required string corporate_name = 1;
-  required string token = 2;
+  required string token = 1;
 }

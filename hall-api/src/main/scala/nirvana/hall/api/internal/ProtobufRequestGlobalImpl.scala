@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal
 
 import monad.support.services.MonadException
-import nirvana.hall.api.entities.{User, OnlineUser}
+import nirvana.hall.api.entities.{SysUser, OnlineUser}
 import nirvana.hall.api.services.{AuthService, HallExceptionCode, ProtobufRequestGlobal}
 import org.apache.tapestry5.ioc.ScopeConstants
 import org.apache.tapestry5.ioc.annotations.Scope
@@ -16,7 +16,7 @@ import scalikejdbc._
 @Scope(ScopeConstants.PERTHREAD)
 class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufRequestGlobal {
   private var _onlineUser: Option[OnlineUser] = None
-  private var _currentUser: Option[User] = None
+  private var _currentUser: Option[SysUser] = None
   private var _token:String = null
 
   override def token(): String = _token
@@ -26,7 +26,7 @@ class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufReques
       _onlineUser = authService.refreshToken(token)
       _onlineUser match {
         case Some(ou) =>
-          _currentUser = User.findBy(sqls.eq(User.column.login, ou.login))
+          _currentUser = SysUser.findBy(sqls.eq(SysUser.column.loginName, ou.login))
         case None =>
         //do nothing
       }
@@ -39,12 +39,12 @@ class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufReques
     _currentUser = None
   }
 
-  override def userId: Int = _currentUser.
+  override def userId: String = _currentUser.
     getOrElse(throw new MonadException("user not login", HallExceptionCode.NOT_LOGIN))
-    .id
+    .pkId
 
   override def isLogin: Boolean = currentUser.isDefined
 
-  override def currentUser: Option[User] = _currentUser
+  override def currentUser: Option[SysUser] = _currentUser
 
 }
