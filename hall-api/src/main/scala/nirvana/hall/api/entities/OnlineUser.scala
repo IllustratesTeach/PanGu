@@ -1,6 +1,5 @@
 package nirvana.hall.api.entities
 
-import nirvana.hall.api.services.AutoSpringDataSourceSession
 import scalikejdbc._
 
 case class OnlineUser(
@@ -32,7 +31,7 @@ object OnlineUser extends SQLSyntaxSupport[OnlineUser] {
 
   val ou = OnlineUser.syntax("ou")
 
- override def autoSession = AutoSpringDataSourceSession()
+ override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
   def find(login: String, loginTime: Int, latestTime: Int, token: String)(implicit session: DBSession = autoSession): Option[OnlineUser] = {
     withSQL {

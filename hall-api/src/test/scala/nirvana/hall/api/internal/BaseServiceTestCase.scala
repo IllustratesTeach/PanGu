@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal
 
 import nirvana.hall.api.config.{HallApiConfig}
-import nirvana.hall.api.entities.Partner
 import nirvana.hall.api.internal.jdbc.TransactionManagement
 import nirvana.hall.api.services.{ProtobufRequestGlobal, UserService}
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
@@ -16,7 +15,6 @@ import org.springframework.transaction.PlatformTransactionManager
 trait BaseServiceTestSupport extends TransactionManagement {
   protected var registry: Registry = _
   protected var token: String = _
-  protected var _partner:Partner = _
   @Before
   def setup: Unit = {
     val modules = Seq[String](
