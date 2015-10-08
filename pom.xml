@@ -10,6 +10,7 @@
   <modules>
     <module>hall-api</module>
     <module>hall-protocol</module>
+    <module>hall-sdk</module>
   </modules>
   <scm>
     <url>https://bitbucket.org/jcai/hall/src</url>

@@ -33,7 +33,7 @@ object HallApiApp
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("nirvana.hall.api.HallApiModule"))
-    startServer(config.web, "hall.api", classes: _*)
+    startServer(config.web, "nirvana.hall.api", classes: _*)
     val version = readVersionNumber("META-INF/maven/nirvana/hall-api/version.properties")
     printTextWithNative(logger, HallApiConstants.HALL_TEXT_LOGO, "api@" + config.web.bind, version, 0)
     logger.info("hall api server started")
