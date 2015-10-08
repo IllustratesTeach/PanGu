@@ -3,7 +3,7 @@ package nirvana.hall.api
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
-import nirvana.hall.api.config.{HallApiConfig, SuowenApiConfig}
+import nirvana.hall.api.config.HallApiConfig
 import org.apache.tapestry5.ioc.annotations.Symbol
 
 /**

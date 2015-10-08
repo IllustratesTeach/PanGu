@@ -5,8 +5,8 @@
     elementFormDefault="qualified"
     id="sync">
   <xs:include schemaLocation="monad.xsd"/>
-  <xs:element name="suowen_api" type="suowenApiType"/>
-  <xs:complexType name="suowenApiType">
+  <xs:element name="hall_api" type="hallApiType"/>
+  <xs:complexType name="hallApiType">
     <xs:sequence>
       <xs:element type="xs:string" name="log_file" minOccurs="1" maxOccurs="1">
         <xs:annotation>

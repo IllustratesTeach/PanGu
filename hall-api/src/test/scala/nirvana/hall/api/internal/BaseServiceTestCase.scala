@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.config.{HallApiConfig, SuowenApiConfig}
+import nirvana.hall.api.config.{HallApiConfig}
 import nirvana.hall.api.entities.Partner
 import nirvana.hall.api.internal.jdbc.TransactionManagement
 import nirvana.hall.api.services.{ProtobufRequestGlobal, UserService}

@@ -3,7 +3,7 @@ package nirvana.hall.api.internal
 import java.io.File
 import java.util.Properties
 
-import nirvana.hall.api.config.{HallApiConfig, SuowenApiConfig}
+import nirvana.hall.api.config.HallApiConfig
 import org.apache.tapestry5.ioc.RegistryBuilder
 import scalikejdbc.mapper._
 

@@ -7,7 +7,7 @@ import javax.sql.DataSource
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import monad.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 import net.sf.log4jdbc.ConnectionSpy
-import nirvana.hall.api.config.SuowenApiConfig
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.TransactionAdvice
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import org.apache.tapestry5.ioc.MethodAdviceReceiver
@@ -53,7 +53,7 @@ object LocalDataSourceModule {
     }
   }
   @EagerLoad
-  def buildDataSource(config: SuowenApiConfig, hub: RegistryShutdownHub, logger: Logger): DataSource = {
+  def buildDataSource(config: HallApiConfig, hub: RegistryShutdownHub, logger: Logger): DataSource = {
     val hikariConfig = new HikariConfig();
     //针对heroku的mysql特别处理
     if (config.api.db.url.startsWith("mysql")) {
