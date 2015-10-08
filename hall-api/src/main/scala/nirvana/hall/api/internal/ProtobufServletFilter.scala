@@ -26,7 +26,7 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
     extends HttpServletRequestFilter with LoggerSupport {
   private val PROTOBUF_HEADER = "X-Hall-Request"
   private val PROTOBUF_ERROR = "X-Hall-Error"
-  private val SUOWEN_TOKEN_HEADER="Hall-Token"
+  private val HALL_TOKEN_HEADER="Hall-Token"
   override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
     val header = request.getHeader(PROTOBUF_HEADER)
     if (header != null) {
@@ -51,9 +51,9 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
       try {
         response.setContentType(HallApiConstants.PROTOBUF_CONTEXT)
 
-        response.setHeader("Access-Control-Expose-Headers",PROTOBUF_ERROR+","+SUOWEN_TOKEN_HEADER)
+        response.setHeader("Access-Control-Expose-Headers",PROTOBUF_ERROR+","+HALL_TOKEN_HEADER)
         response.setHeader("Access-Control-Allow-Origin","*")
-        response.setHeader(SUOWEN_TOKEN_HEADER,protobufRequestGlobal.token())
+        response.setHeader(HALL_TOKEN_HEADER,protobufRequestGlobal.token())
 
         val baseResponse = responseBuilder.build()
         if (baseResponse.getStatus == ResponseStatus.FAIL) {

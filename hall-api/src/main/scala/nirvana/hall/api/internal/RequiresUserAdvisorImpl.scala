@@ -2,7 +2,7 @@ package nirvana.hall.api.internal
 
 import monad.support.services.MonadException
 import nirvana.hall.api.annotations.RequiresUser
-import nirvana.hall.api.services.SuowenExceptionCode.INVALID_USER
+import nirvana.hall.api.services.HallExceptionCode.INVALID_USER
 import nirvana.hall.api.services.{RequiresUserAdvisor, ProtobufRequestGlobal}
 import org.apache.tapestry5.ioc.MethodAdviceReceiver
 import org.apache.tapestry5.ioc.annotations.PreventServiceDecoration

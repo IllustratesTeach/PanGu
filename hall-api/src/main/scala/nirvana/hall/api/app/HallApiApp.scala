@@ -21,7 +21,7 @@ object HallApiApp
   def main(args: Array[String]) {
     val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
-    val config = HallApiModule.buildSuowenApiConfig(serverHome)
+    val config = HallApiModule.buildHallApiConfig(serverHome)
     configLogger(config.logFile, "API", "egf", "nirvana.hall")
 
     val logger = LoggerFactory getLogger getClass

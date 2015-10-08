@@ -36,7 +36,7 @@ object ScalaJdbcGen {
       "nirvana.hall.api.internal.TestModule").map(Class.forName)
     val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
 
-    val suowenConfig = registry.getService(classOf[HallApiConfig])
+    val hallApiConfig = registry.getService(classOf[HallApiConfig])
 
     val srcDir = new File("hall-api/src/main/scala")
     val testDir = new File("hall-api/src/test/scala")
@@ -60,11 +60,11 @@ object ScalaJdbcGen {
       returnCollectionType = generatorSettings.returnCollectionType)
 
     val jdbc = JDBCSettings(
-      driver = suowenConfig.api.db.driver,
-      url = suowenConfig.api.db.url,
-      username = suowenConfig.api.db.user,
-      password = suowenConfig.api.db.password,
-      schema = null //suowenConfig.api.db.user
+      driver = hallApiConfig.api.db.driver,
+      url = hallApiConfig.api.db.url,
+      username = hallApiConfig.api.db.user,
+      password = hallApiConfig.api.db.password,
+      schema = null //hallApiConfig.api.db.user
       )
     val className = None
     Class.forName(jdbc.driver) // load specified jdbc driver

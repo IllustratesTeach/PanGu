@@ -57,7 +57,7 @@ trait BaseServiceTestSupport extends TransactionManagement {
   }
 }
 object TestModule {
-  def buildSuowenApiConfig() = {
+  def buildHallApiConfig() = {
     val config = new HallApiConfig
     config.api.db.driver = "org.h2.Driver"
     config.api.db.user = "sa"

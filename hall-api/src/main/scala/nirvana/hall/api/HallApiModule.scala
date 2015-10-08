@@ -12,7 +12,7 @@ import org.apache.tapestry5.ioc.annotations.Symbol
  * @since 2015-04-02
  */
 object HallApiModule {
-  def buildSuowenApiConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
+  def buildHallApiConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
     val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-api.xml")
     XmlLoader.parseXML[HallApiConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/api/api.xsd")))
   }

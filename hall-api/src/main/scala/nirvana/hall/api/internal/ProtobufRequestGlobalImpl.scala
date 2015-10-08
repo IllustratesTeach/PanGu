@@ -2,7 +2,7 @@ package nirvana.hall.api.internal
 
 import monad.support.services.MonadException
 import nirvana.hall.api.entities.{User, OnlineUser}
-import nirvana.hall.api.services.{AuthService, SuowenExceptionCode, ProtobufRequestGlobal}
+import nirvana.hall.api.services.{AuthService, HallExceptionCode, ProtobufRequestGlobal}
 import org.apache.tapestry5.ioc.ScopeConstants
 import org.apache.tapestry5.ioc.annotations.Scope
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
@@ -40,7 +40,7 @@ class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufReques
   }
 
   override def userId: Int = _currentUser.
-    getOrElse(throw new MonadException("user not login", SuowenExceptionCode.NOT_LOGIN))
+    getOrElse(throw new MonadException("user not login", HallExceptionCode.NOT_LOGIN))
     .id
 
   override def isLogin: Boolean = currentUser.isDefined
