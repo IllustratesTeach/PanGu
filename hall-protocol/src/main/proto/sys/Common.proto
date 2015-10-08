@@ -1,0 +1,34 @@
+package sys;
+
+option java_package = "nirvana.hall.protocol.sys";
+
+option java_outer_classname = "CommonProto";
+
+message BaseRequest{
+  extensions 100 to max;
+  required string token = 1;
+  required int32 version = 2 [default = 10100];
+  /**
+  101 LoginRequest
+  **/
+}
+//服务器返回状态
+enum ResponseStatus {
+  OK = 1;
+  FAIL = 2;
+}
+message BaseResponse{
+  extensions 100 to max;
+  required ResponseStatus status = 1;
+  optional string message = 2;
+  /**
+  101 LoginResponse
+  */
+}
+message KV {
+  required string key = 1;
+  optional string value = 2;
+}
+message KVObject{
+  repeated KV object = 1;
+}
