@@ -476,6 +476,16 @@
         <resource-conf>src/main/conf/production</resource-conf>
       </properties>
     </profile>
+    <profile>
+      <id>oracle</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc14</artifactId>
+          <version>10.2.0.3</version>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
   <url>http://www.ganshane.com</url>
   <inceptionYear>2013</inceptionYear>
