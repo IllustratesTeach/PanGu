@@ -48,6 +48,17 @@
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-core</artifactId>
         <version>${monad-release-version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.19.0-GA</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
