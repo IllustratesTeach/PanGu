@@ -1,7 +1,6 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.v62.annotations.Length
-import org.apache.tapestry5.ioc.internal.util.GenericsUtils
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
@@ -50,10 +49,12 @@ class AncientData {
             if(ANCIENT_CLASS.isAssignableFrom(other)) {
               dataSize += other.newInstance().asInstanceOf[AncientData].getDataSize
             }else if(other.isArray){
-              println(GenericsUtils.resolve().extractActualType(getClass,f))
-              //println(other.getGenericInterfaces.asInstanceOf[ParameterizedType].getActualTypeArguments)
-              //println(parameters(0).getName)
-              //dataSize += other.newInstance().asInstanceOf[AncientData].getDataSize
+              val componentType = other.getComponentType
+              if(ANCIENT_CLASS.isAssignableFrom(componentType)){
+                dataSize += componentType.newInstance().asInstanceOf[AncientData].getDataSize * dataLength
+              }else{
+                throw new IllegalAccessException("unknown type:" + componentType)
+              }
             }else {
               throw new IllegalAccessException("unknown type:" + other)
             }
@@ -120,7 +121,38 @@ class AncientData {
         case `ANCIENT_CLASS` =>
           fieldValue.asInstanceOf[AncientData].writeToChannelBuffer(channelBuffer)
         case other=>
-          throw new IllegalAccessException("unknown type:"+other)
+          if(ANCIENT_CLASS.isAssignableFrom(other)) {
+            if(fieldValue == null){
+              val size = other.newInstance().asInstanceOf[AncientData].getDataSize
+              channelBuffer.writerIndex(channelBuffer.writerIndex() + size)
+            }else{
+              fieldValue.asInstanceOf[AncientData].writeToChannelBuffer(channelBuffer)
+            }
+          }else if(other.isArray){
+            val componentType = other.getComponentType
+            if(ANCIENT_CLASS.isAssignableFrom(componentType)){
+              val componentSize = componentType.newInstance().asInstanceOf[AncientData].getDataSize
+              if(fieldValue == null){//fill empty data
+                channelBuffer.writerIndex(channelBuffer.writerIndex() + componentSize * dataLength)
+              }else{
+                val arr = fieldValue.asInstanceOf[Array[_]]
+                arr.foreach { x =>
+                  if(x == null)//increase writer index
+                    channelBuffer.writerIndex(channelBuffer.writerIndex() + componentSize)
+                  else
+                    x.asInstanceOf[AncientData].writeToChannelBuffer(channelBuffer)
+                }
+
+                val remain = dataLength - arr.length
+                if(remain > 0)
+                  channelBuffer.writerIndex(channelBuffer.writerIndex() + componentSize * remain)
+              }
+            }else{
+              throw new IllegalAccessException("unknown type:" + componentType)
+            }
+          }else {
+            throw new IllegalAccessException("unknown type:" + other)
+          }
       }
     }
   }
@@ -168,7 +200,27 @@ class AncientData {
           ancientData.fromChannelBuffer(channelBuffer)
           getClass.getMethod(f.getName+"_$eq",f.getType).invoke(this,ancientData)
         case other=>
-          throw new IllegalAccessException("unknown type:"+other)
+          if(ANCIENT_CLASS.isAssignableFrom(other)) {
+            val ancientData = other.newInstance().asInstanceOf[AncientData]
+            ancientData.fromChannelBuffer(channelBuffer)
+            getClass.getMethod(f.getName+"_$eq",other).invoke(this,ancientData)
+          }else if(other.isArray){
+            val componentType = other.getComponentType
+            if(ANCIENT_CLASS.isAssignableFrom(componentType)){
+              val dataArray = java.lang.reflect.Array.newInstance(componentType,dataLength)
+
+              0 until dataLength foreach { x=>
+                val value = componentType.newInstance().asInstanceOf[AncientData]
+                value.fromChannelBuffer(channelBuffer)
+                java.lang.reflect.Array.set(dataArray,x,value)
+              }
+              getClass.getMethod(f.getName+"_$eq",other).invoke(this,dataArray)
+            }else{
+              throw new IllegalAccessException("unknown type:" + componentType)
+            }
+          }else {
+            throw new IllegalAccessException("unknown type:" + other)
+          }
       }
     }
   }

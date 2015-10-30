@@ -8,7 +8,7 @@ import nirvana.hall.v62.annotations.Length
  * @since 2015-10-30
  */
 class QueryStruct extends AncientData{
-  var	stSimpQry:GAQUERYSIMPSTRUCT = _					// 192 bytes
+  var	stSimpQry:GAQUERYSIMPSTRUCT = new GAQUERYSIMPSTRUCT					// 192 bytes
   var	nStartLibID:Int = _ 		// int4 start lib id
   var	nEndLibID:Int = _ 		// int4 end lib id
   var	tRmtAddTime:Int = _ 	// distinguish different queries
@@ -60,8 +60,12 @@ class QueryStruct extends AncientData{
   var	pstInfo:Long = _ //GAFIS_QUERYINFO			*pstInfo;			// query info.
   @Length(32)
   var	szRmtQryKey:Array[Byte] = _	// used by remote server to add heterogeneous systems
-
-
+}
+class Key extends AncientData{
+  var id:String = _
+}
+class Position extends AncientData{
+  var pos:Array[Byte] = _
 }
 class GAQUERYSIMPSTRUCT extends AncientData {
   var	cbSize = 0;
@@ -78,15 +82,15 @@ class GAQUERYSIMPSTRUCT extends AncientData {
   var	nStage:Byte = _ ;				// stage( for two step or multi step method, we can expand to k step methods)
   var	nFlagEx:Byte = _ ;			// Extended flag
   var	nQueryID_old:Int = _ 		// query id(to here is 64 bytes)
-  var	stSrcDB:DBIDStruct = _ ;	// where the data come from
+  var	stSrcDB:DBIDStruct = new DBIDStruct ;	// where the data come from
   @Length(4)
-  var	stDestDB:Array[DBIDStruct]= _	// at most we can search 4 database at the same time
+  var	stDestDB:Array[DBIDStruct]= Array[DBIDStruct](new DBIDStruct,new DBIDStruct,new DBIDStruct,new DBIDStruct)	// at most we can search 4 database at the same time
   var	nTimeUsed:Int = _ 		// in seconds
   var	nMaxCandidateNum:Int = _ 	// maximum candidate num
   var	nCurCandidateNum:Int = _ 	// current candidate num(to here is 96 bytes)
-  var	tSubmitTime:GafisDateTime = _	// submit time
-  var	tFinishTime:GafisDateTime = _	// finish time
-  var	tCheckTime:GafisDateTime = _ 		// check time
+  var	tSubmitTime:GafisDateTime = new GafisDateTime	// submit time
+  var	tFinishTime:GafisDateTime = new GafisDateTime	// finish time
+  var	tCheckTime:GafisDateTime = new GafisDateTime 		// check time
   @Length(16)
   var	szCheckUserName:String = _	// this user name is in user id list
   ///////////////to here is 96+40=136 bytes
@@ -129,8 +133,8 @@ class GafisDate extends AncientData{
 }	// size is 4 bytes long.
 
 class GafisDateTime extends AncientData {
-  var tTime:GafisTime = _
-  var tDate:GafisDate = _ 	// date
+  var tTime:GafisTime = new GafisTime
+  var tDate:GafisDate = new GafisDate 	// date
 }
 
 class KeyRangeStruct extends AncientData  {

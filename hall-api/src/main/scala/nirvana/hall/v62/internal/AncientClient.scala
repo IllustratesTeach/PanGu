@@ -68,12 +68,47 @@ object AncientClient extends LoggerSupport{
     val client = createClient("10.1.6.119",6898,1)
     client.executeInChannel{channel=>
       val header = new RequestHeader
-      //header.nIP="10.1.1.1"
       header.szUserName="afisadmin"
       header.nOpClass = 105
       header.nOpCode= 476
+      header.nDBID = 20
+      header.nTableID = 2
+
+      header.bnData1=1
+      header.bnData2 = 48
+      header.bnData3 = 10
+
       val response = channel.writeMessage[ResponseHeader](header)
-      println(response.nReturnValue)
+      println("header sent,then return code:{}",response.nReturnValue)
+
+      val key = new Key
+      key.id="3702022014000002"
+      channel.writeMessage[NoneResponse](key)
+
+      val p = new Position
+      0 until 10 foreach(x=>p.pos(x) = (x+1).asInstanceOf[Byte])
+      channel.writeMessage[NoneResponse](p)
+
+      val queryStruct = new QueryStruct
+      //fill simple data
+      queryStruct.stSimpQry.nQueryType = 0
+      queryStruct.stSimpQry.nPriority = 1
+      queryStruct.stSimpQry.nFlag = 1
+      queryStruct.stSimpQry.stSrcDB.nDBID = 1
+      queryStruct.stSimpQry.stSrcDB.nTableID= 2
+      queryStruct.stSimpQry.stDestDB.apply(0).nDBID = 1
+      queryStruct.stSimpQry.stDestDB.apply(0).nTableID= 2
+      queryStruct.stSimpQry.tSubmitTime.tDate.tYear = 115
+      queryStruct.stSimpQry.tSubmitTime.tDate.tMonth = 9
+      queryStruct.stSimpQry.tSubmitTime.tDate.tDay = 30
+      queryStruct.stSimpQry.nDestDBCount = 1
+
+
+      queryStruct.nItemFlagA = 64
+
+
+      val response2 = channel.writeMessage[ResponseHeader](queryStruct)
+      println("query struct sent,then return code:{}",response2.nReturnValue)
     }
   }
 }
@@ -159,9 +194,14 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
 
     override def writeMessage[R <: AncientData](data: AncientData*)(implicit manifest: Manifest[R]): R = {
       dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      dataReceiver = Promise[AncientData]()
-      data.foreach(channel.write)
-      Await.result(dataReceiver.future,Duration("10s")).asInstanceOf[R]
+      if(dataInstance.isInstanceOf[NoneResponse]) {
+        data.foreach(channel.write)
+        dataInstance.asInstanceOf[R]
+      }else{
+        dataReceiver = Promise[AncientData]()
+        data.foreach(channel.write)
+        Await.result(dataReceiver.future,Duration("10s")).asInstanceOf[R]
+      }
     }
 
     override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {

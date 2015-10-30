@@ -34,7 +34,11 @@ class RequestHeader extends AncientData{
   var nRetVal               = 0L  //UCHAR	8	客户端返回值
   @Length(24)
   var bnRes2:Array[Byte]   = _ //UCHAR	24	保留
-  @Length(64)
+
+  var bnData1 = 0       //卡数目
+  var bnData2:Short = 0 //卡号长度
+  var bnData3:Byte= 0 //参入的比对的特征数目,滚指10，平指10，掌纹2
+  @Length(64-7)
   var bnData:Array[Byte]   = _  //UCHAR	64	附加数据
 }
 class ResponseHeader extends AncientData{
@@ -49,4 +53,8 @@ class ResponseHeader extends AncientData{
   var bnRes                 = 0  //UCHAR	4	Reserved
   @Length(64)
   var bnData                = new Array[Byte](64)  //UCHAR	64	附加数据
+}
+
+class NoneResponse extends AncientData{
+
 }
