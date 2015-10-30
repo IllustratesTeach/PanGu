@@ -10,16 +10,6 @@ import org.junit.{Test, Assert}
  */
 class QueryStructTest {
   @Test
-  def test_key: Unit ={
-    val key = new Key
-    key.id = "asdf"
-    val bytesLength = key.id.getBytes.length
-    Assert.assertEquals(bytesLength,key.getDataSize)
-    val buffer = ChannelBuffers.buffer(bytesLength)
-    key.writeToChannelBuffer(buffer)
-    Assert.assertEquals(bytesLength,buffer.writerIndex())
-  }
-  @Test
   def test_length: Unit ={
     val queryStruct = new QueryStruct
     val range1= new KeyRangeStruct

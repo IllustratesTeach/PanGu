@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.api.services.HallExceptionCode.FAIL_TO_FIND_CHANNEL
+import nirvana.hall.v62.AncientConstants
 import org.jboss.netty.bootstrap.ClientBootstrap
 import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.channel._
@@ -45,21 +46,6 @@ object AncientClient extends LoggerSupport{
     bootstrap.setOption("keepAlive", true)
     bootstrap.setOption("tcpNoDelay", true)
     bootstrap.setOption("connectTimeoutMillis", 10000)
-    //val executionHandler = new ExecutionHandler(executor,false,true)
-    /*
-    bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-      def getPipeline = {
-        val pipeline = Channels.pipeline()
-        pipeline.addLast("ancient-data-encoder", new AncientDataEncoder)
-        pipeline.addLast("exception",new SimpleChannelUpstreamHandler(){
-          override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
-            error(e.getCause.toString,e.getCause)
-          }
-        })
-        pipeline
-      }
-    })
-    */
   }
   def createClient(host:String,port:Int,concurrent:Int=5): AncientClient={
     new AncientClient(host,port,concurrent)
@@ -81,17 +67,14 @@ object AncientClient extends LoggerSupport{
       val response = channel.writeMessage[ResponseHeader](header)
       println("header sent,then return code:{}",response.nReturnValue)
 
-      val key = new Key
-      key.id="3702022014000002"
-      channel.writeMessage[NoneResponse](key)
+      channel.writeMessage[NoneResponse]("3702022014000002".getBytes(),header.bnData2)
 
-      val p = new Position
-      0 until 10 foreach(x=>p.pos(x) = (x+1).asInstanceOf[Byte])
-      channel.writeMessage[NoneResponse](p)
+      val pos = 0 until 10 map(x=>(x+1).asInstanceOf[Byte])
+      channel.writeMessage[NoneResponse](pos)
 
       val queryStruct = new QueryStruct
       //fill simple data
-      queryStruct.stSimpQry.nQueryType = 0
+      queryStruct.stSimpQry.nQueryType = AncientConstants.TTQUERY.asInstanceOf[Byte]
       queryStruct.stSimpQry.nPriority = 1
       queryStruct.stSimpQry.nFlag = 1
       queryStruct.stSimpQry.stSrcDB.nDBID = 1
@@ -116,10 +99,11 @@ class AncientDataEncoder extends OneToOneEncoder with LoggerSupport{
   override def encode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
     msg match {
       case data: AncientData =>
-        debug("data sent")
         val buffer = ctx.getChannel.getConfig.getBufferFactory.getBuffer(data.getDataSize)
         data.writeToChannelBuffer(buffer)
         buffer
+      case arr:Array[Byte] =>
+        ctx.getChannel.getConfig.getBufferFactory.getBuffer(arr,0,arr.length)
       case other =>
         other.asInstanceOf[AnyRef]
     }
@@ -192,7 +176,7 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
     }
 
 
-    override def writeMessage[R <: AncientData](data: AncientData*)(implicit manifest: Manifest[R]): R = {
+    override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
       dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
       if(dataInstance.isInstanceOf[NoneResponse]) {
         data.foreach(channel.write)
@@ -202,6 +186,15 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
         data.foreach(channel.write)
         Await.result(dataReceiver.future,Duration("10s")).asInstanceOf[R]
       }
+    }
+
+
+    override def writeMessage[R <: AncientData](data: Array[Byte], offset: Int, length: Int)(implicit manifest: Manifest[R]): R = {
+      val result = new Array[Byte](length)
+      val finalLength = math.min(length,data.length-offset)
+      System.arraycopy(data,offset,result,offset,finalLength)
+
+      writeMessage(result)
     }
 
     override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
@@ -221,6 +214,7 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
 
     override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
       error(e.getCause.toString,e.getCause)
+      ctx.getChannel.close()
     }
 
 
@@ -254,6 +248,7 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
  * use it to write message and receive message
  */
 trait ChannelOperator{
-  def writeMessage[R <: AncientData](data:AncientData*)(implicit manifest: Manifest[R]): R
+  def writeMessage[R <: AncientData](data:Any*)(implicit manifest: Manifest[R]): R
+  def writeMessage[R <: AncientData](data:Array[Byte],offset:Int=0,length:Int = -1)(implicit manifest: Manifest[R]): R
 }
 

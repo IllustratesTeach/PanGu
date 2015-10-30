@@ -61,12 +61,6 @@ class QueryStruct extends AncientData{
   @Length(32)
   var	szRmtQryKey:Array[Byte] = _	// used by remote server to add heterogeneous systems
 }
-class Key extends AncientData{
-  var id:String = _
-}
-class Position extends AncientData{
-  var pos:Array[Byte] = _
-}
 class GAQUERYSIMPSTRUCT extends AncientData {
   var	cbSize = 0;
   @Length(32)
