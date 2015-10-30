@@ -1,13 +1,57 @@
-package nirvana.hall.api.internal.ancientry
+package nirvana.hall.v62.internal
 
+import nirvana.hall.v62.annotations.Length
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
  * support to serialize/unserialize data
+ * TODO using byte transformation to convert data
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
-class AncientDataSupport {
+class AncientData {
+  private var dataSize:Int = 0
+  /**
+   * get data size
+   */
+  def getDataSize:Int={
+    if(dataSize == 0) {
+      val BYTE_CLASS = classOf[Byte]
+      val CHAR_CLASS = classOf[Char]
+      val SHORT_CLASS = classOf[Short]
+      val INT_CLASS = classOf[Int]
+      val LONG_CLASS = classOf[Long]
+      val STRING_CLASS = classOf[String]
+      val BYTE_ARRAY_CLASS = classOf[Array[Byte]]
+      val ANCIENT_CLASS = classOf[AncientData]
+      getClass.getDeclaredFields.foreach { f =>
+        val annotation = f.getAnnotation(classOf[Length])
+        val fieldValue = getClass.getMethod(f.getName).invoke(this)
+        if (annotation != null) {
+          dataSize += annotation.value()
+        }
+        f.getType match {
+          case `BYTE_CLASS` =>
+            dataSize += 1
+          case `CHAR_CLASS` =>
+            dataSize += 1
+          case `SHORT_CLASS` =>
+            dataSize += 2
+          case `INT_CLASS` =>
+            dataSize += 4
+          case `LONG_CLASS` =>
+            dataSize += 8
+          case `STRING_CLASS` =>
+          case `BYTE_ARRAY_CLASS` =>
+          case `ANCIENT_CLASS` =>
+            dataSize += fieldValue.asInstanceOf[AncientData].getDataSize
+          case other =>
+            throw new IllegalAccessException("unknown type:" + other)
+        }
+      }
+    }
+    dataSize
+  }
   /**
    * serialize to channel buffer
    * @param channelBuffer netty channel buffer
@@ -15,8 +59,8 @@ class AncientDataSupport {
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): Unit = {
     getClass.getDeclaredFields.foreach{f=>
       val annotation = f.getAnnotation(classOf[Length])
-      val fieldValue = getClass.getMethod(f.getName).invoke(this);//.asInstanceOf[AnyRef]
-    var dataLength = 0
+      val fieldValue = getClass.getMethod(f.getName).invoke(this)
+      var dataLength = 0
       if(annotation != null){
         dataLength = annotation.value()
       }
@@ -27,7 +71,7 @@ class AncientDataSupport {
       val LONG_CLASS         = classOf[Long]
       val STRING_CLASS       = classOf[String]
       val BYTE_ARRAY_CLASS   = classOf[Array[Byte]]
-      val ANCIENT_CLASS      = classOf[AncientDataSupport]
+      val ANCIENT_CLASS      = classOf[AncientData]
       f.getType match{
         case `BYTE_CLASS` =>
           channelBuffer.writeByte(fieldValue.asInstanceOf[Byte])
@@ -64,7 +108,7 @@ class AncientDataSupport {
           channelBuffer.writerIndex(channelBuffer.writerIndex() + dataLength - length)
 
         case `ANCIENT_CLASS` =>
-          fieldValue.asInstanceOf[AncientDataSupport].writeToChannelBuffer(channelBuffer)
+          fieldValue.asInstanceOf[AncientData].writeToChannelBuffer(channelBuffer)
         case other=>
           throw new IllegalAccessException("unknown type:"+other)
       }
@@ -89,7 +133,7 @@ class AncientDataSupport {
       val LONG_CLASS         = classOf[Long]
       val STRING_CLASS       = classOf[String]
       val BYTE_ARRAY_CLASS   = classOf[Array[Byte]]
-      val ANCIENT_CLASS      = classOf[AncientDataSupport]
+      val ANCIENT_CLASS      = classOf[AncientData]
       f.getType match{
         case `BYTE_CLASS` =>
           getClass.getMethod(f.getName+"_$eq",BYTE_CLASS).invoke(this,channelBuffer.readByte().asInstanceOf[AnyRef])
@@ -110,7 +154,7 @@ class AncientDataSupport {
           channelBuffer.readBytes(bytes)
           getClass.getMethod(f.getName+"_$eq",BYTE_ARRAY_CLASS).invoke(this,bytes)
         case `ANCIENT_CLASS` =>
-          val ancientData = f.getType.newInstance().asInstanceOf[AncientDataSupport]
+          val ancientData = f.getType.newInstance().asInstanceOf[AncientData]
           ancientData.fromChannelBuffer(channelBuffer)
           getClass.getMethod(f.getName+"_$eq",f.getType).invoke(this,ancientData)
         case other=>

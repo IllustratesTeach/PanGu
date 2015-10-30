@@ -1,11 +1,13 @@
-package nirvana.hall.api.internal.ancientry
+package nirvana.hall.v62.internal
+
+import nirvana.hall.v62.annotations.Length
 
 /**
  * request ancient application server
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
-class RequestHeader extends AncientDataSupport{
+class RequestHeader extends AncientData{
   var cbSize                = 192  //UCHAR	4	结构体大小  192
   var nMajorVer             = 6.toShort  //UCHAR	2	主版本号    6
   var nMinorVer             = 1.toShort   //UCHAR	2	副版本号    1
@@ -17,9 +19,7 @@ class RequestHeader extends AncientDataSupport{
   var szUserPass:String     = _  //char	16	用户密码
   var tLoginTime            = 0  //UCHAR	4	登陆时间
   var nOpClass              = 0.toShort   //UCHAR	2	操作类型
-  var OP_CLASS_QUERY	      = 0.toShort  //105
-  var nOpCode               = 0.toShort  //UCHAR	2	操作码
-  var OP_QUERY_SUBMIT_GA7	  = 0.toShort   //482
+  var nOpCode               = 0.toShort  //UCHAR	2	操作码 482
   var nLoginID              = 0  //UCHAR	4	登陆id
   var nSeqNo                = 0  //UCHAR	4	序号
   @Length(16)
@@ -37,14 +37,15 @@ class RequestHeader extends AncientDataSupport{
   @Length(64)
   var bnData:Array[Byte]   = _  //UCHAR	64	附加数据
 }
-class ResponseHeader {
+class ResponseHeader extends AncientData{
   var cbSize                = 96   //UCHAR	4	结构体大小 96
   var nMajorVer             = 6.toShort  //UCHAR	2	主版本号   6
   var nMinorVer             = 1.toShort  //UCHAR	2	副版本号   1
-  @Length(24)
+  @Length(8)
   var szMagicStr            = "G@xucg$"  //char	8	必须是      G@xucg$
   var nDataLen              = 0  //UCHAR	4	后面的数据长度
-  var nReturnValue          = 1L  //UCHAR	8	服务端返回值 1  成功 -1  失败,服务器仅仅用了前面4个字节
+  var nReturnValue          = 0  //UCHAR	8	服务端返回值 1  成功 -1  失败,服务器仅仅用了前面4个字节
+  var nReturnValue_suffix   = 0 //reserved ,because server only use 4 byte
   var bnRes                 = 0  //UCHAR	4	Reserved
   @Length(64)
   var bnData                = new Array[Byte](64)  //UCHAR	64	附加数据
