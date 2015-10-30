@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.v62.annotations.Length
+import org.apache.tapestry5.ioc.internal.util.GenericsUtils
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
@@ -26,9 +27,9 @@ class AncientData {
       val ANCIENT_CLASS = classOf[AncientData]
       getClass.getDeclaredFields.foreach { f =>
         val annotation = f.getAnnotation(classOf[Length])
-        val fieldValue = getClass.getMethod(f.getName).invoke(this)
+        var dataLength = 0
         if (annotation != null) {
-          dataSize += annotation.value()
+          dataLength = annotation.value()
         }
         f.getType match {
           case `BYTE_CLASS` =>
@@ -42,11 +43,20 @@ class AncientData {
           case `LONG_CLASS` =>
             dataSize += 8
           case `STRING_CLASS` =>
+            dataSize += dataLength
           case `BYTE_ARRAY_CLASS` =>
-          case `ANCIENT_CLASS` =>
-            dataSize += fieldValue.asInstanceOf[AncientData].getDataSize
+            dataSize += dataLength
           case other =>
-            throw new IllegalAccessException("unknown type:" + other)
+            if(ANCIENT_CLASS.isAssignableFrom(other)) {
+              dataSize += other.newInstance().asInstanceOf[AncientData].getDataSize
+            }else if(other.isArray){
+              println(GenericsUtils.resolve().extractActualType(getClass,f))
+              //println(other.getGenericInterfaces.asInstanceOf[ParameterizedType].getActualTypeArguments)
+              //println(parameters(0).getName)
+              //dataSize += other.newInstance().asInstanceOf[AncientData].getDataSize
+            }else {
+              throw new IllegalAccessException("unknown type:" + other)
+            }
         }
       }
     }
