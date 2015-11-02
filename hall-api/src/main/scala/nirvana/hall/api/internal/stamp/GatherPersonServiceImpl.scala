@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal.stamp
 
-import nirvana.hall.api.entities.{GafisGatherTypeNodeField, GafisGatherType, GafisGatherCertificate, GafisPerson}
+import nirvana.hall.api.entities.{GafisGatherTypeNodeField, GafisGatherType, GafisPerson}
 import nirvana.hall.api.services.stamp.GatherPersonService
 import scalikejdbc._
 
