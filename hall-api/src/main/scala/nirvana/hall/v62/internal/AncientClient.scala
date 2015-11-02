@@ -6,14 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.api.services.HallExceptionCode.FAIL_TO_FIND_CHANNEL
-import nirvana.hall.v62.AncientConstants
 import org.jboss.netty.bootstrap.ClientBootstrap
 import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.channel._
 import org.jboss.netty.channel.socket.nio.{NioClientSocketChannelFactory, NioWorkerPool}
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder
 
-import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
 
@@ -47,12 +45,18 @@ object AncientClient extends LoggerSupport{
     bootstrap.setOption("tcpNoDelay", true)
     bootstrap.setOption("connectTimeoutMillis", 10000)
   }
-  def createClient(host:String,port:Int,concurrent:Int=5): AncientClient={
-    new AncientClient(host,port,concurrent)
+  def shutdown():Unit={
+    info("closing client factory")
+    channelFactory.releaseExternalResources()
+    executor.shutdown()
+  }
+  def connect(host:String,port:Int): AncientClient={
+    new AncientClient(host,port)
   }
   def main(args:Array[String]): Unit={
-    val client = createClient("10.1.6.119",6898,1)
+    val client = connect("10.1.6.119",6898)
     client.executeInChannel{channel=>
+      debug("set request header")
       val header = new RequestHeader
       header.szUserName="afisadmin"
       header.nOpClass = 105
@@ -65,16 +69,16 @@ object AncientClient extends LoggerSupport{
       header.bnData3 = 10
 
       val response = channel.writeMessage[ResponseHeader](header)
-      println("header sent,then return code:{}",response.nReturnValue)
+      debug("header sent,then return code:{}",response.nReturnValue)
 
-      channel.writeMessage[NoneResponse]("3702022014000002".getBytes(),header.bnData2)
+      channel.writeByteArray[NoneResponse]("3702022014000002".getBytes(),0,header.bnData2)
 
       val pos = 0 until 10 map(x=>(x+1).asInstanceOf[Byte])
-      channel.writeMessage[NoneResponse](pos)
+      channel.writeByteArray[NoneResponse](pos.toArray)
 
       val queryStruct = new QueryStruct
       //fill simple data
-      queryStruct.stSimpQry.nQueryType = AncientConstants.TTQUERY.asInstanceOf[Byte]
+      queryStruct.stSimpQry.nQueryType = 0 ;//AncientConstants.TTMATCH.asInstanceOf[Byte]
       queryStruct.stSimpQry.nPriority = 1
       queryStruct.stSimpQry.nFlag = 1
       queryStruct.stSimpQry.stSrcDB.nDBID = 1
@@ -91,8 +95,35 @@ object AncientClient extends LoggerSupport{
 
 
       val response2 = channel.writeMessage[ResponseHeader](queryStruct)
-      println("query struct sent,then return code:{}",response2.nReturnValue)
+      info("query struct sent,then return code:{}",response2.nReturnValue)
+      val ret = channel.receive[GADB_RETVAL]()
+      val sid = convertSixByteArrayToLong(ret.nSID)
+      info("query ret value:{},sid:{}",ret.nRetVal,sid)
     }
+    shutdown()
+  }
+  /**
+   * 转换6个字节成long
+   * @param bytes 待转换的六个字节
+   * @return 转换后的long数字
+   */
+  def convertSixByteArrayToLong(bytes: Array[Byte]): Long = {
+    /*
+    val byteBuffer = ByteBuffer.allocate(8).put(Array[Byte](0,0)).put(bytes)
+    byteBuffer.rewind()
+    byteBuffer.getLong
+    */
+    var l = 0L
+    l |= (0xff & bytes(0)) << 16
+    l |= (0xff & bytes(1)) << 8
+    l |= (0xff & bytes(2))
+    l <<= 24
+
+    l |= (0xff & bytes(3)) << 16
+    l |= (0xff & bytes(4)) << 8
+    l |= (0xff & bytes(5))
+
+    l
   }
 }
 class AncientDataEncoder extends OneToOneEncoder with LoggerSupport{
@@ -111,70 +142,40 @@ class AncientDataEncoder extends OneToOneEncoder with LoggerSupport{
 }
 
 //channel pool
-class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
-  private val pool = new ArrayBlockingQueue[ChannelHolder](concurrent)
-  private val count = new AtomicInteger(0)
-
-  @tailrec
-  private def fillPool(): Unit ={
-    val countValue = count.get()
-    //using cas to control concurrent request
-    if(count.get() < concurrent && count.compareAndSet(countValue,countValue+1)) {
-
-      val holder =  new ChannelHolder(new AtomicInteger(0))
-      //val executionHandler = new ExecutionHandler(executor,false,true)
-      AncientClient.bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-        def getPipeline = {
-          val pipeline = Channels.pipeline()
-          pipeline.addLast("ancient-data-encoder", new AncientDataEncoder)
-          pipeline.addLast("handler",holder)
-          pipeline
-        }
-      })
-      val channelFuture = AncientClient.bootstrap.connect(new InetSocketAddress(host, port))
-      if (channelFuture.await(10, TimeUnit.SECONDS)) {
-        if(!pool.offer(holder,10,TimeUnit.SECONDS)){
-          holder.decRef() //关掉当前的channel
-          throw new MonadException("overtime 10s to offer channel",FAIL_TO_FIND_CHANNEL)
-        }
-        channelFuture.getChannel.getCloseFuture.addListener(new ChannelFutureListener {
-          override def operationComplete(future: ChannelFuture): Unit = {
-            holder.decRef()
-          }
-        })
+class AncientClient(host:String,port:Int) extends LoggerSupport{
+  private def connect(): ChannelHolder ={
+    debug("connecting {} {} ...",host,port)
+    val holder =  new ChannelHolder()
+    AncientClient.bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+      def getPipeline = {
+        val pipeline = Channels.pipeline()
+        pipeline.addLast("ancient-data-encoder", new AncientDataEncoder)
+        pipeline.addLast("handler",holder)
+        pipeline
       }
+    })
+    val channelFuture = AncientClient.bootstrap.connect(new InetSocketAddress(host, port))
+    if (!channelFuture.await(10, TimeUnit.SECONDS)) {
+      throw new MonadException("overtime 10s to offer channel",FAIL_TO_FIND_CHANNEL)
     }
-
-    //fill pool until pool is full
-    if(count.get() < concurrent)
-      fillPool()
+    holder
   }
   def executeInChannel[T](action:ChannelOperator=>T): T={
-    fillPool()
-    val channelHolder = pool.poll(5,TimeUnit.SECONDS)
-    if(channelHolder == null){
-      throw new MonadException("overtime 5s to find channel",FAIL_TO_FIND_CHANNEL)
-    }
+    val channelHolder = connect()
     try{
-      channelHolder.incRef()
       action(channelHolder)
     }finally{
-      channelHolder.decRef()
-      if(!pool.offer(channelHolder,10,TimeUnit.SECONDS)){
-        channelHolder.decRef() //closing the channel if not put pool
-      }
+      channelHolder.close()
     }
   }
   //hold the tcp channel
-  class ChannelHolder(ref:AtomicInteger) extends SimpleChannelUpstreamHandler with LoggerSupport with ChannelOperator{
-    var channel: Channel = _
-    var dataReceiver:Promise[AncientData] = _
-    var dataInstance:AncientData  =  _
-    override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
-      channel = ctx.getChannel
-      info("connected!!")
-    }
+  class ChannelHolder() extends SimpleChannelUpstreamHandler with LoggerSupport with ChannelOperator{
+    private var channel:Channel = _
+    private var dataReceiver:Promise[AncientData] = _
+    private var dataInstance:AncientData  =  _
 
+    @volatile
+    private var buffer:ChannelBuffer = _
 
     override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
       dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
@@ -189,7 +190,24 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
     }
 
 
-    override def writeMessage[R <: AncientData](data: Array[Byte], offset: Int, length: Int)(implicit manifest: Manifest[R]): R = {
+    override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
+      dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
+      dataReceiver = Promise[AncientData]()
+      if(buffer ==null || buffer.readableBytes() < dataInstance.getDataSize) {
+        //from message received method
+        Await.result(dataReceiver.future, Duration("10s")).asInstanceOf[R]
+      }else{
+        dataInstance.fromChannelBuffer(buffer)
+        dataInstance.asInstanceOf[R]
+      }
+    }
+
+    override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      this.channel = ctx.getChannel
+      super.channelConnected(ctx, e)
+    }
+
+    override def writeByteArray[R <: AncientData](data: Array[Byte], offset: Int, length: Int)(implicit manifest: Manifest[R]): R = {
       val result = new Array[Byte](length)
       val finalLength = math.min(length,data.length-offset)
       System.arraycopy(data,offset,result,offset,finalLength)
@@ -197,13 +215,24 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
       writeMessage(result)
     }
 
+
+    override def writeByteArray[R <: AncientData](data: Array[Byte])(implicit manifest: Manifest[R]): R = {
+      writeByteArray(data,0,data.length)
+    }
+
     override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
       info("msg:{} received,dataSize:{}",e.getMessage,dataInstance.getDataSize)
       e.getMessage match{
         case buffer:ChannelBuffer =>
-          if(buffer.readableBytes() >= dataInstance.getDataSize){
-            dataInstance.fromChannelBuffer(buffer)
-            dataReceiver.success(dataInstance)
+          if(dataInstance != null) {
+            if (buffer.readableBytes() >= dataInstance.getDataSize) {
+              dataInstance.fromChannelBuffer(buffer)
+              dataReceiver.success(dataInstance)
+              dataInstance = null
+              dataReceiver = null
+            }
+          }else{
+            this.buffer = buffer
           }
         case other=>
           //donothing
@@ -218,26 +247,9 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
     }
 
 
-    def incRef(): Unit = {
-      if (ref.get() != 0)
-        ref.incrementAndGet()
-    }
-
-    @tailrec
-    final def decRef(): Unit = {
-      val refCount = ref.get() - 1
-      if (refCount != 0)
-        if (ref.compareAndSet(refCount, refCount - 1)) {
-          if (refCount - 1 == 0) {
-            //need to  closing channel
-            pool.remove(this)
-            count.decrementAndGet()
-            if (channel!= null && channel.isOpen)
-              channel.close()
-          }
-        } else {
-          decRef()
-        }
+    final def close(): Unit = {
+      if(channel != null)
+        channel.close()
     }
   }
 }
@@ -248,7 +260,26 @@ class AncientClient(host:String,port:Int,concurrent:Int) extends LoggerSupport{
  * use it to write message and receive message
  */
 trait ChannelOperator{
+  /**
+   * write message to channel
+   * @param data data written
+   * @param manifest class reflection
+   * @tparam R return type
+   * @return server return message object
+   */
   def writeMessage[R <: AncientData](data:Any*)(implicit manifest: Manifest[R]): R
-  def writeMessage[R <: AncientData](data:Array[Byte],offset:Int=0,length:Int = -1)(implicit manifest: Manifest[R]): R
+
+  /**
+   * write byte array to channel
+   * @param data data be sent
+   * @param offset byte array offset
+   * @param length data length
+   * @param manifest class reflection
+   * @tparam R return type
+   * @return data from server
+   */
+  def writeByteArray[R <: AncientData](data:Array[Byte],offset:Int,length:Int)(implicit manifest: Manifest[R]): R
+  def writeByteArray[R <: AncientData](data:Array[Byte])(implicit manifest: Manifest[R]): R
+  def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R
 }
 
