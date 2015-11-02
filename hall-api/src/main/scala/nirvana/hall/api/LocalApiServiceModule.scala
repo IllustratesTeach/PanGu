@@ -2,10 +2,7 @@ package nirvana.hall.api
 
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.protobuf.sys._
-import nirvana.hall.api.internal.protobuf.sys.stamp.QueryPersonRequestFilter
-import nirvana.hall.api.internal.stamp.{GatherPortraitServiceImpl, GatherFingerPalmServiceImpl, GatherPersonServiceImpl}
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.stamp.{GatherPortraitService, GatherFingerPalmService, GatherPersonService}
 import org.apache.tapestry5.ioc.annotations.{Contribute, Local, Match}
 import org.apache.tapestry5.ioc.{MethodAdviceReceiver, OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core
@@ -22,6 +19,7 @@ object LocalApiServiceModule {
     binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
     binder.bind(classOf[UserService], classOf[UserServiceImpl])
     binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
+    binder.bind(classOf[DictService], classOf[DictServiceImpl])
     binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])
     binder.bind(classOf[GatherFingerPalmService], classOf[GatherFingerPalmServiceImpl])
     binder.bind(classOf[GatherPortraitService], classOf[GatherPortraitServiceImpl])
@@ -29,6 +27,7 @@ object LocalApiServiceModule {
   @Contribute(classOf[ProtobufRequestHandler])
   def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
     configuration.addInstance("LoginRequestFilter", classOf[LoginRequestFilter])
+    configuration.addInstance("DictListRequestFilter", classOf[DictListRequestFilter])
     configuration.addInstance("QueryPersonRequestFilter", classOf[QueryPersonRequestFilter])
   }
   @Match(Array("*"))

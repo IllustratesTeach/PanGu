@@ -1,0 +1,46 @@
+package sys;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys";
+
+option java_outer_classname = "DictListProto";
+
+//获取字典列表请求
+message DictListRequest {
+  enum DictType{
+    AJLB = 1;//案件类别CODE_AJLB
+    XB = 2;//性别CODE_XB
+    MZ = 3;//民族CODE_MZ
+    GJ = 4;//国籍CODE_GJ
+    ZZMM = 5;//政治面貌CODE_ZZMM
+    WHCD = 6;//文化程度CODE_WHCD
+    ZJXY = 7;//宗教信仰CODE_ZJXY
+    MARRY = 8;//婚姻状况CODE_MARRY
+    TSSF = 9;//特殊身份CODE_TSSF
+    TSRQ = 10;//特殊人群CODE_TSRQ
+    JJLY = 11;//经济来源CODE_JJLY
+    ZC = 12;//专长，特殊技能CODE_ZC
+    XCJB = 13;//协查级别CODE_XCJB
+    AREA = 14;//行政区划SYS_AREA
+
+  }
+  extend BaseRequest {
+    optional DictListRequest cmd = 110;
+  }
+  required DictType dictType = 1;
+  optional string code = 2;
+  optional string name = 3;
+  optional int32 from = 4;
+  optional int32 size = 5;
+}
+//获取字典列表的响应
+message DictListResponse {
+  extend BaseResponse {
+    optional DictListResponse cmd = 110;
+  }
+  message Dict {
+    required string code = 1;
+    required string name = 2;
+  }
+  repeated Dict dict_list = 1;
+}

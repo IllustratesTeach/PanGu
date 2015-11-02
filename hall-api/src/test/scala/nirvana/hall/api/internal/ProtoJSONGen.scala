@@ -19,7 +19,7 @@ object ProtoJSONGen {
       val json=f.getAbsolutePath
         .replaceAll("hall-protocol/src/main/proto","hall-protocol/src/main/resources/proto")
         .replaceAll(".proto$",".json")
-      val p = Runtime.getRuntime.exec(Array[String]("/Users/jcai/HBuilderProjects/ProtoBuf.js-3.8.2/bin/proto2js",
+      val p = Runtime.getRuntime.exec(Array[String]("/Users/songpeng/workspace/program-files/protobuf/ProtoBuf.js-3.8.2/bin/proto2js",
         f.getAbsolutePath,
         "-path=hall-protocol/src/main/proto","-min"))
       if(p.waitFor() != 0){
