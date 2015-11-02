@@ -522,7 +522,7 @@
     <lucene-release-version>4.10.4</lucene-release-version>
     <proguard-release-version>5.1</proguard-release-version>
     <lichen-release-version>0.5.10.2</lichen-release-version>
-    <monad-release-version>5.0.18</monad-release-version>
+    <monad-release-version>5.0.16</monad-release-version>
     <spring-release-version>4.1.6.RELEASE</spring-release-version>
     <rootPath>${basedir}</rootPath>
     <protoc>protoc</protoc>
