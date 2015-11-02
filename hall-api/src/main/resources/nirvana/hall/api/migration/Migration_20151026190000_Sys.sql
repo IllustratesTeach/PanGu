@@ -1,0 +1,6 @@
+-- Loading SYS_USER...
+insert into SYS_USER (pk_id, login_name, password, email, true_name, delete_flag, remark, create_datetime, update_datetime, create_user_id, update_user_id, depart_code, idcard, police_number, gender_code, user_type, phone, depart_start_date, user_status, last_login_date)
+values ('1', 'admin', 'dvrdf11czxfsse4q3dafz1fwr4xax4vf', 'admin@126.com', '管理员', '1', null, null, null, null, null, '370200000000', null, null, null, null, null, null, null, null);
+-- Loading SYS_DEPART...
+insert into SYS_DEPART (code, name, leader, remark, delete_flag, is_leaf, parent_id, dept_level, longitude, latitude, phone, long_name, is_have_chamber, chamber_type, is_special, integration_type)
+values ('370200000000', '青岛市公安局', null, null, '1', '1', null, null, null, null, null, '青岛市公安局', '0', 0, null, '01');
