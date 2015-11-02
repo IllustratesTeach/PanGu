@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.v62.services.SelfMatchTask
+
 /**
  * send match task support
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -7,10 +9,10 @@ package nirvana.hall.v62.internal
  */
 trait SendMatchTaskSupport {
   this:AncientClientSupport =>
-  /*
-  def sendMatchTask: Unit ={
-    val client = createClient("10.1.6.119",6898,1)
-    client.executeInChannel{channel=>
+
+  def sendMatchTask(task:SelfMatchTask): Seq[Long] ={
+    createAncientClient.executeInChannel{channel=>
+      val key = task.cardId.getBytes
       val header = new RequestHeader
       header.szUserName="afisadmin"
       header.nOpClass = 105
@@ -19,26 +21,26 @@ trait SendMatchTaskSupport {
       header.nTableID = 2
 
       header.bnData1=1
-      header.bnData2 = 48
-      header.bnData3 = 10
+      header.bnData2 = key.length.asInstanceOf[Short]
+      header.bnData3 = task.options.positions.length.asInstanceOf[Byte]
 
       val response = channel.writeMessage[ResponseHeader](header)
       println("header sent,then return code:{}",response.nReturnValue)
 
-      channel.writeByteArray[NoneResponse]("3702022014000002".getBytes(),0,header.bnData2)
+      channel.writeByteArray[NoneResponse](key)
 
-      val pos = 0 until 10 map(x=>(x+1).asInstanceOf[Byte])
+      val pos = task.options.positions.map(_.asInstanceOf[Byte])
       channel.writeByteArray[NoneResponse](pos.toArray)
 
       val queryStruct = new QueryStruct
       //fill simple data
-      queryStruct.stSimpQry.nQueryType = AncientConstants.TTQUERY.asInstanceOf[Byte]
+      queryStruct.stSimpQry.nQueryType = task.options.matchType.ordinal().asInstanceOf[Byte]
       queryStruct.stSimpQry.nPriority = 1
       queryStruct.stSimpQry.nFlag = 1
-      queryStruct.stSimpQry.stSrcDB.nDBID = 1
-      queryStruct.stSimpQry.stSrcDB.nTableID= 2
-      queryStruct.stSimpQry.stDestDB.apply(0).nDBID = 1
-      queryStruct.stSimpQry.stDestDB.apply(0).nTableID= 2
+      queryStruct.stSimpQry.stSrcDB.nDBID = task.options.srcDb.dbId.asInstanceOf[Short]
+      queryStruct.stSimpQry.stSrcDB.nTableID= task.options.srcDb.tableId.asInstanceOf[Short]
+      queryStruct.stSimpQry.stDestDB.apply(0).nDBID = task.options.destDb.dbId.asInstanceOf[Short]
+      queryStruct.stSimpQry.stDestDB.apply(0).nTableID= task.options.destDb.dbId.asInstanceOf[Short]
       queryStruct.stSimpQry.tSubmitTime.tDate.tYear = 115
       queryStruct.stSimpQry.tSubmitTime.tDate.tMonth = 9
       queryStruct.stSimpQry.tSubmitTime.tDate.tDay = 30
@@ -51,6 +53,7 @@ trait SendMatchTaskSupport {
       val response2 = channel.writeMessage[ResponseHeader](queryStruct)
       println("query struct sent,then return code:{}",response2.nReturnValue)
     }
+
+    Seq[Long]()
   }
-  */
 }

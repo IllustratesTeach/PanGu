@@ -10,5 +10,5 @@ trait AncientClientSupport {
    * obtain AncientClient instance
    * @return AncientClient instance
    */
-  def getAncientClient:AncientClient
+  def createAncientClient:AncientClient
 }
