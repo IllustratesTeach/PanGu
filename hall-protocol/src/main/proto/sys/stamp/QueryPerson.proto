@@ -1,0 +1,28 @@
+package sys.stamp;
+import "sys/Common.proto";
+import "sys/stamp/Person.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "QueryPersonProto";
+
+
+message QueryPersonRequest {
+    extend BaseRequest {
+        optional QueryPersonRequest cmd = 102;
+    }
+    optional string name = 1;
+    optional string idcard = 2;
+    optional string gatherDateST = 3;
+    optional string gatherDateEN = 4;
+    required int32 start = 5;
+    required int32 limit = 6;
+}
+
+message QueryPersonResponse {
+    extend BaseResponse {
+        optional QueryPersonResponse cmd = 102;
+    }
+    repeated PersonInfo personInfo = 1;
+    
+}

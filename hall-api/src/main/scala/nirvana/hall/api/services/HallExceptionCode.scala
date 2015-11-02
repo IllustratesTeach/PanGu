@@ -10,4 +10,5 @@ import monad.support.services.ErrorCode
 object HallExceptionCode {
   object INVALID_USER extends ErrorCode(9001)
   object NOT_LOGIN extends ErrorCode(9002)
+  object FAIL_TO_FIND_CHANNEL extends ErrorCode(9003)
 }
