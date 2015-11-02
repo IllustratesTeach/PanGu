@@ -61,6 +61,16 @@ class QueryStruct extends AncientData{
   @Length(32)
   var	szRmtQryKey:Array[Byte] = _	// used by remote server to add heterogeneous systems
 }
+
+/**
+ * value returned from server
+ */
+class GADB_RETVAL extends AncientData {
+  @Length(6)
+  var nSID:Array[Byte] = _
+  var nRetVal:Byte = _	// -1 error, 1 success.
+  var nFlag:Byte = _;		// GADB_RETVALFLAG_XXX
+}
 class GAQUERYSIMPSTRUCT extends AncientData {
   var	cbSize = 0;
   @Length(32)
