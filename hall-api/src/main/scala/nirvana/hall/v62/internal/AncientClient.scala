@@ -60,7 +60,7 @@ object AncientClient extends LoggerSupport{
       val header = new RequestHeader
       header.szUserName="afisadmin"
       header.nOpClass = 105
-      header.nOpCode= 476
+      header.nOpCode= 455
       header.nDBID = 20
       header.nTableID = 2
 
@@ -178,28 +178,39 @@ class AncientClient(host:String,port:Int) extends LoggerSupport{
     private var buffer:ChannelBuffer = _
 
     override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
-      dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      if(dataInstance.isInstanceOf[NoneResponse]) {
+      val tmp = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
+      if(tmp.isInstanceOf[NoneResponse]) {
         data.foreach(channel.write)
-        dataInstance.asInstanceOf[R]
+        tmp.asInstanceOf[R]
       }else{
         dataReceiver = Promise[AncientData]()
+        dataInstance = tmp
         data.foreach(channel.write)
-        Await.result(dataReceiver.future,Duration("10s")).asInstanceOf[R]
+        Await.result(dataReceiver.future,Duration("30s")).asInstanceOf[R]
       }
     }
 
 
     override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
       dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
+      internalReceive(dataInstance)
+    }
+    private def internalReceive[R <: AncientData](dataInstance:AncientData): R ={
       dataReceiver = Promise[AncientData]()
-      if(buffer ==null || buffer.readableBytes() < dataInstance.getDataSize) {
+      if(buffer == null || buffer.readableBytes() < dataInstance.getDataSize) {
         //from message received method
-        Await.result(dataReceiver.future, Duration("10s")).asInstanceOf[R]
+        Await.result(dataReceiver.future, Duration("30s")).asInstanceOf[R]
       }else{
         dataInstance.fromChannelBuffer(buffer)
         dataInstance.asInstanceOf[R]
       }
+
+    }
+    override def receiveByteArray(len: Int): Array[Byte] = {
+      val value = new Array[Byte](len)
+      val dataInstance = new DynamicByteArray(value)
+      internalReceive(dataInstance)
+      value
     }
 
     override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
@@ -221,7 +232,7 @@ class AncientClient(host:String,port:Int) extends LoggerSupport{
     }
 
     override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
-      info("msg:{} received,dataSize:{}",e.getMessage,dataInstance.getDataSize)
+      debug("msg:{} received",e.getMessage)
       e.getMessage match{
         case buffer:ChannelBuffer =>
           if(dataInstance != null) {
@@ -281,5 +292,6 @@ trait ChannelOperator{
   def writeByteArray[R <: AncientData](data:Array[Byte],offset:Int,length:Int)(implicit manifest: Manifest[R]): R
   def writeByteArray[R <: AncientData](data:Array[Byte])(implicit manifest: Manifest[R]): R
   def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R
+  def receiveByteArray(len:Int): Array[Byte]
 }
 

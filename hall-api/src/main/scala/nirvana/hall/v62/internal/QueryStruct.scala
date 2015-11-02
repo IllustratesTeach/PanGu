@@ -337,3 +337,4 @@ class tagGAFIS_QUERYINFO extends AncientData {
   @Length(56)
   var bnRes2:Array[Byte] = _ 	// reserved.
 } // 256 bytes long.
+

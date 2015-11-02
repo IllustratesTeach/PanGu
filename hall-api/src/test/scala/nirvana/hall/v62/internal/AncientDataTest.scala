@@ -11,6 +11,7 @@ import org.junit.{Assert, Test}
  * @since 2015-10-29
  */
 class AncientDataTest {
+
   @Test
   def test_ancient: Unit ={
     val header = new RequestHeader
