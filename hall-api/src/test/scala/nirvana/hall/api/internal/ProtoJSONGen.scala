@@ -17,11 +17,13 @@ object ProtoJSONGen {
     val files = FileUtils.listFiles(new File("hall-protocol/src/main/proto"),Array[String]("proto"),true)
     files.foreach{f=>
       val json=f.getAbsolutePath
-        .replaceAll("hall-protocol/src/main/proto","hall-protocol/src/main/resources/proto")
+        .replaceAll("hall-protocol\\\\src\\\\main\\\\proto","\\hall-protocol\\\\src\\\\main\\\\resources\\\\proto")
         .replaceAll(".proto$",".json")
-      val p = Runtime.getRuntime.exec(Array[String]("/Users/jcai/HBuilderProjects/ProtoBuf.js-3.8.2/bin/proto2js",
+      val p = Runtime.getRuntime.exec(Array[String]("node",
+        "E:\\wj-nirvana-hall\\ProtoBuf.js-3.8.2\\ProtoBuf.js-3.8.2\\bin\\proto2js",
         f.getAbsolutePath,
-        "-path=hall-protocol/src/main/proto","-min"))
+        "-path=hall-protocol/src/main/proto",
+        "-min"))
       if(p.waitFor() != 0){
         val es = p.getErrorStream
         println(IOUtils.readLines(es).mkString(","))
