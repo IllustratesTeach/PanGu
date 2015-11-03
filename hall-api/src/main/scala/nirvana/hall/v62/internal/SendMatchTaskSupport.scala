@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.SelfMatchTask
+import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 
@@ -56,7 +57,7 @@ trait SendMatchTaskSupport {
         val gafisError = channel.receive[GafisError]()
         throw new IllegalAccessException("fail to send query struct,num:%s".format(gafisError.nAFISErrno))
       }else{
-        response = channel.receive[ResponseHeader]()
+        //response = channel.receive[ResponseHeader]()
 
         response.nReturnValue = 1
         channel.writeMessage[NoneResponse](response)
@@ -64,7 +65,9 @@ trait SendMatchTaskSupport {
         val matchResult = channel.receive[QueryStruct]()
         val count = matchResult.nMICCount
         debug("match result is {}",count)
+
         val headers = 0 until count map(i=>channel.receive[tagGAFISMICSTRUCT]())
+
         headers.foreach{header=>
           if(header.nMntLen > 0){
             channel.receiveByteArray(header.nMntLen)
@@ -72,6 +75,41 @@ trait SendMatchTaskSupport {
             warn("mnt len is zero")
           }
         }
+
+        //receive server list
+        if(matchResult.nSvrListLen > 0 )
+          channel.receiveByteArray(matchResult.nSvrListLen)
+        var candHead:tagGAQUERYCANDHEADSTRUCT = null
+        if(matchResult.nCandHeadLen >0) {
+          val bytes = channel.receiveByteArray(matchResult.nCandHeadLen) //
+          candHead = new tagGAQUERYCANDHEADSTRUCT
+          candHead.fromChannelBuffer(ChannelBuffers.wrappedBuffer(bytes))
+        }
+        if(matchResult.nCandLen > 0) {
+          val bytes = channel.receiveByteArray(matchResult.nCandLen)
+          val buffer = ChannelBuffers.wrappedBuffer(bytes)
+          val num = candHead.nCandidateNum
+          val result = 0 until num map{i=>
+            val cand = new tagGAQUERYCANDSTRUCT
+            cand.fromChannelBuffer(buffer)
+            debug("sid:{} score:",convertSixByteArrayToLong(cand.nSID),cand.nScore)
+            cand
+          }
+        }
+
+        if(matchResult.nQryCondLen>0)
+          channel.receiveByteArray(matchResult.nQryCondLen)
+        if(matchResult.nMISCondLen>0)
+          channel.receiveByteArray(matchResult.nMISCondLen)
+        if(matchResult.nTextSqlLen>0)
+          channel.receiveByteArray(matchResult.nTextSqlLen)
+        if(matchResult.nCommentLen> 0)
+          channel.receiveByteArray(matchResult.nCommentLen)
+        if(matchResult.nQryInfoLen> 0)
+          channel.receiveByteArray(matchResult.nQryInfoLen)
+
+
+
       }
     }
   }

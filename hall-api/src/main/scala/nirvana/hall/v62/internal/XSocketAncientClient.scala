@@ -3,9 +3,9 @@ package nirvana.hall.v62.internal
 import java.net.InetAddress
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.services.{ChannelOperator, AncientClient, AncientData}
+import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
 import org.jboss.netty.buffer.ChannelBuffers
-import org.xsocket.connection.{IBlockingConnection, BlockingConnection}
+import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
 
 /**
  * ancient client based on xsocket
@@ -15,7 +15,7 @@ import org.xsocket.connection.{IBlockingConnection, BlockingConnection}
 class XSocketAncientClient(host:String,port:Int) extends AncientClient with LoggerSupport{
   def executeInChannel[T](action:ChannelOperator=>T): T={
     val connection = new BlockingConnection(InetAddress.getByName(host),port,10*1000)
-    connection.setReadTimeoutMillis(5 * 1000)
+    connection.setReadTimeoutMillis(30 * 1000)
     val channelHolder = new XSocketChannelOperator(connection)
     try{
       action(channelHolder)
@@ -34,8 +34,11 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
     override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
       data.foreach{
         case el:AncientData =>
-          val buffer = ChannelBuffers.buffer(el.getDataSize).array()
-          connection.write(buffer,0,buffer.length)
+          val buffer = ChannelBuffers.buffer(el.getDataSize)
+          el.writeToChannelBuffer(buffer)
+          val bytes = buffer.array()
+          val count = connection.write(bytes,0,bytes.length)
+          println("message sent {}",count)
         case el:Array[Byte] =>
           connection.write(el,0,el.length)
         case other=>
