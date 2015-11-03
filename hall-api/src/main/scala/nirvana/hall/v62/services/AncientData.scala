@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal
+package nirvana.hall.v62.services
 
 import nirvana.hall.v62.annotations.Length
 import org.jboss.netty.buffer.ChannelBuffer

@@ -1,7 +1,8 @@
-package nirvana.hall.v62.internal
+package nirvana.hall.v62.services
 
 import java.util.concurrent.atomic.AtomicReferenceArray
 
+import nirvana.hall.v62.internal.RequestHeader
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 

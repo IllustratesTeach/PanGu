@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.v62.services.AncientClient
+
 /**
  * provide AncientClient instance
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>

@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.v62.annotations.Length
+import nirvana.hall.v62.services.AncientData
 
 /**
  * 640 byte

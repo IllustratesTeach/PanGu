@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.AncientEnum.MatchType
-import nirvana.hall.v62.services.{MatchOptions, DatabaseTable, SelfMatchTask}
+import nirvana.hall.v62.services.{AncientClient, MatchOptions, DatabaseTable, SelfMatchTask}
 import org.junit.{Assert, Test}
 
 /**
@@ -21,7 +21,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
        * @return AncientClient instance
        */
       override def createAncientClient: AncientClient = {
-        new AncientClient("10.1.6.119",6898)
+        AncientClient.connect("10.1.6.119",6898)
       }
     }
 
@@ -45,7 +45,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
        * @return AncientClient instance
        */
       override def createAncientClient: AncientClient = {
-        new AncientClient("10.1.6.119",6898)
+        AncientClient.connect("10.1.6.119",6898)
       }
     }
 
