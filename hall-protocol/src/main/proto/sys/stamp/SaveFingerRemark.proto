@@ -1,0 +1,22 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "SaveFingerRemarkProto";
+
+//指纹备注图片上传请求
+message SaveFingerRemarkRequest {
+    extend BaseRequest {
+        optional SaveFingerRemarkRequest cmd = 309;
+    }
+    required string personInfo = 1;
+}
+
+message SaveFingerRemarkResponse {
+    extend BaseResponse {
+        optional SaveFingerRemarkResponse cmd = 309;
+    }
+    optional string saveStatus = 1;
+
+}

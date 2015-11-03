@@ -6,22 +6,35 @@ option java_package = "nirvana.hall.protocol.sys.stamp";
 
 option java_outer_classname = "QueryPersonSeniorProto";
 
-
+//捺印高级查询
 message QueryPersonSeniorRequest {
     extend BaseRequest {
-        optional QueryPersonSeniorRequest cmd = 102;
+        optional QueryPersonSeniorRequest cmd = 202;
     }
-    optional string name = 1;
-    optional string idcard = 2;
-    optional string gatherDateST = 3;
-    optional string gatherDateEN = 4;
-    required int32 start = 5;
-    required int32 limit = 6;
+    required int32 start = 1;
+    required int32 limit = 2;
+    optional string gatherdepartcode = 3;
+    optional string inputpsn = 4;
+    optional string gatherCategory = 5;
+    optional string gatherTypeId = 6;
+    optional string personCategory = 7;
+    optional string name = 8;
+    optional string sexCode = 9;
+    optional string idcardno = 10;
+    optional string door = 11;
+    optional string address = 12;
+    optional string caseClasses = 13;
+    optional string birthdayst = 14;
+    optional string birthdayed = 15;
+    optional string gatherDatest = 16;
+    optional string gatherDateed = 17;
+    optional string inputtimest = 18;
+    optional string inputtimeed = 19;
 }
 
 message QueryPersonSeniorResponse {
     extend BaseResponse {
-        optional QueryPersonSeniorResponse cmd = 102;
+        optional QueryPersonSeniorResponse cmd = 202;
     }
     repeated PersonInfo personInfo = 1;
 

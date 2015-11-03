@@ -1,0 +1,22 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "SavePersonProto";
+
+//人员保存请求
+message SavePersonRequest {
+    extend BaseRequest {
+        optional SavePersonRequest cmd = 306;
+    }
+    required string personInfo = 1;
+}
+
+message SavePersonResponse {
+    extend BaseResponse {
+        optional SavePersonResponse cmd = 306;
+    }
+    optional string next = 1;
+
+}

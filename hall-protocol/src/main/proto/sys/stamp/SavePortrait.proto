@@ -1,0 +1,24 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "SavePortraitProto";
+
+//人像保存请求
+message SavePortraitRequest {
+    extend BaseRequest {
+        optional SavePortraitRequest cmd = 307;
+    }
+    required string personId = 1;
+    required string fgp = 2;
+    required string gatherData = 3;
+}
+
+message SavePortraitResponse {
+    extend BaseResponse {
+        optional SavePortraitResponse cmd = 307;
+    }
+    optional string next = 1;
+
+}

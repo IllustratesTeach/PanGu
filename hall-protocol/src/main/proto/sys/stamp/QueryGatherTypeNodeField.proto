@@ -1,0 +1,23 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "GatherTypeNodeFieldProto";
+
+//通过人员类型获取采集项
+message QueryGatherTypeNodeFieldRequest {
+    extend BaseRequest {
+        optional QueryGatherTypeNodeFieldRequest cmd = 303;
+    }
+    required string category = 1;
+}
+
+//返回采集项(格式item1:required-item2:optinal...)
+message QueryGatherTypeNodeFieldResponse {
+    extend BaseResponse {
+        optional QueryGatherTypeNodeFieldResponse cmd = 303;
+    }
+    required string fields = 1;
+
+}

@@ -1,0 +1,22 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "UpdateGatherFlowProto";
+
+//采集流程修改请求
+message UpdateGatherFlowRequest {
+    extend BaseRequest {
+        optional UpdateGatherFlowRequest cmd = 310;
+    }
+    required string personInfo = 1;
+}
+
+message UpdateGatherFlowResponse {
+    extend BaseResponse {
+        optional UpdateGatherFlowResponse cmd = 310;
+    }
+    optional string saveStatus = 1;
+
+}

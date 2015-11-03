@@ -35,8 +35,11 @@ message PersonInfo {
     optional string employaddress = 27;         //工作单位祥址
     optional string gatherCategory = 28;        //采集类别
     optional string personCategory = 29;        //人员类型
-    optional string gatherdepartcode = 30;      //人员类型
-    optional string gatheruserid = 31;          //人员类型
-    optional string remark = 32;                //备注
+    optional string caseName = 30;              //案件名称
+    optional string caseClasses = 31;           //案件类别
+    optional string reason = 32;                //案由
+    optional string gatherdepartcode = 33;      //采集人部门
+    optional string gatheruserid = 34;          //采集人id
+    optional string remark = 35;                //备注
 }
 

@@ -1,0 +1,24 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "QueryFingerRemarkProto";
+
+//指纹备注图片查询请求
+message QueryFingerRemarkRequest {
+    extend BaseRequest {
+        optional QueryFingerRemarkRequest cmd = 305;
+    }
+    required string personId = 1;//捺印编号
+}
+
+//返回采集流程
+message QueryFingerRemarkResponse {
+    extend BaseResponse {
+        optional QueryFingerRemarkResponse cmd = 305;
+    }
+    optional string img = 1;         //图片
+    optional string fingerRemark = 2;//图片备注
+
+}

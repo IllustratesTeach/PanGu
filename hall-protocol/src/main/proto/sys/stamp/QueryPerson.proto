@@ -6,10 +6,10 @@ option java_package = "nirvana.hall.protocol.sys.stamp";
 
 option java_outer_classname = "QueryPersonProto";
 
-
+//人员查询
 message QueryPersonRequest {
     extend BaseRequest {
-        optional QueryPersonRequest cmd = 102;
+        optional QueryPersonRequest cmd = 201;
     }
     optional string name = 1;
     optional string idcard = 2;
@@ -21,7 +21,7 @@ message QueryPersonRequest {
 
 message QueryPersonResponse {
     extend BaseResponse {
-        optional QueryPersonResponse cmd = 102;
+        optional QueryPersonResponse cmd = 201;
     }
     repeated PersonInfo personInfo = 1;
     
