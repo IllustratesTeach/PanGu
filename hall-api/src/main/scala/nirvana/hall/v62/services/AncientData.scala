@@ -1,6 +1,6 @@
 package nirvana.hall.v62.services
 
-import nirvana.hall.v62.annotations.Length
+import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
@@ -24,7 +24,7 @@ class AncientData {
       val STRING_CLASS = classOf[String]
       val BYTE_ARRAY_CLASS = classOf[Array[Byte]]
       val ANCIENT_CLASS = classOf[AncientData]
-      getClass.getDeclaredFields.foreach { f =>
+      getClass.getDeclaredFields.filterNot(_.isAnnotationPresent(classOf[IgnoreTransfer])).foreach { f =>
         val annotation = f.getAnnotation(classOf[Length])
         var dataLength = 0
         if (annotation != null) {
@@ -68,7 +68,7 @@ class AncientData {
    * @param channelBuffer netty channel buffer
    */
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
-    getClass.getDeclaredFields.foreach{f=>
+    getClass.getDeclaredFields.filterNot(_.isAnnotationPresent(classOf[IgnoreTransfer])).foreach { f =>
       val annotation = f.getAnnotation(classOf[Length])
       val fieldValue = getClass.getMethod(f.getName).invoke(this)
       var dataLength = 0
@@ -164,7 +164,7 @@ class AncientData {
    * @param channelBuffer netty channel buffer
    */
   def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type ={
-    getClass.getDeclaredFields.foreach{f=>
+    getClass.getDeclaredFields.filterNot(_.isAnnotationPresent(classOf[IgnoreTransfer])).foreach { f =>
       val annotation = f.getAnnotation(classOf[Length])
       var dataLength = 0
       if(annotation != null){

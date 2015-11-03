@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.v62.services.AncientClient
+import nirvana.hall.v62.services.{ChannelOperator, AncientClient}
 
 /**
  * provide AncientClient instance
@@ -13,4 +13,10 @@ trait AncientClientSupport {
    * @return AncientClient instance
    */
   def createAncientClient:AncientClient
+  def validateResponse(response: ResponseHeader,channel:ChannelOperator): Unit ={
+    if(response.nReturnValue == -1) {
+      val gafisError = channel.receive[GafisError]()
+      throw new IllegalAccessException("fail to send data,num:%s".format(gafisError.nAFISErrno));
+    }
+  }
 }

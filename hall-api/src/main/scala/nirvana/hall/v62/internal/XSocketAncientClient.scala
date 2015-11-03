@@ -73,8 +73,13 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
 
     override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
       val dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      val buffer = receiveByteArray(dataInstance.getDataSize)
-      dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
+      dataInstance match{
+        case x:NoneResponse =>
+          x.asInstanceOf[R]
+        case other=>
+          val buffer = receiveByteArray(dataInstance.getDataSize)
+          dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
+      }
     }
   }
 }

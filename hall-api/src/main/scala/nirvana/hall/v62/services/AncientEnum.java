@@ -12,4 +12,7 @@ public interface AncientEnum {
     enum MatchType{
         TT,TL,LT,LL
     }
+    enum DataType {
+        FINGER_TEMPLATE,FINGER_LATENT
+    }
 }

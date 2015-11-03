@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.v62.annotations.Length
+import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.services.AncientData
 
 /**
@@ -251,6 +251,17 @@ class tagGAFISMICSTRUCT extends AncientData {
   var pstImg:Long = _
   var pstCpr:Long = _
   var pstBin:Long = _
+
+  //上面为拼凑数据，下方为真实数据
+
+  @IgnoreTransfer
+  var pstMntData:Array[Byte] = _
+  @IgnoreTransfer
+  var pstImgData:Array[Byte]= _
+  @IgnoreTransfer
+  var pstCprData:Array[Byte]= _
+  @IgnoreTransfer
+  var pstBinData:Array[Byte]= _
   /*GAFISIMAGESTRUCT *	pstMnt;			// pointer to mnt, pstMnt->bnData is the actual minutia
   #if	POINTER_SIZE==4
   UCHAR	bnRes_pstMnt[4];
