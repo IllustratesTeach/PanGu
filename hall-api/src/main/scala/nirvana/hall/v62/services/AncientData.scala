@@ -67,7 +67,7 @@ class AncientData {
    * serialize to channel buffer
    * @param channelBuffer netty channel buffer
    */
-  def writeToChannelBuffer(channelBuffer:ChannelBuffer): Unit = {
+  def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
     getClass.getDeclaredFields.foreach{f=>
       val annotation = f.getAnnotation(classOf[Length])
       val fieldValue = getClass.getMethod(f.getName).invoke(this)
@@ -155,13 +155,15 @@ class AncientData {
           }
       }
     }
+
+    channelBuffer
   }
 
   /**
    * convert channel buffer data as object
    * @param channelBuffer netty channel buffer
    */
-  def fromChannelBuffer(channelBuffer: ChannelBuffer): Unit ={
+  def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type ={
     getClass.getDeclaredFields.foreach{f=>
       val annotation = f.getAnnotation(classOf[Length])
       var dataLength = 0
@@ -223,6 +225,8 @@ class AncientData {
           }
       }
     }
+
+    this
   }
 }
 
@@ -231,10 +235,11 @@ class DynamicByteArray(val data:Array[Byte]) extends AncientData{
    * convert channel buffer data as object
    * @param channelBuffer netty channel buffer
    */
-  override def fromChannelBuffer(channelBuffer: ChannelBuffer): Unit = {
+  override def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type = {
     if(channelBuffer.readableBytes() >= data.length){
       channelBuffer.readBytes(data)
     }
+    this
   }
 
   /**
@@ -246,7 +251,8 @@ class DynamicByteArray(val data:Array[Byte]) extends AncientData{
    * serialize to channel buffer
    * @param channelBuffer netty channel buffer
    */
-  override def writeToChannelBuffer(channelBuffer: ChannelBuffer): Unit = {
+  override def writeToChannelBuffer(channelBuffer: ChannelBuffer): ChannelBuffer = {
     channelBuffer.writeBytes(data)
+    channelBuffer
   }
 }

@@ -14,18 +14,8 @@ class SendMatchTaskSupportTest extends LoggerSupport{
 
   @Test
   def test_query_match_result: Unit ={
-
-    val sender = new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
-      /**
-       * obtain AncientClient instance
-       * @return AncientClient instance
-       */
-      override def createAncientClient: AncientClient = {
-        AncientClient.connect("10.1.6.119",6898)
-      }
-    }
-
-    sender.queryMatchResult(32)
+    val sender = createSender()
+    sender.queryMatchResult(7)
   }
   @Test
   def test_send: Unit ={
@@ -39,18 +29,22 @@ class SendMatchTaskSupportTest extends LoggerSupport{
 
     val task = SelfMatchTask("3702022014000002",options)
 
-    val sender = new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
+    val sender = createSender()
+
+
+    val sid = sender.sendMatchTask(task)
+    debug("sid :{}",sid)
+    Assert.assertTrue(sid.head > 0)
+  }
+  private def createSender():SendMatchTaskSupport={
+    new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
       /**
        * obtain AncientClient instance
        * @return AncientClient instance
        */
       override def createAncientClient: AncientClient = {
-        AncientClient.connect("10.1.6.119",6898)
+        AncientAppClient.connect("10.1.6.182",6798)
       }
     }
-
-    val sid = sender.sendMatchTask(task)
-    debug("sid :{}",sid)
-    Assert.assertTrue(sid.head > 0)
   }
 }

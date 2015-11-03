@@ -24,5 +24,11 @@ class QueryStructTest {
     queryStruct2.fromChannelBuffer(buffer)
     Assert.assertEquals(2,queryStruct2.stKeyRange.size)
     Assert.assertEquals(range1.szStartKey,queryStruct2.stKeyRange(0).szStartKey)
+
+
+    val candHead = new tagGAQUERYCANDHEADSTRUCT
+    Assert.assertEquals(128,candHead.getDataSize)
+    val cand = new tagGAQUERYCANDSTRUCT
+    Assert.assertEquals(96,cand.getDataSize)
   }
 }

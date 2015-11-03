@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
-import org.jboss.netty.buffer.ChannelBuffers
+import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
 
 /**
@@ -35,20 +35,22 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
       data.foreach{
         case el:AncientData =>
           val buffer = ChannelBuffers.buffer(el.getDataSize)
-          el.writeToChannelBuffer(buffer)
-          val bytes = buffer.array()
+          val bytes = el.writeToChannelBuffer(buffer).array()
           val count = connection.write(bytes,0,bytes.length)
-          println("message sent {}",count)
+          if(count != bytes.length){
+            throw new IllegalAccessException("fail to write byte array")
+          }
         case el:Array[Byte] =>
           connection.write(el,0,el.length)
         case other=>
-          throw new IllegalArgumentException("unspported data "+other)
+          throw new IllegalArgumentException("data unsupported "+other)
       }
       receive[R]()
     }
 
-    override def receiveByteArray(len: Int): Array[Byte] = {
-      connection.readBytesByLength(len)
+    override def receiveByteArray(len: Int): ChannelBuffer = {
+      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
+      //ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
     /**
@@ -71,10 +73,8 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
 
     override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
       val dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      val bytes = receiveByteArray(dataInstance.getDataSize)
-      dataInstance.fromChannelBuffer(ChannelBuffers.wrappedBuffer(bytes))
-
-      dataInstance.asInstanceOf[R]
+      val buffer = receiveByteArray(dataInstance.getDataSize)
+      dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
     }
   }
 }

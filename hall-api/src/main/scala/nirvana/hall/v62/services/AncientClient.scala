@@ -1,5 +1,7 @@
 package nirvana.hall.v62.services
 
+import org.jboss.netty.buffer.ChannelBuffer
+
 /**
  * ancient client.
  * direct call v6.2 application server.
@@ -35,6 +37,6 @@ trait ChannelOperator{
   def writeByteArray[R <: AncientData](data:Array[Byte],offset:Int,length:Int)(implicit manifest: Manifest[R]): R
   def writeByteArray[R <: AncientData](data:Array[Byte])(implicit manifest: Manifest[R]): R
   def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R
-  def receiveByteArray(len:Int): Array[Byte]
+  def receiveByteArray(len:Int): ChannelBuffer
 }
 

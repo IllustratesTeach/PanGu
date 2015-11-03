@@ -8,7 +8,7 @@ import monad.support.services.{MonadException, LoggerSupport}
 import nirvana.hall.api.services.HallExceptionCode.FAIL_TO_FIND_CHANNEL
 import nirvana.hall.v62.services.{ChannelOperator, DynamicByteArray, AncientData}
 import org.jboss.netty.bootstrap.ClientBootstrap
-import org.jboss.netty.buffer.ChannelBuffer
+import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
 import org.jboss.netty.channel._
 import org.jboss.netty.channel.socket.nio.{NioWorkerPool, NioClientSocketChannelFactory}
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder
@@ -133,11 +133,12 @@ class NettyAncientClient(host:String,port:Int) extends LoggerSupport{
       }
 
     }
-    override def receiveByteArray(len: Int): Array[Byte] = {
+    override def receiveByteArray(len: Int): ChannelBuffer = {
       val value = new Array[Byte](len)
       val dataInstance = new DynamicByteArray(value)
       internalReceive(dataInstance)
-      value
+
+      ChannelBuffers.wrappedBuffer(value)
     }
 
     override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {

@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.SelfMatchTask
-import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 
@@ -51,8 +50,8 @@ trait SendMatchTaskSupport {
       queryStruct.nItemFlagA = 64
 
 
-      var response = channel.writeMessage[ResponseHeader](queryStruct)
-      debug("query struct sent,then return code:{},ndatalen",response.nReturnValue,response.nDataLen)
+      val response = channel.writeMessage[ResponseHeader](queryStruct)
+      debug("query struct sent,then return code:{},ndatalen:{}",response.nReturnValue,response.nDataLen)
       if(response.nReturnValue == -1){
         val gafisError = channel.receive[GafisError]()
         throw new IllegalAccessException("fail to send query struct,num:%s".format(gafisError.nAFISErrno))
@@ -69,11 +68,14 @@ trait SendMatchTaskSupport {
         val headers = 0 until count map(i=>channel.receive[tagGAFISMICSTRUCT]())
 
         headers.foreach{header=>
-          if(header.nMntLen > 0){
+          if(header.nMntLen > 0)
             channel.receiveByteArray(header.nMntLen)
-          }else{
-            warn("mnt len is zero")
-          }
+          if(header.nImgLen > 0)
+            channel.receiveByteArray(header.nImgLen)
+          if(header.nCprLen > 0)
+            channel.receiveByteArray(header.nCprLen)
+          if(header.nBinLen > 0)
+            channel.receiveByteArray(header.nBinLen)
         }
 
         //receive server list
@@ -81,18 +83,20 @@ trait SendMatchTaskSupport {
           channel.receiveByteArray(matchResult.nSvrListLen)
         var candHead:tagGAQUERYCANDHEADSTRUCT = null
         if(matchResult.nCandHeadLen >0) {
-          val bytes = channel.receiveByteArray(matchResult.nCandHeadLen) //
+          val buffer = channel.receiveByteArray(matchResult.nCandHeadLen) //
+          val bytes = buffer.toByteBuffer().array()
+
           candHead = new tagGAQUERYCANDHEADSTRUCT
-          candHead.fromChannelBuffer(ChannelBuffers.wrappedBuffer(bytes))
+          candHead.fromChannelBuffer(buffer)
         }
         if(matchResult.nCandLen > 0) {
-          val bytes = channel.receiveByteArray(matchResult.nCandLen)
-          val buffer = ChannelBuffers.wrappedBuffer(bytes)
-          val num = candHead.nCandidateNum
+          val buffer = channel.receiveByteArray(matchResult.nCandLen)
+          val num = candHead.nCandidateNum & 0x0000ffff
+          debug("cand num:{}",num)
           val result = 0 until num map{i=>
             val cand = new tagGAQUERYCANDSTRUCT
             cand.fromChannelBuffer(buffer)
-            debug("sid:{} score:",convertSixByteArrayToLong(cand.nSID),cand.nScore)
+            debug("sid:{} pos:{} score:{}",convertSixByteArrayToLong(cand.nSID),cand.nIndex,cand.nScore)
             cand
           }
         }
@@ -107,14 +111,13 @@ trait SendMatchTaskSupport {
           channel.receiveByteArray(matchResult.nCommentLen)
         if(matchResult.nQryInfoLen> 0)
           channel.receiveByteArray(matchResult.nQryInfoLen)
-
-
-
       }
     }
   }
   def sendMatchTask(task:SelfMatchTask): Seq[Long] ={
     createAncientClient.executeInChannel{channel=>
+
+      //1 --> send common request header
       val buffer = mutable.Buffer[Byte]()
       buffer.appendAll(task.cardId.getBytes)
       buffer.append(0)
