@@ -1,0 +1,24 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+option java_outer_classname = "OperationInfoProto";
+
+message OperationInfoRequest{
+    extend BaseRequest{
+        optional OperationInfoRequest cmd = 209;
+    }
+    optional string personid = 1;
+}
+
+
+message OperationInfoResponse{
+    extend BaseResponse{
+        optional OperationInfoResponse cmd = 210;
+    }
+    optional string gatherDepartName = 1;       //采集人单位
+    optional string createUser = 2;             //采集人
+    optional string inputTime = 3;              //采集时间
+    optional string modifiedTime = 4;           //最后更新时间
+    optional string updateUser = 5;             //最后更新人
+}

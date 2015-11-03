@@ -1,0 +1,32 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "ObtainPersonCardProto";
+
+
+message ObtainPersonCardRequest{
+    extend BaseRequest{
+        optional ObtainPersonCardRequest cmd = 205;
+    }
+    optional string personid = 1;
+}
+
+message ObtainPersonCardResponse{
+    extend BaseResponse{
+        optional ObtainPersonCardResponse cmd = 206;
+    }
+    optional string name = 1;                       //姓名
+    optional string aliasname = 2;                  //别名
+    optional string sexCode = 3;                    //性别
+    optional string idcardno = 4;                   //身份证号
+    optional string birthdayst = 5;                 //出生日期
+    optional string doordetail = 6;                 //户籍地
+    optional string addressdetail = 7;              //现住址
+    optional string personType = 8;                 //类别
+    optional string caseBriefContents = 9;          //简要案情
+    optional string fptGatherDepartName = 10;       //捺印单位
+    optional string gatherFingerTime = 11;          //捺印日期
+    optional string cardid = 12;                    //人员编号
+}
