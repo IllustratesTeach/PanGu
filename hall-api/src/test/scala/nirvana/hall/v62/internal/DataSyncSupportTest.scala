@@ -1,7 +1,9 @@
 package nirvana.hall.v62.internal
 
+import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.protocol.v62.FPTProto.Case
+import nirvana.hall.protocol.v62.FPTProto
+import nirvana.hall.protocol.v62.FPTProto.{LPCard, FingerFgp, TPCard, Case}
 import nirvana.hall.v62.services.{V62ServerAddress, DatabaseTable, AncientClient}
 import org.junit.Test
 
@@ -11,7 +13,67 @@ import org.junit.Test
  * @since 2015-11-03
  */
 class DataSyncSupportTest {
-  private val address = V62ServerAddress("10.1.6.119",6808,"afisadmin")
+  private val address = V62ServerAddress("10.1.6.119",6898,"afisadmin")
+  @Test
+  def test_send_template(): Unit ={
+    val sync = createSender()
+
+    val tpCard = TPCard.newBuilder()
+    tpCard.setStrCardID(System.currentTimeMillis().toString)
+    val blobBuilder = tpCard.addBlobBuilder()
+    blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.mnt")))
+    blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
+    blobBuilder.setType(FPTProto.ImageType.IMAGETYPE_FINGER)
+    blobBuilder.setFgp(FingerFgp.FINGER_R_LITTLE)
+
+    val textBuilder = tpCard.getTextBuilder
+    textBuilder.setStrName ("蔡Sir")
+    textBuilder.setStrAliasName ("大刀蔡")
+    textBuilder.setNSex (1)
+    textBuilder.setStrBirthDate ("19800911")
+    textBuilder.setStrIdentityNum ("123123")
+    textBuilder.setStrBirthAddrCode ("123123")
+    textBuilder.setStrBirthAddr ("中国")
+    textBuilder.setStrAddrCode ("12")
+    textBuilder.setStrAddr ("中国CHINA")
+    textBuilder.setStrPersonType ("1")
+    textBuilder.setStrCaseType1 ("1")
+    textBuilder.setStrCaseType2 ("1")
+    textBuilder.setStrCaseType3 ("1")
+    textBuilder.setStrPrintUnitCode ("1")
+    textBuilder.setStrPrintUnitName ("1")
+    textBuilder.setStrPrinter ("1")
+    textBuilder.setStrPrintDate ("20150121")
+    textBuilder.setStrComment ("中国CHINA")
+    textBuilder.setStrNation ("CHINA")
+    textBuilder.setStrRace ("asdf")
+    textBuilder.setStrCertifType ("1")
+    textBuilder.setStrCertifID ("1")
+    textBuilder.setBHasCriminalRecord (true)
+    textBuilder.setStrCriminalRecordDesc ("asdf")
+    textBuilder.setStrPremium ("asdf")
+    textBuilder.setNXieChaFlag (1)
+    textBuilder.setStrXieChaRequestUnitName ("asdfasdf")
+    textBuilder.setStrXieChaRequestUnitCode ("123")
+    textBuilder.setNXieChaLevel (1)
+    textBuilder.setStrXieChaForWhat ("哈哈哈哈哈")
+    textBuilder.setStrRelPersonNo ("12")
+    textBuilder.setStrRelCaseNo ("12")
+    textBuilder.setStrXieChaTimeLimit ("12")
+    textBuilder.setStrXieChaDate ("")
+    textBuilder.setStrXieChaRequestComment ("")
+    textBuilder.setStrXieChaContacter ("")
+    textBuilder.setStrXieChaTelNo ("")
+    textBuilder.setStrShenPiBy ("")
+
+
+
+
+
+
+    sync.sendTemplateData(address,DatabaseTable(1,2),tpCard.build())
+
+  }
   @Test
   def test_send_case(): Unit ={
     val sync = createSender()
@@ -49,10 +111,29 @@ class DataSyncSupportTest {
     sync.sendCaseData(address,DatabaseTable(2,4),protoCase.build())
   }
   @Test
-  def test_send(): Unit ={
+  def test_latent(): Unit ={
     val sync = createSender()
-    //sync.sendData(DatabaseTable(2,2))
-    sync.sendData(address,DatabaseTable(1,2))
+    val lpCard = LPCard.newBuilder()
+    lpCard.setStrCardID(System.currentTimeMillis().toString)
+    val blobBuilder = lpCard.getBlobBuilder()
+    blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/lf.mnt")))
+    blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/lf.img")))
+    blobBuilder.setType(FPTProto.ImageType.IMAGETYPE_FINGER)
+
+
+    val textBuilder = lpCard.getTextBuilder
+    textBuilder.setStrSeq ("01")
+    textBuilder.setStrRemainPlace ("中国")
+    textBuilder.setStrRidgeColor ("1")
+    textBuilder.setBDeadBody (true)
+    textBuilder.setStrDeadPersonNo ("123123123")
+    textBuilder.setNXieChaState (1)
+    textBuilder.setNBiDuiState (1)
+    textBuilder.setStrStart ("")
+    textBuilder.setStrEnd ("")
+
+
+    sync.sendLatentData(address,DatabaseTable(2,2),lpCard.build())
   }
   private def createSender():DataSyncSupport={
     new DataSyncSupport with AncientClientSupport with LoggerSupport{

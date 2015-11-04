@@ -1,16 +1,231 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.protocol.v62.FPTProto
+import nirvana.hall.protocol.v62.FPTProto.{LPCard, TPCard}
+import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.services.AncientData
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  * synchronize data
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
-class DataSyncStruct {
-  def convertProtoBuf2TPCard(): Unit ={
+object DataSyncStruct {
+  /**
+   * convert protobuf object to gafis' TPCard
+   * @param card protobuf object
+   * @return gafis TPCard
+   * @see FPTBatchUpdater.cpp #812
+   */
+  def convertProtoBuf2TPCard(card: TPCard): tagGTPCARDINFOSTRUCT={
+    val data = new tagGTPCARDINFOSTRUCT
+    data.szCardID = card.getStrCardID
+    data.stAdmData.szMISPersonID = card.getStrPersonID
+    data.stAdmData.szPersonID = card.getStrPersonID
 
+
+    if(card.hasText) {
+      import CaseStruct.appendTextStruct
+      val text = card.getText
+
+      val buffer = mutable.Buffer[tagGATEXTITEMSTRUCT]()
+
+      //text information
+      appendTextStruct(buffer, "Name",text.getStrName)
+      appendTextStruct(buffer, "Alias",text.getStrAliasName)
+      if(text.hasNSex)
+        appendTextStruct(buffer, "SexCode",text.getNSex.toString)
+      appendTextStruct(buffer, "BirthDate",text.getStrBirthDate)
+      appendTextStruct(buffer, "ShenFenID",text.getStrIdentityNum)
+      appendTextStruct(buffer, "HuKouPlaceCode",text.getStrBirthAddrCode)
+      appendTextStruct(buffer, "HuKouPlaceTail",text.getStrBirthAddr)
+      appendTextStruct(buffer, "AddressCode",text.getStrAddrCode)
+      appendTextStruct(buffer, "AddressTail",text.getStrAddr)
+      appendTextStruct(buffer, "PersonClassCode",text.getStrPersonType)
+      appendTextStruct(buffer, "CaseClass1Code",text.getStrCaseType1)
+      appendTextStruct(buffer, "CaseClass2Code",text.getStrCaseType2)
+      appendTextStruct(buffer, "CaseClass3Code",text.getStrCaseType3)
+      appendTextStruct(buffer, "PrinterUnitCode",text.getStrPrintUnitCode)
+      appendTextStruct(buffer, "PrinterUnitNameTail",text.getStrPrintUnitName)
+      appendTextStruct(buffer, "PrinterName",text.getStrPrinter)
+      appendTextStruct(buffer, "PrintDate",text.getStrPrintDate)
+      appendTextStruct(buffer, "Comment",text.getStrComment)
+      appendTextStruct(buffer, "Nationality",text.getStrNation)
+      appendTextStruct(buffer, "RaceCode",text.getStrRace)
+      appendTextStruct(buffer, "CertificateCode",text.getStrCertifID)
+      appendTextStruct(buffer, "CertificateType",text.getStrCertifType)
+      if(text.hasBHasCriminalRecord)
+        appendTextStruct(buffer, "IsCriminalRecord",if(text.getBHasCriminalRecord) "1" else "0")
+      appendTextStruct(buffer, "CriminalRecordDesc",text.getStrCriminalRecordDesc)
+
+      /*
+      PARSETEXT_BEGIN(STR_PREMIUM",text.get)
+      PARSETEXT_BEGIN(STR_XIECHAFLAG",text.get)
+      PARSETEXT_BEGIN(STR_XIECHAREQUESTUNITNAME",text.get)
+      PARSETEXT_BEGIN(STR_XIECHAREQUESTUNITCODE",text.get)
+      PARSETEXT_BEGIN(STR_XIECHALEVEL",text.get)
+      PARSETEXT_BEGIN(STR_XIECHAFORWHAT",text.get)
+      PARSETEXT_BEGIN(STR_RELPERSONNO",text.get)
+      PARSETEXT_BEGIN(STR_RELCASENO",text.get)
+      PARSETEXT_BEGIN(STR_XIECHATIMELIMIT",text.get)
+      PARSETEXT_BEGIN(STR_XIECHADATE",text.get)
+      PARSETEXT_BEGIN(STR_XIECHAREQUESTCOMMENT",text.get)
+      PARSETEXT_BEGIN(STR_XIECHACONTACTER",text.get)
+      PARSETEXT_BEGIN(STR_XIECHATELNO",text.get)
+      PARSETEXT_BEGIN(STR_SHENPIBY",text.get)
+      */
+
+      data.pstTextData = buffer.toArray
+      data.nTextItemCount = data.pstTextData.length.asInstanceOf[Byte]
+    }
+
+    //mic
+    val mics = card.getBlobList.map{blob=>
+      val mic = new tagGAFISMICSTRUCT
+      var flag = 0
+      if(blob.hasStMnt){
+        mic.pstMntData = blob.getStMntBytes.toByteArray
+        mic.nMntLen = mic.pstMntData.length
+
+        flag |= AncientConstants.GAMIC_ITEMFLAG_MNT
+      }
+      if(blob.hasStImage){
+        val imgType = blob.getStImageBytes.byteAt(9) //see tagGAFISIMAGEHEADSTRUCT.bIsCompressed
+        if(imgType == 1){ //image compressed
+          mic.pstCprData = blob.getStImageBytes.toByteArray
+          mic.nCprLen = mic.pstCprData.length
+          flag |= AncientConstants.GAMIC_ITEMFLAG_CPR
+        }else{
+          mic.pstImgData = blob.getStImageBytes.toByteArray
+          mic.nImgLen = mic.pstImgData.length
+          flag |= AncientConstants.GAMIC_ITEMFLAG_IMG
+        }
+      }
+
+      //TODO 纹线数据？
+      mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte] //指位信息
+
+      mic.nItemFlag = flag.asInstanceOf[Byte] //传送的特征类型 ,特征+图像 , 1 2 4 8
+
+      blob.getType match{
+        case FPTProto.ImageType.IMAGETYPE_FINGER =>
+          if(blob.getBPlain)
+            mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_TPLAIN.asInstanceOf[Byte]
+          else
+            mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+
+          //指位信息
+          if(blob.hasFgp){
+            mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte]
+          }
+        case FPTProto.ImageType.IMAGETYPE_FACE =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_PALM =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_VOICE =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
+        case other =>
+          throw new UnsupportedOperationException
+      }
+      mic.bIsLatent = 0 //是否位现场数据
+
+
+      mic
+    }
+
+    data.pstMICData = mics.toArray
+    data.nMicItemCount = mics.size.asInstanceOf[Byte]
+
+
+    data
+  }
+  def convertProtoBuf2LPCard(card: LPCard): tagGLPCARDINFOSTRUCT= {
+    val data = new tagGLPCARDINFOSTRUCT
+    data.szCardID = card.getStrCardID
+
+    if(card.hasText) {
+      import CaseStruct.appendTextStruct
+      val text = card.getText
+
+      val buffer = mutable.Buffer[tagGATEXTITEMSTRUCT]()
+
+      //text information
+      appendTextStruct(buffer, "SeqNo",text.getStrSeq)
+      appendTextStruct(buffer, "RemainPlace",text.getStrRemainPlace)
+      appendTextStruct(buffer, "RidgeColor",text.getStrRidgeColor)
+      if(text.hasBDeadBody)
+        appendTextStruct(buffer, "IsUnknownBody",if(text.getBDeadBody) "1" else "0")
+      appendTextStruct(buffer, "UnknownBodyCode",text.getStrDeadPersonNo)
+      if(text.hasNXieChaState)
+        appendTextStruct(buffer, "XieChaFlag",text.getNXieChaState.toString)
+      if(text.hasNBiDuiState)
+        appendTextStruct(buffer, "BiDuiState",text.getNBiDuiState.toString)
+      appendTextStruct(buffer, "LatStart",text.getStrStart)
+      appendTextStruct(buffer, "LatEnd",text.getStrEnd)
+
+
+      data.pstTextData = buffer.toArray
+      data.nTextItemCount = buffer.size.asInstanceOf[Short]
+    }
+
+    if(card.hasBlob){
+      val blob = card.getBlob
+      val mic = new tagGAFISMICSTRUCT
+      var flag = 0
+      if(blob.hasStMnt){
+        mic.pstMntData = blob.getStMntBytes.toByteArray
+        mic.nMntLen = mic.pstMntData.length
+
+        flag |= 1
+      }
+      if(blob.hasStImage){
+        val imgType = blob.getStImageBytes.byteAt(9) //see tagGAFISIMAGEHEADSTRUCT.bIsCompressed
+        if(imgType == 1){ //image compressed
+          mic.pstCprData = blob.getStImageBytes.toByteArray
+          mic.nCprLen = mic.pstCprData.length
+          flag |= 4
+        }else{
+          mic.pstImgData = blob.getStImageBytes.toByteArray
+          mic.nImgLen = mic.pstImgData.length
+          flag |= 2
+        }
+      }
+
+      //TODO 纹线数据？
+
+      mic.nItemFlag = flag.asInstanceOf[Byte] //传送的特征类型 ,特征+图像 , 1 2 4 8
+
+      blob.getType match{
+        case FPTProto.ImageType.IMAGETYPE_FINGER =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_FACE =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_PALM =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_VOICE =>
+          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
+        case other =>
+          throw new UnsupportedOperationException
+      }
+      mic.bIsLatent = 1 //是否位现场数据
+
+
+      //缺指位信息
+
+      data.pstMICData = mic
+      data.nMicItemCount = 1
+    }
+
+
+    data
   }
 }
 
@@ -37,7 +252,11 @@ class tagGTPCARDINFOSTRUCT  extends AncientData {
   var bnRes2:Int = _				// 4 bytes reserved, to here is 48 bytes
   ///////////////to here is 48 bytes
   var pstMIC:Long =  _	// pointer to micstruct(may not have minutia)
+  @IgnoreTransfer
+  var pstMICData:Array[tagGAFISMICSTRUCT]=  _	// pointer to micstruct(may not have minutia)
   var pstText:Long = _ 	// pointer to text, the structure is GATEXTITEMSTRUCT.
+  @IgnoreTransfer
+  var pstTextData:Array[tagGATEXTITEMSTRUCT]= _ 	// pointer to text, the structure is GATEXTITEMSTRUCT.
   var pstInfoEx:Long = _
   @Length(8)
   var bnRes3:Array[Byte] = _			// 8 bytes reserved, to here is 80 bytes
@@ -182,7 +401,11 @@ class tagGLPCARDINFOSTRUCT  extends AncientData {
   @Length(32)
   var szCardID:String = _			// key  of this item in database
   var pstMIC:Long = _ 		// pointer to mic struct, can hold many items(because a lp can have many mnts).
+  @IgnoreTransfer
+  var pstMICData:tagGAFISMICSTRUCT = _ 		// pointer to mic struct, can hold many items(because a lp can have many mnts).
   var pstText:Long = _	// lp card text info
+  @IgnoreTransfer
+  var pstTextData:Array[tagGATEXTITEMSTRUCT]= _	// lp card text info
   var pstExtraInfo:Long = _
   @IgnoreTransfer
   var pstExtraInfoData= new tagGAFIS_LP_EXTRAINFO()

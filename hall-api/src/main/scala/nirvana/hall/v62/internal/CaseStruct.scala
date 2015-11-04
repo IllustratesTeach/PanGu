@@ -9,11 +9,12 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- *
+ * case struct
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
 object CaseStruct {
+  //convert protocol string list as gafis GAKEYSTRUCT
   private def convertAsKeyArray(stringList:ProtocolStringList): Array[GAKEYSTRUCT] ={
     stringList.map{id=>
       val key = new GAKEYSTRUCT
@@ -21,7 +22,7 @@ object CaseStruct {
       key
     }.toArray
   }
-  private def appendTextStruct(buffer:mutable.Buffer[tagGATEXTITEMSTRUCT],name:String,value:String):Unit = {
+  private[internal] def appendTextStruct(buffer:mutable.Buffer[tagGATEXTITEMSTRUCT],name:String,value:String):Unit = {
     if(value != null && value.length > 0) {
       val textStruct = new tagGATEXTITEMSTRUCT()
       textStruct.bIsPointer = 1
