@@ -1,0 +1,127 @@
+package sys;
+import "sys/Common.proto";
+option java_package = "nirvana.hall.protocol.sys";
+//字典数据同步
+option java_outer_classname = "SyncDictProto";
+
+//字典类型
+enum DictType {
+  CODE_AJLB = 1; //案件类别
+  CODE_CJLB = 2; //采集类别
+  CODE_GJ = 3; //国籍
+  CODE_JJLY = 4; //经济来源
+  CODE_LY = 5; //数据来源
+  CODE_MARRY = 6; //婚姻状况
+  CODE_MZ = 7; //民族
+  CODE_RYLX = 8; //人员类型
+  CODE_TSRQ = 9; //特殊人群
+  CODE_TSSF = 10; //特殊身份
+  CODE_WHCD = 11; //文化程度
+  CODE_XB = 12; //性别
+  CODE_ZC = 13; //专长
+  CODE_ZJXY = 14; //宗教信仰
+  CODE_ZZMM = 15; //政治面貌
+  GAFIS_GATHER_TYPE = 16;//采集类型
+  GAFIS_GATHER_NODE = 17;//采集节点
+  GAFIS_GATHER_TYPE_NODE_FIELD = 18;//采集字段
+  SYS_DEPART = 19;//单位
+}
+//字典同步
+message SyncDictRequest {
+  extend BaseRequest {
+    optional SyncDictRequest cmd = 110;
+  }
+  required DictType dict_type = 1;
+}
+//字典同步的响应
+message SyncDictResponse {
+  extend BaseResponse {
+    optional SyncDictResponse cmd = 110;
+  }
+  message SyncData {
+    extensions 100 to max;
+  }
+  //字典
+  message CodeData {
+    extend SyncData {
+      optional CodeData data = 100;
+    }
+    required string code = 1;
+    optional string name = 2;
+    optional string remark = 3;
+    optional int64 ord = 4;
+    optional string delete_flag = 5;
+    optional string other = 6;//其他字段:CODE_AJLB.FIRST_LETTER,CODE_RYLX.STRTYPE
+  }
+  //采集类型
+  message GatherType {
+    extend SyncData {
+      optional GatherType data = 101;
+    }
+    required string pk_id = 1;
+    required string type_name = 2;
+    required string create_user_id = 3;
+    required int64 create_datetime = 4;
+    optional string menu_id = 5;
+    optional string person_category = 6;
+    optional string gather_category = 7;
+    optional string parent_id = 8;
+    optional string rule_id = 9;
+    optional string is_children = 10;
+    optional string update_user_id = 11;
+    optional int64 update_datetime = 12;
+    optional string delete_flag = 13;
+  }
+  //采集节点
+  message GatherNode {
+    extend SyncData {
+      optional GatherNode data = 102;
+    }
+    required string pk_id = 1;
+    required string node_request = 2;
+    required string create_user_id = 3;
+    required int64 create_datetime = 4;
+    optional string node_code = 5;
+    optional string node_name = 6;
+    optional string node_img = 7;
+    optional string update_user_id = 8;
+    optional int64 update_datetime = 9;
+    optional string delete_flag = 10;
+  }
+  //采集字段配置
+  message GatherTypeNodeField {
+    extend SyncData {
+      optional GatherTypeNodeField data = 103;
+    }
+    required string pk_id = 1;
+    optional string type_id = 2;
+    optional string node_id = 3;
+    optional string field_id = 4;
+    optional int32 required = 5;
+    optional string depart_id = 6;
+  }
+  //部门
+  message Depart {
+    extend SyncData {
+      optional Depart data = 104;
+    }
+    required string code = 1;
+    optional string name = 2;
+    optional string leader = 3;
+    optional string remark = 4;
+    optional string is_leaf = 5;
+    optional string parent_id = 6;
+    optional string dept_level = 7;
+    optional int32 longitude = 8;
+    optional int32 latitude = 9;
+    optional string phone = 10;
+    optional string long_name = 11;
+    optional string is_have_chamber = 12;
+    optional int32 chamber_type = 13;
+    optional int32 is_special = 14;
+    optional string integration_type = 15;
+    optional string delete_flag = 16;
+  }
+  required DictType dict_type = 1;
+  repeated SyncData sync_data = 2;
+}
