@@ -3,9 +3,8 @@ package nirvana.hall.v62.internal
 import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.services.{V62ServerAddress, SelfMatchTask}
-
-import scala.collection.mutable
+import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.services.{SelfMatchTask, V62ServerAddress}
 
 /**
  * send match task support
@@ -117,28 +116,32 @@ trait SendMatchTaskSupport {
       }
     }
   }
-  def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Seq[Long] ={
+  def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Long ={
     createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val buffer = mutable.Buffer[Byte]()
-      buffer.appendAll(task.cardId.getBytes)
-      buffer.append(0)
-      val key = buffer.toArray
+      //because gafis use strcpy to get key,so append 0
+      val keyBytes = task.cardId.getBytes(AncientConstants.UTF8_ENCODING)
+      val buffer = ByteBuffer.allocate(keyBytes.length + 1)
+      buffer.put(keyBytes)
+      buffer.put(0.asInstanceOf[Byte])
+
+      val key = buffer.array()
       val header = new RequestHeader
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _ )
-      header.nOpClass = 105
-      header.nOpCode= 476
-      header.nDBID = 20
-      header.nTableID = 2
+      header.nOpClass = AncientConstants.OP_CLASS_QUERY.asInstanceOf[Short]
+      header.nOpCode= AncientConstants.OP_QUERY_SUBMIT.asInstanceOf[Short]
+      //header.nDBID = 20
+      //header.nTableID = 2
 
-      /*
-      header.bnData1=1
-      header.bnData2 = key.length.asInstanceOf[Short]
-      header.bnData3 = task.options.positions.length.asInstanceOf[Byte]
-      */
+      //send 7 byte: 1) key count 2) key length 3) finger position count
+      val bytes = ByteBuffer.allocate(7)
+        .putInt(1)
+        .putShort(key.length.asInstanceOf[Short])
+        .put(task.options.positions.length.asInstanceOf[Byte]).array()
+      header.bnData = bytes
 
       var response = channel.writeMessage[ResponseHeader](header)
-      println("header sent,then return code:{}",response.nReturnValue)
+      validateResponse(response,channel)
 
       channel.writeByteArray[NoneResponse](key)
 
@@ -154,24 +157,18 @@ trait SendMatchTaskSupport {
       queryStruct.stSimpQry.stSrcDB.nTableID= task.options.srcDb.tableId.asInstanceOf[Short]
       queryStruct.stSimpQry.stDestDB.apply(0).nDBID = task.options.destDb.dbId.asInstanceOf[Short]
       queryStruct.stSimpQry.stDestDB.apply(0).nTableID= task.options.destDb.tableId.asInstanceOf[Short]
-      queryStruct.stSimpQry.tSubmitTime.tDate.tYear = 115
-      queryStruct.stSimpQry.tSubmitTime.tDate.tMonth = 9
-      queryStruct.stSimpQry.tSubmitTime.tDate.tDay = 30
+      //queryStruct.stSimpQry.tSubmitTime.tDate.tYear = 115
+      //queryStruct.stSimpQry.tSubmitTime.tDate.tMonth = 9
+      //queryStruct.stSimpQry.tSubmitTime.tDate.tDay = 30
       queryStruct.stSimpQry.nDestDBCount = 1
 
 
       queryStruct.nItemFlagA = 64
 
-
       response = channel.writeMessage[ResponseHeader](queryStruct)
-      debug("query struct sent,then return code:{},ndatalen",response.nReturnValue,response.nDataLen)
-      if(response.nReturnValue == -1){
-        val gafisError = channel.receive[GafisError]()
-        throw new IllegalAccessException("fail to send query struct,num:%s".format(gafisError.nAFISErrno))
-      }else{
-        val ret = channel.receive[GADB_RETVAL]()
-        Seq[Long](convertSixByteArrayToLong(ret.nSID))
-      }
+      validateResponse(response,channel)
+      val ret = channel.receive[GADB_RETVAL]()
+      convertSixByteArrayToLong(ret.nSID)
     }
   }
   /**
