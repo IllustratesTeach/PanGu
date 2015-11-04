@@ -11,6 +11,12 @@ import org.junit.Test
  */
 class DataSyncSupportTest {
   @Test
+  def test_send_case(): Unit ={
+    val sync = createSender()
+    //sync.sendData(DatabaseTable(2,2))
+    sync.sendCaseData(DatabaseTable(2,4))
+  }
+  @Test
   def test_send(): Unit ={
     val sync = createSender()
     //sync.sendData(DatabaseTable(2,2))

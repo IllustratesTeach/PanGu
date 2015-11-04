@@ -6,8 +6,10 @@ package nirvana.hall.v62
  * @since 2015-10-30
  */
 object AncientConstants {
-final var  OP_CLASS_TPLIB = 101.toShort
-final var  OP_TPLIB_ADD = 50.toShort
-final var  OP_CLASS_LPLIB = 102.toShort
-final var  OP_LPLIB_ADD = 100.toShort
+  final val  OP_CLASS_TPLIB = 101.toShort
+  final val  OP_TPLIB_ADD = 50.toShort
+  final val  OP_CLASS_LPLIB = 102.toShort
+  final val  OP_LPLIB_ADD = 100.toShort
+  final val  OP_CLASS_CASE = 114.toShort
+  final val  OP_CASE_ADD = 250.toShort
 }

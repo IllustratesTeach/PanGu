@@ -12,6 +12,114 @@ import org.apache.commons.io.IOUtils
  */
 trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
+  def sendCaseData(databaseTable: DatabaseTable): Unit ={
+    createAncientClient.executeInChannel{channel=>
+      val header = new RequestHeader
+      header.szUserName="afisadmin"
+      header.nDBID = databaseTable.dbId.asInstanceOf[Short]
+      header.nTableID = databaseTable.tableId.asInstanceOf[Short]
+
+      header.bnData1=1
+      header.bnData2 = 0
+      header.bnData3 = 0
+
+
+      /// sync latent data
+      /*
+      header.nOpClass = AncientConstants.OP_CLASS_LPLIB
+      header.nOpCode= AncientConstants.OP_LPLIB_ADD
+      channel.writeMessage[NoneResponse](header)
+      syncLatentData(channel)
+      */
+
+      //sync template data
+      header.nOpClass = AncientConstants.OP_CLASS_CASE
+      header.nOpCode= AncientConstants.OP_CASE_ADD
+      channel.writeMessage[NoneResponse](header)
+
+
+      syncCase(channel)
+
+
+      //finally receive server response
+      val response  = channel.receive[ResponseHeader]()
+      validateResponse(response,channel)
+
+    }
+  }
+  private def syncCase(channel:ChannelOperator):Unit = {
+    //building data
+    val data = new tagGCASEINFOSTRUCT
+    data.szCaseID=System.currentTimeMillis().toString
+    data.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
+
+    val key = new GAKEYSTRUCT
+    key.key="1446538163548"
+    data.nFingerCount = 1
+    data.pstFingerIdData = Array[GAKEYSTRUCT](key)
+
+
+    val texts = Array(new tagGATEXTITEMSTRUCT())
+    texts.foreach{t=>
+      t.szItemName="CaseClass1Code"
+      t.bIsPointer = 1
+      t.textContent = "1".getBytes("GBK")
+      t.nItemLen = t.textContent.length
+    }
+    data.nTextItemCount = texts.length.toShort
+    data.pstTextData = texts
+
+
+
+
+    val nfing = data.nFingerCount
+    val npalm = data.nPalmCount
+    val ntext = data.nTextItemCount
+    var nextrainfolen = data.nExtraInfoLen
+    // no other info to be sent, quit
+    if ( nfing<=0 && npalm<=0 && ntext<=0 && nextrainfolen<=0 ) {
+      throw new IllegalArgumentException
+    }
+    var response = channel.writeMessage[ResponseHeader](data)
+    validateResponse(response,channel)
+
+    var bExtraInfoFirst = 0;
+    val bnData = new String(response.bnData)
+    if ( bnData.indexOf("$version=002$")>=0 ) {
+      bExtraInfoFirst = 1;
+    }
+    else if ( bnData.indexOf("$version=001$")>=0 ) {
+      bExtraInfoFirst = 0;
+    } else {
+      nextrainfolen = 0;
+    }
+
+
+    if ( nfing>0 && data.pstFingerIdData != null ) {
+      data.pstFingerIdData.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( npalm>0 && data.pstPalmIdData != null ) {
+      data.pstPalmIdData.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( ntext>0 && data.pstTextData!= null ) {
+      data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    }
+
+    if ( bExtraInfoFirst> 0 && ( nextrainfolen > 0 ) ) {
+      channel.writeMessage[NoneResponse](data.pstExtraInfoData)
+      if(data.pstExtraInfoData.nItemSize>0){
+        response = channel.receive[ResponseHeader]()
+        validateResponse(response,channel)
+        channel.writeMessage(data.pstExtraInfoData.pstItemEntryData)
+      }
+    }
+
+    if(ntext > 0)
+      data.pstTextData.filter(_.bIsPointer == 1).foreach{x=>
+        channel.writeByteArray[NoneResponse](x.textContent)
+      }
+
+  }
   def sendData(databaseTable: DatabaseTable): Unit ={
     createAncientClient.executeInChannel{channel=>
       val header = new RequestHeader
