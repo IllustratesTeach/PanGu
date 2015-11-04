@@ -22,6 +22,7 @@ class AddTPCardFilter(facade:V62Facade,config:HallV62Config) extends ProtobufReq
 
       facade.sendTemplateData(address,database,request.getCard)
       responseBuilder.setExtension(AddTPCardResponse.cmd,AddTPCardResponse.newBuilder().build())
+
       true
     }else{
       handler.handle(protobufRequest,responseBuilder)

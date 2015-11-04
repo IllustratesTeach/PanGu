@@ -25,9 +25,11 @@ trait SendMatchTaskSupport {
       header.nDBID = 20
       header.nTableID = 2
 
+      /*
       header.bnData1=1
       header.bnData2 = 0
       header.bnData3 = 0
+      */
 
       channel.writeMessage[NoneResponse](header)
 
@@ -129,9 +131,11 @@ trait SendMatchTaskSupport {
       header.nDBID = 20
       header.nTableID = 2
 
+      /*
       header.bnData1=1
       header.bnData2 = key.length.asInstanceOf[Short]
       header.bnData3 = task.options.positions.length.asInstanceOf[Byte]
+      */
 
       var response = channel.writeMessage[ResponseHeader](header)
       println("header sent,then return code:{}",response.nReturnValue)
