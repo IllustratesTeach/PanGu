@@ -35,7 +35,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
 
     val sid = sender.sendMatchTask(address,task)
     debug("sid :{}",sid)
-    Assert.assertTrue(sid.head > 0)
+    Assert.assertTrue(sid> 0)
   }
   private def createSender():SendMatchTaskSupport={
     new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
