@@ -13,21 +13,39 @@ import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddre
 trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
 
-  type HeaderDataModifier = RequestHeader => Unit
-  type DataWriter = ChannelOperator => Unit
+  //change header data
+  private type HeaderDataModifier = RequestHeader => Unit
+  private type DataWriter = ChannelOperator => Unit
+  //nothing write
+  private val NoneOperator:DataWriter = channel =>{
+  }
+  private val AddDataHeader:HeaderDataModifier = header =>{
+    header.bnData = Array[Byte](1)
+  }
+  //copy key to header
+  private def DeleteDataHeader(key:String)(header:RequestHeader): Unit ={
+    header.bnData = key.getBytes(AncientConstants.GBK_ENCODING)
+  }
   private case class V62OperateOptions(opClass:Int,opCode:Int,func:DataWriter)
   /**
    * send case data to v6.2 system
    * @param databaseTable database define
    * @param protoCase case data based on protobuf
    */
-  def sendCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
+  def addCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
         AncientConstants.OP_CLASS_CASE,
         AncientConstants.OP_CASE_ADD,
         syncCase(protoCase)))
   }
+
+  /**
+   * update case data
+   * @param serverAddress v6.2 server address
+   * @param databaseTable database table of case
+   * @param protoCase case object
+   */
   def updateCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
@@ -35,6 +53,13 @@ trait DataSyncSupport {
         AncientConstants.OP_CASE_UPDATE,
         syncCase(protoCase)))
   }
+
+  /**
+   * delete case by caseId
+   * @param serverAddress server address of v6.2
+   * @param databaseTable database table of case
+   * @param caseId case id
+   */
   def deleteCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,caseId:String): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
@@ -43,6 +68,12 @@ trait DataSyncSupport {
       NoneOperator),DeleteDataHeader(caseId))
   }
 
+  /**
+    * update template data
+    * @param address server address
+    * @param databaseTable database table
+    * @param card template data
+    */
   def updateTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
@@ -50,13 +81,27 @@ trait DataSyncSupport {
         AncientConstants.OP_TPLIB_UPDATE,
         syncTemplateData(card)))
   }
-  def sendTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
+
+  /**
+   * add template data to 6.2
+   * @param address server address
+   * @param databaseTable database table
+   * @param card template data
+   */
+  def addTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
         AncientConstants.OP_CLASS_TPLIB,
         AncientConstants.OP_TPLIB_ADD,
         syncTemplateData(card)))
   }
+
+  /**
+   * delete template data
+   * @param address server address
+   * @param databaseTable database table of template
+   * @param key card id number
+   */
   def deleteTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
@@ -65,6 +110,13 @@ trait DataSyncSupport {
         NoneOperator),
       DeleteDataHeader(key))
   }
+
+  /**
+   * update latenet data
+   * @param address server address
+   * @param databaseTable database table
+   * @param card latent card 
+   */
   def updateLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
@@ -72,13 +124,27 @@ trait DataSyncSupport {
         AncientConstants.OP_LPLIB_UPDATE,
         syncLatentData(card)))
   }
-  def sendLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
+
+  /**
+   * add latent data to 6.2
+   * @param address server address
+   * @param databaseTable database table
+   * @param card latent card
+   */
+  def addLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
         AncientConstants.OP_CLASS_LPLIB,
         AncientConstants.OP_LPLIB_ADD,
         syncLatentData(card)))
   }
+
+  /**
+   * delete latent
+   * @param address server address
+   * @param databaseTable database table
+   * @param key key of latent data
+   */
   def deleteLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
@@ -89,15 +155,6 @@ trait DataSyncSupport {
   }
 
 
-  val NoneOperator = (channel:ChannelOperator) =>{
-
-  }
-  val AddDataHeader = (header:RequestHeader)=>{
-    header.bnData = Array[Byte](1)
-  }
-  def DeleteDataHeader(key:String)(header:RequestHeader): Unit ={
-    header.bnData = key.getBytes(AncientConstants.GBK_ENCODING)
-  }
   private def sendData(address:V62ServerAddress,databaseTable: DatabaseTable,options:V62OperateOptions,headerDataModifier: HeaderDataModifier=AddDataHeader): Unit ={
     createAncientClient(address.host,address.port).executeInChannel{channel=>
       val header = new RequestHeader
@@ -112,11 +169,13 @@ trait DataSyncSupport {
       //set operation data
       header.nOpClass = options.opClass.asInstanceOf[Short]
       header.nOpCode= options.opCode.asInstanceOf[Short]
+      //send commond request header
       channel.writeMessage[NoneResponse](header)
 
+      //transfer data
       options.func(channel)
 
-      //finally receive server response
+      //Finally receive server response
       val response  = channel.receive[ResponseHeader]()
       validateResponse(response,channel)
 

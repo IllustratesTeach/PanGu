@@ -20,7 +20,7 @@ class AddTPCardFilter(facade:V62Facade,config:HallV62Config) extends ProtobufReq
         config.port,config.user,Option(config.password))
       val database = DatabaseTable(config.templateTable.dbId,config.templateTable.tableId)
 
-      facade.sendTemplateData(address,database,request.getCard)
+      facade.addTemplateData(address,database,request.getCard)
       responseBuilder.setExtension(AddTPCardResponse.cmd,AddTPCardResponse.newBuilder().build())
 
       true

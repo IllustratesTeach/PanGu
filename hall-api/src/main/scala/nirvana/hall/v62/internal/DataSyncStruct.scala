@@ -135,16 +135,20 @@ object DataSyncStruct {
       }
       mic.bIsLatent = 0 //是否位现场数据
 
-
       mic
     }
 
     data.pstMICData = mics.toArray
     data.nMicItemCount = mics.size.asInstanceOf[Byte]
 
-
     data
   }
+
+  /**
+   * convert protobuf object to latent card object
+   * @param card protobuf object
+   * @return gafis latent card object
+   */
   def convertProtoBuf2LPCard(card: LPCard): tagGLPCARDINFOSTRUCT= {
     val data = new tagGLPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
@@ -197,8 +201,6 @@ object DataSyncStruct {
         }
       }
 
-      //TODO 纹线数据？
-
       mic.nItemFlag = flag.asInstanceOf[Byte] //传送的特征类型 ,特征+图像 , 1 2 4 8
 
       blob.getType match{
@@ -217,14 +219,9 @@ object DataSyncStruct {
       }
       mic.bIsLatent = 1 //是否位现场数据
 
-
-      //缺指位信息
-
       data.pstMICData = mic
       data.nMicItemCount = 1
     }
-
-
     data
   }
 }

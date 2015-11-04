@@ -71,7 +71,7 @@ class DataSyncSupportTest {
 
 
 
-    sync.sendTemplateData(address,DatabaseTable(1,2),tpCard.build())
+    sync.addTemplateData(address,DatabaseTable(1,2),tpCard.build())
     sync.updateTemplateData(address,DatabaseTable(1,2),tpCard.build())
     println(tpCard.getStrCardID)
     sync.deleteTemplateData(address,DatabaseTable(1,2),tpCard.getStrCardID)
@@ -111,7 +111,7 @@ class DataSyncSupportTest {
     textBuilder.setStrXieChaRequestUnitCode ("510000")
 
 
-    sync.sendCaseData(address,DatabaseTable(2,4),protoCase.build())
+    sync.addCaseData(address,DatabaseTable(2,4),protoCase.build())
     sync.updateCaseData(address,DatabaseTable(2,4),protoCase.build())
     sync.deleteCaseData(address,DatabaseTable(2,4),protoCase.getStrCaseID)
   }
@@ -138,7 +138,7 @@ class DataSyncSupportTest {
     textBuilder.setStrEnd ("")
 
 
-    sync.sendLatentData(address,DatabaseTable(2,2),lpCard.build())
+    sync.addLatentData(address,DatabaseTable(2,2),lpCard.build())
     sync.updateLatentData(address,DatabaseTable(2,2),lpCard.build())
     sync.deleteLatentData(address,DatabaseTable(2,2),lpCard.getStrCardID)
   }
