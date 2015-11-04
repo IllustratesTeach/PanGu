@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable}
 import org.apache.commons.io.IOUtils
@@ -12,7 +13,12 @@ import org.apache.commons.io.IOUtils
  */
 trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
-  def sendCaseData(databaseTable: DatabaseTable): Unit ={
+  /**
+   * send case data to v6.2 system
+   * @param databaseTable database define
+   * @param protoCase case data based on protobuf
+   */
+  def sendCaseData(databaseTable: DatabaseTable,protoCase:Case): Unit ={
     createAncientClient.executeInChannel{channel=>
       val header = new RequestHeader
       header.szUserName="afisadmin"
@@ -23,22 +29,12 @@ trait DataSyncSupport {
       header.bnData2 = 0
       header.bnData3 = 0
 
-
-      /// sync latent data
-      /*
-      header.nOpClass = AncientConstants.OP_CLASS_LPLIB
-      header.nOpCode= AncientConstants.OP_LPLIB_ADD
-      channel.writeMessage[NoneResponse](header)
-      syncLatentData(channel)
-      */
-
-      //sync template data
       header.nOpClass = AncientConstants.OP_CLASS_CASE
       header.nOpCode= AncientConstants.OP_CASE_ADD
       channel.writeMessage[NoneResponse](header)
 
 
-      syncCase(channel)
+      syncCase(channel,protoCase)
 
 
       //finally receive server response
@@ -47,8 +43,10 @@ trait DataSyncSupport {
 
     }
   }
-  private def syncCase(channel:ChannelOperator):Unit = {
+  private def syncCase(channel:ChannelOperator,protoCase:Case):Unit = {
     //building data
+    val data  = CaseStruct.convertProtobuf2Case(protoCase)
+    /*
     val data = new tagGCASEINFOSTRUCT
     data.szCaseID=System.currentTimeMillis().toString
     data.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
@@ -68,8 +66,7 @@ trait DataSyncSupport {
     }
     data.nTextItemCount = texts.length.toShort
     data.pstTextData = texts
-
-
+    */
 
 
     val nfing = data.nFingerCount

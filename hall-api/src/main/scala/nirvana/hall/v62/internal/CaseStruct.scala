@@ -1,15 +1,95 @@
 package nirvana.hall.v62.internal
 
+import com.google.protobuf.ProtocolStringList
+import nirvana.hall.protocol.v62.FPTProto.Case
+import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.services.AncientData
+import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
-class CaseStruct {
+object CaseStruct {
+  private def convertAsKeyArray(stringList:ProtocolStringList): Array[GAKEYSTRUCT] ={
+    stringList.map{id=>
+      val key = new GAKEYSTRUCT
+      key.key = id
+      key
+    }.toArray
+  }
+  private def appendTextStruct(buffer:mutable.Buffer[tagGATEXTITEMSTRUCT],name:String,value:String):Unit = {
+    if(value != null && value.length > 0) {
+      val textStruct = new tagGATEXTITEMSTRUCT()
+      textStruct.bIsPointer = 1
+      textStruct.szItemName = name
+      //convert as GBK encoding,because 6.2 need gbk encoding
+      textStruct.textContent = value.getBytes(AncientConstants.GBK_ENCODING)
+      textStruct.nItemLen = textStruct.textContent.length
 
+      buffer += textStruct
+    }
+
+  }
+  def convertProtobuf2Case(protoCase:Case):tagGCASEINFOSTRUCT = {
+    val gafisCase = new tagGCASEINFOSTRUCT
+    gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
+    //GAFIS里面没有'A',这里去掉前缀
+    gafisCase.szCaseID = protoCase.getStrCaseID.substring(1)
+
+    gafisCase.pstFingerIdData = convertAsKeyArray(protoCase.getStrFingerIDList)
+    gafisCase.nFingerCount = gafisCase.pstFingerIdData.length.asInstanceOf[Short]
+
+    gafisCase.pstPalmIdData = convertAsKeyArray(protoCase.getStrPalmIDList)
+    gafisCase.nPalmCount = gafisCase.pstPalmIdData.length.asInstanceOf[Short]
+
+
+    if (protoCase.hasText) {
+      val text = protoCase.getText
+      val buffer = mutable.Buffer[tagGATEXTITEMSTRUCT]()
+
+      appendTextStruct(buffer, "CaseClass1Code", text.getStrCaseType1)
+      appendTextStruct(buffer, "CaseClass2Code", text.getStrCaseType2)
+      appendTextStruct(buffer, "CaseClass3Code", text.getStrCaseType3)
+      appendTextStruct(buffer, "SuspiciousArea1Code", text.getStrSuspArea1Code)
+      appendTextStruct(buffer, "SuspiciousArea2Code", text.getStrSuspArea2Code)
+      appendTextStruct(buffer, "SuspiciousArea3Code", text.getStrSuspArea3Code)
+      appendTextStruct(buffer, "CaseOccurDate", text.getStrCaseOccurDate)
+      appendTextStruct(buffer, "CaseOccurPlaceCode", text.getStrCaseOccurPlaceCode)
+      appendTextStruct(buffer, "CaseOccurPlaceTail", text.getStrCaseOccurPlace)
+
+      if(text.hasNSuperviseLevel)
+        appendTextStruct(buffer, "SuperviseLevel", text.getNSuperviseLevel.toString)
+
+      appendTextStruct(buffer, "ExtractUnitCode", text.getStrExtractUnitCode)
+      appendTextStruct(buffer, "ExtractUnitNameTail", text.getStrExtractUnitName)
+      appendTextStruct(buffer, "Extractor1", text.getStrExtractor)
+      appendTextStruct(buffer, "ExtractDate", text.getStrExtractDate)
+      appendTextStruct(buffer, "IllicitMoney", text.getStrMoneyLost)
+      appendTextStruct(buffer, "Premium", text.getStrPremium)
+      if(text.hasBPersonKilled)
+        appendTextStruct(buffer, "HasPersonKilled", if (text.getBPersonKilled()) "1" else "0")
+      appendTextStruct(buffer, "Comment", text.getStrComment)
+      if(text.hasNCaseState)
+        appendTextStruct(buffer, "CaseState", text.getNCaseState.toString)
+
+      if(text.hasNXieChaState)
+        appendTextStruct(buffer, "XieChaFlag", text.getNCaseState.toString)
+      if(text.hasNCancelFlag)
+        appendTextStruct(buffer, "CancelFlag", text.getNCancelFlag.toString)
+
+      appendTextStruct(buffer, "XieChaDate", text.getStrXieChaDate)
+      appendTextStruct(buffer, "XieChaRequestUnitName", text.getStrXieChaRequestUnitName)
+      appendTextStruct(buffer, "XieChaRequestUnitCode", text.getStrXieChaRequestUnitCode)
+
+      gafisCase.pstTextData = buffer.toArray
+      gafisCase.nTextItemCount = gafisCase.pstTextData.length.asInstanceOf[Short]
+    }
+    gafisCase
+  }
 }
 // case info structure
 class tagGCASEINFOSTRUCT  extends AncientData {
@@ -54,7 +134,7 @@ class tagGCASEINFOSTRUCT  extends AncientData {
   //	AFISDateTime	tBrokenDate;
   var pstExtraInfo:Long = _
   @IgnoreTransfer
-  var pstExtraInfoData:tagGAFIS_CASE_EXTRAINFO =  _
+  var pstExtraInfoData:tagGAFIS_protoCaseEXTRAINFO =  _
   @Length(16)
   var szBrokenUser:String = _		// broken user. store actual user name.
   @Length(16)
@@ -101,7 +181,7 @@ class tagGAFIS_CASEITEMENTRY  extends AncientData {
 // the GCASEINFOSTRUCT can not hold enough data, we need expand
 // it's size, but for compatibility reason, we add an extra
 // structure to hold other info. 2006.08.04
-class tagGAFIS_CASE_EXTRAINFO  extends AncientData {
+class tagGAFIS_protoCaseEXTRAINFO  extends AncientData {
   var	cbSize:Int = _
   var	bnRes:Int = _
   @Length(32)
@@ -120,7 +200,7 @@ class tagGAFIS_CASE_EXTRAINFO  extends AncientData {
   @Length(16)
   var	szOrgScanUnitCode:String = _
   var	szOrgAFISType:Int = _ 		// fill in AFIS type code.
-  var	nItemFlag:Byte = _;				// CASE_EXTRAINFO_ITEMFLAG_XXX
+  var	nItemFlag:Byte = _;				// protoCaseEXTRAINFO_ITEMFLAG_XXX
   @Length(3)
   var	bnRes3:Array[Byte] = _
   var	nItemSize:Int = _ 		// length of pstItemEntry(count*sizeof(GAFIS_CASEITEMENTRY))
@@ -134,3 +214,5 @@ class tagGAFIS_CASE_EXTRAINFO  extends AncientData {
   @Length(256)
   var	bnResx:Array[Byte]= _
 } ;	// size is 512 bytes long.
+
+
