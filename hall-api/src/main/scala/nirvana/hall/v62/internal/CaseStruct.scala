@@ -39,7 +39,9 @@ object CaseStruct {
     val gafisCase = new tagGCASEINFOSTRUCT
     gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
     //GAFIS里面没有'A',这里去掉前缀
-    gafisCase.szCaseID = protoCase.getStrCaseID.substring(1)
+    gafisCase.szCaseID = protoCase.getStrCaseID
+    if(gafisCase.szCaseID.charAt(0) == 'A')
+      gafisCase.szCaseID = gafisCase.szCaseID.substring(1)
 
     gafisCase.pstFingerIdData = convertAsKeyArray(protoCase.getStrFingerIDList)
     gafisCase.nFingerCount = gafisCase.pstFingerIdData.length.asInstanceOf[Short]

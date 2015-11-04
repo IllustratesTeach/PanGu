@@ -23,7 +23,8 @@ trait AncientClientSupport {
   protected def validateResponse(response: ResponseHeader,channel:ChannelOperator): Unit ={
     if(response.nReturnValue == -1) {
       val gafisError = channel.receive[GafisError]()
-      throw new IllegalAccessException("fail to send data,num:%s".format(gafisError.nAFISErrno));
+      println(gafisError.bnAFISErrData)
+      throw new IllegalAccessException("fail to send data,num:%s,file:%s,line:%s".format(gafisError.nAFISErrno,gafisError.szFileName,gafisError.nLineNum));
     }
   }
 }

@@ -72,6 +72,9 @@ class DataSyncSupportTest {
 
 
     sync.sendTemplateData(address,DatabaseTable(1,2),tpCard.build())
+    sync.updateTemplateData(address,DatabaseTable(1,2),tpCard.build())
+    println(tpCard.getStrCardID)
+    sync.deleteTemplateData(address,DatabaseTable(1,2),tpCard.getStrCardID)
 
   }
   @Test
@@ -109,6 +112,8 @@ class DataSyncSupportTest {
 
 
     sync.sendCaseData(address,DatabaseTable(2,4),protoCase.build())
+    sync.updateCaseData(address,DatabaseTable(2,4),protoCase.build())
+    sync.deleteCaseData(address,DatabaseTable(2,4),protoCase.getStrCaseID)
   }
   @Test
   def test_latent(): Unit ={
@@ -134,6 +139,8 @@ class DataSyncSupportTest {
 
 
     sync.sendLatentData(address,DatabaseTable(2,2),lpCard.build())
+    sync.updateLatentData(address,DatabaseTable(2,2),lpCard.build())
+    sync.deleteLatentData(address,DatabaseTable(2,2),lpCard.getStrCardID)
   }
   private def createSender():DataSyncSupport={
     new DataSyncSupport with AncientClientSupport with LoggerSupport{

@@ -12,32 +12,109 @@ import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddre
  */
 trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
+
+  type HeaderDataModifier = RequestHeader => Unit
+  type DataWriter = ChannelOperator => Unit
+  private case class V62OperateOptions(opClass:Int,opCode:Int,func:DataWriter)
   /**
    * send case data to v6.2 system
    * @param databaseTable database define
    * @param protoCase case data based on protobuf
    */
   def sendCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
-    createAncientClient(serverAddress.host,serverAddress.port)
-      .executeInChannel{channel=>
+    sendData(serverAddress,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_CASE,
+        AncientConstants.OP_CASE_ADD,
+        syncCase(protoCase)))
+  }
+  def updateCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
+    sendData(serverAddress,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_CASE,
+        AncientConstants.OP_CASE_UPDATE,
+        syncCase(protoCase)))
+  }
+  def deleteCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,caseId:String): Unit ={
+    sendData(serverAddress,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_CASE,
+        AncientConstants.OP_CASE_DEL,
+      NoneOperator),DeleteDataHeader(caseId))
+  }
+
+  def updateTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_TPLIB,
+        AncientConstants.OP_TPLIB_UPDATE,
+        syncTemplateData(card)))
+  }
+  def sendTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_TPLIB,
+        AncientConstants.OP_TPLIB_ADD,
+        syncTemplateData(card)))
+  }
+  def deleteTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_TPLIB,
+        AncientConstants.OP_TPLIB_DEL,
+        NoneOperator),
+      DeleteDataHeader(key))
+  }
+  def updateLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_LPLIB,
+        AncientConstants.OP_LPLIB_UPDATE,
+        syncLatentData(card)))
+  }
+  def sendLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_LPLIB,
+        AncientConstants.OP_LPLIB_ADD,
+        syncLatentData(card)))
+  }
+  def deleteLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
+    sendData(address,databaseTable,
+      V62OperateOptions(
+        AncientConstants.OP_CLASS_LPLIB,
+        AncientConstants.OP_LPLIB_DEL,
+        NoneOperator),
+      DeleteDataHeader(key))
+  }
+
+
+  val NoneOperator = (channel:ChannelOperator) =>{
+
+  }
+  val AddDataHeader = (header:RequestHeader)=>{
+    header.bnData = Array[Byte](1)
+  }
+  def DeleteDataHeader(key:String)(header:RequestHeader): Unit ={
+    header.bnData = key.getBytes(AncientConstants.GBK_ENCODING)
+  }
+  private def sendData(address:V62ServerAddress,databaseTable: DatabaseTable,options:V62OperateOptions,headerDataModifier: HeaderDataModifier=AddDataHeader): Unit ={
+    createAncientClient(address.host,address.port).executeInChannel{channel=>
       val header = new RequestHeader
-      header.szUserName=serverAddress.user
-      serverAddress.password.foreach(header.szUserPass= _)
+      header.szUserName=address.user
+      address.password.foreach(header.szUserPass = _)
 
       header.nDBID = databaseTable.dbId.asInstanceOf[Short]
       header.nTableID = databaseTable.tableId.asInstanceOf[Short]
 
-      header.bnData1=1
-      header.bnData2 = 0
-      header.bnData3 = 0
+      headerDataModifier(header)
 
-      header.nOpClass = AncientConstants.OP_CLASS_CASE
-      header.nOpCode= AncientConstants.OP_CASE_ADD
+      //set operation data
+      header.nOpClass = options.opClass.asInstanceOf[Short]
+      header.nOpCode= options.opCode.asInstanceOf[Short]
       channel.writeMessage[NoneResponse](header)
 
-
-      syncCase(channel,protoCase)
-
+      options.func(channel)
 
       //finally receive server response
       val response  = channel.receive[ResponseHeader]()
@@ -45,7 +122,7 @@ trait DataSyncSupport {
 
     }
   }
-  private def syncCase(channel:ChannelOperator,protoCase:Case):Unit = {
+  private def syncCase(protoCase:Case)(channel:ChannelOperator):Unit = {
     //building data
     val data  = CaseStruct.convertProtobuf2Case(protoCase)
 
@@ -60,15 +137,15 @@ trait DataSyncSupport {
     var response = channel.writeMessage[ResponseHeader](data)
     validateResponse(response,channel)
 
-    var bExtraInfoFirst = 0;
+    var bExtraInfoFirst = 0
     val bnData = new String(response.bnData)
     if ( bnData.indexOf("$version=002$")>=0 ) {
-      bExtraInfoFirst = 1;
+      bExtraInfoFirst = 1
     }
     else if ( bnData.indexOf("$version=001$")>=0 ) {
-      bExtraInfoFirst = 0;
+      bExtraInfoFirst = 0
     } else {
-      nextrainfolen = 0;
+      nextrainfolen = 0
     }
 
 
@@ -97,59 +174,7 @@ trait DataSyncSupport {
       }
 
   }
-  def sendTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val header = new RequestHeader
-      header.szUserName=address.user
-      address.password.foreach(header.szUserPass = _)
-
-      header.nDBID = databaseTable.dbId.asInstanceOf[Short]
-      header.nTableID = databaseTable.tableId.asInstanceOf[Short]
-
-      header.bnData1=1
-      header.bnData2 = 0
-      header.bnData3 = 0
-
-      //sync template data
-      header.nOpClass = AncientConstants.OP_CLASS_TPLIB
-      header.nOpCode= AncientConstants.OP_TPLIB_ADD
-      channel.writeMessage[NoneResponse](header)
-      syncTemplateData(channel,card)
-
-      //finally receive server response
-      val response  = channel.receive[ResponseHeader]()
-      validateResponse(response,channel)
-
-    }
-  }
-  def sendLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val header = new RequestHeader
-      header.szUserName=address.user
-      address.password.foreach(header.szUserPass = _)
-
-      header.nDBID = databaseTable.dbId.asInstanceOf[Short]
-      header.nTableID = databaseTable.tableId.asInstanceOf[Short]
-
-      header.bnData1=1
-      header.bnData2 = 0
-      header.bnData3 = 0
-
-
-      /// sync latent data
-      header.nOpClass = AncientConstants.OP_CLASS_LPLIB
-      header.nOpCode= AncientConstants.OP_LPLIB_ADD
-      channel.writeMessage[NoneResponse](header)
-      syncLatentData(channel,card)
-
-
-      //finally receive server response
-      val response  = channel.receive[ResponseHeader]()
-      validateResponse(response,channel)
-
-    }
-  }
-  private def syncTemplateData(channel:ChannelOperator,card:TPCard):Unit={
+  private def syncTemplateData(card:TPCard)(channel:ChannelOperator):Unit={
     val data = DataSyncStruct.convertProtoBuf2TPCard(card)
 
     var response = channel.writeMessage[ResponseHeader](data)
@@ -171,7 +196,7 @@ trait DataSyncSupport {
       data.pstTextData.filterNot(_.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.textContent))
 
   }
-  private def syncLatentData(channel:ChannelOperator,card:LPCard):Unit={
+  private def syncLatentData(card:LPCard)(channel:ChannelOperator):Unit={
     val data = DataSyncStruct.convertProtoBuf2LPCard(card)
 
     var response = channel.writeMessage[ResponseHeader](data)

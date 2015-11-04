@@ -36,10 +36,12 @@ class RequestHeader extends AncientData{
   @Length(24)
   var bnRes2:Array[Byte]   = _ //UCHAR	24	保留
 
+  /*
   var bnData1 = 0       //卡数目
   var bnData2:Short = 0 //卡号长度
   var bnData3:Byte= 0 //参入的比对的特征数目,滚指10，平指10，掌纹2
-  @Length(64-7)
+  */
+  @Length(64)
   var bnData:Array[Byte]   = _  //UCHAR	64	附加数据
 }
 class ResponseHeader extends AncientData{
