@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto.Case
-import nirvana.hall.v62.services.{DatabaseTable, AncientClient}
+import nirvana.hall.v62.services.{V62ServerAddress, DatabaseTable, AncientClient}
 import org.junit.Test
 
 /**
@@ -11,6 +11,7 @@ import org.junit.Test
  * @since 2015-11-03
  */
 class DataSyncSupportTest {
+  private val address = V62ServerAddress("10.1.6.119",6808,"afisadmin")
   @Test
   def test_send_case(): Unit ={
     val sync = createSender()
@@ -45,13 +46,13 @@ class DataSyncSupportTest {
     textBuilder.setStrXieChaRequestUnitCode ("510000")
 
 
-    sync.sendCaseData(DatabaseTable(2,4),protoCase.build())
+    sync.sendCaseData(address,DatabaseTable(2,4),protoCase.build())
   }
   @Test
   def test_send(): Unit ={
     val sync = createSender()
     //sync.sendData(DatabaseTable(2,2))
-    sync.sendData(DatabaseTable(1,2))
+    sync.sendData(address,DatabaseTable(1,2))
   }
   private def createSender():DataSyncSupport={
     new DataSyncSupport with AncientClientSupport with LoggerSupport{
@@ -59,8 +60,8 @@ class DataSyncSupportTest {
        * obtain AncientClient instance
        * @return AncientClient instance
        */
-      override def createAncientClient: AncientClient = {
-        AncientAppClient.connect("10.1.6.119",6898)
+      override def createAncientClient(host:String,port:Int): AncientClient = {
+        AncientAppClient.connect(host,port)
       }
     }
   }

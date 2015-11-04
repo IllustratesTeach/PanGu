@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable}
+import nirvana.hall.v62.services.{V62ServerAddress, ChannelOperator, DatabaseTable}
 import org.apache.commons.io.IOUtils
 
 /**
@@ -18,10 +18,13 @@ trait DataSyncSupport {
    * @param databaseTable database define
    * @param protoCase case data based on protobuf
    */
-  def sendCaseData(databaseTable: DatabaseTable,protoCase:Case): Unit ={
-    createAncientClient.executeInChannel{channel=>
+  def sendCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
+    createAncientClient(serverAddress.host,serverAddress.port)
+      .executeInChannel{channel=>
       val header = new RequestHeader
-      header.szUserName="afisadmin"
+      header.szUserName=serverAddress.user
+      serverAddress.password.foreach(header.szUserPass= _)
+
       header.nDBID = databaseTable.dbId.asInstanceOf[Short]
       header.nTableID = databaseTable.tableId.asInstanceOf[Short]
 
@@ -46,28 +49,6 @@ trait DataSyncSupport {
   private def syncCase(channel:ChannelOperator,protoCase:Case):Unit = {
     //building data
     val data  = CaseStruct.convertProtobuf2Case(protoCase)
-    /*
-    val data = new tagGCASEINFOSTRUCT
-    data.szCaseID=System.currentTimeMillis().toString
-    data.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
-
-    val key = new GAKEYSTRUCT
-    key.key="1446538163548"
-    data.nFingerCount = 1
-    data.pstFingerIdData = Array[GAKEYSTRUCT](key)
-
-
-    val texts = Array(new tagGATEXTITEMSTRUCT())
-    texts.foreach{t=>
-      t.szItemName="CaseClass1Code"
-      t.bIsPointer = 1
-      t.textContent = "1".getBytes("GBK")
-      t.nItemLen = t.textContent.length
-    }
-    data.nTextItemCount = texts.length.toShort
-    data.pstTextData = texts
-    */
-
 
     val nfing = data.nFingerCount
     val npalm = data.nPalmCount
@@ -117,10 +98,12 @@ trait DataSyncSupport {
       }
 
   }
-  def sendData(databaseTable: DatabaseTable): Unit ={
-    createAncientClient.executeInChannel{channel=>
+  def sendData(address:V62ServerAddress,databaseTable: DatabaseTable): Unit ={
+    createAncientClient(address.host,address.port).executeInChannel{channel=>
       val header = new RequestHeader
-      header.szUserName="afisadmin"
+      header.szUserName=address.host
+      address.password.foreach(header.szUserPass = _)
+
       header.nDBID = databaseTable.dbId.asInstanceOf[Short]
       header.nTableID = databaseTable.tableId.asInstanceOf[Short]
 

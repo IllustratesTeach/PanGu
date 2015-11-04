@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.AncientEnum.MatchType
-import nirvana.hall.v62.services.{AncientClient, MatchOptions, DatabaseTable, SelfMatchTask}
+import nirvana.hall.v62.services._
 import org.junit.{Assert, Test}
 
 /**
@@ -12,10 +12,11 @@ import org.junit.{Assert, Test}
  */
 class SendMatchTaskSupportTest extends LoggerSupport{
 
+  private val address = V62ServerAddress("10.1.6.119",6808,"afisadmin")
   @Test
   def test_query_match_result: Unit ={
     val sender = createSender()
-    sender.queryMatchResult(7)
+    sender.queryMatchResult(address,7)
   }
   @Test
   def test_send: Unit ={
@@ -32,7 +33,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
     val sender = createSender()
 
 
-    val sid = sender.sendMatchTask(task)
+    val sid = sender.sendMatchTask(address,task)
     debug("sid :{}",sid)
     Assert.assertTrue(sid.head > 0)
   }
@@ -42,8 +43,9 @@ class SendMatchTaskSupportTest extends LoggerSupport{
        * obtain AncientClient instance
        * @return AncientClient instance
        */
-      override def createAncientClient: AncientClient = {
-        AncientAppClient.connect("10.1.6.182",6798)
+      override def createAncientClient(host:String,port:Int): AncientClient = {
+        //AncientAppClient.connect("10.1.6.182",6798)
+        AncientAppClient.connect(host,port)
       }
     }
   }

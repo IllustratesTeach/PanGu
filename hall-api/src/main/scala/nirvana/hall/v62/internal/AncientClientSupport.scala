@@ -12,8 +12,15 @@ trait AncientClientSupport {
    * obtain AncientClient instance
    * @return AncientClient instance
    */
-  def createAncientClient:AncientClient
-  def validateResponse(response: ResponseHeader,channel:ChannelOperator): Unit ={
+  def createAncientClient(host:String,port:Int):AncientClient
+
+
+  /**
+   * validate the response from server
+   * @param response response object
+   * @param channel server channel
+   */
+  protected def validateResponse(response: ResponseHeader,channel:ChannelOperator): Unit ={
     if(response.nReturnValue == -1) {
       val gafisError = channel.receive[GafisError]()
       throw new IllegalAccessException("fail to send data,num:%s".format(gafisError.nAFISErrno));

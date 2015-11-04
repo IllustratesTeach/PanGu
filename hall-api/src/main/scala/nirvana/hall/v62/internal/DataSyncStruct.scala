@@ -9,7 +9,9 @@ import nirvana.hall.v62.services.AncientData
  * @since 2015-11-03
  */
 class DataSyncStruct {
+  def convertProtoBuf2TPCard(): Unit ={
 
+  }
 }
 
 // the following structure represents a person's tenprint card data

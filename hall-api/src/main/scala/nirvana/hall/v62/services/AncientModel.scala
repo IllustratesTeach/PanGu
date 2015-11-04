@@ -19,6 +19,19 @@ class MatchOptions{
   var srcDb:DatabaseTable = _
   var destDb:DatabaseTable = _
 }
+
+/**
+ * server address
+ * @param host 6.2 server host
+ * @param port bind port
+ */
+case class V62ServerAddress(host:String,port:Int,user:String,password:Option[String]=None)
+
+/**
+ * database table definition
+ * @param dbId database id
+ * @param tableId
+ */
 case class DatabaseTable(dbId:Int,tableId:Int)
 
 case class SelfMatchTask(cardId:String,options:MatchOptions)

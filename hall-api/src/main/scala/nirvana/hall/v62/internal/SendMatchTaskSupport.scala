@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal
 import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.services.SelfMatchTask
+import nirvana.hall.v62.services.{V62ServerAddress, SelfMatchTask}
 
 import scala.collection.mutable
 
@@ -15,10 +15,11 @@ import scala.collection.mutable
 trait SendMatchTaskSupport {
   this:AncientClientSupport with LoggerSupport =>
 
-  def queryMatchResult(sid:Long):Unit ={
-    createAncientClient.executeInChannel{channel=>
+  def queryMatchResult(address:V62ServerAddress,sid:Long):Unit ={
+    createAncientClient(address.host,address.port).executeInChannel{channel=>
       val header = new RequestHeader
-      header.szUserName="afisadmin"
+      header.szUserName=address.user
+      address.password.foreach(header.szUserPass = _)
       header.nOpClass = 105
       header.nOpCode= 455
       header.nDBID = 20
@@ -114,16 +115,15 @@ trait SendMatchTaskSupport {
       }
     }
   }
-  def sendMatchTask(task:SelfMatchTask): Seq[Long] ={
-    createAncientClient.executeInChannel{channel=>
-
-      //1 --> send common request header
+  def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Seq[Long] ={
+    createAncientClient(address.host,address.port).executeInChannel{channel=>
       val buffer = mutable.Buffer[Byte]()
       buffer.appendAll(task.cardId.getBytes)
       buffer.append(0)
       val key = buffer.toArray
       val header = new RequestHeader
-      header.szUserName="afisadmin"
+      header.szUserName=address.user
+      address.password.foreach(header.szUserPass = _ )
       header.nOpClass = 105
       header.nOpCode= 476
       header.nDBID = 20
