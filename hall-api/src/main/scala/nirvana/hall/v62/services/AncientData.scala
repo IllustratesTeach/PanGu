@@ -1,6 +1,7 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
+import org.apache.tapestry5.ioc.internal.services.PropertyAccessImpl
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
@@ -9,6 +10,9 @@ import org.jboss.netty.buffer.ChannelBuffer
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
+object AncientData{
+  private val propertyAccessor = new PropertyAccessImpl
+}
 class AncientData {
   private var dataSize:Int = 0
   /**
@@ -70,7 +74,7 @@ class AncientData {
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
     getClass.getDeclaredFields.filterNot(_.isAnnotationPresent(classOf[IgnoreTransfer])).foreach { f =>
       val annotation = f.getAnnotation(classOf[Length])
-      val fieldValue = getClass.getMethod(f.getName).invoke(this)
+      val fieldValue = AncientData.propertyAccessor.get(this,f.getName) //.invoke(this)
       var dataLength = 0
       if(annotation != null){
         dataLength = annotation.value()
@@ -180,32 +184,32 @@ class AncientData {
       val ANCIENT_CLASS      = classOf[AncientData]
       f.getType match{
         case `BYTE_CLASS` =>
-          getClass.getMethod(f.getName+"_$eq",BYTE_CLASS).invoke(this,channelBuffer.readByte().asInstanceOf[AnyRef])
+          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readByte())
         case `CHAR_CLASS` =>
-          getClass.getMethod(f.getName+"_$eq",CHAR_CLASS).invoke(this,channelBuffer.readChar().asInstanceOf[AnyRef])
+          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readChar())
         case `SHORT_CLASS` =>
-          getClass.getMethod(f.getName+"_$eq",SHORT_CLASS).invoke(this,channelBuffer.readShort().asInstanceOf[AnyRef])
+          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readShort())
         case `INT_CLASS` =>
-          getClass.getMethod(f.getName+"_$eq",INT_CLASS).invoke(this,channelBuffer.readInt().asInstanceOf[AnyRef])
+          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readInt())
         case `LONG_CLASS` =>
-          getClass.getMethod(f.getName+"_$eq",LONG_CLASS).invoke(this,channelBuffer.readLong().asInstanceOf[AnyRef])
+          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readLong())
         case `STRING_CLASS` =>
           val bytes = new Array[Byte](dataLength)
           channelBuffer.readBytes(bytes)
-          getClass.getMethod(f.getName+"_$eq",STRING_CLASS).invoke(this,new String(bytes).trim)
+          AncientData.propertyAccessor.set(this,f.getName,new String(bytes).trim)
         case `BYTE_ARRAY_CLASS` =>
           val bytes = new Array[Byte](dataLength)
           channelBuffer.readBytes(bytes)
-          getClass.getMethod(f.getName+"_$eq",BYTE_ARRAY_CLASS).invoke(this,bytes)
+          AncientData.propertyAccessor.set(this,f.getName,bytes)
         case `ANCIENT_CLASS` =>
           val ancientData = f.getType.newInstance().asInstanceOf[AncientData]
           ancientData.fromChannelBuffer(channelBuffer)
-          getClass.getMethod(f.getName+"_$eq",f.getType).invoke(this,ancientData)
+          AncientData.propertyAccessor.set(this,f.getName,ancientData)
         case other=>
           if(ANCIENT_CLASS.isAssignableFrom(other)) {
             val ancientData = other.newInstance().asInstanceOf[AncientData]
             ancientData.fromChannelBuffer(channelBuffer)
-            getClass.getMethod(f.getName+"_$eq",other).invoke(this,ancientData)
+            AncientData.propertyAccessor.set(this,f.getName,ancientData)
           }else if(other.isArray){
             val componentType = other.getComponentType
             if(ANCIENT_CLASS.isAssignableFrom(componentType)){
@@ -216,7 +220,7 @@ class AncientData {
                 value.fromChannelBuffer(channelBuffer)
                 java.lang.reflect.Array.set(dataArray,x,value)
               }
-              getClass.getMethod(f.getName+"_$eq",other).invoke(this,dataArray)
+              AncientData.propertyAccessor.set(this,f.getName,dataArray)
             }else{
               throw new IllegalAccessException("unknown type:" + componentType)
             }
