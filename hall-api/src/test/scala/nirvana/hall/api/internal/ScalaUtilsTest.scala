@@ -17,7 +17,7 @@ class ScalaUtilsTest {
     codeDataBuilder.setCode("code")
     codeDataBuilder.setName("name")
 
-    val aj = ScalaUtils.convertToScala[CodeAjlb](codeDataBuilder.build)
+    val aj = ScalaUtils.convertProtobufToScala[CodeAjlb](codeDataBuilder.build)
 
     Assert.assertEquals("code",aj.code)
     Assert.assertEquals(Some("name"),aj.name)

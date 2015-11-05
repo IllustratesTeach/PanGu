@@ -36,8 +36,10 @@ object ScalaUtils {
   def typeToClass[T: ClassTag]: Class[T] = {
     tagToClass(classTag[T])
   }
+  //class access
   private val access = new PropertyAccessImpl
 
+  //get value from Protobuf Object
   private def getValueFromProtoObject(protoObject:AnyRef,name:String):Any={
     try {
       access.get(protoObject, name)
@@ -47,10 +49,12 @@ object ScalaUtils {
     }
   }
 
-  def convertToScala[T](obj:CodeData)(implicit typeTag: TypeTag[T],clazzTag:ClassTag[T]):T={
+  /**
+   * convert Protobuf to Scala case object
+   * @param obj CodeData
+   */
+  def convertProtobufToScala[T](obj:CodeData)(implicit typeTag: TypeTag[T],clazzTag:ClassTag[T]):T={
     val clazzSymbol = typeOf[T].typeSymbol
-    //typeOf[T].typeSymbol.asClass.primaryConstructor.asforeach(println)
-    //val clazzSymbol = mirror.reflectClass(typeOf[T]).symbol
     val clazzType = clazzSymbol.asType.toType
     def findValue(symbol:Symbol):Any= {
       val value = getValueFromProtoObject(obj, symbol.name.toString)
@@ -76,6 +80,5 @@ object ScalaUtils {
     val clazzMirror = clazzSymbol.asClass
     val c = clazzMirror.primaryConstructor.asMethod
     mirror.reflectClass(clazzMirror).reflectConstructor(c)(args:_*).asInstanceOf[T]
-
   }
 }
