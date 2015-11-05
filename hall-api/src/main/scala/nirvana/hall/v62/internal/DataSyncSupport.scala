@@ -234,7 +234,7 @@ trait DataSyncSupport {
 
   }
   private def syncTemplateData(card:TPCard)(channel:ChannelOperator):Unit={
-    val data = DataSyncStruct.convertProtoBuf2TPCard(card)
+    val data = FeatureStruct.convertProtoBuf2TPCard(card)
 
     var response = channel.writeMessage[ResponseHeader](data)
     validateResponse(response,channel)
@@ -256,7 +256,7 @@ trait DataSyncSupport {
 
   }
   private def syncLatentData(card:LPCard)(channel:ChannelOperator):Unit={
-    val data = DataSyncStruct.convertProtoBuf2LPCard(card)
+    val data = FeatureStruct.convertProtoBuf2LPCard(card)
 
     var response = channel.writeMessage[ResponseHeader](data)
     validateResponse(response,channel)

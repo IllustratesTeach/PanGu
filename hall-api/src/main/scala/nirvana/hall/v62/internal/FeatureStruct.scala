@@ -10,11 +10,11 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * synchronize data
+ * struct for feature data,such as template,latent and image.
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
-object DataSyncStruct {
+object FeatureStruct {
   /**
    * convert protobuf object to gafis' TPCard
    * @param card protobuf object
