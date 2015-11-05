@@ -61,17 +61,21 @@ object ScalaUtils {
 
     val clazzMirror = clazzSymbol.asClass
     val c = clazzMirror.primaryConstructor.asMethod
-    val args2 = c.paramLists.map(x=>x.map(findValue)).head //take first group as constructor parameter
+    val args = c.paramLists.map(x=>x.map(findValue)).head //take first group as constructor parameter
     val constructor =  mirror.reflectClass(clazzMirror).reflectConstructor(c)
-    constructor.apply(args2:_*).asInstanceOf[T]
+    constructor.apply(args:_*).asInstanceOf[T]
   }
-  def convertScalaToProtobuf[T,P <: MessageOrBuilder](obj:T,builder:P)
-                                                     (implicit typeTag: TypeTag[T],classTag:ClassTag[T]):Unit={
-    val clazzSymbol = typeOf[T].typeSymbol
+
+  /**
+   * retrieve values from scala case class,set  to Protobuf builder instance
+   */
+  def convertScalaToProtobuf[T,P <: MessageOrBuilder](obj:T,builder:P)(implicit typeTag: ClassTag[T]):Unit={
     val instance = mirror.reflect(obj)
+    val clazzSymbol = instance.symbol
+    val clazzType = clazzSymbol.asType.toType
     val clazzMirror = clazzSymbol.asClass
     def setValue(symbol:Symbol):Any= {
-      val termSymbol = universe.typeOf[T].decl(symbol.name.toTermName).asTerm
+      val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       var value:Any= instance.reflectField(termSymbol).get
       val javaProperty = symbol.name.toString
       val firstChar = javaProperty.charAt(0)
