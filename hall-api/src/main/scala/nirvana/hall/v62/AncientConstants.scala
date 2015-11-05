@@ -8,7 +8,7 @@ import java.nio.charset.Charset
  * @since 2015-10-30
  */
 object AncientConstants {
-  final val UTF8_ENCODING=Charset.forName("GBK")
+  final val UTF8_ENCODING=Charset.forName("UTF-8")
   final val GBK_ENCODING=Charset.forName("GBK")
 
   /* all operation are divided into several groups */
