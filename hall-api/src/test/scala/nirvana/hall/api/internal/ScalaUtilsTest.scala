@@ -21,5 +21,11 @@ class ScalaUtilsTest {
 
     Assert.assertEquals("code",aj.code)
     Assert.assertEquals(Some("name"),aj.name)
+
+    val builder2 = CodeData.newBuilder()
+    ScalaUtils.convertScalaToProtobuf(aj,builder2)
+    Assert.assertEquals("code",builder2.getCode)
+    Assert.assertEquals("name",builder2.getName)
+
   }
 }

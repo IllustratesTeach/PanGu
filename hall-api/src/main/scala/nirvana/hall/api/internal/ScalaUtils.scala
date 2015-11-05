@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.protocol.sys.SyncDictProto.SyncDictResponse.CodeData
+import com.google.protobuf.MessageOrBuilder
 import org.apache.tapestry5.ioc.internal.services.PropertyAccessImpl
 
 import scala.reflect.runtime._
@@ -41,44 +41,58 @@ object ScalaUtils {
 
   //get value from Protobuf Object
   private def getValueFromProtoObject(protoObject:AnyRef,name:String):Any={
-    try {
-      access.get(protoObject, name)
-    }catch{
-      case e:IllegalArgumentException => //property not found
-        Nil
-    }
   }
 
   /**
    * convert Protobuf to Scala case object
    * @param obj CodeData
    */
-  def convertProtobufToScala[T](obj:CodeData)(implicit typeTag: TypeTag[T],clazzTag:ClassTag[T]):T={
+  def convertProtobufToScala[T](obj:AnyRef)(implicit typeTag: TypeTag[T]):T={
     val clazzSymbol = typeOf[T].typeSymbol
-    val clazzType = clazzSymbol.asType.toType
     def findValue(symbol:Symbol):Any= {
-      val value = getValueFromProtoObject(obj, symbol.name.toString)
-      symbol.info.resultType.typeArgs match {
-        case Nil =>
-          value
-        case other =>
-          if(symbol.info.resultType <:< typeOf[Option[_]]){ //is option parameter
-            Option(value)
-          }else if(other.head =:= typeOf[Byte]){ //is array of byte
-            value
-          }else{
-            throw new UnsupportedOperationException("")
-          }
+      //retrieve the value by property's name
+      val value = try { access.get(obj, symbol.name.toString) } catch{ case e:IllegalArgumentException => Nil }
+      if(symbol.info.resultType <:< typeOf[Option[_]]){ //is option parameter
+        Option(value)
+      }else{
+        value
       }
     }
 
-    val args = clazzType.members
-      .filter(_.isTerm)
-      .filter(_.asTerm.isAccessor)
-      .map(findValue).toSeq.reverse
-
     val clazzMirror = clazzSymbol.asClass
     val c = clazzMirror.primaryConstructor.asMethod
-    mirror.reflectClass(clazzMirror).reflectConstructor(c)(args:_*).asInstanceOf[T]
+    val args2 = c.paramLists.map(x=>x.map(findValue)).head //take first group as constructor parameter
+    val constructor =  mirror.reflectClass(clazzMirror).reflectConstructor(c)
+    constructor.apply(args2:_*).asInstanceOf[T]
+  }
+  def convertScalaToProtobuf[T,P <: MessageOrBuilder](obj:T,builder:P)
+                                                     (implicit typeTag: TypeTag[T],classTag:ClassTag[T]):Unit={
+    val clazzSymbol = typeOf[T].typeSymbol
+    val instance = mirror.reflect(obj)
+    val clazzMirror = clazzSymbol.asClass
+    def setValue(symbol:Symbol):Any= {
+      val termSymbol = universe.typeOf[T].decl(symbol.name.toTermName).asTerm
+      var value:Any= instance.reflectField(termSymbol).get
+      val javaProperty = symbol.name.toString
+      val firstChar = javaProperty.charAt(0)
+      val propertyMethod = "set"+javaProperty.toString.updated(0,firstChar.toUpper)
+      if(symbol.info.resultType <:< typeOf[Option[_]]) { //is option parameter
+        value.asInstanceOf[Option[_]] match{
+          case Some(v)=> value = v
+          case None => value = null
+        }
+      }
+      try {
+        //FIXME: the method use reflection to set value,not cache property.TODO: use asm or cache property
+        if(value != null)
+          builder.getClass.getMethods.find(_.getName == propertyMethod).foreach(_.invoke(builder, value.asInstanceOf[AnyRef]))
+      }catch{
+        case e: Throwable =>
+          throw new IllegalAccessException("fail to set value for "+javaProperty+",reason:"+e.getMessage)
+      }
+    }
+
+    val c = clazzMirror.primaryConstructor.asMethod
+    c.paramLists.foreach(_.foreach(setValue))
   }
 }
