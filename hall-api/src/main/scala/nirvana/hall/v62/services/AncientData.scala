@@ -1,8 +1,10 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import org.apache.tapestry5.ioc.internal.services.PropertyAccessImpl
 import org.jboss.netty.buffer.ChannelBuffer
+
+import scala.reflect.runtime._
+import scala.reflect.runtime.universe._
 
 /**
  * support to serialize/unserialize data
@@ -10,10 +12,64 @@ import org.jboss.netty.buffer.ChannelBuffer
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
-object AncientData{
-  private val propertyAccessor = new PropertyAccessImpl
+object AncientData {
+  val mirror = universe.runtimeMirror(getClass.getClassLoader)
 }
-class AncientData {
+sealed trait ScalaReflect{
+  private var dataSize:Int = 0
+  private def findBaseLength(tpe:Type,length:Int):Int={
+    val BYTE_CLASS = typeOf[Byte]
+    val CHAR_CLASS = typeOf[Char]
+    val SHORT_CLASS = typeOf[Short]
+    val INT_CLASS = typeOf[Int]
+    val LONG_CLASS = typeOf[Long]
+    val STRING_CLASS = typeOf[String]
+    val ANCIENT_DATA_TYPE = typeOf[AncientData]
+    tpe match {
+      case `BYTE_CLASS` | `CHAR_CLASS` =>
+        1
+      case `SHORT_CLASS` =>
+        2
+      case `INT_CLASS` =>
+        4
+      case `LONG_CLASS` =>
+        8
+      case `STRING_CLASS` =>
+        if(length == 0){
+          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+        }
+        length
+      case other =>
+        if (other <:< typeOf[AncientData]) {
+          val ct = other.typeSymbol.asClass.primaryConstructor.asMethod
+          AncientData.mirror.reflectClass(other.typeSymbol.asClass).reflectConstructor(ct)().asInstanceOf[AncientData].getDataSize
+        }else {
+          if(length == 0){
+            throw new IllegalArgumentException("@Lenght not defined "+tpe)
+          }
+          length * tpe.typeArgs.map(findBaseLength(_,0)).sum
+        }
+    }
+  }
+  def getDataSizeByScala:Int={
+    if(dataSize == 0) {
+      val instanceMirror = AncientData.mirror.reflect(this)
+      val decl = instanceMirror.symbol.asType.toType
+      decl.members
+        .filter(_.isTerm)
+        .filter(_.asTerm.isVar)
+        .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
+        .foreach { m =>
+        val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
+        val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
+        dataSize += findBaseLength(m.info,length)
+      }
+    }
+
+    dataSize
+  }
+}
+sealed trait JavaReflect{
   private var dataSize:Int = 0
   /**
    * get data size
@@ -74,7 +130,7 @@ class AncientData {
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
     getClass.getDeclaredFields.filterNot(_.isAnnotationPresent(classOf[IgnoreTransfer])).foreach { f =>
       val annotation = f.getAnnotation(classOf[Length])
-      val fieldValue = AncientData.propertyAccessor.get(this,f.getName) //.invoke(this)
+      val fieldValue = getClass.getMethod(f.getName).invoke(this)
       var dataLength = 0
       if(annotation != null){
         dataLength = annotation.value()
@@ -184,32 +240,32 @@ class AncientData {
       val ANCIENT_CLASS      = classOf[AncientData]
       f.getType match{
         case `BYTE_CLASS` =>
-          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readByte())
+          getClass.getMethod(f.getName+"_$eq",BYTE_CLASS).invoke(this,channelBuffer.readByte().asInstanceOf[AnyRef])
         case `CHAR_CLASS` =>
-          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readChar())
+          getClass.getMethod(f.getName+"_$eq",CHAR_CLASS).invoke(this,channelBuffer.readChar().asInstanceOf[AnyRef])
         case `SHORT_CLASS` =>
-          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readShort())
+          getClass.getMethod(f.getName+"_$eq",SHORT_CLASS).invoke(this,channelBuffer.readShort().asInstanceOf[AnyRef])
         case `INT_CLASS` =>
-          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readInt())
+          getClass.getMethod(f.getName+"_$eq",INT_CLASS).invoke(this,channelBuffer.readInt().asInstanceOf[AnyRef])
         case `LONG_CLASS` =>
-          AncientData.propertyAccessor.set(this,f.getName,channelBuffer.readLong())
+          getClass.getMethod(f.getName+"_$eq",LONG_CLASS).invoke(this,channelBuffer.readLong().asInstanceOf[AnyRef])
         case `STRING_CLASS` =>
           val bytes = new Array[Byte](dataLength)
           channelBuffer.readBytes(bytes)
-          AncientData.propertyAccessor.set(this,f.getName,new String(bytes).trim)
+          getClass.getMethod(f.getName+"_$eq",STRING_CLASS).invoke(this,new String(bytes).trim)
         case `BYTE_ARRAY_CLASS` =>
           val bytes = new Array[Byte](dataLength)
           channelBuffer.readBytes(bytes)
-          AncientData.propertyAccessor.set(this,f.getName,bytes)
+          getClass.getMethod(f.getName+"_$eq",BYTE_ARRAY_CLASS).invoke(this,bytes)
         case `ANCIENT_CLASS` =>
           val ancientData = f.getType.newInstance().asInstanceOf[AncientData]
           ancientData.fromChannelBuffer(channelBuffer)
-          AncientData.propertyAccessor.set(this,f.getName,ancientData)
+          getClass.getMethod(f.getName+"_$eq",f.getType).invoke(this,ancientData)
         case other=>
           if(ANCIENT_CLASS.isAssignableFrom(other)) {
             val ancientData = other.newInstance().asInstanceOf[AncientData]
             ancientData.fromChannelBuffer(channelBuffer)
-            AncientData.propertyAccessor.set(this,f.getName,ancientData)
+            getClass.getMethod(f.getName+"_$eq",other).invoke(this,ancientData)
           }else if(other.isArray){
             val componentType = other.getComponentType
             if(ANCIENT_CLASS.isAssignableFrom(componentType)){
@@ -220,7 +276,7 @@ class AncientData {
                 value.fromChannelBuffer(channelBuffer)
                 java.lang.reflect.Array.set(dataArray,x,value)
               }
-              AncientData.propertyAccessor.set(this,f.getName,dataArray)
+              getClass.getMethod(f.getName+"_$eq",other).invoke(this,dataArray)
             }else{
               throw new IllegalAccessException("unknown type:" + componentType)
             }
@@ -232,6 +288,8 @@ class AncientData {
 
     this
   }
+}
+class AncientData extends JavaReflect{
 }
 
 class DynamicByteArray(val data:Array[Byte]) extends AncientData{

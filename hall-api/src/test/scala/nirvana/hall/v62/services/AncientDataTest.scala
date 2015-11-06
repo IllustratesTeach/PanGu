@@ -2,6 +2,7 @@ package nirvana.hall.v62.services
 
 import java.util.concurrent.atomic.AtomicReferenceArray
 
+import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.internal.RequestHeader
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
@@ -13,6 +14,12 @@ import org.junit.{Assert, Test}
  */
 class AncientDataTest {
 
+  @Test
+  def test_scala_length: Unit = {
+    val m = new M
+
+    //Assert.assertEquals(34,m.getDataSizeByScala)
+  }
   @Test
   def test_ancient: Unit ={
     val header = new RequestHeader
@@ -32,3 +39,23 @@ class AncientDataTest {
     }
   }
 }
+
+class M extends AncientData{
+  var i:Int = _
+  var s:Short = _
+  @IgnoreTransfer
+  var ignore:Int = _
+  @Length(2)
+  var a:Array[Byte]= _
+  @Length(2)
+  var n:Array[N]= _
+  @Length(20)
+  var str:String= _
+  var n2:N= _
+}
+//2
+class N extends AncientData {
+  @Length(2)
+  var a:Array[Byte]= _
+}
+
