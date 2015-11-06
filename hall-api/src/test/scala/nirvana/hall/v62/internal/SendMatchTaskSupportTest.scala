@@ -12,7 +12,7 @@ import org.junit.{Assert, Test}
  */
 class SendMatchTaskSupportTest extends LoggerSupport{
 
-  private val address = V62ServerAddress("10.1.6.119",6808,"afisadmin")
+  private val address = V62ServerAddress("10.1.6.119",6898,"afisadmin")
   @Test
   def test_query_match_result: Unit ={
     val sender = createSender()

@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.services.{SelfMatchTask, V62ServerAddress}
 
 /**
@@ -16,7 +17,7 @@ trait SendMatchTaskSupport {
 
   def queryMatchResult(address:V62ServerAddress,sid:Long):Unit ={
     createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val header = new RequestHeader
+      val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
       header.nOpClass = 105
@@ -130,8 +131,9 @@ trait SendMatchTaskSupport {
       address.password.foreach(header.szUserPass = _ )
       header.nOpClass = AncientConstants.OP_CLASS_QUERY.asInstanceOf[Short]
       header.nOpCode= AncientConstants.OP_QUERY_SUBMIT.asInstanceOf[Short]
-      //header.nDBID = 20
-      //header.nTableID = 2
+
+      header.nDBID = 20 //查询结果的保存位置
+      header.nTableID = 2
 
       //send 7 byte: 1) key count 2) key length 3) finger position count
       val bytes = ByteBuffer.allocate(7)
