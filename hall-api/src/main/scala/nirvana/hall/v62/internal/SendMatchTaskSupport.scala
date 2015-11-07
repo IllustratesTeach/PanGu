@@ -8,7 +8,7 @@ import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.GADB_RETVAL
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{SelfMatchTask, V62ServerAddress}
 
 /**
@@ -57,10 +57,10 @@ trait SendMatchTaskSupport {
       queryStruct.nItemFlagA = 64
 
 
-      val response = channel.writeMessage[ResponseHeader](queryStruct)
+      val response = channel.writeMessage[GNETANSWERHEADOBJECT](queryStruct)
       debug("query struct sent,then return code:{},ndatalen:{}",response.nReturnValue,response.nDataLen)
       validateResponse(response,channel)
-      //response = channel.receive[ResponseHeader]()
+      //response = channel.receive[GNETANSWERHEADOBJECT]()
 
       response.nReturnValue = 1
       channel.writeMessage[NoneResponse](response)
@@ -142,7 +142,7 @@ trait SendMatchTaskSupport {
         .put(task.options.positions.length.asInstanceOf[Byte]).array()
       header.bnData = bytes
 
-      var response = channel.writeMessage[ResponseHeader](header)
+      var response = channel.writeMessage[GNETANSWERHEADOBJECT](header)
       validateResponse(response,channel)
 
       channel.writeByteArray[NoneResponse](key)
@@ -167,7 +167,7 @@ trait SendMatchTaskSupport {
 
       queryStruct.nItemFlagA = 64
 
-      response = channel.writeMessage[ResponseHeader](queryStruct)
+      response = channel.writeMessage[GNETANSWERHEADOBJECT](queryStruct)
       validateResponse(response,channel)
       val ret = channel.receive[GADB_RETVAL]()
       convertSixByteArrayToLong(ret.nSID)

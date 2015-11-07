@@ -5,6 +5,7 @@ import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GATIMERANGE
 import nirvana.hall.v62.internal.c.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocdef._
+import nirvana.hall.v62.internal.c._
 import nirvana.hall.v62.services.AncientData
 
 /**
@@ -13,7 +14,6 @@ import nirvana.hall.v62.services.AncientData
  * @since 2015-11-06
  */
 object gaqryque {
-  final val SID_SIZE = 6
 
 
   class GA_SIMPCAND extends AncientData

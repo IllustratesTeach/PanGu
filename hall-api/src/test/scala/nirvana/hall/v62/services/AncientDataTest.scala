@@ -3,7 +3,7 @@ package nirvana.hall.v62.services
 import java.util.concurrent.atomic.AtomicReferenceArray
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import nirvana.hall.v62.internal.RequestHeader
+import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 
@@ -22,11 +22,11 @@ class AncientDataTest {
   }
   @Test
   def test_ancient: Unit ={
-    val header = new RequestHeader
+    val header = new GNETREQUESTHEADOBJECT
     header.nIP="10.1.1.1"
     val buffer = ChannelBuffers.buffer(header.getDataSize)
     header.writeToChannelBuffer(buffer)
-    val header2 = new RequestHeader
+    val header2 = new GNETREQUESTHEADOBJECT
     header2.fromChannelBuffer(buffer)
 
     Assert.assertEquals(header.nIP,header2.nIP)

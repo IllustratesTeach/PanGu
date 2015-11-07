@@ -5,6 +5,7 @@ import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
 /**
@@ -16,7 +17,7 @@ trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
 
   //change header data
-  private type HeaderDataModifier = RequestHeader => Unit
+  private type HeaderDataModifier = GNETREQUESTHEADOBJECT => Unit
   private type DataWriter = ChannelOperator => Unit
   //nothing write
   private val NoneOperator:DataWriter = channel =>{
@@ -25,7 +26,7 @@ trait DataSyncSupport {
     header.bnData = Array[Byte](1)
   }
   //copy key to header
-  private def DeleteDataHeader(key:String)(header:RequestHeader): Unit ={
+  private def DeleteDataHeader(key:String)(header:GNETREQUESTHEADOBJECT): Unit ={
     header.bnData = key.getBytes(AncientConstants.GBK_ENCODING)
   }
   private case class V62OperateOptions(opClass:Int,opCode:Int,func:DataWriter)
@@ -159,7 +160,7 @@ trait DataSyncSupport {
 
   private def sendData(address:V62ServerAddress,databaseTable: DatabaseTable,options:V62OperateOptions,headerDataModifier: HeaderDataModifier=AddDataHeader): Unit ={
     createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val header = new RequestHeader
+      val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
 
@@ -178,7 +179,7 @@ trait DataSyncSupport {
       options.func(channel)
 
       //Finally receive server response
-      val response  = channel.receive[ResponseHeader]()
+      val response  = channel.receive[GNETANSWERHEADOBJECT]()
       validateResponse(response,channel)
 
     }
@@ -195,7 +196,7 @@ trait DataSyncSupport {
     if ( nfing<=0 && npalm<=0 && ntext<=0 && nextrainfolen<=0 ) {
       throw new IllegalArgumentException
     }
-    var response = channel.writeMessage[ResponseHeader](data)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
     validateResponse(response,channel)
 
     var bExtraInfoFirst = 0
@@ -223,7 +224,7 @@ trait DataSyncSupport {
     if ( bExtraInfoFirst> 0 && ( nextrainfolen > 0 ) ) {
       channel.writeMessage[NoneResponse](data.pstExtraInfo_Data)
       if(data.pstExtraInfo_Data != null ){
-        response = channel.receive[ResponseHeader]()
+        response = channel.receive[GNETANSWERHEADOBJECT]()
 
         validateResponse(response,channel)
         val head = data.pstExtraInfo_Data.head
@@ -241,7 +242,7 @@ trait DataSyncSupport {
   private def syncTemplateData(card:TPCard)(channel:ChannelOperator):Unit={
     val data = FeatureStruct.convertProtoBuf2TPCard(card)
 
-    var response = channel.writeMessage[ResponseHeader](data)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
     validateResponse(response,channel)
 
 
@@ -250,7 +251,7 @@ trait DataSyncSupport {
     if(data.pstText_Data!= null)
       data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
-    response = channel.receive[ResponseHeader]()
+    response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(response,channel)
 
     if(data.pstMIC_Data != null)
@@ -263,7 +264,7 @@ trait DataSyncSupport {
   private def syncLatentData(card:LPCard)(channel:ChannelOperator):Unit={
     val data = FeatureStruct.convertProtoBuf2LPCard(card)
 
-    var response = channel.writeMessage[ResponseHeader](data)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
     validateResponse(response,channel)
 
     val bnData = new String(response.bnData)
@@ -278,7 +279,7 @@ trait DataSyncSupport {
     if(data.pstText_Data != null)
     data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
-    response = channel.receive[ResponseHeader]()
+    response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(response,channel)
 
     if(data.pstMIC_Data != null)

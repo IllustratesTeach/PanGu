@@ -2,7 +2,6 @@ package nirvana.hall.v62.internal
 
 import nirvana.hall.protocol.v62.FPTProto
 import nirvana.hall.protocol.v62.FPTProto.{LPCard, TPCard}
-import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.internal.c.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocdef
@@ -93,18 +92,18 @@ object FeatureStruct {
         mic.pstMnt_Data = blob.getStMntBytes.toByteArray
         mic.nMntLen = mic.pstMnt_Data.length
 
-        flag |= AncientConstants.GAMIC_ITEMFLAG_MNT
+        flag |= glocdef.GAMIC_ITEMFLAG_MNT
       }
       if(blob.hasStImage){
-        val imgType = blob.getStImageBytes.byteAt(9) //see tagGAFISIMAGEHEADSTRUCT.bIsCompressed
+        val imgType = blob.getStImageBytes.byteAt(9) //see GAFISIMAGEHEADSTRUCT.bIsCompressed
         if(imgType == 1){ //image compressed
           mic.pstCpr_Data = blob.getStImageBytes.toByteArray
           mic.nCprLen = mic.pstCpr_Data.length
-          flag |= AncientConstants.GAMIC_ITEMFLAG_CPR
+          flag |= glocdef.GAMIC_ITEMFLAG_CPR
         }else{
           mic.pstImg_Data = blob.getStImageBytes.toByteArray
           mic.nImgLen = mic.pstImg_Data.length
-          flag |= AncientConstants.GAMIC_ITEMFLAG_IMG
+          flag |= glocdef.GAMIC_ITEMFLAG_IMG
         }
       }
 
@@ -116,22 +115,22 @@ object FeatureStruct {
       blob.getType match{
         case FPTProto.ImageType.IMAGETYPE_FINGER =>
           if(blob.getBPlain)
-            mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_TPLAIN.asInstanceOf[Byte]
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_TPLAIN.asInstanceOf[Byte]
           else
-            mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
 
           //指位信息
           if(blob.hasFgp){
             mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte]
           }
         case FPTProto.ImageType.IMAGETYPE_FACE =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case other =>
           throw new UnsupportedOperationException
       }
@@ -207,15 +206,15 @@ object FeatureStruct {
 
       blob.getType match{
         case FPTProto.ImageType.IMAGETYPE_FINGER =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_FACE =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
-          mic.nItemType = AncientConstants.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case other =>
           throw new UnsupportedOperationException
       }
