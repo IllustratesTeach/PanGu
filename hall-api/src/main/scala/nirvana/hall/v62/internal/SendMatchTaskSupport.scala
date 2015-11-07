@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.GADB_RETVAL
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
@@ -23,8 +24,8 @@ trait SendMatchTaskSupport {
       val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
-      header.nOpClass = 105
-      header.nOpCode= 455
+      header.nOpClass = OP_CLASS_QUERY.asInstanceOf[Short]
+      header.nOpCode= OP_QUERY_GET.asInstanceOf[Short]
       header.nDBID = 20
       header.nTableID = 2
 
@@ -128,8 +129,8 @@ trait SendMatchTaskSupport {
       val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _ )
-      header.nOpClass = AncientConstants.OP_CLASS_QUERY.asInstanceOf[Short]
-      header.nOpCode= AncientConstants.OP_QUERY_SUBMIT.asInstanceOf[Short]
+      header.nOpClass = OP_CLASS_QUERY.asInstanceOf[Short]
+      header.nOpCode= OP_QUERY_SUBMIT.asInstanceOf[Short]
 
       header.nDBID = 20 //查询结果的保存位置
       header.nTableID = 2

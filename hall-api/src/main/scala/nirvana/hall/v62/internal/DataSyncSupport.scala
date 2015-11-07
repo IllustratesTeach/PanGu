@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
@@ -36,8 +37,8 @@ trait DataSyncSupport {
   def addCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_ADD,
+        OP_CLASS_CASE,
+        OP_CASE_ADD,
         syncCase(protoCase)))
   }
 
@@ -50,8 +51,8 @@ trait DataSyncSupport {
   def updateCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_UPDATE,
+        OP_CLASS_CASE,
+        OP_CASE_UPDATE,
         syncCase(protoCase)))
   }
 
@@ -64,8 +65,8 @@ trait DataSyncSupport {
   def deleteCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,caseId:String): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_DEL,
+        OP_CLASS_CASE,
+        OP_CASE_DEL,
       NoneOperator),DeleteDataHeader(caseId))
   }
 
@@ -78,8 +79,8 @@ trait DataSyncSupport {
   def updateTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_UPDATE,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_UPDATE,
         syncTemplateData(card)))
   }
 
@@ -92,8 +93,8 @@ trait DataSyncSupport {
   def addTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_ADD,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_ADD,
         syncTemplateData(card)))
   }
 
@@ -106,8 +107,8 @@ trait DataSyncSupport {
   def deleteTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_DEL,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_DEL,
         NoneOperator),
       DeleteDataHeader(key))
   }
@@ -121,8 +122,8 @@ trait DataSyncSupport {
   def updateLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_UPDATE,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_UPDATE,
         syncLatentData(card)))
   }
 
@@ -135,8 +136,8 @@ trait DataSyncSupport {
   def addLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_ADD,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_ADD,
         syncLatentData(card)))
   }
 
@@ -149,8 +150,8 @@ trait DataSyncSupport {
   def deleteLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_DEL,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_DEL,
         NoneOperator),
       DeleteDataHeader(key))
   }
