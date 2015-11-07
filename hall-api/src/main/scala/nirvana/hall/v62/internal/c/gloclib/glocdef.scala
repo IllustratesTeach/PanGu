@@ -132,22 +132,22 @@ object glocdef {
 
         var pstMnt_Ptr:Int = _ //using 4 byte as pointer
         @IgnoreTransfer
-        var pstMnt_Data:Array[GAFISIMAGESTRUCT] = _;			// pointer to mnt, pstMnt->bnData is the actual minutia
+        var pstMnt_Data:Array[Byte] = _;			// pointer to mnt, pstMnt->bnData is the actual minutia
         @Length(4)
         var bnRes_pstMnt:Array[Byte] = _ ;
         var pstImg_Ptr:Int = _ //using 4 byte as pointer
         @IgnoreTransfer
-        var pstImg_Data:Array[GAFISIMAGESTRUCT] = _;	// pointer to image
+        var pstImg_Data:Array[Byte] = _;	// pointer to image
         @Length(4)
         var bnRes_pstImg:Array[Byte] = _ ;
         var pstCpr_Ptr:Int = _ //using 4 byte as pointer
         @IgnoreTransfer
-        var pstCpr_Data:Array[GAFISIMAGESTRUCT] = _;	// pointer to compressed image
+        var pstCpr_Data:Array[Byte] = _;	// pointer to compressed image
         @Length(4)
         var bnRes_pstCpr:Array[Byte] = _ ;
         var pstBin_Ptr:Int = _ //using 4 byte as pointer
         @IgnoreTransfer
-        var pstBin_Data:Array[GAFISIMAGESTRUCT] = _;	// pointer to binary data
+        var pstBin_Data:Array[Byte] = _;	// pointer to binary data
         @Length(4)
         var bnRes_pstBin:Array[Byte] = _ ;
         } // GAFISMICSTRUCT;		// size of this structure is 64 bytes

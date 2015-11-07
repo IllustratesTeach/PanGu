@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
 /**
@@ -243,19 +244,19 @@ trait DataSyncSupport {
     validateResponse(response,channel)
 
 
-    if(data.pstMICData != null)
-      data.pstMICData.foreach(channel.writeMessage[NoneResponse](_))
-    if(data.pstTextData!= null)
-      data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstText_Data!= null)
+      data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
     response = channel.receive[ResponseHeader]()
     validateResponse(response,channel)
 
-    if(data.pstMICData != null)
-      data.pstMICData.foreach(sendGAFISMICSTRUCT(_,channel))
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))
 
-    if(data.pstTextData != null)
-      data.pstTextData.filterNot(_.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.textContent))
+    if(data.pstText_Data != null)
+      data.pstText_Data.filterNot(_.stData.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.stData.textContent))
 
   }
   private def syncLatentData(card:LPCard)(channel:ChannelOperator):Unit={
@@ -270,34 +271,35 @@ trait DataSyncSupport {
       extraInfo = data.nExtraInfoLen
     }
 
-    if(data.pstMICData != null)
-      channel.writeMessage[NoneResponse](data.pstMICData)
+    if(data.pstMIC_Data != null)
+      channel.writeMessage[NoneResponse](data.pstMIC_Data)
 
-    if(data.pstTextData != null)
-    data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstText_Data != null)
+    data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
     response = channel.receive[ResponseHeader]()
     validateResponse(response,channel)
 
-    if(data.pstMICData != null)
-      sendGAFISMICSTRUCT(data.pstMICData,channel)
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))
 
-    if(data.pstTextData != null)
-      data.pstTextData.filterNot(_.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.textContent))
+    if(data.pstText_Data != null)
+      data.pstText_Data.filterNot(_.stData.textContent == null)
+        .foreach(x=>channel.writeByteArray[NoneResponse](x.stData.textContent))
 
     if(extraInfo > 0)
-      channel.writeMessage[NoneResponse](data.pstExtraInfoData)
+      channel.writeMessage[NoneResponse](data.pstExtraInfo_Data)
 
   }
 
-  private def sendGAFISMICSTRUCT(mic:tagGAFISMICSTRUCT,channel:ChannelOperator): Unit ={
+  private def sendGAFISMICSTRUCT(mic:GAFISMICSTRUCT,channel:ChannelOperator): Unit ={
     if(mic.nMntLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstMntData)
+      channel.writeByteArray[NoneResponse](mic.pstMnt_Data)
     if(mic.nImgLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstImgData)
+      channel.writeByteArray[NoneResponse](mic.pstImg_Data)
     if(mic.nCprLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstCprData)
+      channel.writeByteArray[NoneResponse](mic.pstCpr_Data)
     if(mic.nBinLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstBinData)
+      channel.writeByteArray[NoneResponse](mic.pstBin_Data)
   }
 }

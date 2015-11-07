@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.GADB_RETVAL
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
@@ -57,66 +58,62 @@ trait SendMatchTaskSupport {
 
       val response = channel.writeMessage[ResponseHeader](queryStruct)
       debug("query struct sent,then return code:{},ndatalen:{}",response.nReturnValue,response.nDataLen)
-      if(response.nReturnValue == -1){
-        val gafisError = channel.receive[GafisError]()
-        throw new IllegalAccessException("fail to send query struct,num:%s".format(gafisError.nAFISErrno))
-      }else{
-        //response = channel.receive[ResponseHeader]()
+      validateResponse(response,channel)
+      //response = channel.receive[ResponseHeader]()
 
-        response.nReturnValue = 1
-        channel.writeMessage[NoneResponse](response)
+      response.nReturnValue = 1
+      channel.writeMessage[NoneResponse](response)
 
-        val matchResult = channel.receive[GAQUERYSTRUCT]()
-        val count = matchResult.nMICCount
-        debug("match result is {}",count)
+      val matchResult = channel.receive[GAQUERYSTRUCT]()
+      val count = matchResult.nMICCount
+      debug("match result is {}",count)
 
-        val headers = 0 until count map(i=>channel.receive[GAFISMICSTRUCT]())
+      val headers = 0 until count map(i=>channel.receive[GAFISMICSTRUCT]())
 
-        headers.foreach{header=>
-          if(header.nMntLen > 0)
-            channel.receiveByteArray(header.nMntLen)
-          if(header.nImgLen > 0)
-            channel.receiveByteArray(header.nImgLen)
-          if(header.nCprLen > 0)
-            channel.receiveByteArray(header.nCprLen)
-          if(header.nBinLen > 0)
-            channel.receiveByteArray(header.nBinLen)
-        }
-
-        //receive server list
-        if(matchResult.nSvrListLen > 0 )
-          channel.receiveByteArray(matchResult.nSvrListLen)
-        var candHead:GAQUERYCANDHEADSTRUCT = null
-        if(matchResult.nCandHeadLen >0) {
-          val buffer = channel.receiveByteArray(matchResult.nCandHeadLen) //
-          val bytes = buffer.toByteBuffer().array()
-
-          candHead = new GAQUERYCANDHEADSTRUCT
-          candHead.fromChannelBuffer(buffer)
-        }
-        if(matchResult.nCandLen > 0) {
-          val buffer = channel.receiveByteArray(matchResult.nCandLen)
-          val num = candHead.nCandidateNum & 0x0000ffff
-          debug("cand num:{}",num)
-          val result = 0 until num map{i=>
-            val cand = new GAQUERYCANDSTRUCT
-            cand.fromChannelBuffer(buffer)
-            debug("sid:{} pos:{} score:{}",convertSixByteArrayToLong(cand.nSID),cand.nIndex,cand.nScore)
-            cand
-          }
-        }
-
-        if(matchResult.nQryCondLen>0)
-          channel.receiveByteArray(matchResult.nQryCondLen)
-        if(matchResult.nMISCondLen>0)
-          channel.receiveByteArray(matchResult.nMISCondLen)
-        if(matchResult.nTextSqlLen>0)
-          channel.receiveByteArray(matchResult.nTextSqlLen)
-        if(matchResult.nCommentLen> 0)
-          channel.receiveByteArray(matchResult.nCommentLen)
-        if(matchResult.nQryInfoLen> 0)
-          channel.receiveByteArray(matchResult.nQryInfoLen)
+      headers.foreach{header=>
+        if(header.nMntLen > 0)
+          channel.receiveByteArray(header.nMntLen)
+        if(header.nImgLen > 0)
+          channel.receiveByteArray(header.nImgLen)
+        if(header.nCprLen > 0)
+          channel.receiveByteArray(header.nCprLen)
+        if(header.nBinLen > 0)
+          channel.receiveByteArray(header.nBinLen)
       }
+
+      //receive server list
+      if(matchResult.nSvrListLen > 0 )
+        channel.receiveByteArray(matchResult.nSvrListLen)
+      var candHead:GAQUERYCANDHEADSTRUCT = null
+      if(matchResult.nCandHeadLen >0) {
+        val buffer = channel.receiveByteArray(matchResult.nCandHeadLen) //
+        val bytes = buffer.toByteBuffer().array()
+
+        candHead = new GAQUERYCANDHEADSTRUCT
+        candHead.fromChannelBuffer(buffer)
+      }
+      if(matchResult.nCandLen > 0) {
+        val buffer = channel.receiveByteArray(matchResult.nCandLen)
+        val num = candHead.nCandidateNum & 0x0000ffff
+        debug("cand num:{}",num)
+        val result = 0 until num map{i=>
+          val cand = new GAQUERYCANDSTRUCT
+          cand.fromChannelBuffer(buffer)
+          debug("sid:{} pos:{} score:{}",convertSixByteArrayToLong(cand.nSID),cand.nIndex,cand.nScore)
+          cand
+        }
+      }
+
+      if(matchResult.nQryCondLen>0)
+        channel.receiveByteArray(matchResult.nQryCondLen)
+      if(matchResult.nMISCondLen>0)
+        channel.receiveByteArray(matchResult.nMISCondLen)
+      if(matchResult.nTextSqlLen>0)
+        channel.receiveByteArray(matchResult.nTextSqlLen)
+      if(matchResult.nCommentLen> 0)
+        channel.receiveByteArray(matchResult.nCommentLen)
+      if(matchResult.nQryInfoLen> 0)
+        channel.receiveByteArray(matchResult.nQryInfoLen)
     }
   }
   def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Long ={

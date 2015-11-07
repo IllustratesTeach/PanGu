@@ -1,7 +1,7 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import org.jboss.netty.buffer.ChannelBuffer
+import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
 
 import scala.reflect.runtime._
 import scala.reflect.runtime.universe._
@@ -217,6 +217,9 @@ sealed trait JavaReflect{
     }
 
     channelBuffer
+  }
+  def fromBytes(bytes: Array[Byte]): this.type ={
+    fromChannelBuffer(ChannelBuffers.wrappedBuffer(bytes))
   }
 
   /**

@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import nirvana.hall.v62.services.{ChannelOperator, AncientClient}
 
 /**
@@ -22,7 +23,7 @@ trait AncientClientSupport {
    */
   protected def validateResponse(response: ResponseHeader,channel:ChannelOperator): Unit ={
     if(response.nReturnValue == -1) {
-      val gafisError = channel.receive[GafisError]()
+      val gafisError = channel.receive[GAFISERRDATSTRUCT]()
       println(gafisError.bnAFISErrData)
       throw new IllegalAccessException("fail to send data,num:%s,file:%s,line:%s".format(gafisError.nAFISErrno,gafisError.szFileName,gafisError.nLineNum));
     }
