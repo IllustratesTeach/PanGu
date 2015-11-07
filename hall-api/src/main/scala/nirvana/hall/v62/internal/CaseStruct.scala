@@ -3,8 +3,10 @@ package nirvana.hall.v62.internal
 import com.google.protobuf.ProtocolStringList
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import nirvana.hall.v62.services.AncientData
+import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.galoclp.GCASEINFOSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.glocdef.GATEXTITEMSTRUCT
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
@@ -18,41 +20,41 @@ object CaseStruct {
   private def convertAsKeyArray(stringList:ProtocolStringList): Array[GAKEYSTRUCT] ={
     stringList.map{id=>
       val key = new GAKEYSTRUCT
-      key.key = id
+      key.szKey = id
       key
     }.toArray
   }
-  private[internal] def appendTextStruct(buffer:mutable.Buffer[tagGATEXTITEMSTRUCT],name:String,value:String):Unit = {
+  private[internal] def appendTextStruct(buffer:mutable.Buffer[GATEXTITEMSTRUCT],name:String,value:String):Unit = {
     if(value != null && value.length > 0) {
-      val textStruct = new tagGATEXTITEMSTRUCT()
+      val textStruct = new GATEXTITEMSTRUCT()
       textStruct.bIsPointer = 1
       textStruct.szItemName = name
       //convert as GBK encoding,because 6.2 need gbk encoding
-      textStruct.textContent = value.getBytes(AncientConstants.GBK_ENCODING)
-      textStruct.nItemLen = textStruct.textContent.length
+      textStruct.stData.textContent = value.getBytes(AncientConstants.GBK_ENCODING)
+      textStruct.nItemLen = textStruct.stData.textContent.length
 
       buffer += textStruct
     }
 
   }
-  def convertProtobuf2Case(protoCase:Case):tagGCASEINFOSTRUCT = {
-    val gafisCase = new tagGCASEINFOSTRUCT
+  def convertProtobuf2Case(protoCase:Case):GCASEINFOSTRUCT = {
+    val gafisCase = new GCASEINFOSTRUCT
     gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
     //GAFIS里面没有'A',这里去掉前缀
     gafisCase.szCaseID = protoCase.getStrCaseID
     if(gafisCase.szCaseID.charAt(0) == 'A')
       gafisCase.szCaseID = gafisCase.szCaseID.substring(1)
 
-    gafisCase.pstFingerIdData = convertAsKeyArray(protoCase.getStrFingerIDList)
-    gafisCase.nFingerCount = gafisCase.pstFingerIdData.length.asInstanceOf[Short]
+    gafisCase.pstFingerID_Data = convertAsKeyArray(protoCase.getStrFingerIDList)
+    gafisCase.nFingerCount = gafisCase.pstFingerID_Data.length.asInstanceOf[Short]
 
-    gafisCase.pstPalmIdData = convertAsKeyArray(protoCase.getStrPalmIDList)
-    gafisCase.nPalmCount = gafisCase.pstPalmIdData.length.asInstanceOf[Short]
+    gafisCase.pstPalmID_Data= convertAsKeyArray(protoCase.getStrPalmIDList)
+    gafisCase.nPalmCount = gafisCase.pstPalmID_Data.length.asInstanceOf[Short]
 
 
     if (protoCase.hasText) {
       val text = protoCase.getText
-      val buffer = mutable.Buffer[tagGATEXTITEMSTRUCT]()
+      val buffer = mutable.Buffer[GATEXTITEMSTRUCT]()
 
       appendTextStruct(buffer, "CaseClass1Code", text.getStrCaseType1)
       appendTextStruct(buffer, "CaseClass2Code", text.getStrCaseType2)
@@ -88,12 +90,13 @@ object CaseStruct {
       appendTextStruct(buffer, "XieChaRequestUnitName", text.getStrXieChaRequestUnitName)
       appendTextStruct(buffer, "XieChaRequestUnitCode", text.getStrXieChaRequestUnitCode)
 
-      gafisCase.pstTextData = buffer.toArray
-      gafisCase.nTextItemCount = gafisCase.pstTextData.length.asInstanceOf[Short]
+      gafisCase.pstText_Data = buffer.toArray
+      gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
     }
     gafisCase
   }
 }
+/*
 // case info structure
 class tagGCASEINFOSTRUCT  extends AncientData {
   var cbSize:Int = _ ;		// size of this structure
@@ -219,3 +222,4 @@ class tagGAFIS_protoCaseEXTRAINFO  extends AncientData {
 } ;	// size is 512 bytes long.
 
 
+*/

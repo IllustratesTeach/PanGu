@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal.c.gloclib
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.v62.internal.c.ghpcbase.ghpcdef.AFISDateTime
+import nirvana.hall.v62.internal.c.ghpcbase.glocdef.GAFIS_FPX_STATUS
 import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.v62.internal.c._
 import nirvana.hall.v62.services.AncientData
@@ -127,8 +128,10 @@ object galoclp {
   var nPalmIDLen:Int = _ ;		// temp use
   @Length(SID_SIZE)
   var nSID:String = _ ;		// sid, readonly
+  /*
   @Length(2)
   var bnRes_SID:Array[Byte] = _ ;
+  */
     @Length(2)
     var bnRes4:Array[Byte] = _ ;			// ensure sid occupy 8 byte.
   //	AFISDateTime	tBrokenDate;

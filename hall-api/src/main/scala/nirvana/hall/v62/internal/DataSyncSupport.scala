@@ -208,28 +208,31 @@ trait DataSyncSupport {
     }
 
 
-    if ( nfing>0 && data.pstFingerIdData != null ) {
-      data.pstFingerIdData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( nfing>0 && data.pstFingerID_Data != null ) {
+      data.pstFingerID_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
-    if ( npalm>0 && data.pstPalmIdData != null ) {
-      data.pstPalmIdData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( npalm>0 && data.pstPalmID_Data!= null ) {
+      data.pstPalmID_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
-    if ( ntext>0 && data.pstTextData!= null ) {
-      data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( ntext>0 && data.pstText_Data!= null ) {
+      data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
 
     if ( bExtraInfoFirst> 0 && ( nextrainfolen > 0 ) ) {
-      channel.writeMessage[NoneResponse](data.pstExtraInfoData)
-      if(data.pstExtraInfoData.nItemSize>0){
+      channel.writeMessage[NoneResponse](data.pstExtraInfo_Data)
+      if(data.pstExtraInfo_Data != null ){
         response = channel.receive[ResponseHeader]()
+
         validateResponse(response,channel)
-        channel.writeMessage(data.pstExtraInfoData.pstItemEntryData)
+        val head = data.pstExtraInfo_Data.head
+        if(head.nItemSize >0)
+          channel.writeMessage(head.pstItemEntry_Data)
       }
     }
 
-    if(ntext > 0 && data.pstTextData != null)
-      data.pstTextData.filter(_.bIsPointer == 1).foreach{x=>
-        channel.writeByteArray[NoneResponse](x.textContent)
+    if(ntext > 0 && data.pstText_Data != null)
+      data.pstText_Data.filter(_.bIsPointer == 1).foreach{x=>
+        channel.writeByteArray[NoneResponse](x.stData.textContent)
       }
 
   }

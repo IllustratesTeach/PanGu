@@ -1,13 +1,8 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.protocol.v62.FPTProto
 import nirvana.hall.protocol.v62.FPTProto.{LPCard, TPCard}
-import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.v62.services.AncientData
-
-import scala.collection.JavaConversions._
-import scala.collection.mutable
 
 /**
  * struct for feature data,such as template,latent and image.
@@ -23,6 +18,7 @@ object FeatureStruct {
    */
   def convertProtoBuf2TPCard(card: TPCard): tagGTPCARDINFOSTRUCT={
     val data = new tagGTPCARDINFOSTRUCT
+    /*
     data.szCardID = card.getStrCardID
     data.stAdmData.szMISPersonID = card.getStrPersonID
     data.stAdmData.szPersonID = card.getStrPersonID
@@ -32,7 +28,7 @@ object FeatureStruct {
       import CaseStruct.appendTextStruct
       val text = card.getText
 
-      val buffer = mutable.Buffer[tagGATEXTITEMSTRUCT]()
+      val buffer = mutable.Buffer[GATEXTITEMSTRUCT]()
 
       //text information
       appendTextStruct(buffer, "Name",text.getStrName)
@@ -140,6 +136,7 @@ object FeatureStruct {
 
     data.pstMICData = mics.toArray
     data.nMicItemCount = mics.size.asInstanceOf[Byte]
+      */
 
     data
   }
@@ -151,6 +148,7 @@ object FeatureStruct {
    */
   def convertProtoBuf2LPCard(card: LPCard): tagGLPCARDINFOSTRUCT= {
     val data = new tagGLPCARDINFOSTRUCT
+    /*
     data.szCardID = card.getStrCardID
 
     if(card.hasText) {
@@ -222,6 +220,7 @@ object FeatureStruct {
       data.pstMICData = mic
       data.nMicItemCount = 1
     }
+    */
     data
   }
 }

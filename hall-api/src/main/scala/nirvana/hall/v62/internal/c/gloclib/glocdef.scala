@@ -216,6 +216,8 @@ object glocdef {
         {
           @Length(88)
           var bnData:Array[Byte] = _
+          @IgnoreTransfer
+          var textContent:Array[Byte] = _
           /*
             UCHAR	bnData[88];
             void	*pData;

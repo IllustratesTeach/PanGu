@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.internal.c.GADB_RETVAL
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
