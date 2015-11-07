@@ -4,6 +4,9 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.GADB_RETVAL
+import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.services.{SelfMatchTask, V62ServerAddress}
 
@@ -34,7 +37,7 @@ trait SendMatchTaskSupport {
       channel.writeMessage[NoneResponse](header)
 
 
-      val queryStruct = new QueryStruct
+      val queryStruct = new GAQUERYSTRUCT
       //fill simple data
       queryStruct.stSimpQry.nQueryType = 0
       queryStruct.stSimpQry.nPriority = 1
@@ -64,11 +67,11 @@ trait SendMatchTaskSupport {
         response.nReturnValue = 1
         channel.writeMessage[NoneResponse](response)
 
-        val matchResult = channel.receive[QueryStruct]()
+        val matchResult = channel.receive[GAQUERYSTRUCT]()
         val count = matchResult.nMICCount
         debug("match result is {}",count)
 
-        val headers = 0 until count map(i=>channel.receive[tagGAFISMICSTRUCT]())
+        val headers = 0 until count map(i=>channel.receive[GAFISMICSTRUCT]())
 
         headers.foreach{header=>
           if(header.nMntLen > 0)
@@ -84,12 +87,12 @@ trait SendMatchTaskSupport {
         //receive server list
         if(matchResult.nSvrListLen > 0 )
           channel.receiveByteArray(matchResult.nSvrListLen)
-        var candHead:tagGAQUERYCANDHEADSTRUCT = null
+        var candHead:GAQUERYCANDHEADSTRUCT = null
         if(matchResult.nCandHeadLen >0) {
           val buffer = channel.receiveByteArray(matchResult.nCandHeadLen) //
           val bytes = buffer.toByteBuffer().array()
 
-          candHead = new tagGAQUERYCANDHEADSTRUCT
+          candHead = new GAQUERYCANDHEADSTRUCT
           candHead.fromChannelBuffer(buffer)
         }
         if(matchResult.nCandLen > 0) {
@@ -97,7 +100,7 @@ trait SendMatchTaskSupport {
           val num = candHead.nCandidateNum & 0x0000ffff
           debug("cand num:{}",num)
           val result = 0 until num map{i=>
-            val cand = new tagGAQUERYCANDSTRUCT
+            val cand = new GAQUERYCANDSTRUCT
             cand.fromChannelBuffer(buffer)
             debug("sid:{} pos:{} score:{}",convertSixByteArrayToLong(cand.nSID),cand.nIndex,cand.nScore)
             cand
@@ -126,7 +129,7 @@ trait SendMatchTaskSupport {
       buffer.put(0.asInstanceOf[Byte])
 
       val key = buffer.array()
-      val header = new RequestHeader
+      val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _ )
       header.nOpClass = AncientConstants.OP_CLASS_QUERY.asInstanceOf[Short]
@@ -150,7 +153,7 @@ trait SendMatchTaskSupport {
       val pos = task.options.positions.map(_.asInstanceOf[Byte])
       channel.writeByteArray[NoneResponse](pos.toArray)
 
-      val queryStruct = new QueryStruct
+      val queryStruct = new GAQUERYSTRUCT
       //fill simple data
       queryStruct.stSimpQry.nQueryType = task.options.matchType.ordinal().asInstanceOf[Byte]
       queryStruct.stSimpQry.nPriority = 1

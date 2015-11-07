@@ -16,7 +16,6 @@ object gaqryque {
   final val SID_SIZE = 6
 
 
-
   class GA_SIMPCAND extends AncientData
   {
     var nDestDBID:Short = _ ;
@@ -30,8 +29,7 @@ object gaqryque {
     // which source match the given one.
   } // GA_SIMPCAND;	// candidates, size is 16 bytes long.
 
-  class GA_CANDTEMP
-  {
+  class GA_CANDTEMP {
     @Length(2)
     var data:Array[Byte] = _
     /*
@@ -246,7 +244,7 @@ object gaqryque {
   var nFlag7:Byte = _ ;			// GAQRY_FLAG7_XXX，TT自动认定使用的标志。
   var nFlag8:Byte = _ ;			// 2008.04.12 未使用，为扩展保留；2010.05.09：增加一个标记，表明是广东LT衰减率测试
   @Length(SID_SIZE)
-  var nQueryID:String = _ ;
+  var nQueryID:Array[Byte]= _ ;
     @Length(2)
     var bnRes_sid:Array[Byte] = _ ;		// reserved
   var nMinScore:Int = _ ;	// the score in candidate list at least this value.
@@ -522,7 +520,7 @@ object gaqryque {
     var nXgwRank:Short = _ ;
     var nWsgRank:Short = _ ;
     @Length(SID_SIZE)
-    var nSID:String = _ ;
+    var nSID:Array[Byte]= _ ;
     @Length(8-SID_SIZE)
     var bnRes_SID:Array[Byte] = _ ;
     /**
@@ -626,32 +624,34 @@ object gaqryque {
   var nItemFlagG:Byte = _ ;			// GAIFG_XXX
   var bQryInfoCanBeFree:Byte = _ ;
     var nCommentLen:Int = _ ;		// length of comment.
-  var pszComment_Ptr:Int = _ ;		// some comments.
+  var pszComment_Ptr:Int = _ //using 4 byte as pointer
+  @IgnoreTransfer
+  var pszComment_Data:Array[Byte] = _ // for pszComment pointer ,struct:char;		// some comments.
   @Length(4)
   var bnRes_CommentPt:Array[Byte] = _ ;
     @Length(2)
     var stKeyRange:Array[GAKEYRANGESTRUCT] = _;		// 128 bytes, to here is 256+64 bytes
   var pstCandHead_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstCandHead_Data:Array[GAQUERYCANDHEADSTRUCT] = _;		// pointer to candidate head, no substructure
+  var pstCandHead_Data:Array[GAQUERYCANDHEADSTRUCT] = _ // for pstCandHead pointer ,struct:GAQUERYCANDHEADSTRUCT;		// pointer to candidate head, no substructure
   var pstCand_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstCand_Data:Array[GAQUERYCANDSTRUCT] = _;			// pointer to candidate list, no substructure
+  var pstCand_Data:Array[GAQUERYCANDSTRUCT] = _ // for pstCand pointer ,struct:GAQUERYCANDSTRUCT;			// pointer to candidate list, no substructure
   var pstMIC_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstMIC_Data:Array[GAFISMICSTRUCT] = _;			// pointer to micstructure, contain many informations, has substructure
+  var pstMIC_Data:Array[GAFISMICSTRUCT] = _ // for pstMIC pointer ,struct:GAFISMICSTRUCT;			// pointer to micstructure, contain many informations, has substructure
   var pstQryCond_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstQryCond_Data:Array[Byte] = _;		// points to GBASE_ITEMPKG structure
+  var pstQryCond_Data:Array[Byte] = _ // for pstQryCond pointer ,struct:void;		// points to GBASE_ITEMPKG structure
   var pstMISCond_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstMISCond_Data:Array[Byte] = _;		// mis query condition, no substructure
+  var pstMISCond_Data:Array[Byte] = _ // for pstMISCond pointer ,struct:void;		// mis query condition, no substructure
   var pstSvrList_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstSvrList_Data:Array[Byte] = _;		// server list, no substructure
+  var pstSvrList_Data:Array[Byte] = _ // for pstSvrList pointer ,struct:void;		// server list, no substructure
   var pstTextSql_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstTextSql_Data:Array[Byte] = _;		// pointer to text sql statement, no substructure
+  var pstTextSql_Data:Array[Byte] = _ // for pstTextSql pointer ,struct:void;		// pointer to text sql statement, no substructure
   @Length(4*7)
   var bnRes_AllPt:Array[Byte] = _ ;
     // to here is 320+56+32=408 bytes
@@ -683,7 +683,7 @@ object gaqryque {
     var bnRes_FifoQueSID:Array[Byte] = _ ;
     var pstInfo_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstInfo_Data:Array[GAFIS_QUERYINFO] = _;			// query info.
+  var pstInfo_Data:Array[GAFIS_QUERYINFO] = _ // for pstInfo pointer ,struct:GAFIS_QUERYINFO;			// query info.
   @Length(4)
   var bnRes_pstInfo:Array[Byte] = _ ;		//
   @Length(32)
@@ -862,14 +862,15 @@ object gaqryque {
   } // GASUBLIBPROPSTRUCT;	// property of parallel match lib, size is 128 bytes
 
 
-  class GAQUERYGETMATCHCOND_OLD extends AncientData {
+  class GAQUERYGETMATCHCOND_OLD extends AncientData
+  {
     var cbSize:Int = _ ;	// size of this structure
-    var nDestDBID:Short = _ ;		// which database to search
-    var nDestTableID:Short = _ ;	// which table to be searched
-    var stRangeStart = new GASUBLIBRANGE;
+  var nDestDBID:Short = _ ;		// which database to search
+  var nDestTableID:Short = _ ;	// which table to be searched
+  var stRangeStart = new GASUBLIBRANGE;
     var stRangeEnd = new GASUBLIBRANGE;
     var nSegmentID:Int = _ ;		// queryid, segment id this value is used identify different query
-    var nSeqNo:Int = _ ;			// sequence no, this value is used to identify different query
+  var nSeqNo:Int = _ ;			// sequence no, this value is used to identify different query
   var nGetTime:Int = _ ;		// get match time(server time)
   var nGetTimeLocal:Int = _ ;	// get time (local, send to server)(to here is 40 bytes)
   @Length(16)
@@ -1028,9 +1029,9 @@ object gaqryque {
     // to here is 16 bytes long.
     var ppstSql_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var ppstSql_Data:Array[GAFIS_TABLETEXTSQL] = _;
-    @Length(4)
-    var bnRes_Pt:Array[Byte] = _ ;
+  var ppstSql_Data:Array[GAFIS_TABLETEXTSQL] = _ // for ppstSql pointer ,struct:GAFIS_TABLETEXTSQL;
+  @Length(4)
+  var bnRes_Pt:Array[Byte] = _ ;
     @Length(8)
     var bnRes2:Array[Byte] = _ ;
   } // GAFIS_TEXTSQL;	// size is 32 bytes long.
@@ -1057,5 +1058,4 @@ object gaqryque {
 
 
   /////////////// function declared in glocfh.h
-
 }

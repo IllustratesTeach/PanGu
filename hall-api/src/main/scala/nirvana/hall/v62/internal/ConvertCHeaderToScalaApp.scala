@@ -14,13 +14,13 @@ import scala.io.Source
 object ConvertCHeaderToScalaApp {
   private val definePattern = "#define[\\s]+([^\\s]+)[\\s]+([^$]+)$".r
   private val structBeginPattern = "typedef[\\s]+struct[\\s]+(tag)?([A-Za-z0-9_]+)([^$]*)$".r
-  private val structElement = "(?i)^[\\s\\t]*([a-zA-Z_0-9]+)([\\s\\t\\*]+)([A-Z0-9_a-z]+)(\\[([0-9\\*\\-\\+a-z_]+)\\])?([^$]+)$".r
-  private val charType="(?i)UCHAR|CHAR".r
+  private val structElement = "(?i)^[\\s\\t]*([a-zA-Z_0-9]+)([\\s\\t\\*]+)([A-Z0-9_a-z]+)(\\[([0-9\\*\\-\\+a-z_]+)\\])?([\\s\\S]+)$".r
+  private val charType="(?i)UCHAR|CHAR|VOID".r
   private val structEndPattern ="[\\s\\t]*}([^$]*)$".r
   private val isOutputErrorLine = true
   private var structBegin = false
   def main(args:Array[String]): Unit ={
-    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/gloclib/glocndef.h")
+    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/gloclib/gaqryque.h")
     val content = Source.fromFile(file,AncientConstants.GBK_ENCODING.name().intern()).getLines()
     content
       .filterNot(_.startsWith("#ifndef"))
@@ -55,41 +55,44 @@ object ConvertCHeaderToScalaApp {
           }
         }
 
-        dataType match {
-          case charType() =>
-            if (isPointer) {
-              println("  var %s_Ptr:%s = _ //using 4 byte as pointer".format(name, "Int"))
-              println("  @IgnoreTransfer")
-              print("  var %s_Data:Array[Byte] = _".format(name))
-            }else if(name.startsWith("bn")){
+        //for pointer
+        if(isPointer) {
+            println("  var %s_Ptr:%s = _ //using 4 byte as pointer".format(name, "Int"))
+            println("  @IgnoreTransfer")
+          val arrayType = charType.findFirstIn(dataType) match{
+            case Some(x) =>
+              "Byte"
+            case other=>
+              dataType
+          }
+          print("  var %s_Data:Array[%s] = _ // for %1$s pointer ,struct:%s".format(name,arrayType,dataType))
+        }else {
+          dataType match {
+            case charType() =>
+              if (name.startsWith("bn")) {
+                if (length != null) {
+                  println("  @Length(%s)".format(length))
+                  print("  var %s:Array[Byte] = _ ".format(name))
+                } else {
+                  print("  var %s:Byte = _ ".format(name))
+                }
+              } else {
+                print("  var %s:%s = _ ".format(name, convertCharAsScalaType))
+              }
+            case other =>
               if (length != null) {
                 println("  @Length(%s)".format(length))
-                print("  var %s:Array[Byte] = _ ".format(name))
-              }else{
-                print("  var %s:Byte = _ ".format(name))
+                print("  var %s:Array[%s] = _".format(name, other))
+              } else {
+                if (other == "int" || other == "uint4") {
+                  print("  var %s:Int = _".format(name))
+                } else if (other == "uint2") {
+                  print("  var %s:Short = _".format(name))
+                } else {
+                  print("  var %s = new %s".format(name, other))
+                }
               }
-            }else{
-              print("  var %s:%s = _ ".format(name, convertCharAsScalaType))
-            }
-          case other =>
-            if (length != null) {
-              println("  @Length(%s)".format(length))
-              print("  var %s:Array[%s] = _".format(name, other))
-            }else {
-              if (isPointer) {
-                println("  var %s_Ptr:%s = _ //using 4 byte as pointer".format(name, "Int"))
-                println("  @IgnoreTransfer")
-                print("  var %s_Data:Array[%s] = _".format(name, other))
-              } else if (other == "int" || other == "uint4") {
-                print("  var %s:Int = _".format(name))
-              }else if(other == "uint2"){
-                print("  var %s:Short = _".format(name))
-              }else{
-
-
-                print("  var %s = new %s".format(name,other))
-              }
-            }
+          }
         }
         println(remain)
       case "{" =>
