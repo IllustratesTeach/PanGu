@@ -118,6 +118,35 @@ trait SendMatchTaskSupport {
         channel.receiveByteArray(matchResult.nQryInfoLen)
     }
   }
+  def NET_GAFIS_QUERY_Add(address:V62ServerAddress,
+                          nQryDBID:Short,
+                          nQryTID:Short,
+                          pstQry:GAQUERYSTRUCT,
+                          nOption:Int = 0
+                          ):Long= createAncientClient(address.host,address.port).executeInChannel{channel=>
+
+    val request = new GNETREQUESTHEADOBJECT
+    request.cbSize = 192
+    request.nMajorVer = 6
+    request.nMinorVer = 1
+    request.szUserName=address.user
+    address.password.foreach(request.szUserPass = _ )
+    request.nOption = nOption
+    request.nDBID = nQryDBID
+    request.nTableID = nQryTID
+    request.nOpClass = OP_CLASS_QUERY.asInstanceOf[Short]
+    request.nOpCode = OP_QUERY_ADD.asInstanceOf[Short]
+
+    channel.writeMessage[NoneResponse](request)
+
+
+    GAFIS_NETSCR_SendQueryInfo(channel,pstQry)
+
+    val response = channel.receive[GNETANSWERHEADOBJECT]()//.writeMessage[GNETANSWERHEADOBJECT](pstQry)
+    validateResponse(response,channel)
+
+    response.nReturnValue
+  }
   def NET_GAFIS_QUERY_Submit(address:V62ServerAddress,nQryDBID:Short,nQryTID:Short,
                              pstKey:GADB_KEYARRAY,
                              pstQry:GAQUERYSTRUCT,
