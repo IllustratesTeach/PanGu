@@ -1,0 +1,96 @@
+package matcher;
+
+option java_package = "nirvana.hall.protocol.matcher";
+
+option java_outer_classname = "TextQueryProto";
+
+/** 同步使用的文本数据 **/
+message TextData {
+  enum ColType {
+    INT = 1; //整数
+    LONG = 2; //LONG
+    KEYWORD = 3; //关键词，不进行分词处理
+    TEXT = 4; //文本，需要进行分词处理
+  }
+  message ColData {
+    //列类型
+    required ColType col_type = 1;
+    //类名称
+    required string col_name = 2;
+    //列的值,INT转为4个字节表示 LONG转为8个字节表示
+    required bytes col_value = 3;
+  }
+
+  repeated ColData col = 1;
+}
+/**
+ * 基于文本的文字过滤功能
+ */
+message TextQueryData {
+  enum Occur {
+    //条件之间是必须的关系
+    MUST = 1;
+    //条件之间是或者关系
+    SHOULD = 2;
+    //条件都是非的关系
+    MUST_NOT = 3;
+  }
+  message ColQuery {
+    extensions 100 to max;
+    required string name = 1;
+    optional Occur occur = 2 [default = MUST];
+  }
+  message IntQuery {
+    extend ColQuery {
+      optional IntQuery query = 100;
+    }
+    required int32 value = 1;
+  }
+  message IntRangeQuery {
+    extend ColQuery {
+      optional IntRangeQuery query = 101;
+    }
+    optional int32 min = 1;
+    optional int32 max = 2;
+    optional bool min_inclusive = 3 [default = false];
+    optional bool max_inclusive = 4 [default = false];
+  }
+  message LongQuery {
+    extend ColQuery {
+      optional LongQuery query = 102;
+    }
+    required int64 value = 1;
+  }
+  message LongRangeQuery {
+    extend ColQuery {
+      optional LongRangeQuery query = 103;
+    }
+    optional int64 min = 1;
+    optional int64 max = 2;
+    optional bool min_inclusive = 3 [default = false];
+    optional bool max_inclusive = 4 [default = false];
+  }
+  //keyword 查询支持模糊匹配，譬如：李*
+  message KeywordQuery {
+    extend ColQuery {
+      optional KeywordQuery query = 104;
+    }
+    required string value = 1;
+  }
+  message TextQuery {
+    extend ColQuery {
+      optional TextQuery query = 105;
+    }
+    required string value = 1;
+  }
+
+  //组合查询，几个条件放入到一起进行查询
+  message GroupQuery {
+    extend ColQuery {
+      optional GroupQuery query = 106;
+    }
+    repeated ColQuery clauseQuery = 1;
+  }
+
+  repeated ColQuery query = 1;
+}
