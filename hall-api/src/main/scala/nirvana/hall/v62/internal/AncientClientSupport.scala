@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.services.{AncientData, ChannelOperator, AncientClient}
 
@@ -28,6 +29,16 @@ trait AncientClientSupport {
       println(gafisError.bnAFISErrData)
       throw new IllegalAccessException("fail to send data,num:%s,file:%s,line:%s".format(gafisError.nAFISErrno,gafisError.szFileName,gafisError.nLineNum));
     }
+  }
+  protected def GAFIS_NETSCR_SendMICStruct(mic:GAFISMICSTRUCT,channel:ChannelOperator): Unit ={
+    if(mic.nMntLen > 0)
+      channel.writeByteArray[NoneResponse](mic.pstMnt_Data)
+    if(mic.nImgLen > 0)
+      channel.writeByteArray[NoneResponse](mic.pstImg_Data)
+    if(mic.nCprLen > 0)
+      channel.writeByteArray[NoneResponse](mic.pstCpr_Data)
+    if(mic.nBinLen > 0)
+      channel.writeByteArray[NoneResponse](mic.pstBin_Data)
   }
 }
 class NoneResponse extends AncientData{

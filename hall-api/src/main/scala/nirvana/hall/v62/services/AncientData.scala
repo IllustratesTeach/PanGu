@@ -123,6 +123,10 @@ sealed trait JavaReflect{
     }
     dataSize
   }
+  def toByteArray: Array[Byte]= {
+    val buffer = ChannelBuffers.buffer(getDataSize)
+    writeToChannelBuffer(buffer).array()
+  }
   /**
    * serialize to channel buffer
    * @param channelBuffer netty channel buffer

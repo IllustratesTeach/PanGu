@@ -204,7 +204,7 @@ object gaqryque {
   // the following structure is used to generate a list of query
   class GAQUERYSIMPSTRUCT extends AncientData
   {
-    var cbSize:Int = _ ;			// size of this structure
+    var cbSize:Int = 192 ;			// size of this structure
   @Length(32)
   var szKeyID:String = _ ;		// original key(finger id)
   @Length(16)
@@ -1001,7 +1001,7 @@ object gaqryque {
   //////////////////TEXT SQL EXPANSION
   class GAFIS_TABLETEXTSQL extends AncientData
   {
-    var cbSize:Int = _ ;	//
+    var cbSize:Int = 32 ;	//
   @Length(4)
   var bnRes:Array[Byte] = _ ;
     // to here is 8 bytes long.

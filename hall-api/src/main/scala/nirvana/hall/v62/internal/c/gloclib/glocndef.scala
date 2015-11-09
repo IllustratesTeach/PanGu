@@ -14,9 +14,9 @@ object glocndef {
 
   class GNETREQUESTHEADOBJECT extends AncientData
   {
-    var cbSize:Int = _ ;			// size of this structure
-  var nMajorVer:Short = _ ;		// major version, must be 6
-  var nMinorVer:Short = _ ;		// minor version, must be 0
+    var cbSize:Int = 192 ;			// size of this structure
+  var nMajorVer:Short = 6 ;		// major version, must be 6
+  var nMinorVer:Short = 1 ;		// minor version, must be 1
     @Length(8)
     var szMagicStr:String = GNRHO_MAGICSTR ;		// must be G@xucg$
   @Length(16)
@@ -47,9 +47,9 @@ object glocndef {
 
   class GNETANSWERHEADOBJECT extends AncientData
   {
-    var cbSize:Int = _ ;			// size of this structure
-  var nMajorVer:Short = _ ;		// major version, must be 6
-  var nMinorVer:Short = _ ;		// minor version, must be 0
+    var cbSize:Int = 96 ;			// size of this structure
+  var nMajorVer:Short = 6 ;		// major version, must be 6
+  var nMinorVer:Short = 0 ;		// minor version, must be 0
     @Length(8)
     var szMagicStr:String = GNRHO_MAGICSTR ;		// must be G@xucg$
   var nDataLen:Int = _ ;		// data length followed
