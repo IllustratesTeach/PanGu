@@ -18,6 +18,8 @@ class AddPersonInfoRequestFilter(gatherPersonService : GatherPersonService)
       val request = protobufRequest.getExtension(SavePersonRequest.cmd)
       val builder = SavePersonResponse.newBuilder()
       val result =  gatherPersonService.saveGatherPerson(request.getPersonInfo)
+      builder.setNext(result.toString)
+      responseBuilder.setExtension(SavePersonResponse.cmd, builder.build())
       true
     } else {
       handler.handle(protobufRequest, responseBuilder)
