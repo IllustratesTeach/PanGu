@@ -227,9 +227,8 @@ trait DataSyncSupport {
         response = channel.receive[GNETANSWERHEADOBJECT]()
 
         validateResponse(channel,response)
-        val head = data.pstExtraInfo_Data.head
-        if(head.nItemSize >0)
-          channel.writeMessage(head.pstItemEntry_Data)
+        val head = data.pstExtraInfo_Data
+        channel.writeMessage[NoneResponse](head.pstItemEntry_Data)
       }
     }
 

@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.v62.internal.c.gloclib.galoclp.{GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
+import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.galoclp._
 import nirvana.hall.v62.internal.c.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.{GATEXTITEMSTRUCT, GAFISMICSTRUCT}
@@ -15,6 +16,147 @@ import nirvana.hall.v62.services.ChannelOperator
  */
 trait gnetcsr {
   this: AncientClientSupport =>
+  def GAFIS_NETSCR_RecvCaseInfo(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT,pstCase:GCASEINFOSTRUCT){
+    val pstCase = channel.receive[GCASEINFOSTRUCT]()
+    val nfing = (pstCase.nFingerCount);
+    val npalm = (pstCase.nPalmCount);
+    val ntext = (pstCase.nTextItemCount);
+    val nextrainfolen = (pstCase.nExtraInfoLen);
+    val bfreecase = 1;	// case can be freed.
+    if ( nfing<=0 && ntext<=0 && npalm<=0 && nextrainfolen<=0 ) {
+      throw new IllegalArgumentException("data is null")
+    }
+    if ( nfing>0 ) {
+      pstCase.bFingerIDCanBeFreed = 1;
+    }
+    if ( npalm>0 ) {
+      pstCase.bPalmIDCanBeFreed = 1;
+    }
+    if ( ntext>0 ) {
+      pstCase.bTextCanBeFreed = 1;
+    }
+    if ( nextrainfolen>0 ) {
+      pstCase.bExtraInfoCanBeFreed = 1;
+    }
+
+    pAns.nReturnValue = 1
+
+    val bExtraInfoFirst = 0
+    /*
+    if ( UTIL_GNETLIB_IsNewClientVersion(pReq) )
+    {
+      strcpy((char *)pAns.bnData, "$version=002$");
+      bExtraInfoFirst = 1;
+    }
+    else strcpy((char *)pAns.bnData, "$version=001$");
+    */
+
+    channel.writeMessage[NoneResponse](pAns)
+    if ( nfing>0 ) {
+      pstCase.pstFingerID_Data = 0 until nfing map(i=>channel.receive[GAKEYSTRUCT]())  toArray
+    }
+    if ( npalm>0 ) {
+      pstCase.pstPalmID_Data = 0 until npalm map(i=>channel.receive[GAKEYSTRUCT]()) toArray
+    }
+    if ( ntext>0 ) {
+      pstCase.pstText_Data = 0 until ntext map(i=>channel.receive[GATEXTITEMSTRUCT]()) toArray
+    }
+
+    if ( bExtraInfoFirst >0 && ( nextrainfolen > 0 ) ) {
+      pstCase.pstExtraInfo_Data.cbSize = nextrainfolen
+      pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
+    }
+
+    pAns.nReturnValue = 1
+    channel.writeMessage[NoneResponse](pAns)
+
+    pstCase.pstText_Data.filter(_.bIsPointer == 1).foreach{x=>
+      x.stData.textContent =  channel.receiveByteArray(x.nItemLen).array()
+    }
+
+    if ( bExtraInfoFirst < 0 && ( nextrainfolen > 0 ) ) {
+      pstCase.pstExtraInfo_Data.cbSize = nextrainfolen
+      pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
+    }
+  }
+
+  def GAFIS_NETSCR_SendCaseInfo(channel: ChannelOperator, pstCase:GCASEINFOSTRUCT) {
+
+    // send the case structure to peer
+    if ( pstCase.pstFingerID_Data == null) {
+      pstCase.nFingerCount = 0
+    }
+    val nfing = pstCase.nFingerCount
+    val npalm = pstCase.nPalmCount
+    val ntext = pstCase.nTextItemCount
+    var nextrainfolen = pstCase.nExtraInfoLen
+    // no other info to be sent, quit
+    if ( nfing<=0 && npalm<=0 && ntext<=0 && nextrainfolen<=0 ) {
+      throw new IllegalArgumentException("data is null")
+    }
+    // have other info to be sent, wait peer to alloc memory and return values
+    var pAns = channel.writeMessage[GNETANSWERHEADOBJECT](pstCase)
+    validateResponse(channel,pAns)
+
+    val bnDataString = new String(pAns.bnData)
+    var bExtraInfoFirst = 0
+    if (bnDataString.indexOf("$version=002$")==0 ) {
+      bExtraInfoFirst = 1
+    }
+
+    else if ( bnDataString.indexOf("$version=001$")==0 ) {
+      // need send extra info.
+      bExtraInfoFirst = 0;
+    } else {
+      // client does not know extra info, so clear it.
+      nextrainfolen = 0;
+    }
+    if ( nfing>0 && pstCase.pstFingerID_Data != null ) {
+      // send finger list
+      pstCase.pstFingerID_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( npalm>0 && pstCase.pstPalmID_Data != null) {
+      // send palm id list
+      pstCase.pstPalmID_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( ntext>0 && pstCase.pstText_Data != null ) {
+      // send text id list
+      pstCase.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+
+    if ( bExtraInfoFirst>0 && ( nextrainfolen > 0 ) ) {
+      GAFIS_CASE_EXTRAINFO_Send(channel, pstCase.pstExtraInfo_Data)
+    }
+
+    // text need to be transfered
+    pAns = channel.receive[GNETANSWERHEADOBJECT]()
+    validateResponse(channel,pAns)
+    pstCase.pstText_Data.filter(_.bIsPointer == 1).foreach(x=>channel.writeByteArray[NoneResponse](x.stData.textContent))
+
+    if ( bExtraInfoFirst < 0 && ( nextrainfolen>0 ) ) {
+      channel.writeMessage[NoneResponse](pstCase.pstExtraInfo_Data)
+    }
+  }
+  private def GAFIS_CASE_EXTRAINFO_Send(channel:ChannelOperator,
+    pstInfo:GAFIS_CASE_EXTRAINFO) {
+    channel.writeMessage[NoneResponse](pstInfo)
+    if(pstInfo.nItemSize > 0){
+      val pAns = channel.receive[GNETANSWERHEADOBJECT]()
+      validateResponse(channel,pAns)
+      channel.writeMessage[NoneResponse](pstInfo.pstItemEntry_Data)
+    }
+  }
+  def GAFIS_CASE_EXTRAINFO_Recv(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT):GAFIS_CASE_EXTRAINFO= {
+    val pstInfo = channel.receive[GAFIS_CASE_EXTRAINFO]()
+    pAns.nReturnValue = 1
+    channel.writeMessage[NoneResponse](pAns)
+    pstInfo.pstItemEntry_Data = channel.receive[GAFIS_CASEITEMENTRY]()
+    pstInfo
+  }
+
+
+
+
   protected def GAFIS_NETSCR_RecvLPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GLPCARDINFOSTRUCT) {
     val card = channel.receive[GLPCARDINFOSTRUCT]()
     pstCard.bMicCanBeFreed = 0;

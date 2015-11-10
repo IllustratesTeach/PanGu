@@ -42,7 +42,7 @@ object galoclp {
   // structure to hold other info. 2006.08.04
   class GAFIS_CASE_EXTRAINFO extends AncientData
   {
-    var cbSize:Int = _ ;
+    var cbSize:Int = 512 ;
     @Length(4)
     var bnRes:Array[Byte] = _ ;
     @Length(32)
@@ -52,7 +52,7 @@ object galoclp {
     // to here is 48 bytes long.
     var pstItemEntry_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstItemEntry_Data:Array[GAFIS_CASEITEMENTRY] = _ // for pstItemEntry pointer ,struct:GAFIS_CASEITEMENTRY;	// for store item key list(except lp finger and palm).
+  var pstItemEntry_Data:GAFIS_CASEITEMENTRY = _ // for pstItemEntry pointer ,struct:GAFIS_CASEITEMENTRY;	// for store item key list(except lp finger and palm).
   // so can store face and voice key list.
   @Length(4)
   var bnRes_ItemEntry:Array[Byte] = _ ;
@@ -137,7 +137,7 @@ object galoclp {
   //	AFISDateTime	tBrokenDate;
   var pstExtraInfo_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstExtraInfo_Data:Array[GAFIS_CASE_EXTRAINFO] = _ // for pstExtraInfo pointer ,struct:GAFIS_CASE_EXTRAINFO;
+  var pstExtraInfo_Data:GAFIS_CASE_EXTRAINFO = _ // for pstExtraInfo pointer ,struct:GAFIS_CASE_EXTRAINFO;
   @Length(4)
   var bnRes_ExtraInfo:Array[Byte] = _ ;
     @Length(16)
