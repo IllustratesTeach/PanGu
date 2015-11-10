@@ -20,9 +20,9 @@ trait ganetqry {
   def NET_GAFIS_QUERY_Get(
     nDBID:Short,
     nTableID:Short,
-    pstQry:GAQUERYSTRUCT,
+    pstQry:GAQUERYSTRUCT, //queryId
     nOption:Int=0
-    )= executeInChannel{ channel=>
+    ):GAQUERYSTRUCT= executeInChannel{ channel=>
     val header = createRequestHeader
     header.nOpClass = OP_CLASS_QUERY.asInstanceOf[Short]
     header.nOpCode= OP_QUERY_GET.asInstanceOf[Short]
@@ -35,8 +35,7 @@ trait ganetqry {
     val response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(channel,response)
 
-    if(response.nReturnValue != 0)
-      GAFIS_NETSCR_RecvQueryInfo(channel,response, pstQry)
+    GAFIS_NETSCR_RecvQueryInfo(channel,response)
   }
 
   def NET_GAFIS_QUERY_Add(nQryDBID:Short,

@@ -93,7 +93,7 @@ object gadbdef {
 
   class GADB_KEYARRAY extends AncientData
   {
-    var cbSize:Int = _ ;	// size of this structure
+    var cbSize:Int = 32 ;	// size of this structure
   @Length(2)
   var bnRes:Array[Byte] = _ ;	// reserved 2 bytes long
   var bKeyCanBeFree:Byte = _ ;	//

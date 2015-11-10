@@ -287,19 +287,8 @@ trait gnetcsr {
       channel.writeMessage[NoneResponse](pstCard.pstExtraInfo_Data)
     }
   }
-  def GAFIS_NETSCR_RecvQueryInfo(channel:ChannelOperator,response:GNETANSWERHEADOBJECT,pstQry:GAQUERYSTRUCT):Unit= {
-    val qry = channel.receive[GAQUERYSTRUCT]()
-    // alloc memory for all data
-    pstQry.nCandHeadLen = qry.nCandHeadLen
-    pstQry.nCandLen = qry.nCandLen
-    pstQry.nQryCondLen = qry.nQryCondLen
-
-    pstQry.nMICCount = qry.nMICCount
-    pstQry.nSvrListLen = qry.nSvrListLen
-    pstQry.nMISCondLen = qry.nMISCondLen
-    pstQry.nTextSqlLen = qry.nTextSqlLen
-    pstQry.nCommentLen = qry.nCommentLen
-    pstQry.nQryInfoLen = qry.nQryInfoLen
+  def GAFIS_NETSCR_RecvQueryInfo(channel:ChannelOperator,response:GNETANSWERHEADOBJECT):GAQUERYSTRUCT= {
+    val pstQry= channel.receive[GAQUERYSTRUCT]()
 
     val ncandhead = pstQry.nCandHeadLen
     val ncand = pstQry.nCandLen
@@ -375,6 +364,8 @@ trait gnetcsr {
     if ( nTxtSqlLen > 0) pstQry.pstTextSql_Data = channel.receiveByteArray(nTxtSqlLen).array()
     if ( nCommentLen > 0) pstQry.pszComment_Data = channel.receiveByteArray(nCommentLen).array()
     if ( nqryinfolen > 0) pstQry.pstInfo_Data = channel.receive[GAFIS_QUERYINFO]()
+
+    pstQry
   }
 
   protected def GAFIS_NETSCR_SendQueryInfo(channel: ChannelOperator, pstQry: GAQUERYSTRUCT) {
