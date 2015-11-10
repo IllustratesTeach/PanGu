@@ -258,7 +258,7 @@ object galoctp {
 
   class GTPCARDINFOSTRUCT extends AncientData
   {
-    var cbSize:Int = _ ;				// size of this structure 4 bytes int
+    var cbSize:Int = 384 ;				// size of this structure 4 bytes int
   var nMicItemCount:Byte = _ ;			// count of structure of GAFISMICSTRUCT  1 byte int
   var nItemFlag:Byte = _ ;				// which item is used, TPCARDINFO_ITEMFLAG_XXX
   var nTextItemCount:Short = _ ;		// text item count
@@ -280,7 +280,7 @@ object galoctp {
   var bnRes_AllPt:Array[Byte] = _ ;	// 8 bytes reserved
   var pstInfoEx_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstInfoEx_Data:Array[GAFIS_TPADMININFO_EX] = _ // for pstInfoEx pointer ,struct:GAFIS_TPADMININFO_EX;
+  var pstInfoEx_Data:GAFIS_TPADMININFO_EX = _ // for pstInfoEx pointer ,struct:GAFIS_TPADMININFO_EX;
   @Length(4)
   var bnRes_InfoEx:Array[Byte] = _ ;
     @Length(8)

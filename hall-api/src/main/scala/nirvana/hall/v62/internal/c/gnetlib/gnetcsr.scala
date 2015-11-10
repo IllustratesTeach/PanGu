@@ -1,7 +1,9 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import nirvana.hall.v62.internal.c.gloclib.galoclp.{GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
+import nirvana.hall.v62.internal.c.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.glocdef.{GATEXTITEMSTRUCT, GAFISMICSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
@@ -13,6 +15,134 @@ import nirvana.hall.v62.services.ChannelOperator
  */
 trait gnetcsr {
   this: AncientClientSupport =>
+  protected def GAFIS_NETSCR_RecvLPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GLPCARDINFOSTRUCT) {
+    val card = channel.receive[GLPCARDINFOSTRUCT]()
+    pstCard.bMicCanBeFreed = 0;
+    pstCard.bTextCanBeFreed = 0;
+    pstCard.nMicItemCount = card.nMicItemCount
+    pstCard.nTextItemCount = card.nTextItemCount
+    pstCard.nExtraInfoLen = card.nExtraInfoLen
+
+
+    pAns.nReturnValue = 1
+    pAns.bnData = "$version=001$".getBytes
+
+    channel.writeMessage[NoneResponse](pAns)
+
+    // now we will receive all the structure's
+    if ( pstCard.nMicItemCount > 0 ) {
+      val mics = 0 until pstCard.nMicItemCount map(x=>channel.receive[GAFISMICSTRUCT]())
+      pstCard.pstMIC_Data = mics.toArray
+    }
+    if ( pstCard.nTextItemCount > 0 ) {
+      val items = 0 until pstCard.nTextItemCount map(x=>channel.receive[GATEXTITEMSTRUCT]())
+      pstCard.pstText_Data = items.toArray
+    }
+
+    pAns.nReturnValue = 1
+    channel.writeMessage[NoneResponse](pAns)
+
+    pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_RecvMICStruct(channel,_))
+    pstCard.pstText_Data.filter(_.bIsPointer == 1).foreach(x=>x.stData.textContent = channel.receiveByteArray(x.nItemLen).array())
+
+    if ( pstCard.nExtraInfoLen > 0 ) {
+      pstCard.pstExtraInfo_Data = channel.receive[GAFIS_LP_EXTRAINFO]()
+    }
+  }
+  protected def GAFIS_NETSCR_RecvTPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GTPCARDINFOSTRUCT) {
+    val card = channel.receive[GTPCARDINFOSTRUCT]()
+    pstCard.bMicCanBeFreed = 0;
+    pstCard.bTextCanBeFreed = 0;
+    pstCard.nMicItemCount = card.nMicItemCount
+    pstCard.nTextItemCount = card.nTextItemCount
+    pstCard.nInfoExLen = card.nInfoExLen
+
+
+    pAns.nReturnValue = 1
+    pAns.bnData = "$version=001$".getBytes
+
+    channel.writeMessage[NoneResponse](pAns)
+
+    // now we will receive all the structure's
+    if ( pstCard.nMicItemCount > 0 ) {
+      val mics = 0 until pstCard.nMicItemCount map(x=>channel.receive[GAFISMICSTRUCT]())
+      pstCard.pstMIC_Data = mics.toArray
+    }
+    if ( pstCard.nTextItemCount > 0 ) {
+      val items = 0 until pstCard.nTextItemCount map(x=>channel.receive[GATEXTITEMSTRUCT]())
+      pstCard.pstText_Data = items.toArray
+    }
+
+    pAns.nReturnValue = 1
+    channel.writeMessage[NoneResponse](pAns)
+
+    pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_RecvMICStruct(channel,_))
+    pstCard.pstText_Data.filter(_.bIsPointer == 1).foreach(x=>x.stData.textContent = channel.receiveByteArray(x.nItemLen).array())
+
+    if ( pstCard.nInfoExLen > 0 ) {
+      pstCard.pstInfoEx_Data = channel.receive[GAFIS_TPADMININFO_EX]()
+    }
+  }
+
+  protected def GAFIS_NETSCR_SendTPCardInfo(channel:ChannelOperator,pstCard:GTPCARDINFOSTRUCT){
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](pstCard)
+    validateResponse(channel,response)
+    
+    var ninfoexlen = pstCard.nInfoExLen
+    if (response.bnData!=null&&new String(response.bnData).indexOf("$version=001$")==0 ) {
+      // need send info ex structure.
+    } else {
+      ninfoexlen = 0;
+    }
+    if ( pstCard.nMicItemCount>0 ) {
+      pstCard.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( pstCard.nTextItemCount >0 ) {
+      pstCard.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    response = channel.receive[GNETANSWERHEADOBJECT]()
+
+    if ( pstCard.nMicItemCount > 0 )  pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(channel,_))
+    if ( pstCard.nTextItemCount > 0 ) {
+      pstCard.pstText_Data.filter(_.bIsPointer == 1).foreach { txt =>
+        channel.writeByteArray[NoneResponse](txt.stData.textContent, 0, txt.nItemLen)
+      }
+    }
+
+    if ( ninfoexlen >0 ) {
+      channel.writeMessage[NoneResponse](pstCard.pstInfoEx_Data)
+    }
+  }
+
+  protected def GAFIS_NETSCR_SendLPCardInfo(channel:ChannelOperator,pstCard:GLPCARDINFOSTRUCT): Unit ={
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](pstCard)
+    validateResponse(channel,response)
+
+    var ninfoexlen = pstCard.nExtraInfoLen
+    if (response.bnData!=null&&new String(response.bnData).indexOf("$version=001$")==0 ) {
+      // need send info ex structure.
+    } else {
+      ninfoexlen = 0;
+    }
+    if ( pstCard.nMicItemCount>0 ) {
+      pstCard.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    if ( pstCard.nTextItemCount >0 ) {
+      pstCard.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+    response = channel.receive[GNETANSWERHEADOBJECT]()
+
+    if ( pstCard.nMicItemCount > 0 )  pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(channel,_))
+    if ( pstCard.nTextItemCount > 0 ) {
+      pstCard.pstText_Data.filter(_.bIsPointer == 1).foreach { txt =>
+        channel.writeByteArray[NoneResponse](txt.stData.textContent, 0, txt.nItemLen)
+      }
+    }
+
+    if ( ninfoexlen>0 ) {
+      channel.writeMessage[NoneResponse](pstCard.pstExtraInfo_Data)
+    }
+  }
   def GAFIS_NETSCR_RecvQueryInfo(channel:ChannelOperator,response:GNETANSWERHEADOBJECT,pstQry:GAQUERYSTRUCT):Unit= {
     val qry = channel.receive[GAQUERYSTRUCT]()
     // alloc memory for all data

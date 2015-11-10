@@ -355,7 +355,7 @@ object galoclp {
   var bnRes_Pointer:Array[Byte] = _ ;
     var pstExtraInfo_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstExtraInfo_Data:Array[GAFIS_LP_EXTRAINFO] = _ // for pstExtraInfo pointer ,struct:GAFIS_LP_EXTRAINFO;
+  var pstExtraInfo_Data:GAFIS_LP_EXTRAINFO = _ // for pstExtraInfo pointer ,struct:GAFIS_LP_EXTRAINFO;
   @Length(4)
   var bnRes_ExtraInfo:Array[Byte] = _ ;
     ////////////////// to here is 64 bytes//////////

@@ -33,7 +33,8 @@ trait AncientClientSupport {
    * @param channel server channel
    */
   protected def validateResponse(channel:ChannelOperator,response: GNETANSWERHEADOBJECT): Unit ={
-    if(response.nReturnValue == -1) {
+    //if(response.nReturnValue == -1) {
+    if(response.nReturnValue <0) {
       val gafisError = channel.receive[GAFISERRDATSTRUCT]()
       println(gafisError.bnAFISErrData)
       throw new IllegalAccessException("fail to send data,num:%s,file:%s,line:%s".format(gafisError.nAFISErrno,gafisError.szFileName,gafisError.nLineNum));
