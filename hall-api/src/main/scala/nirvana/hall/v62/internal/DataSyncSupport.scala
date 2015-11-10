@@ -159,7 +159,7 @@ trait DataSyncSupport {
 
 
   private def sendData(address:V62ServerAddress,databaseTable: DatabaseTable,options:V62OperateOptions,headerDataModifier: HeaderDataModifier=AddDataHeader): Unit ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
+    executeInChannel{channel=>
       val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
@@ -180,7 +180,7 @@ trait DataSyncSupport {
 
       //Finally receive server response
       val response  = channel.receive[GNETANSWERHEADOBJECT]()
-      validateResponse(response,channel)
+      validateResponse(channel,response)
 
     }
   }
@@ -197,7 +197,7 @@ trait DataSyncSupport {
       throw new IllegalArgumentException
     }
     var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     var bExtraInfoFirst = 0
     val bnData = new String(response.bnData)
@@ -226,7 +226,7 @@ trait DataSyncSupport {
       if(data.pstExtraInfo_Data != null ){
         response = channel.receive[GNETANSWERHEADOBJECT]()
 
-        validateResponse(response,channel)
+        validateResponse(channel,response)
         val head = data.pstExtraInfo_Data.head
         if(head.nItemSize >0)
           channel.writeMessage(head.pstItemEntry_Data)
@@ -243,7 +243,7 @@ trait DataSyncSupport {
     val data = FeatureStruct.convertProtoBuf2TPCard(card)
 
     var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
 
     if(data.pstMIC_Data != null)
@@ -252,7 +252,7 @@ trait DataSyncSupport {
       data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
     response = channel.receive[GNETANSWERHEADOBJECT]()
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     if(data.pstMIC_Data != null)
       data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))
@@ -265,7 +265,7 @@ trait DataSyncSupport {
     val data = FeatureStruct.convertProtoBuf2LPCard(card)
 
     var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     val bnData = new String(response.bnData)
     var extraInfo = 0
@@ -280,7 +280,7 @@ trait DataSyncSupport {
     data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
     response = channel.receive[GNETANSWERHEADOBJECT]()
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     if(data.pstMIC_Data != null)
       data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))

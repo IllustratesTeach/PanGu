@@ -21,7 +21,7 @@ trait SendMatchTaskSupport {
   this:AncientClientSupport with LoggerSupport =>
 
   def queryMatchResult(address:V62ServerAddress,sid:Long):Unit ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
+    executeInChannel{channel=>
       val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
@@ -60,7 +60,7 @@ trait SendMatchTaskSupport {
 
       val response = channel.writeMessage[GNETANSWERHEADOBJECT](queryStruct)
       debug("query struct sent,then return code:{},ndatalen:{}",response.nReturnValue,response.nDataLen)
-      validateResponse(response,channel)
+      validateResponse(channel,response)
       //response = channel.receive[GNETANSWERHEADOBJECT]()
 
       response.nReturnValue = 1
@@ -123,7 +123,7 @@ trait SendMatchTaskSupport {
                           nQryTID:Short,
                           pstQry:GAQUERYSTRUCT,
                           nOption:Int = 0
-                          ):Long= createAncientClient(address.host,address.port).executeInChannel{channel=>
+                          ):Long= executeInChannel{channel=>
 
     val request = new GNETREQUESTHEADOBJECT
     request.cbSize = 192
@@ -143,7 +143,7 @@ trait SendMatchTaskSupport {
     GAFIS_NETSCR_SendQueryInfo(channel,pstQry)
 
     val response = channel.receive[GNETANSWERHEADOBJECT]()//.writeMessage[GNETANSWERHEADOBJECT](pstQry)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     response.nReturnValue
   }
@@ -152,7 +152,7 @@ trait SendMatchTaskSupport {
                              pstQry:GAQUERYSTRUCT,
                              pnIdx:Array[Byte],
                              nOption:Int = 0
-                              ):Array[GADB_RETVAL]= createAncientClient(address.host,address.port).executeInChannel{channel=>
+                              ):Array[GADB_RETVAL]= executeInChannel{channel=>
 
     val request = new GNETREQUESTHEADOBJECT
     request.cbSize = 192
@@ -173,7 +173,7 @@ trait SendMatchTaskSupport {
 
     request.bnData = byteBuffer.array()
     var response = channel.writeMessage[GNETANSWERHEADOBJECT](request)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
 
     channel.writeByteArray[NoneResponse](pstKey.pKey_Data) //send key
@@ -182,7 +182,7 @@ trait SendMatchTaskSupport {
     GAFIS_NETSCR_SendQueryInfo(channel,pstQry)
 
     response = channel.receive[GNETANSWERHEADOBJECT]()//.writeMessage[GNETANSWERHEADOBJECT](pstQry)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
     0.until(pstKey.nKeyCount).map{ i=>
       channel.receive[GADB_RETVAL]()
     }.toArray
@@ -206,12 +206,12 @@ trait SendMatchTaskSupport {
       //throw new IllegalArgumentException("data is null");
     }
     val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstQry)
-    validateResponse(response,channel)
+    validateResponse(channel,response)
 
     if( nMicCount > 0)
     {
       pstQry.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
-      pstQry.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(_,channel))
+      pstQry.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(channel,_))
     }
     if( nSvrListLen > 0 )
       channel.writeByteArray(pstQry.pstSvrList_Data,0,nSvrListLen);
@@ -229,13 +229,10 @@ trait SendMatchTaskSupport {
     }
     if ( nTxtSqlLen>0 ) channel.writeByteArray[NoneResponse]( pstQry.pstTextSql_Data, 0,nTxtSqlLen);
     if ( nCommentLen>0 ) channel.writeByteArray[NoneResponse]( pstQry.pszComment_Data, 0,nCommentLen);
-    if ( nqryinfolen>0 ) {
-      pstQry.pstInfo_Data.foreach(channel.writeMessage[NoneResponse](_))
-    }
   }
 
   def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Long ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
+    executeInChannel{channel=>
       //because gafis use strcpy to get key,so append 0
       val keyBytes = task.cardId.getBytes(AncientConstants.UTF8_ENCODING)
       val buffer = ByteBuffer.allocate(keyBytes.length + 1)
@@ -260,7 +257,7 @@ trait SendMatchTaskSupport {
       header.bnData = bytes
 
       var response = channel.writeMessage[GNETANSWERHEADOBJECT](header)
-      validateResponse(response,channel)
+      validateResponse(channel,response)
 
       channel.writeByteArray[NoneResponse](key)
 
@@ -285,7 +282,7 @@ trait SendMatchTaskSupport {
       queryStruct.nItemFlagA = 64
 
       response = channel.writeMessage[GNETANSWERHEADOBJECT](queryStruct)
-      validateResponse(response,channel)
+      validateResponse(channel,response)
       val ret = channel.receive[GADB_RETVAL]()
       convertSixByteArrayToLong(ret.nSID)
     }

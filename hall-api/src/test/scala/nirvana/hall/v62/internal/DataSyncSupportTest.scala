@@ -3,8 +3,8 @@ package nirvana.hall.v62.internal
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{LPCard, FingerFgp, TPCard, Case}
-import nirvana.hall.v62.services.{V62ServerAddress, DatabaseTable, AncientClient}
+import nirvana.hall.protocol.v62.FPTProto.{Case, FingerFgp, LPCard, TPCard}
+import nirvana.hall.v62.services.{DatabaseTable, V62ServerAddress}
 import org.junit.Test
 
 /**
@@ -144,13 +144,8 @@ class DataSyncSupportTest {
   }
   private def createSender():DataSyncSupport={
     new DataSyncSupport with AncientClientSupport with LoggerSupport{
-      /**
-       * obtain AncientClient instance
-       * @return AncientClient instance
-       */
-      override def createAncientClient(host:String,port:Int): AncientClient = {
-        AncientAppClient.connect(host,port)
-      }
+
+      override def serverAddress: V62ServerAddress = address
     }
   }
 }

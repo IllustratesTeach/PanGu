@@ -683,7 +683,7 @@ object gaqryque {
     var bnRes_FifoQueSID:Array[Byte] = _ ;
     var pstInfo_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstInfo_Data:Array[GAFIS_QUERYINFO] = _ // for pstInfo pointer ,struct:GAFIS_QUERYINFO;			// query info.
+  var pstInfo_Data:GAFIS_QUERYINFO = _ // for pstInfo pointer ,struct:GAFIS_QUERYINFO;			// query info.
   @Length(4)
   var bnRes_pstInfo:Array[Byte] = _ ;		//
   @Length(32)

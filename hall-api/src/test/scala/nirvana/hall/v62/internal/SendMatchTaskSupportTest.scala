@@ -229,14 +229,8 @@ class SendMatchTaskSupportTest extends LoggerSupport{
   }
   private def createSender():SendMatchTaskSupport={
     new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
-      /**
-       * obtain AncientClient instance
-       * @return AncientClient instance
-       */
-      override def createAncientClient(host:String,port:Int): AncientClient = {
-        //AncientAppClient.connect("10.1.6.182",6798)
-        AncientAppClient.connect(host,port)
-      }
+
+      override def serverAddress: V62ServerAddress = address
     }
   }
 }
