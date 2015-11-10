@@ -25,7 +25,7 @@ trait ganetlp {
     val response =channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
     validateResponse(channel,response)
   }
-  def NET_GAFIS_CASE_Get(nDBID:Short,nTableID:Short,pstCase:GCASEINFOSTRUCT,nOption:Int=0):Unit=executeInChannel{channel=>
+  def NET_GAFIS_CASE_Get(nDBID:Short,nTableID:Short,caseId:String,nOption:Int=0):GCASEINFOSTRUCT=executeInChannel{channel=>
     val pReq = new GNETREQUESTHEADOBJECT
     pReq.nOption = nOption
     pReq.nDBID = nDBID
@@ -33,12 +33,12 @@ trait ganetlp {
     pReq.nOpClass = OP_CLASS_CASE.asInstanceOf[Short]
     pReq.nOpCode = OP_CASE_GET.asInstanceOf[Short]
 
-    pReq.bnData = pstCase.szCaseID.getBytes
+    pReq.bnData = caseId.getBytes
 
     val response = channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
     validateResponse(channel,response)
 
-    GAFIS_NETSCR_RecvCaseInfo(channel,response,pstCase)
+    GAFIS_NETSCR_RecvCaseInfo(channel,response)
   }
 
 

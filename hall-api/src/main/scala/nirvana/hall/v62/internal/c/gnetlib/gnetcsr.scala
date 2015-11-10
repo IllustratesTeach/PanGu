@@ -16,12 +16,12 @@ import nirvana.hall.v62.services.ChannelOperator
  */
 trait gnetcsr {
   this: AncientClientSupport =>
-  def GAFIS_NETSCR_RecvCaseInfo(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT,pstCase:GCASEINFOSTRUCT){
+  def GAFIS_NETSCR_RecvCaseInfo(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT):GCASEINFOSTRUCT={
     val pstCase = channel.receive[GCASEINFOSTRUCT]()
-    val nfing = (pstCase.nFingerCount);
-    val npalm = (pstCase.nPalmCount);
-    val ntext = (pstCase.nTextItemCount);
-    val nextrainfolen = (pstCase.nExtraInfoLen);
+    val nfing = pstCase.nFingerCount;
+    val npalm = pstCase.nPalmCount;
+    val ntext = pstCase.nTextItemCount;
+    val nextrainfolen = pstCase.nExtraInfoLen;
     val bfreecase = 1;	// case can be freed.
     if ( nfing<=0 && ntext<=0 && npalm<=0 && nextrainfolen<=0 ) {
       throw new IllegalArgumentException("data is null")
@@ -78,6 +78,8 @@ trait gnetcsr {
       pstCase.pstExtraInfo_Data.cbSize = nextrainfolen
       pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
     }
+
+    pstCase
   }
 
   def GAFIS_NETSCR_SendCaseInfo(channel: ChannelOperator, pstCase:GCASEINFOSTRUCT) {
