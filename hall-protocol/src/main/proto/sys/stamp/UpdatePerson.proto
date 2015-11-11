@@ -1,0 +1,22 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "UpdatePersonProto";
+
+//人员修改请求
+message UpdatePersonRequest {
+    extend BaseRequest {
+        optional UpdatePersonRequest cmd = 311;
+    }
+    required string personInfo = 1;
+}
+
+message UpdatePersonResponse {
+    extend BaseResponse {
+        optional UpdatePersonResponse cmd = 311;
+    }
+    optional string next = 1;
+
+}

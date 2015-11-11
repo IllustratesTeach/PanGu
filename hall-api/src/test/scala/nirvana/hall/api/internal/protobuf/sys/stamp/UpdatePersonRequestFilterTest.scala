@@ -1,30 +1,30 @@
 package nirvana.hall.api.internal.protobuf.sys.stamp
 
-import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonResponse, QueryBasePersonRequest}
 import org.junit.{Assert, Test}
 import nirvana.hall.api.internal.BaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.QueryPersonProto.{QueryPersonResponse}
+import nirvana.hall.protocol.sys.stamp.UpdatePersonProto.{UpdatePersonResponse, UpdatePersonRequest}
 
 /**
- * Created by wangjue on 2015/11/2.
+ * Created by wangjue on 2015/11/9.
  */
-class QueryPersonRequestFilterTest extends BaseServiceTestSupport {
+class UpdatePersonRequestFilterTest extends BaseServiceTestSupport {
 
   @Test
-  def test_query: Unit ={
-    val queryRequest = QueryBasePersonRequest.newBuilder()
-    queryRequest.setPersonid("CS520201511050001")
+  def test_update: Unit ={
+    val updateRequest = UpdatePersonRequest.newBuilder()
+    updateRequest.setPersonInfo("")
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
     val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
-    protobufRequest.setExtension(QueryBasePersonRequest.cmd, queryRequest.build())
+    protobufRequest.setExtension(UpdatePersonRequest.cmd, updateRequest.build())
     val protobufResponse = BaseResponse.newBuilder()
     protobufResponse.setStatus(ResponseStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
-    val personInfo = protobufResponse.getExtension(QueryBasePersonResponse.cmd)
+
+    val personInfo = protobufResponse.getExtension(UpdatePersonResponse.cmd)
 
     Assert.assertTrue(personInfo != null)
 

@@ -10,8 +10,8 @@ import scala.io.Source
  */
 class Migrate_20151026190000_InitCode extends Migration{
   override def up(): Unit = {
-    execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20151026190000_Code.sql")).mkString)
-    execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20151026190000_Area.sql")).mkString)
+    //execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20151026190000_Code.sql")).mkString)
+    //execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20151026190000_Area.sql")).mkString)
   }
 
   override def down(): Unit = {
