@@ -1,9 +1,9 @@
 package nirvana.hall.api.internal.protobuf.sys
 
 import nirvana.hall.api.internal.BaseServiceTestSupport
-import nirvana.hall.api.services.ProtobufRequestHandler
+import nirvana.hall.api.services.{SyncDictService, ProtobufRequestHandler}
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
-import nirvana.hall.protocol.sys.SyncDictProto.{SyncDictResponse, DictType, SyncDictRequest}
+import nirvana.hall.protocol.sys.SyncDictProto.{DictType, SyncDictRequest, SyncDictResponse}
 import org.junit.{Assert, Test}
 
 /**
@@ -26,5 +26,14 @@ class SyncDictRequestFilterTest extends BaseServiceTestSupport{
     Assert.assertTrue(protobufResponse.hasExtension(SyncDictResponse.cmd))
     Assert.assertTrue(protobufResponse.getExtension(SyncDictResponse.cmd).getSyncDataCount > 0)
 
+    val service = registry.getService(classOf[SyncDictService])
+    val request = SyncDictRequest.newBuilder()
+    DictType.values().foreach{ f =>
+      request.setDictType(f)
+      protobufRequest.setExtension(SyncDictRequest.cmd, request.build())
+//      WebAppClientUtils.call(url, request.build(), response)
+      handler.handle(protobufRequest.build(), protobufResponse)
+      service.syncDict(f, service.findAllDict(f))
+    }
   }
 }

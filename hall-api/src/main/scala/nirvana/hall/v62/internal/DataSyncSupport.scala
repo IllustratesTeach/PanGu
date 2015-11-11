@@ -3,6 +3,9 @@ package nirvana.hall.v62.internal
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
+import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
 /**
@@ -14,7 +17,7 @@ trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
 
   //change header data
-  private type HeaderDataModifier = RequestHeader => Unit
+  private type HeaderDataModifier = GNETREQUESTHEADOBJECT => Unit
   private type DataWriter = ChannelOperator => Unit
   //nothing write
   private val NoneOperator:DataWriter = channel =>{
@@ -23,7 +26,7 @@ trait DataSyncSupport {
     header.bnData = Array[Byte](1)
   }
   //copy key to header
-  private def DeleteDataHeader(key:String)(header:RequestHeader): Unit ={
+  private def DeleteDataHeader(key:String)(header:GNETREQUESTHEADOBJECT): Unit ={
     header.bnData = key.getBytes(AncientConstants.GBK_ENCODING)
   }
   private case class V62OperateOptions(opClass:Int,opCode:Int,func:DataWriter)
@@ -35,8 +38,8 @@ trait DataSyncSupport {
   def addCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_ADD,
+        OP_CLASS_CASE,
+        OP_CASE_ADD,
         syncCase(protoCase)))
   }
 
@@ -49,8 +52,8 @@ trait DataSyncSupport {
   def updateCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_UPDATE,
+        OP_CLASS_CASE,
+        OP_CASE_UPDATE,
         syncCase(protoCase)))
   }
 
@@ -63,8 +66,8 @@ trait DataSyncSupport {
   def deleteCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,caseId:String): Unit ={
     sendData(serverAddress,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_CASE,
-        AncientConstants.OP_CASE_DEL,
+        OP_CLASS_CASE,
+        OP_CASE_DEL,
       NoneOperator),DeleteDataHeader(caseId))
   }
 
@@ -77,8 +80,8 @@ trait DataSyncSupport {
   def updateTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_UPDATE,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_UPDATE,
         syncTemplateData(card)))
   }
 
@@ -91,8 +94,8 @@ trait DataSyncSupport {
   def addTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,card: TPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_ADD,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_ADD,
         syncTemplateData(card)))
   }
 
@@ -105,8 +108,8 @@ trait DataSyncSupport {
   def deleteTemplateData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_TPLIB,
-        AncientConstants.OP_TPLIB_DEL,
+        OP_CLASS_TPLIB,
+        OP_TPLIB_DEL,
         NoneOperator),
       DeleteDataHeader(key))
   }
@@ -120,8 +123,8 @@ trait DataSyncSupport {
   def updateLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_UPDATE,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_UPDATE,
         syncLatentData(card)))
   }
 
@@ -134,8 +137,8 @@ trait DataSyncSupport {
   def addLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,card:LPCard): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_ADD,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_ADD,
         syncLatentData(card)))
   }
 
@@ -148,16 +151,16 @@ trait DataSyncSupport {
   def deleteLatentData(address:V62ServerAddress,databaseTable: DatabaseTable,key:String): Unit ={
     sendData(address,databaseTable,
       V62OperateOptions(
-        AncientConstants.OP_CLASS_LPLIB,
-        AncientConstants.OP_LPLIB_DEL,
+        OP_CLASS_LPLIB,
+        OP_LPLIB_DEL,
         NoneOperator),
       DeleteDataHeader(key))
   }
 
 
   private def sendData(address:V62ServerAddress,databaseTable: DatabaseTable,options:V62OperateOptions,headerDataModifier: HeaderDataModifier=AddDataHeader): Unit ={
-    createAncientClient(address.host,address.port).executeInChannel{channel=>
-      val header = new RequestHeader
+    executeInChannel{channel=>
+      val header = new GNETREQUESTHEADOBJECT
       header.szUserName=address.user
       address.password.foreach(header.szUserPass = _)
 
@@ -176,8 +179,8 @@ trait DataSyncSupport {
       options.func(channel)
 
       //Finally receive server response
-      val response  = channel.receive[ResponseHeader]()
-      validateResponse(response,channel)
+      val response  = channel.receive[GNETANSWERHEADOBJECT]()
+      validateResponse(channel,response)
 
     }
   }
@@ -193,8 +196,8 @@ trait DataSyncSupport {
     if ( nfing<=0 && npalm<=0 && ntext<=0 && nextrainfolen<=0 ) {
       throw new IllegalArgumentException
     }
-    var response = channel.writeMessage[ResponseHeader](data)
-    validateResponse(response,channel)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
+    validateResponse(channel,response)
 
     var bExtraInfoFirst = 0
     val bnData = new String(response.bnData)
@@ -208,58 +211,60 @@ trait DataSyncSupport {
     }
 
 
-    if ( nfing>0 && data.pstFingerIdData != null ) {
-      data.pstFingerIdData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( nfing>0 && data.pstFingerID_Data != null ) {
+      data.pstFingerID_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
-    if ( npalm>0 && data.pstPalmIdData != null ) {
-      data.pstPalmIdData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( npalm>0 && data.pstPalmID_Data!= null ) {
+      data.pstPalmID_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
-    if ( ntext>0 && data.pstTextData!= null ) {
-      data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if ( ntext>0 && data.pstText_Data!= null ) {
+      data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
 
     if ( bExtraInfoFirst> 0 && ( nextrainfolen > 0 ) ) {
-      channel.writeMessage[NoneResponse](data.pstExtraInfoData)
-      if(data.pstExtraInfoData.nItemSize>0){
-        response = channel.receive[ResponseHeader]()
-        validateResponse(response,channel)
-        channel.writeMessage(data.pstExtraInfoData.pstItemEntryData)
+      channel.writeMessage[NoneResponse](data.pstExtraInfo_Data)
+      if(data.pstExtraInfo_Data != null ){
+        response = channel.receive[GNETANSWERHEADOBJECT]()
+
+        validateResponse(channel,response)
+        val head = data.pstExtraInfo_Data
+        channel.writeMessage[NoneResponse](head.pstItemEntry_Data)
       }
     }
 
-    if(ntext > 0 && data.pstTextData != null)
-      data.pstTextData.filter(_.bIsPointer == 1).foreach{x=>
-        channel.writeByteArray[NoneResponse](x.textContent)
+    if(ntext > 0 && data.pstText_Data != null)
+      data.pstText_Data.filter(_.bIsPointer == 1).foreach{x=>
+        channel.writeByteArray[NoneResponse](x.stData.textContent)
       }
 
   }
   private def syncTemplateData(card:TPCard)(channel:ChannelOperator):Unit={
     val data = FeatureStruct.convertProtoBuf2TPCard(card)
 
-    var response = channel.writeMessage[ResponseHeader](data)
-    validateResponse(response,channel)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
+    validateResponse(channel,response)
 
 
-    if(data.pstMICData != null)
-      data.pstMICData.foreach(channel.writeMessage[NoneResponse](_))
-    if(data.pstTextData!= null)
-      data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstText_Data!= null)
+      data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
-    response = channel.receive[ResponseHeader]()
-    validateResponse(response,channel)
+    response = channel.receive[GNETANSWERHEADOBJECT]()
+    validateResponse(channel,response)
 
-    if(data.pstMICData != null)
-      data.pstMICData.foreach(sendGAFISMICSTRUCT(_,channel))
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))
 
-    if(data.pstTextData != null)
-      data.pstTextData.filterNot(_.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.textContent))
+    if(data.pstText_Data != null)
+      data.pstText_Data.filterNot(_.stData.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.stData.textContent))
 
   }
   private def syncLatentData(card:LPCard)(channel:ChannelOperator):Unit={
     val data = FeatureStruct.convertProtoBuf2LPCard(card)
 
-    var response = channel.writeMessage[ResponseHeader](data)
-    validateResponse(response,channel)
+    var response = channel.writeMessage[GNETANSWERHEADOBJECT](data)
+    validateResponse(channel,response)
 
     val bnData = new String(response.bnData)
     var extraInfo = 0
@@ -267,34 +272,35 @@ trait DataSyncSupport {
       extraInfo = data.nExtraInfoLen
     }
 
-    if(data.pstMICData != null)
-      channel.writeMessage[NoneResponse](data.pstMICData)
+    if(data.pstMIC_Data != null)
+      channel.writeMessage[NoneResponse](data.pstMIC_Data)
 
-    if(data.pstTextData != null)
-    data.pstTextData.foreach(channel.writeMessage[NoneResponse](_))
+    if(data.pstText_Data != null)
+    data.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
 
-    response = channel.receive[ResponseHeader]()
-    validateResponse(response,channel)
+    response = channel.receive[GNETANSWERHEADOBJECT]()
+    validateResponse(channel,response)
 
-    if(data.pstMICData != null)
-      sendGAFISMICSTRUCT(data.pstMICData,channel)
+    if(data.pstMIC_Data != null)
+      data.pstMIC_Data.foreach(sendGAFISMICSTRUCT(_,channel))
 
-    if(data.pstTextData != null)
-      data.pstTextData.filterNot(_.textContent == null).foreach(x=>channel.writeByteArray[NoneResponse](x.textContent))
+    if(data.pstText_Data != null)
+      data.pstText_Data.filterNot(_.stData.textContent == null)
+        .foreach(x=>channel.writeByteArray[NoneResponse](x.stData.textContent))
 
     if(extraInfo > 0)
-      channel.writeMessage[NoneResponse](data.pstExtraInfoData)
+      channel.writeMessage[NoneResponse](data.pstExtraInfo_Data)
 
   }
 
-  private def sendGAFISMICSTRUCT(mic:tagGAFISMICSTRUCT,channel:ChannelOperator): Unit ={
+  private def sendGAFISMICSTRUCT(mic:GAFISMICSTRUCT,channel:ChannelOperator): Unit ={
     if(mic.nMntLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstMntData)
+      channel.writeByteArray[NoneResponse](mic.pstMnt_Data)
     if(mic.nImgLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstImgData)
+      channel.writeByteArray[NoneResponse](mic.pstImg_Data)
     if(mic.nCprLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstCprData)
+      channel.writeByteArray[NoneResponse](mic.pstCpr_Data)
     if(mic.nBinLen > 0)
-      channel.writeByteArray[NoneResponse](mic.pstBinData)
+      channel.writeByteArray[NoneResponse](mic.pstBin_Data)
   }
 }

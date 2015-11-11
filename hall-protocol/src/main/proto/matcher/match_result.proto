@@ -1,0 +1,55 @@
+package matcher;
+
+option java_package = "nirvana.hall.protocol.matcher";
+
+option java_outer_classname = "MatchResult";
+
+/* 向Web服务器推送比对结果的请求 */
+message MatchResultRequest {
+  message MatcherStatus{
+    //非0数据都是错误数据
+    required uint32 code = 1 [default = 0];
+    optional string msg = 2;
+  }
+  /*
+   * 比对结果对象。
+   * 需要讨论，结果给出的是否够用
+   */
+  message MatchResultObject { //比对结果
+    //指掌纹编号
+    required int64 object_id = 1;
+    //指掌位,仅仅在LT和TL的时候有用,表示T的指位
+    //从第1位到第10位表示指位
+    // 譬如：譬如：右手拇指是 1 << 0 ,左手小指是 1 << 9
+    optional uint32 pos = 2;
+    //得分
+    required uint32 score = 3;
+  }
+  //比对任务的ID
+  required string match_id = 1;
+  //候选的总数量
+  required uint32 candidate_num = 2;
+  //候选队列中的最大分值
+  required uint32 max_score = 3;
+
+  //候选结果列表
+  repeated MatchResultObject candidate_result = 4;
+
+  //比对状态
+  required MatcherStatus status = 5;
+  //比对消耗时间(单位：毫秒)
+  optional uint64 time_elapsed = 6;
+  //总共参入比对的记录数 (单位为:卡、案件)
+  optional uint64 record_num_matched = 7;
+}
+/*比对结果响应*/
+message MatchResultResponse {
+  /**
+   * 状态
+   */
+  enum MatchResultResponseStatus {
+    OK = 1;
+    ERROR = 2;
+  }
+  required MatchResultResponseStatus status = 1 [default = OK];
+}

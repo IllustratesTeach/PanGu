@@ -1,22 +1,21 @@
 package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.services.AncientClient
+import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, ganetqry}
+import nirvana.hall.v62.services.V62ServerAddress
 
 /**
  * v62 facade
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-04
  */
-class V62Facade extends SendMatchTaskSupport
-with DataSyncSupport
-with AncientClientSupport
-with LoggerSupport{
-  /**
-   * obtain AncientClient instance
-   * @return AncientClient instance
-   */
-  override def createAncientClient(host: String, port: Int): AncientClient = {
-    new XSocketAncientClient(host,port)
-  }
+class V62Facade(config:HallV62Config)
+  extends gnetcsr
+  with DataSyncSupport
+  with ganetqry
+  with AncientClientSupport
+  with LoggerSupport{
+  private val address = V62ServerAddress(config.host,config.port,config.user,Option(config.password))
+  override def serverAddress: V62ServerAddress = address
 }

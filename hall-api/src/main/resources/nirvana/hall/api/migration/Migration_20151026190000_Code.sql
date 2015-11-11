@@ -1514,6 +1514,8 @@ values ('196', '塞浦路斯', '1', 52, null);
 insert into CODE_GJ (code, name, delete_flag, ord, remark)
 values ('200', '捷克斯洛伐克', '1', 53, null);
 insert into CODE_GJ (code, name, delete_flag, ord, remark)
+values ('203', '捷克', '1', 53, null);
+insert into CODE_GJ (code, name, delete_flag, ord, remark)
 values ('204', '贝宁', '1', 54, null);
 insert into CODE_GJ (code, name, delete_flag, ord, remark)
 values ('208', '丹麦', '1', 55, null);
