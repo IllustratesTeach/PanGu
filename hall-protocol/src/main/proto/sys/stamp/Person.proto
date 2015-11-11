@@ -6,7 +6,7 @@ option java_outer_classname = "PersonProto";
 
 //定义捺印人输出字段
 message PersonInfo {
-    optional string personid = 1;
+    optional string personid = 1;               //捺印卡号
     optional string idcardno = 2;               //身份证号
     optional string name = 3;                   //姓名
     optional string usedname = 4;               //曾用名
@@ -41,5 +41,15 @@ message PersonInfo {
     optional string gatherdepartcode = 33;      //采集人部门
     optional string gatheruserid = 34;          //采集人id
     optional string remark = 35;                //备注
+    optional string cardid= 36;                 //人员编号(可编辑)
+    optional string haveseparation = 37;        //父母是否有离异经历
+    optional string ismigrantworker = 38;       //是否农民工子女
+    optional string istraining = 39;            //是否参加职业培训
+    optional string havecertificate = 40;       //是否取得职业资格证
+    optional string nameofschool = 41;          //就读学校名称
+    optional string gatherusername = 42;        //采集人姓名
+    optional string istempregist = 43;          //是否暂住登记
+    optional string havepermit = 44;            //是否办理居住证
+    optional string haveresidence = 45;         //是否有固定住所
 }
 

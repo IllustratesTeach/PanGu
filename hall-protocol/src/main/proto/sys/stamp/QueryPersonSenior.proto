@@ -6,7 +6,7 @@ option java_package = "nirvana.hall.protocol.sys.stamp";
 
 option java_outer_classname = "QueryPersonSeniorProto";
 
-//捺印高级查询
+//人员高级查询
 message QueryPersonSeniorRequest {
     extend BaseRequest {
         optional QueryPersonSeniorRequest cmd = 202;
