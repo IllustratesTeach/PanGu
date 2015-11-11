@@ -59,8 +59,29 @@ trait GatherPersonService {
   def queryGatherTypeNodeFieldBy(gatherTypeId : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherTypeNodeField]
 
 
+  /**
+   * 查询人员基本信息
+   * @param personId
+   * @return
+   */
+  def queryBasePersonInfo(personId : String) : Option[GafisPerson]
+
+  /**
+   * 保存人员信息
+   * @param personInfo
+   * @return
+   */
+  @Transactional
+  def saveGatherPerson(personInfo : String) : Integer
 
 
+  /**
+   * 修改人员信息
+   * @param personInfo
+   * @return
+   */
+  @Transactional
+  def updateGatherPerson(personInfo : String) : GafisPerson
 
 
 

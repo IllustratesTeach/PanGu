@@ -5,6 +5,7 @@ import nirvana.hall.api.entities.{GafisGatherTypeNodeField, GafisGatherType, Gaf
 import nirvana.hall.api.services.stamp.GatherPersonService
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
 import scala.collection.immutable.HashMap
@@ -90,6 +91,16 @@ class GatherPersonServiceImpl extends GatherPersonService{
 
 
   /**
+   * 查询人员基本信息
+   * @param personId
+   * @return
+   */
+  def queryBasePersonInfo(personId : String) : Option[GafisPerson] = {
+    val p = GafisPerson.find(personId)
+    p
+  }
+
+  /**
    * 新增捺印信息
    * @param personInfo
    * @return
@@ -100,9 +111,10 @@ class GatherPersonServiceImpl extends GatherPersonService{
     val ga : GafisPerson = reflectObject[GafisPerson](Constructorparams)
     //println(ga.personid+"---"+ga.name.get)
     val result = createPerson(ga)
-    //
 
-    /*val params = defineNameParameter(personInfo)
+
+    /*updateGatherPerson(personInfo)
+    val params = defineConstructorParameter(personInfo)
     val ga1 : GafisPerson = reflectObject[GafisPerson](params)
     val person = GafisPerson.save(ga1)
 
@@ -119,11 +131,16 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param personInfo
    * @return
    */
+  @Transactional
   def updateGatherPerson(personInfo : String) : GafisPerson = {
-    //命名参数赋值
-    val params = defineNameParameter(personInfo)
+    //val personInfo = "personid=CS520201511050001&name=anmiyy&idcardno=123&gatherDate=2015-11-9 10:30:30&dataSources=1&gatherFingerNum=10"
+    val params = defineConstructorParameter(personInfo)
+    val index = getPropertyIndex("name")
+    if (index != -1)
+      params(index) = Some("anmicc")
     val ga1 : GafisPerson = reflectObject[GafisPerson](params)
-    GafisPerson.save(ga1)
+    val person = GafisPerson.save(ga1)
+    person
   }
 
 
@@ -176,17 +193,11 @@ class GatherPersonServiceImpl extends GatherPersonService{
     Constructorparams
   }
 
-  //构建命名参数数组
-  def defineNameParameter(personInfo : String) : Array[Any] = {
-    //val personInfo = "personid=CS520201511050001&name=anmiyy&idcardno=123&gatherDate=2015-11-9 10:30:30&dataSources=1&gatherFingerNum=10"
-    val pis : Array[String] = personInfo.split("&")
-    var map = new HashMap[String,String]()
-    for (p <- pis) {
-      val pi = p.split("=")
-      map += (pi(0) -> pi(1))
-    }
-    val params = new Array[Any](GafisPerson.columns.size)
 
+
+  //获取属性位置
+  def getPropertyIndex(property : String) : Integer = {
+    var index = -1
     for (c <- 0 to GafisPerson.columns.size-1) {
       val t = GafisPerson.columns(c)
       var field = ""
@@ -195,23 +206,11 @@ class GatherPersonServiceImpl extends GatherPersonService{
       } else {
         field = t.toLowerCase
       }
-      map.foreach(e => {
-        val (k,v) = e
-        if (field.equals(k.toLowerCase)) {
-          if (field == "personid") {
-            params(c) = k + "=" + v
-          } else if (field == "gatherDate") {
-            params(c) = Some(k + "=" + parseDateTime(v))
-          }
-          else {
-            params(c) = Some(k + "=" + v)
-          }
-        }
-      })
+      if (field.equals(property.toLowerCase))
+        index = c
     }
-    params
+    index
   }
-
 
   //格式化时间
   def parseDateTime(time : String) : DateTime = {
@@ -531,11 +530,6 @@ class GatherPersonServiceImpl extends GatherPersonService{
 
   }
 
-
-  //对象序列化数组
-  //def ObjectToArray(obj : Any) : Seq[Any] = {
-
-  //}
 
   //反射构造函数赋值
   def reflectObject[T](args : Seq[Any])(implicit typeTag: TypeTag[T]):T = {
