@@ -1,0 +1,25 @@
+package sys;
+import "sys/Common.proto";
+import "sys/Dict.proto";
+
+option java_package = "nirvana.hall.protocol.sys";
+option java_outer_classname = "DictListProto";
+
+//获取字典列表请求
+message DictListRequest {
+  extend BaseRequest {
+    optional DictListRequest cmd = 111;
+  }
+  required DictType dictType = 1;
+}
+//获取字典列表的响应
+message DictListResponse {
+  extend BaseResponse {
+    optional DictListResponse cmd = 111;
+  }
+  message Dict {
+    required string code = 1;
+    required string name = 2;
+  }
+  repeated Dict dict = 1;
+}

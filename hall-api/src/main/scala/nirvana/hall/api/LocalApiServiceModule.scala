@@ -22,7 +22,7 @@ object LocalApiServiceModule {
     binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
     binder.bind(classOf[UserService], classOf[UserServiceImpl])
     binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
-    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl])
+    binder.bind(classOf[DictService], classOf[DictServiceImpl])
     binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])
     binder.bind(classOf[GatherFingerPalmService], classOf[GatherFingerPalmServiceImpl])
     binder.bind(classOf[GatherPortraitService], classOf[GatherPortraitServiceImpl])
@@ -31,9 +31,10 @@ object LocalApiServiceModule {
   def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
     configuration.addInstance("LoginRequestFilter", classOf[LoginRequestFilter])
     configuration.addInstance("SyncDictRequestFilter", classOf[SyncDictRequestFilter])
+    configuration.addInstance("DictListRequestFilter", classOf[DictListRequestFilter])
     configuration.addInstance("QueryPersonRequestFilter", classOf[QueryPersonRequestFilter])
     configuration.addInstance("AddPersonInfoRequestFilter", classOf[AddPersonInfoRequestFilter])
-      configuration.addInstance("UpdatePersonRequestFilter", classOf[UpdatePersonRequestFilter])
+    configuration.addInstance("UpdatePersonRequestFilter", classOf[UpdatePersonRequestFilter])
   }
   @Match(Array("*"))
   def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
