@@ -7,6 +7,8 @@ import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
 
+import scala.reflect._
+
 /**
  * ancient client based on xsocket
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -71,12 +73,14 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
       writeByteArray(data,0,data.length)
     }
 
-    override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
-      val dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      dataInstance match{
-        case x:NoneResponse =>
-          x.asInstanceOf[R]
-        case other=>
+    override def receive[R <: AncientData :ClassTag](): R = {
+      classTag[R] match{
+        case t if t == classTag[Nothing] =>
+          null.asInstanceOf[R]
+        case t if t == classTag[NoneResponse] =>
+          new NoneResponse().asInstanceOf[R]
+        case _ =>
+          val dataInstance = classTag[R].runtimeClass.newInstance().asInstanceOf[R]
           val buffer = receiveByteArray(dataInstance.getDataSize)
           dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
       }
