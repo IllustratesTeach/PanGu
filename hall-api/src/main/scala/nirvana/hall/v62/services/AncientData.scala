@@ -25,7 +25,6 @@ trait ScalaReflect{
   private val instanceMirror = AncientData.mirror.reflect(this)
   private val clazzSymbol = instanceMirror.symbol
   private val clazzType = clazzSymbol.asType.toType
-  private val clazzMirror = clazzSymbol.asClass
 
   private var dataSize:Int = 0
   private def findBaseLength(tpe:Type,length:Int):Int={
