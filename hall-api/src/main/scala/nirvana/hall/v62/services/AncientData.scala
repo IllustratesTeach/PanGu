@@ -64,16 +64,12 @@ trait ScalaReflect{
       .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
       .toSeq.reverse // <----- must be reversed
       .map{ m =>
+      //find @Length annotation
       val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
-      val length = lengthAnnotation match{
-        case Some(anno) =>
-          anno.tree.children.tail match{
-            case List(AssignOrNamedArg(name,Literal(Constant(value))))=>
-              value.asInstanceOf[Int]
-          }
-        case None =>
-          0
-      }
+      val length = lengthAnnotation.map(_.tree).map{
+        case Apply(fun, AssignOrNamedArg(name,Literal(Constant(value)))::Nil)=>
+          value.asInstanceOf[Int]
+      }.sum
       //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
       processor(m,length)
     }.toArray
