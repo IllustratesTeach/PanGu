@@ -18,7 +18,7 @@ class AncientDataTest {
   def test_scala_length: Unit = {
     val m = new M
 
-    Assert.assertEquals(34,m.getDataSizeByScala)
+    Assert.assertEquals(34,m.getDataSize)
   }
   @Test
   def test_ancient: Unit ={

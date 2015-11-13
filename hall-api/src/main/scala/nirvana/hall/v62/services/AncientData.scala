@@ -16,6 +16,7 @@ import scala.reflect.runtime.universe.definitions._
  */
 object AncientData {
   val mirror = universe.runtimeMirror(getClass.getClassLoader)
+  val STRING_CLASS = typeOf[String]
 }
 trait ScalaReflect{
   private var dataSize:Int = 0
@@ -25,18 +26,17 @@ trait ScalaReflect{
         throw new IllegalArgumentException("@Lenght not defined "+tpe)
       length
     }
-    val STRING_CLASS = typeOf[String]
     tpe match {
       case ByteTpe | CharTpe => 1
       case ShortTpe => 2
       case IntTpe => 4
       case LongTpe => 8
-      case STRING_CLASS =>
+      case AncientData.STRING_CLASS =>
         returnLengthOrThrowException
       case t if t <:< typeOf[ScalaReflect] =>
         val classType = t.typeSymbol.asClass
         val constructor = classType.primaryConstructor.asMethod
-        AncientData.mirror.reflectClass(classType).reflectConstructor(constructor)().asInstanceOf[ScalaReflect].getDataSizeByScala
+        AncientData.mirror.reflectClass(classType).reflectConstructor(constructor)().asInstanceOf[ScalaReflect].getDataSize
       case TypeRef(pre,sym,args) if sym == typeOf[Array[_]].typeSymbol =>
         if(args.length != 1)
           throw new IllegalArgumentException("only support one type parameter in Array.")
@@ -45,7 +45,7 @@ trait ScalaReflect{
         throw new IllegalArgumentException("type is not supported "+other)
     }
   }
-  def getDataSizeByScala:Int={
+  def getDataSize:Int={
     if(dataSize == 0) {
       val instanceMirror = AncientData.mirror.reflect(this)
       val decl = instanceMirror.symbol.asType.toType
@@ -55,7 +55,16 @@ trait ScalaReflect{
         .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
         .foreach { m =>
         val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
-        val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
+        val length = lengthAnnotation match{
+          case Some(anno) =>
+            anno.tree.children.tail match{
+              case List(AssignOrNamedArg(name,Literal(Constant(value))))=>
+                value.asInstanceOf[Int]
+            }
+          case None =>
+            0
+        }
+        //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
         dataSize += findBaseLength(m.info,length)
       }
     }
