@@ -18,7 +18,7 @@ class AncientDataTest {
   def test_scala_length: Unit = {
     val m = new M
 
-    //Assert.assertEquals(34,m.getDataSizeByScala)
+    Assert.assertEquals(34,m.getDataSizeByScala)
   }
   @Test
   def test_ancient: Unit ={
@@ -40,7 +40,7 @@ class AncientDataTest {
   }
 }
 
-class M extends AncientData{
+class M extends ScalaReflect{
   var i:Int = _
   var s:Short = _
   @IgnoreTransfer
@@ -52,9 +52,10 @@ class M extends AncientData{
   @Length(20)
   var str:String= _
   var n2:N= _
+
 }
 //2
-class N extends AncientData {
+class N extends ScalaReflect {
   @Length(2)
   var a:Array[Byte]= _
 }

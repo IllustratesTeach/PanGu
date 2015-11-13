@@ -1,10 +1,12 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
+import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
-import scala.reflect.runtime._
+import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.definitions._
+
 
 /**
  * support to serialize/unserialize data
@@ -15,40 +17,32 @@ import scala.reflect.runtime.universe._
 object AncientData {
   val mirror = universe.runtimeMirror(getClass.getClassLoader)
 }
-sealed trait ScalaReflect{
+trait ScalaReflect{
   private var dataSize:Int = 0
   private def findBaseLength(tpe:Type,length:Int):Int={
-    val BYTE_CLASS = typeOf[Byte]
-    val CHAR_CLASS = typeOf[Char]
-    val SHORT_CLASS = typeOf[Short]
-    val INT_CLASS = typeOf[Int]
-    val LONG_CLASS = typeOf[Long]
+    def returnLengthOrThrowException:Int={
+      if(length == 0)
+        throw new IllegalArgumentException("@Lenght not defined "+tpe)
+      length
+    }
     val STRING_CLASS = typeOf[String]
-    val ANCIENT_DATA_TYPE = typeOf[AncientData]
     tpe match {
-      case `BYTE_CLASS` | `CHAR_CLASS` =>
-        1
-      case `SHORT_CLASS` =>
-        2
-      case `INT_CLASS` =>
-        4
-      case `LONG_CLASS` =>
-        8
-      case `STRING_CLASS` =>
-        if(length == 0){
-          throw new IllegalArgumentException("@Lenght not defined "+tpe)
-        }
-        length
+      case ByteTpe | CharTpe => 1
+      case ShortTpe => 2
+      case IntTpe => 4
+      case LongTpe => 8
+      case STRING_CLASS =>
+        returnLengthOrThrowException
+      case t if t <:< typeOf[ScalaReflect] =>
+        val classType = t.typeSymbol.asClass
+        val constructor = classType.primaryConstructor.asMethod
+        AncientData.mirror.reflectClass(classType).reflectConstructor(constructor)().asInstanceOf[ScalaReflect].getDataSizeByScala
+      case TypeRef(pre,sym,args) if sym == typeOf[Array[_]].typeSymbol =>
+        if(args.length != 1)
+          throw new IllegalArgumentException("only support one type parameter in Array.")
+        returnLengthOrThrowException * findBaseLength(args.head,0)
       case other =>
-        if (other <:< typeOf[AncientData]) {
-          val ct = other.typeSymbol.asClass.primaryConstructor.asMethod
-          AncientData.mirror.reflectClass(other.typeSymbol.asClass).reflectConstructor(ct)().asInstanceOf[AncientData].getDataSize
-        }else {
-          if(length == 0){
-            throw new IllegalArgumentException("@Lenght not defined "+tpe)
-          }
-          length * tpe.typeArgs.map(findBaseLength(_,0)).sum
-        }
+        throw new IllegalArgumentException("type is not supported "+other)
     }
   }
   def getDataSizeByScala:Int={
