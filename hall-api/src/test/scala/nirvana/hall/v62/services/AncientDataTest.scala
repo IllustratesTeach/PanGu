@@ -17,8 +17,22 @@ class AncientDataTest {
   @Test
   def test_scala_length: Unit = {
     val m = new M
+    m.str= "asdf"
+    m.n2 = new N
+    m.n = Array[N](new N)
+    m.n2.a=Array[Byte](1)
+    m.n.head.a = Array[Byte](8)
 
     Assert.assertEquals(34,m.getDataSize)
+    val buffer = ChannelBuffers.buffer(m.getDataSize)
+    m.writeToChannelBuffer(buffer)
+    Assert.assertFalse(buffer.writable())
+
+    val m2 = new M().fromChannelBuffer(buffer)
+    Assert.assertFalse(buffer.readable())
+
+    Assert.assertEquals(m.str,m2.str)
+    Assert.assertEquals(m.n.head.a.head,m2.n.head.a.head)
   }
   @Test
   def test_ancient: Unit ={
@@ -26,9 +40,14 @@ class AncientDataTest {
     header.nIP="10.1.1.1"
     val buffer = ChannelBuffers.buffer(header.getDataSize)
     header.writeToChannelBuffer(buffer)
+    Assert.assertFalse(buffer.writable())
+
+    val bytes = buffer.array()
+
     val header2 = new GNETREQUESTHEADOBJECT
     header2.fromChannelBuffer(buffer)
 
+    Assert.assertEquals(header.szMagicStr,header2.szMagicStr)
     Assert.assertEquals(header.nIP,header2.nIP)
   }
   @Test
