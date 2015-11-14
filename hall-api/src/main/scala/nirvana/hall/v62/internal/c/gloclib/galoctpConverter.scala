@@ -2,12 +2,12 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.protocol.v62.FPTProto
 import nirvana.hall.protocol.v62.FPTProto.TPCard
-import nirvana.hall.v62.internal.CaseStruct
 import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import galoclpConverter.appendTextStruct
 
 /**
  *
@@ -29,7 +29,6 @@ object galoctpConverter {
 
 
     if(card.hasText) {
-      import CaseStruct.appendTextStruct
       val text = card.getText
 
       val buffer = mutable.Buffer[GATEXTITEMSTRUCT]()
@@ -37,6 +36,7 @@ object galoctpConverter {
       //text information
       appendTextStruct(buffer, "Name",text.getStrName)
       appendTextStruct(buffer, "Alias",text.getStrAliasName)
+
       if(text.hasNSex)
         appendTextStruct(buffer, "SexCode",text.getNSex.toString)
       appendTextStruct(buffer, "BirthDate",text.getStrBirthDate)

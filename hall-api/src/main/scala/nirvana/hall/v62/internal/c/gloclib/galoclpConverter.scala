@@ -104,7 +104,7 @@ object galoclpConverter {
       key
     }.toArray
   }
-  private def appendTextStruct(buffer:mutable.Buffer[GATEXTITEMSTRUCT],name:String,value:String):Unit = {
+  private[gloclib] def appendTextStruct(buffer:mutable.Buffer[GATEXTITEMSTRUCT],name:String,value:String):Unit = {
     if(value != null && value.length > 0) {
       val textStruct = new GATEXTITEMSTRUCT()
       textStruct.bIsPointer = 1

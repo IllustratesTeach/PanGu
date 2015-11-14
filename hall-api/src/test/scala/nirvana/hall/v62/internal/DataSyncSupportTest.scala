@@ -13,7 +13,7 @@ import org.junit.Test
  * @since 2015-11-03
  */
 class DataSyncSupportTest {
-  private val address = V62ServerAddress("10.1.6.119",6898,"afisadmin")
+  private val address = V62ServerAddress("192.168.1.51",6798,"afisadmin",Some("helloafis"))
   @Test
   def test_send_template(): Unit ={
     val sync = createSender()

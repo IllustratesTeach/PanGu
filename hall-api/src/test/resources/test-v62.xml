@@ -5,9 +5,11 @@
 -->
 
 <hall_v62>
-   <host>10.1.6.119</host>
-   <port>6898</port>
+   <!-- <host>10.1.6.119</host> -->
+   <host>192.168.1.51</host>
+   <port>6798</port>
    <user>afisadmin</user>
+   <password>helloafis</password>
    <template_finger_table>
       <database_id>1</database_id>
       <table_id>2</table_id>

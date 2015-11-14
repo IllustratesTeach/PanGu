@@ -245,6 +245,7 @@ trait gnetcsr {
       pstCard.pstText_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
     response = channel.receive[GNETANSWERHEADOBJECT]()
+    //validateResponse(channel,response)
 
     if ( pstCard.nMicItemCount > 0 )  pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(channel,_))
     if ( pstCard.nTextItemCount > 0 ) {
