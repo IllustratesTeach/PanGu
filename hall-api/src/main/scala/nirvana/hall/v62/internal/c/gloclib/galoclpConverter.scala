@@ -1,12 +1,15 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import com.google.protobuf.ProtocolStringList
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.LPCard
-import nirvana.hall.v62.internal.CaseStruct
-import nirvana.hall.v62.internal.c.gloclib.galoclp.GLPCARDINFOSTRUCT
+import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard}
+import nirvana.hall.v62.AncientConstants
+import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.v62.internal.c.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 
 import scala.collection.mutable
+import scala.collection.JavaConversions._
 
 /**
  *
@@ -24,7 +27,6 @@ object galoclpConverter {
     data.szCardID = card.getStrCardID
 
     if(card.hasText) {
-      import CaseStruct.appendTextStruct
       val text = card.getText
 
       val buffer = mutable.Buffer[GATEXTITEMSTRUCT]()
@@ -93,5 +95,84 @@ object galoclpConverter {
       data.nMicItemCount = 1
     }
     data
+  }
+  //convert protocol string list as gafis GAKEYSTRUCT
+  private def convertAsKeyArray(stringList:ProtocolStringList): Array[GAKEYSTRUCT] ={
+    stringList.map{id=>
+      val key = new GAKEYSTRUCT
+      key.szKey = id
+      key
+    }.toArray
+  }
+  private def appendTextStruct(buffer:mutable.Buffer[GATEXTITEMSTRUCT],name:String,value:String):Unit = {
+    if(value != null && value.length > 0) {
+      val textStruct = new GATEXTITEMSTRUCT()
+      textStruct.bIsPointer = 1
+      textStruct.szItemName = name
+      //convert as GBK encoding,because 6.2 need gbk encoding
+      textStruct.stData.textContent = value.getBytes(AncientConstants.GBK_ENCODING)
+      textStruct.nItemLen = textStruct.stData.textContent.length
+
+      buffer += textStruct
+    }
+
+  }
+  def convertProtobuf2GCASEINFOSTRUCT(protoCase:Case):GCASEINFOSTRUCT = {
+    val gafisCase = new GCASEINFOSTRUCT
+    gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
+    //GAFIS里面没有'A',这里去掉前缀
+    gafisCase.szCaseID = protoCase.getStrCaseID
+    if(gafisCase.szCaseID.charAt(0) == 'A')
+      gafisCase.szCaseID = gafisCase.szCaseID.substring(1)
+
+    gafisCase.pstFingerID_Data = convertAsKeyArray(protoCase.getStrFingerIDList)
+    gafisCase.nFingerCount = gafisCase.pstFingerID_Data.length.asInstanceOf[Short]
+
+    gafisCase.pstPalmID_Data= convertAsKeyArray(protoCase.getStrPalmIDList)
+    gafisCase.nPalmCount = gafisCase.pstPalmID_Data.length.asInstanceOf[Short]
+
+
+    if (protoCase.hasText) {
+      val text = protoCase.getText
+      val buffer = mutable.Buffer[GATEXTITEMSTRUCT]()
+
+      appendTextStruct(buffer, "CaseClass1Code", text.getStrCaseType1)
+      appendTextStruct(buffer, "CaseClass2Code", text.getStrCaseType2)
+      appendTextStruct(buffer, "CaseClass3Code", text.getStrCaseType3)
+      appendTextStruct(buffer, "SuspiciousArea1Code", text.getStrSuspArea1Code)
+      appendTextStruct(buffer, "SuspiciousArea2Code", text.getStrSuspArea2Code)
+      appendTextStruct(buffer, "SuspiciousArea3Code", text.getStrSuspArea3Code)
+      appendTextStruct(buffer, "CaseOccurDate", text.getStrCaseOccurDate)
+      appendTextStruct(buffer, "CaseOccurPlaceCode", text.getStrCaseOccurPlaceCode)
+      appendTextStruct(buffer, "CaseOccurPlaceTail", text.getStrCaseOccurPlace)
+
+      if(text.hasNSuperviseLevel)
+        appendTextStruct(buffer, "SuperviseLevel", text.getNSuperviseLevel.toString)
+
+      appendTextStruct(buffer, "ExtractUnitCode", text.getStrExtractUnitCode)
+      appendTextStruct(buffer, "ExtractUnitNameTail", text.getStrExtractUnitName)
+      appendTextStruct(buffer, "Extractor1", text.getStrExtractor)
+      appendTextStruct(buffer, "ExtractDate", text.getStrExtractDate)
+      appendTextStruct(buffer, "IllicitMoney", text.getStrMoneyLost)
+      appendTextStruct(buffer, "Premium", text.getStrPremium)
+      if(text.hasBPersonKilled)
+        appendTextStruct(buffer, "HasPersonKilled", if (text.getBPersonKilled()) "1" else "0")
+      appendTextStruct(buffer, "Comment", text.getStrComment)
+      if(text.hasNCaseState)
+        appendTextStruct(buffer, "CaseState", text.getNCaseState.toString)
+
+      if(text.hasNXieChaState)
+        appendTextStruct(buffer, "XieChaFlag", text.getNCaseState.toString)
+      if(text.hasNCancelFlag)
+        appendTextStruct(buffer, "CancelFlag", text.getNCancelFlag.toString)
+
+      appendTextStruct(buffer, "XieChaDate", text.getStrXieChaDate)
+      appendTextStruct(buffer, "XieChaRequestUnitName", text.getStrXieChaRequestUnitName)
+      appendTextStruct(buffer, "XieChaRequestUnitCode", text.getStrXieChaRequestUnitCode)
+
+      gafisCase.pstText_Data = buffer.toArray
+      gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
+    }
+    gafisCase
   }
 }
