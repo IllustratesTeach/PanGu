@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.c.gnetlib.{gnetflib, gnetcsr, ganetqry}
+import nirvana.hall.v62.internal.c.gnetlib.{ganetdbp, gnetflib, gnetcsr, ganetqry}
 import nirvana.hall.v62.services.V62ServerAddress
 
 /**
@@ -14,6 +14,7 @@ class V62Facade(config:HallV62Config)
   extends gnetcsr
   with DataSyncSupport
   with ganetqry
+  with ganetdbp
   with gnetflib
   with AncientClientSupport
   with LoggerSupport{

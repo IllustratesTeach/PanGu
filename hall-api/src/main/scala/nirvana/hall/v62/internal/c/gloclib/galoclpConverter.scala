@@ -19,7 +19,7 @@ object galoclpConverter {
    * @param card protobuf object
    * @return gafis latent card object
    */
-  def convertProtoBuf2LPCard(card: LPCard): GLPCARDINFOSTRUCT= {
+  def convertProtoBuf2GLPCARDINFOSTRUCT(card: LPCard): GLPCARDINFOSTRUCT= {
     val data = new GLPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
 

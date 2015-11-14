@@ -21,7 +21,7 @@ class AddTPCardFilter(facade:V62Facade,config:HallV62Config) extends ProtobufReq
         config.port,config.user,Option(config.password))
       val database = DatabaseTable(config.templateTable.dbId,config.templateTable.tableId)
 
-      val tpCard = galoctpConverter.convertProtoBuf2TPCard(request.getCard)
+      val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(request.getCard)
       facade.NET_GAFIS_FLIB_Add(config.templateTable.dbId.toShort,
         config.templateTable.tableId.toShort,
         request.getCard.getStrCardID,tpCard)

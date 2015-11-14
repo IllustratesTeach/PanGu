@@ -21,7 +21,7 @@ object galoctpConverter {
    * @return gafis TPCard
    * @see FPTBatchUpdater.cpp #812
    */
-  def convertProtoBuf2TPCard(card: TPCard): GTPCARDINFOSTRUCT={
+  def convertProtoBuf2GTPCARDINFOSTRUCT(card: TPCard): GTPCARDINFOSTRUCT={
     val data = new GTPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
     data.stAdmData.szMISPersonID = card.getStrPersonID
