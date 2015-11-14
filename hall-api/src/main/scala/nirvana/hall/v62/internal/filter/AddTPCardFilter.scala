@@ -5,6 +5,7 @@ import nirvana.hall.protocol.sys.CommonProto.{BaseResponse, BaseRequest}
 import nirvana.hall.protocol.v62.AddTPCardProto.{AddTPCardResponse, AddTPCardRequest}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
 import nirvana.hall.v62.services.{DatabaseTable, V62ServerAddress}
 
 /**
@@ -20,9 +21,11 @@ class AddTPCardFilter(facade:V62Facade,config:HallV62Config) extends ProtobufReq
         config.port,config.user,Option(config.password))
       val database = DatabaseTable(config.templateTable.dbId,config.templateTable.tableId)
 
-      facade.addTemplateData(address,database,request.getCard)
+      val tpCard = galoctpConverter.convertProtoBuf2TPCard(request.getCard)
+      facade.NET_GAFIS_FLIB_Add(config.templateTable.dbId.toShort,
+        config.templateTable.tableId.toShort,
+        request.getCard.getStrCardID,tpCard)
       responseBuilder.setExtension(AddTPCardResponse.cmd,AddTPCardResponse.newBuilder().build())
-
       true
     }else{
       handler.handle(protobufRequest,responseBuilder)
