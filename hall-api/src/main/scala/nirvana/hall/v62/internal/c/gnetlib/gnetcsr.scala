@@ -51,6 +51,7 @@ trait gnetcsr {
     else strcpy((char *)pAns.bnData, "$version=001$");
     */
 
+    pAns.bnData = "$version=001$".getBytes
     channel.writeMessage[NoneResponse](pAns)
     if ( nfing>0 ) {
       pstCase.pstFingerID_Data = 0 until nfing map(i=>channel.receive[GAKEYSTRUCT]())  toArray
@@ -67,11 +68,14 @@ trait gnetcsr {
       pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
     }
 
-    pAns.nReturnValue = 1
-    channel.writeMessage[NoneResponse](pAns)
+    if(pstCase.pstText_Data.forall(x=>x.bIsPointer == 1 && x.nItemLen >0)){
 
-    pstCase.pstText_Data.filter(_.bIsPointer == 1).foreach{x=>
-      x.stData.textContent =  channel.receiveByteArray(x.nItemLen).array()
+      pAns.nReturnValue = 1
+      channel.writeMessage[NoneResponse](pAns)
+
+      pstCase.pstText_Data.filter(_.bIsPointer == 1).foreach{x=>
+        x.stData.textContent =  channel.receiveByteArray(x.nItemLen).array()
+      }
     }
 
     if ( bExtraInfoFirst < 0 && ( nextrainfolen > 0 ) ) {
