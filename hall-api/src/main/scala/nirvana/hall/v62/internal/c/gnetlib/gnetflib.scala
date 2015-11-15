@@ -3,11 +3,11 @@ package nirvana.hall.v62.internal.c.gnetlib
 import java.nio.ByteBuffer
 
 import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.gloclib.{galoclp, glocdef, galoctp, gadbprop}
 import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBPROPSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoctp.{GCARDITEMOBJECT, GTPCARDINFOSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.v62.internal.c.gloclib.{gadbprop, galoclp, galoctp, glocdef}
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.AncientData
 
@@ -28,8 +28,7 @@ trait gnetflib {
     pItemInd:Array[GCARDITEMOBJECT],
     pItemInfo:AncientData,
     nOption:Int)=executeInChannel {channel=>
-    val pReq = new GNETREQUESTHEADOBJECT
-
+    val pReq = createRequestHeader
 
     var option = nOption
     pItemInfo match{
@@ -78,7 +77,8 @@ trait gnetflib {
   }
 
   def NET_GAFIS_FLIB_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int):Unit=executeInChannel{channel=>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
+
     pReq.bnData = pszKey.getBytes
     pReq.nOption = nOption
     pReq.nDBID = nDBID
@@ -116,7 +116,7 @@ trait gnetflib {
                          pszKey:String,
                          pItemInfo:AncientData,
                          nOption:Int=0)=executeInChannel { channel =>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     pReq.bnData = pszKey.getBytes
     pReq.nOption = nOption
     pReq.nDBID = nDBID
