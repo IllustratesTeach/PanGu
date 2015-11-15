@@ -87,7 +87,7 @@ class AddTPCardFilterTest {
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertTrue(protobufResponse.hasExtension(AddTPCardProto.AddTPCardResponse.cmd))
-
+    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
   }
 
 }
