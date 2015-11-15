@@ -248,8 +248,6 @@ object galoclp {
     var szGroupCode:Long = _ ;		// belong to this group. has code table.
   @Length(SID_SIZE)
   var nSID:String = _ ;		// sid, readonly
-  @Length(2)
-  var bnRes_SID:Array[Byte] = _ ;
     var nHitPersonState:Byte = _ ;	// person state of matched tp finger(lp or tl used)
   // this flag control the searching filter method
   // if the person has been captured, the the lp finger
