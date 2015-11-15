@@ -14,6 +14,8 @@ message BaseRequest{
   111   DictListRequest
   9001  AddTPCardRequest
   9002  AddLPCardRequest
+  9003  AddCaseRequest
+  9004  DelCaseRequest
   **/
 }
 //服务器返回状态
@@ -31,6 +33,8 @@ message BaseResponse{
   111   DictListResponse
   9001  AddTPCardResponse
   9002  AddLPCardResponse
+  9003  AddCaseResponse
+  9004  DelCaseResponse
   */
 }
 message KV {

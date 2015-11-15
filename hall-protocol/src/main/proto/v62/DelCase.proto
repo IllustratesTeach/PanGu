@@ -1,0 +1,20 @@
+package v62;
+import "sys/Common.proto";
+import "v62/FPTData.proto";
+
+option java_package = "nirvana.hall.protocol.v62";
+option java_outer_classname = "DelCaseProto";
+
+//删除案件
+message DelCaseRequest{
+    extend sys.BaseRequest{
+        optional DelCaseRequest cmd = 9004;
+    }
+    required string caseId = 1;
+}
+
+message DelCaseResponse{
+    extend sys.BaseResponse{
+        optional DelCaseResponse cmd = 9004;
+    }
+}

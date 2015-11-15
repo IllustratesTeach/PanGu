@@ -22,7 +22,7 @@ class AddCaseFilterTest {
 
      val requestBuilder = AddCaseRequest.newBuilder()
      val caseInfo = requestBuilder.getCaseBuilder
-     caseInfo.setStrCaseID(System.currentTimeMillis().toString)
+     caseInfo.setStrCaseID("123456")
      caseInfo.setNCaseFingerCount(0)
      caseInfo.setNSendFingerCount(0)
      val textBuilder = caseInfo.getTextBuilder
@@ -34,9 +34,7 @@ class AddCaseFilterTest {
      textBuilder.setNXieChaState(1)
      textBuilder.setStrCaseOccurPlace("贵阳市")
      textBuilder.setStrCaseOccurPlaceCode("520000")
-     textBuilder.setStrCaseType1("")
-     textBuilder.setStrCaseType2("")
-     textBuilder.setStrCaseType3("")
+     textBuilder.setStrCaseType1("setStrCaseType1")
      textBuilder.setStrComment("comment")
      textBuilder.setStrExtractDate("20151111")
      textBuilder.setStrExtractUnitCode("520000")
