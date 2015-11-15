@@ -1,0 +1,27 @@
+package nirvana.hall.v62.internal.filter
+
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
+import nirvana.hall.protocol.v62.AddCaseProto.{AddCaseRequest, AddCaseResponse}
+import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
+
+/**
+  * Created by songpeng on 15/11/15.
+  */
+class AddCaseFilter(facade: V62Facade, config: HallV62Config) extends ProtobufRequestFilter{
+   override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+     if(protobufRequest.hasExtension(AddCaseRequest.cmd)){
+       val request = protobufRequest.getExtension(AddCaseRequest.cmd)
+       val caseInfo = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(request.getCase);
+       facade.NET_GAFIS_CASE_Add(config.caseTable.dbId.toShort,
+         config.caseTable.tableId.toShort, caseInfo)
+
+       responseBuilder.setExtension(AddCaseResponse.cmd, AddCaseResponse.newBuilder().build())
+       true
+     }else{
+       handler.handle(protobufRequest, responseBuilder);
+     }
+   }
+ }

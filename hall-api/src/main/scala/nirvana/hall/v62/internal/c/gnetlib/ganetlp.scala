@@ -61,7 +61,7 @@ trait ganetlp {
     validateResponse(channel,response)
   }
   def NET_GAFIS_CASE_Add(nDBID:Short,nTableID:Short,
-    pstCase:GCASEINFOSTRUCT, nOption:Int):Unit=executeInChannel{channel=>
+    pstCase:GCASEINFOSTRUCT, nOption:Int = 0):Unit=executeInChannel{channel=>
 
     val pReq = createRequestHeader
 

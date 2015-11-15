@@ -2,11 +2,11 @@ package nirvana.hall.v62.internal.filter
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.v62.AddLPCardProto.AddLPCardRequest
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, PatternType}
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
-import org.junit.Test
+import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 15/11/15.
@@ -48,6 +48,8 @@ class AddLPCardFilterTest {
     val protobufResponse = BaseResponse.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
+    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+
   }
 
 }

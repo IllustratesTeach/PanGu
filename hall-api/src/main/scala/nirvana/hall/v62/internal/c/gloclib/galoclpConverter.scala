@@ -118,6 +118,7 @@ object galoclpConverter {
 
   }
   def convertProtobuf2GCASEINFOSTRUCT(protoCase:Case):GCASEINFOSTRUCT = {
+    //TODO 添加数据长度校验
     val gafisCase = new GCASEINFOSTRUCT
     gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
     //GAFIS里面没有'A',这里去掉前缀
