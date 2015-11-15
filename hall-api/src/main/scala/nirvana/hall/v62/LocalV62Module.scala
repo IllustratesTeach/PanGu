@@ -21,5 +21,6 @@ object LocalV62Module {
     configuration.addInstance("AddLPCardFilter", classOf[AddLPCardFilter])
     configuration.addInstance("AddCaseFilter", classOf[AddCaseFilter])
     configuration.addInstance("DelCaseFilter", classOf[DelCaseFilter])
+    configuration.addInstance("GetCaseFilter", classOf[GetCaseFilter])
   }
 }

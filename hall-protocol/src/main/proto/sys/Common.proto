@@ -16,6 +16,7 @@ message BaseRequest{
   9002  AddLPCardRequest
   9003  AddCaseRequest
   9004  DelCaseRequest
+  9005  GetCaseRequest
   **/
 }
 //服务器返回状态
@@ -35,6 +36,7 @@ message BaseResponse{
   9002  AddLPCardResponse
   9003  AddCaseResponse
   9004  DelCaseResponse
+  9005  GetCaseResponse
   */
 }
 message KV {

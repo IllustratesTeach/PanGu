@@ -1,6 +1,5 @@
 package v62;
 import "sys/Common.proto";
-import "v62/FPTData.proto";
 
 option java_package = "nirvana.hall.protocol.v62";
 option java_outer_classname = "DelCaseProto";

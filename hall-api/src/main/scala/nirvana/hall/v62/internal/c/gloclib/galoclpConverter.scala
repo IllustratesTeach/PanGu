@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.ProtocolStringList
+import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto
 import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard}
 import nirvana.hall.v62.AncientConstants
@@ -16,7 +17,7 @@ import scala.collection.JavaConversions._
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-14
  */
-object galoclpConverter {
+object galoclpConverter extends LoggerSupport{
   /**
    * convert protobuf object to latent card object
    * @param card protobuf object
@@ -175,5 +176,76 @@ object galoclpConverter {
       gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
     }
     gafisCase
+  }
+
+  /**
+   * GCASEINFOSTRUCT结构转protobuf
+   * @param gCase
+   * @return
+   */
+  def convertGCASEINFOSTRUCT2Protobuf(gCase: GCASEINFOSTRUCT): Case = {
+    val caseInfo = Case.newBuilder()
+    caseInfo.setNCaseFingerCount(gCase.nFingerCount)
+    caseInfo.setStrCaseID("A"+gCase.szCaseID)//6.2案件编号没有A
+    val text = caseInfo.getTextBuilder
+    text.setBPersonKilled(gCase.bHasPersonKilled == 1)
+    text.setNCancelFlag(gCase.pstText_Data.length)
+    gCase.pstText_Data.foreach{ item=>
+      val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
+      val textContent = new String(bytes).trim
+      item szItemName match{
+        case "CaseClass1Code" =>
+          text.setStrCaseType1(textContent)
+        case "CaseClass2Code" =>
+          text.setStrCaseType2(textContent)
+        case "CaseClass3Code" =>
+          text.setStrCaseType3(textContent)
+        case "SuspiciousArea1Code" =>
+          text.setStrSuspArea1Code(textContent)
+        case "SuspiciousArea2Code" =>
+          text.setStrSuspArea2Code(textContent)
+        case "SuspiciousArea3Code" =>
+          text.setStrSuspArea3Code(textContent)
+        case "CaseOccurDate" =>
+          text.setStrCaseOccurDate(textContent)
+        case "CaseOccurPlaceCode" =>
+          text.setStrCaseOccurPlaceCode(textContent)
+        case "CaseOccurPlaceTail" =>
+          text.setStrCaseOccurPlace(textContent)
+        case "SuperviseLevel" =>
+          text.setNSuperviseLevel(Integer.parseInt(textContent))
+        case "ExtractUnitCode" =>
+          text.setStrExtractUnitCode(textContent)
+        case "ExtractUnitNameTail" =>
+          text.setStrExtractUnitName(textContent)
+        case "Extractor1" =>
+          text.setStrExtractor(textContent)
+        case "ExtractDate" =>
+          text.setStrExtractDate(textContent)
+        case "IllicitMoney" =>
+          text.setStrMoneyLost(textContent)
+        case "Premium" =>
+          text.setStrPremium(textContent)
+        case "HasPersonKilled" =>
+          text.setBPersonKilled("1".equals(textContent))
+        case "Comment" =>
+          text.setStrComment(textContent)
+        case "CaseState" =>
+          text.setNCaseState(Integer.parseInt(textContent))
+        case "XieChaFlag" =>
+          text.setNXieChaState(Integer.parseInt(textContent))
+        case "CancelFlag" =>
+          text.setNCancelFlag(Integer.parseInt(textContent))
+        case "XieChaDate" =>
+          text.setStrXieChaDate(textContent)
+        case "XieChaRequestUnitName" =>
+          text.setStrXieChaRequestUnitName(textContent)
+        case "XieChaRequestUnitCode" =>
+          text.setStrXieChaRequestUnitCode(textContent)
+        case other =>
+          warn("{} not mapped", other)
+      }
+    }
+    caseInfo.build()
   }
 }
