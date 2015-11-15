@@ -13,6 +13,7 @@ import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddre
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
+@deprecated(message = "use gnetflib method instead of")
 trait DataSyncSupport {
   this:LoggerSupport with AncientClientSupport =>
 
