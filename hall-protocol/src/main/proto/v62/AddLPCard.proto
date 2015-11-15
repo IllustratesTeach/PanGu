@@ -1,0 +1,20 @@
+package v62;
+import "sys/Common.proto";
+import "v62/FPTData.proto";
+
+option java_package = "nirvana.hall.protocol.v62";
+option java_outer_classname = "AddLPCardProto";
+
+//添加现场指纹
+message AddLPCardRequest{
+    extend sys.BaseRequest{
+        optional AddLPCardRequest cmd = 9002;
+    }
+    required LPCard card = 1;
+}
+
+message AddLPCardResponse{
+    extend sys.BaseResponse{
+        optional AddLPCardResponse cmd = 9002;
+    }
+}
