@@ -36,12 +36,15 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
     override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
       data.foreach{
         case el:AncientData =>
+          /*
           val buffer = ChannelBuffers.buffer(el.getDataSize)
           val bytes = el.writeToChannelBuffer(buffer).array()
           val count = connection.write(bytes,0,bytes.length)
           if(count != bytes.length){
             throw new IllegalAccessException("fail to write byte array")
           }
+          */
+          el.writeToDataSink(connection)
         case el:Array[Byte] =>
           connection.write(el,0,el.length)
         case other=>
@@ -51,7 +54,7 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
     }
 
     override def receiveByteArray(len: Int): ChannelBuffer = {
-      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
+      ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
       //ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
@@ -81,8 +84,11 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
           new NoneResponse().asInstanceOf[R]
         case _ =>
           val dataInstance = classTag[R].runtimeClass.newInstance().asInstanceOf[R]
+          dataInstance.fromDataSource(connection)
+          /*
           val buffer = receiveByteArray(dataInstance.getDataSize)
           dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
+          */
       }
     }
   }

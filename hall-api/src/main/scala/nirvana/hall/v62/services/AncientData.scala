@@ -4,6 +4,7 @@ import java._
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
+import org.xsocket.{IDataSource, IDataSink}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
@@ -34,8 +35,8 @@ trait ScalaReflect{
       length
     }
     tpe match {
-      case ByteTpe | CharTpe => 1
-      case ShortTpe => 2
+      case ByteTpe => 1
+      case ShortTpe | CharTpe => 2
       case IntTpe => 4
       case LongTpe => 8
       case AncientData.STRING_CLASS =>
@@ -83,6 +84,68 @@ trait ScalaReflect{
   }
   /**
    * serialize to channel buffer
+   * @param dataSink netty channel buffer
+   */
+  def writeToDataSink(dataSink:IDataSink): IDataSink= {
+    internalProcessField{(symbol,length)=>
+      val tpe = symbol.info
+      def returnLengthOrThrowException:Int={
+        if(length == 0)
+          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+        length
+      }
+      def writeString(str:String,length:Int): Unit ={
+        if(str == null) writeBytes(null,length) else writeBytes(str.getBytes,length)
+      }
+      def skip(length:Int): Unit ={
+        0 until length foreach(x=>dataSink.write(0.asInstanceOf[Byte]))
+      }
+      def writeBytes(bytes:Array[Byte],length:Int): Unit ={
+        val bytesLength = if(bytes == null) 0 else bytes.length
+        val zeroLength = length - bytesLength
+        if(bytes != null)
+          dataSink.write(bytes,0,bytes.length)
+        if(zeroLength > 0)
+          skip(zeroLength)
+      }
+
+      val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
+      val value = instanceMirror.reflectField(termSymbol).get
+      tpe match {
+        case ByteTpe => dataSink.write(value.asInstanceOf[Byte])
+        case ShortTpe | CharTpe => dataSink.write(value.asInstanceOf[Short])
+        case IntTpe => dataSink.write(value.asInstanceOf[Int])
+        case LongTpe => dataSink.write(value.asInstanceOf[Long])
+        case AncientData.STRING_CLASS =>
+          writeString(value.asInstanceOf[String],returnLengthOrThrowException)
+        case t if t <:< typeOf[ScalaReflect] =>
+          if(value == null) {
+            val len: Int = createAncientDataByType(t).getDataSize
+            skip(len)
+          }else{
+            value.asInstanceOf[ScalaReflect].writeToDataSink(dataSink)
+          }
+        case t  if t =:= typeOf[Array[Byte]] =>
+          writeBytes(value.asInstanceOf[Array[Byte]],returnLengthOrThrowException)
+        case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol =>
+          val len = returnLengthOrThrowException
+          val type_len = createAncientDataByType(args.head).getDataSize
+          var zeroLen = type_len * len
+          if(value != null){
+            val ancientDataArray = value.asInstanceOf[Array[ScalaReflect]].filterNot( _ == null)
+            ancientDataArray.foreach(_.writeToDataSink(dataSink))
+            zeroLen = (len-ancientDataArray.length) * type_len
+          }
+          if(zeroLen >0)
+            skip(zeroLen)
+        case other =>
+          throw new IllegalArgumentException("type is not supported "+other)
+      }
+    }
+    dataSink
+  }
+  /**
+   * serialize to channel buffer
    * @param channelBuffer netty channel buffer
    */
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
@@ -108,8 +171,8 @@ trait ScalaReflect{
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val value = instanceMirror.reflectField(termSymbol).get
       tpe match {
-        case ByteTpe | CharTpe => channelBuffer.writeByte(value.asInstanceOf[Byte])
-        case ShortTpe => channelBuffer.writeShort(value.asInstanceOf[Short])
+        case ByteTpe => channelBuffer.writeByte(value.asInstanceOf[Byte])
+        case ShortTpe | CharTpe  => channelBuffer.writeShort(value.asInstanceOf[Short])
         case IntTpe => channelBuffer.writeInt(value.asInstanceOf[Int])
         case LongTpe => channelBuffer.writeLong(value.asInstanceOf[Long])
         case AncientData.STRING_CLASS =>
@@ -142,6 +205,55 @@ trait ScalaReflect{
   }
   /**
    * convert channel buffer data as object
+   * @param dataSource netty channel buffer
+   */
+  def fromDataSource(dataSource: IDataSource): this.type ={
+    internalProcessField{(symbol,length)=>
+      val tpe = symbol.info
+      def returnLengthOrThrowException:Int={
+        if(length == 0)
+          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+        length
+      }
+      def readByteArray(len:Int): Array[Byte]={
+        dataSource.readBytesByLength(len)
+      }
+
+      val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
+      val field = instanceMirror.reflectField(termSymbol)
+      tpe match {
+        case ByteTpe => field.set(dataSource.readByte())
+        case ShortTpe | CharTpe => field.set(dataSource.readShort())
+        case IntTpe => field.set(dataSource.readInt())
+        case LongTpe => field.set(dataSource.readLong())
+        case AncientData.STRING_CLASS =>
+          val bytes = readByteArray(returnLengthOrThrowException)
+          field.set(new String(bytes).trim)
+        case t if t <:< typeOf[ScalaReflect] =>
+          val ancientData = createAncientDataByType(t)
+          ancientData.fromDataSource(dataSource)
+          field.set(ancientData)
+        case t  if t =:= typeOf[Array[Byte]] =>
+          val bytes = readByteArray(returnLengthOrThrowException)
+          field.set(bytes)
+        case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol =>
+          val len = returnLengthOrThrowException
+          val sampleClass = createAncientDataByType(args.head).getClass
+          val ancientDataArray = lang.reflect.Array.newInstance(sampleClass,len)
+
+          0 until len foreach {i=>
+            lang.reflect.Array.set(ancientDataArray,i,createAncientDataByType(args.head).fromDataSource(dataSource))
+          }
+          field.set(ancientDataArray)
+        case other =>
+          throw new IllegalArgumentException("type is not supported "+other)
+      }
+    }
+
+    this
+  }
+  /**
+   * convert channel buffer data as object
    * @param channelBuffer netty channel buffer
    */
   def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type ={
@@ -156,8 +268,8 @@ trait ScalaReflect{
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val field = instanceMirror.reflectField(termSymbol)
       tpe match {
-        case ByteTpe | CharTpe => field.set(channelBuffer.readByte())
-        case ShortTpe => field.set(channelBuffer.readShort())
+        case ByteTpe => field.set(channelBuffer.readByte())
+        case ShortTpe | CharTpe => field.set(channelBuffer.readShort())
         case IntTpe => field.set(channelBuffer.readInt())
         case LongTpe => field.set(channelBuffer.readLong())
         case AncientData.STRING_CLASS =>
