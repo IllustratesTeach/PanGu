@@ -1,8 +1,8 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.internal.filter.lp
 
-import nirvana.hall.api.services.{ProtobufRequestHandler, ProtobufRequestFilter}
-import nirvana.hall.protocol.sys.CommonProto.{BaseResponse, BaseRequest}
-import nirvana.hall.protocol.v62.AddLPCardProto.{AddLPCardResponse, AddLPCardRequest}
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
+import nirvana.hall.protocol.v62.lp.LPCardAddProto.{LPCardAddResponse, LPCardAddRequest}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
@@ -10,10 +10,10 @@ import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 /**
  * Created by songpeng on 15/11/15.
  */
-class AddLPCardFilter(facade: V62Facade, config: HallV62Config) extends ProtobufRequestFilter{
+class LPCardAddFilter(facade: V62Facade, config: HallV62Config) extends ProtobufRequestFilter{
   override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
-    if(protobufRequest.hasExtension(AddLPCardRequest.cmd)){
-      val request = protobufRequest.getExtension(AddLPCardRequest.cmd)
+    if(protobufRequest.hasExtension(LPCardAddRequest.cmd)){
+      val request = protobufRequest.getExtension(LPCardAddRequest.cmd)
       //转换为c的结构
       val lpCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(request.getCard)
       //调用实现方法
@@ -21,7 +21,7 @@ class AddLPCardFilter(facade: V62Facade, config: HallV62Config) extends Protobuf
         config.latentTable.tableId.toShort,
         request.getCard.getStrCardID, lpCard)
 
-      responseBuilder.setExtension(AddLPCardResponse.cmd, AddLPCardResponse.newBuilder().build())
+      responseBuilder.setExtension(LPCardAddResponse.cmd, LPCardAddResponse.newBuilder().build())
       true
     }else{
       handler.handle(protobufRequest, responseBuilder);

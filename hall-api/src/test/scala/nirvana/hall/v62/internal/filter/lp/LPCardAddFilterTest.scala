@@ -1,17 +1,17 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.internal.filter.lp
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.AddLPCardProto.AddLPCardRequest
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, PatternType}
+import nirvana.hall.protocol.v62.lp.LPCardAddProto.LPCardAddRequest
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 15/11/15.
  */
-class AddLPCardFilterTest {
+class LPCardAddFilterTest {
   protected var registry:Registry = _
 
   @Test
@@ -22,7 +22,7 @@ class AddLPCardFilterTest {
       "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
 
-    val requestBuilder = AddLPCardRequest.newBuilder()
+    val requestBuilder = LPCardAddRequest.newBuilder()
     val lpCard = requestBuilder.getCardBuilder
     lpCard.setStrCardID(System.currentTimeMillis().toString)
     val textBuilder = lpCard.getTextBuilder
@@ -30,7 +30,7 @@ class AddLPCardFilterTest {
     textBuilder.setStrStart("")
     textBuilder.setStrEnd("")
     textBuilder.setStrRemainPlace("杯子")
-    textBuilder.setStrRidgeColor("")
+    textBuilder.setStrRidgeColor("1")
     textBuilder.setBDeadBody(false)
     textBuilder.setNBiDuiState(1)
     textBuilder.setNXieChaState(1)
@@ -44,7 +44,7 @@ class AddLPCardFilterTest {
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
     val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
-    protobufRequest.setExtension(AddLPCardRequest.cmd, requestBuilder.build())
+    protobufRequest.setExtension(LPCardAddRequest.cmd, requestBuilder.build())
     val protobufResponse = BaseResponse.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)

@@ -1,0 +1,19 @@
+package v62.lp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.v62.lp";
+option java_outer_classname = "CaseDelProto";
+
+//删除案件
+message CaseDelRequest{
+    extend sys.BaseRequest{
+        optional CaseDelRequest cmd = 9004;
+    }
+    required string caseId = 1;
+}
+
+message CaseDelResponse{
+    extend sys.BaseResponse{
+        optional CaseDelResponse cmd = 9004;
+    }
+}

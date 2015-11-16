@@ -1,15 +1,15 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.internal.filter.lp
 
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.DelCaseProto.DelCaseRequest
+import nirvana.hall.protocol.v62.lp.CaseDelProto.CaseDelRequest
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
 /**
   * Created by songpeng on 15/11/15.
   */
-class DelCaseFilterTest {
+class CaseDelFilterTest {
    protected var registry:Registry = _
 
    @Test
@@ -20,11 +20,11 @@ class DelCaseFilterTest {
        "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
      registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
 
-     val requestBuilder = DelCaseRequest.newBuilder()
+     val requestBuilder = CaseDelRequest.newBuilder()
      requestBuilder.setCaseId("123456")
      val handler = registry.getService(classOf[ProtobufRequestHandler])
      val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
-     protobufRequest.setExtension(DelCaseRequest.cmd, requestBuilder.build())
+     protobufRequest.setExtension(CaseDelRequest.cmd, requestBuilder.build())
      val protobufResponse = BaseResponse.newBuilder()
 
      handler.handle(protobufRequest.build(), protobufResponse)

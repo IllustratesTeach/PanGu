@@ -1,15 +1,15 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.internal.filter.lp
 
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.AddCaseProto.AddCaseRequest
+import nirvana.hall.protocol.v62.lp.CaseAddProto.CaseAddRequest
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
 /**
   * Created by songpeng on 15/11/15.
   */
-class AddCaseFilterTest {
+class CaseFilterAddTest {
    protected var registry:Registry = _
 
    @Test
@@ -20,7 +20,7 @@ class AddCaseFilterTest {
        "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
      registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
 
-     val requestBuilder = AddCaseRequest.newBuilder()
+     val requestBuilder = CaseAddRequest.newBuilder()
      val caseInfo = requestBuilder.getCaseBuilder
      caseInfo.setStrCaseID("123456")
      caseInfo.setNCaseFingerCount(0)
@@ -34,18 +34,18 @@ class AddCaseFilterTest {
      textBuilder.setNXieChaState(1)
      textBuilder.setStrCaseOccurPlace("贵阳市")
      textBuilder.setStrCaseOccurPlaceCode("520000")
-     textBuilder.setStrCaseType1("setStrCaseType1")
+     textBuilder.setStrCaseType1("010000")
      textBuilder.setStrComment("comment")
      textBuilder.setStrExtractDate("20151111")
      textBuilder.setStrExtractUnitCode("520000")
      textBuilder.setStrExtractUnitName("gui zhou")
      textBuilder.setStrMoneyLost("100")
-     textBuilder.setStrPremium("premium")
-     textBuilder.setStrSuspArea1Code("")
+     textBuilder.setStrPremium("1000")
+     textBuilder.setStrSuspArea1Code("520100")
 
      val handler = registry.getService(classOf[ProtobufRequestHandler])
      val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
-     protobufRequest.setExtension(AddCaseRequest.cmd, requestBuilder.build())
+     protobufRequest.setExtension(CaseAddRequest.cmd, requestBuilder.build())
      val protobufResponse = BaseResponse.newBuilder()
 
      handler.handle(protobufRequest.build(), protobufResponse)

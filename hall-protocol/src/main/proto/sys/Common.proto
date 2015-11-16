@@ -12,11 +12,11 @@ message BaseRequest{
   101   LoginRequest
   110   SyncDictResponse
   111   DictListRequest
-  9001  AddTPCardRequest
-  9002  AddLPCardRequest
-  9003  AddCaseRequest
-  9004  DelCaseRequest
-  9005  GetCaseRequest
+  9001  TPCardAddRequest
+  9002  LPCardAddRequest
+  9003  CaseAddRequest
+  9004  CaseDelRequest
+  9005  CaseGetRequest
   **/
 }
 //服务器返回状态
@@ -32,11 +32,11 @@ message BaseResponse{
   101 LoginResponse
   110   SyncDictResponse
   111   DictListResponse
-  9001  AddTPCardResponse
-  9002  AddLPCardResponse
-  9003  AddCaseResponse
-  9004  DelCaseResponse
-  9005  GetCaseResponse
+  9001  TPCardAddResponse
+  9002  LPCardAddResponse
+  9003  CaseAddResponse
+  9004  CaseDelResponse
+  9005  CaseGetResponse
   */
 }
 message KV {
