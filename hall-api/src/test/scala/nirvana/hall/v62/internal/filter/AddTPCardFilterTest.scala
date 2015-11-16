@@ -34,7 +34,7 @@ class AddTPCardFilterTest {
     blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.mnt")))
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
     blobBuilder.setType(FPTProto.ImageType.IMAGETYPE_FINGER)
-    blobBuilder.setFgp(FingerFgp.FINGER_R_LITTLE)
+    blobBuilder.setFgp(FingerFgp.FINGER_R_THUMB)
 
     val textBuilder = tpCard.getTextBuilder
     textBuilder.setStrName ("蔡Sir")
