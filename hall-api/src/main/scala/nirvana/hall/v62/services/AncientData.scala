@@ -533,29 +533,3 @@ sealed trait JavaReflect{
 class AncientData extends ScalaReflect{
 }
 
-class DynamicByteArray(val data:Array[Byte]) extends AncientData{
-  /**
-   * convert channel buffer data as object
-   * @param channelBuffer netty channel buffer
-   */
-  override def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type = {
-    if(channelBuffer.readableBytes() >= data.length){
-      channelBuffer.readBytes(data)
-    }
-    this
-  }
-
-  /**
-   * get data size
-   */
-  override def getDataSize: Int = data.length
-
-  /**
-   * serialize to channel buffer
-   * @param channelBuffer netty channel buffer
-   */
-  override def writeToChannelBuffer(channelBuffer: ChannelBuffer): ChannelBuffer = {
-    channelBuffer.writeBytes(data)
-    channelBuffer
-  }
-}
