@@ -148,6 +148,7 @@ trait ScalaReflect{
    * serialize to channel buffer
    * @param channelBuffer netty channel buffer
    */
+  @deprecated(message = "use writeToDataSink instead of")
   def writeToChannelBuffer(channelBuffer:ChannelBuffer): ChannelBuffer = {
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
@@ -256,6 +257,7 @@ trait ScalaReflect{
    * convert channel buffer data as object
    * @param channelBuffer netty channel buffer
    */
+  @deprecated(message = "use fromDataSource instead of")
   def fromChannelBuffer(channelBuffer: ChannelBuffer): this.type ={
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
@@ -299,13 +301,6 @@ trait ScalaReflect{
     }
 
     this
-  }
-  def toByteArray: Array[Byte]= {
-    val buffer = ChannelBuffers.buffer(getDataSize)
-    writeToChannelBuffer(buffer).array()
-  }
-  def fromBytes(bytes: Array[Byte]): this.type ={
-    fromChannelBuffer(ChannelBuffers.wrappedBuffer(bytes))
   }
 }
 sealed trait JavaReflect{
