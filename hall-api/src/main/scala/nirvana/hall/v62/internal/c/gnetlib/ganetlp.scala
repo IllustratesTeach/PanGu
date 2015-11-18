@@ -44,7 +44,7 @@ trait ganetlp {
 
 
   def NET_GAFIS_CASE_Update(nDBID:Short,nTableID:Short,
-                         pstCase:GCASEINFOSTRUCT, nOption:Int):Unit=executeInChannel{channel=>
+                         pstCase:GCASEINFOSTRUCT, nOption:Int = 0):Unit=executeInChannel{channel=>
 
     val pReq = createRequestHeader
 

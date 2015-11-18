@@ -17,6 +17,7 @@ message BaseRequest{
   9003  CaseAddRequest
   9004  CaseDelRequest
   9005  CaseGetRequest
+  9006  CaseUpdateRequest
   **/
 }
 //服务器返回状态
@@ -37,6 +38,7 @@ message BaseResponse{
   9003  CaseAddResponse
   9004  CaseDelResponse
   9005  CaseGetResponse
+  9006  CaseUpdateResponse
   */
 }
 message KV {

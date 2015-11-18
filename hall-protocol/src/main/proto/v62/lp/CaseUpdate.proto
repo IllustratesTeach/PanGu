@@ -1,0 +1,20 @@
+package v62.lp;
+import "sys/Common.proto";
+import "v62/FPTData.proto";
+
+option java_package = "nirvana.hall.protocol.v62.lp";
+option java_outer_classname = "CaseUpdateProto";
+
+//添加案件
+message CaseUpdateRequest{
+    extend sys.BaseRequest{
+        optional CaseUpdateRequest cmd = 9006;
+    }
+    required Case case = 1;
+}
+
+message CaseUpdateResponse{
+    extend sys.BaseResponse{
+        optional CaseUpdateResponse cmd = 9006;
+    }
+}
