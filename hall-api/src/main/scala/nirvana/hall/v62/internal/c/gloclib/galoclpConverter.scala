@@ -1,9 +1,9 @@
 package nirvana.hall.v62.internal.c.gloclib
 
-import com.google.protobuf.ProtocolStringList
+import com.google.protobuf.{ByteString, ProtocolStringList}
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard}
+import nirvana.hall.protocol.v62.FPTProto.{ImageType, Case, LPCard}
 import nirvana.hall.v62.AncientConstants
 import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
@@ -97,6 +97,69 @@ object galoclpConverter extends LoggerSupport{
     }
     data
   }
+
+  /**
+   * convert GLPCARDINFOSTRUCT object to LPCard object
+   */
+  def convertGLPCARDINFOSTRUCT2ProtoBuf(gCard: GLPCARDINFOSTRUCT): LPCard = {
+    val card = LPCard.newBuilder()
+    //TODO cardId查询为空？？？
+//    card.setStrCardID(gCard.szCardID)
+    card.setStrCardID("")
+    val text = card.getTextBuilder
+    gCard.pstText_Data.foreach{ item =>
+      val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
+      val textContent = new String(bytes).trim
+      item szItemName match {
+        case "SeqNo" =>
+          text.setStrSeq(textContent)
+        case "RemainPlace" =>
+          text.setStrRemainPlace(textContent)
+        case "RidgeColor" =>
+          text.setStrRidgeColor(textContent)
+        case "IsUnknownBody" =>
+          text.setBDeadBody("1".equals(textContent))
+        case "UnknownBodyCode" =>
+          text.setStrDeadPersonNo(textContent)
+        case "XieChaFlag" =>
+          text.setNXieChaState(Integer.parseInt(textContent))
+        case "BiDuiState" =>
+          text.setNBiDuiState(Integer.parseInt(textContent))
+        case "LatStart" =>
+          text.setStrStart(textContent)
+        case "LatEnd" =>
+          text.setStrEnd(textContent)
+        case other =>
+      }
+    }
+    val mic = card.getBlobBuilder
+    gCard.pstMIC_Data.foreach{ item =>
+
+      if(item.pstMnt_Data != null)
+        mic.setStMntBytes(ByteString.copyFrom(item.pstMnt_Data))
+      if(item.pstCpr_Data != null) {
+        mic.setStImageBytes(ByteString.copyFrom(item.pstCpr_Data))
+      }else if(item.pstImg_Data != null) {
+        mic.setStImageBytes(ByteString.copyFrom(item.pstImg_Data))
+      }
+      item.nItemType match {
+        case glocdef.GAMIC_ITEMTYPE_FINGER =>
+          mic.setType(ImageType.IMAGETYPE_FINGER)
+        case glocdef.GAMIC_ITEMTYPE_FACE =>
+          mic.setType(ImageType.IMAGETYPE_FACE)
+        case glocdef.GAMIC_ITEMTYPE_DATA =>
+          mic.setType(ImageType.IMAGETYPE_CARDIMG)
+        case glocdef.GAMIC_ITEMTYPE_PALM =>
+          mic.setType(ImageType.IMAGETYPE_PALM)
+        case glocdef.GAMIC_ITEMTYPE_VOICE =>
+          mic.setType(ImageType.IMAGETYPE_VOICE)
+        case other =>
+          mic.setType(ImageType.IMAGETYPE_UNKNOWN)
+      }
+    }
+    card.build()
+  }
+
   //convert protocol string list as gafis GAKEYSTRUCT
   private def convertAsKeyArray(stringList:ProtocolStringList): Array[GAKEYSTRUCT] ={
     stringList.map{id=>
@@ -179,7 +242,7 @@ object galoclpConverter extends LoggerSupport{
   }
 
   /**
-   * GCASEINFOSTRUCT结构转protobuf
+   * convert GCASEINFOSTRUCT object to protobuf object
    * @param gCase
    * @return
    */

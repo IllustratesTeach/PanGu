@@ -10,7 +10,7 @@ message CaseGetRequest{
     extend sys.BaseRequest{
         optional CaseGetRequest cmd = 9005;
     }
-    required string caseId = 1;
+    required string case_id = 1;
 }
 
 message CaseGetResponse{

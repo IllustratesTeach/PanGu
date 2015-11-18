@@ -9,7 +9,7 @@ message CaseDelRequest{
     extend sys.BaseRequest{
         optional CaseDelRequest cmd = 9004;
     }
-    required string caseId = 1;
+    required string case_id = 1;
 }
 
 message CaseDelResponse{

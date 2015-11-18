@@ -23,11 +23,18 @@ trait gnetflib {
     type tpe = Value
     val ADD,UPDATE = Value
   }
+
+  /**
+   * 获取卡片信息
+   * @param pszKey 卡号
+   * @param pItemInfo 要获取的卡片信息
+   * @param pItemInd 默认为null，当指定具体的类型（指位，掌纹，指纹，人像）才会传值
+   */
   def NET_GAFIS_FLIB_Get(nDBID:Short,nTableID:Short,
     pszKey:String,
-    pItemInd:Array[GCARDITEMOBJECT],
     pItemInfo:AncientData,
-    nOption:Int)=executeInChannel {channel=>
+    pItemInd:Array[GCARDITEMOBJECT] = null,
+    nOption:Int = 0)=executeInChannel {channel=>
     val pReq = createRequestHeader
 
     var option = nOption
@@ -76,7 +83,7 @@ trait gnetflib {
     NET_GAFIS_SYS_GetDBByID(nDBID)
   }
 
-  def NET_GAFIS_FLIB_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int):Unit=executeInChannel{channel=>
+  def NET_GAFIS_FLIB_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int = 0):Unit=executeInChannel{channel=>
     val pReq = createRequestHeader
 
     pReq.bnData = pszKey.getBytes
