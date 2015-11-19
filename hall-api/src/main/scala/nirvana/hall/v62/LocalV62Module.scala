@@ -19,13 +19,7 @@ object LocalV62Module {
   @Contribute(classOf[ProtobufRequestHandler])
   def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
     configuration.addInstance("TPCardAddFilter", classOf[TPCardAddFilter])
-    configuration.addInstance("LPCardAddFilter", classOf[LPCardAddFilter])
-    configuration.addInstance("LPCardDelFilter", classOf[LPCardDelFilter])
-    configuration.addInstance("LPCardUpdateFilter", classOf[LPCardUpdateFilter])
-    configuration.addInstance("LPCardGetFilter", classOf[LPCardGetFilter])
-    configuration.addInstance("CaseAddFilter", classOf[CaseAddFilter])
-    configuration.addInstance("CaseDelFilter", classOf[CaseDelFilter])
-    configuration.addInstance("CaseGetFilter", classOf[CaseGetFilter])
-    configuration.addInstance("CaseUpdateFilter", classOf[CaseUpdateFilter])
+    configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
+    configuration.addInstance("CaseFilter", classOf[CaseFilter])
   }
 }
