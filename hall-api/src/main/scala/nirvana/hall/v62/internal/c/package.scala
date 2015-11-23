@@ -10,6 +10,9 @@ import nirvana.hall.v62.services.AncientData
  */
 package object c {
 
+  class SID_TYPE extends AncientData{
+    var sidType:Long= _
+  }
   final val SID_SIZE = 6
   // if we call SaveSelRes, we need to know each row result.
   class GADB_RETVAL extends AncientData{
