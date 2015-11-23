@@ -1,0 +1,56 @@
+package v62.lp;
+import "sys/Common.proto";
+import "v62/FPTData.proto";
+
+option java_package = "nirvana.hall.protocol.v62.lp";
+option java_outer_classname = "LPCardProto";
+
+//添加现场指纹
+message LPCardAddRequest{
+    extend sys.BaseRequest{
+        optional LPCardAddRequest cmd = 9002;
+    }
+    required LPCard card = 1;
+}
+message LPCardAddResponse{
+    extend sys.BaseResponse{
+        optional LPCardAddResponse cmd = 9002;
+    }
+}
+//删除现场指纹
+message LPCardDelRequest{
+    extend sys.BaseRequest{
+        optional LPCardDelRequest cmd = 9007;
+    }
+    required string card_id = 1;
+}
+message LPCardDelResponse{
+    extend sys.BaseResponse{
+        optional LPCardDelResponse cmd = 9007;
+    }
+}
+//更新现场指纹
+message LPCardUpdateRequest{
+    extend sys.BaseRequest{
+        optional LPCardUpdateRequest cmd = 9009;
+    }
+    required LPCard card = 1;
+}
+message LPCardUpdateResponse{
+    extend sys.BaseResponse{
+        optional LPCardUpdateResponse cmd = 9009;
+    }
+}
+//查询现场指纹
+message LPCardGetRequest{
+    extend sys.BaseRequest{
+        optional LPCardGetRequest cmd = 9008;
+    }
+    required string card_id = 1;
+}
+message LPCardGetResponse{
+    extend sys.BaseResponse{
+        optional LPCardGetResponse cmd = 9008;
+    }
+    optional LPCard card = 1;
+}

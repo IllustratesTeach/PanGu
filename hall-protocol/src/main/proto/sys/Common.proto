@@ -9,7 +9,15 @@ message BaseRequest{
   required string token = 1;
   required int32 version = 2 [default = 10100];
   /**
-  101 LoginRequest
+  101   LoginRequest
+  110   SyncDictResponse
+  111   DictListRequest
+  9001  TPCardAddRequest
+  9002  LPCardAddRequest
+  9003  CaseAddRequest
+  9004  CaseDelRequest
+  9005  CaseGetRequest
+  9006  CaseUpdateRequest
   **/
 }
 //服务器返回状态
@@ -23,6 +31,14 @@ message BaseResponse{
   optional string message = 2;
   /**
   101 LoginResponse
+  110   SyncDictResponse
+  111   DictListResponse
+  9001  TPCardAddResponse
+  9002  LPCardAddResponse
+  9003  CaseAddResponse
+  9004  CaseDelResponse
+  9005  CaseGetResponse
+  9006  CaseUpdateResponse
   */
 }
 message KV {

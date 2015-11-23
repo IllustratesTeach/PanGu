@@ -171,7 +171,7 @@ object glocdef {
 
   // the following structure is used to satisfy variable need for text info
   // only some very case we need to allocate pointer to date
-  class GATEXTPTSTRUCT
+  class GATEXTPTSTRUCT extends AncientData
   {
     @Length(88)
     var data:Array[Byte] = _

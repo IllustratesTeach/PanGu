@@ -17,6 +17,7 @@ import nirvana.hall.v62.services.{ChannelOperator, SelfMatchTask, V62ServerAddre
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-02
  */
+@deprecated(message = "use ganetqry method instead of")
 trait SendMatchTaskSupport {
   this:AncientClientSupport with LoggerSupport =>
 

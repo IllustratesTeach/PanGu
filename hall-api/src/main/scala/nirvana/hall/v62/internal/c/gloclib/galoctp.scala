@@ -141,8 +141,6 @@ object galoctp {
     var szGroupCode:Long = _ ;		// belong to this group. has code table.
   @Length(SID_SIZE)
   var nSID:String = _ ;		// sid, readonly
-  @Length(2)
-  var bnRes_SID:Array[Byte] = _ ;
     @Length(2)
     var bnRes1:Array[Byte] = _ ;
     var tSubmitTLDate = new AFISDateTime;

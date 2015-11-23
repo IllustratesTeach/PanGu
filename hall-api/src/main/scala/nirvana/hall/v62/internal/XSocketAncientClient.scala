@@ -7,6 +7,8 @@ import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
 
+import scala.reflect._
+
 /**
  * ancient client based on xsocket
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -34,12 +36,15 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
     override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
       data.foreach{
         case el:AncientData =>
+          /*
           val buffer = ChannelBuffers.buffer(el.getDataSize)
           val bytes = el.writeToChannelBuffer(buffer).array()
           val count = connection.write(bytes,0,bytes.length)
           if(count != bytes.length){
             throw new IllegalAccessException("fail to write byte array")
           }
+          */
+          el.writeToDataSink(connection)
         case el:Array[Byte] =>
           connection.write(el,0,el.length)
         case other=>
@@ -49,7 +54,7 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
     }
 
     override def receiveByteArray(len: Int): ChannelBuffer = {
-      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
+      ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
       //ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
@@ -71,14 +76,19 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
       writeByteArray(data,0,data.length)
     }
 
-    override def receive[R <: AncientData]()(implicit manifest: Manifest[R]): R = {
-      val dataInstance = manifest.runtimeClass.newInstance().asInstanceOf[AncientData]
-      dataInstance match{
-        case x:NoneResponse =>
-          x.asInstanceOf[R]
-        case other=>
+    override def receive[R <: AncientData :ClassTag](): R = {
+      classTag[R] match{
+        case t if t == classTag[Nothing] =>
+          null.asInstanceOf[R]
+        case t if t == classTag[NoneResponse] =>
+          new NoneResponse().asInstanceOf[R]
+        case _ =>
+          val dataInstance = classTag[R].runtimeClass.newInstance().asInstanceOf[R]
+          dataInstance.fromDataSource(connection)
+          /*
           val buffer = receiveByteArray(dataInstance.getDataSize)
           dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
+          */
       }
     }
   }

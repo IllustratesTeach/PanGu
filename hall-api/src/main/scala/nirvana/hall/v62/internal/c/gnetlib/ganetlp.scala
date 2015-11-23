@@ -1,9 +1,9 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.v62.internal.{NoneResponse, AncientClientSupport}
 import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.gloclib.galoclp.GCASEINFOSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
 /**
  *
@@ -12,9 +12,9 @@ import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETR
  */
 trait ganetlp {
   this:AncientClientSupport with gnetcsr =>
-  def NET_GAFIS_CASE_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int):Unit=executeInChannel{channel=>
+  def NET_GAFIS_CASE_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int = 0):Unit=executeInChannel{channel=>
+    val pReq = createRequestHeader
 
-    val pReq = new GNETREQUESTHEADOBJECT
     pReq.nOption = nOption
     pReq.nDBID = nDBID
     pReq.nTableID = nTableID
@@ -26,7 +26,8 @@ trait ganetlp {
     validateResponse(channel,response)
   }
   def NET_GAFIS_CASE_Get(nDBID:Short,nTableID:Short,caseId:String,nOption:Int=0):GCASEINFOSTRUCT=executeInChannel{channel=>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
+
     pReq.nOption = nOption
     pReq.nDBID = nDBID
     pReq.nTableID = nTableID
@@ -43,9 +44,10 @@ trait ganetlp {
 
 
   def NET_GAFIS_CASE_Update(nDBID:Short,nTableID:Short,
-                         pstCase:GCASEINFOSTRUCT, nOption:Int):Unit=executeInChannel{channel=>
+                         pstCase:GCASEINFOSTRUCT, nOption:Int = 0):Unit=executeInChannel{channel=>
 
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
+
     pReq.nOption = nOption
     pReq.nDBID = nDBID
     pReq.nTableID = nTableID
@@ -59,9 +61,10 @@ trait ganetlp {
     validateResponse(channel,response)
   }
   def NET_GAFIS_CASE_Add(nDBID:Short,nTableID:Short,
-    pstCase:GCASEINFOSTRUCT, nOption:Int):Unit=executeInChannel{channel=>
+    pstCase:GCASEINFOSTRUCT, nOption:Int = 0):Unit=executeInChannel{channel=>
 
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
+
     pReq.nOption = nOption
     pReq.nDBID = nDBID
     pReq.nTableID = nTableID

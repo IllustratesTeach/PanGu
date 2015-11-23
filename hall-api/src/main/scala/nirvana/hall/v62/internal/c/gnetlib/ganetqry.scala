@@ -6,7 +6,7 @@ import nirvana.hall.v62.internal.c.GADB_RETVAL
 import nirvana.hall.v62.internal.c.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.V62ServerAddress
 
@@ -43,12 +43,8 @@ trait ganetqry {
                           pstQry:GAQUERYSTRUCT,
                           nOption:Int = 0):Long= executeInChannel{channel=>
 
-    val request = new GNETREQUESTHEADOBJECT
-    request.cbSize = 192
-    request.nMajorVer = 6
-    request.nMinorVer = 1
-    request.szUserName=serverAddress.user
-    serverAddress.password.foreach(request.szUserPass = _ )
+    val request = createRequestHeader
+
     request.nOption = nOption
     request.nDBID = nQryDBID
     request.nTableID = nQryTID
@@ -72,12 +68,8 @@ trait ganetqry {
                              nOption:Int = 0
                               ):Array[GADB_RETVAL]= executeInChannel{channel=>
 
-    val request = new GNETREQUESTHEADOBJECT
-    request.cbSize = 192
-    request.nMajorVer = 6
-    request.nMinorVer = 1
-    request.szUserName=address.user
-    address.password.foreach(request.szUserPass = _ )
+    val request = createRequestHeader
+
     request.nOption = nOption
     request.nDBID = nQryDBID
     request.nTableID = nQryTID

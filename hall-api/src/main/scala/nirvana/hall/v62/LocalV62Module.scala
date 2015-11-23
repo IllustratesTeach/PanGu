@@ -2,9 +2,10 @@ package nirvana.hall.v62
 
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
 import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.filter.AddTPCardFilter
-import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
+import nirvana.hall.v62.internal.filter.lp._
+import nirvana.hall.v62.internal.filter.tp.TPCardAddFilter
 import org.apache.tapestry5.ioc.annotations.Contribute
+import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 
 /**
  *
@@ -17,6 +18,8 @@ object LocalV62Module {
   }
   @Contribute(classOf[ProtobufRequestHandler])
   def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
-    configuration.addInstance("AddTPCardFilter", classOf[AddTPCardFilter])
+    configuration.addInstance("TPCardAddFilter", classOf[TPCardAddFilter])
+    configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
+    configuration.addInstance("CaseFilter", classOf[CaseFilter])
   }
 }

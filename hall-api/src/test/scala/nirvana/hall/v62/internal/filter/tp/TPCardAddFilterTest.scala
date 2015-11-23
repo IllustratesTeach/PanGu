@@ -1,23 +1,20 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.internal.filter.tp
 
 import com.google.protobuf.ByteString
-import monad.support.services.XmlLoader
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
+import nirvana.hall.protocol.v62.FPTProto
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, TPCard}
-import nirvana.hall.protocol.v62.{AddTPCardProto, FPTProto}
-import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.protocol.v62.tp.TPCardAddProto
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
-
-import scala.io.Source
 
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-04
  */
-class AddTPCardFilterTest {
+class TPCardAddFilterTest {
   protected var registry:Registry = _
   @Test
   def test_request: Unit ={
@@ -34,7 +31,7 @@ class AddTPCardFilterTest {
     blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.mnt")))
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
     blobBuilder.setType(FPTProto.ImageType.IMAGETYPE_FINGER)
-    blobBuilder.setFgp(FingerFgp.FINGER_R_LITTLE)
+    blobBuilder.setFgp(FingerFgp.FINGER_R_THUMB)
 
     val textBuilder = tpCard.getTextBuilder
     textBuilder.setStrName ("蔡Sir")
@@ -76,25 +73,18 @@ class AddTPCardFilterTest {
     textBuilder.setStrXieChaTelNo ("")
     textBuilder.setStrShenPiBy ("")
 
-    val addTpCard = AddTPCardProto.AddTPCardRequest.newBuilder()
-    addTpCard.setCard(tpCard.build())
+    val TPCardAdd = TPCardAddProto.TPCardAddRequest.newBuilder()
+    TPCardAdd.setCard(tpCard.build())
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
     val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
-    protobufRequest.setExtension(AddTPCardProto.AddTPCardRequest.cmd, addTpCard.build())
+    protobufRequest.setExtension(TPCardAddProto.TPCardAddRequest.cmd, TPCardAdd.build())
     val protobufResponse = BaseResponse.newBuilder()
     protobufResponse.setStatus(ResponseStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
 
-    Assert.assertTrue(protobufResponse.hasExtension(AddTPCardProto.AddTPCardResponse.cmd))
-
+    Assert.assertTrue(protobufResponse.hasExtension(TPCardAddProto.TPCardAddResponse.cmd))
+    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
   }
 
-}
-
-object TestModule {
-  def buildHallV62Config={
-    val content = Source.fromInputStream(getClass.getResourceAsStream("/test-v62.xml"),"utf8").mkString
-    XmlLoader.parseXML[HallV62Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v62/v62.xsd")))
-  }
 }

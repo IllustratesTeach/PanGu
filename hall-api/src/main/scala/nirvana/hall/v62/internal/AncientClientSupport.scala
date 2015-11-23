@@ -22,6 +22,9 @@ trait AncientClientSupport {
     val header = new GNETREQUESTHEADOBJECT
     header.szUserName=serverAddress.user
     serverAddress.password.foreach(header.szUserPass = _)
+    header.cbSize = 192
+    header.nMajorVer = 6
+    header.nMinorVer = 1
 
     header
   }
