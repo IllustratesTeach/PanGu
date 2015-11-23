@@ -21,6 +21,16 @@ class AncientDataTest {
     def getMyData = getData
   }
   @Test
+  def test_wrong: Unit = {
+    val wrong = new Wrong
+    try{
+      wrong.getDataSize
+      Assert.fail("fail to reach this")
+    }catch{
+      case e:Throwable=>
+    }
+  }
+  @Test
   def test_xsocket: Unit = {
     val m = new M
     m.str= "asdf"
@@ -106,5 +116,9 @@ class M extends ScalaReflect{
 class N extends ScalaReflect {
   @Length(2)
   var aN:Array[Byte]= _
+}
+class Wrong extends ScalaReflect {
+  @Length(19)
+  var m:Int = _
 }
 

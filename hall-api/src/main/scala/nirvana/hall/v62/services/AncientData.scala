@@ -31,18 +31,23 @@ trait ScalaReflect{
   private def findBaseLength(tpe:Type,length:Int):Int={
     def returnLengthOrThrowException:Int={
       if(length == 0)
-        throw new IllegalArgumentException("@Lenght not defined "+tpe)
+        throw new IllegalArgumentException("@Length not defined @"+tpe)
       length
     }
+    def throwExceptionIfLengthGTZeroOrGet[T](value:T): T={
+      if(length !=0)
+        throw new IllegalArgumentException("@Length wrong defined @"+tpe)
+      value
+    }
     tpe match {
-      case ByteTpe => 1
-      case ShortTpe | CharTpe => 2
-      case IntTpe => 4
-      case LongTpe => 8
+      case ByteTpe => throwExceptionIfLengthGTZeroOrGet(1)
+      case ShortTpe | CharTpe => throwExceptionIfLengthGTZeroOrGet(2)
+      case IntTpe => throwExceptionIfLengthGTZeroOrGet(4)
+      case LongTpe => throwExceptionIfLengthGTZeroOrGet(8)
       case AncientData.STRING_CLASS =>
         returnLengthOrThrowException
       case t if t <:< typeOf[ScalaReflect] =>
-        createAncientDataByType(t).getDataSize
+        throwExceptionIfLengthGTZeroOrGet(createAncientDataByType(t).getDataSize)
       case TypeRef(pre,sym,args) if sym == typeOf[Array[_]].typeSymbol =>
         if(args.length != 1)
           throw new IllegalArgumentException("only support one type parameter in Array.")
