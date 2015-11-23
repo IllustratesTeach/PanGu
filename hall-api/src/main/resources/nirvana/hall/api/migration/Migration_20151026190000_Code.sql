@@ -2380,3 +2380,13 @@ values ('8', '中国农工民主党党员', '1', 9, null);
 insert into CODE_ZZMM (code, name, delete_flag, ord, remark)
 values ('9', '中国致公党党员', '1', 10, null);
 -- 14 records loaded
+-- Loading CODE_XB...
+insert into CODE_XB (code, name, delete_flag, ord, remark)
+values ('0', '未知', '1', 3, null);
+insert into CODE_XB (code, name, delete_flag, ord, remark)
+values ('1', '男', '1', 1, null);
+insert into CODE_XB (code, name, delete_flag, ord, remark)
+values ('2', '女', '1', 2, null);
+insert into CODE_XB (code, name, delete_flag, ord, remark)
+values ('9', '未说明', '1', 4, null);
+-- 4 records loaded
