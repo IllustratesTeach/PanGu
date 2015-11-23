@@ -105,24 +105,27 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param personInfo
    * @return
    */
-  def saveGatherPerson(personInfo : String) : Integer = {
+  def saveGatherPerson(personInfo : String) : GafisPerson = {
     //构造函数
     val Constructorparams = defineConstructorParameter(personInfo)
+    val index = getPropertyIndex("inputtime")
+    Constructorparams(getPropertyIndex("inputtime")) = Some(DateTime.now())
     val ga : GafisPerson = reflectObject[GafisPerson](Constructorparams)
-    //println(ga.personid+"---"+ga.name.get)
-    val result = createPerson(ga)
 
+    //println(ga.personid+"---"+ga.name.get)
+    val person = createPerson(ga)
 
     /*updateGatherPerson(personInfo)
     val params = defineConstructorParameter(personInfo)
     val ga1 : GafisPerson = reflectObject[GafisPerson](params)
-    val person = GafisPerson.save(ga1)
+    val person = GafisPerson.save(ga1)*/
 
-    val p = GafisPerson.find("CS520201511050001").get
+    /*val p = GafisPerson.find("CS520201511050001").get
     println("采集日期："+parseDateTimeToString(p.gatherDate.get))
+    println("创建日期："+parseDateTimeToString(p.inputtime.get))
     println(p.personid+"---------"+p.name.get+"-----"+p.dataSources.get+"-----"+p.gatherFingerNum.get)*/
 
-    result
+    person
   }
 
 
@@ -131,13 +134,12 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param personInfo
    * @return
    */
-  @Transactional
   def updateGatherPerson(personInfo : String) : GafisPerson = {
-    //val personInfo = "personid=CS520201511050001&name=anmiyy&idcardno=123&gatherDate=2015-11-9 10:30:30&dataSources=1&gatherFingerNum=10"
     val params = defineConstructorParameter(personInfo)
-    val index = getPropertyIndex("name")
-    if (index != -1)
-      params(index) = Some("anmicc")
+    val personid = params(0).toString
+    val p = GafisPerson.find(personid).get
+    params(getPropertyIndex("inputtime")) = p.inputtime
+    params(getPropertyIndex("modifiedtime")) = Some(DateTime.now())
     val ga1 : GafisPerson = reflectObject[GafisPerson](params)
     val person = GafisPerson.save(ga1)
     person
@@ -150,8 +152,14 @@ class GatherPersonServiceImpl extends GatherPersonService{
   def defineConstructorParameter(personInfo : String) : Array[Any] = {
     val pis : Array[String] = personInfo.split("&")
     var map = new HashMap[String,String]()
+    //val pi = pis(1).split("=")
+
+
     for (p <- pis) {
       val pi = p.split("=")
+      if (pi.length == 1)
+        map += (pi(0) -> "")
+      else
       map += (pi(0) -> pi(1))
     }
     //var shortArr = Array("staturest","avoirdupois","footsize","shoelength","shoesize","dataSources","fingershowStatus")
@@ -173,9 +181,11 @@ class GatherPersonServiceImpl extends GatherPersonService{
         if (field.equals(k.toLowerCase)) {
           if (field == "personid") {
             if (v.isEmpty)
-              Constructorparams(c) = UUID.randomUUID().toString.replace("-","")
+              Constructorparams(c) = UUID.randomUUID().toString.replace("-","").substring(0,22)
             else
               Constructorparams(c) = v
+          } else if (field == "birthdayst"){
+            Constructorparams(c) = Some(null)
           }
           else {
             Constructorparams(c) = Some(v)
@@ -185,7 +195,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
       })
       if (!hasValue) {
         if (field == "personid")
-          Constructorparams(c) = None
+          Constructorparams(c) = ""
         else
           Constructorparams(c) = Some(null)
       }
@@ -228,7 +238,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
   }
 
 
-  def createPerson(person : GafisPerson) (implicit session: DBSession = GafisPerson.autoSession) : Integer = {
+  def createPerson(person : GafisPerson) (implicit session: DBSession = GafisPerson.autoSession) : GafisPerson = {
     val column = GafisPerson.column
     withSQL {
       insert.into(GafisPerson).columns(
@@ -527,6 +537,153 @@ class GatherPersonServiceImpl extends GatherPersonService{
         person.contrcaptureCode
       )
     }.update.apply()
+    new GafisPerson(
+      personid = person.personid,
+      idcardno = person.idcardno,
+      name = person.name,
+      spellname = person.spellname,
+      usedname = person.usedname,
+      usedspell = person.usedspell,
+      aliasname = person.aliasname,
+      aliasspell = person.aliasspell,
+      sexCode = person.sexCode,
+      nativeplaceCode = person.nativeplaceCode,
+      nationCode = person.nationCode,
+      ifmarryCode = person.ifmarryCode,
+      toneCode = person.toneCode,
+      tone = person.tone,
+      birthdayst = person.birthdayst,
+      birthdayed = person.birthdayed,
+      birthCode = person.birthCode,
+      birthStreet = person.birthStreet,
+      birthdetail = person.birthdetail,
+      door = person.door,
+      doorStreet = person.doorStreet,
+      doordetail = person.doordetail,
+      address = person.address,
+      addressStreet = person.addressStreet,
+      addressdetail = person.addressdetail,
+      cultureCode = person.cultureCode,
+      sourceincomeCode = person.sourceincomeCode,
+      faithCode = person.faithCode,
+      haveemployment = person.haveemployment,
+      jobCode = person.jobCode,
+      headship = person.headship,
+      employunit = person.employunit,
+      employaddress = person.employaddress,
+      otherspecialty = person.otherspecialty,
+      specialidentityCode = person.specialidentityCode,
+      politicsCode = person.politicsCode,
+      istransientpop = person.istransientpop,
+      istempregist = person.istempregist,
+      havepermit = person.havepermit,
+      haveresidence = person.haveresidence,
+      isservice = person.isservice,
+      specialgroupCode = person.specialgroupCode,
+      haveseparation = person.haveseparation,
+      ismigrantworker = person.ismigrantworker,
+      nameofschool = person.nameofschool,
+      istraining = person.istraining,
+      havecertificate = person.havecertificate,
+      staturest = person.staturest,
+      avoirdupois = person.avoirdupois,
+      footsize = person.footsize,
+      shoelength = person.shoelength,
+      bodilyformCode = person.bodilyformCode,
+      faceformCode = person.faceformCode,
+      iseyeglass = person.iseyeglass,
+      shoesize = person.shoesize,
+      bloodtypeCode = person.bloodtypeCode,
+      gatherOrgCode = person.gatherOrgCode,
+      ipaddress = person.ipaddress,
+      gathererId = person.gathererId,
+      gatherDate = person.gatherDate,
+      gatherTypeId = person.gatherTypeId,
+      status = person.status,
+      isfingerrepeat = person.isfingerrepeat,
+      fingerrepeatno = person.fingerrepeatno,
+      taskSource = person.taskSource,
+      receiveTime = person.receiveTime,
+      isreturn = person.isreturn,
+      returnTime = person.returnTime,
+      annex = person.annex,
+      inputpsn = person.inputpsn,
+      inputtime = person.inputtime,
+      modifiedpsn = person.modifiedpsn,
+      modifiedtime = person.modifiedtime,
+      deletag = person.deletag,
+      schedule = person.schedule,
+      approval = person.approval,
+      dnaCode = person.dnaCode,
+      gatherCategory = person.gatherCategory,
+      personCategory = person.personCategory,
+      auditor = person.auditor,
+      auditedtime = person.auditedtime,
+      isregather = person.isregather,
+      gatherFingerMode = person.gatherFingerMode,
+      caseName = person.caseName,
+      caseClasses = person.caseClasses,
+      reason = person.reason,
+      gatherFingerNum = person.gatherFingerNum,
+      fingerRemark = person.fingerRemark,
+      deprtmac = person.deprtmac,
+      gatherdepartcode = person.gatherdepartcode,
+      gatheruserid = person.gatheruserid,
+      gatherFingerTime = person.gatherFingerTime,
+      isSendTl = person.isSendTl,
+      caseBriefContents = person.caseBriefContents,
+      pushStatus = person.pushStatus,
+      pushDate = person.pushDate,
+      remark = person.remark,
+      dataSources = person.dataSources,
+      fingershowStatus = person.fingershowStatus,
+      cityCode = person.cityCode,
+      delayDeadline = person.delayDeadline,
+      fptGatherDepartCode = person.fptGatherDepartCode,
+      fptGatherDepartName = person.fptGatherDepartName,
+      sid = person.sid,
+      blowCode = person.blowCode,
+      blowStreet = person.blowStreet,
+      blowDetail = person.blowDetail,
+      blowLongitude = person.blowLongitude,
+      blowLatitude = person.blowLatitude,
+      blowEastwest = person.blowEastwest,
+      blowNorthsouth = person.blowNorthsouth,
+      seq = person.seq,
+      cardid = person.cardid,
+      recordmark = person.recordmark,
+      recordsituation = person.recordsituation,
+      validDate = person.validDate,
+      arriveLocalDate = person.arriveLocalDate,
+      leaveLocalDate = person.leaveLocalDate,
+      dbSource = person.dbSource,
+      dbSourceDis = person.dbSourceDis,
+      jobDes = person.jobDes,
+      isXjssmz = person.isXjssmz,
+      passportNum = person.passportNum,
+      countryCode = person.countryCode,
+      foreignName = person.foreignName,
+      passportValidDate = person.passportValidDate,
+      visaPlace = person.visaPlace,
+      passportType = person.passportType,
+      visaDate = person.visaDate,
+      assistLevel = person.assistLevel,
+      assistBonus = person.assistBonus,
+      assistPurpose = person.assistPurpose,
+      assistRefPerson = person.assistRefPerson,
+      assistRefCase = person.assistRefCase,
+      assistValidDate = person.assistValidDate,
+      assistExplain = person.assistExplain,
+      assistDeptCode = person.assistDeptCode,
+      assistDeptName = person.assistDeptName,
+      assistDate = person.assistDate,
+      assistContacts = person.assistContacts,
+      assistNumber = person.assistNumber,
+      assistApproval = person.assistApproval,
+      assistSign = person.assistSign,
+      gatherdepartname = person.gatherdepartname,
+      gatherusername = person.gatherusername,
+      contrcaptureCode = person.contrcaptureCode)
 
   }
 

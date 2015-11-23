@@ -324,6 +324,12 @@
         <version>1.6</version>
         <scope>test</scope>
       </dependency>
+		<!-- wangjue -->
+	  <dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>ejb3-persistence</artifactId>
+		<version>1.0.2.GA</version>
+	  </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

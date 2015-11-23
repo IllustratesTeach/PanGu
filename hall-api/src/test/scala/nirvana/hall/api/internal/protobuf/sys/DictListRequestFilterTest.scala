@@ -19,7 +19,7 @@ class DictListRequestFilterTest extends BaseServiceTestSupport{
     val protobufResponse = BaseResponse.newBuilder()
 
     val request = DictListRequest.newBuilder()
-    request.setDictType(DictType.CODE_MZ)
+    request.setDictType(DictType.CODE_XB)
     protobufRequest.setExtension(DictListRequest.cmd, request.build())
 
     handler.handle(protobufRequest.build(), protobufResponse)

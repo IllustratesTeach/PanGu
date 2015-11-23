@@ -2,7 +2,7 @@ package nirvana.hall.api
 
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.protobuf.sys._
-import nirvana.hall.api.internal.protobuf.sys.stamp.{UpdatePersonRequestFilter, AddPersonInfoRequestFilter, QueryPersonRequestFilter}
+import nirvana.hall.api.internal.protobuf.sys.stamp._
 import nirvana.hall.api.internal.stamp.{GatherPortraitServiceImpl, GatherFingerPalmServiceImpl, GatherPersonServiceImpl}
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.stamp.{GatherPortraitService, GatherFingerPalmService, GatherPersonService}
@@ -35,6 +35,10 @@ object LocalApiServiceModule {
     configuration.addInstance("QueryPersonRequestFilter", classOf[QueryPersonRequestFilter])
     configuration.addInstance("AddPersonInfoRequestFilter", classOf[AddPersonInfoRequestFilter])
     configuration.addInstance("UpdatePersonRequestFilter", classOf[UpdatePersonRequestFilter])
+    configuration.addInstance("AddPortraitRequestFilter", classOf[AddPortraitRequestFilter])
+    configuration.addInstance("QueryPortraitRequestFilter", classOf[QueryPortraitRequestFilter])
+    configuration.addInstance("AddFingerRequestFilter", classOf[AddFingerRequestFilter])
+    configuration.addInstance("QueryFingerRequestFilter", classOf[QueryFingerRequestFilter])
   }
   @Match(Array("*"))
   def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {

@@ -1,0 +1,29 @@
+package sys.stamp;
+import "sys/Common.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "QueryPortraitProto";
+
+message PortraitInfo {
+    optional string personid = 1;
+    optional string fgp = 2;
+    optional string gatherData = 3;
+    optional string inputpsn = 4;
+    optional string inputtime = 5;
+}
+
+//人像查询请求
+message QueryPortraitRequest {
+    extend BaseRequest {
+        optional QueryPortraitRequest cmd = 314;
+    }
+    required string personId = 1;
+}
+
+message QueryPortraitResponse {
+    extend BaseResponse {
+        optional QueryPortraitResponse cmd = 314;
+    }
+    repeated PortraitInfo portraitInfo = 1;
+}

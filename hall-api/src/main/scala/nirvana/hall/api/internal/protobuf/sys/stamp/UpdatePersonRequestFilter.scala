@@ -20,8 +20,19 @@ class UpdatePersonRequestFilter(gatherPersonService : GatherPersonService)
       val request = protobufRequest.getExtension(UpdatePersonRequest.cmd)
       val builder = UpdatePersonResponse.newBuilder()
       val person =  gatherPersonService.updateGatherPerson(request.getPersonInfo)
-      person match {
-        case (person) =>
+      builder.setNext("1")
+      responseBuilder.setExtension(UpdatePersonResponse.cmd,builder.build())
+      if (person.personid!=null) {
+        builder.setNext("1")
+        responseBuilder.setExtension(UpdatePersonResponse.cmd,builder.build())
+      } else {
+        builder.setNext("0")
+        responseBuilder.setExtension(UpdatePersonResponse.cmd,builder.build())
+        responseBuilder.setStatus(ResponseStatus.FAIL)
+        responseBuilder.setMessage("update failed");
+      }
+      /*person match {
+        case (Some(person.personid)) =>
           builder.setNext("1")
           responseBuilder.setExtension(UpdatePersonResponse.cmd,builder.build())
         case _ =>
@@ -29,7 +40,7 @@ class UpdatePersonRequestFilter(gatherPersonService : GatherPersonService)
           responseBuilder.setExtension(UpdatePersonResponse.cmd,builder.build())
           responseBuilder.setStatus(ResponseStatus.FAIL)
           responseBuilder.setMessage("update failed");
-      }
+      }*/
       true
     } else {
       handler.handle(protobufRequest, responseBuilder)
