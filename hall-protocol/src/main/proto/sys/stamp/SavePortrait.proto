@@ -11,8 +11,7 @@ message SavePortraitRequest {
         optional SavePortraitRequest cmd = 307;
     }
     required string personId = 1;
-    required string fgp = 2;
-    required string gatherData = 3;
+    required string gatherData = 2;
 }
 
 message SavePortraitResponse {
@@ -20,5 +19,4 @@ message SavePortraitResponse {
         optional SavePortraitResponse cmd = 307;
     }
     optional string next = 1;
-
 }

@@ -5,10 +5,12 @@ option java_package = "nirvana.hall.protocol.sys.stamp";
 
 option java_outer_classname = "QueryFingerDataProto";
 
-message gatherData {
+message GatherData {
     optional string gatherData = 1;     //指纹数据
-    optional int32 gatherFgp = 2;      //指位
-    optional int32 gatherFgpCase = 3;  //滚指或平指
+    optional int32 gatherFgp = 2;       //指位
+    optional int32 gatherFgpCase = 3;   //滚指或平指
+    optional int32 lobtype = 4;         //1:数据;2特征
+    optional int32 groupId = 5;         //0:默认;1:许公望压缩;3:JPG
 }
 
 //指纹图像数据查询请求
@@ -24,7 +26,7 @@ message QueryFingerDataResponse {
     extend BaseResponse {
         optional QueryFingerDataResponse cmd = 304;
     }
-    repeated gatherData data = 1;
+    repeated GatherData gatherData = 1;
 
 
 }
