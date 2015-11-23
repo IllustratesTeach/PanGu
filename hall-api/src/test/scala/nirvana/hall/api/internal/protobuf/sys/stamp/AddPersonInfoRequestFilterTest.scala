@@ -18,7 +18,7 @@ class AddPersonInfoRequestFilterTest extends BaseServiceTestSupport {
   @Test
   def test_addPersonInfo: Unit ={
     val addRequest = SavePersonRequest.newBuilder()
-    addRequest.setPersonInfo("personid=CS520201511050001&name=anmi&idcardno=123&gatherDate=2015-11-9 15:53:30&dataSources=1&gatherFingerNum=10")
+    addRequest.setPersonInfo("personid=CS520201511050001&yy=test&name=&idcardno=&gatherDate=2015-11-9 15:53:30&dataSources=1&gatherFingerNum=10")
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
 
@@ -28,8 +28,8 @@ class AddPersonInfoRequestFilterTest extends BaseServiceTestSupport {
     val protobufResponse = BaseResponse.newBuilder()
     protobufResponse.setStatus(ResponseStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
-
-    Assert.assertEquals("1",protobufResponse.getExtension(SavePersonResponse.cmd).getNext)
+    val personid = protobufResponse.getExtension(SavePersonResponse.cmd).getPersonInfo(0).getPersonid
+    Assert.assertEquals("CS520201511050001",personid)
 
     //query
     /*val queryRequest = QueryBasePersonRequest.newBuilder()
@@ -43,7 +43,9 @@ class AddPersonInfoRequestFilterTest extends BaseServiceTestSupport {
     val personInfo = protobufResponse.getExtension(QueryBasePersonResponse.cmd)
     Assert.assertTrue(personInfo != null)*/
     val person = GafisPerson.find("CS520201511050001").get
-    Assert.assertEquals("anmi",person.name.get)
+    println(person.name)
+    println(person.spellname)
+    Assert.assertEquals("",person.name.get)
 
 
     //update
