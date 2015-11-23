@@ -18,6 +18,9 @@ message BaseRequest{
   9004  CaseDelRequest
   9005  CaseGetRequest
   9006  CaseUpdateRequest
+  9007  LPCardDelRequest
+  9008  LPCardGetRequest
+  9009  LPCardUpdateRequest
   **/
 }
 //服务器返回状态
@@ -39,6 +42,9 @@ message BaseResponse{
   9004  CaseDelResponse
   9005  CaseGetResponse
   9006  CaseUpdateResponse
+  9007  LPCardDelResponse
+  9008  LPCardGetResponse
+  9009  LPCardUpdateResponse
   */
 }
 message KV {

@@ -309,6 +309,14 @@ object galoclpConverter extends LoggerSupport{
           warn("{} not mapped", other)
       }
     }
+    val fingerIdList = caseInfo.getStrFingerIDList
+    gCase.pstFingerID_Data.foreach{ f=>
+      fingerIdList.add(f.szKey)
+    }
+    val palmIdList = caseInfo.getStrPalmIDList
+    gCase.pstPalmID_Data.foreach{ f=>
+      palmIdList.add(f.szKey)
+    }
     caseInfo.build()
   }
 }

@@ -1,13 +1,14 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import com.google.protobuf.ByteString
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.TPCard
+import nirvana.hall.protocol.v62.FPTProto.{ImageType, FingerFgp, TPCard}
+import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import galoclpConverter.appendTextStruct
 
 /**
  *
@@ -26,7 +27,6 @@ object galoctpConverter {
     data.szCardID = card.getStrCardID
     data.stAdmData.szMISPersonID = card.getStrPersonID
     data.stAdmData.szPersonID = card.getStrPersonID
-
 
     if(card.hasText) {
       val text = card.getText
@@ -144,5 +144,101 @@ object galoctpConverter {
     data
   }
 
+  /**
+   * convert gafis' tpcard object to protobuf
+   * @param data
+   * @return
+   */
+  def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT): TPCard = {
+    val card = TPCard.newBuilder()
+    //TODO cardId为空？？？ ，补全信息,such as BPlain
+//    card.setStrCardID(data.szCardID)
+    card.setStrCardID("")
+    if(data.stAdmData.szPersonID != null)
+      card.setStrPersonID(data.stAdmData.szPersonID)
+
+    val text = card.getTextBuilder
+    data.pstText_Data.foreach{ item =>
+      val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
+      val textContent = new String(bytes).trim
+      item szItemName match{
+        case "Name" =>
+          text.setStrName(textContent)
+        case "Alias" =>
+          text.setStrAliasName(textContent)
+        case "SexCode" =>
+          text.setNSex(Integer.parseInt(textContent))
+        case "BirthDate" =>
+          text.setStrBirthDate(textContent)
+        case "ShenFenID" =>
+          text.setStrIdentityNum(textContent)
+        case "HuKouPlaceCode" =>
+          text.setStrBirthAddrCode(textContent)
+        case "HuKouPlaceTail" =>
+          text.setStrBirthAddr(textContent)
+        case "AddressCode" =>
+          text.setStrAddrCode(textContent)
+        case "AddressTail" =>
+          text.setStrAddr(textContent)
+        case "PersonClassCode" =>
+          text.setStrPersonType(textContent)
+        case "CaseClass1Code" =>
+          text.setStrCaseType1(textContent)
+        case "CaseClass2Code" =>
+          text.setStrCaseType2(textContent)
+        case "CaseClass3Code" =>
+          text.setStrCaseType3(textContent)
+        case "PrinterUnitCode" =>
+          text.setStrPrintUnitCode(textContent)
+        case "PrinterUnitNameTail" =>
+          text.setStrPrintUnitName(textContent)
+        case "PrinterName" =>
+          text.setStrPrinter(textContent)
+        case "PrintDate" =>
+          text.setStrPrintDate(textContent)
+        case "Comment" =>
+          text.setStrComment(textContent)
+        case "Nationality" =>
+          text.setStrNation(textContent)
+        case "RaceCode" =>
+          text.setStrRace(textContent)
+        case "CertificateCode" =>
+          text.setStrCertifID(textContent)
+        case "CertificateType" =>
+          text.setStrCertifType(textContent)
+        case "IsCriminalRecord" =>
+          text.setBHasCriminalRecord("1".equals(textContent))
+        case "CriminalRecordDesc" =>
+          text.setStrCriminalRecordDesc(textContent)
+        case other =>
+      }
+    }
+
+    data.pstMIC_Data.foreach{ mic =>
+      val data = card.addBlobBuilder()
+      if(mic.pstMnt_Data != null)
+        data.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
+      if(mic.pstCpr_Data != null)
+        data.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
+      data.setFgp(FingerFgp.valueOf(mic.nItemData))
+      mic.nItemType match {
+        case glocdef.GAIMG_IMAGETYPE_FINGER =>
+          data.setType(ImageType.IMAGETYPE_FINGER)
+        case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
+          data.setType(ImageType.IMAGETYPE_FINGER)
+        case glocdef.GAMIC_ITEMTYPE_FACE =>
+          data.setType(ImageType.IMAGETYPE_FACE)
+        case glocdef.GAMIC_ITEMTYPE_DATA =>
+          data.setType(ImageType.IMAGETYPE_CARDIMG)
+        case glocdef.GAMIC_ITEMTYPE_PALM =>
+          data.setType(ImageType.IMAGETYPE_PALM)
+        case glocdef.GAMIC_ITEMTYPE_VOICE =>
+          data.setType(ImageType.IMAGETYPE_VOICE)
+        case other =>
+      }
+    }
+
+    card.build()
+  }
 
 }
