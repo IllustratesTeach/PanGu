@@ -72,7 +72,7 @@ trait GatherPersonService {
    * @return
    */
   @Transactional
-  def saveGatherPerson(personInfo : String) : Integer
+  def saveGatherPerson(personInfo : String) : GafisPerson
 
 
   /**

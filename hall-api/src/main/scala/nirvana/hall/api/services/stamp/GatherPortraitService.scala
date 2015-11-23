@@ -2,6 +2,7 @@ package nirvana.hall.api.services.stamp
 
 import nirvana.hall.api.entities.{SysUser, GafisGatherPortrait}
 import nirvana.hall.api.services.AutoSpringDataSourceSession
+import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession
 
 /**
@@ -19,18 +20,32 @@ trait GatherPortraitService {
 
 
   /**
+   * 解析人像
+   * @param personId
+   * @param gatherData
+   * @param session
+   * @return
+   */
+  @Transactional
+  def analysisGatherPortrait(personId : String,gatherData : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : String
+
+
+  /**
    * 人像信息新增
    * @param gafisGatherPortrait
    * @return
    */
-  def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait,login : SysUser) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
+  @Transactional
+  def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
 
 
   /**
-   * 人像信息修改
-   * @param gafisGatherPortrait
+   * 覆盖删除人像
+   * @param personid
+   * @param session
    * @return
    */
-  def updateGatherPortrait(gafisGatherPortrait: GafisGatherPortrait) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
+  @Transactional
+  def deleteGatherPortrait(personid : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
 
 }
