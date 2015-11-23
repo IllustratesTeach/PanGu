@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal
 
 import nirvana.hall.api.entities.CodeAjlb
-import nirvana.hall.protocol.sys.SyncDictProto.SyncDictResponse.CodeData
+import nirvana.hall.protocol.sys.DictProto.CodeData
 import org.junit.{Assert, Test}
 
 /**
