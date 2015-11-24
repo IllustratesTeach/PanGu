@@ -30,8 +30,8 @@ class nettableTest {
     field3.szItemName = "FINGERRHMCPR"
     field3.nFormFlag = gadbrec.SELRESITEM_FFLAG_ISMEMBLOB
 
-    result.pstItem_Data = Array(field1,field3)
-    result.nResItemCount = result.pstItem_Data.length
+    //result.pstItem_Data = Array(field1,field3)
+    result.nResItemCount = 0 //result.pstItem_Data.length
     result.nItemFlag = gadbrec.SELRES_ITEM_RESITEM
     result.nFreeOption = gadbrec.SELRES_CANBEFREE_RESITEM
 
@@ -41,7 +41,7 @@ class nettableTest {
     val stmt: GADB_SELSTATEMENT = new GADB_SELSTATEMENT
     //stmt.szStatement="cardid = 12"
     stmt.stReadOpt.nFlag = gadbrec.READROW_FLAG_GETBLOBINFOONLY
-    stmt.stReadOpt.nResColFmt = gadbrec.RESCOLFMT_NAMEGIVEN
+    stmt.stReadOpt.nResColFmt = gadbrec.RESCOLFMT_GETALL //.RESCOLFMT_NAMEGIVEN
     stmt.stReadOpt.nPosBy = gadbrec.READROW_POSBY_SELECT
 
     facade.NET_GAFIS_TABLE_Select(1,2,result,stmt)

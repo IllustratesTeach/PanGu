@@ -419,9 +419,10 @@ trait gnetcsr {
     channel.writeByteArray(pData)
   }
   def GAFIS_NETSCR_SendSelItemToSelect(channel:ChannelOperator,pstRes:GADB_SELRESULT) {
-    val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstRes)
-    validateResponse(channel,response)
+    channel.writeMessage(pstRes)
     if(pstRes.nResItemCount > 0 ){
+      val response = channel.receive[GNETANSWERHEADOBJECT]()
+      validateResponse(channel,response)
       if(pstRes.pstItem_Data == null) {
         throw new IllegalArgumentException("nResItemCount(%s) greater than 0,but  pstItem_Data is null".format(pstRes.nResItemCount))
       }

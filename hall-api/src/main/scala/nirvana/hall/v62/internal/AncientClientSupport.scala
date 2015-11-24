@@ -79,6 +79,12 @@ trait AncientClientSupport {
   protected def NETOP_RECVANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
     channel.receive(pAns)
   }
+  protected def NETOP_RECVDATA[R <: AncientData](channel:ChannelOperator,target:R): R={
+    channel.receive[R](target)
+  }
+  protected def NETOP_RETVAL_LT_FIN(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT):Unit={
+    validateResponse(channel,pAns)
+  }
 }
 class NoneResponse extends AncientData{
 }

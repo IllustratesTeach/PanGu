@@ -30,4 +30,23 @@ trait gnetfunc {
 
       validateResponse(pstCon,pAns)
   }
+  def NET_GAFIS_RMTLIB_SERVER_Get(nDBID:Short, nTableID:Short, pServer:RMTSERVERSTRUCT, nOption:Int):Unit=
+    executeInChannel{pstCon =>
+      val pReq = new GNETREQUESTHEADOBJECT
+
+      NETREQ_SetOpClass(pReq, OP_CLASS_RMTLIB);
+      NETREQ_SetOpCode(pReq, OP_RMTLIB_SERVER_GET);
+      NETREQ_SetDBID(pReq, nDBID);
+      NETREQ_SetTableID(pReq, nTableID);
+      NETREQ_SetOption(pReq, nOption);
+      pReq.bnData = pServer.szUnitCode.getBytes
+
+      val pAns = new GNETANSWERHEADOBJECT
+
+      NETOP_SENDREQ(pstCon, pReq);		//send request
+      NETOP_RECVANS(pstCon, pAns);		//receive count of server
+      NETOP_RETVAL_LT_FIN(pstCon,pAns);
+      NETOP_RECVDATA(pstCon, pServer);
+    }
+
 }
