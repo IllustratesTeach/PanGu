@@ -33,7 +33,6 @@ trait nettable {
 
     val n = pAns.nReturnValue
     if ( n>0 ) {
-      println("n ====> "+n)
       GAFIS_NETSCR_RecvSelResult(channel, pstRes)
     }
   }
