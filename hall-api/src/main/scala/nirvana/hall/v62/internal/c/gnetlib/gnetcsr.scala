@@ -419,7 +419,8 @@ trait gnetcsr {
     channel.writeByteArray(pData)
   }
   def GAFIS_NETSCR_SendSelItemToSelect(channel:ChannelOperator,pstRes:GADB_SELRESULT) {
-    channel.writeMessage(pstRes)
+    val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstRes)
+    validateResponse(channel,response)
     if(pstRes.nResItemCount > 0 ){
       if(pstRes.pstItem_Data == null) {
         throw new IllegalArgumentException("nResItemCount(%s) greater than 0,but  pstItem_Data is null".format(pstRes.nResItemCount))
@@ -428,7 +429,7 @@ trait gnetcsr {
     }
   }
   def GAFIS_NETSCR_RecvSelResult(channel:ChannelOperator,pstRes:GADB_SELRESULT){
-    var response = channel.receive[GNETANSWERHEADOBJECT]()
+    channel.receive[GADB_SELRESULT](pstRes)
     pstRes.nFreeOption = 0
 
     var nRowCnt = pstRes.nRecGot
@@ -446,12 +447,13 @@ trait gnetcsr {
     var bNeedSend = 0
 
 
+    var response = new GNETANSWERHEADOBJECT
     response.nReturnValue = 1
     channel.writeMessage(response)
 
 
     if ( (pstRes.nItemFlag & SELRES_ITEM_RESITEM) > 0 && nResItemLen > 0 ) {
-      val itemData = 0 to nResItemLen map(x=>channel.receive[GADB_SELRESITEM]())
+      val itemData = 0 until nResItemLen map(x=>channel.receive[GADB_SELRESITEM]())
       pstRes.pstItem_Data = itemData.toArray
     }
     if ( (pstRes.nItemFlag & SELRES_ITEM_READFLAG) > 0 && nReadFlagLen > 0 ) {
@@ -465,7 +467,7 @@ trait gnetcsr {
         nRowCnt = pstRes.nRecGot
         nRowSize = pstRes.nSegSize
         var nBlobSize = 0
-        var buf = mutable.Buffer[GADB_MEMBLOB]()
+        val buf = mutable.Buffer[GADB_MEMBLOB]()
         do {
           response = channel.receive[GNETANSWERHEADOBJECT]()
           val i = CodeHelper.convertAsInt(response.bnData);	// column

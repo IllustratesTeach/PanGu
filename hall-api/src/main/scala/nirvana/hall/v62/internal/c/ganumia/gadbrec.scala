@@ -451,9 +451,9 @@ object gadbrec {
   // the length of the blob is contains in GADB_MEMBLOB format.
   // if we get data from database, we always treats blob as memblob and non-blob as normal
   // but if user wants to save data to blob, we can store anything in memblob.
-  final val SELRESITEM_FFLAG_NORMAL = 0x0	//
-  final val SELRESITEM_FFLAG_ISMEMBLOB = 0x1	//
-  final val SELRESITEM_FFLAG_LOB = 0x2	// normal lob.
+  final val SELRESITEM_FFLAG_NORMAL:Byte = 0x0	//
+  final val SELRESITEM_FFLAG_ISMEMBLOB :Byte= 0x1	//
+  final val SELRESITEM_FFLAG_LOB:Byte = 0x2	// normal lob.
 
   // GADB_SELRESITEM::nFlag
   final val SELRESITEM_FLAG_MIXLOBPT = 0x1	// mix lob pt.

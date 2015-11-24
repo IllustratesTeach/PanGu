@@ -55,6 +55,30 @@ trait AncientClientSupport {
     if ( mic.nCprLen >0 ) mic.pstCpr_Data = channel.receiveByteArray(mic.nCprLen).array()
     if ( mic.nBinLen >0 ) mic.pstBin_Data = channel.receiveByteArray(mic.nBinLen).array()
   }
+  protected def NETREQ_SetOpClass(pReq:GNETREQUESTHEADOBJECT,opClass:Int): Unit ={
+    pReq.nOpClass = opClass.toShort
+  }
+  protected def NETREQ_SetOpCode(pReq:GNETREQUESTHEADOBJECT, opCode:Int):Unit={
+    pReq.nOpCode = opCode.toShort
+  }
+  protected def NETREQ_SetDBID(pReq:GNETREQUESTHEADOBJECT, nDBID:Int):Unit={
+    pReq.nDBID = nDBID.toShort
+  }
+  protected def NETREQ_SetTableID(pReq:GNETREQUESTHEADOBJECT, nTableID:Int):Unit={
+    pReq.nTableID = nTableID.toShort
+  }
+  protected def NETREQ_SetOption(pReq:GNETREQUESTHEADOBJECT, nOption:Int):Unit={
+    pReq.nOption = nOption
+  }
+  protected def  NETOP_SENDREQ(channel:ChannelOperator,data:GNETREQUESTHEADOBJECT): Unit ={
+    channel.writeMessage[NoneResponse](data)
+  }
+  protected def  NETOP_SENDDATA[R <: AncientData](channel:ChannelOperator,data:R): Unit ={
+    channel.writeMessage[NoneResponse](data)
+  }
+  protected def NETOP_RECVANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
+    channel.receive(pAns)
+  }
 }
 class NoneResponse extends AncientData{
 }

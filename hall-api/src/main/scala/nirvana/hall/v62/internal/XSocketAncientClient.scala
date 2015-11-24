@@ -76,6 +76,9 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
       writeByteArray(data,0,data.length)
     }
 
+    override def receive[R <: AncientData](target:R): R = {
+      target.fromDataSource(connection)
+    }
     override def receive[R <: AncientData :ClassTag](): R = {
       classTag[R] match{
         case t if t == classTag[Nothing] =>
