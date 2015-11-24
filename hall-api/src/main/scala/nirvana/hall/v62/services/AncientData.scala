@@ -1,6 +1,7 @@
 package nirvana.hall.v62.services
 
 import java._
+import java.io.IOException
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
@@ -209,11 +210,53 @@ trait ScalaReflect{
     }
     channelBuffer
   }
+  type StreamSource = {
+
+    /**
+     * read a byte
+     *
+     * @return the byte value
+     * @throws IOException If an I/O error occurs
+     */
+    def readByte(): Byte
+
+    /**
+     * read a short value
+     *
+     * @return the short value
+     * @throws IOException If an I/O error occurs
+     */
+    def readShort(): Short
+
+    /**
+     * read an int
+     *
+     * @return the int value
+     * @throws IOException If an I/O error occurs
+     */
+    def readInt(): Int
+
+    /**
+     * read a long
+     *
+     * @return the long value
+     * @throws IOException If an I/O error occurs
+     */
+    def readLong(): Long
+
+    /**
+     * read a double
+     *
+     * @return the double value
+     * @throws IOException If an I/O error occurs
+     */
+    def readDouble(): Double
+  }
   /**
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
    */
-  def fromDataSource(dataSource: IDataSource): this.type ={
+  def fromDataSource(dataSource: StreamSource): this.type ={
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
@@ -222,16 +265,22 @@ trait ScalaReflect{
         length
       }
       def readByteArray(len:Int): Array[Byte]={
-        dataSource.readBytesByLength(len)
+        dataSource match{
+          case ds:IDataSource =>
+            ds.readBytesByLength(len)
+          case channel:ChannelBuffer =>
+            channel.readBytes(len).array()
+        }
+        //dataSource.readBytesByLength(len)
       }
 
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val field = instanceMirror.reflectField(termSymbol)
       tpe match {
-        case ByteTpe => field.set(dataSource.readByte())
-        case ShortTpe | CharTpe => field.set(dataSource.readShort())
-        case IntTpe => field.set(dataSource.readInt())
-        case LongTpe => field.set(dataSource.readLong())
+        case ByteTpe => field.set(dataSource.readByte)
+        case ShortTpe | CharTpe => field.set(dataSource.readShort)
+        case IntTpe => field.set(dataSource.readInt)
+        case LongTpe => field.set(dataSource.readLong)
         case AncientData.STRING_CLASS =>
           val bytes = readByteArray(returnLengthOrThrowException)
           field.set(new String(bytes).trim)
