@@ -1,11 +1,11 @@
 package nirvana.hall.v62.services
 
 import java._
-import java.io.IOException
 
 import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.v62.services.AncientData._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.xsocket.{IDataSource, IDataSink}
+import org.xsocket.{IDataSink, IDataSource}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
@@ -22,6 +22,13 @@ import scala.reflect.runtime.universe.definitions._
 object AncientData {
   val mirror = universe.runtimeMirror(getClass.getClassLoader)
   val STRING_CLASS = typeOf[String]
+  type StreamReader = {
+    def readByte(): Byte
+    def readShort(): Short
+    def readInt(): Int
+    def readLong(): Long
+    def readDouble(): Double
+  }
 }
 trait ScalaReflect{
   private val instanceMirror = AncientData.mirror.reflect(this)
@@ -88,6 +95,7 @@ trait ScalaReflect{
       .reflectConstructor(constructor)()
       .asInstanceOf[ScalaReflect]
   }
+
   /**
    * serialize to channel buffer
    * @param dataSink netty channel buffer
@@ -210,53 +218,11 @@ trait ScalaReflect{
     }
     channelBuffer
   }
-  type StreamSource = {
-
-    /**
-     * read a byte
-     *
-     * @return the byte value
-     * @throws IOException If an I/O error occurs
-     */
-    def readByte(): Byte
-
-    /**
-     * read a short value
-     *
-     * @return the short value
-     * @throws IOException If an I/O error occurs
-     */
-    def readShort(): Short
-
-    /**
-     * read an int
-     *
-     * @return the int value
-     * @throws IOException If an I/O error occurs
-     */
-    def readInt(): Int
-
-    /**
-     * read a long
-     *
-     * @return the long value
-     * @throws IOException If an I/O error occurs
-     */
-    def readLong(): Long
-
-    /**
-     * read a double
-     *
-     * @return the double value
-     * @throws IOException If an I/O error occurs
-     */
-    def readDouble(): Double
-  }
   /**
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
    */
-  def fromDataSource(dataSource: StreamSource): this.type ={
+  def fromDataSource(dataSource: StreamReader): this.type ={
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
@@ -277,10 +243,10 @@ trait ScalaReflect{
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val field = instanceMirror.reflectField(termSymbol)
       tpe match {
-        case ByteTpe => field.set(dataSource.readByte)
-        case ShortTpe | CharTpe => field.set(dataSource.readShort)
-        case IntTpe => field.set(dataSource.readInt)
-        case LongTpe => field.set(dataSource.readLong)
+        case ByteTpe => field.set(dataSource.readByte())
+        case ShortTpe | CharTpe => field.set(dataSource.readShort())
+        case IntTpe => field.set(dataSource.readInt())
+        case LongTpe => field.set(dataSource.readLong())
         case AncientData.STRING_CLASS =>
           val bytes = readByteArray(returnLengthOrThrowException)
           field.set(new String(bytes).trim)
