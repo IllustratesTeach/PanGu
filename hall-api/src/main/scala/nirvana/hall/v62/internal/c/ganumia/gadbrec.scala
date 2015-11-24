@@ -367,9 +367,11 @@ object gadbrec {
       var bnRes:Array[Byte] = _ ;
       var nPos:Int = _ ;		// position result form is FLATMEMORY
     } // u;
-    GADB_BLOBCOL	stLobInfo;	// size is 8 bytes long
     */
-    @Length(16)
+    @IgnoreTransfer
+    var pData_Data:Array[Byte] = _
+    var stLobInfo:GADB_BLOBCOL = _	;	// size is 8 bytes long
+    @Length(8)
     var bnRes:Array[Byte] = _
   } //GADB_MEMBLOB;	// size of this structure is 16 bytes long
 
