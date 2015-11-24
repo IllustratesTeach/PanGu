@@ -84,7 +84,7 @@ class AncientDataTest {
     val bytes = buffer.array()
 
     val header2 = new GNETREQUESTHEADOBJECT
-    header2.fromChannelBuffer(buffer)
+    header2.fromDataSource(buffer)
 
     Assert.assertEquals(header.szMagicStr,header2.szMagicStr)
     Assert.assertEquals(header.nIP,header2.nIP)

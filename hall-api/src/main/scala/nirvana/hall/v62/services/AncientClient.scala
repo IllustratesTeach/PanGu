@@ -39,6 +39,7 @@ trait ChannelOperator{
   def writeByteArray[R <: AncientData](data:Array[Byte],offset:Int,length:Int)(implicit manifest: Manifest[R]): R
   def writeByteArray[R <: AncientData](data:Array[Byte])(implicit manifest: Manifest[R]): R
   def receive[R <: AncientData :ClassTag](): R ;
+  def receive[R <:AncientData](target:R):R ;
   def receiveByteArray(len:Int): ChannelBuffer
 }
 

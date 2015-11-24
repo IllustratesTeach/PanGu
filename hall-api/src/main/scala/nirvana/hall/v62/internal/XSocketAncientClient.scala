@@ -17,7 +17,7 @@ import scala.reflect._
 class XSocketAncientClient(host:String,port:Int) extends AncientClient with LoggerSupport{
   def executeInChannel[T](action:ChannelOperator=>T): T={
     val connection = new BlockingConnection(InetAddress.getByName(host),port,10*1000)
-    connection.setReadTimeoutMillis(30 * 1000)
+    connection.setReadTimeoutMillis(300 * 1000)
     val channelHolder = new XSocketChannelOperator(connection)
     try{
       action(channelHolder)
@@ -76,6 +76,9 @@ class XSocketAncientClient(host:String,port:Int) extends AncientClient with Logg
       writeByteArray(data,0,data.length)
     }
 
+    override def receive[R <: AncientData](target:R): R = {
+      target.fromDataSource(connection)
+    }
     override def receive[R <: AncientData :ClassTag](): R = {
       classTag[R] match{
         case t if t == classTag[Nothing] =>

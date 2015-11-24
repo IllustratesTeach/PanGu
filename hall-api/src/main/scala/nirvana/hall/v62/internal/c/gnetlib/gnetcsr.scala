@@ -1,13 +1,19 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import nirvana.hall.v62.internal.c.CodeHelper
+import nirvana.hall.v62.internal.c.ganumia.gadbrec
+import nirvana.hall.v62.internal.c.ganumia.gadbrec._
 import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoclp._
 import nirvana.hall.v62.internal.c.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocdef.{GATEXTITEMSTRUCT, GAFISMICSTRUCT}
+import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
+import org.jboss.netty.buffer.ChannelBuffers
+
+import scala.collection.mutable
 
 /**
  *
@@ -406,5 +412,96 @@ trait gnetcsr {
     if (nTxtSqlLen > 0) channel.writeByteArray[NoneResponse](pstQry.pstTextSql_Data, 0, nTxtSqlLen);
     if (nCommentLen > 0) channel.writeByteArray[NoneResponse](pstQry.pszComment_Data, 0, nCommentLen);
     if (nqryinfolen > 0) channel.writeMessage[NoneResponse](pstQry.pstInfo_Data)
+  }
+  def GAFIS_NETSCR_UTIL_SendAllocData(channel:ChannelOperator,pData:Array[Byte]){
+    val response = channel.receive[GNETANSWERHEADOBJECT]()
+    validateResponse(channel,response)
+    channel.writeByteArray(pData)
+  }
+  def GAFIS_NETSCR_SendSelItemToSelect(channel:ChannelOperator,pstRes:GADB_SELRESULT) {
+    channel.writeMessage(pstRes)
+    if(pstRes.nResItemCount > 0 ){
+      val response = channel.receive[GNETANSWERHEADOBJECT]()
+      validateResponse(channel,response)
+      if(pstRes.pstItem_Data == null) {
+        throw new IllegalArgumentException("nResItemCount(%s) greater than 0,but  pstItem_Data is null".format(pstRes.nResItemCount))
+      }
+      pstRes.pstItem_Data.foreach(channel.writeMessage[NoneResponse](_))
+    }
+  }
+  def GAFIS_NETSCR_RecvSelResult(channel:ChannelOperator,pstRes:GADB_SELRESULT){
+    channel.receive[GADB_SELRESULT](pstRes)
+    pstRes.nFreeOption = 0
+
+    var nRowCnt = pstRes.nRecGot
+    var nRowSize = pstRes.nSegSize
+    var nDataBufLen = 0
+
+    if ( (pstRes.nFlag & gadbrec.SELRES_FLAG_FLATMEMORY) > 0) {
+      // flat memory
+      nDataBufLen = pstRes.nNextAvailBlobPos
+    } else {
+      nDataBufLen = nRowCnt*nRowSize
+    }
+    val nResItemLen = pstRes.nResItemCount
+    val nReadFlagLen = pstRes.nReadFlagRowSize * nRowCnt
+    var bNeedSend = 0
+
+
+    var response = new GNETANSWERHEADOBJECT
+    response.nReturnValue = 1
+    channel.writeMessage(response)
+
+
+    if ( (pstRes.nItemFlag & SELRES_ITEM_RESITEM) > 0 && nResItemLen > 0 ) {
+      val itemData = 0 until nResItemLen map(x=>channel.receive[GADB_SELRESITEM]())
+      pstRes.pstItem_Data = itemData.toArray
+    }
+    if ( (pstRes.nItemFlag & SELRES_ITEM_READFLAG) > 0 && nReadFlagLen > 0 ) {
+      pstRes.pReadFlag_Data = channel.receiveByteArray(nReadFlagLen).array()
+    }
+    if ( (pstRes.nItemFlag & SELRES_ITEM_DATABUF) > 0 && nDataBufLen>0 ) {
+      pstRes.pDataBuf_Data = channel.receiveByteArray(nDataBufLen).array()
+
+      if ( (pstRes.nFlag & SELRES_FLAG_BLOBHASDATA) >0 &&
+        !((pstRes.nFlag & SELRES_FLAG_FLATMEMORY)>0) && nDataBufLen>0 ) {
+        nRowCnt = pstRes.nRecGot
+        nRowSize = pstRes.nSegSize
+        var nBlobSize = 0
+        val buf = mutable.Buffer[GADB_MEMBLOB]()
+        do {
+          response = channel.receive[GNETANSWERHEADOBJECT]()
+          val i = CodeHelper.convertAsInt(response.bnData);	// column
+          val k = CodeHelper.convertAsInt(response.bnData,4);	// row
+          nBlobSize = CodeHelper.convertAsInt(response.bnData,8);
+          if ( nBlobSize > 0 ) {
+            bNeedSend = 1
+            val n = pstRes.pstItem_Data(i).nDataOffset
+            val pstBlob= new  GADB_MEMBLOB
+            val buffer = ChannelBuffers.wrappedBuffer(pstRes.pDataBuf_Data,k*nRowSize + n,pstBlob.getDataSize)
+            pstBlob.fromDataSource(buffer)
+
+            //val pstBlob = (GADB_MEMBLOB *)(pstRes -> pDataBuf + k * nRowSize + n);
+            //ZMALLOC_GOTOFIN(pstBlob -> u.pData, UCHAR *, nBlobSize);
+            bNeedSend = 0
+            response.nReturnValue = 1
+            channel.writeMessage(response)
+
+            pstBlob.pData_Data = channel.receiveByteArray(nBlobSize).array()
+
+            buf += pstBlob
+          }
+        } while(nBlobSize>0 )
+
+        //set result
+        pstRes.pDataBuf_Result = buf.toArray
+      }
+    }
+
+    if(bNeedSend > 0) {
+      response.nReturnValue = -1
+      channel.writeMessage(response)
+    }
+
   }
 }

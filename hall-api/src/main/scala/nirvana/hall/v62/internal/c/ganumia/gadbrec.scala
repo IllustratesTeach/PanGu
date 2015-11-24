@@ -367,9 +367,11 @@ object gadbrec {
       var bnRes:Array[Byte] = _ ;
       var nPos:Int = _ ;		// position result form is FLATMEMORY
     } // u;
-    GADB_BLOBCOL	stLobInfo;	// size is 8 bytes long
     */
-    @Length(16)
+    @IgnoreTransfer
+    var pData_Data:Array[Byte] = _
+    var stLobInfo:GADB_BLOBCOL = _	;	// size is 8 bytes long
+    @Length(8)
     var bnRes:Array[Byte] = _
   } //GADB_MEMBLOB;	// size of this structure is 16 bytes long
 
@@ -449,9 +451,9 @@ object gadbrec {
   // the length of the blob is contains in GADB_MEMBLOB format.
   // if we get data from database, we always treats blob as memblob and non-blob as normal
   // but if user wants to save data to blob, we can store anything in memblob.
-  final val SELRESITEM_FFLAG_NORMAL = 0x0	//
-  final val SELRESITEM_FFLAG_ISMEMBLOB = 0x1	//
-  final val SELRESITEM_FFLAG_LOB = 0x2	// normal lob.
+  final val SELRESITEM_FFLAG_NORMAL:Byte = 0x0	//
+  final val SELRESITEM_FFLAG_ISMEMBLOB :Byte= 0x1	//
+  final val SELRESITEM_FFLAG_LOB:Byte = 0x2	// normal lob.
 
   // GADB_SELRESITEM::nFlag
   final val SELRESITEM_FLAG_MIXLOBPT = 0x1	// mix lob pt.
@@ -504,6 +506,8 @@ object gadbrec {
   var pDataBuf_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pDataBuf_Data:Array[Byte] = _ // for pDataBuf pointer ,struct:UCHAR;	// data buffer	can be null, if null then no data.
+    @IgnoreTransfer
+  var pDataBuf_Result:Array[GADB_MEMBLOB] = _
   var pstItem_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pstItem_Data:Array[GADB_SELRESITEM] = _ // for pstItem pointer ,struct:GADB_SELRESITEM;
@@ -539,50 +543,50 @@ object gadbrec {
   // lob columns may be set not read. other columns will be set to read all.
 
   // GADB_SELRESULT::nFlag
-  final val SELRES_FLAG_FLATMEMORY = 0x1	// if nFormFlag is SELRES_FORMFLAG_ISFREE,
+  final val SELRES_FLAG_FLATMEMORY : Byte = 0x1	// if nFormFlag is SELRES_FORMFLAG_ISFREE,
   // and if there is blobs, then memory used by
   // blob is borrowed in pDataBuf and not allocated
   // individually.
-  final val SELRES_FLAG_BLOBISPT = 0x2	// used only when SELRES_FLAG_FLATMEMORY is set.
+  final val SELRES_FLAG_BLOBISPT : Byte = 0x2	// used only when SELRES_FLAG_FLATMEMORY is set.
   // if this flag set. then memblob using pointer not
   // offset. i.e., GADB_MEMBLOB::pData is used (called
   // format pt). else GADB_MEMBLOB::nPos is used. called
   // format offset.
-  final val SELRES_FLAG_ROWHEADOK = 0x4	// only usefully in freerow format, each row head
+  final val SELRES_FLAG_ROWHEADOK : Byte = 0x4	// only usefully in freerow format, each row head
   // is GADB_ROWHEADSCHEMA, and this flag specify
   // that sid in that can be used.
 
-  final val SELRES_FLAG_BLOBHASDATA = 0x4	// some columns has pointer.
+  final val SELRES_FLAG_BLOBHASDATA : Byte = 0x4	// some columns has pointer.
   // the following flag is used in flat form.
   // on some cases, we need change some blob pointer in lob, and for flat form
   // even it's pt, the pt is in the range
   // pstRes->pDataBuf and pstRes->pDataBuf+nDataBufSize.
   // so if this flag set, we also check lob pointer.
-  final val SELRES_FLAG_MIXBLOBPT = 0x10
+  final val SELRES_FLAG_MIXBLOBPT : Byte = 0x10
 
   // GADB_SELRESULT::nFormFlag, judge by nFormFlag==SELRES_FORMFLAG_xx
-  final val SELRES_FORMFLAG_NORMAL = 0x0	// normal
+  final val SELRES_FORMFLAG_NORMAL : Byte = 0x0	// normal
 
   // if is free form, we can cast each row to GADB_MEMFORMROW, which has an header. and null flag.
   // so we can judge whether a row is used or not.
-  final val SELRES_FORMFLAG_ISFREE = 0x1	// free form
+  final val SELRES_FORMFLAG_ISFREE : Byte = 0x1	// free form
 
   // GADB_SELRESULT::nItemFlag, can be or'ed. indicates given pointer can be used or not.
-  final val SELRES_ITEM_DATABUF = 0x1
-  final val SELRES_ITEM_RESITEM = 0x2
-  final val SELRES_ITEM_READFLAG = 0x4
+  final val SELRES_ITEM_DATABUF : Byte = 0x1
+  final val SELRES_ITEM_RESITEM : Byte = 0x2
+  final val SELRES_ITEM_READFLAG : Byte = 0x4
 
   // GADB_SELSTATEMENT::nResColFmt, GADB_READROWOPT::nResColFmt
-  final val RESCOLFMT_PREPARED = 0x0	// format has been prepared
-  final val RESCOLFMT_GETALL = 0x1	// read all column
-  final val RESCOLFMT_NAMEGIVEN = 0x2	// read only those columns that name given
+  final val RESCOLFMT_PREPARED : Byte = 0x0	// format has been prepared
+  final val RESCOLFMT_GETALL : Byte = 0x1	// read all column
+  final val RESCOLFMT_NAMEGIVEN : Byte = 0x2	// read only those columns that name given
 
 
   // GADB_SELRESULT::nFreeOption
-  final val SELRES_CANBEFREE_RESITEM = 0x1
-  final val SELRES_CANBEFREE_DATABUF = 0x2
-  final val SELRES_CANBEFREE_READFLAG = 0x4
-  final val SELRES_CANBEFREE_LOB = 0x8
+  final val SELRES_CANBEFREE_RESITEM : Byte = 0x1
+  final val SELRES_CANBEFREE_DATABUF : Byte = 0x2
+  final val SELRES_CANBEFREE_READFLAG : Byte = 0x4
+  final val SELRES_CANBEFREE_LOB : Byte = 0x8
 
   class GBDB_INTERNAL_TIMESEL extends AncientData
   {
@@ -622,9 +626,9 @@ object gadbrec {
   } // GADB_READROWOPT;	// size is 32 bytes
 
   // GADB_READROWOPT::nGetFlag
-  final val READROW_GETFLAG_GETPMCOL = 0x1	// get parallel search columns
-  final val READROW_GETFLAG_GETCLOB = 0x2	// get lob text
-  final val READROW_GETFLAG_GETBLOB = 0x4	// get binary lob.
+  final val READROW_GETFLAG_GETPMCOL : Byte = 0x1	// get parallel search columns
+  final val READROW_GETFLAG_GETCLOB : Byte = 0x2	// get lob text
+  final val READROW_GETFLAG_GETBLOB : Byte = 0x4	// get binary lob.
 
   final val READROW_GETFLAG_GETLOB = (READROW_GETFLAG_GETBLOB|READROW_GETFLAG_GETCLOB)
 
@@ -655,28 +659,28 @@ object gadbrec {
   var bnRes:Array[Byte] = _ ;		// reserved
   } // GADB_SELSTATEMENT;	// size is 2048 +512 bytes
 
-  final val GADB_STMTFLAG_NULLASTRUE = 0x1	// default is false.
+  final val GADB_STMTFLAG_NULLASTRUE : Byte = 0x1	// default is false.
   // GADB_READROWOPT::nFlag
-  final val READROW_FLAG_USEMINMODTIME = 0x1	// using tMinModTime, for blobs, if the modification
+  final val READROW_FLAG_USEMINMODTIME : Byte = 0x1	// using tMinModTime, for blobs, if the modification
   // time if before then we will not got that blob
-  final val READROW_FLAG_ISFREEFORMROW = 0x2
-  final val READROW_FLAG_GETBLOBINFOONLY = 0x4	// only get blob info, not blob it self
+  final val READROW_FLAG_ISFREEFORMROW : Byte = 0x2
+  final val READROW_FLAG_GETBLOBINFOONLY : Byte = 0x4	// only get blob info, not blob it self
 
   // if one column length is larger then given length we prefer it's to be saved in
   // memblob format. this is useful when there is a lot of null values for that column
-  final val READROW_FLAG_PREFERMEMBLOB = 0x8
+  final val READROW_FLAG_PREFERMEMBLOB : Byte = 0x8
 
   // used for non-selection case. if one row is deleted, then does not add one row to the
   // result. if specified the reader will have the responsibility to position given
   // key or sid to specific row in result.
-  final val READROW_FLAG_NOTGETDELROW = 0x10
+  final val READROW_FLAG_NOTGETDELROW : Byte = 0x10
 
   // when getting each row, there may be error generated, if
   // the following flag is set, then error will omitted. else will fail.
-  final val READROW_FLAG_CONTINUEONERROR = 0x20
+  final val READROW_FLAG_CONTINUEONERROR : Byte = 0x20
 
   // drop not exist column
-  final val READROW_FLAG_DROPNONEXISTCOL = 0x40
+  final val READROW_FLAG_DROPNONEXISTCOL : Byte = 0x40
 
   // reading partial lob only.
   final val READROW_FLAG_PARTIALLOB = 0x80	// lower priority then READROW_FLAG_GETBLOBINFOONLY.
@@ -684,8 +688,8 @@ object gadbrec {
   // then this flag will be omitted.
 
   // GADB_READROWOPT::nFlagEx
-  final val READROW_FLAGEX_USERBUF = 0x1	// when getting data, the user has supplied buffer.
-  final val READROW_FLAGEX_COLFIXEDORDER = 0x2	// column has fixed order.
+  final val READROW_FLAGEX_USERBUF : Byte = 0x1	// when getting data, the user has supplied buffer.
+  final val READROW_FLAGEX_COLFIXEDORDER : Byte = 0x2	// column has fixed order.
 
   // this flag has effect on memory blob only. if set, we store blob in pDataBuf(first
   // allocated enough memory) and pointer in memory blob can not freed. this is useful
@@ -694,10 +698,10 @@ object gadbrec {
   //#define	READROW_FLAG_FLATMEMORY			0x20
 
   // GADB_READROWOPT::nPosBy
-  final val READROW_POSBY_KEY = 0x0	// read row by key
-  final val READROW_POSBY_SID = 0x1	// read row by sid
-  final val READROW_POSBY_SELECT = 0x2	// read row by select
-  final val READROW_POSBY_SIDRANGE = 0x3	// read row by sid range.
+  final val READROW_POSBY_KEY : Byte = 0x0	// read row by key
+  final val READROW_POSBY_SID : Byte = 0x1	// read row by sid
+  final val READROW_POSBY_SELECT : Byte = 0x2	// read row by select
+  final val READROW_POSBY_SIDRANGE : Byte = 0x3	// read row by sid range.
 
   class GADB_SAVEROWOPT extends AncientData
   {
@@ -737,102 +741,102 @@ object gadbrec {
   } // GADB_COPYROWOPT;	// size is 32 bytes long
 
   // GADB_SAVEROWOPT::nOldRowExistOption
-  final val SAVEROW_OREOPT_FAIL = 0x0
-  final val SAVEROW_OREOPT_DROP = 0x1
-  final val SAVEROW_OREOPT_REPLACE = 0x2
-  final val SAVEROW_OREOPT_UPDATE = 0x3
-  final val SAVEROW_OREOPT_CHECKTYPE = 0x4	// whether is same or not same.
+  final val SAVEROW_OREOPT_FAIL : Byte = 0x0
+  final val SAVEROW_OREOPT_DROP : Byte = 0x1
+  final val SAVEROW_OREOPT_REPLACE : Byte = 0x2
+  final val SAVEROW_OREOPT_UPDATE : Byte = 0x3
+  final val SAVEROW_OREOPT_CHECKTYPE : Byte = 0x4	// whether is same or not same.
 
   // GADB_SAVEROWOPT::nOldRowExistSameOption is used when not using SID as position parameter
   // GADB_SAVEROWOPT::nOldRowExistSameOption
   // if old and new are same record(by uuid and/or key)
-  final val SAVEROW_OREOPT_SAME_FAIL = 0x0
-  final val SAVEROW_OREOPT_SAME_REPLACE = 0x1	// replace old record
-  final val SAVEROW_OREOPT_SAME_UPDATE = 0x2	// update old record
-  final val SAVEROW_OREOPT_SAME_DROP = 0x3	// drop new record
+  final val SAVEROW_OREOPT_SAME_FAIL : Byte = 0x0
+  final val SAVEROW_OREOPT_SAME_REPLACE : Byte = 0x1	// replace old record
+  final val SAVEROW_OREOPT_SAME_UPDATE : Byte = 0x2	// update old record
+  final val SAVEROW_OREOPT_SAME_DROP : Byte = 0x3	// drop new record
 
   // different row at same position
   // GADB_SAVEROWOPT::nOldRowExistNotSameOption is used when not using SID as position parameter
-  final val SAVEROW_OREOPT_NOTSAME_FAIL = 0x0	// update old record
-  final val SAVEROW_OREOPT_NOTSAME_REPLACE = 0x1	// update old record
-  final val SAVEROW_OREOPT_NOTSAME_DROP = 0x2	// drop new record.
+  final val SAVEROW_OREOPT_NOTSAME_FAIL : Byte = 0x0	// update old record
+  final val SAVEROW_OREOPT_NOTSAME_REPLACE : Byte = 0x1	// update old record
+  final val SAVEROW_OREOPT_NOTSAME_DROP : Byte = 0x2	// drop new record.
 
   // GADB_SAVEROWOPT::nColNotExistOption
-  final val SAVEROW_CNEOPT_FAIL = 0x0	// if column does not exist, fail
-  final val SAVEROW_CNEOPT_DROP = 0x1	// drop non-exist column
+  final val SAVEROW_CNEOPT_FAIL : Byte = 0x0	// if column does not exist, fail
+  final val SAVEROW_CNEOPT_DROP : Byte = 0x1	// drop non-exist column
 
   //GADB_SAVEROWOPT:nPosBy
-  final val SAVEROW_POSBY_NORMAL = 0x1	// if key exists, using key, if key does not exist
+  final val SAVEROW_POSBY_NORMAL : Byte = 0x1	// if key exists, using key, if key does not exist
   // then add it at an unused slot, if table is log
   // mode, add it at table tail
-  final val SAVEROW_POSBY_SID = 0x2	// position by SID, even key exists. the sid can be supplied
+  final val SAVEROW_POSBY_SID : Byte = 0x2	// position by SID, even key exists. the sid can be supplied
   // by function parameters or as one column in results.
-  final val SAVEROW_POSBY_KEY = 0x3
+  final val SAVEROW_POSBY_KEY : Byte = 0x3
 
   // GADB_SAVEROWOPT::nPosFlag
-  final val SAVEROW_POSFLAG_USESIDINHEAD = 0x1	// if sid are supplied both through column name
+  final val SAVEROW_POSFLAG_USESIDINHEAD : Byte = 0x1	// if sid are supplied both through column name
   // and row head, then using sid in row head.
 
   // GADB_SAVEROWOPT::nOldRowNotExistOption
-  final val SAVEROW_ORNOPT_NEW = 0x0	// new record, if old not exist(key or pos).
-  final val SAVEROW_ORNOPT_FAIL = 0x1	// if old record not exist, fail.
-  final val SAVEROW_ORNOPT_DROP = 0x2	// drop new record.	// so it's update
+  final val SAVEROW_ORNOPT_NEW : Byte = 0x0	// new record, if old not exist(key or pos).
+  final val SAVEROW_ORNOPT_FAIL : Byte = 0x1	// if old record not exist, fail.
+  final val SAVEROW_ORNOPT_DROP : Byte = 0x2	// drop new record.	// so it's update
 
   // GADB_SAVEROWOPT::nFlag
-  final val SAVEROW_FLAG_NOTUSEINDEX = 0x1	// not use index(do not change).
-  final val SAVEROW_FLAG_USEOLDPOS = 0x2	// if savebysid and old record exist(not at same sid)
+  final val SAVEROW_FLAG_NOTUSEINDEX : Byte = 0x1	// not use index(do not change).
+  final val SAVEROW_FLAG_USEOLDPOS : Byte = 0x2	// if savebysid and old record exist(not at same sid)
   // then do not using sid specified.
-  final val SAVEROW_FLAG_ERRCONTINUE = 0x4	// if meet error continue.
+  final val SAVEROW_FLAG_ERRCONTINUE : Byte = 0x4	// if meet error continue.
   // default is break.
-  final val SAVEROW_FLAG_CHKSAMEROWKEY = 0x8	// if notuseindex specified, and old and new row is
+  final val SAVEROW_FLAG_CHKSAMEROWKEY : Byte = 0x8	// if notuseindex specified, and old and new row is
   // in same position, check key match or not.
-  final val SAVEROW_FLAG_UUIDIDENTIFY = 0x10	// using uuid to identify whether is same row( if
+  final val SAVEROW_FLAG_UUIDIDENTIFY : Byte = 0x10	// using uuid to identify whether is same row( if
   // has key using key first)
-  final val SAVEROW_FLAG_FAILCONTINUE = 0x20	// ERRCONTINUE is some error occurred, while FAILCONTINUE
+  final val SAVEROW_FLAG_FAILCONTINUE : Byte = 0x20	// ERRCONTINUE is some error occurred, while FAILCONTINUE
   // means one option is fail for some case.
 
   /*
   // GADB_SAVEROWOPT::nNoKeyOldNewMatchOption
-  final val SAVEROW_ONMOPT_VIEWASSAME = 0x0
-  final val SAVEROW_ONMOPT_VIEWASNOTSAME = 0x1
-  final val SAVEROW_ONMOPT_BYUUID = 0x2
+  final val SAVEROW_ONMOPT_VIEWASSAME : Byte = 0x0
+  final val SAVEROW_ONMOPT_VIEWASNOTSAME : Byte = 0x1
+  final val SAVEROW_ONMOPT_BYUUID : Byte = 0x2
   */
 
   // GADB_SAVEROWOPT::nCellFlag
-  final val SAVEROW_CELLFLAG_CUTSOURCE = 0x2	// SETCOLOPT_FLAG_CUTSOURCE
-  final val SAVEROW_CELLFLAG_NULLLONGSRC = 0x4	// SETCOLOPT_FLAG_NULLLONGSRC
+  final val SAVEROW_CELLFLAG_CUTSOURCE : Byte = 0x2	// SETCOLOPT_FLAG_CUTSOURCE
+  final val SAVEROW_CELLFLAG_NULLLONGSRC : Byte = 0x4	// SETCOLOPT_FLAG_NULLLONGSRC
 
   // GADB_SAVEROWOPT::nSaveMode, 0 is not ok.
-  final val SAVEROW_SAVEMODE_NORMAL = 0x1
-  final val SAVEROW_SAVEMODE_CREATELIB = 0x2	// batch mode.
-  final val SAVEROW_SAVEMODE_UPDATELIB = 0x3	// batch mode.
-  final val SAVEROW_SAVEMODE_ASYNCCREATE = 0x4
-  final val SAVEROW_SAVEMODE_ASYNCUPDATE = 0x5
+  final val SAVEROW_SAVEMODE_NORMAL : Byte = 0x1
+  final val SAVEROW_SAVEMODE_CREATELIB : Byte = 0x2	// batch mode.
+  final val SAVEROW_SAVEMODE_UPDATELIB : Byte = 0x3	// batch mode.
+  final val SAVEROW_SAVEMODE_ASYNCCREATE : Byte = 0x4
+  final val SAVEROW_SAVEMODE_ASYNCUPDATE : Byte = 0x5
 
   // sync : means row position is same for source and target.
   // async : position is unimportant.
-  final val SAVEROW_SAVEMODE_SYNCCREATE = 0x6
-  final val SAVEROW_SAVEMODE_SYNCUPDATE = 0x7
+  final val SAVEROW_SAVEMODE_SYNCCREATE : Byte = 0x6
+  final val SAVEROW_SAVEMODE_SYNCUPDATE : Byte = 0x7
 
   // GADB_SAVEROWOPT::nOption
-  final val SAVEROW_OPT_NOTSAVEDELROW = 0x1	//
-  final val SAVEROW_OPT_COPYMODE = 0x2	// in this mode, we reserve almost all inner columns
-  final val SAVEROW_OPT_NEWCREATIONTIME = 0x4	// if SAVEROW_OPT_COPYMODE flag set, the creation time
+  final val SAVEROW_OPT_NOTSAVEDELROW : Byte = 0x1	//
+  final val SAVEROW_OPT_COPYMODE : Byte = 0x2	// in this mode, we reserve almost all inner columns
+  final val SAVEROW_OPT_NEWCREATIONTIME : Byte = 0x4	// if SAVEROW_OPT_COPYMODE flag set, the creation time
   // will be reserved, but this indicates not reserve it.
-  final val SAVEROW_OPT_NEWUPDATETIME = 0x8	// not keep old update time.
-  final val SAVEROW_OPT_NEWLOBUPDATETIME = 0x10	// when save selres, set new lob update time.
-  final val SAVEROW_OPT_ASYNCBKPKEYUUID = 0x20	// if do async backup(save mode), using key and uuid to identify
+  final val SAVEROW_OPT_NEWUPDATETIME : Byte = 0x8	// not keep old update time.
+  final val SAVEROW_OPT_NEWLOBUPDATETIME : Byte = 0x10	// when save selres, set new lob update time.
+  final val SAVEROW_OPT_ASYNCBKPKEYUUID : Byte = 0x20	// if do async backup(save mode), using key and uuid to identify
   // each row, default is not using uuid.(to be compatible with some
   // application that does not copy uuid).
-  final val SAVEROW_OPT_UPDNOINTERTIMECHANGE = 0x40	// when update, does not change update user and update time.
+  final val SAVEROW_OPT_UPDNOINTERTIMECHANGE : Byte = 0x40	// when update, does not change update user and update time.
   final val SAVEROW_OPT_COPYISAROW = 0x80	// when update, copy isa row.
 
   // GADB_SAVEROWOPT::nBkpDelRowType
   // the following options used for backup rows to be deleted when updating data.
-  final val SAVEROW_BKPDEL_NOBKP = 0x0	// does not backup deleted row. sync used only.
-  final val SAVEROW_BKPDEL_BKPOLDEST = 0x1	// backup one copy, backup the oldest.
-  final val SAVEROW_BKPDEL_BKPLATEST = 0x2	// backup one copy, backup the latest.
-  final val SAVEROW_BKPDEL_BKPMULTI = 0x3	// backup more than one copy
+  final val SAVEROW_BKPDEL_NOBKP : Byte = 0x0	// does not backup deleted row. sync used only.
+  final val SAVEROW_BKPDEL_BKPOLDEST : Byte = 0x1	// backup one copy, backup the oldest.
+  final val SAVEROW_BKPDEL_BKPLATEST : Byte = 0x2	// backup one copy, backup the latest.
+  final val SAVEROW_BKPDEL_BKPMULTI : Byte = 0x3	// backup more than one copy
 
   // we submit some simple condition to retrieve
   class GADB_ROWRETRSTRUCT extends AncientData
@@ -866,10 +870,10 @@ object gadbrec {
   } // GADB_ROWRETRSTRUCT;	// size is 256 bytes
 
   // the following structures are added on jun.23, 2003
-  final val GADB_SERIAL_ITEMTYPE_UNKONW = 0x0
-  final val GADB_SERIAL_ITEMTYPE_CT = 0x1
-  final val GADB_SERIAL_ITEMTYPE_ISA = 0x2
-  final val GADB_SERIAL_ITEMTYPE_BLOB = 0x3
+  final val GADB_SERIAL_ITEMTYPE_UNKONW : Byte = 0x0
+  final val GADB_SERIAL_ITEMTYPE_CT : Byte = 0x1
+  final val GADB_SERIAL_ITEMTYPE_ISA : Byte = 0x2
+  final val GADB_SERIAL_ITEMTYPE_BLOB : Byte = 0x3
 
   final val GADB_SERIAL_ALIGNAT = 16
 
@@ -916,31 +920,31 @@ object gadbrec {
   //  +------------------------+
   ///////////////////end of new added structures
   //////////////////
-  final val GADB_ROWRETR_ITEMFLAG_KEYWILD = 0x1
-  final val GADB_ROWRETR_ITEMFLAG_ADDTIME = 0x2
-  final val GADB_ROWRETR_ITEMFLAG_LASTEDITTIME = 0x4
-  final val GADB_ROWRETR_ITEMFLAG_MAXTOGET = 0x8
-  final val GADB_ROWRETR_ITEMFLAG_CNAMEWILD = 0x10
-  final val GADB_ROWRETR_ITEMFLAG_MNAMEWILD = 0x20
-  final val GADB_ROWRETR_ITEMFLAG_SIDRANGE = 0x40
+  final val GADB_ROWRETR_ITEMFLAG_KEYWILD : Byte = 0x1
+  final val GADB_ROWRETR_ITEMFLAG_ADDTIME : Byte = 0x2
+  final val GADB_ROWRETR_ITEMFLAG_LASTEDITTIME : Byte = 0x4
+  final val GADB_ROWRETR_ITEMFLAG_MAXTOGET : Byte = 0x8
+  final val GADB_ROWRETR_ITEMFLAG_CNAMEWILD : Byte = 0x10
+  final val GADB_ROWRETR_ITEMFLAG_MNAMEWILD : Byte = 0x20
+  final val GADB_ROWRETR_ITEMFLAG_SIDRANGE : Byte = 0x40
 
   // values for GADB_ROWRETRSTRUCT::nOption
-  final val GADB_ROWRETR_OPT_GETSID = 0x1	// does not get key but get sid
-  final val GADB_ROWRETR_OPT_NOTGETDEL = 0x2	// does not get delete row
+  final val GADB_ROWRETR_OPT_GETSID : Byte = 0x1	// does not get key but get sid
+  final val GADB_ROWRETR_OPT_NOTGETDEL : Byte = 0x2	// does not get delete row
 
 
-  final val COLCOPY_OPT_UPDATE = 0x1
-  final val COLCOPY_OPT_CREATENEW = 0x2
-  final val COLCOPY_OPT_NOCONTIGUOUS = 0x4	// does not need records that status is unused
+  final val COLCOPY_OPT_UPDATE : Byte = 0x1
+  final val COLCOPY_OPT_CREATENEW : Byte = 0x2
+  final val COLCOPY_OPT_NOCONTIGUOUS : Byte = 0x4	// does not need records that status is unused
 
   /////////////////////////////////////////////////////////////
 
 
-  final val TABLE_ADDOPT_APPEND = 0x1	// append mode
+  final val TABLE_ADDOPT_APPEND : Byte = 0x1	// append mode
 
   // AllocBlock Option
-  final val ALLOCBLOCK_OPT_NOTADD2SIDFILE = 0x1
-  final val ALLOCBLOCK_OPT_NOLOCK = 0x2
+  final val ALLOCBLOCK_OPT_NOTADD2SIDFILE : Byte = 0x1
+  final val ALLOCBLOCK_OPT_NOLOCK : Byte = 0x2
 
   // we using the following routine to specify a number of records/rows
   class GADB_ROWPOSSTRUCT extends AncientData
@@ -1018,11 +1022,11 @@ object gadbrec {
   } // GADB_ROWMODCACHE;	// size of this structure is 128 bytes long
 
 
-  final val MROWOPT_NOTADDZEROLENBLOB = 0x1	//
-  final val MROWOPT_OMMITNONEXISTCOL = 0x2	// omit non exist column
-  final val MROWOPT_CUTSOURCE = 0x4	// if source data length is longer then target buffer
+  final val MROWOPT_NOTADDZEROLENBLOB : Byte = 0x1	//
+  final val MROWOPT_OMMITNONEXISTCOL : Byte = 0x2	// omit non exist column
+  final val MROWOPT_CUTSOURCE : Byte = 0x4	// if source data length is longer then target buffer
   // then cut source data. using for setcolumn
-  final val MROWOPT_ISNEWADD = 0x8
+  final val MROWOPT_ISNEWADD : Byte = 0x8
 
   // the following structure is used to reference a column in GADB_SELRESULT
   // structure.
@@ -1044,8 +1048,8 @@ object gadbrec {
   var nFlag:Byte = _ ;		// GADB_RETVALFLAG_XXX
   } // GADB_RETVAL;	// size is 8 bytes long.
 
-  final val GADB_RETVALFLAG_HASOP = 0x1	//
-  final val GADB_RETVALFLAG_FAILED = 0x2
+  final val GADB_RETVALFLAG_HASOP : Byte = 0x1	//
+  final val GADB_RETVALFLAG_FAILED : Byte = 0x2
 
   // read write.
   class GADB_NORMALRES extends AncientData
@@ -1067,7 +1071,7 @@ object gadbrec {
   } //GADB_NORMALRES;	// 128 bytes long.
 
   // GADB_NORMALRES::nOption
-  final val GADB_NORMALRESOPT_FIXEDROWSIZE = 0x1
+  final val GADB_NORMALRESOPT_FIXEDROWSIZE : Byte = 0x1
 
 
   class GADB_COLDATA extends AncientData
@@ -1111,8 +1115,8 @@ object gadbrec {
 
 
   // GADB_SELRES_BuildNullFlag::nOption
-  final val GADB_BNFLAG_BLANKSTRASNULL = 0x1	// blank string as null.
-  final val GADB_BNFLAG_ZEROLENLOBASNULL = 0x2	// if lob lengh is zero then view it as null.
+  final val GADB_BNFLAG_BLANKSTRASNULL : Byte = 0x1	// blank string as null.
+  final val GADB_BNFLAG_ZEROLENLOBASNULL : Byte = 0x2	// if lob lengh is zero then view it as null.
 
 }
 
