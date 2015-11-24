@@ -17,6 +17,7 @@ class V62Facade(config:HallV62Config)
   with ganetdbp
   with ganetlp
   with gnetflib
+  with nettable
   with AncientClientSupport
   with LoggerSupport{
   private val address = V62ServerAddress(config.host,config.port,config.user,Option(config.password))

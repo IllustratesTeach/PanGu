@@ -13,6 +13,8 @@ import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
 import org.jboss.netty.buffer.ChannelBuffers
 
+import scala.collection.mutable
+
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -419,9 +421,10 @@ trait gnetcsr {
   def GAFIS_NETSCR_SendSelItemToSelect(channel:ChannelOperator,pstRes:GADB_SELRESULT) {
     channel.writeMessage(pstRes)
     if(pstRes.nResItemCount > 0 ){
-      if(pstRes.pstItem_Data == null)
+      if(pstRes.pstItem_Data == null) {
         throw new IllegalArgumentException("nResItemCount(%s) greater than 0,but  pstItem_Data is null".format(pstRes.nResItemCount))
-      pstRes.pstItem_Data.foreach(channel.writeMessage(_))
+      }
+      pstRes.pstItem_Data.foreach(channel.writeMessage[NoneResponse](_))
     }
   }
   def GAFIS_NETSCR_RecvSelResult(channel:ChannelOperator,pstRes:GADB_SELRESULT){
@@ -462,6 +465,7 @@ trait gnetcsr {
         nRowCnt = pstRes.nRecGot
         nRowSize = pstRes.nSegSize
         var nBlobSize = 0
+        var buf = mutable.Buffer[GADB_MEMBLOB]()
         do {
           response = channel.receive[GNETANSWERHEADOBJECT]()
           val i = CodeHelper.convertAsInt(response.bnData);	// column
@@ -482,11 +486,14 @@ trait gnetcsr {
 
             pstBlob.pData_Data = channel.receiveByteArray(nBlobSize).array()
 
+            buf += pstBlob
           }
-        } while(nBlobSize>0 );
+        } while(nBlobSize>0 )
+
+        //set result
+        pstRes.pDataBuf_Result = buf.toArray
       }
     }
-
 
     if(bNeedSend > 0) {
       response.nReturnValue = -1

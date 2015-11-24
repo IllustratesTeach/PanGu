@@ -23,7 +23,7 @@ trait nettable {
     pReq.nOpCode = gnopcode.OP_TABLE_SELECT.toShort
 
 
-    var pAns = channel.receive[GNETANSWERHEADOBJECT]()
+    var pAns = channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
     validateResponse(channel,pAns)
 
     GAFIS_NETSCR_SendSelItemToSelect(channel, pstRes)

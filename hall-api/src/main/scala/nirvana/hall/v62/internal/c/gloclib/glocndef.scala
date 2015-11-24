@@ -53,7 +53,9 @@ object glocndef {
     @Length(8)
     var szMagicStr:String = GNRHO_MAGICSTR ;		// must be G@xucg$
   var nDataLen:Int = _ ;		// data length followed
-  var nReturnValue:Long = _ ;	// return values
+  var nReturnValue:Int= _ ;	// return values
+    @Length(4)
+    var nReturnValueRes:Array[Byte]= _ ;	// return values
   @Length(4)
   var bnRes:Array[Byte] = _ ;			// 8 bytes reserved
   @Length(64)
