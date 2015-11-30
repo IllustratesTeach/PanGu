@@ -37,6 +37,7 @@ object AncientData extends WrapAsStreamWriter{
     def writeShort(i:Int)
     def writeLong(i:Long)
     def writeBytes(src:Array[Byte])
+    def writeZero(length:Int)
   }
 }
 
@@ -53,6 +54,19 @@ trait WrapAsStreamWriter {
           def writeBytes(src: Array[Byte]): Unit = dataSink.write(src, 0, src.length)
           def writeLong(i: Long): Unit = dataSink.write(i)
           def writeByte(byte: Int): Unit = dataSink.write(byte.toByte)
+          def writeZero(length:Int):Unit = {
+            val nLong = length >>> 3
+            val nBytes = length & 7
+            0 until nLong foreach(x=>writeLong(0))
+            if (nBytes == 4) {
+              writeInt(0)
+            } else if (nBytes < 4) {
+              0 until nBytes foreach(x=>writeByte(0))
+            } else {
+              writeInt(0)
+              0 until (nBytes - 4) foreach(x=>writeByte(0))
+            }
+          }
         }
       case buffer: ChannelBuffer =>
         buffer
@@ -156,16 +170,13 @@ trait ScalaReflect{
       def writeString(str:String,length:Int): Unit ={
         if(str == null) writeBytes(null,length) else writeBytes(str.getBytes,length)
       }
-      def skip(length:Int): Unit ={
-        0 until length foreach(x=>dataSink.writeByte(0.asInstanceOf[Byte]))
-      }
       def writeBytes(bytes:Array[Byte],length:Int): Unit ={
         val bytesLength = if(bytes == null) 0 else bytes.length
         val zeroLength = length - bytesLength
         if(bytes != null)
           dataSink.writeBytes(bytes)
         if(zeroLength > 0)
-          skip(zeroLength)
+          dataSink.writeZero(zeroLength)
       }
 
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
@@ -179,8 +190,8 @@ trait ScalaReflect{
           writeString(value.asInstanceOf[String],returnLengthOrThrowException)
         case t if t <:< typeOf[ScalaReflect] => //inherit ScalaReflect
           if(value == null) {
-            val len: Int = createAncientDataByType(t).getDataSize
-            skip(len)
+            val len = createAncientDataByType(t).getDataSize
+            dataSink.writeZero(len)
           }else{
             value.asInstanceOf[ScalaReflect].writeToStreamWriter(dataSink)
           }
@@ -196,7 +207,7 @@ trait ScalaReflect{
             zeroLen = (len-ancientDataArray.length) * type_len
           }
           if(zeroLen >0)
-            skip(zeroLen)
+            dataSink.writeZero(zeroLen)
         case other =>
           throw new IllegalArgumentException("type is not supported "+other)
       }
