@@ -44,7 +44,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
             throw new IllegalAccessException("fail to write byte array")
           }
           */
-          el.writeToDataSink(connection)
+          el.writeToStreamWriter(connection)
         case el:Array[Byte] =>
           connection.write(el,0,el.length)
         case other=>

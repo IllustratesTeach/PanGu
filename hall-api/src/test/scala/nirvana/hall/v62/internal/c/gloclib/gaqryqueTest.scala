@@ -19,7 +19,7 @@ class gaqryqueTest {
     queryStruct.stKeyRange = Array[GAKEYRANGESTRUCT](range1)
     Assert.assertEquals(512,queryStruct.getDataSize)
     val buffer = ChannelBuffers.buffer(512)
-    queryStruct.writeToChannelBuffer(buffer)
+    queryStruct.writeToStreamWriter(buffer)
     Assert.assertEquals(512,buffer.writerIndex())
 
     val queryStruct2 = new GAQUERYSTRUCT

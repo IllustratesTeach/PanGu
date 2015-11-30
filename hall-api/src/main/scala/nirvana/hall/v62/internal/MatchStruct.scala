@@ -103,9 +103,9 @@ object MatchStruct {
     itemPackage.nBufSize = itemPackage.nDataLen
 
     val buffer = ChannelBuffers.buffer(itemPackage.nDataLen)
-    itemPackage.writeToChannelBuffer(buffer)
-    itemHead.writeToChannelBuffer(buffer)
-    item.writeToChannelBuffer(buffer)
+    itemPackage.writeToStreamWriter(buffer)
+    itemHead.writeToStreamWriter(buffer)
+    item.writeToStreamWriter(buffer)
 
     queryStruct.pstQryCond_Data = buffer.array()
     queryStruct.nQryCondLen = queryStruct.pstQryCond_Data.length

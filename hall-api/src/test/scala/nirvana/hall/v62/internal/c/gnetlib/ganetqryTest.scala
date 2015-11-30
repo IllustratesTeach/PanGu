@@ -90,12 +90,12 @@ class ganetqryTest {
     itemPackage.nBufSize = itemPackage.nDataLen
 
     val buffer = ChannelBuffers.buffer(itemPackage.nDataLen)
-    itemPackage.writeToChannelBuffer(buffer)
+    itemPackage.writeToStreamWriter(buffer)
 
-    itemHead.writeToChannelBuffer(buffer)
-    item.writeToChannelBuffer(buffer)
+    itemHead.writeToStreamWriter(buffer)
+    item.writeToStreamWriter(buffer)
 
-    itemHead2.writeToChannelBuffer(buffer)
+    itemHead2.writeToStreamWriter(buffer)
     buffer.writeBytes(xmlData)
 
 
