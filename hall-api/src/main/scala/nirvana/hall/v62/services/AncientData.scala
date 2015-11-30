@@ -20,8 +20,11 @@ import scala.reflect.runtime.universe.definitions._
  * @since 2015-10-29
  */
 object AncientData {
+  //global scala reflect mirror
   val mirror = universe.runtimeMirror(getClass.getClassLoader)
   val STRING_CLASS = typeOf[String]
+
+  /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
   type StreamReader = {
     def readByte(): Byte
     def readShort(): Short
@@ -34,8 +37,13 @@ trait ScalaReflect{
   private val clazzSymbol = instanceMirror.symbol
   private val clazzType = clazzSymbol.asType.toType
 
+  //self type data size by member data type
   private var dataSize:Int = 0
-  private def findBaseLength(tpe:Type,length:Int):Int={
+
+  /**
+   * find primitive data type length
+   */
+  private def findPrimitiveTypeLength(tpe:Type,length:Int):Int={
     def returnLengthOrThrowException:Int={
       if(length == 0)
         throw new IllegalArgumentException("@Length not defined @"+tpe)
@@ -58,14 +66,20 @@ trait ScalaReflect{
       case TypeRef(pre,sym,args) if sym == typeOf[Array[_]].typeSymbol =>
         if(args.length != 1)
           throw new IllegalArgumentException("only support one type parameter in Array.")
-        returnLengthOrThrowException * findBaseLength(args.head,0)
+        //using recursive call to find length
+        returnLengthOrThrowException * findPrimitiveTypeLength(args.head,0)
       case other =>
         throw new IllegalArgumentException("type is not supported "+other)
     }
   }
+
+  /**
+   * calculate data size and return.
+   * @return data size
+   */
   def getDataSize:Int={
     if(dataSize == 0) {
-      dataSize = internalProcessField((symbol,length)=>findBaseLength(symbol.info,length)).sum
+      dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol.info,length)).sum
     }
     dataSize
   }
@@ -76,7 +90,7 @@ trait ScalaReflect{
       .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
       .toSeq.reverse // <----- must be reversed
       .map{ m =>
-      //find @Length annotation
+      //find @Length annotation and get value
       val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
       val length = lengthAnnotation.map(_.tree).map{
         case Apply(fun, AssignOrNamedArg(name,Literal(Constant(value)))::Nil)=>
@@ -131,7 +145,7 @@ trait ScalaReflect{
         case LongTpe => dataSink.write(value.asInstanceOf[Long])
         case AncientData.STRING_CLASS =>
           writeString(value.asInstanceOf[String],returnLengthOrThrowException)
-        case t if t <:< typeOf[ScalaReflect] =>
+        case t if t <:< typeOf[ScalaReflect] => //inherit ScalaReflect
           if(value == null) {
             val len: Int = createAncientDataByType(t).getDataSize
             skip(len)
@@ -140,7 +154,7 @@ trait ScalaReflect{
           }
         case t  if t =:= typeOf[Array[Byte]] =>
           writeBytes(value.asInstanceOf[Array[Byte]],returnLengthOrThrowException)
-        case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol =>
+        case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol => //Array of ScalaReflect
           val len = returnLengthOrThrowException
           val type_len = createAncientDataByType(args.head).getDataSize
           var zeroLen = type_len * len
