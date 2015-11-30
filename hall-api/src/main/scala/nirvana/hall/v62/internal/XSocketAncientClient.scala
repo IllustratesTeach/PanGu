@@ -2,10 +2,12 @@ package nirvana.hall.v62.internal
 
 import java.net.InetAddress
 
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
+import nirvana.hall.v62.services.AncientData._
 
 import scala.reflect._
 

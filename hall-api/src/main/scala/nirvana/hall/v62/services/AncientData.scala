@@ -45,39 +45,30 @@ object AncientData extends WrapAsStreamWriter{
  * wrap netty's ChannelBuffer and xSocket's IDataSink
  */
 trait WrapAsStreamWriter {
-  def asStreamWriter[T](stream: T): StreamWriter = {
-    stream match {
-      case dataSink: IDataSink =>
-        new {
-          def writeShort(i: Int): Unit = dataSink.write(i.toShort)
-          def writeInt(i: Int): Unit = dataSink.write(i)
-          def writeBytes(src: Array[Byte]): Unit = dataSink.write(src, 0, src.length)
-          def writeLong(i: Long): Unit = dataSink.write(i)
-          def writeByte(byte: Int): Unit = dataSink.write(byte.toByte)
-          def writeZero(length:Int):Unit = {
-            if (length == 0) {
-              return
-            }
-            if (length < 0) {
-              throw new IllegalArgumentException("length must be 0 or greater than 0.")
-            }
-            val nLong = length >>> 3
-            val nBytes = length & 7
-            0 until nLong foreach(x=>writeLong(0))
-            if (nBytes == 4) {
-              writeInt(0)
-            } else if (nBytes < 4) {
-              0 until nBytes foreach(x=>writeByte(0))
-            } else {
-              writeInt(0)
-              0 until (nBytes - 4) foreach(x=>writeByte(0))
-            }
-          }
-        }
-      case buffer: ChannelBuffer =>
-        buffer
-      case other =>
-        throw new IllegalArgumentException("type:%s unspported".format(other))
+  implicit def asStreamWriter(dataSink: IDataSink): StreamWriter = new {
+    def writeShort(i: Int): Unit = dataSink.write(i.toShort)
+    def writeInt(i: Int): Unit = dataSink.write(i)
+    def writeBytes(src: Array[Byte]): Unit = dataSink.write(src, 0, src.length)
+    def writeLong(i: Long): Unit = dataSink.write(i)
+    def writeByte(byte: Int): Unit = dataSink.write(byte.toByte)
+    def writeZero(length: Int): Unit = {
+      if (length == 0) {
+        return
+      }
+      if (length < 0) {
+        throw new IllegalArgumentException("length must be 0 or greater than 0.")
+      }
+      val nLong = length >>> 3
+      val nBytes = length & 7
+      0 until nLong foreach (x => writeLong(0))
+      if (nBytes == 4) {
+        writeInt(0)
+      } else if (nBytes < 4) {
+        0 until nBytes foreach (x => writeByte(0))
+      } else {
+        writeInt(0)
+        0 until (nBytes - 4) foreach (x => writeByte(0))
+      }
     }
   }
 }
@@ -164,8 +155,8 @@ trait ScalaReflect{
    * serialize to channel buffer
    * @param stream netty channel buffer
    */
-  def writeToStreamWriter[T](stream:T): T= {
-    val dataSink = AncientData.asStreamWriter(stream)
+  def writeToStreamWriter[T](stream:T)(implicit converter:T=> StreamWriter): T= {
+    val dataSink = converter(stream)
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={

@@ -8,6 +8,7 @@ import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 import org.xsocket.datagram.UserDatagram
+import nirvana.hall.v62.services.AncientData._
 
 /**
  *
