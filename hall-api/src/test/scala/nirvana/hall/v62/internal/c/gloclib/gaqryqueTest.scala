@@ -23,7 +23,7 @@ class gaqryqueTest {
     Assert.assertEquals(512,buffer.writerIndex())
 
     val queryStruct2 = new GAQUERYSTRUCT
-    queryStruct2.fromChannelBuffer(buffer)
+    queryStruct2.fromStreamReader(buffer)
     Assert.assertEquals(2,queryStruct2.stKeyRange.size)
     Assert.assertEquals(range1.szStartKey,queryStruct2.stKeyRange(0).szStartKey)
 

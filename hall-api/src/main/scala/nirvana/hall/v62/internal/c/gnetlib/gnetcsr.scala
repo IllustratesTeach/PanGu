@@ -479,7 +479,7 @@ trait gnetcsr {
             val n = pstRes.pstItem_Data(i).nDataOffset
             val pstBlob= new  GADB_MEMBLOB
             val buffer = ChannelBuffers.wrappedBuffer(pstRes.pDataBuf_Data,k*nRowSize + n,pstBlob.getDataSize)
-            pstBlob.fromDataSource(buffer)
+            pstBlob.fromStreamReader(buffer)
 
             //val pstBlob = (GADB_MEMBLOB *)(pstRes -> pDataBuf + k * nRowSize + n);
             //ZMALLOC_GOTOFIN(pstBlob -> u.pData, UCHAR *, nBlobSize);

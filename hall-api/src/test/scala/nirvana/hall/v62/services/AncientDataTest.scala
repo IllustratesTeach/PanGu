@@ -48,7 +48,7 @@ class AncientDataTest {
     byteBuffer.reset()
 
     val connection2 = new UserDatagram(byteBuffer)
-    val m2 = new M().fromDataSource(connection2)
+    val m2 = new M().fromStreamReader(connection2)
 
     Assert.assertEquals(m.str,m2.str)
     Assert.assertEquals(m.n.head.aN.head,m2.n.head.aN.head)
@@ -67,7 +67,7 @@ class AncientDataTest {
     m.writeToChannelBuffer(buffer)
     Assert.assertFalse(buffer.writable())
 
-    val m2 = new M().fromChannelBuffer(buffer)
+    val m2 = new M().fromStreamReader(buffer)
     Assert.assertFalse(buffer.readable())
 
     Assert.assertEquals(m.str,m2.str)
@@ -84,7 +84,7 @@ class AncientDataTest {
     val bytes = buffer.array()
 
     val header2 = new GNETREQUESTHEADOBJECT
-    header2.fromDataSource(buffer)
+    header2.fromStreamReader(buffer)
 
     Assert.assertEquals(header.szMagicStr,header2.szMagicStr)
     Assert.assertEquals(header.nIP,header2.nIP)

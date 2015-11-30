@@ -93,7 +93,7 @@ trait SendMatchTaskSupport {
         val bytes = buffer.toByteBuffer().array()
 
         candHead = new GAQUERYCANDHEADSTRUCT
-        candHead.fromChannelBuffer(buffer)
+        candHead.fromStreamReader(buffer)
       }
       if(matchResult.nCandLen > 0) {
         val buffer = channel.receiveByteArray(matchResult.nCandLen)
@@ -101,7 +101,7 @@ trait SendMatchTaskSupport {
         debug("cand num:{}",num)
         val result = 0 until num map{i=>
           val cand = new GAQUERYCANDSTRUCT
-          cand.fromChannelBuffer(buffer)
+          cand.fromStreamReader(buffer)
           debug("sid:{} pos:{} score:{}",convertSixByteArrayToLong(cand.nSID),cand.nIndex,cand.nScore)
           cand
         }

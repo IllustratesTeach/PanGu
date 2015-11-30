@@ -77,7 +77,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
 
     override def receive[R <: AncientData](target:R): R = {
-      target.fromDataSource(connection)
+      target.fromStreamReader(connection)
     }
     override def receive[R <: AncientData :ClassTag](): R = {
       classTag[R] match{
@@ -87,7 +87,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
           new NoneResponse().asInstanceOf[R]
         case _ =>
           val dataInstance = classTag[R].runtimeClass.newInstance().asInstanceOf[R]
-          dataInstance.fromDataSource(connection)
+          dataInstance.fromStreamReader(connection)
           /*
           val buffer = receiveByteArray(dataInstance.getDataSize)
           dataInstance.fromChannelBuffer(buffer).asInstanceOf[R]
