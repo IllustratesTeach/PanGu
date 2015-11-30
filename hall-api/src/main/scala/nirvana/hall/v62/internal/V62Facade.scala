@@ -22,6 +22,7 @@ class V62Facade(config:HallV62Config)
   with gnetfunc
   with AncientClientSupport
   with LoggerSupport{
-  private val address = V62ServerAddress(config.host,config.port,config.user,Option(config.password))
+  private val address = V62ServerAddress(config.host,config.port,
+    config.connectionTimeoutSecs,config.readTimeoutSecs,config.user,Option(config.password))
   override def serverAddress: V62ServerAddress = address
 }

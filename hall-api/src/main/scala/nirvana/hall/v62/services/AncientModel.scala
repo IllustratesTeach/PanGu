@@ -25,7 +25,7 @@ class MatchOptions{
  * @param host 6.2 server host
  * @param port bind port
  */
-case class V62ServerAddress(host:String,port:Int,user:String,password:Option[String]=None)
+case class V62ServerAddress(host:String,port:Int,connectionTimeoutSecs:Int,readTimeoutSecs:Int,user:String,password:Option[String]=None)
 
 /**
  * database table definition

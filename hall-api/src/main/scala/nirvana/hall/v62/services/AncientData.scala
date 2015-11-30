@@ -14,7 +14,7 @@ import scala.reflect.runtime.universe.definitions._
 
 
 /**
- * support to serialize/unserialize data
+ * support to serialize/deserialize data
  * TODO using byte transformation to convert data
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
@@ -27,7 +27,6 @@ object AncientData {
     def readShort(): Short
     def readInt(): Int
     def readLong(): Long
-    def readDouble(): Double
   }
 }
 trait ScalaReflect{
