@@ -55,6 +55,12 @@ trait WrapAsStreamWriter {
           def writeLong(i: Long): Unit = dataSink.write(i)
           def writeByte(byte: Int): Unit = dataSink.write(byte.toByte)
           def writeZero(length:Int):Unit = {
+            if (length == 0) {
+              return
+            }
+            if (length < 0) {
+              throw new IllegalArgumentException("length must be 0 or greater than 0.")
+            }
             val nLong = length >>> 3
             val nBytes = length & 7
             0 until nLong foreach(x=>writeLong(0))
@@ -173,10 +179,10 @@ trait ScalaReflect{
       def writeBytes(bytes:Array[Byte],length:Int): Unit ={
         val bytesLength = if(bytes == null) 0 else bytes.length
         val zeroLength = length - bytesLength
-        if(bytes != null)
+        if(bytes != null) {
           dataSink.writeBytes(bytes)
-        if(zeroLength > 0)
-          dataSink.writeZero(zeroLength)
+        }
+        dataSink.writeZero(zeroLength)
       }
 
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
@@ -193,7 +199,7 @@ trait ScalaReflect{
             val len = createAncientDataByType(t).getDataSize
             dataSink.writeZero(len)
           }else{
-            value.asInstanceOf[ScalaReflect].writeToStreamWriter(dataSink)
+            value.asInstanceOf[ScalaReflect].writeToStreamWriter(stream)
           }
         case t  if t =:= typeOf[Array[Byte]] =>
           writeBytes(value.asInstanceOf[Array[Byte]],returnLengthOrThrowException)
@@ -203,11 +209,12 @@ trait ScalaReflect{
           var zeroLen = type_len * len
           if(value != null){
             val ancientDataArray = value.asInstanceOf[Array[ScalaReflect]].filterNot( _ == null)
-            ancientDataArray.foreach(_.writeToStreamWriter(dataSink))
-            zeroLen = (len-ancientDataArray.length) * type_len
+            ancientDataArray.foreach{x=>
+              x.writeToStreamWriter(stream)
+              zeroLen -= type_len
+            }
           }
-          if(zeroLen >0)
-            dataSink.writeZero(zeroLen)
+          dataSink.writeZero(zeroLen)
         case other =>
           throw new IllegalArgumentException("type is not supported "+other)
       }

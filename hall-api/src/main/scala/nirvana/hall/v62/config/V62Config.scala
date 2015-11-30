@@ -16,9 +16,9 @@ class HallV62Config {
   @XmlElement(name="port")
   var port:Int = _
   @XmlElement(name="connection_timeout_secs")
-  var connectionTimeoutSecs:Int = _
+  var connectionTimeoutSecs:Int = 30
   @XmlElement(name="read_timeout_secs")
-  var readTimeoutSecs:Int = _
+  var readTimeoutSecs:Int = 30
   @XmlElement(name="user")
   var user:String= _
   @XmlElement(name="password")
