@@ -51,9 +51,9 @@ object GafisGatherPalm extends SQLSyntaxSupport[GafisGatherPalm] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, personId: Option[String], fgp: Short, groupId: Option[Short], lobtype: Short, gatherData: Blob, inputpsn: Option[String], inputtime: DateTime, modifiedpsn: Option[String], modifiedtime: Option[DateTime], seq: Option[Long], palmDataNosqlId: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherPalm] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherPalm] = {
     withSQL {
-      select.from(GafisGatherPalm as ggp).where.eq(ggp.pkId, pkId).and.eq(ggp.personId, personId).and.eq(ggp.fgp, fgp).and.eq(ggp.groupId, groupId).and.eq(ggp.lobtype, lobtype).and.eq(ggp.gatherData, gatherData).and.eq(ggp.inputpsn, inputpsn).and.eq(ggp.inputtime, inputtime).and.eq(ggp.modifiedpsn, modifiedpsn).and.eq(ggp.modifiedtime, modifiedtime).and.eq(ggp.seq, seq).and.eq(ggp.palmDataNosqlId, palmDataNosqlId)
+      select.from(GafisGatherPalm as ggp).where.eq(ggp.pkId, pkId)
     }.map(GafisGatherPalm(ggp.resultName)).single.apply()
   }
 
@@ -156,13 +156,13 @@ object GafisGatherPalm extends SQLSyntaxSupport[GafisGatherPalm] {
         column.modifiedtime -> entity.modifiedtime,
         column.seq -> entity.seq,
         column.palmDataNosqlId -> entity.palmDataNosqlId
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.fgp, entity.fgp).and.eq(column.groupId, entity.groupId).and.eq(column.lobtype, entity.lobtype).and.eq(column.gatherData, entity.gatherData).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.seq, entity.seq).and.eq(column.palmDataNosqlId, entity.palmDataNosqlId)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherPalm)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherPalm).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.fgp, entity.fgp).and.eq(column.groupId, entity.groupId).and.eq(column.lobtype, entity.lobtype).and.eq(column.gatherData, entity.gatherData).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.seq, entity.seq).and.eq(column.palmDataNosqlId, entity.palmDataNosqlId) }.update.apply()
+    withSQL { delete.from(GafisGatherPalm).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

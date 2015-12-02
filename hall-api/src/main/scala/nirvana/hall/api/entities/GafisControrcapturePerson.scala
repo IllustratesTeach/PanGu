@@ -40,9 +40,9 @@ object GafisControrcapturePerson extends SQLSyntaxSupport[GafisControrcapturePer
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkid: String, personid: Option[String], approvalType: Option[String], approvalPerson: Option[String], approvalDate: Option[DateTime], approvalRemark: Option[String], approvalResult: Option[String])(implicit session: DBSession = autoSession): Option[GafisControrcapturePerson] = {
+  def find(pkid: String)(implicit session: DBSession = autoSession): Option[GafisControrcapturePerson] = {
     withSQL {
-      select.from(GafisControrcapturePerson as gcp).where.eq(gcp.pkid, pkid).and.eq(gcp.personid, personid).and.eq(gcp.approvalType, approvalType).and.eq(gcp.approvalPerson, approvalPerson).and.eq(gcp.approvalDate, approvalDate).and.eq(gcp.approvalRemark, approvalRemark).and.eq(gcp.approvalResult, approvalResult)
+      select.from(GafisControrcapturePerson as gcp).where.eq(gcp.pkid, pkid)
     }.map(GafisControrcapturePerson(gcp.resultName)).single.apply()
   }
 
@@ -120,13 +120,13 @@ object GafisControrcapturePerson extends SQLSyntaxSupport[GafisControrcapturePer
         column.approvalDate -> entity.approvalDate,
         column.approvalRemark -> entity.approvalRemark,
         column.approvalResult -> entity.approvalResult
-      ).where.eq(column.pkid, entity.pkid).and.eq(column.personid, entity.personid).and.eq(column.approvalType, entity.approvalType).and.eq(column.approvalPerson, entity.approvalPerson).and.eq(column.approvalDate, entity.approvalDate).and.eq(column.approvalRemark, entity.approvalRemark).and.eq(column.approvalResult, entity.approvalResult)
+      ).where.eq(column.pkid, entity.pkid)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisControrcapturePerson)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisControrcapturePerson).where.eq(column.pkid, entity.pkid).and.eq(column.personid, entity.personid).and.eq(column.approvalType, entity.approvalType).and.eq(column.approvalPerson, entity.approvalPerson).and.eq(column.approvalDate, entity.approvalDate).and.eq(column.approvalRemark, entity.approvalRemark).and.eq(column.approvalResult, entity.approvalResult) }.update.apply()
+    withSQL { delete.from(GafisControrcapturePerson).where.eq(column.pkid, entity.pkid) }.update.apply()
   }
 
 }

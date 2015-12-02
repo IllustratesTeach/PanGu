@@ -48,9 +48,9 @@ object GafisFingerTextLog extends SQLSyntaxSupport[GafisFingerTextLog] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, userId: Option[String], userName: Option[String], unitCode: Option[String], unitName: Option[String], ip: Option[String], objectId: Option[String], tableName: Option[String], oldInfo: Option[String], newInfo: Option[String], createDatetime: Option[DateTime])(implicit session: DBSession = autoSession): Option[GafisFingerTextLog] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisFingerTextLog] = {
     withSQL {
-      select.from(GafisFingerTextLog as gftl).where.eq(gftl.pkId, pkId).and.eq(gftl.userId, userId).and.eq(gftl.userName, userName).and.eq(gftl.unitCode, unitCode).and.eq(gftl.unitName, unitName).and.eq(gftl.ip, ip).and.eq(gftl.objectId, objectId).and.eq(gftl.tableName, tableName).and.eq(gftl.oldInfo, oldInfo).and.eq(gftl.newInfo, newInfo).and.eq(gftl.createDatetime, createDatetime)
+      select.from(GafisFingerTextLog as gftl).where.eq(gftl.pkId, pkId)
     }.map(GafisFingerTextLog(gftl.resultName)).single.apply()
   }
 
@@ -148,13 +148,13 @@ object GafisFingerTextLog extends SQLSyntaxSupport[GafisFingerTextLog] {
         column.oldInfo -> entity.oldInfo,
         column.newInfo -> entity.newInfo,
         column.createDatetime -> entity.createDatetime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.userName, entity.userName).and.eq(column.unitCode, entity.unitCode).and.eq(column.unitName, entity.unitName).and.eq(column.ip, entity.ip).and.eq(column.objectId, entity.objectId).and.eq(column.tableName, entity.tableName).and.eq(column.oldInfo, entity.oldInfo).and.eq(column.newInfo, entity.newInfo).and.eq(column.createDatetime, entity.createDatetime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisFingerTextLog)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisFingerTextLog).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.userName, entity.userName).and.eq(column.unitCode, entity.unitCode).and.eq(column.unitName, entity.unitName).and.eq(column.ip, entity.ip).and.eq(column.objectId, entity.objectId).and.eq(column.tableName, entity.tableName).and.eq(column.oldInfo, entity.oldInfo).and.eq(column.newInfo, entity.newInfo).and.eq(column.createDatetime, entity.createDatetime) }.update.apply()
+    withSQL { delete.from(GafisFingerTextLog).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

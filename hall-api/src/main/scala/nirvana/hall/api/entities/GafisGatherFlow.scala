@@ -48,9 +48,9 @@ object GafisGatherFlow extends SQLSyntaxSupport[GafisGatherFlow] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, personId: Option[String], gatherStatus: Option[Long], gatherDate: Option[DateTime], gathererId: Option[String], ord: Option[Long], gatherNodeId: Option[String], isSkip: Option[Long], skipReason: Option[String], skipOperator: Option[String], skipTime: Option[DateTime])(implicit session: DBSession = autoSession): Option[GafisGatherFlow] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherFlow] = {
     withSQL {
-      select.from(GafisGatherFlow as ggf).where.eq(ggf.pkId, pkId).and.eq(ggf.personId, personId).and.eq(ggf.gatherStatus, gatherStatus).and.eq(ggf.gatherDate, gatherDate).and.eq(ggf.gathererId, gathererId).and.eq(ggf.ord, ord).and.eq(ggf.gatherNodeId, gatherNodeId).and.eq(ggf.isSkip, isSkip).and.eq(ggf.skipReason, skipReason).and.eq(ggf.skipOperator, skipOperator).and.eq(ggf.skipTime, skipTime)
+      select.from(GafisGatherFlow as ggf).where.eq(ggf.pkId, pkId)
     }.map(GafisGatherFlow(ggf.resultName)).single.apply()
   }
 
@@ -148,13 +148,13 @@ object GafisGatherFlow extends SQLSyntaxSupport[GafisGatherFlow] {
         column.skipReason -> entity.skipReason,
         column.skipOperator -> entity.skipOperator,
         column.skipTime -> entity.skipTime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.gatherStatus, entity.gatherStatus).and.eq(column.gatherDate, entity.gatherDate).and.eq(column.gathererId, entity.gathererId).and.eq(column.ord, entity.ord).and.eq(column.gatherNodeId, entity.gatherNodeId).and.eq(column.isSkip, entity.isSkip).and.eq(column.skipReason, entity.skipReason).and.eq(column.skipOperator, entity.skipOperator).and.eq(column.skipTime, entity.skipTime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherFlow)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherFlow).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.gatherStatus, entity.gatherStatus).and.eq(column.gatherDate, entity.gatherDate).and.eq(column.gathererId, entity.gathererId).and.eq(column.ord, entity.ord).and.eq(column.gatherNodeId, entity.gatherNodeId).and.eq(column.isSkip, entity.isSkip).and.eq(column.skipReason, entity.skipReason).and.eq(column.skipOperator, entity.skipOperator).and.eq(column.skipTime, entity.skipTime) }.update.apply()
+    withSQL { delete.from(GafisGatherFlow).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

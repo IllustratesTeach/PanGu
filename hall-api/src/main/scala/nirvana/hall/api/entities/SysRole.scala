@@ -48,9 +48,9 @@ object SysRole extends SQLSyntaxSupport[SysRole] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, roleName: String, roleDescription: Option[String], deleteFlag: Option[String], createDatetime: DateTime, updateDatetime: Option[DateTime], createUserId: Option[String], updateUserId: Option[String], roleLevel: Option[String], sysCode: Option[String], roleSign: Option[String])(implicit session: DBSession = autoSession): Option[SysRole] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysRole] = {
     withSQL {
-      select.from(SysRole as sr).where.eq(sr.pkId, pkId).and.eq(sr.roleName, roleName).and.eq(sr.roleDescription, roleDescription).and.eq(sr.deleteFlag, deleteFlag).and.eq(sr.createDatetime, createDatetime).and.eq(sr.updateDatetime, updateDatetime).and.eq(sr.createUserId, createUserId).and.eq(sr.updateUserId, updateUserId).and.eq(sr.roleLevel, roleLevel).and.eq(sr.sysCode, sysCode).and.eq(sr.roleSign, roleSign)
+      select.from(SysRole as sr).where.eq(sr.pkId, pkId)
     }.map(SysRole(sr.resultName)).single.apply()
   }
 
@@ -148,13 +148,13 @@ object SysRole extends SQLSyntaxSupport[SysRole] {
         column.roleLevel -> entity.roleLevel,
         column.sysCode -> entity.sysCode,
         column.roleSign -> entity.roleSign
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.roleName, entity.roleName).and.eq(column.roleDescription, entity.roleDescription).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.roleLevel, entity.roleLevel).and.eq(column.sysCode, entity.sysCode).and.eq(column.roleSign, entity.roleSign)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysRole)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysRole).where.eq(column.pkId, entity.pkId).and.eq(column.roleName, entity.roleName).and.eq(column.roleDescription, entity.roleDescription).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.roleLevel, entity.roleLevel).and.eq(column.sysCode, entity.sysCode).and.eq(column.roleSign, entity.roleSign) }.update.apply()
+    withSQL { delete.from(SysRole).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

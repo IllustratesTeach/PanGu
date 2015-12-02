@@ -43,9 +43,9 @@ object SysArea extends SQLSyntaxSupport[SysArea] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(areaCode: String, areaName: Option[String], areaAlias: Option[String], parentId: Option[String], deleteFlag: Option[String], remark: Option[String], isLeaf: Option[String], areanumber: Option[String], areaFirstLetter: Option[String])(implicit session: DBSession = autoSession): Option[SysArea] = {
+  def find(areaCode: String)(implicit session: DBSession = autoSession): Option[SysArea] = {
     withSQL {
-      select.from(SysArea as sa).where.eq(sa.areaCode, areaCode).and.eq(sa.areaName, areaName).and.eq(sa.areaAlias, areaAlias).and.eq(sa.parentId, parentId).and.eq(sa.deleteFlag, deleteFlag).and.eq(sa.remark, remark).and.eq(sa.isLeaf, isLeaf).and.eq(sa.areanumber, areanumber).and.eq(sa.areaFirstLetter, areaFirstLetter)
+      select.from(SysArea as sa).where.eq(sa.areaCode, areaCode)
     }.map(SysArea(sa.resultName)).single.apply()
   }
 
@@ -133,13 +133,13 @@ object SysArea extends SQLSyntaxSupport[SysArea] {
         column.isLeaf -> entity.isLeaf,
         column.areanumber -> entity.areanumber,
         column.areaFirstLetter -> entity.areaFirstLetter
-      ).where.eq(column.areaCode, entity.areaCode).and.eq(column.areaName, entity.areaName).and.eq(column.areaAlias, entity.areaAlias).and.eq(column.parentId, entity.parentId).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.isLeaf, entity.isLeaf).and.eq(column.areanumber, entity.areanumber).and.eq(column.areaFirstLetter, entity.areaFirstLetter)
+      ).where.eq(column.areaCode, entity.areaCode)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysArea)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysArea).where.eq(column.areaCode, entity.areaCode).and.eq(column.areaName, entity.areaName).and.eq(column.areaAlias, entity.areaAlias).and.eq(column.parentId, entity.parentId).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.isLeaf, entity.isLeaf).and.eq(column.areanumber, entity.areanumber).and.eq(column.areaFirstLetter, entity.areaFirstLetter) }.update.apply()
+    withSQL { delete.from(SysArea).where.eq(column.areaCode, entity.areaCode) }.update.apply()
   }
 
 }

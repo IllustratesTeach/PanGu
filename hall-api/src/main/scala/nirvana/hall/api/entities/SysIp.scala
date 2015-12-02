@@ -40,9 +40,9 @@ object SysIp extends SQLSyntaxSupport[SysIp] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, addreIp: String, deleteFlag: Option[Long], createUsername: Option[String], createUserid: Option[String], createDatetime: Option[DateTime], remark: Option[String])(implicit session: DBSession = autoSession): Option[SysIp] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysIp] = {
     withSQL {
-      select.from(SysIp as si).where.eq(si.pkId, pkId).and.eq(si.addreIp, addreIp).and.eq(si.deleteFlag, deleteFlag).and.eq(si.createUsername, createUsername).and.eq(si.createUserid, createUserid).and.eq(si.createDatetime, createDatetime).and.eq(si.remark, remark)
+      select.from(SysIp as si).where.eq(si.pkId, pkId)
     }.map(SysIp(si.resultName)).single.apply()
   }
 
@@ -120,13 +120,13 @@ object SysIp extends SQLSyntaxSupport[SysIp] {
         column.createUserid -> entity.createUserid,
         column.createDatetime -> entity.createDatetime,
         column.remark -> entity.remark
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.addreIp, entity.addreIp).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createUsername, entity.createUsername).and.eq(column.createUserid, entity.createUserid).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.remark, entity.remark)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysIp)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysIp).where.eq(column.pkId, entity.pkId).and.eq(column.addreIp, entity.addreIp).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createUsername, entity.createUsername).and.eq(column.createUserid, entity.createUserid).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.remark, entity.remark) }.update.apply()
+    withSQL { delete.from(SysIp).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

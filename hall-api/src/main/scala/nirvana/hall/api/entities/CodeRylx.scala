@@ -37,9 +37,9 @@ object CodeRylx extends SQLSyntaxSupport[CodeRylx] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(code: String, name: Option[String], deleteFlag: Option[String], ord: Option[Long], remark: Option[String], strtype: Option[String])(implicit session: DBSession = autoSession): Option[CodeRylx] = {
+  def find(code: String)(implicit session: DBSession = autoSession): Option[CodeRylx] = {
     withSQL {
-      select.from(CodeRylx as cr).where.eq(cr.code, code).and.eq(cr.name, name).and.eq(cr.deleteFlag, deleteFlag).and.eq(cr.ord, ord).and.eq(cr.remark, remark).and.eq(cr.strtype, strtype)
+      select.from(CodeRylx as cr).where.eq(cr.code, code)
     }.map(CodeRylx(cr.resultName)).single.apply()
   }
 
@@ -112,13 +112,13 @@ object CodeRylx extends SQLSyntaxSupport[CodeRylx] {
         column.ord -> entity.ord,
         column.remark -> entity.remark,
         column.strtype -> entity.strtype
-      ).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.ord, entity.ord).and.eq(column.remark, entity.remark).and.eq(column.strtype, entity.strtype)
+      ).where.eq(column.code, entity.code)
     }.update.apply()
     entity
   }
 
   def destroy(entity: CodeRylx)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(CodeRylx).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.ord, entity.ord).and.eq(column.remark, entity.remark).and.eq(column.strtype, entity.strtype) }.update.apply()
+    withSQL { delete.from(CodeRylx).where.eq(column.code, entity.code) }.update.apply()
   }
 
 }

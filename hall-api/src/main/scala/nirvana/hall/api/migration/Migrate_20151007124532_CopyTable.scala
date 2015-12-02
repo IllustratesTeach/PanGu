@@ -11,7 +11,7 @@ class Migrate_20151007124532_CopyTable
 
   def up(): Unit = {
     createTable("CODE_AJLB",Comment("案件类别字典")){ t=>
-      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(200),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
@@ -19,49 +19,49 @@ class Migrate_20151007124532_CopyTable
       t.column("FIRST_LETTER",VarcharType,Limit(30),Nullable,Comment("首字母"))
     }
     createTable("CODE_CJLB",Comment("采集类别字典")){ t=>
-      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(200),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_GJ",Comment("国籍字典")){ t=>
-      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(6),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_JJLY",Comment("经济来源")){ t=>
-      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_LY",Comment("捺印数据来源")){ t=>
-      t.column("CODE",VarcharType,Limit(1),NotNull)
+      t.column("CODE",VarcharType,Limit(1),NotNull,PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable)
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable)
       t.column("ORD",BigintType,Limit(22),Nullable)
       t.column("REMARK",VarcharType,Limit(90),Nullable)
     }
     createTable("CODE_MARRY",Comment("婚否字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_MZ",Comment("民族字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_RYLX",Comment("人员类型字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(200),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
@@ -69,56 +69,63 @@ class Migrate_20151007124532_CopyTable
       t.column("STRTYPE",VarcharType,Limit(2),Nullable,Comment("类型"))
     }
     createTable("CODE_TSRQ",Comment("特殊人群字典")){ t=>
-      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_TSSF",Comment("特殊身份字典")){ t=>
-      t.column("CODE",VarcharType,Limit(4),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(4),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_WHCD",Comment("文化程度字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_XB",Comment("性别字典")){ t=>
-      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(1),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_ZC",Comment("专长字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_ZJXY",Comment("宗教信仰字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
+      t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
+      t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
+      t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
+      t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
+    }
+    createTable("CODE_ZJZL",Comment("证件类型字典")){ t=>
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("CODE_ZZMM",Comment("政治面貌字典")){ t=>
-      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"))
+      t.column("CODE",VarcharType,Limit(2),NotNull,Comment("字典编码"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("字典名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
     }
     createTable("GAFIS_CONTRORCAPTURE_PERSON",Comment("辑控抓获待审核人表")){ t=>
-      t.column("PKID",VarcharType,Limit(32),NotNull,Comment("主键"))
+      t.column("PKID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
       t.column("PERSONID",VarcharType,Limit(32),Nullable,Comment("人员编号"))
       t.column("APPROVAL_TYPE",VarcharType,Limit(1),Nullable,Comment("审核类型：0：辑控 1：抓获"))
       t.column("APPROVAL_PERSON",VarcharType,Limit(32),Nullable,Comment("审核人"))
@@ -127,7 +134,7 @@ class Migrate_20151007124532_CopyTable
       t.column("APPROVAL_RESULT",VarcharType,Limit(1),Nullable,Comment("审核结果:1:确认 0:否认"))
     }
     createTable("GAFIS_FINGER_TEXT_LOG",Comment("指纹系统文本信息日志记录")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("USER_ID",VarcharType,Limit(32),Nullable,Comment("用户id"))
       t.column("USER_NAME",VarcharType,Limit(90),Nullable,Comment("用户名"))
       t.column("UNIT_CODE",VarcharType,Limit(12),Nullable,Comment("单位编号"))
@@ -140,7 +147,7 @@ class Migrate_20151007124532_CopyTable
       t.column("CREATE_DATETIME",TimestampType,Limit(7),Nullable,Comment("修改时间"))
     }
     createTable("GAFIS_GATHER_DATA_LOG",Comment("采集图像信息日志记录")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("USER_ID",VarcharType,Limit(32),Nullable,Comment("用户id"))
       t.column("USER_NAME",VarcharType,Limit(90),Nullable,Comment("用户名"))
       t.column("UNIT_CODE",VarcharType,Limit(12),Nullable,Comment("单位编号"))
@@ -155,7 +162,7 @@ class Migrate_20151007124532_CopyTable
       t.column("CREATE_DATETIME",TimestampType,Limit(7),Nullable,Comment("修改时间"))
     }
     createTable("GAFIS_GATHER_FIELDSET",Comment("采集必填项")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("NODE_ID",VarcharType,Limit(32),Nullable,Comment("节点"))
       t.column("FIELD_NAME",VarcharType,Limit(100),Nullable,Comment("字段名称"))
       t.column("FIELD",VarcharType,Limit(32),Nullable,Comment("字段属性"))
@@ -165,7 +172,7 @@ class Migrate_20151007124532_CopyTable
       t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
       t.column("PERSON_ID",VarcharType,Limit(32),Nullable,Comment("人员ID"))
       t.column("FGP",SmallintType,Limit(2),NotNull,Comment("采集部位(字典)"))
-      t.column("GROUP_ID",SmallintType,Limit(1),Nullable,Comment("0:默认;1:许公望压缩;3:JPG"))
+      t.column("GROUP_ID",SmallintType,Limit(1),Nullable,Comment("0:默认;1:许公望压缩;3:JPG;4:纹线"))
       t.column("LOBTYPE",SmallintType,Limit(1),NotNull,Comment("1:数据;2特征"))
       t.column("INPUTPSN",VarcharType,Limit(32),Nullable,Comment("记录创建人ID"))
       t.column("INPUTTIME",TimestampType,Limit(7),NotNull,Comment("记录创建时间"))
@@ -181,10 +188,13 @@ class Migrate_20151007124532_CopyTable
       t.column("FINGER_DATA_NOSQL_ID",VarcharType,Limit(10),Nullable,Comment("指纹数据nosql存储id"))
       t.column("PARTITION_CITYCODE",VarcharType,Limit(8),Nullable,Comment("区域分区"))
     }
-    addIndex("GAFIS_GATHER_FINGER",Array[String]("SEQ"),Name("GAFIS_GATHER_FINGER_IDX_01"))
+    addIndex("GAFIS_GATHER_FINGER",Array[String]("PERSON_ID","GROUP_ID"),Name("GAFIS_GATHER_FINGER_IDX1"))
+    addIndex("GAFIS_GATHER_FINGER",Array[String]("GROUP_ID"),Name("GAFIS_GATHER_FINGER_IDX2"))
+    addIndex("GAFIS_GATHER_FINGER",Array[String]("SEQ","GROUP_ID"),Name("GAFIS_GATHER_FINGER_IDX_01"))
     addIndex("GAFIS_GATHER_FINGER",Array[String]("PERSON_ID"),Name("GAFIS_GATHER_FINGER_IDX_02"))
+    addIndex("GAFIS_GATHER_FINGER",Array[String]("INPUTTIME","PERSON_ID"),Name("GAFIS_GATHER_FINGER_IDX_03"))
     createTable("GAFIS_GATHER_FLOW",Comment("采集流程记录")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSON_ID",VarcharType,Limit(32),Nullable,Comment("人员ID"))
       t.column("GATHER_STATUS",BigintType,Limit(22),Nullable,Comment("采集状态（0：未采集，1：已采集）"))
       t.column("GATHER_DATE",TimestampType,Limit(7),Nullable,Comment("采集时间（精确到秒）"))
@@ -196,8 +206,9 @@ class Migrate_20151007124532_CopyTable
       t.column("SKIP_OPERATOR",VarcharType,Limit(32),Nullable,Comment("跳过人"))
       t.column("SKIP_TIME",TimestampType,Limit(7),Nullable,Comment("跳过时间"))
     }
+    addIndex("GAFIS_GATHER_FLOW",Array[String]("PERSON_ID","GATHER_STATUS"),Name("GAFIS_GATHER_FLOW_IDX_01"))
     createTable("GAFIS_GATHER_IDCARD",Comment("人员身份证信息表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSONID",VarcharType,Limit(23),Nullable,Comment("人员编号"))
       t.column("FGP_CODE",VarcharType,Limit(20),Nullable,Comment("数据类型(字典)"))
       t.column("GATHER_DATA",BlobType,Limit(4000),Nullable,Comment("身份证数据"))
@@ -209,7 +220,7 @@ class Migrate_20151007124532_CopyTable
       t.column("GATHERDATANOSQLID",VarcharType,Limit(10),Nullable,Comment("身份证NOSQLID"))
     }
     createTable("GAFIS_GATHER_NODE",Comment("采集节点配置表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("NODE_CODE",VarcharType,Limit(20),Nullable,Comment("节点编号"))
       t.column("NODE_NAME",VarcharType,Limit(50),Nullable,Comment("节点名称"))
       t.column("NODE_REQUEST",VarcharType,Limit(200),NotNull,Comment("节点请求"))
@@ -221,7 +232,7 @@ class Migrate_20151007124532_CopyTable
       t.column("NODE_IMG",VarcharType,Limit(20),Nullable,Comment("节点图片"))
     }
     createTable("GAFIS_GATHER_OCX_VERSION",Comment("控件版本信息")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(30),Nullable,Comment("控件名称"))
       t.column("TYPE",VarcharType,Limit(2),Nullable,Comment("控件类型：1：活体采集指纹，2：扫描捺印"))
       t.column("VERSION",VarcharType,Limit(10),Nullable,Comment("版本号"))
@@ -230,7 +241,7 @@ class Migrate_20151007124532_CopyTable
       t.column("DELETAG",VarcharType,Limit(1),Nullable,Comment("删除标志"))
     }
     createTable("GAFIS_GATHER_PALM",Comment("采集掌纹表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSON_ID",VarcharType,Limit(32),Nullable,Comment("人员ID"))
       t.column("FGP",SmallintType,Limit(2),NotNull,Comment("采集部位(字典)"))
       t.column("GROUP_ID",SmallintType,Limit(1),Nullable,Comment("0:特征;1:许公望压缩;3:JPG;4:纹线"))
@@ -243,8 +254,10 @@ class Migrate_20151007124532_CopyTable
       t.column("SEQ",BigintType,Limit(22),Nullable,Comment("8.0数据同步用"))
       t.column("PALM_DATA_NOSQL_ID",VarcharType,Limit(10),Nullable,Comment("掌纹数据nosql存储id"))
     }
+    addIndex("GAFIS_GATHER_PALM",Array[String]("PERSON_ID","GROUP_ID"),Name("GAFIS_GATHER_PALM_IDX01"))
+    addIndex("GAFIS_GATHER_PALM",Array[String]("SEQ","GROUP_ID","FGP"),Name("GAFIS_GATHER_PALM_IDX02"))
     createTable("GAFIS_GATHER_PERSON_PHOTO"){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSONID",VarcharType,Limit(32),Nullable,Comment("人员ID"))
       t.column("PHOTO_CODE",VarcharType,Limit(10),NotNull,Comment("图片ID"))
       t.column("PHOTO_DATA",BlobType,Limit(4000),NotNull,Comment("图片数据"))
@@ -256,7 +269,7 @@ class Migrate_20151007124532_CopyTable
       t.column("COMMENTS",VarcharType,Limit(1000),Nullable,Comment("备注"))
     }
     createTable("GAFIS_GATHER_PORTRAIT",Comment("采集人像表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSONID",VarcharType,Limit(32),Nullable,Comment("人员ID"))
       t.column("FGP",VarcharType,Limit(1),NotNull,Comment("采集部位(字典)正面、左侧、右侧"))
       t.column("GATHER_DATA",BlobType,Limit(4000),NotNull,Comment("图像数据"))
@@ -268,7 +281,7 @@ class Migrate_20151007124532_CopyTable
       t.column("GATHERDATANOSQLID",VarcharType,Limit(10),Nullable,Comment("人像NOSQLID"))
     }
     createTable("GAFIS_GATHER_SPECIALTY",Comment("人员专长表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSONID",VarcharType,Limit(23),Nullable,Comment("指纹编号"))
       t.column("SPECIALTY_CODE",VarcharType,Limit(2),Nullable,Comment("专长(字典)"))
       t.column("INPUTPSN",VarcharType,Limit(32),Nullable,Comment("记录创建人ID"))
@@ -278,7 +291,7 @@ class Migrate_20151007124532_CopyTable
       t.column("DELETAG",VarcharType,Limit(1),Nullable,Comment("删除标志"))
     }
     createTable("GAFIS_GATHER_TYPE",Comment("人员类型表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("TYPE_NAME",VarcharType,Limit(60),NotNull,Comment("采集类型名称"))
       t.column("DELETE_FLAG",BigintType,Limit(22),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("CREATE_USER_ID",VarcharType,Limit(50),NotNull,Comment("记录创建人姓名"))
@@ -290,10 +303,12 @@ class Migrate_20151007124532_CopyTable
       t.column("GATHER_CATEGORY",VarcharType,Limit(1),Nullable,Comment("采集类别"))
       t.column("PARENT_ID",VarcharType,Limit(32),Nullable,Comment("父类ID"))
       t.column("ISCHILDREN",VarcharType,Limit(1),Nullable,Comment("是否有子节点:1表示有,0表示无"))
-      t.column("RULE_ID",VarcharType,Limit(32),Nullable,Comment("人员编号规则ID"))
+      t.column("RULE_ID",VarcharType,Limit(32),Nullable,Comment("捺印卡号规则ID"))
+      t.column("CARD_RULE_ID",VarcharType,Limit(32),Nullable,Comment("人员编号规则ID"))
+      t.column("CARD_RULE_TYPE",VarcharType,Limit(1),Nullable,Comment("人员编号规则类型：0 同捺印卡号 1 自定义"))
     }
     createTable("GAFIS_GATHER_TYPE_NODE",Comment("人员类型采集节点表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("TYPE_ID",VarcharType,Limit(32),NotNull,Comment("所属人员类型"))
       t.column("NODE_ID",VarcharType,Limit(32),Nullable,Comment("节点编号"))
       t.column("NODE_ORD",BigintType,Limit(22),Nullable,Comment("排序"))
@@ -301,7 +316,7 @@ class Migrate_20151007124532_CopyTable
       t.column("DEPART_ID",VarcharType,Limit(32),Nullable,Comment("所属部门编号"))
     }
     createTable("GAFIS_GATHER_TYPE_NODE_FIELD",Comment("采集类型节点字段表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("TYPE_ID",VarcharType,Limit(32),Nullable,Comment("采集类型ID"))
       t.column("NODE_ID",VarcharType,Limit(32),Nullable,Comment("节点编号"))
       t.column("FIELD_ID",VarcharType,Limit(32),Nullable,Comment("字段ID"))
@@ -309,7 +324,7 @@ class Migrate_20151007124532_CopyTable
       t.column("DEPART_ID",VarcharType,Limit(32),Nullable,Comment("部门编号"))
     }
     createTable("GAFIS_LOGIC_DB"){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键ID"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键ID"),PrimaryKey)
       t.column("LOGIC_CODE",VarcharType,Limit(32),Nullable,Comment("编号或代码号"))
       t.column("LOGIC_NAME",VarcharType,Limit(32),Nullable,Comment("名称"))
       t.column("LOGIC_CATEGORY",VarcharType,Limit(1),Nullable,Comment("分库类型，0:捺印分库,  1:案件分库"))
@@ -317,17 +332,17 @@ class Migrate_20151007124532_CopyTable
       t.column("LOGIC_REMARK",VarcharType,Limit(60),Nullable,Comment("备注"))
     }
     createTable("GAFIS_LOGIC_DB_CASE",Comment("案件逻辑分库中间表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
       t.column("LOGIC_DB_PKID",VarcharType,Limit(32),Nullable,Comment("逻辑分库主键"))
       t.column("CASE_PKID",VarcharType,Limit(32),Nullable,Comment("案件主键"))
     }
     createTable("GAFIS_LOGIC_DB_FINGERPRINT",Comment("排印逻辑分库中间表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
       t.column("LOGIC_DB_PKID",VarcharType,Limit(32),Nullable,Comment("逻辑分库主键"))
       t.column("FINGERPRINT_PKID",VarcharType,Limit(32),Nullable,Comment("捺印主键"))
     }
     createTable("GAFIS_PERSON",Comment("采集人员信息主表")){ t=>
-      t.column("PERSONID",VarcharType,Limit(23),NotNull,Comment("指纹编号"),PrimaryKey)
+      t.column("PERSONID",VarcharType,Limit(23),NotNull,Comment("捺印卡号"),PrimaryKey)
       t.column("IDCARDNO",VarcharType,Limit(18),Nullable,Comment("身份证号码"))
       t.column("NAME",VarcharType,Limit(60),Nullable,Comment("姓名"))
       t.column("SPELLNAME",VarcharType,Limit(60),Nullable,Comment("姓名拼音"))
@@ -349,9 +364,9 @@ class Migrate_20151007124532_CopyTable
       t.column("DOOR",VarcharType,Limit(6),Nullable,Comment("户籍地代码(区域)"))
       t.column("DOOR_STREET",VarcharType,Limit(60),Nullable,Comment("户籍地-乡镇/街道/社区"))
       t.column("DOORDETAIL",VarcharType,Limit(90),Nullable,Comment("户籍地详细住址"))
-      t.column("ADDRESS",VarcharType,Limit(6),Nullable)
-      t.column("ADDRESS_STREET",VarcharType,Limit(60),Nullable)
-      t.column("ADDRESSDETAIL",VarcharType,Limit(90),Nullable)
+      t.column("ADDRESS",VarcharType,Limit(6),Nullable,Comment("现住址代码(区域)"))
+      t.column("ADDRESS_STREET",VarcharType,Limit(60),Nullable,Comment("现住址乡镇/街道/社区"))
+      t.column("ADDRESSDETAIL",VarcharType,Limit(90),Nullable,Comment("现住地详细地址"))
       t.column("CULTURE_CODE",VarcharType,Limit(2),Nullable,Comment("文化程度(字典)"))
       t.column("SOURCEINCOME_CODE",VarcharType,Limit(2),Nullable,Comment("经济来源(字典)"))
       t.column("FAITH_CODE",VarcharType,Limit(2),Nullable,Comment("宗教信仰(字典)"))
@@ -359,7 +374,7 @@ class Migrate_20151007124532_CopyTable
       t.column("JOB_CODE",VarcharType,Limit(4),Nullable,Comment("职业(字典)"))
       t.column("HEADSHIP",VarcharType,Limit(60),Nullable,Comment("职务"))
       t.column("EMPLOYUNIT",VarcharType,Limit(60),Nullable,Comment("工作单位"))
-      t.column("EMPLOYADDRESS",VarcharType,Limit(90),Nullable)
+      t.column("EMPLOYADDRESS",VarcharType,Limit(90),Nullable,Comment("工作单位地址"))
       t.column("OTHERSPECIALTY",VarcharType,Limit(300),Nullable,Comment("其它专长"))
       t.column("SPECIALIDENTITY_CODE",VarcharType,Limit(4),Nullable,Comment("特殊身份(字典)"))
       t.column("POLITICS_CODE",VarcharType,Limit(3),Nullable,Comment("政治面貌(字典)"))
@@ -384,7 +399,7 @@ class Migrate_20151007124532_CopyTable
       t.column("SHOESIZE",SmallintType,Limit(3),Nullable,Comment("鞋号（码）"))
       t.column("BLOODTYPE_CODE",VarcharType,Limit(1),Nullable,Comment("血型(字典)"))
       t.column("GATHER_ORG_CODE",VarcharType,Limit(12),Nullable,Comment("创建单位编码"))
-      t.column("IPADDRESS",VarcharType,Limit(15),Nullable)
+      t.column("IPADDRESS",VarcharType,Limit(15),Nullable,Comment("采集IP地址"))
       t.column("GATHERER_ID",VarcharType,Limit(32),Nullable,Comment("采集人ID"))
       t.column("GATHER_DATE",TimestampType,Limit(7),Nullable,Comment("采集时间"))
       t.column("GATHER_TYPE_ID",VarcharType,Limit(32),Nullable,Comment("所属采集类型ID"))
@@ -424,7 +439,7 @@ class Migrate_20151007124532_CopyTable
       t.column("PUSH_STATUS",VarcharType,Limit(1),Nullable,Comment("案事件推送状态"))
       t.column("PUSH_DATE",TimestampType,Limit(7),Nullable,Comment("案事件推送时间"))
       t.column("REMARK",VarcharType,Limit(2000),Nullable,Comment("备注或抓获情况"))
-      t.column("DATA_SOURCES",SmallintType,Limit(1),Nullable)
+      t.column("DATA_SOURCES",SmallintType,Limit(1),Nullable,Comment("数据来源，字典CODE_LY"))
       t.column("FINGERSHOW_STATUS",SmallintType,Limit(1),Nullable,Comment("指纹系统显示标识(0:不显示1:显示。显示情况：1):来自标采系统且有指纹的;2):来自指纹系统;3):来自协查)"))
       t.column("CITY_CODE",CharType,Limit(4),Nullable,Comment("区域标识(区域的前四位)"))
       t.column("DELAY_DEADLINE",TimestampType,Limit(7),Nullable,Comment("案事件系统数据调取截止时间（默认为采集时间）"))
@@ -439,7 +454,7 @@ class Migrate_20151007124532_CopyTable
       t.column("BLOW_EASTWEST",CharType,Limit(1),Nullable,Comment("东西经度"))
       t.column("BLOW_NORTHSOUTH",CharType,Limit(1),Nullable,Comment("南北纬度"))
       t.column("SEQ",BigintType,Limit(22),Nullable,Comment("8.0数据同步用"))
-      t.column("CARDID",VarcharType,Limit(23),Nullable,Comment("捺印卡号"))
+      t.column("CARDID",VarcharType,Limit(23),Nullable,Comment("人员编号"))
       t.column("RECORDMARK",CharType,Limit(1),Nullable,Comment("前科库标识 1：有；2：无"))
       t.column("RECORDSITUATION",VarcharType,Limit(3072),Nullable,Comment("前科劣迹情况"))
       t.column("VALID_DATE",TimestampType,Limit(7),Nullable,Comment("有效期限"))
@@ -473,28 +488,22 @@ class Migrate_20151007124532_CopyTable
       t.column("GATHERDEPARTNAME",VarcharType,Limit(100),Nullable,Comment("采集单位名称"))
       t.column("GATHERUSERNAME",VarcharType,Limit(100),Nullable,Comment("采集人name"))
       t.column("CONTRCAPTURE_CODE",VarcharType,Limit(1),Nullable,Comment("辑控抓获标识(字典)"))
+      t.column("CERTIFICATETYPE",VarcharType,Limit(2),Nullable,Comment("证件类型CODE_ZJZL"))
+      t.column("CERTIFICATEID",VarcharType,Limit(90),Nullable,Comment("证件号码"))
+      t.column("PERSON_TYPE",VarcharType,Limit(3),Nullable,Comment("人员类别"))
+      t.column("SMUGGLING",VarcharType,Limit(1),Nullable,Comment("偷渡(1:是,2:否)"))
+      t.column("CASE_CLASSES2",VarcharType,Limit(6),Nullable,Comment("案件类别2"))
+      t.column("CASE_CLASSES3",VarcharType,Limit(6),Nullable,Comment("案件类别3"))
     }
     createTable("GAFIS_PERSON_ATT",Comment("人员附件")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("图片ID"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("图片ID"),PrimaryKey)
       t.column("IMG",BlobType,Limit(4000),Nullable,Comment("图片"))
       t.column("TYPE",CharType,Limit(2),Nullable,Comment("图片类型(1:指纹采集备注图片类型)"))
       t.column("PERSONID",VarcharType,Limit(23),Nullable,Comment("人员ID"))
       t.column("GATHERDATANOSQLID",VarcharType,Limit(10),Nullable,Comment("图片NOSQLID"))
     }
-    createTable("GAFIS_PERSON_NO"){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
-      t.column("DATETIME",TimestampType,Limit(7),Nullable,Comment("yyyyMM"))
-      t.column("COUNT",BigintType,Limit(22),Nullable)
-      t.column("DEPT_NO",VarcharType,Limit(32),Nullable,Comment("部门编号"))
-      t.column("MISS",VarcharType,Limit(4000),Nullable,Comment("缺失的序号"))
-      t.column("RULE_ID",VarcharType,Limit(32),Nullable,Comment("人员编号规则ID"))
-    }
-    createTable("GAFIS_PERSON_NO_RULE",Comment("人员编号规则")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
-      t.column("RULE",VarcharType,Limit(30),Nullable)
-    }
     createTable("LOG_INFO",Comment("系统日志")){ t=>
-      t.column("NUM_ID",BigintType,Limit(22),NotNull,Comment("流水号"))
+      t.column("NUM_ID",BigintType,Limit(22),NotNull,Comment("流水号"),PrimaryKey)
       t.column("USER_ID",VarcharType,Limit(32),Nullable,Comment("用户标识"))
       t.column("ORGANIZATION",VarcharType,Limit(100),Nullable,Comment("单位"))
       t.column("USER_NAME",VarcharType,Limit(100),Nullable,Comment("用户名"))
@@ -504,12 +513,13 @@ class Migrate_20151007124532_CopyTable
       t.column("OPERATE_CONDITION",VarcharType,Limit(1000),Nullable,Comment("操作条件"))
       t.column("OPERATE_RESULT",VarcharType,Limit(1),Nullable,Comment("操作结果"))
       t.column("OPERATE_OBJECT",VarcharType,Limit(100),Nullable,Comment("操作对象"))
+      t.column("DEPARTNAME",VarcharType,Limit(100),Nullable,Comment("部门名称"))
       t.column("UPDATE_BEFORE",VarcharType,Limit(100),Nullable,Comment("字段修改前的值"))
       t.column("UPDATE_AFTER",VarcharType,Limit(100),Nullable,Comment("字段修改后的值"))
-      t.column("DEPARTNAME",VarcharType,Limit(100),Nullable,Comment("部门名称"))
+      t.column("TIME",TimestampType,Limit(7),Nullable)
     }
     createTable("SYS_AREA",Comment("行政区划")){ t=>
-      t.column("AREA_CODE",VarcharType,Limit(10),NotNull,Comment("区域编码"))
+      t.column("AREA_CODE",VarcharType,Limit(10),NotNull,Comment("区域编码"),PrimaryKey)
       t.column("AREA_NAME",VarcharType,Limit(90),Nullable,Comment("区域名称"))
       t.column("AREA_ALIAS",VarcharType,Limit(90),Nullable,Comment("区域简称"))
       t.column("PARENT_ID",VarcharType,Limit(10),Nullable,Comment("父编码"))
@@ -520,14 +530,14 @@ class Migrate_20151007124532_CopyTable
       t.column("AREA_FIRST_LETTER",VarcharType,Limit(30),Nullable,Comment("区域名称首字母"))
     }
     createTable("SYS_CONTROL",Comment("控件更新管理")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("VERSION",VarcharType,Limit(10),Nullable,Comment("版本"))
       t.column("UPLOAD_PERSON",VarcharType,Limit(32),Nullable,Comment("上传人"))
       t.column("UPLOAD_TIME",TimestampType,Limit(7),Nullable,Comment("上传时间"))
       t.column("CLIENT_TYPE",VarcharType,Limit(1),Nullable,Comment("客户端类型(0:控件,1:CS)"))
       t.column("FILE_PATH",VarcharType,Limit(200),Nullable,Comment("文件路径"))
       t.column("ENABLE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标识(0:禁用,1:启用)"))
-      t.column("SYS_TYPE",VarcharType,Limit(1),Nullable,Comment("系统类型(0:标采 1:指纹)"))
+      t.column("SYS_TYPE",VarcharType,Limit(1),Nullable,Comment("系统类型(0:标采; 1:指纹)"))
     }
     createTable("SYS_CONTROL_LOG",Comment("控件更新日志表")){ t=>
       t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
@@ -539,7 +549,7 @@ class Migrate_20151007124532_CopyTable
       t.column("STATE",VarcharType,Limit(1),Nullable,Comment("安装状态(2:失败,0:默认,1:成功)"))
     }
     createTable("SYS_DEPART",Comment("部门列表")){ t=>
-      t.column("CODE",VarcharType,Limit(12),NotNull,Comment("部门编号"))
+      t.column("CODE",VarcharType,Limit(12),NotNull,Comment("部门编号"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(200),Nullable,Comment("部门名称"))
       t.column("LEADER",VarcharType,Limit(60),Nullable,Comment("负责人"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
@@ -557,7 +567,7 @@ class Migrate_20151007124532_CopyTable
       t.column("INTEGRATION_TYPE",CharType,Limit(2),Nullable,Comment("一体化类型 01：无一体化设备 02：东方金指一体化设备"))
     }
     createTable("SYS_DEPLOY",Comment("系统基本配置")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("PROJECT_NAME",VarcharType,Limit(300),NotNull,Comment("系统名称"))
       t.column("CURRENT_FILE_PATH",VarcharType,Limit(100),Nullable,Comment("附件存储路径"))
       t.column("UPLOAD_IP",VarcharType,Limit(64),Nullable,Comment("上级IP"))
@@ -575,13 +585,13 @@ class Migrate_20151007124532_CopyTable
       t.column("WEBSERVICE_URL",VarcharType,Limit(100),Nullable,Comment("webService访问地址"))
     }
     createTable("SYS_FUNCTION",Comment("功能权限表")){ t=>
-      t.column("FUNCTION_ID",VarcharType,Limit(32),NotNull,Comment("功能标记"))
+      t.column("FUNCTION_ID",VarcharType,Limit(32),NotNull,Comment("功能标记"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(90),Nullable,Comment("名称"))
       t.column("REMARK",VarcharType,Limit(300),Nullable,Comment("描述"))
     }
     createTable("SYS_IP",Comment("IP表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
-      t.column("ADDRE_IP",VarcharType,Limit(50),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
+      t.column("ADDRE_IP",VarcharType,Limit(50),NotNull,Comment("人员类型名称"))
       t.column("DELETE_FLAG",BigintType,Limit(22),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("CREATE_USERNAME",VarcharType,Limit(50),Nullable,Comment("记录创建人姓名"))
       t.column("CREATE_USERID",VarcharType,Limit(50),Nullable)
@@ -589,7 +599,7 @@ class Migrate_20151007124532_CopyTable
       t.column("REMARK",VarcharType,Limit(200),Nullable)
     }
     createTable("SYS_LOG"){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("ADDRE_IP",VarcharType,Limit(50),Nullable)
       t.column("USER_NAME",VarcharType,Limit(50),Nullable)
       t.column("USER_ID",VarcharType,Limit(50),Nullable)
@@ -599,7 +609,7 @@ class Migrate_20151007124532_CopyTable
       t.column("LOG_TYPE",VarcharType,Limit(50),Nullable)
     }
     createTable("SYS_LOGINTIME_CONTROL",Comment("登陆时间控制表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("CONTROL_NAME",VarcharType,Limit(20),Nullable,Comment("控制名称"))
       t.column("CONTROL_RULE",VarcharType,Limit(1),Nullable,Comment("控制规则(1:日期段控制,2:每日时间段控制)"))
       t.column("START_TIME",VarcharType,Limit(20),Nullable,Comment("开始时间"))
@@ -608,7 +618,7 @@ class Migrate_20151007124532_CopyTable
       t.column("CREATE_TIME",TimestampType,Limit(7),Nullable,Comment("创建时间"))
     }
     createTable("SYS_MEG",Comment("系统消息提醒表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("PERSON_ID",VarcharType,Limit(32),NotNull,Comment("人员id"))
       t.column("PERSON_NAME",VarcharType,Limit(60),Nullable,Comment("人员名称"))
       t.column("GATHER_USER_ID",VarcharType,Limit(32),Nullable,Comment("采集人"))
@@ -634,7 +644,7 @@ class Migrate_20151007124532_CopyTable
       t.column("WIN_PANEL",VarcharType,Limit(60),Nullable,Comment("前台panel"))
     }
     createTable("SYS_MENU_ROLE",Comment("角色拥有菜单表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("ROLE_ID",VarcharType,Limit(32),NotNull,Comment("角色ID"))
       t.column("MENU_CODE",VarcharType,Limit(10),Nullable,Comment("菜单编码"))
       t.column("REMARK",VarcharType,Limit(300),Nullable,Comment("备注"))
@@ -647,7 +657,7 @@ class Migrate_20151007124532_CopyTable
       t.column("ONLY_READ",BigintType,Limit(22),Nullable,Comment("只读标记0:可写1:只读"))
     }
     createTable("SYS_ROLE",Comment("角色表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("ROLE_NAME",VarcharType,Limit(60),NotNull,Comment("角色名"))
       t.column("ROLE_DESCRIPTION",VarcharType,Limit(90),Nullable,Comment("角色描述"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
@@ -660,21 +670,21 @@ class Migrate_20151007124532_CopyTable
       t.column("ROLE_SIGN",VarcharType,Limit(20),Nullable,Comment("角色标识"))
     }
     createTable("SYS_ROLE_FUNCTION",Comment("角色功能关系表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("ROLE_ID",VarcharType,Limit(32),Nullable,Comment("角色"))
       t.column("FUNCTION_ID",VarcharType,Limit(32),Nullable,Comment("功能"))
       t.column("CREATE_USER_ID",VarcharType,Limit(32),Nullable,Comment("创建人ID"))
       t.column("CREATE_DATETIME",TimestampType,Limit(7),Nullable,Comment("创建时间"))
     }
     createTable("SYS_ROLE_SIGN",Comment("角色标识字典表")){ t=>
-      t.column("CODE",VarcharType,Limit(20),NotNull,Comment("角色标识且唯一"))
+      t.column("CODE",VarcharType,Limit(20),NotNull,Comment("角色标识且唯一"),PrimaryKey)
       t.column("NAME",VarcharType,Limit(300),Nullable,Comment("标识名称"))
       t.column("DELETE_FLAG",VarcharType,Limit(1),Nullable,Comment("启用标志(0: 禁用1: 启用)"))
       t.column("REMARK",VarcharType,Limit(90),Nullable,Comment("备注"))
       t.column("ORD",BigintType,Limit(22),Nullable,Comment("排序"))
     }
     createTable("SYS_USER",Comment("系统用户表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("LOGIN_NAME",VarcharType,Limit(60),NotNull,Comment("用户登录名"))
       t.column("PASSWORD",VarcharType,Limit(32),Nullable,Comment("密码"))
       t.column("EMAIL",VarcharType,Limit(60),Nullable,Comment("电子邮箱"))
@@ -697,14 +707,14 @@ class Migrate_20151007124532_CopyTable
       t.column("LOGIN_TIME_CONTROL",VarcharType,Limit(1),Nullable,Comment("登录时间控制(0:长期用户,1:登录受限用户)"))
     }
     createTable("SYS_USER_LOGINTIME_CONTROL",Comment("用户登陆时间控制对应表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,PrimaryKey)
       t.column("USER_ID",VarcharType,Limit(32),Nullable,Comment("用户ID"))
       t.column("CONTROL_ID",VarcharType,Limit(32),Nullable,Comment("控制ID"))
       t.column("CREATE_USER",VarcharType,Limit(32),Nullable,Comment("创建人"))
       t.column("CREATE_TIME",TimestampType,Limit(7),Nullable,Comment("创建时间"))
     }
     createTable("SYS_USER_ROLE",Comment("角色用户关联表")){ t=>
-      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"))
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("序号"),PrimaryKey)
       t.column("USER_ID",VarcharType,Limit(32),NotNull,Comment("用户序号"))
       t.column("ROLE_ID",VarcharType,Limit(32),NotNull,Comment("角色ID"))
       t.column("REMARK",VarcharType,Limit(300),Nullable,Comment("备注"))
@@ -745,8 +755,6 @@ class Migrate_20151007124532_CopyTable
     dropTable("SYS_CONTROL")
     dropTable("SYS_AREA")
     dropTable("LOG_INFO")
-    dropTable("GAFIS_PERSON_NO_RULE")
-    dropTable("GAFIS_PERSON_NO")
     dropTable("GAFIS_PERSON_ATT")
     dropTable("GAFIS_PERSON")
     dropTable("GAFIS_LOGIC_DB_FINGERPRINT")
@@ -769,6 +777,7 @@ class Migrate_20151007124532_CopyTable
     dropTable("GAFIS_FINGER_TEXT_LOG")
     dropTable("GAFIS_CONTRORCAPTURE_PERSON")
     dropTable("CODE_ZZMM")
+    dropTable("CODE_ZJZL")
     dropTable("CODE_ZJXY")
     dropTable("CODE_ZC")
     dropTable("CODE_XB")

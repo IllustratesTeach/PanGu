@@ -37,9 +37,9 @@ object GafisGatherTypeNode extends SQLSyntaxSupport[GafisGatherTypeNode] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, typeId: String, nodeId: Option[String], nodeOrd: Option[Long], isSkip: Option[Short], departId: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherTypeNode] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherTypeNode] = {
     withSQL {
-      select.from(GafisGatherTypeNode as ggtn).where.eq(ggtn.pkId, pkId).and.eq(ggtn.typeId, typeId).and.eq(ggtn.nodeId, nodeId).and.eq(ggtn.nodeOrd, nodeOrd).and.eq(ggtn.isSkip, isSkip).and.eq(ggtn.departId, departId)
+      select.from(GafisGatherTypeNode as ggtn).where.eq(ggtn.pkId, pkId)
     }.map(GafisGatherTypeNode(ggtn.resultName)).single.apply()
   }
 
@@ -112,13 +112,13 @@ object GafisGatherTypeNode extends SQLSyntaxSupport[GafisGatherTypeNode] {
         column.nodeOrd -> entity.nodeOrd,
         column.isSkip -> entity.isSkip,
         column.departId -> entity.departId
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.typeId, entity.typeId).and.eq(column.nodeId, entity.nodeId).and.eq(column.nodeOrd, entity.nodeOrd).and.eq(column.isSkip, entity.isSkip).and.eq(column.departId, entity.departId)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherTypeNode)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherTypeNode).where.eq(column.pkId, entity.pkId).and.eq(column.typeId, entity.typeId).and.eq(column.nodeId, entity.nodeId).and.eq(column.nodeOrd, entity.nodeOrd).and.eq(column.isSkip, entity.isSkip).and.eq(column.departId, entity.departId) }.update.apply()
+    withSQL { delete.from(GafisGatherTypeNode).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

@@ -42,9 +42,9 @@ object SysControl extends SQLSyntaxSupport[SysControl] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, version: Option[String], uploadPerson: Option[String], uploadTime: Option[DateTime], clientType: Option[String], filePath: Option[String], enableFlag: Option[String], sysType: Option[String])(implicit session: DBSession = autoSession): Option[SysControl] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysControl] = {
     withSQL {
-      select.from(SysControl as sc).where.eq(sc.pkId, pkId).and.eq(sc.version, version).and.eq(sc.uploadPerson, uploadPerson).and.eq(sc.uploadTime, uploadTime).and.eq(sc.clientType, clientType).and.eq(sc.filePath, filePath).and.eq(sc.enableFlag, enableFlag).and.eq(sc.sysType, sysType)
+      select.from(SysControl as sc).where.eq(sc.pkId, pkId)
     }.map(SysControl(sc.resultName)).single.apply()
   }
 
@@ -127,13 +127,13 @@ object SysControl extends SQLSyntaxSupport[SysControl] {
         column.filePath -> entity.filePath,
         column.enableFlag -> entity.enableFlag,
         column.sysType -> entity.sysType
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.version, entity.version).and.eq(column.uploadPerson, entity.uploadPerson).and.eq(column.uploadTime, entity.uploadTime).and.eq(column.clientType, entity.clientType).and.eq(column.filePath, entity.filePath).and.eq(column.enableFlag, entity.enableFlag).and.eq(column.sysType, entity.sysType)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysControl)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysControl).where.eq(column.pkId, entity.pkId).and.eq(column.version, entity.version).and.eq(column.uploadPerson, entity.uploadPerson).and.eq(column.uploadTime, entity.uploadTime).and.eq(column.clientType, entity.clientType).and.eq(column.filePath, entity.filePath).and.eq(column.enableFlag, entity.enableFlag).and.eq(column.sysType, entity.sysType) }.update.apply()
+    withSQL { delete.from(SysControl).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

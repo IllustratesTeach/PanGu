@@ -47,9 +47,9 @@ object GafisGatherPersonPhoto extends SQLSyntaxSupport[GafisGatherPersonPhoto] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, personid: Option[String], photoCode: String, photoData: Blob, photoOrg: Option[Long], inputpsn: Option[String], inputtime: DateTime, modifiedpsn: Option[String], modifiedtime: Option[DateTime], comments: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherPersonPhoto] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherPersonPhoto] = {
     withSQL {
-      select.from(GafisGatherPersonPhoto as ggpp).where.eq(ggpp.pkId, pkId).and.eq(ggpp.personid, personid).and.eq(ggpp.photoCode, photoCode).and.eq(ggpp.photoData, photoData).and.eq(ggpp.photoOrg, photoOrg).and.eq(ggpp.inputpsn, inputpsn).and.eq(ggpp.inputtime, inputtime).and.eq(ggpp.modifiedpsn, modifiedpsn).and.eq(ggpp.modifiedtime, modifiedtime).and.eq(ggpp.comments, comments)
+      select.from(GafisGatherPersonPhoto as ggpp).where.eq(ggpp.pkId, pkId)
     }.map(GafisGatherPersonPhoto(ggpp.resultName)).single.apply()
   }
 
@@ -142,13 +142,13 @@ object GafisGatherPersonPhoto extends SQLSyntaxSupport[GafisGatherPersonPhoto] {
         column.modifiedpsn -> entity.modifiedpsn,
         column.modifiedtime -> entity.modifiedtime,
         column.comments -> entity.comments
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.personid, entity.personid).and.eq(column.photoCode, entity.photoCode).and.eq(column.photoData, entity.photoData).and.eq(column.photoOrg, entity.photoOrg).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.comments, entity.comments)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherPersonPhoto)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherPersonPhoto).where.eq(column.pkId, entity.pkId).and.eq(column.personid, entity.personid).and.eq(column.photoCode, entity.photoCode).and.eq(column.photoData, entity.photoData).and.eq(column.photoOrg, entity.photoOrg).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.comments, entity.comments) }.update.apply()
+    withSQL { delete.from(GafisGatherPersonPhoto).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

@@ -35,9 +35,9 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, nodeId: Option[String], fieldName: Option[String], field: Option[String], rule: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherFieldset] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherFieldset] = {
     withSQL {
-      select.from(GafisGatherFieldset as ggf).where.eq(ggf.pkId, pkId).and.eq(ggf.nodeId, nodeId).and.eq(ggf.fieldName, fieldName).and.eq(ggf.selectDynamic("field"), field).and.eq(ggf.rule, rule)
+      select.from(GafisGatherFieldset as ggf).where.eq(ggf.pkId, pkId)
     }.map(GafisGatherFieldset(ggf.resultName)).single.apply()
   }
 
@@ -105,13 +105,13 @@ object GafisGatherFieldset extends SQLSyntaxSupport[GafisGatherFieldset] {
         column.fieldName -> entity.fieldName,
         column.selectDynamic("field") -> entity.field,
         column.rule -> entity.rule
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.selectDynamic("field"), entity.field).and.eq(column.rule, entity.rule)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherFieldset)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherFieldset).where.eq(column.pkId, entity.pkId).and.eq(column.nodeId, entity.nodeId).and.eq(column.fieldName, entity.fieldName).and.eq(column.selectDynamic("field"), entity.field).and.eq(column.rule, entity.rule) }.update.apply()
+    withSQL { delete.from(GafisGatherFieldset).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

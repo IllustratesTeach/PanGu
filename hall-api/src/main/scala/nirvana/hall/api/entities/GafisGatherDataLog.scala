@@ -53,9 +53,9 @@ object GafisGatherDataLog extends SQLSyntaxSupport[GafisGatherDataLog] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, userId: Option[String], userName: Option[String], unitCode: Option[String], unitName: Option[String], ip: Option[String], objectId: Option[String], tableName: Option[String], fgp: Option[String], oldData: Option[Blob], newData: Option[Blob], lobtype: Option[Short], createDatetime: Option[DateTime])(implicit session: DBSession = autoSession): Option[GafisGatherDataLog] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherDataLog] = {
     withSQL {
-      select.from(GafisGatherDataLog as ggdl).where.eq(ggdl.pkId, pkId).and.eq(ggdl.userId, userId).and.eq(ggdl.userName, userName).and.eq(ggdl.unitCode, unitCode).and.eq(ggdl.unitName, unitName).and.eq(ggdl.ip, ip).and.eq(ggdl.objectId, objectId).and.eq(ggdl.tableName, tableName).and.eq(ggdl.fgp, fgp).and.eq(ggdl.oldData, oldData).and.eq(ggdl.newData, newData).and.eq(ggdl.lobtype, lobtype).and.eq(ggdl.createDatetime, createDatetime)
+      select.from(GafisGatherDataLog as ggdl).where.eq(ggdl.pkId, pkId)
     }.map(GafisGatherDataLog(ggdl.resultName)).single.apply()
   }
 
@@ -163,13 +163,13 @@ object GafisGatherDataLog extends SQLSyntaxSupport[GafisGatherDataLog] {
         column.newData -> entity.newData,
         column.lobtype -> entity.lobtype,
         column.createDatetime -> entity.createDatetime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.userName, entity.userName).and.eq(column.unitCode, entity.unitCode).and.eq(column.unitName, entity.unitName).and.eq(column.ip, entity.ip).and.eq(column.objectId, entity.objectId).and.eq(column.tableName, entity.tableName).and.eq(column.fgp, entity.fgp).and.eq(column.oldData, entity.oldData).and.eq(column.newData, entity.newData).and.eq(column.lobtype, entity.lobtype).and.eq(column.createDatetime, entity.createDatetime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherDataLog)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherDataLog).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.userName, entity.userName).and.eq(column.unitCode, entity.unitCode).and.eq(column.unitName, entity.unitName).and.eq(column.ip, entity.ip).and.eq(column.objectId, entity.objectId).and.eq(column.tableName, entity.tableName).and.eq(column.fgp, entity.fgp).and.eq(column.oldData, entity.oldData).and.eq(column.newData, entity.newData).and.eq(column.lobtype, entity.lobtype).and.eq(column.createDatetime, entity.createDatetime) }.update.apply()
+    withSQL { delete.from(GafisGatherDataLog).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

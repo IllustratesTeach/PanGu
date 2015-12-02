@@ -31,9 +31,9 @@ object GafisLogicDbCase extends SQLSyntaxSupport[GafisLogicDbCase] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, logicDbPkid: Option[String], casePkid: Option[String])(implicit session: DBSession = autoSession): Option[GafisLogicDbCase] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisLogicDbCase] = {
     withSQL {
-      select.from(GafisLogicDbCase as gldc).where.eq(gldc.pkId, pkId).and.eq(gldc.logicDbPkid, logicDbPkid).and.eq(gldc.casePkid, casePkid)
+      select.from(GafisLogicDbCase as gldc).where.eq(gldc.pkId, pkId)
     }.map(GafisLogicDbCase(gldc.resultName)).single.apply()
   }
 
@@ -91,13 +91,13 @@ object GafisLogicDbCase extends SQLSyntaxSupport[GafisLogicDbCase] {
         column.pkId -> entity.pkId,
         column.logicDbPkid -> entity.logicDbPkid,
         column.casePkid -> entity.casePkid
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.logicDbPkid, entity.logicDbPkid).and.eq(column.casePkid, entity.casePkid)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisLogicDbCase)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisLogicDbCase).where.eq(column.pkId, entity.pkId).and.eq(column.logicDbPkid, entity.logicDbPkid).and.eq(column.casePkid, entity.casePkid) }.update.apply()
+    withSQL { delete.from(GafisLogicDbCase).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

@@ -14,9 +14,10 @@ case class LogInfo(
   operateCondition: Option[String] = None,
   operateResult: Option[String] = None,
   operateObject: Option[String] = None,
+  departname: Option[String] = None,
   updateBefore: Option[String] = None,
   updateAfter: Option[String] = None,
-  departname: Option[String] = None) {
+  time: Option[DateTime] = None) {
 
   def save()(implicit session: DBSession = LogInfo.autoSession): LogInfo = LogInfo.save(this)(session)
 
@@ -29,7 +30,7 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
 
   override val tableName = "LOG_INFO"
 
-  override val columns = Seq("NUM_ID", "USER_ID", "ORGANIZATION", "USER_NAME", "TERMINAL_ID", "OPERATE_TYPE", "OPERATE_TIME", "OPERATE_CONDITION", "OPERATE_RESULT", "OPERATE_OBJECT", "UPDATE_BEFORE", "UPDATE_AFTER", "DEPARTNAME")
+  override val columns = Seq("NUM_ID", "USER_ID", "ORGANIZATION", "USER_NAME", "TERMINAL_ID", "OPERATE_TYPE", "OPERATE_TIME", "OPERATE_CONDITION", "OPERATE_RESULT", "OPERATE_OBJECT", "DEPARTNAME", "UPDATE_BEFORE", "UPDATE_AFTER", "TIME")
 
   def apply(li: SyntaxProvider[LogInfo])(rs: WrappedResultSet): LogInfo = apply(li.resultName)(rs)
   def apply(li: ResultName[LogInfo])(rs: WrappedResultSet): LogInfo = new LogInfo(
@@ -43,18 +44,19 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
     operateCondition = rs.get(li.operateCondition),
     operateResult = rs.get(li.operateResult),
     operateObject = rs.get(li.operateObject),
+    departname = rs.get(li.departname),
     updateBefore = rs.get(li.updateBefore),
     updateAfter = rs.get(li.updateAfter),
-    departname = rs.get(li.departname)
+    time = rs.get(li.time)
   )
 
   val li = LogInfo.syntax("li")
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(numId: Long, userId: Option[String], organization: Option[String], userName: Option[String], terminalId: Option[String], operateType: Option[Short], operateTime: Option[DateTime], operateCondition: Option[String], operateResult: Option[String], operateObject: Option[String], updateBefore: Option[String], updateAfter: Option[String], departname: Option[String])(implicit session: DBSession = autoSession): Option[LogInfo] = {
+  def find(numId: Long)(implicit session: DBSession = autoSession): Option[LogInfo] = {
     withSQL {
-      select.from(LogInfo as li).where.eq(li.numId, numId).and.eq(li.userId, userId).and.eq(li.organization, organization).and.eq(li.userName, userName).and.eq(li.terminalId, terminalId).and.eq(li.operateType, operateType).and.eq(li.operateTime, operateTime).and.eq(li.operateCondition, operateCondition).and.eq(li.operateResult, operateResult).and.eq(li.operateObject, operateObject).and.eq(li.updateBefore, updateBefore).and.eq(li.updateAfter, updateAfter).and.eq(li.departname, departname)
+      select.from(LogInfo as li).where.eq(li.numId, numId)
     }.map(LogInfo(li.resultName)).single.apply()
   }
 
@@ -95,9 +97,10 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
     operateCondition: Option[String] = None,
     operateResult: Option[String] = None,
     operateObject: Option[String] = None,
+    departname: Option[String] = None,
     updateBefore: Option[String] = None,
     updateAfter: Option[String] = None,
-    departname: Option[String] = None)(implicit session: DBSession = autoSession): LogInfo = {
+    time: Option[DateTime] = None)(implicit session: DBSession = autoSession): LogInfo = {
     withSQL {
       insert.into(LogInfo).columns(
         column.numId,
@@ -110,9 +113,10 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
         column.operateCondition,
         column.operateResult,
         column.operateObject,
+        column.departname,
         column.updateBefore,
         column.updateAfter,
-        column.departname
+        column.time
       ).values(
         numId,
         userId,
@@ -124,9 +128,10 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
         operateCondition,
         operateResult,
         operateObject,
+        departname,
         updateBefore,
         updateAfter,
-        departname
+        time
       )
     }.update.apply()
 
@@ -141,9 +146,10 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
       operateCondition = operateCondition,
       operateResult = operateResult,
       operateObject = operateObject,
+      departname = departname,
       updateBefore = updateBefore,
       updateAfter = updateAfter,
-      departname = departname)
+      time = time)
   }
 
   def save(entity: LogInfo)(implicit session: DBSession = autoSession): LogInfo = {
@@ -159,16 +165,17 @@ object LogInfo extends SQLSyntaxSupport[LogInfo] {
         column.operateCondition -> entity.operateCondition,
         column.operateResult -> entity.operateResult,
         column.operateObject -> entity.operateObject,
+        column.departname -> entity.departname,
         column.updateBefore -> entity.updateBefore,
         column.updateAfter -> entity.updateAfter,
-        column.departname -> entity.departname
-      ).where.eq(column.numId, entity.numId).and.eq(column.userId, entity.userId).and.eq(column.organization, entity.organization).and.eq(column.userName, entity.userName).and.eq(column.terminalId, entity.terminalId).and.eq(column.operateType, entity.operateType).and.eq(column.operateTime, entity.operateTime).and.eq(column.operateCondition, entity.operateCondition).and.eq(column.operateResult, entity.operateResult).and.eq(column.operateObject, entity.operateObject).and.eq(column.updateBefore, entity.updateBefore).and.eq(column.updateAfter, entity.updateAfter).and.eq(column.departname, entity.departname)
+        column.time -> entity.time
+      ).where.eq(column.numId, entity.numId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: LogInfo)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(LogInfo).where.eq(column.numId, entity.numId).and.eq(column.userId, entity.userId).and.eq(column.organization, entity.organization).and.eq(column.userName, entity.userName).and.eq(column.terminalId, entity.terminalId).and.eq(column.operateType, entity.operateType).and.eq(column.operateTime, entity.operateTime).and.eq(column.operateCondition, entity.operateCondition).and.eq(column.operateResult, entity.operateResult).and.eq(column.operateObject, entity.operateObject).and.eq(column.updateBefore, entity.updateBefore).and.eq(column.updateAfter, entity.updateAfter).and.eq(column.departname, entity.departname) }.update.apply()
+    withSQL { delete.from(LogInfo).where.eq(column.numId, entity.numId) }.update.apply()
   }
 
 }

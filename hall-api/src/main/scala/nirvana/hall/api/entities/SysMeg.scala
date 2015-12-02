@@ -44,9 +44,9 @@ object SysMeg extends SQLSyntaxSupport[SysMeg] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, personId: String, personName: Option[String], gatherUserId: Option[String], megType: Option[Long], message: Option[String], lookStatus: Option[Long], inputtime: Option[DateTime], gatherDepartCode: Option[String])(implicit session: DBSession = autoSession): Option[SysMeg] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysMeg] = {
     withSQL {
-      select.from(SysMeg as sm).where.eq(sm.pkId, pkId).and.eq(sm.personId, personId).and.eq(sm.personName, personName).and.eq(sm.gatherUserId, gatherUserId).and.eq(sm.megType, megType).and.eq(sm.message, message).and.eq(sm.lookStatus, lookStatus).and.eq(sm.inputtime, inputtime).and.eq(sm.gatherDepartCode, gatherDepartCode)
+      select.from(SysMeg as sm).where.eq(sm.pkId, pkId)
     }.map(SysMeg(sm.resultName)).single.apply()
   }
 
@@ -134,13 +134,13 @@ object SysMeg extends SQLSyntaxSupport[SysMeg] {
         column.lookStatus -> entity.lookStatus,
         column.inputtime -> entity.inputtime,
         column.gatherDepartCode -> entity.gatherDepartCode
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.personName, entity.personName).and.eq(column.gatherUserId, entity.gatherUserId).and.eq(column.megType, entity.megType).and.eq(column.message, entity.message).and.eq(column.lookStatus, entity.lookStatus).and.eq(column.inputtime, entity.inputtime).and.eq(column.gatherDepartCode, entity.gatherDepartCode)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysMeg)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysMeg).where.eq(column.pkId, entity.pkId).and.eq(column.personId, entity.personId).and.eq(column.personName, entity.personName).and.eq(column.gatherUserId, entity.gatherUserId).and.eq(column.megType, entity.megType).and.eq(column.message, entity.message).and.eq(column.lookStatus, entity.lookStatus).and.eq(column.inputtime, entity.inputtime).and.eq(column.gatherDepartCode, entity.gatherDepartCode) }.update.apply()
+    withSQL { delete.from(SysMeg).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

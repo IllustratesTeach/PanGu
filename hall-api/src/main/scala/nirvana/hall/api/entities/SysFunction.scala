@@ -31,9 +31,9 @@ object SysFunction extends SQLSyntaxSupport[SysFunction] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(functionId: String, name: Option[String], remark: Option[String])(implicit session: DBSession = autoSession): Option[SysFunction] = {
+  def find(functionId: String)(implicit session: DBSession = autoSession): Option[SysFunction] = {
     withSQL {
-      select.from(SysFunction as sf).where.eq(sf.functionId, functionId).and.eq(sf.name, name).and.eq(sf.remark, remark)
+      select.from(SysFunction as sf).where.eq(sf.functionId, functionId)
     }.map(SysFunction(sf.resultName)).single.apply()
   }
 
@@ -91,13 +91,13 @@ object SysFunction extends SQLSyntaxSupport[SysFunction] {
         column.functionId -> entity.functionId,
         column.name -> entity.name,
         column.remark -> entity.remark
-      ).where.eq(column.functionId, entity.functionId).and.eq(column.name, entity.name).and.eq(column.remark, entity.remark)
+      ).where.eq(column.functionId, entity.functionId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysFunction)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysFunction).where.eq(column.functionId, entity.functionId).and.eq(column.name, entity.name).and.eq(column.remark, entity.remark) }.update.apply()
+    withSQL { delete.from(SysFunction).where.eq(column.functionId, entity.functionId) }.update.apply()
   }
 
 }

@@ -36,9 +36,9 @@ object SysUserLogintimeControl extends SQLSyntaxSupport[SysUserLogintimeControl]
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, userId: Option[String], controlId: Option[String], createUser: Option[String], createTime: Option[DateTime])(implicit session: DBSession = autoSession): Option[SysUserLogintimeControl] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysUserLogintimeControl] = {
     withSQL {
-      select.from(SysUserLogintimeControl as sulc).where.eq(sulc.pkId, pkId).and.eq(sulc.userId, userId).and.eq(sulc.controlId, controlId).and.eq(sulc.createUser, createUser).and.eq(sulc.createTime, createTime)
+      select.from(SysUserLogintimeControl as sulc).where.eq(sulc.pkId, pkId)
     }.map(SysUserLogintimeControl(sulc.resultName)).single.apply()
   }
 
@@ -106,13 +106,13 @@ object SysUserLogintimeControl extends SQLSyntaxSupport[SysUserLogintimeControl]
         column.controlId -> entity.controlId,
         column.createUser -> entity.createUser,
         column.createTime -> entity.createTime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.controlId, entity.controlId).and.eq(column.createUser, entity.createUser).and.eq(column.createTime, entity.createTime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysUserLogintimeControl)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysUserLogintimeControl).where.eq(column.pkId, entity.pkId).and.eq(column.userId, entity.userId).and.eq(column.controlId, entity.controlId).and.eq(column.createUser, entity.createUser).and.eq(column.createTime, entity.createTime) }.update.apply()
+    withSQL { delete.from(SysUserLogintimeControl).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

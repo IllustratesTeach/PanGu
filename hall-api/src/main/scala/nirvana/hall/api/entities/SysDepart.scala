@@ -57,9 +57,9 @@ object SysDepart extends SQLSyntaxSupport[SysDepart] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(code: String, name: Option[String], leader: Option[String], remark: Option[String], deleteFlag: Option[String], isLeaf: Option[String], parentId: Option[String], deptLevel: Option[String], longitude: Option[Int], latitude: Option[Int], phone: Option[String], longName: Option[String], isHaveChamber: Option[String], chamberType: Option[Short], isSpecial: Option[Short], integrationType: Option[String])(implicit session: DBSession = autoSession): Option[SysDepart] = {
+  def find(code: String)(implicit session: DBSession = autoSession): Option[SysDepart] = {
     withSQL {
-      select.from(SysDepart as sd).where.eq(sd.code, code).and.eq(sd.name, name).and.eq(sd.leader, leader).and.eq(sd.remark, remark).and.eq(sd.deleteFlag, deleteFlag).and.eq(sd.isLeaf, isLeaf).and.eq(sd.parentId, parentId).and.eq(sd.deptLevel, deptLevel).and.eq(sd.longitude, longitude).and.eq(sd.latitude, latitude).and.eq(sd.phone, phone).and.eq(sd.longName, longName).and.eq(sd.isHaveChamber, isHaveChamber).and.eq(sd.chamberType, chamberType).and.eq(sd.isSpecial, isSpecial).and.eq(sd.integrationType, integrationType)
+      select.from(SysDepart as sd).where.eq(sd.code, code)
     }.map(SysDepart(sd.resultName)).single.apply()
   }
 
@@ -182,13 +182,13 @@ object SysDepart extends SQLSyntaxSupport[SysDepart] {
         column.chamberType -> entity.chamberType,
         column.isSpecial -> entity.isSpecial,
         column.integrationType -> entity.integrationType
-      ).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.leader, entity.leader).and.eq(column.remark, entity.remark).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.isLeaf, entity.isLeaf).and.eq(column.parentId, entity.parentId).and.eq(column.deptLevel, entity.deptLevel).and.eq(column.longitude, entity.longitude).and.eq(column.latitude, entity.latitude).and.eq(column.phone, entity.phone).and.eq(column.longName, entity.longName).and.eq(column.isHaveChamber, entity.isHaveChamber).and.eq(column.chamberType, entity.chamberType).and.eq(column.isSpecial, entity.isSpecial).and.eq(column.integrationType, entity.integrationType)
+      ).where.eq(column.code, entity.code)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysDepart)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysDepart).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.leader, entity.leader).and.eq(column.remark, entity.remark).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.isLeaf, entity.isLeaf).and.eq(column.parentId, entity.parentId).and.eq(column.deptLevel, entity.deptLevel).and.eq(column.longitude, entity.longitude).and.eq(column.latitude, entity.latitude).and.eq(column.phone, entity.phone).and.eq(column.longName, entity.longName).and.eq(column.isHaveChamber, entity.isHaveChamber).and.eq(column.chamberType, entity.chamberType).and.eq(column.isSpecial, entity.isSpecial).and.eq(column.integrationType, entity.integrationType) }.update.apply()
+    withSQL { delete.from(SysDepart).where.eq(column.code, entity.code) }.update.apply()
   }
 
 }

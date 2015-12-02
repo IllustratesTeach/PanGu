@@ -37,9 +37,9 @@ object GafisLogicDb extends SQLSyntaxSupport[GafisLogicDb] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, logicCode: Option[String], logicName: Option[String], logicCategory: Option[String], logicDeltag: Option[String], logicRemark: Option[String])(implicit session: DBSession = autoSession): Option[GafisLogicDb] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisLogicDb] = {
     withSQL {
-      select.from(GafisLogicDb as gld).where.eq(gld.pkId, pkId).and.eq(gld.logicCode, logicCode).and.eq(gld.logicName, logicName).and.eq(gld.logicCategory, logicCategory).and.eq(gld.logicDeltag, logicDeltag).and.eq(gld.logicRemark, logicRemark)
+      select.from(GafisLogicDb as gld).where.eq(gld.pkId, pkId)
     }.map(GafisLogicDb(gld.resultName)).single.apply()
   }
 
@@ -112,13 +112,13 @@ object GafisLogicDb extends SQLSyntaxSupport[GafisLogicDb] {
         column.logicCategory -> entity.logicCategory,
         column.logicDeltag -> entity.logicDeltag,
         column.logicRemark -> entity.logicRemark
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.logicCode, entity.logicCode).and.eq(column.logicName, entity.logicName).and.eq(column.logicCategory, entity.logicCategory).and.eq(column.logicDeltag, entity.logicDeltag).and.eq(column.logicRemark, entity.logicRemark)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisLogicDb)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisLogicDb).where.eq(column.pkId, entity.pkId).and.eq(column.logicCode, entity.logicCode).and.eq(column.logicName, entity.logicName).and.eq(column.logicCategory, entity.logicCategory).and.eq(column.logicDeltag, entity.logicDeltag).and.eq(column.logicRemark, entity.logicRemark) }.update.apply()
+    withSQL { delete.from(GafisLogicDb).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

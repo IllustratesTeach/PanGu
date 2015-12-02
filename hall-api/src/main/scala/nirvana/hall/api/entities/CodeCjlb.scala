@@ -35,9 +35,9 @@ object CodeCjlb extends SQLSyntaxSupport[CodeCjlb] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(code: String, name: Option[String], deleteFlag: Option[String], ord: Option[Long], remark: Option[String])(implicit session: DBSession = autoSession): Option[CodeCjlb] = {
+  def find(code: String)(implicit session: DBSession = autoSession): Option[CodeCjlb] = {
     withSQL {
-      select.from(CodeCjlb as cc).where.eq(cc.code, code).and.eq(cc.name, name).and.eq(cc.deleteFlag, deleteFlag).and.eq(cc.ord, ord).and.eq(cc.remark, remark)
+      select.from(CodeCjlb as cc).where.eq(cc.code, code)
     }.map(CodeCjlb(cc.resultName)).single.apply()
   }
 
@@ -105,13 +105,13 @@ object CodeCjlb extends SQLSyntaxSupport[CodeCjlb] {
         column.deleteFlag -> entity.deleteFlag,
         column.ord -> entity.ord,
         column.remark -> entity.remark
-      ).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.ord, entity.ord).and.eq(column.remark, entity.remark)
+      ).where.eq(column.code, entity.code)
     }.update.apply()
     entity
   }
 
   def destroy(entity: CodeCjlb)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(CodeCjlb).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.ord, entity.ord).and.eq(column.remark, entity.remark) }.update.apply()
+    withSQL { delete.from(CodeCjlb).where.eq(column.code, entity.code) }.update.apply()
   }
 
 }

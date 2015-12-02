@@ -40,9 +40,9 @@ object GafisGatherOcxVersion extends SQLSyntaxSupport[GafisGatherOcxVersion] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, name: Option[String], `type`: Option[String], version: Option[String], remark: Option[String], createDatetime: Option[DateTime], deletag: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherOcxVersion] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherOcxVersion] = {
     withSQL {
-      select.from(GafisGatherOcxVersion as ggov).where.eq(ggov.pkId, pkId).and.eq(ggov.name, name).and.eq(ggov.`type`, `type`).and.eq(ggov.version, version).and.eq(ggov.remark, remark).and.eq(ggov.createDatetime, createDatetime).and.eq(ggov.deletag, deletag)
+      select.from(GafisGatherOcxVersion as ggov).where.eq(ggov.pkId, pkId)
     }.map(GafisGatherOcxVersion(ggov.resultName)).single.apply()
   }
 
@@ -120,13 +120,13 @@ object GafisGatherOcxVersion extends SQLSyntaxSupport[GafisGatherOcxVersion] {
         column.remark -> entity.remark,
         column.createDatetime -> entity.createDatetime,
         column.deletag -> entity.deletag
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.name, entity.name).and.eq(column.`type`, entity.`type`).and.eq(column.version, entity.version).and.eq(column.remark, entity.remark).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.deletag, entity.deletag)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherOcxVersion)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherOcxVersion).where.eq(column.pkId, entity.pkId).and.eq(column.name, entity.name).and.eq(column.`type`, entity.`type`).and.eq(column.version, entity.version).and.eq(column.remark, entity.remark).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.deletag, entity.deletag) }.update.apply()
+    withSQL { delete.from(GafisGatherOcxVersion).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

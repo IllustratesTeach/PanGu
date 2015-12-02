@@ -36,9 +36,9 @@ object GafisPersonAtt extends SQLSyntaxSupport[GafisPersonAtt] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, img: Option[Blob], `type`: Option[String], personid: Option[String], gatherdatanosqlid: Option[String])(implicit session: DBSession = autoSession): Option[GafisPersonAtt] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisPersonAtt] = {
     withSQL {
-      select.from(GafisPersonAtt as gpa).where.eq(gpa.pkId, pkId).and.eq(gpa.img, img).and.eq(gpa.`type`, `type`).and.eq(gpa.personid, personid).and.eq(gpa.gatherdatanosqlid, gatherdatanosqlid)
+      select.from(GafisPersonAtt as gpa).where.eq(gpa.pkId, pkId)
     }.map(GafisPersonAtt(gpa.resultName)).single.apply()
   }
 
@@ -106,13 +106,13 @@ object GafisPersonAtt extends SQLSyntaxSupport[GafisPersonAtt] {
         column.`type` -> entity.`type`,
         column.personid -> entity.personid,
         column.gatherdatanosqlid -> entity.gatherdatanosqlid
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.img, entity.img).and.eq(column.`type`, entity.`type`).and.eq(column.personid, entity.personid).and.eq(column.gatherdatanosqlid, entity.gatherdatanosqlid)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisPersonAtt)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisPersonAtt).where.eq(column.pkId, entity.pkId).and.eq(column.img, entity.img).and.eq(column.`type`, entity.`type`).and.eq(column.personid, entity.personid).and.eq(column.gatherdatanosqlid, entity.gatherdatanosqlid) }.update.apply()
+    withSQL { delete.from(GafisPersonAtt).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

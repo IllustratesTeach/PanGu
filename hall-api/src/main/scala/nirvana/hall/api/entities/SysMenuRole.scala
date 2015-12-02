@@ -48,9 +48,9 @@ object SysMenuRole extends SQLSyntaxSupport[SysMenuRole] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, roleId: String, menuCode: Option[String], remark: Option[String], createUser: String, createDatetime: Option[DateTime], updateUser: Option[String], updateDatetime: Option[DateTime], createUserId: Option[String], updateUserId: Option[String], onlyRead: Option[Long])(implicit session: DBSession = autoSession): Option[SysMenuRole] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysMenuRole] = {
     withSQL {
-      select.from(SysMenuRole as smr).where.eq(smr.pkId, pkId).and.eq(smr.roleId, roleId).and.eq(smr.menuCode, menuCode).and.eq(smr.remark, remark).and.eq(smr.createUser, createUser).and.eq(smr.createDatetime, createDatetime).and.eq(smr.updateUser, updateUser).and.eq(smr.updateDatetime, updateDatetime).and.eq(smr.createUserId, createUserId).and.eq(smr.updateUserId, updateUserId).and.eq(smr.onlyRead, onlyRead)
+      select.from(SysMenuRole as smr).where.eq(smr.pkId, pkId)
     }.map(SysMenuRole(smr.resultName)).single.apply()
   }
 
@@ -148,13 +148,13 @@ object SysMenuRole extends SQLSyntaxSupport[SysMenuRole] {
         column.createUserId -> entity.createUserId,
         column.updateUserId -> entity.updateUserId,
         column.onlyRead -> entity.onlyRead
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.roleId, entity.roleId).and.eq(column.menuCode, entity.menuCode).and.eq(column.remark, entity.remark).and.eq(column.createUser, entity.createUser).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateUser, entity.updateUser).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.onlyRead, entity.onlyRead)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysMenuRole)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysMenuRole).where.eq(column.pkId, entity.pkId).and.eq(column.roleId, entity.roleId).and.eq(column.menuCode, entity.menuCode).and.eq(column.remark, entity.remark).and.eq(column.createUser, entity.createUser).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateUser, entity.updateUser).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.onlyRead, entity.onlyRead) }.update.apply()
+    withSQL { delete.from(SysMenuRole).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

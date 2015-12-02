@@ -35,9 +35,9 @@ object SysRoleSign extends SQLSyntaxSupport[SysRoleSign] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(code: String, name: Option[String], deleteFlag: Option[String], remark: Option[String], ord: Option[Long])(implicit session: DBSession = autoSession): Option[SysRoleSign] = {
+  def find(code: String)(implicit session: DBSession = autoSession): Option[SysRoleSign] = {
     withSQL {
-      select.from(SysRoleSign as srs).where.eq(srs.code, code).and.eq(srs.name, name).and.eq(srs.deleteFlag, deleteFlag).and.eq(srs.remark, remark).and.eq(srs.ord, ord)
+      select.from(SysRoleSign as srs).where.eq(srs.code, code)
     }.map(SysRoleSign(srs.resultName)).single.apply()
   }
 
@@ -105,13 +105,13 @@ object SysRoleSign extends SQLSyntaxSupport[SysRoleSign] {
         column.deleteFlag -> entity.deleteFlag,
         column.remark -> entity.remark,
         column.ord -> entity.ord
-      ).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.ord, entity.ord)
+      ).where.eq(column.code, entity.code)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysRoleSign)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysRoleSign).where.eq(column.code, entity.code).and.eq(column.name, entity.name).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.ord, entity.ord) }.update.apply()
+    withSQL { delete.from(SysRoleSign).where.eq(column.code, entity.code) }.update.apply()
   }
 
 }

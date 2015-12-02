@@ -42,9 +42,9 @@ object GafisGatherSpecialty extends SQLSyntaxSupport[GafisGatherSpecialty] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, personid: Option[String], specialtyCode: Option[String], inputpsn: Option[String], inputtime: Option[DateTime], modifiedpsn: Option[String], modifiedtime: Option[DateTime], deletag: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherSpecialty] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherSpecialty] = {
     withSQL {
-      select.from(GafisGatherSpecialty as ggs).where.eq(ggs.pkId, pkId).and.eq(ggs.personid, personid).and.eq(ggs.specialtyCode, specialtyCode).and.eq(ggs.inputpsn, inputpsn).and.eq(ggs.inputtime, inputtime).and.eq(ggs.modifiedpsn, modifiedpsn).and.eq(ggs.modifiedtime, modifiedtime).and.eq(ggs.deletag, deletag)
+      select.from(GafisGatherSpecialty as ggs).where.eq(ggs.pkId, pkId)
     }.map(GafisGatherSpecialty(ggs.resultName)).single.apply()
   }
 
@@ -127,13 +127,13 @@ object GafisGatherSpecialty extends SQLSyntaxSupport[GafisGatherSpecialty] {
         column.modifiedpsn -> entity.modifiedpsn,
         column.modifiedtime -> entity.modifiedtime,
         column.deletag -> entity.deletag
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.personid, entity.personid).and.eq(column.specialtyCode, entity.specialtyCode).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.deletag, entity.deletag)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherSpecialty)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherSpecialty).where.eq(column.pkId, entity.pkId).and.eq(column.personid, entity.personid).and.eq(column.specialtyCode, entity.specialtyCode).and.eq(column.inputpsn, entity.inputpsn).and.eq(column.inputtime, entity.inputtime).and.eq(column.modifiedpsn, entity.modifiedpsn).and.eq(column.modifiedtime, entity.modifiedtime).and.eq(column.deletag, entity.deletag) }.update.apply()
+    withSQL { delete.from(GafisGatherSpecialty).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

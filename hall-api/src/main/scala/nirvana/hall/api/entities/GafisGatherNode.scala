@@ -46,9 +46,9 @@ object GafisGatherNode extends SQLSyntaxSupport[GafisGatherNode] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, nodeCode: Option[String], nodeName: Option[String], nodeRequest: String, deleteFlag: Option[Long], createUserId: String, createDatetime: DateTime, updateUserId: Option[String], updateDatetime: Option[DateTime], nodeImg: Option[String])(implicit session: DBSession = autoSession): Option[GafisGatherNode] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[GafisGatherNode] = {
     withSQL {
-      select.from(GafisGatherNode as ggn).where.eq(ggn.pkId, pkId).and.eq(ggn.nodeCode, nodeCode).and.eq(ggn.nodeName, nodeName).and.eq(ggn.nodeRequest, nodeRequest).and.eq(ggn.deleteFlag, deleteFlag).and.eq(ggn.createUserId, createUserId).and.eq(ggn.createDatetime, createDatetime).and.eq(ggn.updateUserId, updateUserId).and.eq(ggn.updateDatetime, updateDatetime).and.eq(ggn.nodeImg, nodeImg)
+      select.from(GafisGatherNode as ggn).where.eq(ggn.pkId, pkId)
     }.map(GafisGatherNode(ggn.resultName)).single.apply()
   }
 
@@ -141,13 +141,13 @@ object GafisGatherNode extends SQLSyntaxSupport[GafisGatherNode] {
         column.updateUserId -> entity.updateUserId,
         column.updateDatetime -> entity.updateDatetime,
         column.nodeImg -> entity.nodeImg
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.nodeCode, entity.nodeCode).and.eq(column.nodeName, entity.nodeName).and.eq(column.nodeRequest, entity.nodeRequest).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createUserId, entity.createUserId).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.nodeImg, entity.nodeImg)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: GafisGatherNode)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(GafisGatherNode).where.eq(column.pkId, entity.pkId).and.eq(column.nodeCode, entity.nodeCode).and.eq(column.nodeName, entity.nodeName).and.eq(column.nodeRequest, entity.nodeRequest).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.createUserId, entity.createUserId).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.nodeImg, entity.nodeImg) }.update.apply()
+    withSQL { delete.from(GafisGatherNode).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

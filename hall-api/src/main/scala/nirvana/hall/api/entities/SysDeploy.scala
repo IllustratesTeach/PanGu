@@ -57,9 +57,9 @@ object SysDeploy extends SQLSyntaxSupport[SysDeploy] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, projectName: String, currentFilePath: Option[String], uploadIp: Option[String], uploadPort: Option[Long], uploadPwd: Option[String], sysVersion: Option[String], localIp: Option[String], serverNo: Option[String], localPort: Option[Long], autoUpload: Option[Long], personNoPr: Option[String], webSerUrl: Option[String], webSerUsername: Option[String], webSerPassword: Option[String], webserviceUrl: Option[String])(implicit session: DBSession = autoSession): Option[SysDeploy] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysDeploy] = {
     withSQL {
-      select.from(SysDeploy as sd).where.eq(sd.pkId, pkId).and.eq(sd.projectName, projectName).and.eq(sd.currentFilePath, currentFilePath).and.eq(sd.uploadIp, uploadIp).and.eq(sd.uploadPort, uploadPort).and.eq(sd.uploadPwd, uploadPwd).and.eq(sd.sysVersion, sysVersion).and.eq(sd.localIp, localIp).and.eq(sd.serverNo, serverNo).and.eq(sd.localPort, localPort).and.eq(sd.autoUpload, autoUpload).and.eq(sd.personNoPr, personNoPr).and.eq(sd.webSerUrl, webSerUrl).and.eq(sd.webSerUsername, webSerUsername).and.eq(sd.webSerPassword, webSerPassword).and.eq(sd.webserviceUrl, webserviceUrl)
+      select.from(SysDeploy as sd).where.eq(sd.pkId, pkId)
     }.map(SysDeploy(sd.resultName)).single.apply()
   }
 
@@ -182,13 +182,13 @@ object SysDeploy extends SQLSyntaxSupport[SysDeploy] {
         column.webSerUsername -> entity.webSerUsername,
         column.webSerPassword -> entity.webSerPassword,
         column.webserviceUrl -> entity.webserviceUrl
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.projectName, entity.projectName).and.eq(column.currentFilePath, entity.currentFilePath).and.eq(column.uploadIp, entity.uploadIp).and.eq(column.uploadPort, entity.uploadPort).and.eq(column.uploadPwd, entity.uploadPwd).and.eq(column.sysVersion, entity.sysVersion).and.eq(column.localIp, entity.localIp).and.eq(column.serverNo, entity.serverNo).and.eq(column.localPort, entity.localPort).and.eq(column.autoUpload, entity.autoUpload).and.eq(column.personNoPr, entity.personNoPr).and.eq(column.webSerUrl, entity.webSerUrl).and.eq(column.webSerUsername, entity.webSerUsername).and.eq(column.webSerPassword, entity.webSerPassword).and.eq(column.webserviceUrl, entity.webserviceUrl)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysDeploy)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysDeploy).where.eq(column.pkId, entity.pkId).and.eq(column.projectName, entity.projectName).and.eq(column.currentFilePath, entity.currentFilePath).and.eq(column.uploadIp, entity.uploadIp).and.eq(column.uploadPort, entity.uploadPort).and.eq(column.uploadPwd, entity.uploadPwd).and.eq(column.sysVersion, entity.sysVersion).and.eq(column.localIp, entity.localIp).and.eq(column.serverNo, entity.serverNo).and.eq(column.localPort, entity.localPort).and.eq(column.autoUpload, entity.autoUpload).and.eq(column.personNoPr, entity.personNoPr).and.eq(column.webSerUrl, entity.webSerUrl).and.eq(column.webSerUsername, entity.webSerUsername).and.eq(column.webSerPassword, entity.webSerPassword).and.eq(column.webserviceUrl, entity.webserviceUrl) }.update.apply()
+    withSQL { delete.from(SysDeploy).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

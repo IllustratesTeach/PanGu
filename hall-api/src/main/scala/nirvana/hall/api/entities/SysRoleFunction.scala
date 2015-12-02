@@ -36,9 +36,9 @@ object SysRoleFunction extends SQLSyntaxSupport[SysRoleFunction] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, roleId: Option[String], functionId: Option[String], createUserId: Option[String], createDatetime: Option[DateTime])(implicit session: DBSession = autoSession): Option[SysRoleFunction] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysRoleFunction] = {
     withSQL {
-      select.from(SysRoleFunction as srf).where.eq(srf.pkId, pkId).and.eq(srf.roleId, roleId).and.eq(srf.functionId, functionId).and.eq(srf.createUserId, createUserId).and.eq(srf.createDatetime, createDatetime)
+      select.from(SysRoleFunction as srf).where.eq(srf.pkId, pkId)
     }.map(SysRoleFunction(srf.resultName)).single.apply()
   }
 
@@ -106,13 +106,13 @@ object SysRoleFunction extends SQLSyntaxSupport[SysRoleFunction] {
         column.functionId -> entity.functionId,
         column.createUserId -> entity.createUserId,
         column.createDatetime -> entity.createDatetime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.roleId, entity.roleId).and.eq(column.functionId, entity.functionId).and.eq(column.createUserId, entity.createUserId).and.eq(column.createDatetime, entity.createDatetime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysRoleFunction)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysRoleFunction).where.eq(column.pkId, entity.pkId).and.eq(column.roleId, entity.roleId).and.eq(column.functionId, entity.functionId).and.eq(column.createUserId, entity.createUserId).and.eq(column.createDatetime, entity.createDatetime) }.update.apply()
+    withSQL { delete.from(SysRoleFunction).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

@@ -40,9 +40,9 @@ object SysLogintimeControl extends SQLSyntaxSupport[SysLogintimeControl] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, controlName: Option[String], controlRule: Option[String], startTime: Option[String], endTime: Option[String], createUser: Option[String], createTime: Option[DateTime])(implicit session: DBSession = autoSession): Option[SysLogintimeControl] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysLogintimeControl] = {
     withSQL {
-      select.from(SysLogintimeControl as slc).where.eq(slc.pkId, pkId).and.eq(slc.controlName, controlName).and.eq(slc.controlRule, controlRule).and.eq(slc.startTime, startTime).and.eq(slc.endTime, endTime).and.eq(slc.createUser, createUser).and.eq(slc.createTime, createTime)
+      select.from(SysLogintimeControl as slc).where.eq(slc.pkId, pkId)
     }.map(SysLogintimeControl(slc.resultName)).single.apply()
   }
 
@@ -120,13 +120,13 @@ object SysLogintimeControl extends SQLSyntaxSupport[SysLogintimeControl] {
         column.endTime -> entity.endTime,
         column.createUser -> entity.createUser,
         column.createTime -> entity.createTime
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.controlName, entity.controlName).and.eq(column.controlRule, entity.controlRule).and.eq(column.startTime, entity.startTime).and.eq(column.endTime, entity.endTime).and.eq(column.createUser, entity.createUser).and.eq(column.createTime, entity.createTime)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysLogintimeControl)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysLogintimeControl).where.eq(column.pkId, entity.pkId).and.eq(column.controlName, entity.controlName).and.eq(column.controlRule, entity.controlRule).and.eq(column.startTime, entity.startTime).and.eq(column.endTime, entity.endTime).and.eq(column.createUser, entity.createUser).and.eq(column.createTime, entity.createTime) }.update.apply()
+    withSQL { delete.from(SysLogintimeControl).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

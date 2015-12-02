@@ -42,9 +42,9 @@ object SysLog extends SQLSyntaxSupport[SysLog] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, addreIp: Option[String], userName: Option[String], userId: Option[String], createDatetime: DateTime, deleteFlag: Long, remark: Option[String], logType: Option[String])(implicit session: DBSession = autoSession): Option[SysLog] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysLog] = {
     withSQL {
-      select.from(SysLog as sl).where.eq(sl.pkId, pkId).and.eq(sl.addreIp, addreIp).and.eq(sl.userName, userName).and.eq(sl.userId, userId).and.eq(sl.createDatetime, createDatetime).and.eq(sl.deleteFlag, deleteFlag).and.eq(sl.remark, remark).and.eq(sl.logType, logType)
+      select.from(SysLog as sl).where.eq(sl.pkId, pkId)
     }.map(SysLog(sl.resultName)).single.apply()
   }
 
@@ -127,13 +127,13 @@ object SysLog extends SQLSyntaxSupport[SysLog] {
         column.deleteFlag -> entity.deleteFlag,
         column.remark -> entity.remark,
         column.logType -> entity.logType
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.addreIp, entity.addreIp).and.eq(column.userName, entity.userName).and.eq(column.userId, entity.userId).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.logType, entity.logType)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysLog)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysLog).where.eq(column.pkId, entity.pkId).and.eq(column.addreIp, entity.addreIp).and.eq(column.userName, entity.userName).and.eq(column.userId, entity.userId).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.logType, entity.logType) }.update.apply()
+    withSQL { delete.from(SysLog).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }

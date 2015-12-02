@@ -149,7 +149,13 @@ case class GafisPerson(
   assistSign: Option[String] = None,
   gatherdepartname: Option[String] = None,
   gatherusername: Option[String] = None,
-  contrcaptureCode: Option[String] = None) {
+  contrcaptureCode: Option[String] = None,
+  certificatetype: Option[String] = None,
+  certificateid: Option[String] = None,
+  personType: Option[String] = None,
+  smuggling: Option[String] = None,
+  caseClasses2: Option[String] = None,
+  caseClasses3: Option[String] = None) {
 
   def save()(implicit session: DBSession = GafisPerson.autoSession): GafisPerson = GafisPerson.save(this)(session)
 
@@ -162,7 +168,7 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
 
   override val tableName = "GAFIS_PERSON"
 
-  override val columns = Seq("PERSONID", "IDCARDNO", "NAME", "SPELLNAME", "USEDNAME", "USEDSPELL", "ALIASNAME", "ALIASSPELL", "SEX_CODE", "NATIVEPLACE_CODE", "NATION_CODE", "IFMARRY_CODE", "TONE_CODE", "TONE", "BIRTHDAYST", "BIRTHDAYED", "BIRTH_CODE", "BIRTH_STREET", "BIRTHDETAIL", "DOOR", "DOOR_STREET", "DOORDETAIL", "ADDRESS", "ADDRESS_STREET", "ADDRESSDETAIL", "CULTURE_CODE", "SOURCEINCOME_CODE", "FAITH_CODE", "HAVEEMPLOYMENT", "JOB_CODE", "HEADSHIP", "EMPLOYUNIT", "EMPLOYADDRESS", "OTHERSPECIALTY", "SPECIALIDENTITY_CODE", "POLITICS_CODE", "ISTRANSIENTPOP", "ISTEMPREGIST", "HAVEPERMIT", "HAVERESIDENCE", "ISSERVICE", "SPECIALGROUP_CODE", "HAVESEPARATION", "ISMIGRANTWORKER", "NAMEOFSCHOOL", "ISTRAINING", "HAVECERTIFICATE", "STATUREST", "AVOIRDUPOIS", "FOOTSIZE", "SHOELENGTH", "BODILYFORM_CODE", "FACEFORM_CODE", "ISEYEGLASS", "SHOESIZE", "BLOODTYPE_CODE", "GATHER_ORG_CODE", "IPADDRESS", "GATHERER_ID", "GATHER_DATE", "GATHER_TYPE_ID", "STATUS", "ISFINGERREPEAT", "FINGERREPEATNO", "TASK_SOURCE", "RECEIVE_TIME", "ISRETURN", "RETURN_TIME", "ANNEX", "INPUTPSN", "INPUTTIME", "MODIFIEDPSN", "MODIFIEDTIME", "DELETAG", "SCHEDULE", "APPROVAL", "DNA_CODE", "GATHER_CATEGORY", "PERSON_CATEGORY", "AUDITOR", "AUDITEDTIME", "ISREGATHER", "GATHER_FINGER_MODE", "CASE_NAME", "CASE_CLASSES", "REASON", "GATHER_FINGER_NUM", "FINGER_REMARK", "DEPRTMAC", "GATHERDEPARTCODE", "GATHERUSERID", "GATHER_FINGER_TIME", "IS_SEND_TL", "CASE_BRIEF_CONTENTS", "PUSH_STATUS", "PUSH_DATE", "REMARK", "DATA_SOURCES", "FINGERSHOW_STATUS", "CITY_CODE", "DELAY_DEADLINE", "FPT_GATHER_DEPART_CODE", "FPT_GATHER_DEPART_NAME", "SID", "BLOW_CODE", "BLOW_STREET", "BLOW_DETAIL", "BLOW_LONGITUDE", "BLOW_LATITUDE", "BLOW_EASTWEST", "BLOW_NORTHSOUTH", "SEQ", "CARDID", "RECORDMARK", "RECORDSITUATION", "VALID_DATE", "ARRIVE_LOCAL_DATE", "LEAVE_LOCAL_DATE", "DB_SOURCE", "DB_SOURCE_DIS", "JOB_DES", "IS_XJSSMZ", "PASSPORT_NUM", "COUNTRY_CODE", "FOREIGN_NAME", "PASSPORT_VALID_DATE", "VISA_PLACE", "PASSPORT_TYPE", "VISA_DATE", "ASSIST_LEVEL", "ASSIST_BONUS", "ASSIST_PURPOSE", "ASSIST_REF_PERSON", "ASSIST_REF_CASE", "ASSIST_VALID_DATE", "ASSIST_EXPLAIN", "ASSIST_DEPT_CODE", "ASSIST_DEPT_NAME", "ASSIST_DATE", "ASSIST_CONTACTS", "ASSIST_NUMBER", "ASSIST_APPROVAL", "ASSIST_SIGN", "GATHERDEPARTNAME", "GATHERUSERNAME", "CONTRCAPTURE_CODE")
+  override val columns = Seq("PERSONID", "IDCARDNO", "NAME", "SPELLNAME", "USEDNAME", "USEDSPELL", "ALIASNAME", "ALIASSPELL", "SEX_CODE", "NATIVEPLACE_CODE", "NATION_CODE", "IFMARRY_CODE", "TONE_CODE", "TONE", "BIRTHDAYST", "BIRTHDAYED", "BIRTH_CODE", "BIRTH_STREET", "BIRTHDETAIL", "DOOR", "DOOR_STREET", "DOORDETAIL", "ADDRESS", "ADDRESS_STREET", "ADDRESSDETAIL", "CULTURE_CODE", "SOURCEINCOME_CODE", "FAITH_CODE", "HAVEEMPLOYMENT", "JOB_CODE", "HEADSHIP", "EMPLOYUNIT", "EMPLOYADDRESS", "OTHERSPECIALTY", "SPECIALIDENTITY_CODE", "POLITICS_CODE", "ISTRANSIENTPOP", "ISTEMPREGIST", "HAVEPERMIT", "HAVERESIDENCE", "ISSERVICE", "SPECIALGROUP_CODE", "HAVESEPARATION", "ISMIGRANTWORKER", "NAMEOFSCHOOL", "ISTRAINING", "HAVECERTIFICATE", "STATUREST", "AVOIRDUPOIS", "FOOTSIZE", "SHOELENGTH", "BODILYFORM_CODE", "FACEFORM_CODE", "ISEYEGLASS", "SHOESIZE", "BLOODTYPE_CODE", "GATHER_ORG_CODE", "IPADDRESS", "GATHERER_ID", "GATHER_DATE", "GATHER_TYPE_ID", "STATUS", "ISFINGERREPEAT", "FINGERREPEATNO", "TASK_SOURCE", "RECEIVE_TIME", "ISRETURN", "RETURN_TIME", "ANNEX", "INPUTPSN", "INPUTTIME", "MODIFIEDPSN", "MODIFIEDTIME", "DELETAG", "SCHEDULE", "APPROVAL", "DNA_CODE", "GATHER_CATEGORY", "PERSON_CATEGORY", "AUDITOR", "AUDITEDTIME", "ISREGATHER", "GATHER_FINGER_MODE", "CASE_NAME", "CASE_CLASSES", "REASON", "GATHER_FINGER_NUM", "FINGER_REMARK", "DEPRTMAC", "GATHERDEPARTCODE", "GATHERUSERID", "GATHER_FINGER_TIME", "IS_SEND_TL", "CASE_BRIEF_CONTENTS", "PUSH_STATUS", "PUSH_DATE", "REMARK", "DATA_SOURCES", "FINGERSHOW_STATUS", "CITY_CODE", "DELAY_DEADLINE", "FPT_GATHER_DEPART_CODE", "FPT_GATHER_DEPART_NAME", "SID", "BLOW_CODE", "BLOW_STREET", "BLOW_DETAIL", "BLOW_LONGITUDE", "BLOW_LATITUDE", "BLOW_EASTWEST", "BLOW_NORTHSOUTH", "SEQ", "CARDID", "RECORDMARK", "RECORDSITUATION", "VALID_DATE", "ARRIVE_LOCAL_DATE", "LEAVE_LOCAL_DATE", "DB_SOURCE", "DB_SOURCE_DIS", "JOB_DES", "IS_XJSSMZ", "PASSPORT_NUM", "COUNTRY_CODE", "FOREIGN_NAME", "PASSPORT_VALID_DATE", "VISA_PLACE", "PASSPORT_TYPE", "VISA_DATE", "ASSIST_LEVEL", "ASSIST_BONUS", "ASSIST_PURPOSE", "ASSIST_REF_PERSON", "ASSIST_REF_CASE", "ASSIST_VALID_DATE", "ASSIST_EXPLAIN", "ASSIST_DEPT_CODE", "ASSIST_DEPT_NAME", "ASSIST_DATE", "ASSIST_CONTACTS", "ASSIST_NUMBER", "ASSIST_APPROVAL", "ASSIST_SIGN", "GATHERDEPARTNAME", "GATHERUSERNAME", "CONTRCAPTURE_CODE", "CERTIFICATETYPE", "CERTIFICATEID", "PERSON_TYPE", "SMUGGLING", "CASE_CLASSES2", "CASE_CLASSES3")
 
   def apply(gp: SyntaxProvider[GafisPerson])(rs: WrappedResultSet): GafisPerson = apply(gp.resultName)(rs)
   def apply(gp: ResultName[GafisPerson])(rs: WrappedResultSet): GafisPerson = new GafisPerson(
@@ -311,7 +317,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
     assistSign = rs.get(gp.assistSign),
     gatherdepartname = rs.get(gp.gatherdepartname),
     gatherusername = rs.get(gp.gatherusername),
-    contrcaptureCode = rs.get(gp.contrcaptureCode)
+    contrcaptureCode = rs.get(gp.contrcaptureCode),
+    certificatetype = rs.get(gp.certificatetype),
+    certificateid = rs.get(gp.certificateid),
+    personType = rs.get(gp.personType),
+    smuggling = rs.get(gp.smuggling),
+    caseClasses2 = rs.get(gp.caseClasses2),
+    caseClasses3 = rs.get(gp.caseClasses3)
   )
 
   val gp = GafisPerson.syntax("gp")
@@ -496,7 +508,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
     assistSign: Option[String] = None,
     gatherdepartname: Option[String] = None,
     gatherusername: Option[String] = None,
-    contrcaptureCode: Option[String] = None)(implicit session: DBSession = autoSession): GafisPerson = {
+    contrcaptureCode: Option[String] = None,
+    certificatetype: Option[String] = None,
+    certificateid: Option[String] = None,
+    personType: Option[String] = None,
+    smuggling: Option[String] = None,
+    caseClasses2: Option[String] = None,
+    caseClasses3: Option[String] = None)(implicit session: DBSession = autoSession): GafisPerson = {
     withSQL {
       insert.into(GafisPerson).columns(
         column.personid,
@@ -644,7 +662,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
         column.assistSign,
         column.gatherdepartname,
         column.gatherusername,
-        column.contrcaptureCode
+        column.contrcaptureCode,
+        column.certificatetype,
+        column.certificateid,
+        column.personType,
+        column.smuggling,
+        column.caseClasses2,
+        column.caseClasses3
       ).values(
         personid,
         idcardno,
@@ -791,7 +815,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
         assistSign,
         gatherdepartname,
         gatherusername,
-        contrcaptureCode
+        contrcaptureCode,
+        certificatetype,
+        certificateid,
+        personType,
+        smuggling,
+        caseClasses2,
+        caseClasses3
       )
     }.update.apply()
 
@@ -941,7 +971,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
       assistSign = assistSign,
       gatherdepartname = gatherdepartname,
       gatherusername = gatherusername,
-      contrcaptureCode = contrcaptureCode)
+      contrcaptureCode = contrcaptureCode,
+      certificatetype = certificatetype,
+      certificateid = certificateid,
+      personType = personType,
+      smuggling = smuggling,
+      caseClasses2 = caseClasses2,
+      caseClasses3 = caseClasses3)
   }
 
   def save(entity: GafisPerson)(implicit session: DBSession = autoSession): GafisPerson = {
@@ -1092,7 +1128,13 @@ object GafisPerson extends SQLSyntaxSupport[GafisPerson] {
         column.assistSign -> entity.assistSign,
         column.gatherdepartname -> entity.gatherdepartname,
         column.gatherusername -> entity.gatherusername,
-        column.contrcaptureCode -> entity.contrcaptureCode
+        column.contrcaptureCode -> entity.contrcaptureCode,
+        column.certificatetype -> entity.certificatetype,
+        column.certificateid -> entity.certificateid,
+        column.personType -> entity.personType,
+        column.smuggling -> entity.smuggling,
+        column.caseClasses2 -> entity.caseClasses2,
+        column.caseClasses3 -> entity.caseClasses3
       ).where.eq(column.personid, entity.personid)
     }.update.apply()
     entity

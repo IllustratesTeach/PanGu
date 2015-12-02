@@ -68,9 +68,9 @@ object SysUser extends SQLSyntaxSupport[SysUser] {
 
  override def autoSession = nirvana.hall.api.services.AutoSpringDataSourceSession()
 
-  def find(pkId: String, loginName: String, password: Option[String], email: Option[String], trueName: Option[String], deleteFlag: Option[String], remark: Option[String], createDatetime: Option[DateTime], updateDatetime: Option[DateTime], createUserId: Option[String], updateUserId: Option[String], departCode: Option[String], idcard: Option[String], policeNumber: Option[String], genderCode: Option[String], userType: Option[String], phone: Option[String], departStartDate: Option[DateTime], userStatus: Option[String], lastLoginDate: Option[DateTime], loginTimeControl: Option[String])(implicit session: DBSession = autoSession): Option[SysUser] = {
+  def find(pkId: String)(implicit session: DBSession = autoSession): Option[SysUser] = {
     withSQL {
-      select.from(SysUser as su).where.eq(su.pkId, pkId).and.eq(su.loginName, loginName).and.eq(su.password, password).and.eq(su.email, email).and.eq(su.trueName, trueName).and.eq(su.deleteFlag, deleteFlag).and.eq(su.remark, remark).and.eq(su.createDatetime, createDatetime).and.eq(su.updateDatetime, updateDatetime).and.eq(su.createUserId, createUserId).and.eq(su.updateUserId, updateUserId).and.eq(su.departCode, departCode).and.eq(su.idcard, idcard).and.eq(su.policeNumber, policeNumber).and.eq(su.genderCode, genderCode).and.eq(su.userType, userType).and.eq(su.phone, phone).and.eq(su.departStartDate, departStartDate).and.eq(su.userStatus, userStatus).and.eq(su.lastLoginDate, lastLoginDate).and.eq(su.loginTimeControl, loginTimeControl)
+      select.from(SysUser as su).where.eq(su.pkId, pkId)
     }.map(SysUser(su.resultName)).single.apply()
   }
 
@@ -218,13 +218,13 @@ object SysUser extends SQLSyntaxSupport[SysUser] {
         column.userStatus -> entity.userStatus,
         column.lastLoginDate -> entity.lastLoginDate,
         column.loginTimeControl -> entity.loginTimeControl
-      ).where.eq(column.pkId, entity.pkId).and.eq(column.loginName, entity.loginName).and.eq(column.password, entity.password).and.eq(column.email, entity.email).and.eq(column.trueName, entity.trueName).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.departCode, entity.departCode).and.eq(column.idcard, entity.idcard).and.eq(column.policeNumber, entity.policeNumber).and.eq(column.genderCode, entity.genderCode).and.eq(column.userType, entity.userType).and.eq(column.phone, entity.phone).and.eq(column.departStartDate, entity.departStartDate).and.eq(column.userStatus, entity.userStatus).and.eq(column.lastLoginDate, entity.lastLoginDate).and.eq(column.loginTimeControl, entity.loginTimeControl)
+      ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
   }
 
   def destroy(entity: SysUser)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(SysUser).where.eq(column.pkId, entity.pkId).and.eq(column.loginName, entity.loginName).and.eq(column.password, entity.password).and.eq(column.email, entity.email).and.eq(column.trueName, entity.trueName).and.eq(column.deleteFlag, entity.deleteFlag).and.eq(column.remark, entity.remark).and.eq(column.createDatetime, entity.createDatetime).and.eq(column.updateDatetime, entity.updateDatetime).and.eq(column.createUserId, entity.createUserId).and.eq(column.updateUserId, entity.updateUserId).and.eq(column.departCode, entity.departCode).and.eq(column.idcard, entity.idcard).and.eq(column.policeNumber, entity.policeNumber).and.eq(column.genderCode, entity.genderCode).and.eq(column.userType, entity.userType).and.eq(column.phone, entity.phone).and.eq(column.departStartDate, entity.departStartDate).and.eq(column.userStatus, entity.userStatus).and.eq(column.lastLoginDate, entity.lastLoginDate).and.eq(column.loginTimeControl, entity.loginTimeControl) }.update.apply()
+    withSQL { delete.from(SysUser).where.eq(column.pkId, entity.pkId) }.update.apply()
   }
 
 }
