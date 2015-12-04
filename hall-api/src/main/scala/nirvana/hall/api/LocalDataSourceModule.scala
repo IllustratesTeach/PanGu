@@ -70,6 +70,10 @@ object LocalDataSourceModule {
 
     }
     else {
+      //针对oracle特别处理
+      if(config.api.db.driver.startsWith("oracle")){
+        hikariConfig.setConnectionTestQuery("select 1 from dual")
+      }
       hikariConfig.setDriverClassName(config.api.db.driver)
       hikariConfig.setJdbcUrl(config.api.db.url)
       if (config.api.db.user != null)
