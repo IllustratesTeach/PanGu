@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal
 import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETREQUESTHEADOBJECT, GNETANSWERHEADOBJECT}
-import nirvana.hall.v62.services.{V62ServerAddress, AncientData, ChannelOperator}
+import nirvana.hall.v62.services.{GafisException, V62ServerAddress, AncientData, ChannelOperator}
 
 /**
  * provide AncientClient instance
@@ -39,7 +39,7 @@ trait AncientClientSupport {
     //if(response.nReturnValue == -1) {
     if(response.nReturnValue <0) {
       val gafisError = channel.receive[GAFISERRDATSTRUCT]()
-      throw new IllegalAccessException("fail to send data,num:%s,file:%s,line:%s".format(gafisError.nAFISErrno,gafisError.szFileName,gafisError.nLineNum));
+      throw new GafisException(gafisError)
     }
   }
   protected def GAFIS_NETSCR_SendMICStruct(channel:ChannelOperator,mic:GAFISMICSTRUCT): Unit ={
