@@ -45,10 +45,8 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
   }
 
   def findSyncQueue(implicit session: DBSession): Option[SyncQueue] ={
-    val sq = SyncQueue.sq
-    withSQL{
-      selectFrom(SyncQueue as sq).where.eq(sq.uploadStatus, "0")
-    }.map(SyncQueue(sq.resultName)).single.apply()
+    //TODO "0" must be defined as constants
+    SyncQueue.findBy(sqls.eq(SyncQueue.sq.uploadStatus,"0"))
   }
 
   /**
