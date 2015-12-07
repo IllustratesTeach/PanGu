@@ -42,19 +42,19 @@ object GafisException{
   }
 }
 class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
-  fillInStackTrace().setStackTrace(getStackTrace)
   /**
    * get error code
    * @return error code
    */
   def code:Int =  gafisError.nAFISErrno
 
+  def getSimpleMessage: String = findMessageByCode(code).getOrElse(UNKNOW_ERROR) +"(%s)".format(code)
   /**
    * retrieve message
    * @return error message
    */
   override def getMessage: String = {
-    val message = findMessageByCode(code).getOrElse(UNKNOW_ERROR) +"(%s)".format(code)
+    val message = getSimpleMessage
     if(gafisError.szFileName != null)
       message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)
     else
