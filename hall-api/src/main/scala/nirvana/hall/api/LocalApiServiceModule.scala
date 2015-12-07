@@ -3,9 +3,9 @@ package nirvana.hall.api
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.protobuf.sys._
 import nirvana.hall.api.internal.protobuf.sys.stamp._
-import nirvana.hall.api.internal.stamp.{GatherPortraitServiceImpl, GatherFingerPalmServiceImpl, GatherPersonServiceImpl}
+import nirvana.hall.api.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.stamp.{GatherPortraitService, GatherFingerPalmService, GatherPersonService}
+import nirvana.hall.api.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import org.apache.tapestry5.ioc.annotations.{Contribute, Local, Match}
 import org.apache.tapestry5.ioc.{MethodAdviceReceiver, OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core

@@ -1,25 +1,19 @@
 package nirvana.hall.v62
 
-import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.filter.lp._
-import nirvana.hall.v62.internal.filter.tp.TPCardFilter
-import org.apache.tapestry5.ioc.annotations.Contribute
-import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
+import monad.core.MonadCoreSymbols
+import monad.core.internal.MonadConfigFileUtils
+import monad.support.services.XmlLoader
+import nirvana.hall.v62.config.HallV62Config
+import org.apache.tapestry5.ioc.annotations.Symbol
 
 /**
- *
+ * v62 module
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-04
  */
 object LocalV62Module {
-  def bind(binder:ServiceBinder): Unit ={
-    binder.bind(classOf[V62Facade])
-  }
-  @Contribute(classOf[ProtobufRequestHandler])
-  def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
-    configuration.addInstance("TPCardAddFilter", classOf[TPCardFilter])
-    configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
-    configuration.addInstance("CaseFilter", classOf[CaseFilter])
+  def buildHallV62Config(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
+    val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-v62.xml")
+    XmlLoader.parseXML[HallV62Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v62/v62.xsd")))
   }
 }

@@ -1,8 +1,6 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.protocol.sys.DictProto.{DictData, DictType}
-import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.DBSession
 
 /**
  * 字典同步 service
@@ -16,16 +14,6 @@ trait DictService {
    * @return
    */
   def findAllDict(dictType: DictType): Seq[DictData]
-
-  /**
-   * 同步字典
-   * @param dictType 字典类型
-   * @param dictDataList 要同步的字典数据
-   * @param session
-   * @return
-   */
-  @Transactional
-  def syncDict(dictType: DictType, dictDataList: Seq[DictData])(implicit session: DBSession = AutoSpringDataSourceSession.apply())
 
   /**
    * 查询字典列表
