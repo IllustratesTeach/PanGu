@@ -92,12 +92,11 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
   }
 
   private def updateSyncQueueFail(syncQueue: SyncQueue, exception: Exception)(implicit session: DBSession): Unit ={
-    var message = ""
-    exception match {
+    val message = exception match {
       case e: GafisException =>
-        message = e.getSimpleMessage
+        e.getSimpleMessage
       case other =>
-        message = other.getMessage
+        other.getMessage
     }
     withSQL{
       val column = SyncQueue.column
