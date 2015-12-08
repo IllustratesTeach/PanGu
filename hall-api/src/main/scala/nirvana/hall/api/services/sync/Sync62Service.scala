@@ -2,6 +2,7 @@ package nirvana.hall.api.services.sync
 
 import nirvana.hall.api.entities.SyncQueue
 import nirvana.hall.api.services.AutoSpringDataSourceSession
+import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession
 
 /**
@@ -16,5 +17,6 @@ trait Sync62Service {
    * @param session
    * @return
    */
+  @Transactional
   def doWork(syncQueue: SyncQueue)(implicit session: DBSession = AutoSpringDataSourceSession.apply())
 }

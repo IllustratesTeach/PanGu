@@ -19,8 +19,38 @@ trait Sync62LPCardService{
    * @return
    */
   def syncLPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-    //TODO 添加修改和删除
     val fingerId = syncQueue.uploadKeyid.get
+    syncQueue.opration.get match {
+      case "insert" =>
+        addLPCard(facade, v62Config, fingerId)
+      case "update" =>
+        updateLPCard(facade, v62Config, fingerId)
+      case "delete" =>
+        deleteLPCard(facade, v62Config, fingerId)
+    }
+  }
+  private def addLPCard(facade: V62Facade, v62Config: HallV62Config, fingerId: String)(implicit session: DBSession): Unit = {
+    val lpCard = getLPCard(fingerId)
+    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
+    //调用实现方法
+    facade.NET_GAFIS_FLIB_Add(v62Config.latentTable.dbId.toShort,
+      v62Config.latentTable.tableId.toShort,
+      fingerId, gLPCard)
+  }
+  private def updateLPCard(facade: V62Facade, v62Config: HallV62Config, fingerId: String)(implicit session: DBSession): Unit = {
+    val lpCard = getLPCard(fingerId)
+    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
+    //调用实现方法
+    facade.NET_GAFIS_FLIB_Update(v62Config.latentTable.dbId.toShort,
+      v62Config.latentTable.tableId.toShort,
+      fingerId, gLPCard)
+  }
+  private def deleteLPCard(facade: V62Facade, v62Config: HallV62Config, fingerId: String)(implicit session: DBSession): Unit = {
+    facade.NET_GAFIS_FLIB_Del(v62Config.latentTable.dbId.toShort,
+      v62Config.latentTable.tableId.toShort,
+      fingerId)
+  }
+  private def getLPCard(fingerId: String)(implicit session: DBSession): LPCard = {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(fingerId)
 
@@ -57,13 +87,9 @@ trait Sync62LPCardService{
       pattern.split(",").foreach(f => blobBuilder.addRp(PatternType.valueOf(f)))
     }
 
-    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard.build())
-    //调用实现方法
-    facade.NET_GAFIS_FLIB_Add(v62Config.latentTable.dbId.toShort,
-      v62Config.latentTable.tableId.toShort,
-      fingerId, gLPCard)
+    lpCard.build()
   }
-  def findCaseFingerMntByFingerId(fingerId: String)(implicit session: DBSession): Option[GafisCaseFingerMnt] = {
+  private def findCaseFingerMntByFingerId(fingerId: String)(implicit session: DBSession): Option[GafisCaseFingerMnt] = {
     val gcfm = GafisCaseFingerMnt.syntax("gcfm")
     withSQL{
       selectFrom(GafisCaseFingerMnt as gcfm).where.eq(gcfm.fingerId, fingerId)

@@ -1,11 +1,13 @@
 package nirvana.hall.api.internal.sync
 
-import nirvana.hall.api.entities.{GafisCase, SyncQueue}
+import nirvana.hall.api.entities.{GafisCaseFinger, GafisCase, SyncQueue}
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
-import scalikejdbc.DBSession
+import scalikejdbc.{SQL, DBSession}
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 15/12/7.
@@ -19,6 +21,32 @@ trait Sync62CaseService {
    */
   def syncCase(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     val caseId = syncQueue.uploadKeyid.get
+    syncQueue.opration.get match {
+      case "insert" =>
+        addCase(facade, v62Config, caseId)
+      case "update" =>
+        updateCase(facade, v62Config, caseId)
+      case "delete" =>
+        deleteCase(facade, v62Config, caseId)
+    }
+  }
+
+  private def addCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+    val caseInfo = getCase(caseId)
+    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    facade.NET_GAFIS_CASE_Add(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
+  }
+  private def updateCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+    val caseInfo = getCase(caseId)
+    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    facade.NET_GAFIS_CASE_Update(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
+  }
+  private def deleteCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+    facade.NET_GAFIS_CASE_Del(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort,
+      if(caseId.indexOf("A") == 0) caseId.substring(1) else caseId)
+  }
+
+  private def getCase(caseId: String)(implicit session: DBSession): Case = {
     val caseBuilder = Case.newBuilder()
     val caseInfo = GafisCase.find(caseId).get
     caseBuilder.setStrCaseID(caseId)
@@ -44,15 +72,15 @@ trait Sync62CaseService {
     caseInfo.assistRevokeSign.foreach(f => textBuilder.setNCancelFlag(f))
     caseInfo.caseState.foreach(f => textBuilder.setNCaseState(f))
 
-    //      val caseFingerList = findCaseFingerIdsListByCaseId(caseId)
-    //      caseFingerList.foreach(caseBuilder.addStrFingerID)
+    findCaseFingerIdsListByCaseId(caseId).foreach(caseBuilder.addStrFingerID)
 
-    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseBuilder.build())
-    facade.NET_GAFIS_CASE_Add(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
+    caseBuilder.build()
   }
-//  def findCaseFingerIdsListByCaseId(caseId: String)(implicit session: DBSession): Seq[String] = {
-//    val fingerIds = ArrayBuffer[String]()
-//    SQL("select finger_id from "+ GafisCaseFinger.tableName + " where case_id=?").bind(caseId).foreach(rs => fingerIds += rs.string(1))
-//    fingerIds.toSeq
-//  }
+
+  private def findCaseFingerIdsListByCaseId(caseId: String)(implicit session: DBSession): Seq[String] = {
+    val fingerIds = ArrayBuffer[String]()
+    SQL("select finger_id from " + GafisCaseFinger.tableName + " where case_id=? and deletag='1'").bind(caseId).foreach(rs => fingerIds += rs.string(1))
+    fingerIds.toSeq
+  }
+
 }

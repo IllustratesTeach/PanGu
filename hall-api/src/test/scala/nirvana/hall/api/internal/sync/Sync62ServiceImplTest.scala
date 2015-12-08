@@ -21,7 +21,7 @@ class Sync62ServiceImplTest {
   @Test
   def test_sync(): Unit ={
     val syncService = registry.getService(classOf[Sync62Service])
-    val syncQueue = SyncQueue.find("8a8187e45161e057015161e6fb50000d").get
+    val syncQueue = SyncQueue.find("8a8187e4516192000151619a32fc0006").get
     syncService.doWork(syncQueue)
 
   }

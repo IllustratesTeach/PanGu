@@ -11,6 +11,8 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.GafisException
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.joda.time.DateTime
+import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
 /**
@@ -38,7 +40,8 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
     periodicExecutor.addJob(new CronSchedule(apiConfig.sync62Cron), "sync-70to62", new Runnable {
       override def run(): Unit = {
-        findSyncQueue(SyncQueue.autoSession).foreach(doWork)
+        println(new DateTime())
+//        findSyncQueue(SyncQueue.autoSession).foreach(doWork)
       }
     })
   }
@@ -56,6 +59,7 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
    * @param session
    * @return
    */
+  @Transactional
   override def doWork(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     val uploadFlag = syncQueue.uploadFlag.get
 
@@ -68,23 +72,39 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
         case UPLOAD_FLAG_LPCARD =>
           syncLPCard(facade, v62Config, syncQueue)
         case other =>
-          //TODO 定义异常
-          println(uploadFlag)
+          throw new RuntimeException("unknown uploadFlag "+ other)
       }
+      updateSyncQueueSucess(syncQueue)
     }
     catch {
-      case e: GafisException =>
-      case other =>
-        //TODO 其他异常处理
+      case e: Exception =>
+        updateSyncQueueFail(syncQueue, e)
     }
-    updateSyncQueueFlagFinish(syncQueue)
   }
 
   /**
    * 更新队列任务状态
    * @param syncQueue
    */
-  private def updateSyncQueueFlagFinish(syncQueue: SyncQueue): Unit ={
+  private def updateSyncQueueSucess(syncQueue: SyncQueue)(implicit session: DBSession): Unit ={
+    withSQL{
+      val column = SyncQueue.column
+      update(SyncQueue).set(column.uploadStatus -> "1", column.remark -> "success").where.eq(column.pkId, syncQueue.pkId)
+    }.update().apply()
+  }
+
+  private def updateSyncQueueFail(syncQueue: SyncQueue, exception: Exception)(implicit session: DBSession): Unit ={
+    var message = ""
+    if(exception.isInstanceOf[GafisException]){
+      val gafisException = exception.asInstanceOf[GafisException]
+      message = gafisException.getSimpleMessage
+    }else{
+      message = exception.getMessage
+    }
+    withSQL{
+      val column = SyncQueue.column
+      update(SyncQueue).set(column.uploadStatus -> "2", column.remark -> message).where.eq(column.pkId, syncQueue.pkId)
+    }.update().apply()
 
   }
 

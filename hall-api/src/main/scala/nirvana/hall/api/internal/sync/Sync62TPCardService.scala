@@ -19,8 +19,40 @@ trait Sync62TPCardService {
    * @return
    */
   def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-    //TODO 添加修改和删除
     val personId = syncQueue.uploadKeyid.get
+    syncQueue.opration.get match {
+      case "insert" =>
+        addTPCard(facade, v62Config, personId)
+      case "update" =>
+        updateTPCard(facade, v62Config, personId)
+      case "delete" =>
+        deleteTPCard(facade, v62Config, personId)
+    }
+  }
+
+  private def addTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit = {
+    val tpCard = getTPCard(personId)
+    //数据转换为C的结构
+    val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
+    //上报
+    facade.NET_GAFIS_FLIB_Add(v62Config.templateTable.dbId.toShort,
+      v62Config.templateTable.tableId.toShort,
+      personId,gTPCard)
+  }
+
+  private def updateTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit = {
+    val tpCard = getTPCard(personId)
+    val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
+    facade.NET_GAFIS_FLIB_Update(v62Config.templateTable.dbId.toShort,
+      v62Config.templateTable.tableId.toShort, personId, gTPCard)
+  }
+
+  private def deleteTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit ={
+    facade.NET_GAFIS_FLIB_Del(v62Config.templateTable.dbId.toShort,
+      v62Config.templateTable.tableId.toShort, personId)
+  }
+
+  private def getTPCard(personId: String)(implicit session: DBSession): TPCard ={
     val person = GafisPerson.find(personId).get
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(personId)
@@ -83,18 +115,15 @@ trait Sync62TPCardService {
       blobBuilder.setBPlain("1".equals(finger.fgpCase.toString))
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
-    //数据转换为C的结构
-    val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard.build())
-    //上报
-    facade.NET_GAFIS_FLIB_Add(v62Config.templateTable.dbId.toShort,
-      v62Config.templateTable.tableId.toShort,
-      personId,gTPCard)
+    tpCard.build()
   }
 
-  def findGafisGatherFingerListByPersonId(personId: String)(implicit session: DBSession): Seq[GafisGatherFinger] ={
+  private def findGafisGatherFingerListByPersonId(personId: String)(implicit session: DBSession): Seq[GafisGatherFinger] ={
     val ggf = GafisGatherFinger.syntax("ggf")
     withSQL {
       select.from(GafisGatherFinger as ggf).where.eq(ggf.personId, personId)
     }.map(GafisGatherFinger(ggf.resultName)).list().apply().toSeq
   }
+
+
 }
