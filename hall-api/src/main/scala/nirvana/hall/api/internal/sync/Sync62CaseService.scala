@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal.sync
 
 import nirvana.hall.api.entities.{GafisCase, SyncQueue}
-import nirvana.hall.api.services.sync.Sync62CaseService
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
@@ -11,15 +10,14 @@ import scalikejdbc.DBSession
 /**
  * Created by songpeng on 15/12/7.
  */
-class Sync62CaseServiceImpl(facade: V62Facade, v62Config: HallV62Config) extends Sync62CaseService{
+trait Sync62CaseService {
   /**
-   * 同步案件信息到6.2
+   * 同步案件信息到62
    * @param syncQueue
    * @param session
    * @return
    */
-  override def syncCase(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-
+  def syncCase(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     val caseId = syncQueue.uploadKeyid.get
     val caseBuilder = Case.newBuilder()
     val caseInfo = GafisCase.find(caseId).get

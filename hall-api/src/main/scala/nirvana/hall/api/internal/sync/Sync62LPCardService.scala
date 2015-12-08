@@ -2,9 +2,7 @@ package nirvana.hall.api.internal.sync
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.entities.{GafisCaseFinger, GafisCaseFingerMnt, SyncQueue}
-import nirvana.hall.api.services.sync.Sync62LPCardService
-import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, PatternType}
-import nirvana.hall.protocol.v62.lp.LPCardProto.LPCardAddRequest
+import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
@@ -12,7 +10,7 @@ import scalikejdbc._
 /**
  * Created by songpeng on 15/12/7.
  */
-class Sync62LPCardServiceImpl(facade: V62Facade, v62Config: HallV62Config) extends Sync62LPCardService{
+trait Sync62LPCardService{
 
   /**
    * 同步现场卡片信息到62
@@ -20,11 +18,10 @@ class Sync62LPCardServiceImpl(facade: V62Facade, v62Config: HallV62Config) exten
    * @param session
    * @return
    */
-  override def syncLPCard(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
+  def syncLPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     //TODO 添加修改和删除
     val fingerId = syncQueue.uploadKeyid.get
-    val requestBuilder = LPCardAddRequest.newBuilder()
-    val lpCard = requestBuilder.getCardBuilder
+    val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(fingerId)
 
     val card = GafisCaseFinger.find(fingerId).get
@@ -51,10 +48,9 @@ class Sync62LPCardServiceImpl(facade: V62Facade, v62Config: HallV62Config) exten
     }
     //指位
     card.fgp.foreach { fgp =>
-      for (i <- 0 until fgp.length) {
-        if ("1".equals(fgp.charAt(i) + ""))
-          blobBuilder.addFgp(FingerFgp.valueOf(i + 1))
-      }
+      0.until(fgp.length)
+        .filter("1" == fgp.charAt(_))
+        .foreach (i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
     }
     //纹型
     card.pattern.foreach { pattern =>

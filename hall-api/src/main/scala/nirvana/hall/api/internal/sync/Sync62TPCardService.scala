@@ -2,31 +2,23 @@ package nirvana.hall.api.internal.sync
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.entities._
-import nirvana.hall.api.services.sync.Sync62TPCardService
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
-import org.joda.time.DateTime
 import scalikejdbc._
 
 /**
  * Created by songpeng on 15/12/7.
  */
-class Sync62TPCardServiceImpl(facade: V62Facade,v62Config: HallV62Config) extends Sync62TPCardService{
-  implicit def string2Int(string: String): Int ={
-    Integer.parseInt(string)
-  }
-  implicit def dateTime2String(date: DateTime): String = {
-    date.toString("yyyyMMdd")
-  }
+trait Sync62TPCardService {
   /**
    * 同步捺印卡到6.2
    * @param syncQueue
    * @param session
    * @return
    */
-  override def syncTPCard(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
+  def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     //TODO 添加修改和删除
     val personId = syncQueue.uploadKeyid.get
     val person = GafisPerson.find(personId).get
@@ -97,11 +89,6 @@ class Sync62TPCardServiceImpl(facade: V62Facade,v62Config: HallV62Config) extend
     facade.NET_GAFIS_FLIB_Add(v62Config.templateTable.dbId.toShort,
       v62Config.templateTable.tableId.toShort,
       personId,gTPCard)
-
-    //更新上报状态
-    syncQueue.uploadStatus == Option("1")
-    syncQueue.finishdate == Option(new DateTime())
-    SyncQueue.save(syncQueue)
   }
 
   def findGafisGatherFingerListByPersonId(personId: String)(implicit session: DBSession): Seq[GafisGatherFinger] ={

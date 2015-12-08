@@ -5,9 +5,10 @@ import javax.inject.Inject
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.entities._
 import nirvana.hall.api.services.DictService
-import nirvana.hall.api.services.sync.{Sync62CaseService, Sync62LPCardService, Sync62Service, Sync62TPCardService}
+import nirvana.hall.api.services.sync.Sync62Service
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.services.GafisException
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import scalikejdbc._
@@ -16,7 +17,11 @@ import scalikejdbc._
  * Created by songpeng on 15/12/1.
  */
 @EagerLoad
-class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig) extends Sync62Service{
+class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig)
+  extends Sync62Service
+  with Sync62CaseService
+  with Sync62LPCardService
+  with Sync62TPCardService{
   @Inject
   var sync62TPCardService: Sync62TPCardService = _
   @Inject
@@ -53,16 +58,34 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
    */
   override def doWork(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
     val uploadFlag = syncQueue.uploadFlag.get
-    uploadFlag match {
-      case UPLOAD_FLAG_TPCARD =>
-        sync62TPCardService.syncTPCard(syncQueue)
-      case UPLOAD_FLAG_CASE =>
-        sync62CaseService.syncCase(syncQueue)
-      case UPLOAD_FLAG_LPCARD =>
-        sync62LPCardService.syncLPCard(syncQueue)
-      case other =>
-        println(uploadFlag)
+
+    try {
+      uploadFlag match {
+        case UPLOAD_FLAG_TPCARD =>
+          syncTPCard(facade, v62Config, syncQueue)
+        case UPLOAD_FLAG_CASE =>
+          syncCase(facade, v62Config, syncQueue)
+        case UPLOAD_FLAG_LPCARD =>
+          syncLPCard(facade, v62Config, syncQueue)
+        case other =>
+          //TODO 定义异常
+          println(uploadFlag)
+      }
     }
+    catch {
+      case e: GafisException =>
+      case other =>
+        //TODO 其他异常处理
+    }
+    updateSyncQueueFlagFinish(syncQueue)
+  }
+
+  /**
+   * 更新队列任务状态
+   * @param syncQueue
+   */
+  private def updateSyncQueueFlagFinish(syncQueue: SyncQueue): Unit ={
+
   }
 
 }
