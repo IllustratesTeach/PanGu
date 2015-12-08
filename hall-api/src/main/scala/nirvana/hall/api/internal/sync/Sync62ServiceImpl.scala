@@ -11,7 +11,6 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.GafisException
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
@@ -40,8 +39,7 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
     periodicExecutor.addJob(new CronSchedule(apiConfig.sync62Cron), "sync-70to62", new Runnable {
       override def run(): Unit = {
-        println(new DateTime())
-//        findSyncQueue(SyncQueue.autoSession).foreach(doWork)
+        findSyncQueue(SyncQueue.autoSession).foreach(doWork)
       }
     })
   }
@@ -95,11 +93,11 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
 
   private def updateSyncQueueFail(syncQueue: SyncQueue, exception: Exception)(implicit session: DBSession): Unit ={
     var message = ""
-    if(exception.isInstanceOf[GafisException]){
-      val gafisException = exception.asInstanceOf[GafisException]
-      message = gafisException.getSimpleMessage
-    }else{
-      message = exception.getMessage
+    exception match {
+      case e: GafisException =>
+        message = e.getSimpleMessage
+      case other =>
+        message = other.getMessage
     }
     withSQL{
       val column = SyncQueue.column
