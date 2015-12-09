@@ -7,7 +7,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>hall-image-processor</artifactId>
+  <artifactId>hall-image</artifactId>
   <name>Nirvana Image Processor Server</name>
   <parent>
     <groupId>nirvana</groupId>
@@ -71,7 +71,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>hall-image-decoder-${project.version}</finalName>
+    <finalName>hall-image-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.scala-tools</groupId>
@@ -85,15 +85,15 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>image-decoder</id>
+            <id>image</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>hall-image-decoder-${project.version}</finalName>
+              <finalName>hall-image-${project.version}</finalName>
               <descriptors>
-                <descriptor>support/assembly/bin-image-decoder.xml</descriptor>
+                <descriptor>support/assembly/bin-image.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
