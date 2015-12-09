@@ -5,12 +5,12 @@
 #include <string.h>
 
 typedef int (*GFP_FPT_DCXX)(
-							     unsigned char	code[4],
-								 unsigned char	*cp_data,
-								 int			length,
-								 unsigned char	*img,
-								 unsigned char	buf[256]
-								);
+    unsigned char	code[4],
+    unsigned char	*cp_data,
+    int			length,
+    unsigned char	*img,
+    unsigned char	buf[256]
+    );
 
 /* Support for throwing Java exceptions */
 typedef enum {
@@ -62,6 +62,37 @@ static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
 		SWIG_JavaThrowException(jenv, SWIG_JavaArithmeticException, string);
 	}
 }
+
+/*
+int
+gfimglib_wsq_decode(unsigned char *compress_buffer,		//!< compressed data buffer (1-d stream)
+					int compressed_size,				//!< number of bytes in the compressed buffer
+					int *width, int *height, int *ppi,	//!< 宽度、高度和分辨率
+					unsigned char **output_buffer,		//!< pointer to decompressed image buffer
+					int *output_size					//!< number of bytes in output buffer, can be null
+					)
+*/
+JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
+  (JNIEnv *jenv, jobject, jbyteArray compressed_img, jint width, jint height, jint ppi);
+{
+	int		retval, ndepth;
+
+	if ( !compress_buffer || !width || !height ) {
+		SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "invalid parameter");
+	}
+  int compressed_size = jenv->GetArrayLength(compress_buffer);
+  UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compress_buffer, NULL);
+
+  jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
+  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
+	ndepth = 8;
+	retval = wsq_decode_mem(&dest_img_bin, width, height, &ndepth, ppi, NULL, compressed_img_bin, compressed_size);
+	jenv->ReleaseByteArrayElements(compressed_img,(jbyte*)compressed_img_bin,JNI_ABORT);
+	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_ABORT);
+
+  return dest_img;
+}
+
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter

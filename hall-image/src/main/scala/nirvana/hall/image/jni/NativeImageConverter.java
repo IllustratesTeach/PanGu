@@ -28,4 +28,14 @@ public class NativeImageConverter {
      * @return source data
      */
     public native byte[] decodeByManufactory(long handle,String function,String code,byte[] cpr_data,int dest_img_size);
+
+    /**
+     * decode compressed data by WSQ
+     * @param cpr_data compressed data
+     * @param width width of image
+     * @param height height of image
+     * @param ppi ppi
+     * @return original data
+     */
+    public native byte[] decodeByWSQ(byte[] cpr_data,int width,int height,int ppi);
 }

@@ -26,11 +26,18 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    decodeByManufactory
- * Signature: (J[B)[B
+ * Signature: (JLjava/lang/String;Ljava/lang/String;[BI)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
-  (JNIEnv *jenv, jobject, jlong , jstring ,jstring,jbyteArray,jint);
+  (JNIEnv *, jobject, jlong, jstring, jstring, jbyteArray, jint);
 
+/*
+ * Class:     nirvana_hall_image_jni_NativeImageConverter
+ * Method:    decodeByWSQ
+ * Signature: ([BIII)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
+  (JNIEnv *, jobject, jbyteArray, jint, jint, jint);
 
 #ifdef __cplusplus
 }
