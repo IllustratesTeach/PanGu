@@ -267,5 +267,5 @@ trait ScalaReflect{
     this
   }
 }
-class AncientData extends ScalaReflect{}
+trait AncientData extends ScalaReflect{}
 
