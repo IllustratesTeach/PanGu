@@ -27,5 +27,5 @@ public class NativeImageConverter {
      * @param cpr_data compressed data
      * @return source data
      */
-    public native byte[] decodeByManufactory(long handle,byte[] cpr_data);
+    public native byte[] decodeByManufactory(long handle,String function,String code,byte[] cpr_data,int dest_img_size);
 }
