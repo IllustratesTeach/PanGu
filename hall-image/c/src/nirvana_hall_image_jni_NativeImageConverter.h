@@ -29,7 +29,8 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  * Signature: (J[B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
-  (JNIEnv *, jobject, jlong, jbyteArray);
+  (JNIEnv *jenv, jobject, jlong , jstring ,jstring,jbyteArray,jint);
+
 
 #ifdef __cplusplus
 }
