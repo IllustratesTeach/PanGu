@@ -1,6 +1,7 @@
 package nirvana.hall.image.internal
 
 import nirvana.hall.image.jni.BaseJniTest
+import org.apache.commons.io.IOUtils
 import org.junit.Test
 
 /**
@@ -10,9 +11,9 @@ import org.junit.Test
  */
 class FirmDecoderTest extends BaseJniTest{
   @Test
-  def test_decode: Unit ={
+  def test_decode_1700: Unit ={
     val decoder = new FirmDecoder("support")
-    val cprData:Array[Byte] = "".getBytes()
-    decoder.decode("1300",cprData,640,640)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1700.data"))
+    decoder.decode("1700",cprData,640,640)
   }
 }
