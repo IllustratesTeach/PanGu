@@ -6,6 +6,7 @@ set/p VERSION=<__v
 del __v
 echo %VERSION:~0,10%
 
+cd hall-image\c
 echo "start building with version %VERSION%"
 
 set ENV_PATH="c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
