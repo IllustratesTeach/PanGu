@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;I)J
  */
 JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLibrary
-  (JNIEnv *, jobject, jstring, jint);
+  (JNIEnv *, jclass, jstring, jint);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibrary
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BI)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
-  (JNIEnv *, jobject, jlong, jstring, jstring, jbyteArray, jint);
+  (JNIEnv *, jclass, jlong, jstring, jstring, jbyteArray, jint);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -37,7 +37,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
  * Signature: ([BIII)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
-  (JNIEnv *, jobject, jbyteArray, jint, jint, jint);
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jint);
 
 #ifdef __cplusplus
 }
