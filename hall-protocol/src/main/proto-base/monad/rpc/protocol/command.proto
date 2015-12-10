@@ -1,0 +1,23 @@
+package monad.rpc.protocol;
+
+option optimize_for = SPEED;
+
+option java_package = "monad.rpc.protocol";
+
+option java_outer_classname = "CommandProto";
+
+enum CommandStatus {
+  OK = 1;
+  FAIL = 2;
+}
+message BaseCommand {
+  extensions 100 to max;
+
+  required int64 task_id = 1;
+  optional CommandStatus status = 2 [default = OK];
+  optional string msg = 3;
+  /**
+    firm_image_decompress#FirmImageDecompressRequest 10001
+    firm_image_decompress#FirmImageDecompressResponse 10002
+   */
+}
