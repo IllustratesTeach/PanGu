@@ -39,7 +39,7 @@ object NirvanaHallImageApp
       startUpContainer(classes: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-image/version.properties")
       printTextWithNative(logger, HALL_TEXT_LOGO, "image@" + config.rpc.bind, version, "1.1")
-      logger.info("spout server started")
+      logger.info("image server started")
 
       join()
     }
