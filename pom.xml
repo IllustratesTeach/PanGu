@@ -9,6 +9,7 @@
   <description>Nirvana Hall Application Server</description>
   <modules>
     <module>hall-api</module>
+    <module>hall-extractor</module>
     <module>hall-image</module>
     <module>hall-protocol</module>
     <module>hall-sdk</module>
