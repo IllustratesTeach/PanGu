@@ -80,7 +80,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 	  int ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
 	  //free byte array elements
 	  jenv->ReleaseByteArrayElements(cpr_data,(jbyte*)cpr_data_bin,JNI_ABORT);
-	  jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_ABORT);
+	  jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_COMMIT);
 
 	  ThrowExceptionByFPTCode(jenv,ret);
 
