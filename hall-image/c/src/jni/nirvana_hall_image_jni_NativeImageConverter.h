@@ -39,6 +39,14 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
   (JNIEnv *, jclass, jbyteArray, jint, jint, jint);
 
+/*
+ * Class:     nirvana_hall_image_jni_NativeImageConverter
+ * Method:    encodeByWSQ
+ * Signature: ([BIIII)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_encodeByWSQ
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jint,jint);
+
 #ifdef __cplusplus
 }
 #endif
