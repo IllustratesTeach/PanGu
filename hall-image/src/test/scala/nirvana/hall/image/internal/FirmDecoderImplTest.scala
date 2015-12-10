@@ -11,9 +11,15 @@ import org.junit.Test
  */
 class FirmDecoderImplTest extends BaseJniTest{
   @Test
-  def test_decode_1700: Unit ={
+  def test_decode_1700: Unit = {
     val decoder = new FirmDecoderImpl("support")
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1700.data"))
-    decoder.decode("1700",cprData,640,640,500)
+    decoder.decode("1700", cprData, 640, 640, 500)
+  }
+  @Test
+  def test_decode_1400_vi_wsq{
+    val decoder = new FirmDecoderImpl("support")
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
+    decoder.decode("1400",cprData,640,640,500)
   }
 }
