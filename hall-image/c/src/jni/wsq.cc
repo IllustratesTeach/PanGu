@@ -41,11 +41,11 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 	int		retval, ndepth;
 
   int compressed_size = jenv->GetArrayLength(compressed_img);
-  UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compressed_img, NULL);
+  UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compressed_img, JNI_FALSE);
 
   int dest_img_size = width * height;
   jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
-  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
+  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, JNI_FALSE);
 	ndepth = 8;
 	retval = wsq_decode_mem(&dest_img_bin, (int*)&width, (int*)&height, &ndepth, (int*)&ppi, NULL, compressed_img_bin, compressed_size);
 	jenv->ReleaseByteArrayElements(compressed_img,(jbyte*)compressed_img_bin,JNI_ABORT);
@@ -77,16 +77,17 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_en
 	retval = wsq_encode_mem(&compressed_img_bin, &compressed_img_size, fRatio,
 													original_img_bin, width, height, ndepth, ppi, NULL);
 
-	if ( retval != 0 )
-	{
+	if ( retval != 0 ){
 		free(compressed_img_bin);
 		SWIG_JavaThrowExceptionByCode(jenv,SWIG_JavaArithmeticException,retval);
-	}
-	jbyteArray compressed_img = jenv->NewByteArray(compressed_img_size);
-	jenv->SetByteArrayRegion(compressed_img,0,compressed_img_size,(jbyte*)compressed_img_bin);
-	free(compressed_img_bin);
+    return NULL;
+	}else{
+    jbyteArray compressed_img = jenv->NewByteArray(compressed_img_size);
+    jenv->SetByteArrayRegion(compressed_img,0,compressed_img_size,(jbyte*)compressed_img_bin);
+    free(compressed_img_bin);
+    return compressed_img;
+  }
 
-	return compressed_img;
 }
 
 
