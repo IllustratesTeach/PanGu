@@ -47,7 +47,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
   jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
   UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
 	ndepth = 8;
-	retval = wsq_decode_mem(&dest_img_bin, &width, &height, &ndepth, &ppi, NULL, compressed_img_bin, compressed_size);
+	retval = wsq_decode_mem(&dest_img_bin, (int*)&width, (int*)&height, &ndepth, (int*)&ppi, NULL, compressed_img_bin, compressed_size);
 	jenv->ReleaseByteArrayElements(compressed_img,(jbyte*)compressed_img_bin,JNI_ABORT);
 	//force commit data
 	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_COMMIT);

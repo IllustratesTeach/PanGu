@@ -2,7 +2,9 @@
 
 #include "jni.h"
 
-#ifndef WIN32
+#ifdef WIN32
+#include <Windows.h>
+#else
 typedef unsigned char UCHAR;
 #endif
 /* Support for throwing Java exceptions */

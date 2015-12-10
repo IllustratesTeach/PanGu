@@ -1,7 +1,9 @@
 #ifdef WIN32
 
 #include "nirvana_hall_image_jni_NativeImageConverter.h"
-#include <windows.h>
+
+#include "jni_helper.h"
+
 typedef int (*GFP_FPT_DCXX)(
     unsigned char	code[4],
     unsigned char	*cp_data,
