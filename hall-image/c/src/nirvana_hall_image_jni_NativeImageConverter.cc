@@ -1,4 +1,5 @@
 #include "nirvana_hall_image_jni_NativeImageConverter.h"
+#include "include/wsq.h"
 #include <windows.h>
 #include <jni.h>
 #include <stdlib.h>
@@ -73,20 +74,18 @@ gfimglib_wsq_decode(unsigned char *compress_buffer,		//!< compressed data buffer
 					)
 */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
-  (JNIEnv *jenv, jobject, jbyteArray compressed_img, jint width, jint height, jint ppi);
+  (JNIEnv *jenv, jobject jobj, jbyteArray compressed_img, jint width, jint height, jint ppi)
 {
 	int		retval, ndepth;
 
-	if ( !compress_buffer || !width || !height ) {
-		SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "invalid parameter");
-	}
-  int compressed_size = jenv->GetArrayLength(compress_buffer);
-  UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compress_buffer, NULL);
+  int compressed_size = jenv->GetArrayLength(compressed_img);
+  UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compressed_img, NULL);
 
+  int dest_img_size = width * height;
   jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
   UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
 	ndepth = 8;
-	retval = wsq_decode_mem(&dest_img_bin, width, height, &ndepth, ppi, NULL, compressed_img_bin, compressed_size);
+	retval = wsq_decode_mem(&dest_img_bin, (int*)&width, (int*)&height, &ndepth, (int*)&ppi, NULL, compressed_img_bin, compressed_size);
 	jenv->ReleaseByteArrayElements(compressed_img,(jbyte*)compressed_img_bin,JNI_ABORT);
 	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_ABORT);
 

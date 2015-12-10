@@ -120,10 +120,6 @@ typedef char JOCTET;
 #endif /* CHAR_IS_UNSIGNED */
 
 #endif /* HAVE_UNSIGNED_CHAR */
-#include "gbaselib/gbasedef.h"
-#if	_AFIS_OS_GROUP_==_AFIS_OS_GROUP_WINDOWS_
-#include <basetsd.h>
-#endif
 
 /* These typedefs are used for various table entries and so forth.
  * They must be at least as wide as specified; but making them too big

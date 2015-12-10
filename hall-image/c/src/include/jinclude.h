@@ -14,7 +14,6 @@
  * JPEG library.  Most applications need only include jpeglib.h.
  */
 
-#include "gbaselib/gaplatfm.h"
 
 
 /* Include auto-config file to find out which system include files we need. */
@@ -69,6 +68,10 @@
 #define MEMZERO(target,size)	memset((void *)(target), 0, (size_t)(size))
 #define MEMCOPY(dest,src,size)	memcpy((void *)(dest), (const void *)(src), (size_t)(size))
 
+#endif
+
+#ifdef WIN32
+typedef int INT32 ;
 #endif
 
 /*

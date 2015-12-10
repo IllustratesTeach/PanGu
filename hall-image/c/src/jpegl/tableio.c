@@ -105,7 +105,6 @@ identified are necessarily the best available for the purpose.
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include "gbaselib/gaplatfm.h"
 #include "../include/jpegl.h"
 #include "../include/computil.h"
 #include "../include/dataio.h"

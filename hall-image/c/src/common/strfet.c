@@ -49,7 +49,6 @@ identified are necessarily the best available for the purpose.
 
 ***********************************************************************/
 
-#include "gbaselib/gaplatfm.h"
 #include <stdio.h>
 #include <string.h>
 #include "../include/fet.h"

@@ -51,8 +51,6 @@ identified are necessarily the best available for the purpose.
 
 ***********************************************************************/
 
-#include "gbaselib/gbasedef.h"
-#include "gbaselib/gasysutl.h"
 #include "../include/usebsd.h"
 #include <string.h>
 //#include <strings.h>

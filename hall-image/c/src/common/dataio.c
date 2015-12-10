@@ -83,7 +83,6 @@ identified are necessarily the best available for the purpose.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gbaselib/gaplatfm.h"
 #include "../include/dataio.h"
 #include "../include/ioutil.h"
 #include "../include/swap.h"

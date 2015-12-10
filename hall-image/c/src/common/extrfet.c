@@ -50,7 +50,6 @@ identified are necessarily the best available for the purpose.
 
 ***********************************************************************/
 
-#include "gbaselib/gaplatfm.h"
 
 #include "../include/usebsd.h"
 #include <string.h>

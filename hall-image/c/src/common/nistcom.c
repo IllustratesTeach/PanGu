@@ -84,7 +84,6 @@ identified are necessarily the best available for the purpose.
 #include <stdio.h>
 #include <string.h>
 //#include <ihead.h>
-#include "gbaselib/gaplatfm.h"
 #include "../include/nistcom.h"
 
 /*****************************************************************/
