@@ -89,6 +89,9 @@ identified are necessarily the best available for the purpose.
 #define IHEAD_IMAGE         0
 
 #define VARIANCE_THRESH     1.01
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct quantization {
    float q;  /* quantization level */
@@ -328,5 +331,9 @@ extern void init_wsq_decoder_resources(DTT_TABLE *pdtt_table);
 extern void free_wsq_decoder_resources(DTT_TABLE *pdtt_table);
 
 extern int delete_comments_wsq(unsigned char **, int *, unsigned char *, const int);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_WSQ_H */

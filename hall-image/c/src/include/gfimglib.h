@@ -12,7 +12,6 @@
 #ifndef _INC_GFIMGLIB_H_20100820151656_
 #define _INC_GFIMGLIB_H_20100820151656_
 
-#include "gbaselib/osdepend.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>

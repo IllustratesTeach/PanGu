@@ -74,7 +74,7 @@ gfimglib_wsq_decode(unsigned char *compress_buffer,		//!< compressed data buffer
 					)
 */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
-  (JNIEnv *jenv, jobject jobj, jbyteArray compressed_img, jint width, jint height, jint ppi)
+  (JNIEnv *jenv, jclass, jbyteArray compressed_img, jint width, jint height, jint ppi)
 {
 	int		retval, ndepth;
 
@@ -99,7 +99,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
  * Signature: (Ljava/lang/String;I)J
  */
 JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLibrary
-  (JNIEnv *jenv, jobject, jstring pszFileName, jint nOption){
+  (JNIEnv *jenv, jclass, jstring pszFileName, jint nOption){
 	  char* dll_path;
 	  HMODULE hHandle;
 	  dll_path = (char *)jenv->GetStringUTFChars(pszFileName, 0);
@@ -119,7 +119,7 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibrary
-  (JNIEnv *jenv, jobject, jlong handle){
+  (JNIEnv *jenv, jclass, jlong handle){
 	  if(FreeLibrary((HMODULE)handle) != TRUE){
 		  SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "fail to free library");
 	  }
@@ -131,7 +131,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  * Signature: (J[B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
-  (JNIEnv *jenv, jobject jobject, jlong hHandle, jstring fun_name,jstring code,jbyteArray cpr_data,jint dest_img_size){
+  (JNIEnv *jenv, jclass, jlong hHandle, jstring fun_name,jstring code,jbyteArray cpr_data,jint dest_img_size){
 	  char* fun;
 	  GFP_FPT_DCXX p;
 	  size_t cpr_data_length;
