@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
+import nirvana.hall.c.services.grmtlib.gserver.RMTSERVERSTRUCT
 import nirvana.hall.v62.internal.c.BaseV62TestCase
-import nirvana.hall.v62.internal.c.grmtlib.gserver.RMTSERVERSTRUCT
 import org.junit.Test
 
 /**

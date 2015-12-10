@@ -1,5 +1,6 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.c.services.AncientData
 import org.jboss.netty.buffer.ChannelBuffer
 
 import scala.reflect.ClassTag

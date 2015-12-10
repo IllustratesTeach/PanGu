@@ -5,7 +5,7 @@ import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
 import nirvana.hall.protocol.v62.qry.QueryProto.QuerySendRequest
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 
 /**

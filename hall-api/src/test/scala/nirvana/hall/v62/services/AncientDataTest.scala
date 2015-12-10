@@ -3,12 +3,13 @@ package nirvana.hall.v62.services
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicReferenceArray
 
-import nirvana.hall.v62.annotations.{IgnoreTransfer, Length}
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.c.annotations.{Length, IgnoreTransfer}
+import nirvana.hall.c.services.{ScalaReflect, AncientData}
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 import org.xsocket.datagram.UserDatagram
-import nirvana.hall.v62.services.AncientData._
+import AncientData._
 
 /**
  *

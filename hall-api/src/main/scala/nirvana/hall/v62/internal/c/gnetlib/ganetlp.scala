@@ -1,8 +1,8 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.gloclib.galoclp.GCASEINFOSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.gloclib.galoclp.GCASEINFOSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
 /**

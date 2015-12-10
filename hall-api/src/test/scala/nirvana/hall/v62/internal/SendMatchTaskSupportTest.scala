@@ -1,13 +1,13 @@
 package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.internal.c.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.v62.internal.c.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.{glocdef, gaqryque}
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.gqrycond.GAFIS_QRYPARAM
+import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
+import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
+import nirvana.hall.c.services.gloclib.{glocdef, gaqryque}
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.v62.services.AncientEnum.MatchType
 import nirvana.hall.v62.services._
 import org.apache.commons.io.IOUtils

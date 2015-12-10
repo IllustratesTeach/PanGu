@@ -1,8 +1,8 @@
 package nirvana.hall.v62.internal
 
 
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
-import nirvana.hall.v62.services.AncientData
+import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import org.junit.{Assert, Test}
 
 import scala.reflect._

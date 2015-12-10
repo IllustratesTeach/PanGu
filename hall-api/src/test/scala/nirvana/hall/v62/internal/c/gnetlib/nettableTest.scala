@@ -2,8 +2,8 @@ package nirvana.hall.v62.internal.c.gnetlib
 
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.ganumia.gadbrec
-import nirvana.hall.v62.internal.c.ganumia.gadbrec.{GADB_SELRESULT, GADB_SELRESITEM, GADB_SELSTATEMENT}
+import nirvana.hall.c.services.ganumia.gadbrec
+import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESULT, GADB_SELRESITEM, GADB_SELSTATEMENT}
 import org.junit.Test
 
 /**

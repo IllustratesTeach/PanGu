@@ -1,8 +1,8 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.protocol.v62.FPTProto.{LPCard, TPCard}
-import nirvana.hall.v62.internal.c.gloclib.galoclp.GLPCARDINFOSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galoctpConverter}
 
 /**

@@ -4,12 +4,12 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.MatchConfig
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.DatabaseTable
-import nirvana.hall.v62.internal.c.gbaselib.gitempkg.{GBASE_ITEMPKG_PKGHEADSTRUCT, GBASE_ITEMPKG_ITEMHEADSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.gqrycond.{GAFIS_XGWQRYCOND, GAFIS_QRYPARAM}
-import nirvana.hall.v62.internal.c.gloclib.{glocdef, gaqryque}
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_PKGHEADSTRUCT, GBASE_ITEMPKG_ITEMHEADSTRUCT}
+import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
+import nirvana.hall.c.services.gloclib.gqrycond.{GAFIS_XGWQRYCOND, GAFIS_QRYPARAM}
+import nirvana.hall.c.services.gloclib.{glocdef, gaqryque}
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.v62.services.AncientEnum
 import org.jboss.netty.buffer.ChannelBuffers
 import scala.collection.JavaConversions._

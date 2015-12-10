@@ -2,11 +2,12 @@ package nirvana.hall.v62.internal.c.gnetlib
 
 import java.nio.ByteBuffer
 
-import nirvana.hall.v62.internal.c.GADB_RETVAL
-import nirvana.hall.v62.internal.c.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.GADB_RETVAL
+import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
 /**

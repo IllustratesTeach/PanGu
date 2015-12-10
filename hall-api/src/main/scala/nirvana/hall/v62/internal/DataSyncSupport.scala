@@ -1,11 +1,11 @@
 package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
-import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
 /**

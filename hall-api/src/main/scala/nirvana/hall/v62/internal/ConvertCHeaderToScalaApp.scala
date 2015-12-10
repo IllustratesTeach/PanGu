@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import java.io.File
 
-import nirvana.hall.v62.AncientConstants
+import nirvana.hall.c.AncientConstants
 
 import scala.io.Source
 

@@ -1,11 +1,12 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.ByteString
+import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{ImageType, FingerFgp, TPCard}
+import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
-import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable

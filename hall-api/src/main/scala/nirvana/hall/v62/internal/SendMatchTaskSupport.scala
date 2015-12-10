@@ -3,13 +3,13 @@ package nirvana.hall.v62.internal
 import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.internal.c.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.GADB_RETVAL
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.GADB_RETVAL
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{ChannelOperator, SelfMatchTask, V62ServerAddress}
 
 /**

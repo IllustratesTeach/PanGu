@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.v62.annotations.Length
-import nirvana.hall.v62.services.AncientData
+import nirvana.hall.c.annotations.Length
+import nirvana.hall.c.services.AncientData
 
 /**
  *

@@ -2,14 +2,14 @@ package nirvana.hall.v62.internal.c.gnetlib
 
 import java.nio.ByteBuffer
 
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
-import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBPROPSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.galoclp.GLPCARDINFOSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.galoctp.{GCARDITEMOBJECT, GTPCARDINFOSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
-import nirvana.hall.v62.internal.c.gloclib.{gadbprop, galoclp, galoctp, glocdef}
+import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.gloclib.gadbprop.GADBPROPSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.galoctp.{GCARDITEMOBJECT, GTPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.c.services.gloclib.{gadbprop, galoclp, galoctp, glocdef}
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
-import nirvana.hall.v62.services.AncientData
 
 /**
  *

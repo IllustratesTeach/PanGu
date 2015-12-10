@@ -1,9 +1,9 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import nirvana.hall.c.services.ghpcbase.gnopcode
+import nirvana.hall.c.services.gloclib.gadbprop.GADBPROPSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode
-import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBPROPSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 
 /**
  *

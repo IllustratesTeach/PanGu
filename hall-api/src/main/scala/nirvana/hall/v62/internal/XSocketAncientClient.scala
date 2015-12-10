@@ -4,10 +4,11 @@ import java.net.InetAddress
 
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.v62.services.{AncientClient, AncientData, ChannelOperator}
+import nirvana.hall.c.services.AncientData
+import nirvana.hall.v62.services.{AncientClient, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
-import nirvana.hall.v62.services.AncientData._
+import AncientData._
 
 import scala.reflect._
 

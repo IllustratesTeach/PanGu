@@ -1,9 +1,10 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETREQUESTHEADOBJECT, GNETANSWERHEADOBJECT}
-import nirvana.hall.v62.services.{GafisException, V62ServerAddress, AncientData, ChannelOperator}
+import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.v62.services.{ChannelOperator, GafisException, V62ServerAddress}
 
 /**
  * provide AncientClient instance

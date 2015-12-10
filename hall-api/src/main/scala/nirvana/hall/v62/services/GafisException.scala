@@ -4,7 +4,7 @@ import java.util
 import javax.xml.bind.annotation._
 
 import monad.support.services.XmlLoader
-import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
+import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 
 import scala.collection.JavaConversions._
 import scala.io.Source

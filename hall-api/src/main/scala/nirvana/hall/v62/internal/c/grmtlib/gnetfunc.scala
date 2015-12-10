@@ -1,10 +1,10 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
 import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.grmtlib.gserver.RMTSERVERSTRUCT
+import nirvana.hall.c.services.grmtlib.grmtcode._
 import nirvana.hall.v62.internal.c.gnetlib.gnetcsr
-import nirvana.hall.v62.internal.c.grmtlib.gserver.RMTSERVERSTRUCT
-import nirvana.hall.v62.internal.c.grmtlib.grmtcode._
 
 /**
  *

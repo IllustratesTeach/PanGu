@@ -2,15 +2,16 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.{ByteString, ProtocolStringList}
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{ImageType, Case, LPCard}
-import nirvana.hall.v62.AncientConstants
-import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.protocol.v62.FPTProto.{Case, ImageType, LPCard}
 
-import scala.collection.mutable
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  *

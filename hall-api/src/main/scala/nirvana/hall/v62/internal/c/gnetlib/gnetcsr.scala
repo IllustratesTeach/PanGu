@@ -1,14 +1,14 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import nirvana.hall.c.services.ganumia.gadbrec
+import nirvana.hall.c.services.ganumia.gadbrec._
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp._
+import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.c.CodeHelper
-import nirvana.hall.v62.internal.c.ganumia.gadbrec
-import nirvana.hall.v62.internal.c.ganumia.gadbrec._
-import nirvana.hall.v62.internal.c.gbaselib.gbasedef.GAKEYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.galoclp._
-import nirvana.hall.v62.internal.c.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
 import org.jboss.netty.buffer.ChannelBuffers

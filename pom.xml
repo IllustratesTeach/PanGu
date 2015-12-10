@@ -9,6 +9,7 @@
   <description>Nirvana Hall Application Server</description>
   <modules>
     <module>hall-api</module>
+    <module>hall-c</module>
     <module>hall-extractor</module>
     <module>hall-image</module>
     <module>hall-protocol</module>
@@ -24,6 +25,11 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
+        <artifactId>hall-c</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

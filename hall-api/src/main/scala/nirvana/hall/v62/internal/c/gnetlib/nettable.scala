@@ -1,9 +1,9 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
 import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.v62.internal.c.ganumia.gadbrec.{GADB_SELSTATEMENT, GADB_SELRESULT}
-import nirvana.hall.v62.internal.c.ghpcbase.gnopcode
-import nirvana.hall.v62.internal.c.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELSTATEMENT, GADB_SELRESULT}
+import nirvana.hall.c.services.ghpcbase.gnopcode
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 
 /**
  * clone from nettable.c

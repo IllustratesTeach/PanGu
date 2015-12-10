@@ -1,6 +1,6 @@
 package nirvana.hall.v62.services
 
-import nirvana.hall.v62.internal.c.gbaselib.gafiserr.GAFISERRDATSTRUCT
+import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import org.junit.{Assert, Test}
 
 /**

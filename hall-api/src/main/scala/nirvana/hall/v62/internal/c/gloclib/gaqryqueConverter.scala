@@ -1,12 +1,13 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
+import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.c.gbaselib.gitempkg.{GBASE_ITEMPKG_PKGHEADSTRUCT, GBASE_ITEMPKG_ITEMHEADSTRUCT}
-import nirvana.hall.v62.internal.c.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.v62.internal.c.gloclib.gqrycond.GAFIS_QRYPARAM
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**

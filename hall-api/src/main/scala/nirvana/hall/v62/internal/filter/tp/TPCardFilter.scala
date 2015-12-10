@@ -5,7 +5,7 @@ import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
 import nirvana.hall.protocol.v62.tp.TPCardProto._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.gloclib.galoctp.GTPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
 
 /**
