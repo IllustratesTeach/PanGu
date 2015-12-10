@@ -54,7 +54,6 @@ identified are necessarily the best available for the purpose.
 ***********************************************************************/
 
 #include <string.h>
-#include "../include/gfimglib.h"
 #include "../include/wsq.h"
 #include "../include/dataio.h"
 

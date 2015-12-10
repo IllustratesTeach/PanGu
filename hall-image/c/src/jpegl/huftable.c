@@ -57,9 +57,7 @@ identified are necessarily the best available for the purpose.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include "../include/jpegl.h"
-#include "../include/dataio.h"
 
 /*****************************************************/
 /* for encoder                                       */
