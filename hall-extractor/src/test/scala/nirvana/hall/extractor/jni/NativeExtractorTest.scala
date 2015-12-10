@@ -12,7 +12,7 @@ import org.junit.Test
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
-class NativeImageConverterTest extends BaseJniTest{
+class NativeExtractorTest extends BaseJniTest{
   @Test
   def test_extractor: Unit ={
     val img = IOUtils.toByteArray(getClass.getResourceAsStream("/lf.img"))
