@@ -19,7 +19,7 @@ object ConvertCHeaderToScalaApp {
   private val structEndPattern ="[\\s\\t]*}([^$]*)$".r
   private var structBegin = false
   def main(args:Array[String]): Unit ={
-    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/grmtlib/grmtcode.h")
+    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/afiskernel.h")
     val content = Source.fromFile(file,AncientConstants.GBK_ENCODING.name().intern()).getLines()
     content
       .filterNot(_.startsWith("#ifndef"))
