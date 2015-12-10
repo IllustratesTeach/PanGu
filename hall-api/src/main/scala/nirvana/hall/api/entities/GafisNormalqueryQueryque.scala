@@ -53,7 +53,8 @@ case class GafisNormalqueryQueryque(
   recordNumMatched: Option[Long] = None,
   matchProgress: Option[Short] = None,
   messagetag: Option[Short] = None,
-  overtimetag: Option[Short] = None) {
+  overtimetag: Option[Short] = None,
+  syncTargetSid: Option[String] = None) {
 
   def save()(implicit session: DBSession = GafisNormalqueryQueryque.autoSession): GafisNormalqueryQueryque = GafisNormalqueryQueryque.save(this)(session)
 
@@ -66,7 +67,7 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
 
   override val tableName = "GAFIS_NORMALQUERY_QUERYQUE"
 
-  override val columns = Seq("PK_ID", "ORA_SID", "KEYID", "QUERYTYPE", "STATUS", "PRIORITY", "HITPOSSIBILITY", "VERIFYRESULT", "FLAG", "FLAGC", "FLAGD", "FLAGE", "FLAGG", "QRYCONDITION", "MIC", "TEXTSQL", "CANDHEAD", "CANDLIST", "TIMEUSED", "MAXCANDNUM", "CURCANDNUM", "MINSCORE", "STARTKEY1", "ENDKEY1", "STARTKEY2", "ENDKEY2", "USERNAME", "USERUNITCODE", "FINISHTIME", "COMPUTERIP", "COMPUTERNAME", "ORACOMMENT", "MAXSCORE", "CREATETIME", "BEGINTIME", "DELETAG", "USERID", "SUBMITTSYSTEM", "PRIORITYNEW", "HANDLERESULT", "QRYCONDITION_NOSQL_ID", "MIC_NOSQL_ID", "CANDHEAD_NOSQL_ID", "CANDLIST_NOSQL_ID", "TIME_ELAPSED", "RECORD_NUM_MATCHED", "MATCH_PROGRESS", "MESSAGETAG", "OVERTIMETAG")
+  override val columns = Seq("PK_ID", "ORA_SID", "KEYID", "QUERYTYPE", "STATUS", "PRIORITY", "HITPOSSIBILITY", "VERIFYRESULT", "FLAG", "FLAGC", "FLAGD", "FLAGE", "FLAGG", "QRYCONDITION", "MIC", "TEXTSQL", "CANDHEAD", "CANDLIST", "TIMEUSED", "MAXCANDNUM", "CURCANDNUM", "MINSCORE", "STARTKEY1", "ENDKEY1", "STARTKEY2", "ENDKEY2", "USERNAME", "USERUNITCODE", "FINISHTIME", "COMPUTERIP", "COMPUTERNAME", "ORACOMMENT", "MAXSCORE", "CREATETIME", "BEGINTIME", "DELETAG", "USERID", "SUBMITTSYSTEM", "PRIORITYNEW", "HANDLERESULT", "QRYCONDITION_NOSQL_ID", "MIC_NOSQL_ID", "CANDHEAD_NOSQL_ID", "CANDLIST_NOSQL_ID", "TIME_ELAPSED", "RECORD_NUM_MATCHED", "MATCH_PROGRESS", "MESSAGETAG", "OVERTIMETAG", "SYNC_TARGET_SID")
 
   def apply(gnq: SyntaxProvider[GafisNormalqueryQueryque])(rs: WrappedResultSet): GafisNormalqueryQueryque = apply(gnq.resultName)(rs)
   def apply(gnq: ResultName[GafisNormalqueryQueryque])(rs: WrappedResultSet): GafisNormalqueryQueryque = new GafisNormalqueryQueryque(
@@ -118,7 +119,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
     recordNumMatched = rs.get(gnq.recordNumMatched),
     matchProgress = rs.get(gnq.matchProgress),
     messagetag = rs.get(gnq.messagetag),
-    overtimetag = rs.get(gnq.overtimetag)
+    overtimetag = rs.get(gnq.overtimetag),
+    syncTargetSid = rs.get(gnq.syncTargetSid)
   )
 
   val gnq = GafisNormalqueryQueryque.syntax("gnq")
@@ -206,7 +208,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
     recordNumMatched: Option[Long] = None,
     matchProgress: Option[Short] = None,
     messagetag: Option[Short] = None,
-    overtimetag: Option[Short] = None)(implicit session: DBSession = autoSession): GafisNormalqueryQueryque = {
+    overtimetag: Option[Short] = None,
+    syncTargetSid: Option[String] = None)(implicit session: DBSession = autoSession): GafisNormalqueryQueryque = {
     withSQL {
       insert.into(GafisNormalqueryQueryque).columns(
         column.pkId,
@@ -257,7 +260,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
         column.recordNumMatched,
         column.matchProgress,
         column.messagetag,
-        column.overtimetag
+        column.overtimetag,
+        column.syncTargetSid
       ).values(
         pkId,
         oraSid,
@@ -307,7 +311,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
         recordNumMatched,
         matchProgress,
         messagetag,
-        overtimetag
+        overtimetag,
+        syncTargetSid
       )
     }.update.apply()
 
@@ -360,7 +365,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
       recordNumMatched = recordNumMatched,
       matchProgress = matchProgress,
       messagetag = messagetag,
-      overtimetag = overtimetag)
+      overtimetag = overtimetag,
+      syncTargetSid = syncTargetSid)
   }
 
   def save(entity: GafisNormalqueryQueryque)(implicit session: DBSession = autoSession): GafisNormalqueryQueryque = {
@@ -414,7 +420,8 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
         column.recordNumMatched -> entity.recordNumMatched,
         column.matchProgress -> entity.matchProgress,
         column.messagetag -> entity.messagetag,
-        column.overtimetag -> entity.overtimetag
+        column.overtimetag -> entity.overtimetag,
+        column.syncTargetSid -> entity.syncTargetSid
       ).where.eq(column.pkId, entity.pkId)
     }.update.apply()
     entity
