@@ -8,7 +8,6 @@ import nirvana.hall.v62.internal.c.ghpcbase.gnopcode._
 import nirvana.hall.v62.internal.c.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.v62.internal.c.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
-import nirvana.hall.v62.services.V62ServerAddress
 
 /**
  * gnetflib
@@ -61,7 +60,7 @@ trait ganetqry {
 
     response.nReturnValue
   }
-  def NET_GAFIS_QUERY_Submit(address:V62ServerAddress,nQryDBID:Short,nQryTID:Short,
+  def NET_GAFIS_QUERY_Submit(nQryDBID:Short,nQryTID:Short,
                              pstKey:GADB_KEYARRAY,
                              pstQry:GAQUERYSTRUCT,
                              pnIdx:Array[Byte],

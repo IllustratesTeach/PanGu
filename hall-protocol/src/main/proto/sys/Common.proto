@@ -21,6 +21,10 @@ message BaseRequest{
   9007  LPCardDelRequest
   9008  LPCardGetRequest
   9009  LPCardUpdateRequest
+  9010  TPCardDelRequest
+  9011  TPCardUpdateRequest
+  9012  TPCardGetRequest
+  9013  QuerySendRequest
   **/
 }
 //服务器返回状态
@@ -45,6 +49,10 @@ message BaseResponse{
   9007  LPCardDelResponse
   9008  LPCardGetResponse
   9009  LPCardUpdateResponse
+  9010  TPCardDelResponse
+  9011  TPCardUpdateResponse
+  9012  TPCardGetResponse
+  9013  QuerySendResponse
   */
 }
 message KV {

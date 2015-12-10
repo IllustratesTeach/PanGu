@@ -1,0 +1,14 @@
+package v62.qry;
+import "sys/Common.proto";
+import "matcher/match_task_query.proto";
+
+option java_package = "nirvana.hall.protocol.v62.qry";
+option java_outer_classname = "QueryProto";
+
+message QuerySendRequest {
+    extend sys.BaseRequest{
+        optional QuerySendRequest cmd = 9013;
+    }
+    repeated matcher.MatchTask matchTask = 1;
+}
+
