@@ -34,10 +34,10 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    decodeByWSQ
- * Signature: ([BIII)[B
+ * Signature: ([B)Lnirvana/hall/image/jni/OriginalImage;
  */
-JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
-  (JNIEnv *, jclass, jbyteArray, jint, jint, jint);
+JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
+  (JNIEnv *, jclass, jbyteArray);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -45,7 +45,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
  * Signature: ([BIIII)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_encodeByWSQ
-  (JNIEnv *, jclass, jbyteArray, jint, jint, jint,jint);
+  (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jint);
 
 #ifdef __cplusplus
 }

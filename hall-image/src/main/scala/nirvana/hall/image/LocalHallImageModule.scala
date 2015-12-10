@@ -4,8 +4,9 @@ import monad.core.MonadCoreConstants
 import monad.core.config.ZkClientConfigSupport
 import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
-import nirvana.hall.image.internal.FirmImageDecompressRequestFilter
-import org.apache.tapestry5.ioc.OrderedConfiguration
+import nirvana.hall.image.internal.{FirmDecoderImpl, FirmImageDecompressRequestFilter}
+import nirvana.hall.image.services.FirmDecoder
+import org.apache.tapestry5.ioc.{ServiceBinder, OrderedConfiguration}
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
@@ -16,6 +17,9 @@ import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
  * @since 2015-12-10
  */
 object LocalHallImageModule {
+  def bind(binder:ServiceBinder): Unit ={
+    binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+  }
   //增加EagerLoad,避免出现deadlock
   @EagerLoad
   def buildZookeeperTemplate(config: ZkClientConfigSupport, periodExecutor: PeriodicExecutor, hub: RegistryShutdownHub): ZookeeperTemplate = {

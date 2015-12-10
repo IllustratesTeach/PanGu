@@ -35,26 +35,53 @@ gfimglib_wsq_decode(unsigned char *compress_buffer,		//!< compressed data buffer
 					int *output_size					//!< number of bytes in output buffer, can be null
 					)
 */
-JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
-  (JNIEnv *jenv, jclass, jbyteArray compressed_img, jint width, jint height, jint ppi)
-{
+/*
+ * Class:     nirvana_hall_image_jni_NativeImageConverter
+ * Method:    decodeByWSQ
+ * Signature: ([B)Lnirvana/hall/image/jni/OriginalImage;
+ */
+JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
+    (JNIEnv * jenv, jclass, jbyteArray compressed_img) {
 	int		retval, ndepth;
+  int   width,height,ppi;
 
   int compressed_size = jenv->GetArrayLength(compressed_img);
   UCHAR* compressed_img_bin = (UCHAR*)jenv->GetByteArrayElements(compressed_img, JNI_FALSE);
 
-  int dest_img_size = width * height;
-  jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
-  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, JNI_FALSE);
-	ndepth = 8;
-	retval = wsq_decode_mem(&dest_img_bin, (int*)&width, (int*)&height, &ndepth, (int*)&ppi, NULL, compressed_img_bin, compressed_size);
-	jenv->ReleaseByteArrayElements(compressed_img,(jbyte*)compressed_img_bin,JNI_ABORT);
-	//force commit data
-	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,JNI_COMMIT);
-	if(retval != 0) {
-		SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, retval);
-	}
-	return dest_img;
+  retval = wsq_decodedinfo(&width, &height, &ppi, compressed_img_bin, compressed_size);
+  if(retval !=0){
+    jenv->ReleaseByteArrayElements(compressed_img, (jbyte *) compressed_img_bin, JNI_ABORT);
+    SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, retval);
+    return NULL;
+  }else {
+    int dest_img_size = width * height;
+    jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
+    UCHAR *dest_img_bin = (UCHAR *) jenv->GetByteArrayElements(dest_img, JNI_FALSE);
+    ndepth = 8;
+    retval = wsq_decode_mem(&dest_img_bin, &width, &height, &ndepth, &ppi, NULL,
+                            compressed_img_bin, compressed_size);
+    jenv->ReleaseByteArrayElements(compressed_img, (jbyte *) compressed_img_bin, JNI_ABORT);
+    //force commit data
+    jenv->ReleaseByteArrayElements(dest_img, (jbyte *) dest_img_bin, 0);
+    if (retval != 0) {
+      SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, retval);
+    }
+
+    jclass originalImageClass = jenv->FindClass("nirvana/hall/image/jni/OriginalImage");
+    jmethodID constructorId = jenv->GetMethodID(originalImageClass,"<init>","()V");
+    jobject originalImage = jenv->NewObject(originalImageClass,constructorId);
+
+    jmethodID widthMethod = jenv->GetMethodID(originalImageClass,"setWidth","(I)V");
+    jenv->CallVoidMethod(originalImage,widthMethod,width);
+
+    jmethodID heightMethod = jenv->GetMethodID(originalImageClass,"setHeight","(I)V");
+    jenv->CallVoidMethod(originalImage,heightMethod,height);
+
+    jmethodID dataMethod = jenv->GetMethodID(originalImageClass,"setData","([B)V");
+    jenv->CallVoidMethod(originalImage,dataMethod,dest_img);
+
+    return originalImage;
+  }
 
 }
 

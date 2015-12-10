@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
 import nirvana.hall.image.jni.NativeImageConverter
+import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
 import org.apache.tapestry5.ioc.annotations.Symbol
@@ -17,10 +18,11 @@ import scala.collection.JavaConversions._
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
-class FirmDecoder(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) {
+class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) extends FirmDecoder{
   private val dlls = new ConcurrentHashMap[String,Dll]()
   private case class Dll(fileName:String,functionName:String,Handle:Long)
   private val lock = new ReentrantLock()
+  private val WSQ = "1400"
 
   /**
    * decode compressed data using firm's algorithm
@@ -30,10 +32,15 @@ class FirmDecoder(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) {
    * @param height image height
    * @return original image data
    */
-  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int): Array[Byte]={
-    val dll = findDllHandle(code)
-    val destImgSize = width * height
-    NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,code,cpr_data,destImgSize);
+  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): Array[Byte]={
+    code match{
+      case WSQ =>
+        NativeImageConverter.decodeByWSQ(cpr_data).getData
+      case other=>
+        val dll = findDllHandle(code)
+        val destImgSize = width * height
+        NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,code,cpr_data,destImgSize);
+    }
   }
   /**
    * find dll handle by code

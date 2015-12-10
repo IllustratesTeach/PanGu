@@ -13,14 +13,15 @@ class NativeImageConverterTest extends BaseJniTest{
   def test_wsq: Unit ={
     val is = getClass.getResourceAsStream("/wsq.data")
     val cpr_data = IOUtils.toByteArray(is)
-    val originalData = NativeImageConverter.decodeByWSQ(cpr_data,640,640,500)
+    val originalImage = NativeImageConverter.decodeByWSQ(cpr_data)
+    val originalData = originalImage.getData
     val destIO = getClass.getResourceAsStream("/wsq.data.uncompressed")
     val expect = IOUtils.toByteArray(destIO)
     Assert.assertArrayEquals(expect,originalData)
 
     //test compress
     val cpr = NativeImageConverter.encodeByWSQ(originalData,640,640,500,10)
-    val originalData2 = NativeImageConverter.decodeByWSQ(cpr,640,640,500)
+    val originalData2 = NativeImageConverter.decodeByWSQ(cpr).getData
     Assert.assertEquals(expect.length,originalData2.length)
   }
 }

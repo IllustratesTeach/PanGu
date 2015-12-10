@@ -32,11 +32,8 @@ public class NativeImageConverter {
     /**
      * decode compressed data by WSQ
      * @param cpr_data compressed data
-     * @param width width of image
-     * @param height height of image
-     * @param ppi ppi
      * @return original data
      */
-    public static native byte[] decodeByWSQ(byte[] cpr_data,int width,int height,int ppi);
+    public static native OriginalImage decodeByWSQ(byte[] cpr_data);
     public static native byte[] encodeByWSQ(byte[] origin_data,int width,int height,int ppi,int ratio);
 }
