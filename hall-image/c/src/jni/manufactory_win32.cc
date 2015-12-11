@@ -5,7 +5,7 @@
 #include "jni_helper.h"
 
 //define function type
-typedef int (*GFP_FPT_DCXX)(
+typedef int (*GA_FPT_DCXX)(
     unsigned char	code[4],
     unsigned char	*cp_data,
     int			length,
@@ -32,10 +32,13 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	  HMODULE hHandle;
 	  dll_path = (char *)jenv->GetStringUTFChars(pszFileName, 0);
 	  if(dll_path == NULL){
+		  jenv->ReleaseStringUTFChars(pszFileName,dll_path);
 		  SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "dll path is null");
 		  return 0;
 	  }
 	  hHandle = LoadLibraryEx(dll_path, NULL, nOption);
+	  //relase string
+	  jenv->ReleaseStringUTFChars(pszFileName,dll_path);
 	  if(hHandle == NULL)
 		  SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "fail to load dll");
 	  return (jlong)hHandle;
@@ -62,21 +65,31 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
   (JNIEnv *jenv, jclass, jlong hHandle, jstring fun_name,jstring code,jbyteArray cpr_data,jint dest_img_size){
 	  char* fun= (char *)jenv->GetStringUTFChars(fun_name, 0);
 	  if(fun == NULL){
+		  jenv->ReleaseStringUTFChars(fun_name,fun);
 		  SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "function name is null");
 		  return 0;
 	  }
-	  GFP_FPT_DCXX p = (GFP_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
+	  GA_FPT_DCXX p = (GA_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
+
+	  UCHAR *code_str = (UCHAR*)jenv->GetStringUTFChars(code,JNI_FALSE);
 
 	  size_t cpr_data_length = jenv->GetArrayLength(cpr_data);
-	  UCHAR* cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, 0);
-	  UCHAR szResult[260] = {0};
-	  UCHAR *code_str = (UCHAR*)jenv->GetStringUTFChars(code,0);
+	  UCHAR* cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, JNI_FALSE);
+
 	  jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
-	  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
+	  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, JNI_FALSE);
+
+	  UCHAR szResult[260] = {0};
+	  //call dll function to decompress data
 	  int ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
+
 	  //free byte array elements
 	  jenv->ReleaseByteArrayElements(cpr_data,(jbyte*)cpr_data_bin,JNI_ABORT);
 	  jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,0);
+
+	  //release string
+	  jenv->ReleaseStringUTFChars(fun_name,fun);
+	  jenv->ReleaseStringUTFChars(code,(char *)code_str);
 
 	  ThrowExceptionByFPTCode(jenv,ret);
 	  return dest_img;
