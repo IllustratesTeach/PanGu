@@ -269,6 +269,10 @@ trait ScalaReflect{
   def fromByteArray(data: Array[Byte]):this.type = {
     fromStreamReader(ChannelBuffers.wrappedBuffer(data))
   }
+  def toByteArray:Array[Byte]={
+    val data = ChannelBuffers.buffer(getDataSize)
+    writeToStreamWriter(data).array()
+  }
 }
 trait AncientData extends ScalaReflect{}
 

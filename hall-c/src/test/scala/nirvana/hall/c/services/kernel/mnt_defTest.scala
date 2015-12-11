@@ -1,6 +1,6 @@
-package nirvana.hall.c.services.nirvana
+package nirvana.hall.c.services.kernel
 
-import nirvana.hall.c.services.nirvana.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
 import org.junit.{Assert, Test}
 
 /**

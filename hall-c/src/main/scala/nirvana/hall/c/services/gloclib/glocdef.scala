@@ -100,7 +100,7 @@ object glocdef {
         class GAFISIMAGESTRUCT extends AncientData
         {
         var stHead = new GAFISIMAGEHEADSTRUCT;	// image head structure
-        @Length(8)
+          @IgnoreTransfer
         var bnData:Array[Byte] = _ ;	// image followed
         } // GAFISIMAGESTRUCT;	// size of this structure depends on the image size(32-2GB)
 
