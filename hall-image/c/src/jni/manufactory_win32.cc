@@ -12,7 +12,7 @@ typedef int (*GA_FPT_DCXX)(
     unsigned char	*img,
     unsigned char	buf[256]
     );
-    
+
 static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
 {
 	if(nCode != 1){

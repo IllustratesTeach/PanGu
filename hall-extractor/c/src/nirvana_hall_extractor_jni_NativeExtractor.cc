@@ -11,6 +11,15 @@
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
   (JNIEnv * jenv, jclass, jbyteArray img_bytes,jbyteArray mnt_bytes,jbyte finger_pos,jbyte ExtractMode, jbyte belatent){
+  if(img_bytes == NULL){
+    SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"image data is null");
+    return;
+  }
+  if(mnt_bytes == NULL){
+    SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"feature output is null");
+    return;
+  }
+
   UCHAR* img_data = (UCHAR*)jenv->GetByteArrayElements(img_bytes,JNI_FALSE);
   GAFISIMAGESTRUCT* img= (GAFISIMAGESTRUCT*)img_data;
   img->stHead.nFingerIndex = (UCHAR) finger_pos;
