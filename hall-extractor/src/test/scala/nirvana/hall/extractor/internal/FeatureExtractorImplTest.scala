@@ -1,6 +1,7 @@
 package nirvana.hall.extractor.internal
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.extractor.services.ExtractorModel.{FeatureType, FingerPosition}
 import org.apache.commons.io.IOUtils
@@ -23,7 +24,11 @@ class FeatureExtractorImplTest extends BaseJniTest{
     buffer.readBytes(gafisImg.bnData)
 
     val extractor = new FeatureExtractorImpl
-    extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.Template)
+    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.Template)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+
+    feature
 
   }
 }

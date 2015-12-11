@@ -55,6 +55,11 @@ class FeatureExtractorImpl extends FeatureExtractor{
     }
 
     val mntBuffer = ChannelBuffers.buffer(imgHead.getDataSize + feature.getDataSize)
+    //add head information
+    imgHead.nImgSize = feature.getDataSize
+    imgHead.szName = "FingerMnt"
+    imgHead.writeToStreamWriter(mntBuffer)
+
     val mntData = mntBuffer.array()
 
     NativeExtractor.ExtractMNT_All(imgData,mntData,
