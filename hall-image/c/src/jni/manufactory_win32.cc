@@ -4,6 +4,7 @@
 
 #include "jni_helper.h"
 
+//define function type
 typedef int (*GFP_FPT_DCXX)(
     unsigned char	code[4],
     unsigned char	*cp_data,
@@ -12,14 +13,6 @@ typedef int (*GFP_FPT_DCXX)(
     unsigned char	buf[256]
     );
 
-static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
-{
-	if(nCode != 1){
-		char string[25]={0};
-		_itoa_s(nCode,string,10);
-		SWIG_JavaThrowException(jenv, SWIG_JavaArithmeticException, string);
-	}
-}
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    loadLibrary
@@ -59,22 +52,17 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
   (JNIEnv *jenv, jclass, jlong hHandle, jstring fun_name,jstring code,jbyteArray cpr_data,jint dest_img_size){
-	  char* fun;
-	  GFP_FPT_DCXX p;
-	  size_t cpr_data_length;
-	  UCHAR* cpr_data_bin;
-	  fun= (char *)jenv->GetStringUTFChars(fun_name, 0);
+	  char* fun= (char *)jenv->GetStringUTFChars(fun_name, 0);
 	  if(fun == NULL){
 		  SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "function name is null");
 		  return 0;
 	  }
-	  p = (GFP_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
+	  GFP_FPT_DCXX p = (GFP_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
 
-	  cpr_data_length = jenv->GetArrayLength(cpr_data);
-	  cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, 0);
+	  size_t cpr_data_length = jenv->GetArrayLength(cpr_data);
+	  UCHAR* cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, 0);
 	  UCHAR szResult[260] = {0};
-	  UCHAR *code_str;
-	  code_str = (UCHAR*)jenv->GetStringUTFChars(code,0);
+	  UCHAR *code_str = (UCHAR*)jenv->GetStringUTFChars(code,0);
 	  jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
 	  UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, NULL);
 	  int ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
@@ -83,7 +71,6 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 	  jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,0);
 
 	  ThrowExceptionByFPTCode(jenv,ret);
-
 	  return dest_img;
 }
 #endif
