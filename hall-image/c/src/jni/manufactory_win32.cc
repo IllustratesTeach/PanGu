@@ -12,7 +12,15 @@ typedef int (*GFP_FPT_DCXX)(
     unsigned char	*img,
     unsigned char	buf[256]
     );
-
+    
+static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
+{
+	if(nCode != 1){
+		char string[25]={0};
+		_itoa_s(nCode,string,10);
+		SWIG_JavaThrowException(jenv, SWIG_JavaArithmeticException, string);
+	}
+}
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    loadLibrary
