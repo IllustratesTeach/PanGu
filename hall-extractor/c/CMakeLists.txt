@@ -32,14 +32,14 @@ ADD_LIBRARY(hall-extractor4j SHARED ${HALL_EXTRACTOR_JNI_SOURCES})
 IF(WIN32)
   IF($ARCH MATCHES "w64")
     FIND_LIBRARY(TEXFDLL
-	  NAME texfdll64
-	  PATHS "${KERNEL_DIR}\\build-w64\\src"
-	  DOC "texfdll release library") 
+            NAME texfdll64
+            PATHS "${KERNEL_DIR}\\build-w64\\src"
+            DOC "texfdll release library")
   ELSE()
     FIND_LIBRARY(TEXFDLL
-	  NAME texfdll
-	  PATHS "${KERNEL_DIR}\\build-w32\\src"
-	  DOC "texfdll release library") 
+            NAME texfdll
+            PATHS "${KERNEL_DIR}\\build-w32\\src"
+            DOC "texfdll release library")
   ENDIF()
   TARGET_LINK_LIBRARIES(hall-extractor4j ${TEXFDLL})
 ELSE()
