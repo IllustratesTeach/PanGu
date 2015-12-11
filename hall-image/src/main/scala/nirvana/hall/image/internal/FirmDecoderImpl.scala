@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
-import nirvana.hall.image.jni.NativeImageConverter
+import nirvana.hall.image.jni.{OriginalImage, NativeImageConverter}
 import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
@@ -32,14 +32,19 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
    * @param height image height
    * @return original image data
    */
-  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): Array[Byte]={
+  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage={
     code match{
       case WSQ =>
-        NativeImageConverter.decodeByWSQ(cpr_data).getData
+        NativeImageConverter.decodeByWSQ(cpr_data)
       case other=>
         val dll = findDllHandle(code)
         val destImgSize = width * height
-        NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,code,cpr_data,destImgSize);
+        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,code,cpr_data,destImgSize);
+        val img = new OriginalImage
+        img.setWidth(width)
+        img.setHeight(height)
+        img.setData(originalData)
+        img
     }
   }
   /**

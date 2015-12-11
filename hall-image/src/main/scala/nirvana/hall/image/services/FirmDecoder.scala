@@ -1,5 +1,7 @@
 package nirvana.hall.image.services
 
+import nirvana.hall.image.jni.OriginalImage
+
 /**
  * firm decoder
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -14,5 +16,5 @@ trait FirmDecoder{
    * @param height image height
    * @return original image data
    */
-  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): Array[Byte];
+  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage
 }
