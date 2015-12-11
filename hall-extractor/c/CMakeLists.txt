@@ -16,9 +16,34 @@ FIND_PACKAGE(JNI REQUIRED)
 INCLUDE_DIRECTORIES(${JAVA_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(${JAVA_INCLUDE_PATH2})
 
+#define some variable
+IF(NOT DEFINED ARCH)
+  MESSAGE(FATAL_ERROR "ARCH not defined,pls use -DARCH=(w32|w64) to define")
+ENDIF()
+IF(NOT DEFINED KERNEL_DIR)
+  MESSAGE(FATAL_ERROR "KERNEL_DIR not defined,pls use -DKERNEL_DIR=(w32|w64) to define")
+ENDIF()
+
+INCLUDE_DIRECTORIES(${KERNEL_DIR}/include)
+
 FILE(GLOB_RECURSE HALL_EXTRACTOR_JNI_SOURCES ${PROJECT_SOURCE_DIR}/src/*)
 LIST(APPEND HALL_EXTRACTOR_JNI_SOURCES ${PROJECT_SOURCE_DIR}/../../hall-image/c/src/jni/jni_helper.cc)
 ADD_LIBRARY(hall-extractor4j SHARED ${HALL_EXTRACTOR_JNI_SOURCES})
-TARGET_LINK_LIBRARIES(hall-extractor4j nirvana-kernel)
+IF(WIN32)
+  IF($ARCH MATCHES "w64")
+    FIND_LIBRARY(TEXFDLL
+	  NAME texfdll64
+	  PATHS "${KERNEL_DIR}\\build-w64\\src"
+	  DOC "texfdll release library") 
+  ELSE()
+    FIND_LIBRARY(TEXFDLL
+	  NAME texfdll
+	  PATHS "${KERNEL_DIR}\\build-w32\\src"
+	  DOC "texfdll release library") 
+  ENDIF()
+  TARGET_LINK_LIBRARIES(hall-extractor4j ${TEXFDLL})
+ELSE()
+  TARGET_LINK_LIBRARIES(hall-extractor4j nirvana-kernel)
+ENDIF()
 
 
