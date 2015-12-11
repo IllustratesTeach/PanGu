@@ -21,7 +21,7 @@ class FirmDecoderImplTest extends BaseJniTest{
     val decoder = new FirmDecoderImpl("support")
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
     Range(0,409600).foreach{
-      decoder.decode("1400",null,640,640,500)
+      decoder.decode("1400",cprData,640,640,500)
     }
   }
 }
