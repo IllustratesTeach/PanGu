@@ -85,15 +85,15 @@ trait ScalaReflect{
   /**
    * find primitive data type length
    */
-  private def findPrimitiveTypeLength(tpe:Type,length:Int):Int={
+  private def findPrimitiveTypeLength(term:Symbol,tpe:Type,length:Int):Int={
     def returnLengthOrThrowException:Int={
       if(length == 0)
-        throw new IllegalArgumentException("@Length not defined @"+tpe)
+        throw new IllegalArgumentException("@Length not defined at "+term)
       length
     }
     def throwExceptionIfLengthGTZeroOrGet[T](value:T): T={
       if(length !=0)
-        throw new IllegalArgumentException("@Length wrong defined @"+tpe)
+        throw new IllegalArgumentException("@Length wrong defined at "+term)
       value
     }
     tpe match {
@@ -109,7 +109,7 @@ trait ScalaReflect{
         if(args.length != 1)
           throw new IllegalArgumentException("only support one type parameter in Array.")
         //using recursive call to find length
-        returnLengthOrThrowException * findPrimitiveTypeLength(args.head,0)
+        returnLengthOrThrowException * findPrimitiveTypeLength(term,args.head,0)
       case other =>
         throw new IllegalArgumentException("type is not supported "+other)
     }
@@ -121,7 +121,7 @@ trait ScalaReflect{
    */
   def getDataSize:Int={
     if(dataSize == 0) {
-      dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol.info,length)).sum
+      dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol,symbol.info,length)).sum
     }
     dataSize
   }

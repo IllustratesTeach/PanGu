@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.kernel
 
-import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.{PALMLATMNTSTRUCT, PALMMNTSTRUCT, FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
 import org.junit.{Assert, Test}
 
 /**
@@ -16,6 +16,12 @@ class mnt_defTest {
 
     val mnt2 = new FINGERLATMNTSTRUCT
     Assert.assertEquals(640,mnt2.getDataSize)
+
+    val mnt3 = new PALMMNTSTRUCT
+    Assert.assertEquals(8192,mnt3.getDataSize)
+
+    val mnt4 = new PALMLATMNTSTRUCT
+    Assert.assertEquals(5120,mnt4.getDataSize)
   }
 
 }

@@ -454,7 +454,7 @@ var OPTrp:Byte = _ ;			//	外侧区纹型信息0：未知,1：存在,2：不存�
   //	垂直向下为 0，水平向右为 90，水平向左为-90
   var mqlevON:Byte = _ ; //	使用细节特征评判 1...使用，0...不使用
     @Length((PTPMNTSIZE + 4) / 8)
-  var mqlev:Byte = _ ; //	细节特征质量，按位设置，1代表可靠，0代表不可靠
+  var mqlev:Array[Byte] = _ ; //	细节特征质量，按位设置，1代表可靠，0代表不可靠
   var mdate:Short = _ ; //	生成或变更时间，转换成短整型 YY*32*32+MM*32+DD
   var nSignature:Short = _ ; //	图象标签，用来判定图象特征一致性
   var bEditedMinutia:Byte = _ ; //	捺印细节特征是否修改正确
@@ -566,7 +566,7 @@ var OPTrp:Byte = _ ;			//	外侧区纹型信息0：未知,1：存在,2：不存�
   var mdate:Short = _ ; //	生成或变更时间，转换成短整型 YY*32*32+MM*32+DD
   var nSignature:Short = _ ; //	图象标签，用来判定图象特征一致性
     @Length(5120 - 41 - PALMDELTASIZE * 9 - PALMPATCORESIZE * 7 - 6 * PLPMNTSIZE - (PLPMNTSIZE + 4) / 8 - 5 * BLKMNTSIZE - 5 * LINECOUNTSIZE - 9 * MNTPOSSIZE)
-  var MntFill:Byte = _
+  var MntFill:Array[Byte] = _
   } // PALMLATMNTSTRUCT;
 
 
