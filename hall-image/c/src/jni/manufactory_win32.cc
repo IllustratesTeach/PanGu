@@ -28,19 +28,22 @@ static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
  */
 JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLibrary
   (JNIEnv *jenv, jclass, jstring pszFileName, jint nOption){
-	  char* dll_path;
-	  HMODULE hHandle;
-	  dll_path = (char *)jenv->GetStringUTFChars(pszFileName, 0);
+    if(pszFileName == NULL){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"file path is null");
+      return NULL;
+    }
+	  char* dll_path = (char *)jenv->GetStringUTFChars(pszFileName, JNI_FALSE);
 	  if(dll_path == NULL){
 		  jenv->ReleaseStringUTFChars(pszFileName,dll_path);
 		  SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "dll path is null");
 		  return 0;
 	  }
-	  hHandle = LoadLibraryEx(dll_path, NULL, nOption);
-	  //relase string
+	  HMODULE hHandle = LoadLibraryEx(dll_path, NULL, nOption);
+	  //release string
 	  jenv->ReleaseStringUTFChars(pszFileName,dll_path);
 	  if(hHandle == NULL)
 		  SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "fail to load dll");
+
 	  return (jlong)hHandle;
 }
 
@@ -63,15 +66,23 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
   (JNIEnv *jenv, jclass, jlong hHandle, jstring fun_name,jstring code,jbyteArray cpr_data,jint dest_img_size){
+    if(fun_name == NULL){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"function name is null");
+      return NULL;
+    }
+    if(code == NULL){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"firm code is null");
+      return NULL;
+    }
+    int code_len = jenv->GetStringUTFLength(fun_name);
+    if(code_len != 4){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"firm code's length must be 4");
+      return NULL;
+    }
 	  char* fun= (char *)jenv->GetStringUTFChars(fun_name, 0);
-	  if(fun == NULL){
-		  jenv->ReleaseStringUTFChars(fun_name,fun);
-		  SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "function name is null");
-		  return 0;
-	  }
-	  GA_FPT_DCXX p = (GA_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
-
 	  UCHAR *code_str = (UCHAR*)jenv->GetStringUTFChars(code,JNI_FALSE);
+
+	  GA_FPT_DCXX p = (GA_FPT_DCXX)GetProcAddress((HMODULE)hHandle, fun);
 
 	  size_t cpr_data_length = jenv->GetArrayLength(cpr_data);
 	  UCHAR* cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, JNI_FALSE);

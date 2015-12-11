@@ -32,6 +32,12 @@ float	UTIL_GetWsqEncodeBitRate(int nRatio)
  */
 JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByWSQ
     (JNIEnv * jenv, jclass, jbyteArray compressed_img) {
+  
+  if(compressed_img == NULL){
+    SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"compressed image is null");
+    return NULL;
+  }
+
 	int		retval, ndepth;
   int   width,height,ppi;
 
