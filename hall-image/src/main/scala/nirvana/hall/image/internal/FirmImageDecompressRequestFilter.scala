@@ -20,6 +20,9 @@ class FirmImageDecompressRequestFilter(firmDecoder: FirmDecoder) extends RpcServ
 
       val firmResponseBuilder = FirmImageDecompressResponse.newBuilder()
       firmResponseBuilder.setData(ByteString.copyFrom(originalImg.getData))
+      firmResponseBuilder.setWidth(originalImg.getWidth)
+      firmResponseBuilder.setHeight(originalImg.getHeight)
+      firmResponseBuilder.setDpi(originalImg.getDpi)
 
       response.writeMessage(commandRequest,FirmImageDecompressResponse.cmd,firmResponseBuilder.build())
 
