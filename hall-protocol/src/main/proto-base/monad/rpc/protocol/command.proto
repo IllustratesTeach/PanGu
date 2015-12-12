@@ -19,5 +19,7 @@ message BaseCommand {
   /**
     firm_image_decompress#FirmImageDecompressRequest 10001
     firm_image_decompress#FirmImageDecompressResponse 10002
+    extract#ExtractRequest 10003
+    extract#ExtractResponse 10004
    */
 }

@@ -1,0 +1,32 @@
+/**
+ * 定义了依赖厂商的解压缩算法进行解压缩
+ */
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+
+option java_package = "nirvana.hall.protocol.image";
+
+option java_outer_classname = "ExtractProto";
+/* send request to image server */
+message ExtractRequest{
+  extend monad.rpc.protocol.BaseCommand {
+    optional ExtractRequest cmd = 10003;
+  }
+  enum MntType{
+    Template = 1;
+    Latent = 2;
+  }
+  required bytes img_data = 1;
+  required int32 position = 2;
+  required MntType mnt_type = 3;
+}
+
+/* response */
+message ExtractResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional ExtractResponse cmd = 10004;
+  }
+  optional bytes mnt_data = 1;
+}

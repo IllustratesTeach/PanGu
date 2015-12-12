@@ -27,4 +27,7 @@ message FirmImageDecompressResponse {
     optional FirmImageDecompressResponse cmd = 10002;
   }
   optional bytes data = 1;
+  optional int32 width = 2;
+  optional int32 height = 3;
+  optional int32 dpi = 4;
 }
