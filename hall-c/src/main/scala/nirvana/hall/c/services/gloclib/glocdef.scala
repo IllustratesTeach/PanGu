@@ -1,6 +1,7 @@
 package nirvana.hall.c.services.gloclib
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 import nirvana.hall.c.services.ghpcbase.ghpcdef.GAFIS_UUIDStruct
 import nirvana.hall.c.services.AncientData
 
@@ -102,6 +103,40 @@ object glocdef {
         var stHead = new GAFISIMAGEHEADSTRUCT;	// image head structure
           @IgnoreTransfer
         var bnData:Array[Byte] = _ ;	// image followed
+          /**
+           * serialize to channel buffer
+           * @param stream netty channel buffer
+           */
+          override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
+            if(bnData == null)
+              throw new IllegalStateException("bnData is null")
+            if(bnData.length != stHead.nImgSize)
+              throw new IllegalArgumentException("bnData's length (%s) != head's nImgSize(%s)".format(bnData.length,stHead.nImgSize))
+            super.writeToStreamWriter(stream)
+            if(bnData != null)
+              stream.writeBytes(bnData)
+
+            stream
+          }
+
+          /**
+           * convert channel buffer data as object
+           * @param dataSource netty channel buffer
+           */
+          override def fromStreamReader(dataSource: StreamReader): GAFISIMAGESTRUCT.this.type = {
+            super.fromStreamReader(dataSource)
+            bnData = readBytesFromStreamReader(dataSource,stHead.nImgSize)
+
+            this
+          }
+
+          /**
+           * calculate data size and return.
+           * @return data size
+           */
+          override def getDataSize: Int = {
+            stHead.getDataSize + bnData.length
+          }
         } // GAFISIMAGESTRUCT;	// size of this structure depends on the image size(32-2GB)
 
         // the following structure represents a image which has four parts:

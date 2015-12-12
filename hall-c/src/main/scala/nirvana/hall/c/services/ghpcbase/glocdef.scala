@@ -3,6 +3,7 @@ package nirvana.hall.c.services.ghpcbase
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 
 /**
  *
@@ -92,6 +93,7 @@ object glocdef {
   final val GAFIS_QUALDESC_DESQUAMATE = 2	// skin come off. Tuo Pi
   final val GAFIS_QUALDESC_OTHER = 9	// other reason not previous one.
 
+  /*
   // the following structure represents a general image
   class GAFISIMAGESTRUCT extends AncientData
   {
@@ -99,6 +101,7 @@ object glocdef {
   @Length(8)
   var bnData:Array[Byte] = _ ;	// image followed
   } // GAFISIMAGESTRUCT;	// size of this structure depends on the image size(32-2GB)
+  */
 
   // the following structure represents a image which has four parts:
   // minutiae, some binary data(blurred area, etc.) compressed format

@@ -212,6 +212,14 @@ trait ScalaReflect{
     }
     stream
   }
+  protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]={
+    dataSource match{
+      case ds:IDataSource =>
+        ds.readBytesByLength(len)
+      case channel:ChannelBuffer =>
+        channel.readBytes(len).array()
+    }
+  }
   /**
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
@@ -224,14 +232,7 @@ trait ScalaReflect{
           throw new IllegalArgumentException("@Lenght not defined "+tpe)
         length
       }
-      def readByteArray(len:Int): Array[Byte]={
-        dataSource match{
-          case ds:IDataSource =>
-            ds.readBytesByLength(len)
-          case channel:ChannelBuffer =>
-            channel.readBytes(len).array()
-        }
-      }
+      def readByteArray(len:Int): Array[Byte]= readBytesFromStreamReader(dataSource,len)
 
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val field = instanceMirror.reflectField(termSymbol)

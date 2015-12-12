@@ -24,19 +24,10 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @return GAFISIMAGESTRUCT
    */
   override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType, extractMode: ExtractMode=ExtractMode.NEW): GAFISIMAGESTRUCT = {
-    val imgBuffer = ChannelBuffers.buffer(img.stHead.getDataSize + img.bnData.length)
-    img.writeToStreamWriter(imgBuffer)
-    imgBuffer.writeBytes(img.bnData)
-    val mntData = extractByGAFISIMGBinary(imgBuffer.array(),fingerPos,featureType,extractMode)
+    val imgData = img.toByteArray
+    val mntData = extractByGAFISIMGBinary(imgData,fingerPos,featureType,extractMode)
 
-
-    val destBuffer = ChannelBuffers.wrappedBuffer(mntData)
-    val result = new GAFISIMAGESTRUCT
-    result.stHead.fromStreamReader(destBuffer)
-    result.bnData = new Array[Byte](mntData.length - result.stHead.getDataSize)
-    destBuffer.getBytes(destBuffer.readerIndex(),result.bnData)
-
-    result
+    new GAFISIMAGESTRUCT().fromByteArray(mntData)
   }
   override def extractByGAFISIMGBinary(imgData: Array[Byte], fingerPos: FingerPosition, featureType: FeatureType, extractMode: ExtractMode=ExtractMode.NEW): Array[Byte]= {
     val imgHead = new GAFISIMAGEHEADSTRUCT
