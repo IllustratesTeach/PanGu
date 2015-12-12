@@ -4,6 +4,8 @@ import monad.core.MonadCoreConstants
 import monad.core.config.ZkClientConfigSupport
 import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
+import nirvana.hall.extractor.internal.{ExtractRequestFilter, FeatureExtractorImpl}
+import nirvana.hall.extractor.services.FeatureExtractor
 import org.apache.tapestry5.ioc.{ServiceBinder, OrderedConfiguration}
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
@@ -16,7 +18,7 @@ import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
  */
 object LocalHallExtractorModule {
   def bind(binder:ServiceBinder): Unit ={
-    //binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+    binder.bind(classOf[FeatureExtractor],classOf[FeatureExtractorImpl]).withId("FeatureExtractor")
   }
   //增加EagerLoad,避免出现deadlock
   @EagerLoad
@@ -37,6 +39,6 @@ object LocalHallExtractorModule {
 
   @Contribute(classOf[RpcServerMessageHandler])
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
-    //configuration.addInstance("FirmImageDecompressReques", classOf[FirmImageDecompressRequestFilter])
+    configuration.addInstance("ExtractRequest", classOf[ExtractRequestFilter])
   }
 }

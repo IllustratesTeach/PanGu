@@ -3,10 +3,12 @@ package nirvana.hall.extractor.internal
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
-import nirvana.hall.c.services.kernel.mnt_def.{PALMLATMNTSTRUCT, PALMMNTSTRUCT, FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT, PALMLATMNTSTRUCT, PALMMNTSTRUCT}
 import nirvana.hall.extractor.jni.NativeExtractor
-import nirvana.hall.extractor.services.ExtractorModel.{ExtractMode, FeatureType, FingerPosition}
+import nirvana.hall.extractor.services.ExtractorModel.{FeatureType, FingerPosition}
 import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.protocol.image.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.image.ExtractProto.FingerPosition
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -20,16 +22,15 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @param img image data
    * @param fingerPos finger position
    * @param featureType feature type
-   * @param extractMode extract mode
    * @return GAFISIMAGESTRUCT
    */
-  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType, extractMode: ExtractMode=ExtractMode.NEW): GAFISIMAGESTRUCT = {
+  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType): GAFISIMAGESTRUCT = {
     val imgData = img.toByteArray
-    val mntData = extractByGAFISIMGBinary(imgData,fingerPos,featureType,extractMode)
+    val mntData = extractByGAFISIMGBinary(imgData,fingerPos,featureType)
 
     new GAFISIMAGESTRUCT().fromByteArray(mntData)
   }
-  override def extractByGAFISIMGBinary(imgData: Array[Byte], fingerPos: FingerPosition, featureType: FeatureType, extractMode: ExtractMode=ExtractMode.NEW): Array[Byte]= {
+  override def extractByGAFISIMGBinary(imgData: Array[Byte], fingerPos: FingerPosition, featureType: FeatureType): Array[Byte]= {
     val imgHead = new GAFISIMAGEHEADSTRUCT
     imgHead.fromByteArray(imgData)
     if(imgHead.nImgSize + imgHead.getDataSize != imgData.length){
@@ -54,8 +55,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val mntData = mntBuffer.array()
 
     NativeExtractor.ExtractMNT_All(imgData,mntData,
-      fingerPos.getValue.toByte,
-      extractMode.ordinal().toByte,
+      fingerPos.getNumber.toByte,
+      0.toByte,
       featureType.ordinal().toByte)
 
     mntData

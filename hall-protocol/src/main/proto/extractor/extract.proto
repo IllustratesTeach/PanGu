@@ -9,18 +9,33 @@ option optimize_for = SPEED;
 option java_package = "nirvana.hall.protocol.image";
 
 option java_outer_classname = "ExtractProto";
+//指位
+enum	FingerPosition
+{
+  FINGER_UNDET	= 0;	//不确定
+  FINGER_R_THUMB	= 1;	//右拇
+  FINGER_R_INDEX	= 2;	//右食
+  FINGER_R_MIDDLE	= 3;	//右中
+  FINGER_R_RING	= 4;	//右环
+  FINGER_R_LITTLE	= 5;	//右小
+  FINGER_L_THUMB	= 6;	//左姆
+  FINGER_L_INDEX	= 7;	//左食
+  FINGER_L_MIDDLE	= 8;	//左中
+  FINGER_L_RING	= 9;	//左环
+  FINGER_L_LITTLE	= 10;	//左小
+}
 /* send request to image server */
 message ExtractRequest{
   extend monad.rpc.protocol.BaseCommand {
     optional ExtractRequest cmd = 10003;
   }
-  enum MntType{
+  enum FeatureType{
     Template = 1;
     Latent = 2;
   }
   required bytes img_data = 1;
-  required int32 position = 2;
-  required MntType mnt_type = 3;
+  required FingerPosition position = 2;
+  required FeatureType mnt_type = 3;
 }
 
 /* response */
