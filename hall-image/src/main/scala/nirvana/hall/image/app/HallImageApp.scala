@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
-object NirvanaHallImageApp
+object HallImageApp
   extends JettyServerSupport
   with GlobalLoggerConfigurationSupport
   with SystemEnvDetectorSupport
