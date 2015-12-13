@@ -13,6 +13,7 @@
     <module>hall-extractor</module>
     <module>hall-image</module>
     <module>hall-protocol</module>
+    <module>hall-protobuf-web</module>
     <module>hall-sdk</module>
   </modules>
   <scm>
@@ -35,6 +36,11 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
+        <artifactId>hall-protobuf-web</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

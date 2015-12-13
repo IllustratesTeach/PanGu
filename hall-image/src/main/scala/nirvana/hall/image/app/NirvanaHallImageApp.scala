@@ -34,6 +34,7 @@ object NirvanaHallImageApp
 
 
         Class.forName("nirvana.hall.image.LocalHallImageModule"),
+        Class.forName("nirvana.hall.protobuf.LocalProtobufWebModule"),
         Class.forName("nirvana.hall.image.NirvanaHallImageModule")
       )
       startServer(config.web, "nirvana.hall.image", classes: _*)

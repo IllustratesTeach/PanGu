@@ -1,7 +1,7 @@
-package nirvana.hall.image.internal
+package nirvana.hall.protobuf.internal
 
 import java.io.OutputStream
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import com.google.protobuf.ExtensionRegistry
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
