@@ -16,6 +16,26 @@ import org.junit.Test
  */
 class FeatureExtractorImplTest extends BaseJniTest{
   @Test
+  def test_extract_bmp: Unit ={
+    /*
+    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/bmp.bmp"))
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.fromByteArray(img)
+    gafisImg.stHead.nResolution = 500
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nImgSize = img.length
+    gafisImg.bnData = img
+
+    val extractor = new FeatureExtractorImpl
+    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.Template)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+
+    feature
+    */
+
+  }
+  @Test
   def test_extract_wsq: Unit ={
     val img = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data.uncompressed"))
     val gafisImg = new GAFISIMAGESTRUCT
