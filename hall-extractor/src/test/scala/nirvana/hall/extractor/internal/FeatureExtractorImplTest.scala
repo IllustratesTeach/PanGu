@@ -4,7 +4,8 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
-import nirvana.hall.extractor.services.ExtractorModel.{FeatureType, FingerPosition}
+import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import org.apache.commons.io.IOUtils
 import org.junit.Test
 

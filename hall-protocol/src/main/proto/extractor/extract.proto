@@ -6,7 +6,7 @@ package nirvana.proto;
 import "monad/rpc/protocol/command.proto";
 option optimize_for = SPEED;
 
-option java_package = "nirvana.hall.protocol.image";
+option java_package = "nirvana.hall.protocol.extract";
 
 option java_outer_classname = "ExtractProto";
 //指位

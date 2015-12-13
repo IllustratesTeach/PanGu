@@ -5,10 +5,9 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT, PALMLATMNTSTRUCT, PALMMNTSTRUCT}
 import nirvana.hall.extractor.jni.NativeExtractor
-import nirvana.hall.extractor.services.ExtractorModel.{FeatureType, FingerPosition}
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.protocol.image.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.image.ExtractProto.FingerPosition
+import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**

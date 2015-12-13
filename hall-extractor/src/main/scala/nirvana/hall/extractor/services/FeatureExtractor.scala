@@ -1,8 +1,8 @@
 package nirvana.hall.extractor.services
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.protocol.image.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.image.ExtractProto.FingerPosition
+import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 
 /**
  * extract feature from image

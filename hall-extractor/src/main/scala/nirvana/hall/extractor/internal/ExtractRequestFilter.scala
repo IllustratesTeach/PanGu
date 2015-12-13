@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{RpcServerMessageHandler, CommandResponse, RpcServerMessageFilter}
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.protocol.image.ExtractProto.{ExtractResponse, ExtractRequest}
+import nirvana.hall.protocol.extract.ExtractProto.{ExtractResponse, ExtractRequest}
 
 /**
  * support extract request protocol
