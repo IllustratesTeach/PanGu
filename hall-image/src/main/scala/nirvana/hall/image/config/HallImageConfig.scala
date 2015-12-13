@@ -2,8 +2,9 @@ package nirvana.hall.image.config
 
 import javax.xml.bind.annotation.{XmlRootElement, XmlType}
 
-import monad.core.config.{ZkClientConfigSupport, HeartbeatConfigSupport, LogFileSupport}
+import monad.core.config.{LocalStoreConfigSupport, ZkClientConfigSupport, HeartbeatConfigSupport, LogFileSupport}
 import monad.rpc.config.RpcBindSupport
+import monad.support.services.WebServerConfigSupport
 
 /**
  * hall image configuration
@@ -14,6 +15,8 @@ import monad.rpc.config.RpcBindSupport
 @XmlType(name = "HallImageConfig")
 class HallImageConfig
   extends RpcBindSupport
+  with WebServerConfigSupport
+  with LocalStoreConfigSupport
   with LogFileSupport
   with ZkClientConfigSupport
   with HeartbeatConfigSupport

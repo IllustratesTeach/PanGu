@@ -2,7 +2,7 @@ package nirvana.hall.image.app
 
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
-import monad.support.services.{SystemEnvDetectorSupport, TapestryIocContainerSupport}
+import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
 import nirvana.hall.image.NirvanaHallImageModule
 import nirvana.hall.image.jni.JniLoader
 import org.slf4j.LoggerFactory
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
  * @since 2015-12-10
  */
 object NirvanaHallImageApp
-  extends TapestryIocContainerSupport
+  extends JettyServerSupport
   with GlobalLoggerConfigurationSupport
   with SystemEnvDetectorSupport
   with BootstrapTextSupport {
@@ -36,9 +36,9 @@ object NirvanaHallImageApp
         Class.forName("nirvana.hall.image.LocalHallImageModule"),
         Class.forName("nirvana.hall.image.NirvanaHallImageModule")
       )
-      startUpContainer(classes: _*)
+      startServer(config.web, "nirvana.hall.image", classes: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-image/version.properties")
-      printTextWithNative(logger, HALL_TEXT_LOGO, "image@" + config.rpc.bind, version, "1.1")
+      printTextWithNative(logger, HALL_TEXT_LOGO, "image rpc@" + config.rpc.bind+" web@"+config.web.bind, version, "1.1")
       logger.info("image server started")
 
       join()
