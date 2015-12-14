@@ -29,12 +29,11 @@ object HallImageApp
       val classes = List[Class[_]](
         Class.forName("monad.core.LocalMonadCoreModule"),
         Class.forName("monad.rpc.LocalRpcModule"),
-        Class.forName("monad.rpc.LocalRpcClientModule"),
         Class.forName("monad.rpc.LocalRpcServerModule"),
 
+        Class.forName("nirvana.hall.protobuf.LocalProtobufWebModule"),
 
         Class.forName("nirvana.hall.image.LocalHallImageModule"),
-        Class.forName("nirvana.hall.protobuf.LocalProtobufWebModule"),
         Class.forName("nirvana.hall.image.NirvanaHallImageModule")
       )
       startServer(config.web, "nirvana.hall.image", classes: _*)

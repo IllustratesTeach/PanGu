@@ -12,7 +12,7 @@ import org.apache.tapestry5.ioc.annotations.Symbol
  * @since 2015-12-09
  */
 object NirvanaHallExtractorModule {
-  def buildHallImageConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
+  def buildHallExtractConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
     val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-extractor.xml")
     XmlLoader.parseXML[HallExtractorConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/extractor/extractor.xsd")))
   }
