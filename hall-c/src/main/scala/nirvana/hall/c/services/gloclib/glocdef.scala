@@ -21,7 +21,7 @@ object glocdef {
       // may apply many methods to it
       class GAFISIMAGEHEADSTRUCT extends AncientData
       {
-      var nSize:Int = _ ;			// size of this structure, 4 bytes int
+      var nSize:Int = 64 ;			// size of this structure, 4 bytes int
       var nWidth:Short = _ ;			// width of the image, 2 bytes int
       var nHeight:Short = _ ;			// height of the image, 2 bytes int
       var nBits:Byte = _ ;				// bit per pixel, 8, 16, 24, no pallete, 1 byte
