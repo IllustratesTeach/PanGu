@@ -38,7 +38,7 @@ object HallExtractorApp
       )
       startServer(config.web, "nirvana.hall.extract", classes: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-extractor/version.properties")
-      printTextWithNative(logger, HALL_TEXT_LOGO, "extractor rpc@" + config.rpc.bind + "web@"+config.web.bind, version, "1.1")
+      printTextWithNative(logger, HALL_TEXT_LOGO, "extractor rpc@" + config.rpc.bind + " web@"+config.web.bind, version, "1.1")
       logger.info("extractor server started")
 
       join()
