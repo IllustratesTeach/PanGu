@@ -15,7 +15,7 @@ class ExtractRequestFilter(extractor:FeatureExtractor) extends RpcServerMessageF
   override def handle(commandRequest: BaseCommand, response: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(ExtractRequest.cmd)){
       val extractRequest = commandRequest.getExtension(ExtractRequest.cmd)
-      val mntData = extractor.extractByGAFISIMGBinary(extractRequest.getImgData.toByteArray,
+      val mntData = extractor.extractByGAFISIMGBinary(extractRequest.getImgData.newInput(),
         extractRequest.getPosition,
         extractRequest.getMntType)
 

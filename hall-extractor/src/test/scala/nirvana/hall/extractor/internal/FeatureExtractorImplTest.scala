@@ -17,7 +17,7 @@ import org.junit.Test
 class FeatureExtractorImplTest extends BaseJniTest{
   @Test
   def test_extract_bmp: Unit ={
-    val imgData = IOUtils.toByteArray(getClass.getResourceAsStream("/bmp.bmp"))
+    val imgData = getClass.getResourceAsStream("/bmp.bmp")
 
     val extractor = new FeatureExtractorImpl
     val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.Template)

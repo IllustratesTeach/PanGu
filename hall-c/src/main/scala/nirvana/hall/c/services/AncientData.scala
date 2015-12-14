@@ -1,10 +1,11 @@
 package nirvana.hall.c.services
 
 import java._
+import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
-import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
+import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
 
 import scala.reflect.ClassTag
@@ -218,6 +219,10 @@ trait ScalaReflect{
         ds.readBytesByLength(len)
       case channel:ChannelBuffer =>
         channel.readBytes(len).array()
+      case iis:ImageInputStream=>
+        val r = new Array[Byte](len)
+        iis.readFully(r)
+        r
     }
   }
   /**

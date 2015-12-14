@@ -2,8 +2,9 @@ package nirvana.hall.extractor.internal
 
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.ByteArrayInputStream
+import java.io.{InputStream, ByteArrayInputStream}
 import javax.imageio.ImageIO
+import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gloclib.glocdef
@@ -21,6 +22,9 @@ import org.jboss.netty.buffer.ChannelBuffers
  * @since 2015-12-11
  */
 class FeatureExtractorImpl extends FeatureExtractor{
+  val iioRegistry = IIORegistry.getDefaultInstance
+  iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
+
   private val COLOR_GRAY_SPACE=  ColorSpace.getInstance(ColorSpace.CS_GRAY);
   /**
    * extract feature from image data
@@ -31,12 +35,12 @@ class FeatureExtractorImpl extends FeatureExtractor{
    */
   override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType): GAFISIMAGESTRUCT = {
     val imgData = img.toByteArray
-    val mntData = extractByGAFISIMGBinary(imgData,fingerPos,featureType)
+    val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType)
 
     new GAFISIMAGESTRUCT().fromByteArray(mntData)
   }
-  override def extractByGAFISIMGBinary(imgData: Array[Byte], fingerPos: FingerPosition, featureType: FeatureType): Array[Byte]= {
-    val image = readByteArrayAsGAFISIMAGE(imgData)
+  override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType): Array[Byte]= {
+    val image = readByteArrayAsGAFISIMAGE(is)
     val originalImgData = image.toByteArray
     val imgHead = image.stHead
 
@@ -64,35 +68,31 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     mntData
   }
-  private def readByteArrayAsGAFISIMAGE(imgData:Array[Byte]): GAFISIMAGESTRUCT ={
-    if(imgData(0) == 0x00 && imgData(1) == 0x40){
-      new GAFISIMAGESTRUCT().fromByteArray(imgData)
-    }else {
-      val img = ImageIO.read(new ByteArrayInputStream(imgData))
-      val grayImg = img.getColorModel.getColorSpace match{
-        case COLOR_GRAY_SPACE=>
-          img
-        case other=>
-          val dstImage = new BufferedImage(img.getWidth, img.getHeight, img.getType);
-          val colorConvertOp = new ColorConvertOp(COLOR_GRAY_SPACE, null);
-          colorConvertOp.filter(img, dstImage)
-          dstImage
-      }
-
-      val gafisImg = new GAFISIMAGESTRUCT
-      gafisImg.stHead.nResolution = 500
-      //TODO determined by feature type
-      gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-      gafisImg.stHead.nWidth = grayImg.getWidth.toShort
-      gafisImg.stHead.nHeight = grayImg.getHeight.toShort
-      gafisImg.stHead.nBits = grayImg.getColorModel.getPixelSize.toByte
-      gafisImg.stHead.nImgSize = grayImg.getWidth * grayImg.getHeight
-
-      //get gray image data
-      val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte]
-      gafisImg.bnData = dataBuffer.getData
-
-      gafisImg
+  private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
+    val img = ImageIO.read(imgData)
+    val grayImg = img.getColorModel.getColorSpace match{
+      case COLOR_GRAY_SPACE=>
+        img
+      case other=>
+        val dstImage = new BufferedImage(img.getWidth, img.getHeight, img.getType);
+        val colorConvertOp = new ColorConvertOp(COLOR_GRAY_SPACE, null);
+        colorConvertOp.filter(img, dstImage)
+        dstImage
     }
+
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.nResolution = 500
+    //TODO determined by feature type
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nWidth = grayImg.getWidth.toShort
+    gafisImg.stHead.nHeight = grayImg.getHeight.toShort
+    gafisImg.stHead.nBits = grayImg.getColorModel.getPixelSize.toByte
+    gafisImg.stHead.nImgSize = grayImg.getWidth * grayImg.getHeight
+
+    //get gray image data
+    val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte]
+    gafisImg.bnData = dataBuffer.getData
+
+    gafisImg
   }
 }
