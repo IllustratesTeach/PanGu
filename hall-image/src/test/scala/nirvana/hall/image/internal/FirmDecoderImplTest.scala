@@ -1,5 +1,10 @@
 package nirvana.hall.image.internal
 
+import java.awt.{RenderingHints, AlphaComposite, Font, Color}
+import java.awt.image.{DataBufferByte, BufferedImage}
+import java.io.File
+import javax.imageio.ImageIO
+
 import nirvana.hall.image.jni.BaseJniTest
 import org.apache.commons.io.IOUtils
 import org.junit.Test
@@ -23,5 +28,37 @@ class FirmDecoderImplTest extends BaseJniTest{
     Range(0,409600).foreach{ i=>
       decoder.decode("1400",cprData,640,640,500)
     }
+  }
+  @Test
+  def test_draw{
+    val img = new BufferedImage(640,640,BufferedImage.TYPE_BYTE_GRAY)
+    val g = img.createGraphics()
+    g.setColor(Color.WHITE);
+    g.fillRect(0,0,640,640)
+    g.setColor(Color.BLACK);
+    g.setFont(new Font("Monaco",Font.BOLD,50))
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,0.01f))
+    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    g.drawString("PT.ALDIN",200,300)
+    /*
+    g.setFont(new Font("Monaco",Font.BOLD,10))
+    g.drawString("PT.ALDINO",10,10)
+    */
+
+    ImageIO.write(img,"BMP",new File("s.bmp"))
+    val raster = img.getData
+    val e =raster.getDataElements(265,636,null)
+    println("e:",e)
+
+    val buffer = img.getData.getDataBuffer.asInstanceOf[DataBufferByte]
+    val data = buffer.getData()
+    println("width:",img.getWidth(),"height",img.getHeight)
+    print("[")
+    for(i <- Range(0,img.getWidth);j <- Range(0,img.getHeight)){
+      //if((data(i*j) & 0xff) != 0xff) println(i,j,data(i*j) & 0xff)
+      if(buffer.getElem(i*j) != 0xff) print(i*j+",")
+    }
+    println("];")
+
   }
 }
