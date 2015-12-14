@@ -2,14 +2,13 @@ package nirvana.hall.extractor.internal
 
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.{InputStream, ByteArrayInputStream}
+import java.io.{ByteArrayInputStream, InputStream}
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
-import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT, PALMLATMNTSTRUCT, PALMMNTSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def._
 import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
@@ -44,12 +43,20 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val originalImgData = image.toByteArray
     val imgHead = image.stHead
 
-    val feature:AncientData = imgHead.nImageType match {
-      case glocdef.GAIMG_IMAGETYPE_FINGER =>
-        if(featureType == FeatureType.Template) new FINGERMNTSTRUCT else new FINGERLATMNTSTRUCT
-      case glocdef.GAIMG_IMAGETYPE_PALM =>
-        if(featureType == FeatureType.Template) new PALMMNTSTRUCT else new PALMLATMNTSTRUCT
-      case other=>
+    val (feature,isLatent) = featureType match {
+      case FeatureType.FingerTemplate =>
+        image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+        (new FINGERMNTSTRUCT,0)
+      case FeatureType.FingerLatent =>
+        image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+        (new FINGERLATMNTSTRUCT,1)
+      case FeatureType.PalmTemplate =>
+        image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
+        (new PALMMNTSTRUCT,0)
+      case FeatureType.PalmLatent =>
+        image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
+        (new PALMLATMNTSTRUCT,1)
+      case other =>
         throw new IllegalArgumentException("unsupported data type %s".format(other))
     }
 
@@ -60,12 +67,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
     imgHead.writeToStreamWriter(mntBuffer)
 
     val mntData = mntBuffer.array()
-
-    NativeExtractor.ExtractMNT_All(originalImgData,mntData,
-      fingerPos.getNumber.toByte,
-      0.toByte,
-      featureType.ordinal().toByte)
-
+    NativeExtractor.ExtractMNT_All(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
     mntData
   }
   private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
@@ -82,8 +84,6 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.nResolution = 500
-    //TODO determined by feature type
-    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
     gafisImg.stHead.nWidth = grayImg.getWidth.toShort
     gafisImg.stHead.nHeight = grayImg.getHeight.toShort
     gafisImg.stHead.nBits = grayImg.getColorModel.getPixelSize.toByte

@@ -30,8 +30,10 @@ message ExtractRequest{
     optional ExtractRequest cmd = 10003;
   }
   enum FeatureType{
-    Template = 1;
-    Latent = 2;
+    FingerTemplate = 1;
+    FingerLatent = 2;
+    PalmTemplate = 3;
+    PalmLatent = 4;
   }
   required bytes img_data = 1;
   required FingerPosition position = 2;
