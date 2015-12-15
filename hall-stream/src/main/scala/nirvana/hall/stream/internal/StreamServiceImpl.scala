@@ -53,10 +53,16 @@ object StreamServiceObject{
       featureData = null
     }
   }
+  //event factory
   private[internal] val EVENT_FACTORY = new EventFactory[StreamEvent] {
     def newInstance() = new StreamEvent()
   }
 }
+
+/**
+ * implements StreamService
+ * @param config configuration
+ */
 class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
   private val streamPool: ExecutorService = Executors.newCachedThreadPool(new ThreadFactory {
     private val seq = new AtomicInteger(0)
@@ -67,6 +73,7 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
       t
     }
   })
+  //size of to cache awaiting event
   private val buffer = 1 << 10
 
   private var disruptor:Disruptor[StreamEvent] = _
@@ -75,14 +82,26 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
   def startDisruptor(decompressService: DecompressService,extractService: ExtractService,featureSaverService: FeatureSaverService):Unit = {
     disruptor = new Disruptor[StreamEvent](EVENT_FACTORY, buffer, streamPool)
     disruptor.handleExceptionsWith(new LogExceptionHandler)
+    //decompress workers
     val decompressWorkers = 0 until config.stream.decompressThread map (x => new DecompressImageWorker(decompressService))
+    //extract workers
     val extractWorkers = 0 until config.stream.extractThread map (x => new ExtractFeatureWorker(extractService))
+    //saver workers
     val saverWorkers = 0 until config.stream.saveFeatureThread map (x => new FeatureSaverWorker(featureSaverService))
 
     disruptor.handleEventsWithWorkerPool(decompressWorkers:_*)
       .thenHandleEventsWithWorkerPool(extractWorkers:_*)
       .thenHandleEventsWithWorkerPool(saverWorkers:_*)
   }
+
+  /**
+   * push event
+   * @param id data unique key
+   * @param img image data
+   * @param imgIsCompressed whether image is compressed
+   * @param position finger position
+   * @param featureType feature type
+   */
   def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,position:FingerPosition,featureType:FeatureType): Unit ={
     disruptor.publishEvent(new EventTranslator[StreamEvent](){
       override def translateTo(t: StreamEvent, l: Long): Unit = {

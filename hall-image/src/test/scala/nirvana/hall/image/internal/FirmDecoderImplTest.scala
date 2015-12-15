@@ -54,11 +54,18 @@ class FirmDecoderImplTest extends BaseJniTest{
     val data = buffer.getData()
     println("width:",img.getWidth(),"height",img.getHeight)
     print("[")
+    var m=0;
     for(i <- Range(0,img.getWidth);j <- Range(0,img.getHeight)){
       //if((data(i*j) & 0xff) != 0xff) println(i,j,data(i*j) & 0xff)
-      if(buffer.getElem(i*j) != 0xff) print(i*j+",")
+      if(buffer.getElem(i*j) != 0xff) {
+        print(i*j+",")
+        m+=1
+        if(m %16 ==0)
+          println()
+      }
     }
     println("];")
+    println("m:",m)
 
   }
 }
