@@ -5,6 +5,7 @@ package nirvana.hall.stream.internal
 import java.io.{Closeable, IOException}
 
 import com.google.protobuf.{GeneratedMessage, Message}
+import nirvana.hall.stream.HallStreamConstants
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpPost}
@@ -29,6 +30,7 @@ object WebHttpClientUtils {
     val httpClient: CloseableHttpClient = createHttpClient
     try {
       val post: HttpPost = new HttpPost(url)
+      post.setHeader(HallStreamConstants.PROTOBUF_HEADER,HallStreamConstants.PROTOBUF_HEADER_VALUE)
       val reqEntity: ByteArrayEntity = new ByteArrayEntity(request.toByteArray)
       post.setEntity(reqEntity)
       val response: CloseableHttpResponse = httpClient.execute(post)
