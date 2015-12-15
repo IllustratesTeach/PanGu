@@ -10,5 +10,13 @@ import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
  * @since 2015-12-15
  */
 trait StreamService {
+  /**
+   * push stream event
+   * @param id data unique key
+   * @param img image data
+   * @param imgIsCompressed whether image is compressed
+   * @param position finger position
+   * @param featureType feature type
+   */
   def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,position:FingerPosition,featureType:FeatureType): Unit
 }

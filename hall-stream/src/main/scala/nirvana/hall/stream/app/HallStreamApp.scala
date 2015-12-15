@@ -25,14 +25,9 @@ object HallStreamApp
       val logger = LoggerFactory getLogger getClass
       logger.info("Starting extractor server ....")
       val classes = List[Class[_]](
-        Class.forName("monad.core.LocalMonadCoreModule"),
-        Class.forName("monad.rpc.LocalRpcModule"),
-        Class.forName("monad.rpc.LocalRpcServerModule"),
 
-        Class.forName("nirvana.hall.protobuf.LocalProtobufWebModule"),
-
-        Class.forName("nirvana.hall.extractor.LocalHallExtractorModule"),
-        Class.forName("nirvana.hall.extractor.NirvanaHallExtractorModule")
+        Class.forName("nirvana.hall.stream.LocalHallStreamModule"),
+        Class.forName("nirvana.hall.stream.HallStreamModule")
       )
       startUpContainer(classes: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-extractor/version.properties")

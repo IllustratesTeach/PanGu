@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
            elementFormDefault="qualified">
   <xs:include schemaLocation="monad.xsd"/>
-  <xs:element name="hall_extractor" type="hallExtractorType"/>
+  <xs:element name="hall_stream" type="hallExtractorType"/>
   <xs:complexType name="hallExtractorType">
     <xs:sequence>
       <xs:element type="xs:string" name="log_file" minOccurs="1" maxOccurs="1">
