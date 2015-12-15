@@ -2,6 +2,7 @@ package nirvana.hall.stream.internal
 
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
+import javax.annotation.PostConstruct
 
 import com.google.protobuf.ByteString
 import com.lmax.disruptor.{EventTranslator, EventFactory}
@@ -56,7 +57,7 @@ object StreamServiceObject{
     def newInstance() = new StreamEvent()
   }
 }
-class StreamServiceImpl(config:HallStreamConfigSupport,decompressService: DecompressService,extractService: ExtractService,featureSaverService: FeatureSaverService) extends StreamService{
+class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
   private val streamPool: ExecutorService = Executors.newCachedThreadPool(new ThreadFactory {
     private val seq = new AtomicInteger(0)
     def newThread(p1: Runnable) = {
@@ -70,7 +71,8 @@ class StreamServiceImpl(config:HallStreamConfigSupport,decompressService: Decomp
 
   private var disruptor:Disruptor[StreamEvent] = _
 
-  protected def startDisruptor(): Unit = {
+  @PostConstruct
+  def startDisruptor(decompressService: DecompressService,extractService: ExtractService,featureSaverService: FeatureSaverService):Unit = {
     disruptor = new Disruptor[StreamEvent](EVENT_FACTORY, buffer, streamPool)
     disruptor.handleExceptionsWith(new LogExceptionHandler)
     val decompressWorkers = 0 until config.stream.decompressThread map (x => new DecompressImageWorker(decompressService))

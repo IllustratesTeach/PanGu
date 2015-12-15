@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+  <xs:include schemaLocation="monad.xsd"/>
+  <xs:element name="hall_extractor" type="hallExtractorType"/>
+  <xs:complexType name="hallExtractorType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="log_file" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置日志文件的路径</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="extractorType" name="stream" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>hall stream configuration</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="extractorType">
+    <xs:sequence>
+      <xs:element type="xs:int" name="decompress_thread_num" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>decompress thread</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:int" name="extract_thread_num" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>extract thread</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:int" name="save_feature_thread_num" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>save feature data thread</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
