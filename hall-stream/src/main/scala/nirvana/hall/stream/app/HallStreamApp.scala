@@ -3,7 +3,7 @@ package nirvana.hall.stream.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{SystemEnvDetectorSupport, TapestryIocContainerSupport}
-import nirvana.hall.stream.HallStreamModule
+import nirvana.hall.stream.{HallStreamSymbols, HallStreamModule}
 import org.slf4j.LoggerFactory
 
 /**
@@ -20,22 +20,32 @@ object HallStreamApp
       val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
       System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
       val config = HallStreamModule.buildHallExtractConfig(serverHome)
-      configLogger(config.logFile, "EXTRACTOR", "egf", "nirvana","monad")
+      configLogger(config.logFile, "STREAM", "egf", "nirvana","monad")
 
       val logger = LoggerFactory getLogger getClass
-      logger.info("Starting extractor server ....")
-      val classes = List[Class[_]](
+      logger.info("Starting stream server ....")
+      /*
+      load other module from system property.
+      */
+      val extraModules = System.getProperty(HallStreamSymbols.STREAM_EXTRA_MODULE_CLASS)
 
+      val classes = List[Class[_]](
         Class.forName("nirvana.hall.stream.LocalHallStreamModule"),
         Class.forName("nirvana.hall.stream.HallStreamModule")
       )
-      startUpContainer(classes: _*)
+
+      val finalClasses =  if(extraModules!= null)
+        extraModules.split(",").map(Class.forName) ++:  classes
+      else classes
+
+      startUpContainer(finalClasses: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-extractor/version.properties")
       printTextWithNative(logger, HALL_TEXT_LOGO, "stream", version, "1.1")
       logger.info("extractor server started")
 
       join()
     }
+
     final val HALL_TEXT_LOGO = """ #
    __ _____   __   __
   / // / _ | / /  / /
