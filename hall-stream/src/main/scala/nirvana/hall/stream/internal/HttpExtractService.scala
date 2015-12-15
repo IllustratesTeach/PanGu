@@ -21,7 +21,7 @@ class HttpExtractService(url: String) extends ExtractService{
     request.setMntType(featureType)
     request.setPosition(fingerPosition)
 
-    WebHttpClientUtils.call(url, request.build(), response)
+    //WebHttpClientUtils.call(url, request.build(), response)
     Option(response.getMntData)
   }
 }

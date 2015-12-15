@@ -28,8 +28,9 @@ class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessag
     if(header != null){
       val responseBuilder = BaseCommand.newBuilder()
       responseBuilder.setStatus(CommandStatus.OK)
+      var baseRequest:BaseCommand = null
       try {
-        val baseRequest = CommandProto.BaseCommand
+        baseRequest = CommandProto.BaseCommand
           .getDefaultInstance
           .getParserForType
           .parseFrom(request.getInputStream, extensionRegistry)
@@ -44,13 +45,25 @@ class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessag
             null
           }
         }
-        serverMessageHandler.handle(baseRequest,commandResponse)
+        val result = serverMessageHandler.handle(baseRequest,commandResponse)
+        if(!result) {
+          responseBuilder.setStatus(CommandStatus.FAIL)
+          responseBuilder.setMsg("message not handled !")
+        }
       }catch {
         case NonFatal(e) =>
           error(e.getMessage, e)
           responseBuilder.setStatus(CommandStatus.FAIL)
           responseBuilder.setMsg(e.toString)
       }
+      if(!responseBuilder.hasTaskId){
+
+        if(baseRequest == null)
+          responseBuilder.setTaskId(-1L)
+        else
+          responseBuilder.setTaskId(baseRequest.getTaskId)
+      }
+
       writeProtobufMessage(response,responseBuilder.build())
 
       true

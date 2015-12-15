@@ -1,4 +1,4 @@
-package nirvana.hall.stream
+package nirvana.hall.stream.internal
 
 import org.junit.Test
 

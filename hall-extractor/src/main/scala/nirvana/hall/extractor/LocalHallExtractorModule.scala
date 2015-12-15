@@ -1,15 +1,17 @@
 package nirvana.hall.extractor
 
+import com.google.protobuf.ExtensionRegistry
 import monad.core.MonadCoreConstants
 import monad.core.config.ZkClientConfigSupport
-import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
+import monad.rpc.services.{ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
 import nirvana.hall.extractor.internal.{ExtractRequestFilter, FeatureExtractorImpl}
 import nirvana.hall.extractor.services.FeatureExtractor
-import org.apache.tapestry5.ioc.{ServiceBinder, OrderedConfiguration}
+import nirvana.hall.protocol.extract.ExtractProto
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
+import org.apache.tapestry5.ioc.{Configuration, OrderedConfiguration, ServiceBinder}
 
 /**
  *
@@ -40,5 +42,13 @@ object LocalHallExtractorModule {
   @Contribute(classOf[RpcServerMessageHandler])
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
     configuration.addInstance("ExtractRequest", classOf[ExtractRequestFilter])
+  }
+  @Contribute(classOf[ExtensionRegistry])
+  def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {
+    configuration.add(new ProtobufExtensionRegistryConfiger {
+      override def config(registry: ExtensionRegistry): Unit = {
+        ExtractProto.registerAllExtensions(registry)
+      }
+    })
   }
 }

@@ -30,6 +30,7 @@ object HallStreamApp
       val extraModules = System.getProperty(HallStreamSymbols.STREAM_EXTRA_MODULE_CLASS)
 
       val classes = List[Class[_]](
+        Class.forName("monad.rpc.LocalRpcModule"),
         Class.forName("nirvana.hall.stream.LocalHallStreamModule"),
         Class.forName("nirvana.hall.stream.HallStreamModule")
       )
