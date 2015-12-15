@@ -15,6 +15,7 @@
     <module>hall-protocol</module>
     <module>hall-protobuf-web</module>
     <module>hall-sdk</module>
+    <module>hall-stream</module>
   </modules>
   <scm>
     <url>https://bitbucket.org/jcai/hall/src</url>
