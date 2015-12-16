@@ -114,26 +114,24 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
-      <!--
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>image</id>
+            <id>stream</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>hall-image-${project.version}</finalName>
+              <finalName>hall-stream-${project.version}</finalName>
               <descriptors>
-                <descriptor>support/assembly/bin-image.xml</descriptor>
+                <descriptor>support/assembly/bin-stream.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      -->
     </plugins>
   </build>
 </project>
