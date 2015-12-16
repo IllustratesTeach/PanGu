@@ -24,7 +24,7 @@ class BianjianFeatureSaverService(@InjectService("MntDataSource") dataSource:Dat
    */
   override def save(id: Any, feature: ByteString): Unit = {
     debug("save record with id {}",id)
-    val sql: String = "insert into gafis_mnt (csid, mnt, seq) values(?,?,select FROM gafis_mnt_seq.nextval)"
+    val sql: String = "insert into gafis_mnt (csid, mnt, seq) values(?,?, gafis_mnt_seq.nextval)"
     implicit val ds = dataSource
     JdbcDatabase.update(sql){ps=>
       ps.setLong(1, id.asInstanceOf[Long])

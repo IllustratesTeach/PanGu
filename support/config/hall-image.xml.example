@@ -14,7 +14,7 @@
     <address>127.0.0.1:3333</address>
   </zk>
   <web>
-    <bind>127.0.0.*:9001</bind>
+    <bind>127.0.0.1:9001</bind>
   </web>
 </hall_image>
 

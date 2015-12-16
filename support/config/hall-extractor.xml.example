@@ -5,7 +5,7 @@
 -->
 
 <hall_extractor>
-  <log_file>${server.home}/log/nirvana.hall.image.log</log_file>
+  <log_file>${server.home}/log/nirvana.hall.extractor.log</log_file>
   <local_store_dir>${server.home}/config/local</local_store_dir>
   <rpc>
     <bind>127.*:5559</bind>
