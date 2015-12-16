@@ -6,9 +6,13 @@ package nirvana.hall.stream.internal.adapter.bianjian
  * @since 2015-12-16
  */
 object BianjianTestSymobls{
-  val JDBC_URL="hall.stream.bianjian.jdbc.url"
-  val JDBC_USER="hall.stream.bianjian.jdbc.user"
-  val JDBC_PASS="hall.stream.bianjian.jdbc.pass"
+  val IMG_JDBC_URL="hall.stream.bianjian.img.jdbc.url"
+  val IMG_JDBC_USER="hall.stream.bianjian.img.jdbc.user"
+  val IMG_JDBC_PASS="hall.stream.bianjian.jdbc.img.pass"
+
+  val MNT_JDBC_URL="hall.stream.bianjian.mnt.jdbc.url"
+  val MNT_JDBC_USER="hall.stream.bianjian.mnt.jdbc.user"
+  val MNT_JDBC_PASS="hall.stream.bianjian.mnt.jdbc.pass"
 
   val RPC_IMAGE_URL="rpc.image.url"
   val RPC_EXTRACT_URL="rpc.extract.url"

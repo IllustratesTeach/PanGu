@@ -6,7 +6,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import nirvana.hall.stream.internal.{HttpExtractService, HttpDecompressService}
 import nirvana.hall.stream.services.{ExtractService, RpcHttpClient, DecompressService, FeatureSaverService}
 import org.apache.tapestry5.ioc.ServiceBinder
-import org.apache.tapestry5.ioc.annotations.{EagerLoad, Local}
+import org.apache.tapestry5.ioc.annotations.{ServiceId, EagerLoad, Local}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -44,15 +44,38 @@ object BianjianTestModule {
   }
 
   @EagerLoad
+  @ServiceId("ImgDataSource")
   def buildDataSource(hub: RegistryShutdownHub, logger: Logger): DataSource = {
     val hikariConfig = new HikariConfig();
     //针对oracle特别处理
     hikariConfig.setConnectionTestQuery("select 1 from dual")
     hikariConfig.setDriverClassName("oracle.jdbc.driver.OracleDriver")
 
-    hikariConfig.setJdbcUrl(System.getProperty(BianjianTestSymobls.JDBC_URL))
-    hikariConfig.setUsername(System.getProperty(BianjianTestSymobls.JDBC_USER))
-    hikariConfig.setPassword(System.getProperty(BianjianTestSymobls.JDBC_PASS))
+    hikariConfig.setJdbcUrl(System.getProperty(BianjianTestSymobls.IMG_JDBC_URL))
+    hikariConfig.setUsername(System.getProperty(BianjianTestSymobls.IMG_JDBC_USER))
+    hikariConfig.setPassword(System.getProperty(BianjianTestSymobls.IMG_JDBC_PASS))
+    //设置自动提交事务
+    hikariConfig.setAutoCommit(false)
+
+    hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+    hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+    hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+    hikariConfig.setMaximumPoolSize(5)
+    //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
+
+    new HikariDataSource(hikariConfig)
+  }
+  @EagerLoad
+  @ServiceId("MntDataSource")
+  def buildMntDataSource(hub: RegistryShutdownHub, logger: Logger): DataSource = {
+    val hikariConfig = new HikariConfig();
+    //针对oracle特别处理
+    hikariConfig.setConnectionTestQuery("select 1 from dual")
+    hikariConfig.setDriverClassName("oracle.jdbc.driver.OracleDriver")
+
+    hikariConfig.setJdbcUrl(System.getProperty(BianjianTestSymobls.MNT_JDBC_URL))
+    hikariConfig.setUsername(System.getProperty(BianjianTestSymobls.MNT_JDBC_USER))
+    hikariConfig.setPassword(System.getProperty(BianjianTestSymobls.MNT_JDBC_PASS))
     //设置自动提交事务
     hikariConfig.setAutoCommit(false)
 
