@@ -31,7 +31,7 @@ class FirmDecoderImplTest extends BaseJniTest{
   }
   @Test
   def test_draw{
-    val img = new BufferedImage(640,640,BufferedImage.TYPE_BYTE_GRAY)
+    var img = new BufferedImage(640,640,BufferedImage.TYPE_BYTE_GRAY)
     val g = img.createGraphics()
     g.setColor(Color.WHITE);
     g.fillRect(0,0,640,640)
@@ -46,6 +46,7 @@ class FirmDecoderImplTest extends BaseJniTest{
     */
 
     ImageIO.write(img,"BMP",new File("s.bmp"))
+    img = ImageIO.read(new File("s.bmp"))
     val raster = img.getData
     val e =raster.getDataElements(265,636,null)
     println("e:",e)
