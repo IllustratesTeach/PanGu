@@ -36,10 +36,10 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
     code match{
       case WSQ =>
         try{
-          lock.lock()
+          //lock.lock()
           NativeImageConverter.decodeByWSQ(cpr_data)
         }finally{
-          lock.unlock()
+          //lock.unlock()
         }
       case other=>
         val dll = findDllHandle(code)
