@@ -6,7 +6,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import nirvana.hall.stream.internal.{HttpExtractService, HttpDecompressService}
 import nirvana.hall.stream.services.{ExtractService, RpcHttpClient, DecompressService, FeatureSaverService}
 import org.apache.tapestry5.ioc.ServiceBinder
-import org.apache.tapestry5.ioc.annotations.{ServiceId, EagerLoad, Local}
+import org.apache.tapestry5.ioc.annotations.{InjectService, ServiceId, EagerLoad, Local}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -21,7 +21,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor
  */
 object BianjianTestModule {
   def bind(binder:ServiceBinder): Unit ={
-    binder.bind(classOf[BianjianStream]).withId("BianjianStream")
+    binder.bind(classOf[BianjianStream]).withId("BianjianStream").eagerLoad()
     binder.bind(classOf[FeatureSaverService],classOf[BianjianFeatureSaverService]).withId("BianjianFeatureSaverService")
   }
   def buildDecompressService(rpcHttpClient:RpcHttpClient): DecompressService={
@@ -33,7 +33,7 @@ object BianjianTestModule {
     new HttpExtractService(url,rpcHttpClient)
   }
   @EagerLoad
-  def buildPlatformTransactionManager(dataSource: DataSource):PlatformTransactionManager = {
+  def buildPlatformTransactionManager(@InjectService("MntDataSource") dataSource: DataSource):PlatformTransactionManager = {
     new DataSourceTransactionManager(dataSource)
   }
   def buildTransactionInterceptor(@Local transactionManager: PlatformTransactionManager): TransactionInterceptor = {

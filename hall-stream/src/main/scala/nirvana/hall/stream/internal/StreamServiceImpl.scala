@@ -13,6 +13,7 @@ import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.stream.config.HallStreamConfigSupport
 import nirvana.hall.stream.internal.StreamServiceObject._
 import nirvana.hall.stream.services.{StreamService, FeatureSaverService, DecompressService, ExtractService}
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 
 /**
  * implements stream service
@@ -79,7 +80,10 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
   private var disruptor:Disruptor[StreamEvent] = _
 
   @PostConstruct
-  def startDisruptor(decompressService: DecompressService,extractService: ExtractService,featureSaverService: FeatureSaverService):Unit = {
+  def startDisruptor(decompressService: DecompressService,
+                     extractService: ExtractService,
+                     featureSaverService: FeatureSaverService,
+                     registryShutdownHub: RegistryShutdownHub):Unit = {
     disruptor = new Disruptor[StreamEvent](EVENT_FACTORY, buffer, streamPool)
     disruptor.handleExceptionsWith(new LogExceptionHandler)
     //decompress workers
@@ -92,6 +96,12 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
     disruptor.handleEventsWithWorkerPool(decompressWorkers:_*)
       .thenHandleEventsWithWorkerPool(extractWorkers:_*)
       .thenHandleEventsWithWorkerPool(saverWorkers:_*)
+
+    disruptor.start()
+
+    registryShutdownHub.addRegistryShutdownListener(new Runnable {
+      override def run(): Unit = disruptor.shutdown()
+    })
   }
 
   /**

@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.stream.internal.JdbcDatabase
@@ -18,7 +19,8 @@ import scala.annotation.tailrec
  * @since 2015-12-16
  */
 @EagerLoad
-class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,streamService:StreamService) {
+class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,streamService:StreamService)
+extends LoggerSupport{
   private implicit val ds = dataSource
   private val batch_size = 1000
   private val firmCode = "1400"
@@ -27,7 +29,9 @@ class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,strea
   def startStream(): Unit ={
     val minSeq = getMinSeq
     val maxSeq = getMaxSeq + 1
+    info("begin to read stream from database min:{} max:{}",minSeq,maxSeq)
     fetch(minSeq,minSeq+batch_size,maxSeq)
+    info("congratulation!!! finish to read data")
   }
   //递归
   @tailrec
@@ -45,16 +49,16 @@ class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,strea
         ps.setInt(2, until)
     }{rs=>
       val csid = rs.getLong("csid")
-      val zp = rs.getBytes("zp")
-      streamService.pushEvent(csid, ByteString.copyFrom(zp), true,firmCode,FingerPosition.FINGER_L_THUMB, FeatureType.FingerTemplate)
+      val zp = rs.getBinaryStream("zp")
+      streamService.pushEvent(csid, ByteString.readFrom(zp), true,firmCode,FingerPosition.FINGER_L_THUMB, FeatureType.FingerTemplate)
     }
   }
 
   def getMaxSeq : Int={
-    getSeq("select min(csid) from T_PC_A_CS").getOrElse(0)
+    getSeq("select max(csid) from T_PC_A_CS").getOrElse(0)
   }
   def getMinSeq: Int={
-    getSeq("select max(csid) from T_PC_A_CS").getOrElse(0)
+    getSeq("select min(csid) from T_PC_A_CS").getOrElse(0)
   }
   def getSeq(sql: String): Option[Int] ={
     JdbcDatabase.queryFirst(sql){ps=>}{rs=>

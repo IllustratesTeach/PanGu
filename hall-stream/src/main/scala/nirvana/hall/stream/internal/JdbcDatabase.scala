@@ -31,7 +31,7 @@ private[internal] object JdbcDatabase {
   }
 
   def update(sql: String)(psSetter:PreparedStatement=>Unit)(implicit ds: DataSource): Int = {
-    use(autoCommit = false) { conn =>
+    use(autoCommit = true) { conn =>
       val st = conn.prepareStatement(sql)
       try {
         psSetter.apply(st)

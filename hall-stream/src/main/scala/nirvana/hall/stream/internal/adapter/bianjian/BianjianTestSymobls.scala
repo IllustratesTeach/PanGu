@@ -8,7 +8,7 @@ package nirvana.hall.stream.internal.adapter.bianjian
 object BianjianTestSymobls{
   val IMG_JDBC_URL="hall.stream.bianjian.img.jdbc.url"
   val IMG_JDBC_USER="hall.stream.bianjian.img.jdbc.user"
-  val IMG_JDBC_PASS="hall.stream.bianjian.jdbc.img.pass"
+  val IMG_JDBC_PASS="hall.stream.bianjian.img.jdbc.pass"
 
   val MNT_JDBC_URL="hall.stream.bianjian.mnt.jdbc.url"
   val MNT_JDBC_USER="hall.stream.bianjian.mnt.jdbc.user"

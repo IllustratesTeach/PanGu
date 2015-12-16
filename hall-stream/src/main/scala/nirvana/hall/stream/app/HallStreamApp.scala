@@ -42,8 +42,10 @@ object HallStreamApp
       startUpContainer(finalClasses: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-extractor/version.properties")
       printTextWithNative(logger, HALL_TEXT_LOGO, "stream", version, "1.1")
-      logger.info("extractor server started")
+      logger.info("stream server started")
 
+      //wait stream start
+      //Thread.currentThread().join(5 * 60 * 1000)
       join()
     }
 

@@ -19,7 +19,12 @@ class BianjianStreamTest {
     val registry = Mockito.mock(classOf[RegistryShutdownHub])
 
     //config jdbc
-    //System.setProperty()
+    System.setProperty(BianjianTestSymobls.IMG_JDBC_URL, "jdbc:oracle:thin:@127.0.0.1:1521:xe")
+    System.setProperty(BianjianTestSymobls.IMG_JDBC_USER, "pcsys_cs")
+    System.setProperty(BianjianTestSymobls.IMG_JDBC_PASS, "11")
+    System.setProperty(BianjianTestSymobls.MNT_JDBC_URL, "jdbc:oracle:thin:@127.0.0.1:1521:xe")
+    System.setProperty(BianjianTestSymobls.MNT_JDBC_USER, "pcsys_cs")
+    System.setProperty(BianjianTestSymobls.MNT_JDBC_PASS, "11")
 
 
     val dataSource = BianjianTestModule.buildDataSource(registry,logger)
