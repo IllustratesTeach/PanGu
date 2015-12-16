@@ -12,6 +12,9 @@ import nirvana.hall.stream.services.{DecompressService, ExtractService, FeatureS
  */
 class DecompressImageWorker(decompressService: DecompressService) extends WorkHandler[StreamEvent]{
   override def onEvent(t: StreamEvent): Unit = {
+    if(t.img == null){
+      throw new IllegalArgumentException("image parameter is null!")
+    }
     if(t.imgIsCompressed){//need decompress
       val requestBuilder = FirmImageDecompressRequest.newBuilder()
       requestBuilder.setCprData(t.img)
@@ -34,7 +37,15 @@ class DecompressImageWorker(decompressService: DecompressService) extends WorkHa
  */
 class ExtractFeatureWorker(extractService: ExtractService) extends WorkHandler[StreamEvent]{
   override def onEvent(t: StreamEvent): Unit = {
-    extractService.extract(t.originalImgData,t.position,t.feature)
+    if(t.originalImgData != null){
+      val featureOpt = extractService.extract(t.originalImgData,t.position,t.feature)
+      featureOpt match{
+        case Some(feature) =>
+          t.featureData = feature
+        case other =>
+          throw new IllegalAccessException("fail to extract feature")
+      }
+    }
   }
 }
 /**
@@ -44,6 +55,7 @@ class ExtractFeatureWorker(extractService: ExtractService) extends WorkHandler[S
  */
 class FeatureSaverWorker(saver:FeatureSaverService) extends WorkHandler[StreamEvent]{
   override def onEvent(t: StreamEvent): Unit = {
-    saver.save(t.id,t.featureData)
+    if(t.featureData != null)
+      saver.save(t.id,t.featureData)
   }
 }
