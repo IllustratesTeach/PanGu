@@ -58,6 +58,21 @@
       <artifactId>httpclient</artifactId>
       <version>4.3.5</version>
     </dependency>
+    <!-- datasource pool -->
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP-java6</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
