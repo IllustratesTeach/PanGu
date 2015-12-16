@@ -102,13 +102,14 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
    * @param position finger position
    * @param featureType feature type
    */
-  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,position:FingerPosition,featureType:FeatureType): Unit ={
+  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,firmCode:String,position:FingerPosition,featureType:FeatureType): Unit ={
     disruptor.publishEvent(new EventTranslator[StreamEvent](){
       override def translateTo(t: StreamEvent, l: Long): Unit = {
         t.reset()
         t.id = id
         t.img = img
         t.imgIsCompressed = imgIsCompressed
+        t.compressFirmCode = firmCode
         t.position = position
         t.feature = featureType
       }

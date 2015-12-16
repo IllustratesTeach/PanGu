@@ -18,5 +18,5 @@ trait StreamService {
    * @param position finger position
    * @param featureType feature type
    */
-  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,position:FingerPosition,featureType:FeatureType): Unit
+  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,firmCode:String,position:FingerPosition,featureType:FeatureType): Unit
 }

@@ -30,16 +30,11 @@ private[internal] object JdbcDatabase {
     }
   }
 
-  def update(sql: String, psSetterOpt:Option[PreparedStatement=>Unit]=None)(implicit ds: DataSource): Int = {
+  def update(sql: String)(psSetter:PreparedStatement=>Unit)(implicit ds: DataSource): Int = {
     use(autoCommit = false) { conn =>
       val st = conn.prepareStatement(sql)
       try {
-        psSetterOpt match{
-          case Some(setter) =>
-            setter(st)
-          case other=>
-            //do nothing
-        }
+        psSetter.apply(st)
         st.executeUpdate()
       } finally {
         closeJdbc(st)
@@ -64,16 +59,27 @@ private[internal] object JdbcDatabase {
     }
   }
 
-  def queryWithPsSetter[T](sql: String, psSetterOpt: Option[PreparedStatement => Unit] = None)(mapper: ResultSet => T)(implicit ds: DataSource) {
-    use(false) { conn =>
+  def queryFirst[T](sql: String)(psSetter: PreparedStatement => Unit)(mapper: ResultSet => T)(implicit ds: DataSource):Option[T]= {
+    use(autoCommit = false) { conn =>
       val st = conn.prepareStatement(sql)
       try {
-        psSetterOpt match{
-          case Some(setter) =>
-            setter.apply(st)
-          case other=>
-            //do nothing
+        psSetter.apply(st)
+        val rs = st.executeQuery
+        try {
+          if(rs.next) Some(mapper(rs)) else None
+        } finally {
+          closeJdbc(rs)
         }
+      } finally {
+        closeJdbc(st)
+      }
+    }
+  }
+  def queryWithPsSetter(sql: String)(psSetter: PreparedStatement => Unit)(mapper: ResultSet => Unit)(implicit ds: DataSource) {
+    use(autoCommit = false) { conn =>
+      val st = conn.prepareStatement(sql)
+      try {
+        psSetter.apply(st)
         val rs = st.executeQuery
         try {
           while (rs.next) mapper(rs)
