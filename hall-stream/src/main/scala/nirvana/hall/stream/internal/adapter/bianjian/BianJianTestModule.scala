@@ -48,7 +48,7 @@ object BianjianTestModule {
     val hikariConfig = new HikariConfig();
     //针对oracle特别处理
     hikariConfig.setConnectionTestQuery("select 1 from dual")
-    hikariConfig.setDriverClassName("com.oracle.jdbc.Driver")
+    hikariConfig.setDriverClassName("oracle.jdbc.driver.OracleDriver")
 
     hikariConfig.setJdbcUrl(System.getProperty(BianjianTestSymobls.JDBC_URL))
     hikariConfig.setUsername(System.getProperty(BianjianTestSymobls.JDBC_USER))
