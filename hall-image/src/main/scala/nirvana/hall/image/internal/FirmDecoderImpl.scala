@@ -35,7 +35,12 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
   def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage={
     code match{
       case WSQ =>
-        NativeImageConverter.decodeByWSQ(cpr_data)
+        try{
+          lock.lock()
+          NativeImageConverter.decodeByWSQ(cpr_data)
+        }finally{
+          lock.unlock()
+        }
       case other=>
         val dll = findDllHandle(code)
         val destImgSize = width * height
