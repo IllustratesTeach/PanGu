@@ -1,6 +1,8 @@
 package nirvana.hall.c.services
 
 import java._
+import java.io.InputStream
+import java.nio.ByteBuffer
 import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
@@ -8,6 +10,7 @@ import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
 
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
@@ -40,12 +43,38 @@ object AncientData extends WrapAsStreamWriter{
     def writeBytes(src:Array[Byte])
     def writeZero(length:Int)
   }
+  @tailrec
+  def readByteArray(is:InputStream,data:Array[Byte],size:Int,offset:Int=0): Unit ={
+    val n = is.read(data)
+    if(n != size){
+      readByteArray(is,data,size-n,n)
+    }
+  }
 }
 
 /**
  * wrap netty's ChannelBuffer and xSocket's IDataSink
  */
 trait WrapAsStreamWriter {
+  implicit def asStreamReader(is:InputStream):StreamReader = new {
+    private val tmp = new Array[Byte](8)
+    def readByte(): Byte = {
+      AncientData.readByteArray(is,tmp,1)
+      tmp(0)
+    }
+    def readShort(): Short ={
+      AncientData.readByteArray(is,tmp,2)
+      ByteBuffer.wrap(tmp).getShort
+    }
+    def readInt(): Int ={
+      AncientData.readByteArray(is,tmp,4)
+      ByteBuffer.wrap(tmp).getInt
+    }
+    def readLong(): Long ={
+      AncientData.readByteArray(is,tmp,8)
+      ByteBuffer.wrap(tmp).getLong
+    }
+  }
   implicit def asStreamWriter(dataSink: IDataSink): StreamWriter = new {
     def writeShort(i: Int): Unit = dataSink.write(i.toShort)
     def writeInt(i: Int): Unit = dataSink.write(i)
@@ -219,6 +248,10 @@ trait ScalaReflect{
         ds.readBytesByLength(len)
       case channel:ChannelBuffer =>
         channel.readBytes(len).array()
+      case is:InputStream =>
+        val r = new Array[Byte](len)
+        AncientData.readByteArray(is,r,len)
+        r
       case iis:ImageInputStream=>
         val r = new Array[Byte](len)
         iis.readFully(r)
