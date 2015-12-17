@@ -6,7 +6,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import nirvana.hall.stream.internal.{HttpExtractService, HttpDecompressService}
 import nirvana.hall.stream.services.{ExtractService, RpcHttpClient, DecompressService, FeatureSaverService}
 import org.apache.tapestry5.ioc.ServiceBinder
-import org.apache.tapestry5.ioc.annotations.{InjectService, ServiceId, EagerLoad, Local}
+import org.apache.tapestry5.ioc.annotations._
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -20,14 +20,20 @@ import org.springframework.transaction.interceptor.TransactionInterceptor
  * @since 2015-10-06
  */
 object BianjianTestModule {
+  @Startup
+  def startStream(bianjianStream:BianjianStream): Unit ={
+    bianjianStream.startStream()
+  }
   def bind(binder:ServiceBinder): Unit ={
     binder.bind(classOf[BianjianStream]).withId("BianjianStream").eagerLoad()
     binder.bind(classOf[FeatureSaverService],classOf[BianjianFeatureSaverService]).withId("BianjianFeatureSaverService")
   }
+  @EagerLoad
   def buildDecompressService(rpcHttpClient:RpcHttpClient): DecompressService={
     val url = System.getProperty(BianjianTestSymobls.RPC_IMAGE_URL)
     new HttpDecompressService(url,rpcHttpClient)
   }
+  @EagerLoad
   def buildExtractService(rpcHttpClient: RpcHttpClient):ExtractService={
     val url = System.getProperty(BianjianTestSymobls.RPC_EXTRACT_URL)
     new HttpExtractService(url,rpcHttpClient)

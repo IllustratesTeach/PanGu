@@ -1,6 +1,5 @@
 package nirvana.hall.stream.internal.adapter.bianjian
 
-import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
@@ -27,7 +26,6 @@ extends LoggerSupport{
   private val batch_size = 1000
   private val firmCode = "1400"
 
-  @PostConstruct
   def startStream(): Unit ={
     val minSeq = getMinSeq
     val maxSeq = getMaxSeq + 1
@@ -65,13 +63,13 @@ extends LoggerSupport{
     }
   }
 
-  def getMaxSeq : Int={
+  private def getMaxSeq : Int={
     getSeq("select max(csid) from T_PC_A_CS").getOrElse(0)
   }
-  def getMinSeq: Int={
+  private def getMinSeq: Int={
     getSeq("select min(csid) from T_PC_A_CS").getOrElse(0)
   }
-  def getSeq(sql: String): Option[Int] ={
+  private def getSeq(sql: String): Option[Int] ={
     JdbcDatabase.queryFirst(sql){ps=>}{rs=>
       rs.getInt(1)
     }
