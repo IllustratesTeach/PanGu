@@ -5,9 +5,11 @@ import java.awt.image.{DataBufferByte, BufferedImage}
 import java.io.File
 import javax.imageio.ImageIO
 
+import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.BaseJniTest
+import nirvana.hall.c.services.AncientData._
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
@@ -31,6 +33,13 @@ class FirmDecoderImplTest extends BaseJniTest{
     gafisImg.stHead.bIsCompressed = 1.toByte
     gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
     gafisImg.bnData = cprData
+    gafisImg.stHead.nImgSize = cprData.length
+
+    val output = ByteString.newOutput(gafisImg.getDataSize)
+    gafisImg.writeToStreamWriter(output)
+    val byteStringData = output.toByteString
+    gafisImg.fromStreamReader(byteStringData.newInput())
+
     val dest = decoder.decode(gafisImg)
 
     Assert.assertNotNull(dest.bnData)

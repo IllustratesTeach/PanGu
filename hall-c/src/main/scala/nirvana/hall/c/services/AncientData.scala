@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
-import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
+import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
 
@@ -45,18 +45,18 @@ object AncientData extends WrapAsStreamWriter{
   }
   @tailrec
   def readByteArray(is:InputStream,data:Array[Byte],size:Int,offset:Int=0): Unit ={
-    val n = is.read(data)
+    val n = is.read(data,offset,size)
     if(n != size){
       readByteArray(is,data,size-n,n)
     }
   }
-}
+  class InputStreamReader(is:InputStream){
+    def readByteArray(len: Int): Array[Byte] = {
+      val data = new Array[Byte](len)
+      AncientData.readByteArray(is,data,len)
+      data
+    }
 
-/**
- * wrap netty's ChannelBuffer and xSocket's IDataSink
- */
-trait WrapAsStreamWriter {
-  implicit def asStreamReader(is:InputStream):StreamReader = new {
     private val tmp = new Array[Byte](8)
     def readByte(): Byte = {
       AncientData.readByteArray(is,tmp,1)
@@ -75,6 +75,13 @@ trait WrapAsStreamWriter {
       ByteBuffer.wrap(tmp).getLong
     }
   }
+}
+
+/**
+ * wrap netty's ChannelBuffer and xSocket's IDataSink
+ */
+trait WrapAsStreamWriter {
+  implicit def asStreamReader(is:InputStream):StreamReader = new InputStreamReader(is)
   implicit def asStreamWriter(output: OutputStream): StreamWriter = new {
     private val arr = new Array[Byte](8)
     private val tmp = ByteBuffer.wrap(arr)
@@ -290,10 +297,8 @@ trait ScalaReflect{
         ds.readBytesByLength(len)
       case channel:ChannelBuffer =>
         channel.readBytes(len).array()
-      case is:InputStream =>
-        val r = new Array[Byte](len)
-        AncientData.readByteArray(is,r,len)
-        r
+      case isr:InputStreamReader =>
+        isr.readByteArray(len)
       case iis:ImageInputStream=>
         val r = new Array[Byte](len)
         iis.readFully(r)
