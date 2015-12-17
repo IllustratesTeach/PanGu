@@ -27,6 +27,8 @@ private[internal] object JdbcDatabase {
       case NonFatal(e) =>
         if (!autoCommit) conn.rollback()
         throw MonadException.wrap(e)
+    }finally {
+      closeJdbc(conn)
     }
   }
 
