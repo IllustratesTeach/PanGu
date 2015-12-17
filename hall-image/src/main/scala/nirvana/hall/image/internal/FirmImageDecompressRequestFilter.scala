@@ -3,6 +3,8 @@ package nirvana.hall.image.internal
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
+import nirvana.hall.c.services.AncientData._
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.services.FirmDecoder
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
 
@@ -16,13 +18,15 @@ class FirmImageDecompressRequestFilter(firmDecoder: FirmDecoder) extends RpcServ
     if(commandRequest.hasExtension(FirmImageDecompressRequest.cmd)){
 
       val request = commandRequest.getExtension(FirmImageDecompressRequest.cmd)
-      val originalImg = firmDecoder.decode(request.getCode,request.getCprData.toByteArray,request.getWidth,request.getHeight,request.getDpi)
+      val is = request.getCprData.newInput()
+      val gafisImg = new GAFISIMAGESTRUCT
+      gafisImg.fromStreamReader(is)
 
+      val originalImg = firmDecoder.decode(gafisImg)
       val firmResponseBuilder = FirmImageDecompressResponse.newBuilder()
-      firmResponseBuilder.setData(ByteString.copyFrom(originalImg.getData))
-      firmResponseBuilder.setWidth(originalImg.getWidth)
-      firmResponseBuilder.setHeight(originalImg.getHeight)
-      firmResponseBuilder.setDpi(originalImg.getDpi)
+      val output = ByteString.newOutput(originalImg.getDataSize)
+      originalImg.writeToStreamWriter(output)
+      firmResponseBuilder.setOriginalData(output.toByteString)
 
       response.writeMessage(commandRequest,FirmImageDecompressResponse.cmd,firmResponseBuilder.build())
 
@@ -31,4 +35,5 @@ class FirmImageDecompressRequestFilter(firmDecoder: FirmDecoder) extends RpcServ
       handler.handle(commandRequest,response)
     }
   }
+
 }

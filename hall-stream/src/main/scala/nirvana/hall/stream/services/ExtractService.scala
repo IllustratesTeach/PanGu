@@ -1,6 +1,7 @@
 package nirvana.hall.stream.services
 
 import com.google.protobuf.ByteString
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 
@@ -16,5 +17,5 @@ trait ExtractService {
    * @param fingerPosition finger position
    * @param featureType feature type
    */
-  def extract(img:ByteString,fingerPosition: FingerPosition,featureType: FeatureType):Option[ByteString]
+  def extract(img:GAFISIMAGESTRUCT,fingerPosition: FingerPosition,featureType: FeatureType):Option[ByteString]
 }

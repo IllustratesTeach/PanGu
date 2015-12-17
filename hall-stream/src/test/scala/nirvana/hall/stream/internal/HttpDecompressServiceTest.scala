@@ -1,8 +1,11 @@
 package nirvana.hall.stream.internal
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.image.FirmImageDecompressProto
 import nirvana.hall.protocol.image.FirmImageDecompressProto.FirmImageDecompressRequest
+import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
 /**
@@ -20,13 +23,17 @@ class HttpDecompressServiceTest {
     val service = new HttpDecompressService("http://127.0.0.1:9001/image",httpClient)
     val request = FirmImageDecompressRequest.newBuilder()
     val is = getClass.getResourceAsStream("/wsq.data")
-    request.setCode("1400")
+    val bnData = IOUtils.toByteArray(is)
+
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 1
+    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
+    gafisImg.bnData = bnData
+    gafisImg.stHead.nImgSize = bnData.length
+
     request.setCprData(ByteString.readFrom(is))
-    request.setDpi(500)
-    request.setHeight(400)
-    request.setWidth(400)
     val result = service.decompress(request.build())
     Assert.assertTrue(result.isDefined)
-    Assert.assertEquals(409600,result.get.size())
+    Assert.assertEquals(409600,result.get.bnData.length)
   }
 }

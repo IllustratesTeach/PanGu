@@ -14,11 +14,7 @@ message FirmImageDecompressRequest {
   extend monad.rpc.protocol.BaseCommand {
     optional FirmImageDecompressRequest cmd = 10001;
   }
-  required string code = 1;
-  required bytes cpr_data = 2;
-  optional int32 width = 3;
-  optional int32 height = 4;
-  optional int32 dpi = 5;
+  required bytes cpr_data = 1;
 }
 
 /* response */
@@ -26,8 +22,5 @@ message FirmImageDecompressResponse {
   extend monad.rpc.protocol.BaseCommand {
     optional FirmImageDecompressResponse cmd = 10002;
   }
-  optional bytes data = 1;
-  optional int32 width = 2;
-  optional int32 height = 3;
-  optional int32 dpi = 4;
+  optional bytes original_data = 1;
 }

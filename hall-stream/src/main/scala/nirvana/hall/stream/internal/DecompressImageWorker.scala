@@ -1,10 +1,12 @@
 package nirvana.hall.stream.internal
 
+import com.google.protobuf.ByteString
 import com.lmax.disruptor.WorkHandler
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.image.FirmImageDecompressProto.FirmImageDecompressRequest
 import nirvana.hall.stream.internal.StreamServiceObject.StreamEvent
 import nirvana.hall.stream.services.{DecompressService, ExtractService, FeatureSaverService}
+import nirvana.hall.c.services.AncientData._
 
 /**
  * decompress image handler
@@ -18,10 +20,11 @@ class DecompressImageWorker(decompressService: DecompressService)
     if(t.img == null){
       throw new IllegalArgumentException("image parameter is null!")
     }
-    if(t.imgIsCompressed){//need decompress
+    if(t.img.stHead.bIsCompressed == 1){//need decompress
       val requestBuilder = FirmImageDecompressRequest.newBuilder()
-      requestBuilder.setCprData(t.img)
-      requestBuilder.setCode(t.compressFirmCode)
+      val output = ByteString.newOutput(t.img.getDataSize)
+      t.img.writeToStreamWriter(output)
+      requestBuilder.setCprData(output.toByteString)
       try {
         decompressService.decompress(requestBuilder.build()) match {
           case Some(originImageData) =>

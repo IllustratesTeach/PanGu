@@ -3,12 +3,14 @@ package nirvana.hall.stream.internal.adapter.bianjian
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
 
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.stream.internal.JdbcDatabase
 import nirvana.hall.stream.services.StreamService
+import org.apache.commons.io.IOUtils
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, InjectService}
 
 import scala.annotation.tailrec
@@ -50,7 +52,16 @@ extends LoggerSupport{
     }{rs=>
       val csid = rs.getLong("csid")
       val zp = rs.getBinaryStream("zp")
-      streamService.pushEvent(csid, ByteString.readFrom(zp), true,firmCode,FingerPosition.FINGER_L_THUMB, FeatureType.FingerTemplate)
+
+      val gafisImg = new GAFISIMAGESTRUCT
+      gafisImg.stHead.bIsCompressed = 1
+      gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
+      gafisImg.bnData = IOUtils.toByteArray(zp)
+      gafisImg.stHead.nImgSize = gafisImg.bnData.length
+      IOUtils.closeQuietly(zp)
+
+
+      streamService.pushEvent(csid,gafisImg,FingerPosition.FINGER_L_THUMB, FeatureType.FingerTemplate)
     }
   }
 

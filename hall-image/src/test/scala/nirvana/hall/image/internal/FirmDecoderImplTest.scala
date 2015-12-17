@@ -5,9 +5,11 @@ import java.awt.image.{DataBufferByte, BufferedImage}
 import java.io.File
 import javax.imageio.ImageIO
 
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.BaseJniTest
 import org.apache.commons.io.IOUtils
-import org.junit.Test
+import org.junit.{Assert, Test}
 
 /**
  *
@@ -20,6 +22,18 @@ class FirmDecoderImplTest extends BaseJniTest{
     val decoder = new FirmDecoderImpl("support")
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1700.data"))
     decoder.decode("1700", cprData, 640, 640, 500)
+  }
+  @Test
+  def test_decode_gafisimg{
+    val decoder = new FirmDecoderImpl("support")
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 1.toByte
+    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
+    gafisImg.bnData = cprData
+    val dest = decoder.decode(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
   }
   @Test
   def test_decode_1400_vi_wsq{

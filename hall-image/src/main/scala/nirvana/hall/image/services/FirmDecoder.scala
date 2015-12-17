@@ -1,5 +1,6 @@
 package nirvana.hall.image.services
 
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.OriginalImage
 
 /**
@@ -16,5 +17,7 @@ trait FirmDecoder{
    * @param height image height
    * @return original image data
    */
+  @deprecated
   def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage
+  def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT
 }

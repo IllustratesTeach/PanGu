@@ -9,7 +9,7 @@ public class OriginalImage {
     private byte[] data;
     private int width;
     private int height;
-    private int dpi;
+    private int ppi;
 
     public byte[] getData() {
         return data;
@@ -35,11 +35,11 @@ public class OriginalImage {
         this.height = height;
     }
 
-    public int getDpi() {
-        return dpi;
+    public int getPpi() {
+        return ppi;
     }
 
-    public void setDpi(int dpi) {
-        this.dpi = dpi;
+    public void setPpi(int ppi) {
+        this.ppi = ppi;
     }
 }

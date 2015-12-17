@@ -5,6 +5,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
+import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.{OriginalImage, NativeImageConverter}
 import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
@@ -32,6 +35,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
    * @param height image height
    * @return original image data
    */
+  @deprecated
   def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage={
     code match{
       case WSQ =>
@@ -50,6 +54,81 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
         img.setHeight(height)
         img.setData(originalData)
         img
+    }
+  }
+  def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT={
+    if(gafisImg.stHead.bIsCompressed == 0)
+      return gafisImg
+
+    val firmCode = getCodeFromGAFISImage(gafisImg)
+
+    val destImg = new GAFISIMAGESTRUCT
+    destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray)
+    destImg.stHead.bIsCompressed = 0.toByte
+
+    firmCode match{
+      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
+        val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
+        destImg.stHead.nWidth = img.getWidth.toShort
+        destImg.stHead.nHeight = img.getHeight.toShort
+
+        destImg.stHead.nImgSize = img.getData.length
+        destImg.bnData = img.getData
+
+        if(img.getPpi > 0)
+          destImg.stHead.nResolution = img.getPpi.toShort
+
+      case other=>
+        val width = gafisImg.stHead.nWidth
+        val height = gafisImg.stHead.nHeight
+        val dll = findDllHandle(firmCode)
+        val destImgSize = width *  height
+        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,
+          firmCode,gafisImg.bnData,destImgSize)
+
+        destImg.stHead.nImgSize = originalData.size
+        destImg.bnData = originalData
+    }
+
+    destImg
+  }
+  private def getCodeFromGAFISImage(gafisImg: GAFISIMAGESTRUCT): String ={
+    val codeFromImage =  gafisImg.stHead.nCompressMethod.toInt
+    codeFromImage match{
+      case glocdef.GAIMG_CPRMETHOD_DEFAULT => 	// by xgw supplied method
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_XGW => 	// by xgw supplied method.
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_XGW_EZW => 	// 许公望的EZW压缩方法：适合低倍率高保真的压缩.
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_GA10 => 	// 公安部10倍压缩方法
+        fpt4code.GAIMG_CPRMETHOD_GA10_CODE
+      case glocdef.GAIMG_CPRMETHOD_GFS => 	// golden
+        fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+      case glocdef.GAIMG_CPRMETHOD_PKU => 	// call pku's compress method
+        fpt4code.GAIMG_CPRMETHOD_PKU_CODE
+      case glocdef.GAIMG_CPRMETHOD_COGENT => 	// cogent compress method
+        fpt4code.GAIMG_CPRMETHOD_COGENT_CODE
+      case glocdef.GAIMG_CPRMETHOD_WSQ => 	// was method
+        fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
+      case glocdef.GAIMG_CPRMETHOD_NEC => 	// nec compress method
+        fpt4code.GAIMG_CPRMETHOD_NEC_CODE
+      case glocdef.GAIMG_CPRMETHOD_TSINGHUA => 	// tsing hua
+        fpt4code.GAIMG_CPRMETHOD_TSINGHUA_CODE
+      case glocdef.GAIMG_CPRMETHOD_BUPT => 	// beijing university of posts and telecommunications
+        fpt4code.GAIMG_CPRMETHOD_BUPT_CODE
+      case glocdef.GAIMG_CPRMETHOD_RMTZIP => 	// compressmethod provide by communication server(GAFIS)
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_LCW => 	// compress method provide by lucas wang.
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_JPG => 	// jpeg method.
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_MORPHO => 	//!< 广东测试时提供的压缩算法，MORPHO(SAGEM)
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case glocdef.GAIMG_CPRMETHOD_MAXVALUE =>
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
+      case other=>
+        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
     }
   }
   /**

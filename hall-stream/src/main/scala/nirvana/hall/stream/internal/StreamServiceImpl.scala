@@ -8,6 +8,7 @@ import com.google.protobuf.ByteString
 import com.lmax.disruptor.{EventTranslator, EventFactory}
 import com.lmax.disruptor.dsl.Disruptor
 import monad.core.services.LogExceptionHandler
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.stream.config.HallStreamConfigSupport
@@ -28,19 +29,15 @@ object StreamServiceObject{
     //process id data
     var id:Any = _
     //image data
-    var img:ByteString = _
+    var img:GAFISIMAGESTRUCT = _
     //feature type
     var feature:FeatureType = _
     //position
     var position:FingerPosition = _
-    //whether image is compressed
-    var imgIsCompressed:Boolean = false
-    //firm code,wsq is "1400"
-    var compressFirmCode:String = _
 
     //====> if need decompress
     //original image data
-    var originalImgData:ByteString = _
+    var originalImgData:GAFISIMAGESTRUCT= _
     //feature data
     var featureData:ByteString = _
     def reset(): Unit ={
@@ -48,8 +45,6 @@ object StreamServiceObject{
       img = null
       feature = null
       position = null
-      imgIsCompressed = false
-      compressFirmCode = null
       originalImgData = null
       featureData = null
     }
@@ -108,18 +103,15 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
    * push event
    * @param id data unique key
    * @param img image data
-   * @param imgIsCompressed whether image is compressed
    * @param position finger position
    * @param featureType feature type
    */
-  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,firmCode:String,position:FingerPosition,featureType:FeatureType): Unit ={
+  def pushEvent(id:Any,img:GAFISIMAGESTRUCT,position:FingerPosition,featureType:FeatureType): Unit ={
     disruptor.publishEvent(new EventTranslator[StreamEvent](){
       override def translateTo(t: StreamEvent, l: Long): Unit = {
         t.reset()
         t.id = id
         t.img = img
-        t.imgIsCompressed = imgIsCompressed
-        t.compressFirmCode = firmCode
         t.position = position
         t.feature = featureType
       }

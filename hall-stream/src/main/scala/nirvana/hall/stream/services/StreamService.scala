@@ -1,6 +1,6 @@
 package nirvana.hall.stream.services
 
-import com.google.protobuf.ByteString
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 
@@ -14,9 +14,8 @@ trait StreamService {
    * push stream event
    * @param id data unique key
    * @param img image data
-   * @param imgIsCompressed whether image is compressed
    * @param position finger position
    * @param featureType feature type
    */
-  def pushEvent(id:Any,img:ByteString,imgIsCompressed:Boolean,firmCode:String,position:FingerPosition,featureType:FeatureType): Unit
+  def pushEvent(id:Any,img:GAFISIMAGESTRUCT,position:FingerPosition,featureType:FeatureType): Unit
 }

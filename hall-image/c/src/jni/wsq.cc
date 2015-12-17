@@ -78,6 +78,9 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
     jmethodID dataMethod = jenv->GetMethodID(originalImageClass,"setData","([B)V");
     jenv->CallVoidMethod(originalImage,dataMethod,dest_img);
 
+    jmethodID ppiMethod = jenv->GetMethodID(originalImageClass,"setPpi","(I)V");
+    jenv->CallVoidMethod(originalImage,ppiMethod,ppi);
+
     return originalImage;
   }
 

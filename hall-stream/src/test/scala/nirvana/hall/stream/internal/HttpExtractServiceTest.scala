@@ -22,14 +22,13 @@ class HttpExtractServiceTest{
     val is = getClass.getResourceAsStream("/wsq.data.uncompressed")
     val img = ByteString.readFrom(is).toByteArray
     val gafisImg = new GAFISIMAGESTRUCT
-    gafisImg.stHead.nHeight = 640
-    gafisImg.stHead.nWidth= 640
-    gafisImg.stHead.nResolution = 500
     gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
     gafisImg.stHead.nImgSize = img.length
+    gafisImg.stHead.bIsCompressed = 1
+    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
     gafisImg.bnData = img
 
-    val mnt = service.extract(ByteString.copyFrom(gafisImg.toByteArray), FingerPosition.FINGER_L_THUMB, FeatureType.FingerLatent)
+    val mnt = service.extract(gafisImg, FingerPosition.FINGER_L_THUMB, FeatureType.FingerLatent)
     Assert.assertEquals(704, mnt.get.size())
   }
 }

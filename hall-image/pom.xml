@@ -17,6 +17,10 @@
   <dependencies>
     <dependency>
       <groupId>nirvana</groupId>
+      <artifactId>hall-c</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nirvana</groupId>
       <artifactId>hall-protocol</artifactId>
     </dependency>
     <dependency>

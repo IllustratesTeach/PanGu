@@ -1,6 +1,6 @@
 package nirvana.hall.stream.services
 
-import com.google.protobuf.ByteString
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.image.FirmImageDecompressProto.FirmImageDecompressRequest
 
 /**
@@ -14,5 +14,5 @@ trait DecompressService {
    * @param request request
    * @return original image data
    */
-  def decompress(request:FirmImageDecompressRequest):Option[ByteString]
+  def decompress(request:FirmImageDecompressRequest):Option[GAFISIMAGESTRUCT]
 }
