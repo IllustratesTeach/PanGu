@@ -24,7 +24,6 @@ class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,strea
 extends LoggerSupport{
   private implicit val ds = dataSource
   private val batch_size = 1000
-  private val firmCode = "1400"
 
   def startStream(): Unit ={
     val minSeq = getMinSeq
