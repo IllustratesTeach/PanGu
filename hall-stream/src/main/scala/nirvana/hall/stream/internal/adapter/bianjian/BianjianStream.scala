@@ -23,11 +23,15 @@ import scala.annotation.tailrec
 class BianjianStream(@InjectService("ImgDataSource") dataSource:DataSource,streamService:StreamService)
 extends LoggerSupport{
   private implicit val ds = dataSource
-  private val batch_size = 1000
+  private val batch_size = 10000
+  private val firmCode = "1400"
+  private val fetchSeqmentSql = "select t.csid, t.zp from T_PC_A_CS t where t.csid >=? and t.csid <? "
+  private val minSql = "select min(csid) from T_PC_A_CS"
+  private val maxSql = "select max(csid) from T_PC_A_CS"
 
   def startStream(): Unit ={
-    val minSeq = getMinSeq
-    val maxSeq = getMaxSeq + 1
+    val minSeq = System.getProperty("minSeq", ""+getMinSeq).toInt
+    val maxSeq = System.getProperty("maxSeq", ""+getMaxSeq).toInt
     info("begin to read stream from database min:{} max:{}",minSeq,maxSeq)
     fetch(minSeq,minSeq+batch_size,maxSeq)
     info("congratulation!!! finish to read data")
@@ -41,8 +45,7 @@ extends LoggerSupport{
     }
   }
   private def fetchSegmentData(from: Int, until: Int): Unit ={
-    val sql = "select t.csid, t.zp from T_PC_A_CS t where t.csid >=? and t.csid <? order by t.csid"
-    JdbcDatabase.queryWithPsSetter(sql){
+    JdbcDatabase.queryWithPsSetter(fetchSeqmentSql){
       ps=>
         ps.setInt(1, from)
         ps.setInt(2, until)
@@ -63,10 +66,10 @@ extends LoggerSupport{
   }
 
   private def getMaxSeq : Int={
-    getSeq("select max(csid) from T_PC_A_CS").getOrElse(0)
+    getSeq(maxSql).getOrElse(0)
   }
   private def getMinSeq: Int={
-    getSeq("select min(csid) from T_PC_A_CS").getOrElse(0)
+    getSeq(minSql).getOrElse(0)
   }
   private def getSeq(sql: String): Option[Int] ={
     JdbcDatabase.queryFirst(sql){ps=>}{rs=>
