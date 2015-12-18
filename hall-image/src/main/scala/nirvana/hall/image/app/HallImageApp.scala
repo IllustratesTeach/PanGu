@@ -5,6 +5,7 @@ import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSuppo
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
 import nirvana.hall.image.NirvanaHallImageModule
 import nirvana.hall.image.jni.JniLoader
+import nirvana.hall.support.HallSupportConstants
 import org.slf4j.LoggerFactory
 
 /**
@@ -31,22 +32,16 @@ object HallImageApp
         Class.forName("monad.rpc.LocalRpcModule"),
         Class.forName("monad.rpc.LocalRpcServerModule"),
 
-        Class.forName("nirvana.hall.protobuf.LocalProtobufWebModule"),
+        Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
 
         Class.forName("nirvana.hall.image.LocalHallImageModule"),
         Class.forName("nirvana.hall.image.NirvanaHallImageModule")
       )
       startServer(config.web, "nirvana.hall.image", classes: _*)
       val version = readVersionNumber("META-INF/maven/nirvana/hall-image/version.properties")
-      printTextWithNative(logger, HALL_TEXT_LOGO, "image rpc@" + config.rpc.bind+" web@"+config.web.bind, version, "1.1")
+      printTextWithNative(logger, HallSupportConstants.HALL_TEXT_LOGO, "image rpc@" + config.rpc.bind+" web@"+config.web.bind, version, "1.1")
       logger.info("image server started")
 
       join()
     }
-  final val HALL_TEXT_LOGO = """ #
-   __ _____   __   __
-  / // / _ | / /  / /
- / _  / __ |/ /__/ /__ module : |@@|red %s|@#
-/_//_/_/ |_/____/____/ version: |@@|yellow %s|@
-                             """.replaceAll("#", "@|green ")
 }
