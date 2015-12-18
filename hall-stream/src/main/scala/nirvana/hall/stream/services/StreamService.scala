@@ -18,4 +18,9 @@ trait StreamService {
    * @param featureType feature type
    */
   def pushEvent(id:Any,img:GAFISIMAGESTRUCT,position:FingerPosition,featureType:FeatureType): Unit
+
+  /**
+   * await termination
+   */
+  def awaitTermination():Unit
 }

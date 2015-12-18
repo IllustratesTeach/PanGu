@@ -3,6 +3,7 @@ package nirvana.hall.stream.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{SystemEnvDetectorSupport, TapestryIocContainerSupport}
+import nirvana.hall.stream.services.StreamService
 import nirvana.hall.stream.{HallStreamSymbols, HallStreamModule}
 import org.slf4j.LoggerFactory
 
@@ -44,9 +45,7 @@ object HallStreamApp
       printTextWithNative(logger, HALL_TEXT_LOGO, "stream", version, "1.1")
       logger.info("stream server started")
 
-      //wait stream start
-      //Thread.currentThread().join(5 * 60 * 1000)
-      join()
+      getService(classOf[StreamService]).awaitTermination()
     }
 
     final val HALL_TEXT_LOGO = """ #

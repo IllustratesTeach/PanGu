@@ -1,7 +1,7 @@
 package nirvana.hall.stream.internal
 
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
+import java.util.concurrent.{TimeUnit, ExecutorService, Executors, ThreadFactory}
 import javax.annotation.PostConstruct
 
 import com.google.protobuf.ByteString
@@ -97,6 +97,11 @@ class StreamServiceImpl(config:HallStreamConfigSupport) extends StreamService{
     registryShutdownHub.addRegistryShutdownListener(new Runnable {
       override def run(): Unit = disruptor.shutdown()
     })
+  }
+  def awaitTermination(): Unit ={
+    disruptor.shutdown()
+    //await complete
+    streamPool.awaitTermination(Integer.MAX_VALUE,TimeUnit.DAYS)
   }
 
   /**
