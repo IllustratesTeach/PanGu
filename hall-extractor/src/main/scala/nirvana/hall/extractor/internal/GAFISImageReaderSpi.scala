@@ -13,6 +13,7 @@ import javax.imageio.{IIOException, ImageReadParam, ImageReader, ImageTypeSpecif
 import com.sun.imageio.plugins.bmp.BMPMetadata
 import com.sun.imageio.plugins.common.{I18N, ImageUtil}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGEHEADSTRUCT
+import nirvana.hall.extractor.HallExtractorConstants
 
 /**
  * gafis image reader spi
@@ -140,12 +141,14 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
     // Get the image data.
     var raster: WritableRaster = null
 
+    val properties = new util.Hashtable[String,Any]()
     if (bi == null) {
       if (sampleModel != null && colorModel != null) {
         sampleModel = sampleModel.createCompatibleSampleModel(destinationRegion.x + destinationRegion.width, destinationRegion.y + destinationRegion.height)
         if (seleBand) sampleModel = sampleModel.createSubsetSampleModel(sourceBands)
         raster = Raster.createWritableRaster(sampleModel, new Point)
-        bi = new BufferedImage(colorModel, raster, false, null)
+        properties.put(HallExtractorConstants.GAFIS_IMG_HEAD_KEY,head)
+        bi = new BufferedImage(colorModel, raster, false,properties)
       }
     }
     else {
@@ -156,7 +159,10 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
     }
 
     val bdata = raster.getDataBuffer.asInstanceOf[DataBufferByte].getData
-    read8Bit(bdata)
+    if(head.bIsCompressed == 1)
+      iis.read(bdata,0,head.nImgSize)
+    else
+      read8Bit(bdata)
 
     bi
   }

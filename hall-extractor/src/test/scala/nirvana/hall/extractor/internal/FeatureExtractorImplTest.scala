@@ -7,7 +7,7 @@ import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import org.apache.commons.io.IOUtils
-import org.junit.Test
+import org.junit.{Assert, Test}
 
 /**
  *
@@ -47,15 +47,20 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract: Unit ={
-    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/lf.img"))
+    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.img"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(img)
 
     val extractor = new FeatureExtractorImpl
-    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_R_THUMB,FeatureType.FingerTemplate)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
 
-    feature
+    val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.mnt"))
+    val destMntData = new GAFISIMAGESTRUCT().fromByteArray(bytes)
+    destMntData.stHead.szName="FingerRHMMnt"
+    val expectFeature = new FINGERMNTSTRUCT
+    expectFeature.fromByteArray(bytes.slice(64,bytes.length))
+    Assert.assertArrayEquals(destMntData.toByteArray,mnt.toByteArray)
 
   }
 }

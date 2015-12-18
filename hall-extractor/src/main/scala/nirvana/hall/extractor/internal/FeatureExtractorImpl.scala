@@ -7,8 +7,9 @@ import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def._
+import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
@@ -33,6 +34,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @return GAFISIMAGESTRUCT
    */
   override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType): GAFISIMAGESTRUCT = {
+    if(img.stHead.bIsCompressed == 1)
+      throw new IllegalArgumentException("compressed image unspported!")
     val imgData = img.toByteArray
     val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType)
 
@@ -42,6 +45,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val image = readByteArrayAsGAFISIMAGE(is)
     val originalImgData = image.toByteArray
     val imgHead = image.stHead
+
 
     val (feature,isLatent) = featureType match {
       case FeatureType.FingerTemplate =>
@@ -62,8 +66,12 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val mntBuffer = ChannelBuffers.buffer(imgHead.getDataSize + feature.getDataSize)
     //add head information
+    imgHead.bIsCompressed = 0
+    imgHead.nCompressMethod = 0
     imgHead.nImgSize = feature.getDataSize
-    imgHead.szName = "FingerMnt"
+    imgHead.nFingerIndex = fingerPos.getNumber.toByte
+    if(fingerPos.getNumber >0)
+      imgHead.szName = HallExtractorConstants.MNT_NAMES(fingerPos.getNumber - 1)
     imgHead.writeToStreamWriter(mntBuffer)
 
     val mntData = mntBuffer.array()
@@ -82,16 +90,22 @@ class FeatureExtractorImpl extends FeatureExtractor{
         dstImage
     }
 
+    val originalHead = img.getProperty(HallExtractorConstants.GAFIS_IMG_HEAD_KEY).asInstanceOf[GAFISIMAGEHEADSTRUCT]
     val gafisImg = new GAFISIMAGESTRUCT
-    gafisImg.stHead.nResolution = 500
-    gafisImg.stHead.nWidth = grayImg.getWidth.toShort
-    gafisImg.stHead.nHeight = grayImg.getHeight.toShort
-    gafisImg.stHead.nBits = grayImg.getColorModel.getPixelSize.toByte
-    gafisImg.stHead.nImgSize = grayImg.getWidth * grayImg.getHeight
+    val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    if(originalHead == null) {
+      gafisImg.stHead.nResolution = 500
+      gafisImg.stHead.nWidth = grayImg.getWidth.toShort
+      gafisImg.stHead.nHeight = grayImg.getHeight.toShort
+      gafisImg.stHead.nBits = grayImg.getColorModel.getPixelSize.toByte
+      gafisImg.stHead.nImgSize = grayImg.getWidth * grayImg.getHeight
+      gafisImg.bnData = dataBuffer
+    }else{
+      gafisImg.bnData = new Array[Byte](originalHead.nImgSize)
+      gafisImg.stHead = originalHead
+      System.arraycopy(dataBuffer,0,gafisImg.bnData,0,originalHead.nImgSize)
+    }
 
-    //get gray image data
-    val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte]
-    gafisImg.bnData = dataBuffer.getData
 
     gafisImg
   }
