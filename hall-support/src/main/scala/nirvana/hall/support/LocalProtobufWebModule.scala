@@ -1,6 +1,6 @@
-package nirvana.hall.protobuf
+package nirvana.hall.support
 
-import nirvana.hall.protobuf.internal.ProtobufRpcServerMessageServletFilter
+import nirvana.hall.support.internal.ProtobufRpcServerMessageServletFilter
 import org.apache.tapestry5.ioc.OrderedConfiguration
 import org.apache.tapestry5.ioc.annotations.Contribute
 import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletRequestHandler}

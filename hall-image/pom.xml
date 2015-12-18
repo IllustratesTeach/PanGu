@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
       <groupId>nirvana</groupId>
-      <artifactId>hall-protobuf-web</artifactId>
+      <artifactId>hall-support</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ganshane.monad</groupId>

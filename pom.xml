@@ -13,9 +13,9 @@
     <module>hall-extractor</module>
     <module>hall-image</module>
     <module>hall-protocol</module>
-    <module>hall-protobuf-web</module>
     <module>hall-sdk</module>
     <module>hall-stream</module>
+    <module>hall-support</module>
   </modules>
   <scm>
     <url>https://bitbucket.org/jcai/hall/src</url>
@@ -41,7 +41,7 @@
       </dependency>
       <dependency>
         <groupId>nirvana</groupId>
-        <artifactId>hall-protobuf-web</artifactId>
+        <artifactId>hall-support</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

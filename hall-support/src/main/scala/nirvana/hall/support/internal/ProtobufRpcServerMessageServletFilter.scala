@@ -1,4 +1,4 @@
-package nirvana.hall.protobuf.internal
+package nirvana.hall.support.internal
 
 import java.io.OutputStream
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
