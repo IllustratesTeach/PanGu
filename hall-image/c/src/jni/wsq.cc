@@ -100,10 +100,8 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_en
 	ndepth = 8;
 
 	UCHAR* original_img_bin = (UCHAR*)jenv->GetByteArrayElements(input_buffer,NULL);
-
 	int compressed_img_size=0;
-	//TODO size too large?
-	UCHAR * compressed_img_bin = (UCHAR*)malloc(width * height);
+	UCHAR * compressed_img_bin = NULL;
 
 
 	fRatio = UTIL_GetWsqEncodeBitRate((int)ratio);
@@ -113,16 +111,17 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_en
   //release input buffer
   jenv->ReleaseByteArrayElements(input_buffer,(jbyte*)original_img_bin,JNI_ABORT);
 	if ( retval != 0 ){
-		free(compressed_img_bin);
 		SWIG_JavaThrowExceptionByCode(jenv,SWIG_JavaArithmeticException,retval);
     return NULL;
 	}else{
-    jbyteArray compressed_img = jenv->NewByteArray(compressed_img_size);
-    jenv->SetByteArrayRegion(compressed_img,0,compressed_img_size,(jbyte*)compressed_img_bin);
-    free(compressed_img_bin);
-    return compressed_img;
+    if(compressed_img_bin != NULL) {
+      jbyteArray compressed_img = jenv->NewByteArray(compressed_img_size);
+      jenv->SetByteArrayRegion(compressed_img, 0, compressed_img_size, (jbyte *) compressed_img_bin);
+      free(compressed_img_bin);
+      return compressed_img;
+    }
   }
-
+  return NULL;
 }
 
 

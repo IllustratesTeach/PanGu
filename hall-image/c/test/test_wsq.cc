@@ -45,8 +45,15 @@ TEST_F(WSQTest, TestCrack) {
   retval = wsq_decode_mem(&dest_img_bin, &width, &height, &ndepth, &ppi, NULL,
                           compressed_img_bin, fileSize);
 
+  ASSERT_EQ(0,retval);
+  unsigned char* compressed_img_bin2 = NULL;
+  retval = wsq_encode_mem(&compressed_img_bin2, &compressed_size, 10.0,
+                          dest_img_bin, width, height, ndepth, ppi, NULL);
+  ASSERT_EQ(0,retval);
+
   delete[] fileContents;
   free(dest_img_bin);
+  free(compressed_img_bin2);
   ASSERT_EQ(0,retval);
   ASSERT_EQ(640,width);
   ASSERT_EQ(640,height);
