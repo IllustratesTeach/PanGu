@@ -52,16 +52,21 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
   }else {
     //construct original image buffer
     int dest_img_size = width * height;
-    jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
-    UCHAR *dest_img_bin = (UCHAR *) jenv->GetByteArrayElements(dest_img, JNI_FALSE);
+    UCHAR *dest_img_bin = NULL;
     ndepth = 8;
     retval = wsq_decode_mem(&dest_img_bin, &width, &height, &ndepth, &ppi, NULL,
                             compressed_img_bin, compressed_size);
+    //release compressed image
     jenv->ReleaseByteArrayElements(compressed_img, (jbyte *) compressed_img_bin, JNI_ABORT);
-    //force commit data and free c++ pointer
-    jenv->ReleaseByteArrayElements(dest_img, (jbyte *) dest_img_bin, 0);
     if (retval != 0) {
       SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, retval);
+      return NULL;
+    }
+    jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
+    //copy original image data to dest image
+    if(dest_img_bin != NULL) {
+      jenv->SetByteArrayRegion(dest_img, 0, dest_img_size, (jbyte *) dest_img_bin);
+      free(dest_img_bin);
     }
 
     //build OriginalImage object
