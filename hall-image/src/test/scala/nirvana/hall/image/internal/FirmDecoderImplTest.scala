@@ -43,6 +43,9 @@ class FirmDecoderImplTest extends BaseJniTest{
     val dest = decoder.decode(gafisImg)
 
     Assert.assertNotNull(dest.bnData)
+
+    val originBytes = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data.uncompressed"))
+    Assert.assertArrayEquals(originBytes,dest.bnData)
   }
   @Test
   def test_decode_1400_vi_wsq{

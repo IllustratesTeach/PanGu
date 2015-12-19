@@ -13,6 +13,7 @@ import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
 import org.apache.tapestry5.ioc.annotations.Symbol
+import org.jnbis.WsqDecoder
 
 import scala.collection.JavaConversions._
 
@@ -26,6 +27,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
   private case class Dll(fileName:String,functionName:String,Handle:Long)
   private val lock = new ReentrantLock()
   private val WSQ = "1400"
+  private val wsqDecoder = new WsqDecoder
 
   /**
    * decode compressed data using firm's algorithm
@@ -68,12 +70,15 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
 
     firmCode match{
       case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
-        val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
+        val img = wsqDecoder.decode(gafisImg.bnData)
+        //val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
         destImg.stHead.nWidth = img.getWidth.toShort
         destImg.stHead.nHeight = img.getHeight.toShort
 
-        destImg.stHead.nImgSize = img.getData.length
-        destImg.bnData = img.getData
+        destImg.stHead.nImgSize = img.getPixels.length
+        destImg.bnData = img.getPixels
+        //destImg.stHead.nImgSize = img.getData.length
+        //destImg.bnData = img.getData
 
         if(img.getPpi > 0)
           destImg.stHead.nResolution = img.getPpi.toShort
