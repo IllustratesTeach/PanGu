@@ -1,10 +1,8 @@
 package nirvana.hall.api.internal.sync
 
-import javax.inject.Inject
-
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.entities._
-import nirvana.hall.api.services.{AutoSpringDataSourceSession, DictService}
+import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.api.services.sync.Sync62Service
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
@@ -24,14 +22,7 @@ class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: Ha
   with Sync62CaseService
   with Sync62LPCardService
   with Sync62TPCardService{
-  @Inject
-  var sync62TPCardService: Sync62TPCardService = _
-  @Inject
-  var sync62CaseService: Sync62CaseService = _
-  @Inject
-  var sync62LPCardService: Sync62LPCardService = _
-  @Inject
-  var dictService: DictService = _
+
   //上报标记(1:捺印;2:案件;3:现场)
   val UPLOAD_FLAG_TPCARD = "1"
   val UPLOAD_FLAG_CASE = "2"

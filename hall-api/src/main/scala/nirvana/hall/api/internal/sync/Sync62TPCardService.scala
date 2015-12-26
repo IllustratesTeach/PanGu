@@ -112,7 +112,7 @@ trait Sync62TPCardService {
       }
       blobBuilder.setStImageBytes(ByteString.readFrom(finger.gatherData.getBinaryStream()))
       blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-      blobBuilder.setBPlain("1".equals(finger.fgpCase.toString))
+      blobBuilder.setBPlain("1".equals(finger.fgpCase.get))
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
     tpCard.build()
