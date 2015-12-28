@@ -2,12 +2,11 @@ package nirvana.hall.v62.internal.c.gnetlib
 
 import java.nio.ByteBuffer
 
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.GADB_RETVAL
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
 /**
@@ -97,6 +96,22 @@ trait ganetqry {
       channel.receive[GADB_RETVAL]()
     }.toArray
   }
+  def NET_GAFIS_QUERY_Update(nDBID:Short,nTableID:Short,pstQry:GAQUERYSTRUCT,nOption:Int = 0) =executeInChannel{channel=>
+    val pAns = new GNETANSWERHEADOBJECT
+    val pReq = new GNETREQUESTHEADOBJECT
+    NETREQ_SetOption(pReq, nOption);
+    NETREQ_SetDBID(pReq, nDBID);
+    NETREQ_SetTableID(pReq, nTableID);
+    NETREQ_SetOpClass(pReq, OP_CLASS_QUERY);
+    NETREQ_SetOpCode(pReq, OP_QUERY_UPDATE);
+
+    channel.writeMessage(pReq)
+    GAFIS_NETSCR_SendQueryInfo(channel, pstQry)
+
+    NETOP_RECVANS(channel, pAns);
+    validateResponse(channel,pAns)
+  }
+
 
   final val GAFIS_KEYLIST_GetName = "KeyList"
   final val GAFIS_QRYPARAM_GetName = "QryParam"
