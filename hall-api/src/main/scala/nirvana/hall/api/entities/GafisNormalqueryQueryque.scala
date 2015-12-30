@@ -1,8 +1,9 @@
 package nirvana.hall.api.entities
 
+import java.sql.Blob
+
+import org.joda.time.DateTime
 import scalikejdbc._
-import org.joda.time.{DateTime}
-import java.sql.{Blob, Clob}
 
 case class GafisNormalqueryQueryque(
   pkId: String,
@@ -20,7 +21,7 @@ case class GafisNormalqueryQueryque(
   flagg: Option[Short] = None,
   qrycondition: Option[Blob] = None,
   mic: Option[Blob] = None,
-  textsql: Option[Clob] = None,
+  textsql: Option[String] = None,
   candhead: Option[Blob] = None,
   candlist: Option[Blob] = None,
   timeused: Option[Int] = None,
@@ -36,7 +37,7 @@ case class GafisNormalqueryQueryque(
   finishtime: Option[DateTime] = None,
   computerip: Option[String] = None,
   computername: Option[String] = None,
-  oracomment: Option[Clob] = None,
+  oracomment: Option[String] = None,
   maxscore: Option[Long] = None,
   createtime: Option[DateTime] = None,
   begintime: Option[DateTime] = None,
@@ -175,7 +176,7 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
     flagg: Option[Short] = None,
     qrycondition: Option[Blob] = None,
     mic: Option[Blob] = None,
-    textsql: Option[Clob] = None,
+    textsql: Option[String] = None,
     candhead: Option[Blob] = None,
     candlist: Option[Blob] = None,
     timeused: Option[Int] = None,
@@ -191,7 +192,7 @@ object GafisNormalqueryQueryque extends SQLSyntaxSupport[GafisNormalqueryQueryqu
     finishtime: Option[DateTime] = None,
     computerip: Option[String] = None,
     computername: Option[String] = None,
-    oracomment: Option[Clob] = None,
+    oracomment: Option[String] = None,
     maxscore: Option[Long] = None,
     createtime: Option[DateTime] = None,
     begintime: Option[DateTime] = None,
