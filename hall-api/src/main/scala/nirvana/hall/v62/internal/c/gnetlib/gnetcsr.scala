@@ -394,11 +394,14 @@ trait gnetcsr {
     //查询任务号，如果是获取查询结果，有任务号
     val queryId = pstQry.stSimpQry.nQueryID
 
+
+    channel.writeMessage(pstQry)
+
     if (ncand <= 0 && ncandhead <= 0 && nqrycond <= 0 && nMicCount <= 0 && nSvrListLen <= 0 &&
-      nMisCondLen <= 0 && nTxtSqlLen <= 0 && nCommentLen <= 0 && nqryinfolen <= 0 && queryId == null) {
+      nMisCondLen <= 0 && nTxtSqlLen <= 0 && nCommentLen <= 0 && nqryinfolen <= 0) {
       throw new IllegalArgumentException("data is null");
     }
-    val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstQry)
+    val response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse( channel,response)
 
     if (nMicCount > 0) {
