@@ -78,10 +78,12 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
         destImg.stHead.nHeight = img.getHeight.toShort
 
         destImg.stHead.nImgSize = img.getPixels.length
-        destImg.bnData = img.getPixels
+        destImg.bnData = imgixels
         */
         val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
         destImg.stHead.nImgSize = img.getData.length
+        destImg.stHead.nWidth = img.getWidth.toShort
+        destImg.stHead.nHeight = img.getHeight.toShort
         destImg.bnData = img.getData
 
         if(img.getPpi > 0)
