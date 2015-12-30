@@ -26,7 +26,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
   private val dlls = new ConcurrentHashMap[String,Dll]()
   private case class Dll(fileName:String,functionName:String,Handle:Long)
   private val lock = new ReentrantLock()
-  private val WSQ = "1400"
   private val wsqDecoder = new WsqDecoder
 
   /**
@@ -40,7 +39,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
   @deprecated
   def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage={
     code match{
-      case WSQ =>
+      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE =>
         try{
           //lock.lock()
           NativeImageConverter.decodeByWSQ(cpr_data)
@@ -66,7 +65,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
 
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray)
-    destImg.stHead.bIsCompressed = 0.toByte
+    destImg.stHead.bIsCompressed = 0
+    destImg.stHead.nCompressMethod = 0
 
     firmCode match{
       case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
