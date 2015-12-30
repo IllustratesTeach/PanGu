@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal.query
 
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.entities.GafisNormalqueryQueryque
+import nirvana.hall.api.entities.{GafisQuery7to6, GafisNormalqueryQueryque}
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.api.services.query.Query7to6Service
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
@@ -78,7 +78,7 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
     val matchTask = MatchTask.newBuilder()
     matchTask.setMatchId(query.keyid.get)
     matchTask.setMatchType(MatchType.valueOf(query.querytype.get+1))
-    matchTask.setObjectId(1)//必填项，但是没有用到
+    matchTask.setObjectId(query.oraSid.get)//必填项，现在用于存放oraSid
     matchTask.setPriority(query.priority.get)
     matchTask.setScoreThreshold(query.minscore.get)
 
@@ -102,7 +102,14 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
     val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
 
     val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask)(v62Config)
-    facade.NET_GAFIS_QUERY_Submit(20, 2, pstKey, queryStruct, idx)
+    val retval = facade.NET_GAFIS_QUERY_Submit(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
+
+    //记录6.2的查询SID
+    retval.foreach{ ret =>
+      GafisQuery7to6.create(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID))
+    }
   }
+
+
 
 }

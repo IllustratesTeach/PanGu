@@ -25,6 +25,7 @@ message BaseRequest{
   9011  TPCardUpdateRequest
   9012  TPCardGetRequest
   9013  QuerySendRequest
+  9014  QueryGetRequest
   **/
 }
 //服务器返回状态
@@ -53,6 +54,7 @@ message BaseResponse{
   9011  TPCardUpdateResponse
   9012  TPCardGetResponse
   9013  QuerySendResponse
+  9014  QueryGetResponse
   */
 }
 message KV {

@@ -53,6 +53,11 @@
           <xs:documentation>案件录入的数据库表</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="databaseTableType" name="query_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>查询的数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
 
     </xs:sequence>
   </xs:complexType>

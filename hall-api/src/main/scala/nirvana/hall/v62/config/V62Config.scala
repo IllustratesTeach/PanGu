@@ -30,6 +30,8 @@ class HallV62Config {
   var latentTable:DatabaseTable = _
   @XmlElement(name="case_table")
   var caseTable:DatabaseTable = _
+  @XmlElement(name="query_table")
+  var queryTable:DatabaseTable = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HallV62DatabaseTable")

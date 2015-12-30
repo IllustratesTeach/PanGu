@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal.filter.qry
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.qry.QueryProto.QuerySendRequest
+import nirvana.hall.protocol.v62.qry.QueryProto.{QueryGetRequest, QuerySendRequest}
 import org.apache.tapestry5.ioc.{RegistryBuilder, Registry}
 import org.junit.{Assert, Test}
 
@@ -35,5 +35,19 @@ class QueryFilterTest {
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+  }
+
+  @Test
+  def test_getQuery: Unit ={
+    val requestBuilder = QueryGetRequest.newBuilder()
+    requestBuilder.setOraSid(0)
+    val handler = registry.getService(classOf[ProtobufRequestHandler])
+    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    protobufRequest.setExtension(QueryGetRequest.cmd, requestBuilder.build())
+    val protobufResponse = BaseResponse.newBuilder()
+
+    handler.handle(protobufRequest.build(), protobufResponse)
+    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+
   }
 }

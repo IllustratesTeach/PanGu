@@ -21,4 +21,8 @@
       <database_id>2</database_id>
       <table_id>4</table_id>
    </case_table>
+   <query_table>
+      <database_id>20</database_id>
+      <table_id>2</table_id>
+   </query_table>
 </hall_v62>

@@ -1,10 +1,13 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
+import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
@@ -86,4 +89,59 @@ object gaqryqueConverter {
     queryStruct
   }
 
+  def convertQueryId2GAQUERYSTRUCT(queryId: Long):GAQUERYSTRUCT ={
+    val pstQry = new GAQUERYSTRUCT
+    pstQry.stSimpQry.nQueryID = convertLongAsSixByteArray(queryId)
+    pstQry
+  }
+
+  def convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct: GAQUERYSTRUCT): MatchResultRequest ={
+    val matchResultRequest = MatchResultRequest.newBuilder()
+
+    val queryId = gaQueryStruct.stSimpQry.nQueryID
+    matchResultRequest.setMatchId(convertSixByteArrayToLong(queryId)+"")
+
+    val pstCandData = gaQueryStruct.pstCand_Data
+    matchResultRequest.setCandidateNum(pstCandData.length)
+
+    var maxScore = 0
+
+    pstCandData.foreach{ candData =>
+      val matchResult = matchResultRequest.addCandidateResultBuilder()
+      matchResult.setObjectId(convertSixByteArrayToLong(candData.nSID))
+      matchResult.setPos(candData.nIndex)
+      matchResult.setScore(candData.nScore)
+      if(maxScore < candData.nScore)
+        maxScore = candData.nScore
+    }
+    matchResultRequest.setMaxScore(maxScore)
+
+    matchResultRequest.build()
+  }
+
+  /**
+   * 转换6个字节成long
+   * @param bytes 待转换的六个字节
+   * @return 转换后的long数字
+   */
+  def convertSixByteArrayToLong(bytes: Array[Byte]): Long = {
+    /*
+    val byteBuffer = ByteBuffer.allocate(8).put(Array[Byte](0,0)).put(bytes)
+    byteBuffer.rewind()
+    byteBuffer.getLong
+    */
+    var l = 0L
+    l |= (0xff & bytes(0)) << 16
+    l |= (0xff & bytes(1)) << 8
+    l |= (0xff & bytes(2))
+    l <<= 24
+
+    l |= (0xff & bytes(3)) << 16
+    l |= (0xff & bytes(4)) << 8
+    l |= (0xff & bytes(5))
+
+    l
+  }
+  def convertLongAsSixByteArray(sid: Long): Array[Byte]=
+    ByteBuffer.allocate(8).putLong(sid).array().slice(2,8)
 }
