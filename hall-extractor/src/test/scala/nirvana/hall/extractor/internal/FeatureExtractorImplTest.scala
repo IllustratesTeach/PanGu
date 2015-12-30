@@ -60,7 +60,9 @@ class FeatureExtractorImplTest extends BaseJniTest{
     destMntData.stHead.szName="FingerRHMMnt"
     val expectFeature = new FINGERMNTSTRUCT
     expectFeature.fromByteArray(bytes.slice(64,bytes.length))
-    Assert.assertArrayEquals(destMntData.toByteArray,mnt.toByteArray)
+    Assert.assertArrayEquals(expectFeature.xx,feature.xx)
+    Assert.assertArrayEquals(expectFeature.yy,feature.yy)
+    Assert.assertArrayEquals(expectFeature.zz,feature.zz)
 
   }
 }
