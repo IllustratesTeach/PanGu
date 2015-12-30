@@ -67,21 +67,27 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray)
     destImg.stHead.bIsCompressed = 0
     destImg.stHead.nCompressMethod = 0
+    destImg.stHead.nBits = 8
 
     firmCode match{
       case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
+        /*
+
         val img = wsqDecoder.decode(gafisImg.bnData)
-        //val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
         destImg.stHead.nWidth = img.getWidth.toShort
         destImg.stHead.nHeight = img.getHeight.toShort
 
         destImg.stHead.nImgSize = img.getPixels.length
         destImg.bnData = img.getPixels
-        //destImg.stHead.nImgSize = img.getData.length
-        //destImg.bnData = img.getData
+        */
+        val img = NativeImageConverter.decodeByWSQ(gafisImg.bnData)
+        destImg.stHead.nImgSize = img.getData.length
+        destImg.bnData = img.getData
 
         if(img.getPpi > 0)
           destImg.stHead.nResolution = img.getPpi.toShort
+        else
+          destImg.stHead.nResolution = 500 //default ppi
 
       case other=>
         val width = gafisImg.stHead.nWidth
