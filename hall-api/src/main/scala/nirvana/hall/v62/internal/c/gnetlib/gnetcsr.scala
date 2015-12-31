@@ -368,8 +368,7 @@ trait gnetcsr {
 
     if( nSvrListLen > 0 )  pstQry.pstSvrList_Data = channel.receiveByteArray(nSvrListLen).array()
     if( ncandhead> 0 )  { //receive candidate head struct
-      pstQry.pstCandHead_Data = new GAQUERYCANDHEADSTRUCT
-      channel.receive(pstQry.pstCandHead_Data)
+      pstQry.pstCandHead_Data =  channel.receive[GAQUERYCANDHEADSTRUCT]()
     }
     if( ncand> 0 )  {//receive candidate data
       val num = pstQry.pstCandHead_Data.nCandidateNum & 0x0000ffff
