@@ -218,7 +218,7 @@ trait SendMatchTaskSupport {
       channel.writeByteArray(pstQry.pstSvrList_Data,0,nSvrListLen);
 
     if ( ncandhead >0)
-      pstQry.pstCandHead_Data.foreach(channel.writeMessage[NoneResponse](_))
+      channel.writeMessage[NoneResponse](pstQry.pstCandHead_Data)
     if ( ncand >0 )
       pstQry.pstCand_Data.foreach(channel.writeMessage[NoneResponse](_))
 
