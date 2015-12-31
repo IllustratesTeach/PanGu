@@ -17,7 +17,7 @@ import org.junit.{Assert, Test}
 class TPCardFilterTest {
   val modules = Seq[String](
     "nirvana.hall.api.LocalProtobufModule",
-    "nirvana.hall.v62.LocalV62Module",
+    "nirvana.hall.v62.LocalV62ServiceModule",
     "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
   protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test

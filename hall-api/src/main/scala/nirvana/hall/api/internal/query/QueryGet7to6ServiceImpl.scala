@@ -11,6 +11,7 @@ import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.joda.time.DateTime
+import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
 /**
@@ -19,7 +20,21 @@ import scalikejdbc._
 class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig)
   extends QueryGet7to6Service{
 
+  @Transactional
+  override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque)(implicit session: DBSession): Unit = {
+    val queryId = GafisQuery7to6.find(queryque.oraSid.get).map(_.queryId)
+    if(queryId != None){
+      val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(queryId.get)
+      val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstQry)
+
+      if(gaQueryStruct.stSimpQry.nStatus >= 2){//判断是否已经完成比对
+        addMatchResult(queryque.pkId, gaQueryStruct)
+      }
+    }
+  }
+
   private val STATUS_MATCHING = "1"//任务状态，正在比对
+  private val STATUS_FINISH = "2"
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
@@ -31,21 +46,16 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConf
   }
   def doWork: Unit ={
     implicit val session = AutoSpringDataSourceSession.apply()
+    //这里手动提交事务
     getGafisNormalqueryQueryqueMatching().foreach{ queryque =>
-      val queryId = GafisQuery7to6.find(queryque.oraSid.get).map(_.queryId)
-      if(queryId != null){
-        val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(queryId.get)
-        val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstQry)
-
-        if(gaQueryStruct.stSimpQry.nStatus >= 2){//判断是否已经完成比对
-          addMatchResult(gaQueryStruct)
-        }
-      }
+      session.connection.setAutoCommit(false)
+      getQueryAndSaveMatchResult(queryque)
+      session.connection.commit()
+      doWork
     }
-
   }
 
-  override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
+  override def getGafisNormalqueryQueryqueMatching(implicit session: DBSession): Option[GafisNormalqueryQueryque] = {
     val query = GafisNormalqueryQueryque.findAllBy(
       sqls.eq(GafisNormalqueryQueryque.gnq.status, STATUS_MATCHING)
         .and.isNotNull(GafisNormalqueryQueryque.gnq.syncTargetSid)
@@ -58,20 +68,19 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConf
    * 保存比对结果
    * @param gaQueryStruct
    */
-  private def addMatchResult(gaQueryStruct: gaqryque.GAQUERYSTRUCT)(implicit session: DBSession): Unit ={
-    val matchId = gaqryqueConverter.convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID)
-
+  @Transactional
+  private def addMatchResult(pkId: String, gaQueryStruct: gaqryque.GAQUERYSTRUCT)(implicit session: DBSession): Unit ={
     withSQL{
       val column = GafisNormalqueryQueryque.column
       update(GafisNormalqueryQueryque).set(
-        column.status -> 2,
+        column.status -> STATUS_FINISH,
         column.curcandnum -> gaQueryStruct.stSimpQry.nCurCandidateNum,
-        column.candhead -> gaQueryStruct.pstCandHead_Data,
-        column.candlist -> gaQueryStruct.pstCand_Data,
+        column.candhead -> gaQueryStruct.pstCandHead_Data.toByteArray,
+        column.candlist -> gaQueryStruct.pstCand_Data(0).toByteArray,
         column.hitpossibility -> gaQueryStruct.stSimpQry.nHitPossibility.toInt,
         column.verifyresult -> gaQueryStruct.stSimpQry.nVerifyResult.toInt,
         column.finishtime -> new DateTime()
-      ).where.eq(column.oraSid, matchId)
+      ).where.eq(column.pkId, pkId)
     }.update().apply()
 
   }

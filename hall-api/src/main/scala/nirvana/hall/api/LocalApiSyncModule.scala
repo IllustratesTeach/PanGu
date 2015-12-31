@@ -1,8 +1,8 @@
 package nirvana.hall.api
 
-import nirvana.hall.api.internal.query.Query7to6ServiceImpl
+import nirvana.hall.api.internal.query.{QueryGet7to6ServiceImpl, Query7to6ServiceImpl}
 import nirvana.hall.api.internal.sync._
-import nirvana.hall.api.services.query.Query7to6Service
+import nirvana.hall.api.services.query.{QueryGet7to6Service, Query7to6Service}
 import nirvana.hall.api.services.sync._
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -15,6 +15,7 @@ object LocalApiSyncModule {
     binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
     binder.bind(classOf[Sync62Service], classOf[Sync62ServiceImpl]).eagerLoad()
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()
+    binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
 
   }
 }
