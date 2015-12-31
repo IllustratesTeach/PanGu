@@ -1,6 +1,6 @@
 // Copyright 2012,2013,2015 the original author or authors. All rights reserved.
 // site: http://www.ganshane.com
-package nirvana.hall.stream.internal
+package nirvana.hall.support.services
 
 import java.sql._
 import javax.sql.DataSource
@@ -13,7 +13,7 @@ import scala.util.control.NonFatal
 /**
  * jdbc操作数据库的通用类
  */
-private[internal] object JdbcDatabase {
+object JdbcDatabase {
   private val logger = LoggerFactory getLogger getClass
 
   def use[T](autoCommit: Boolean = true)(action: Connection => T)(implicit ds: DataSource): T = {

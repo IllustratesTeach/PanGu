@@ -4,8 +4,8 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.stream.internal.JdbcDatabase
 import nirvana.hall.stream.services.FeatureSaverService
+import nirvana.hall.support.services.JdbcDatabase
 import org.apache.tapestry5.ioc.annotations.InjectService
 import org.springframework.transaction.PlatformTransactionManager
 

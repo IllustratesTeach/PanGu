@@ -9,6 +9,7 @@ import monad.rpc.protocol.CommandProto
 import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import monad.rpc.services.{CommandResponse, RpcServerMessageHandler}
 import monad.support.services.LoggerSupport
+import nirvana.hall.support.HallSupportConstants
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
 import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletRequestHandler}
 import org.jboss.netty.channel.ChannelFuture
@@ -22,9 +23,8 @@ import scala.util.control.NonFatal
  */
 class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessageHandler,extensionRegistry: ExtensionRegistry)
   extends HttpServletRequestFilter with LoggerSupport{
-  private val PROTOBUF_HEADER = "X-Hall-Request"
   override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
-    val header = request.getHeader(PROTOBUF_HEADER)
+    val header = request.getHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER)
     if(header != null){
       val responseBuilder = BaseCommand.newBuilder()
       responseBuilder.setStatus(CommandStatus.OK)

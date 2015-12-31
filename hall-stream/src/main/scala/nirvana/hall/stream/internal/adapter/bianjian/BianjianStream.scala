@@ -7,8 +7,8 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.stream.internal.JdbcDatabase
 import nirvana.hall.stream.services.StreamService
+import nirvana.hall.support.services.JdbcDatabase
 import org.apache.commons.io.IOUtils
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, InjectService}
 

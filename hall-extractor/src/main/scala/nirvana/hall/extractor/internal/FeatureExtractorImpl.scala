@@ -14,6 +14,7 @@ import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.support.services.GAFISImageReaderSpi
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**

@@ -1,4 +1,4 @@
-package nirvana.hall.extractor.internal
+package nirvana.hall.support.services
 
 import java.awt.image._
 import java.awt.{Point, Rectangle}
@@ -13,7 +13,6 @@ import javax.imageio.{IIOException, ImageReadParam, ImageReader, ImageTypeSpecif
 import com.sun.imageio.plugins.bmp.BMPMetadata
 import com.sun.imageio.plugins.common.{I18N, ImageUtil}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGEHEADSTRUCT
-import nirvana.hall.extractor.HallExtractorConstants
 
 /**
  * gafis image reader spi
@@ -32,7 +31,7 @@ class GAFISImageReaderSpi extends ImageReaderSpi(
     GAFISImageReaderSpi.formatNames,
     GAFISImageReaderSpi.entensions,
     GAFISImageReaderSpi.mimeType,
-    "nirvana.hall.extractor.internal.GAFISImageReader",
+    "nirvana.hall.support.services.GAFISImageReader",
   Array[Class[_]](classOf[ImageInputStream]), GAFISImageReaderSpi.writerSpiNames, false, null, null, null, null, true, BMPMetadata.nativeMetadataFormatName, "com.sun.imageio.plugins.bmp.BMPMetadataFormat", null, null)
 {
   private var registered: Boolean = false

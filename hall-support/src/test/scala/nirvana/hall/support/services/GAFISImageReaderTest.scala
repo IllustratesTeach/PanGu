@@ -1,4 +1,4 @@
-package nirvana.hall.extractor.internal
+package nirvana.hall.support.services
 
 import java.io.File
 import javax.imageio.ImageIO

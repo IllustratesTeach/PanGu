@@ -16,6 +16,10 @@
   </parent>
   <dependencies>
     <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-c</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.ganshane.monad</groupId>
       <artifactId>monad-rpc</artifactId>
     </dependency>
