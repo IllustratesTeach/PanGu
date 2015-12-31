@@ -5,7 +5,7 @@ import nirvana.hall.c.services.ganumia.gadbrec._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp._
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
-import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAFIS_QUERYINFO, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.c.CodeHelper
@@ -367,8 +367,14 @@ trait gnetcsr {
     }
 
     if( nSvrListLen > 0 )  pstQry.pstSvrList_Data = channel.receiveByteArray(nSvrListLen).array()
-    if( ncandhead> 0 )  pstQry.pstSvrList_Data = channel.receiveByteArray(ncandhead).array()
-    if( ncand> 0 )  pstQry.pstSvrList_Data = channel.receiveByteArray(ncand).array()
+    if( ncandhead> 0 )  { //receive candiate head struct
+      pstQry.pstCandHead_Data = new GAQUERYCANDHEADSTRUCT
+      channel.receive(pstQry.pstCandHead_Data)
+    }
+    if( ncand> 0 )  {//receive candidate data
+      val num = pstQry.pstCandHead_Data.nCandidateNum & 0x0000ffff
+      pstQry.pstCand_Data = Range(0,num).map(i=>channel.receive[GAQUERYCANDSTRUCT]()).toArray
+    }
 
     if ( nqrycond > 0) pstQry.pstQryCond_Data = channel.receiveByteArray(nqrycond).array()
     if ( nMisCondLen >0) pstQry.pstMISCond_Data = channel.receiveByteArray(nMisCondLen).array()
@@ -407,7 +413,7 @@ trait gnetcsr {
     }
     if (nSvrListLen > 0) channel.writeByteArray(pstQry.pstSvrList_Data, 0, nSvrListLen);
 
-    if (ncandhead > 0) pstQry.pstCandHead_Data.foreach(channel.writeMessage[NoneResponse](_))
+    if (ncandhead > 0) channel.writeMessage[NoneResponse](pstQry.pstCandHead_Data)
     if (ncand > 0) pstQry.pstCand_Data.foreach(channel.writeMessage[NoneResponse](_))
 
     if (nqrycond > 0) channel.writeByteArray[NoneResponse](pstQry.pstQryCond_Data, 0, nqrycond)

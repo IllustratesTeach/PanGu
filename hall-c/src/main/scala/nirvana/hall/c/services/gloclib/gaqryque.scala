@@ -633,7 +633,7 @@ object gaqryque {
     var stKeyRange:Array[GAKEYRANGESTRUCT] = _;		// 128 bytes, to here is 256+64 bytes
   var pstCandHead_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pstCandHead_Data:Array[GAQUERYCANDHEADSTRUCT] = _ // for pstCandHead pointer ,struct:GAQUERYCANDHEADSTRUCT;		// pointer to candidate head, no substructure
+  var pstCandHead_Data:GAQUERYCANDHEADSTRUCT = _ // for pstCandHead pointer ,struct:GAQUERYCANDHEADSTRUCT;		// pointer to candidate head, no substructure
   var pstCand_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pstCand_Data:Array[GAQUERYCANDSTRUCT] = _ // for pstCand pointer ,struct:GAQUERYCANDSTRUCT;			// pointer to candidate list, no substructure
