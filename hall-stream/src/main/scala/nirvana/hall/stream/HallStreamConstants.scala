@@ -6,6 +6,4 @@ package nirvana.hall.stream
  * @since 2015-12-15
  */
 object HallStreamConstants {
-  val PROTOBUF_HEADER = "X-Hall-Request"
-  val PROTOBUF_HEADER_VALUE = "ok"
 }

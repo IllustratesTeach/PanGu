@@ -4,8 +4,10 @@ import com.google.protobuf.ExtensionRegistry
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.image.FirmImageDecompressProto
-import nirvana.hall.stream.internal.{RpcHttpClientImpl, StreamServiceImpl}
-import nirvana.hall.stream.services.{RpcHttpClient, StreamService}
+import nirvana.hall.stream.internal.StreamServiceImpl
+import nirvana.hall.stream.services.StreamService
+import nirvana.hall.support.internal.RpcHttpClientImpl
+import nirvana.hall.support.services.RpcHttpClient
 import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
 import org.apache.tapestry5.ioc.annotations.Contribute
 

@@ -4,7 +4,8 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
-import nirvana.hall.stream.services.{DecompressService, RpcHttpClient}
+import nirvana.hall.stream.services.DecompressService
+import nirvana.hall.support.services.RpcHttpClient
 
 /**
  * http decompress service

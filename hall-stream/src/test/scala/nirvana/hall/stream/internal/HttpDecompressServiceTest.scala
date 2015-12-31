@@ -5,6 +5,7 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.image.FirmImageDecompressProto
 import nirvana.hall.protocol.image.FirmImageDecompressProto.FirmImageDecompressRequest
+import nirvana.hall.support.internal.RpcHttpClientImpl
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 

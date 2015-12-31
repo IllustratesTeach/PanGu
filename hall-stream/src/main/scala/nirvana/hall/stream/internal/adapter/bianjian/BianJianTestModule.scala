@@ -4,7 +4,8 @@ import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import nirvana.hall.stream.internal.{HttpExtractService, HttpDecompressService}
-import nirvana.hall.stream.services.{ExtractService, RpcHttpClient, DecompressService, FeatureSaverService}
+import nirvana.hall.stream.services.{ExtractService, DecompressService, FeatureSaverService}
+import nirvana.hall.support.services.RpcHttpClient
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations._
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub

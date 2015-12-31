@@ -6,6 +6,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.support.internal.RpcHttpClientImpl
 import org.junit.{Assert, Test}
 
 /**

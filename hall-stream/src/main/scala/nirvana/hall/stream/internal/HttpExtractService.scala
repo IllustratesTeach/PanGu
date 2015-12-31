@@ -4,8 +4,9 @@ import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractRequest, ExtractResponse, FingerPosition}
-import nirvana.hall.stream.services.{ExtractService, RpcHttpClient}
+import nirvana.hall.stream.services.ExtractService
 import nirvana.hall.c.services.AncientData._
+import nirvana.hall.support.services.RpcHttpClient
 
 /**
  * Created by songpeng on 15/12/15.

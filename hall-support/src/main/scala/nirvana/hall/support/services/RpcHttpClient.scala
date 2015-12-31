@@ -1,4 +1,4 @@
-package nirvana.hall.stream.services
+package nirvana.hall.support.services
 
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
 import monad.rpc.protocol.CommandProto.BaseCommand

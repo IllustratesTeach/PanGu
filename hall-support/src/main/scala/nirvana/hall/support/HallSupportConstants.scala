@@ -12,4 +12,6 @@ object HallSupportConstants {
  / _  / __ |/ /__/ /__ module : |@@|red %s|@#
 /_//_/_/ |_/____/____/ version: |@@|yellow %s|@
                              """.replaceAll("#", "@|green ")
+  val HTTP_PROTOBUF_HEADER = "X-Hall-Request"
+  val HTTP_PROTOBUF_HEADER_VALUE = "ok"
 }
