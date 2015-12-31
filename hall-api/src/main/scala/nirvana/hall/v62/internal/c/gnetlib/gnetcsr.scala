@@ -367,7 +367,7 @@ trait gnetcsr {
     }
 
     if( nSvrListLen > 0 )  pstQry.pstSvrList_Data = channel.receiveByteArray(nSvrListLen).array()
-    if( ncandhead> 0 )  { //receive candiate head struct
+    if( ncandhead> 0 )  { //receive candidate head struct
       pstQry.pstCandHead_Data = new GAQUERYCANDHEADSTRUCT
       channel.receive(pstQry.pstCandHead_Data)
     }
