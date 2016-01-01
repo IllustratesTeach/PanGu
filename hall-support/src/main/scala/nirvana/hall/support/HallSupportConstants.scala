@@ -14,4 +14,5 @@ object HallSupportConstants {
                              """.replaceAll("#", "@|green ")
   val HTTP_PROTOBUF_HEADER = "X-Hall-Request"
   val HTTP_PROTOBUF_HEADER_VALUE = "ok"
+  final val GAFIS_IMG_HEAD_KEY="gafis-img"
 }

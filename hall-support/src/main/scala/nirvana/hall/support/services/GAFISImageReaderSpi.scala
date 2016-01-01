@@ -13,6 +13,7 @@ import javax.imageio.{IIOException, ImageReadParam, ImageReader, ImageTypeSpecif
 import com.sun.imageio.plugins.bmp.BMPMetadata
 import com.sun.imageio.plugins.common.{I18N, ImageUtil}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGEHEADSTRUCT
+import nirvana.hall.support.HallSupportConstants
 
 /**
  * gafis image reader spi
@@ -146,7 +147,7 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
         sampleModel = sampleModel.createCompatibleSampleModel(destinationRegion.x + destinationRegion.width, destinationRegion.y + destinationRegion.height)
         if (seleBand) sampleModel = sampleModel.createSubsetSampleModel(sourceBands)
         raster = Raster.createWritableRaster(sampleModel, new Point)
-        properties.put(HallExtractorConstants.GAFIS_IMG_HEAD_KEY,head)
+        properties.put(HallSupportConstants.GAFIS_IMG_HEAD_KEY,head)
         bi = new BufferedImage(colorModel, raster, false,properties)
       }
     }

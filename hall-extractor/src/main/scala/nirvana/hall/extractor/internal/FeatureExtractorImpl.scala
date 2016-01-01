@@ -14,6 +14,7 @@ import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -91,7 +92,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
         dstImage
     }
 
-    val originalHead = img.getProperty(HallExtractorConstants.GAFIS_IMG_HEAD_KEY).asInstanceOf[GAFISIMAGEHEADSTRUCT]
+    val originalHead = img.getProperty(HallSupportConstants.GAFIS_IMG_HEAD_KEY).asInstanceOf[GAFISIMAGEHEADSTRUCT]
     val gafisImg = new GAFISIMAGESTRUCT
     val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
     if(originalHead == null) {
