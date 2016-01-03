@@ -20,8 +20,13 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService{
   }
 
   @Transactional
-  override def delete[T: ClassTag](id: Any): Unit = {
+  override def deleteById[T: ClassTag](id: Any): Unit = {
     val entity = entityManager.find(classTag[T].runtimeClass,id)
+    entityManager.remove(entity)
+  }
+
+  @Transactional
+  override def delete[T](entity: T): Unit = {
     entityManager.remove(entity)
   }
 }

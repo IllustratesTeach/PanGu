@@ -13,5 +13,7 @@ trait EntityService {
   @Transactional
   def save[T](entity:T):T
   @Transactional
-  def delete[T:ClassTag](id:Any)
+  def deleteById[T:ClassTag](id:Any)
+  @Transactional
+  def delete[T](entity:T)
 }

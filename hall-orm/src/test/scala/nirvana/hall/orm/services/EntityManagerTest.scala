@@ -4,9 +4,8 @@ import javax.persistence._
 
 import nirvana.hall.orm.{BaseOrmTestCase, ModelA}
 import org.junit.{Assert, Test}
-import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.support.{TransactionSynchronizationManager, DefaultTransactionDefinition}
+import org.springframework.transaction.support.DefaultTransactionDefinition
 
 /**
  *
@@ -16,11 +15,6 @@ import org.springframework.transaction.support.{TransactionSynchronizationManage
 class EntityManagerTest extends BaseOrmTestCase{
   @Test
   def test_save: Unit ={
-    //OpenSession In Thread
-    val entityManagerFactory= getService[EntityManagerFactory]
-    val em = getService[EntityManager]
-    val emHolder= new EntityManagerHolder(em)
-    TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
 
     val transaction = getService[PlatformTransactionManager]
     val transactionDef = new DefaultTransactionDefinition()

@@ -5,6 +5,7 @@ import javax.persistence._
 import javax.sql.DataSource
 
 import nirvana.hall.orm.config.{HallOrmConfigSupport, JpaProperty}
+import nirvana.hall.orm.services.ActiveRecord
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.Before
 import org.springframework.jdbc.datasource.DriverManagerDataSource
@@ -12,7 +13,7 @@ import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHold
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.FileSystemUtils
 
-import scala.reflect.{ClassTag,classTag}
+import scala.reflect.{ClassTag, classTag}
 
 /**
  *
@@ -45,10 +46,12 @@ class BaseOrmTestCase {
     registry.shutdown()
   }
 }
+object ModelA{
+}
 @Entity
 @Table(name = "model_a")
 @javax.persistence.SequenceGenerator(name = "entity_a_seq", sequenceName = "entity_a_seq")
-class ModelA{
+class ModelA extends ActiveRecord{
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entity_a_seq")
   @Column(name = "id")

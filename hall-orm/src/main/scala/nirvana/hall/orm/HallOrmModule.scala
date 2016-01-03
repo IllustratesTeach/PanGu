@@ -7,10 +7,10 @@ import javax.sql.DataSource
 
 import nirvana.hall.orm.config.HallOrmConfigSupport
 import nirvana.hall.orm.internal.{EntityManagerCreatorImpl, EntityManagerTransactionAdvice, EntityServiceImpl}
-import nirvana.hall.orm.services.{EntityManagerCreator, EntityService}
-import org.apache.tapestry5.ioc.annotations.{InjectService, Local, Match, Scope}
+import nirvana.hall.orm.services.{ActiveRecord, EntityManagerCreator, EntityService}
+import org.apache.tapestry5.ioc.annotations._
 import org.apache.tapestry5.ioc.services.{PerthreadManager, ThreadCleanupListener}
-import org.apache.tapestry5.ioc.{MethodAdviceReceiver, ScopeConstants, ServiceBinder}
+import org.apache.tapestry5.ioc.{ObjectLocator, MethodAdviceReceiver, ScopeConstants, ServiceBinder}
 import org.slf4j.Logger
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.orm.jpa.{JpaTransactionManager, LocalContainerEntityManagerFactoryBean}
@@ -66,10 +66,13 @@ object HallOrmModule {
     })
     manager
   }
-  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory):PlatformTransactionManager={
+  @EagerLoad
+  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,objectLocator:ObjectLocator):PlatformTransactionManager={
     val transactionManager = new JpaTransactionManager()
     transactionManager.setEntityManagerFactory(entityManagerFactory)
     transactionManager.afterPropertiesSet()
+
+    ActiveRecord.objectLocator = objectLocator
     transactionManager
   }
 
