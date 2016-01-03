@@ -5,7 +5,7 @@ import javax.persistence._
 import javax.sql.DataSource
 
 import nirvana.hall.orm.config.{HallOrmConfigSupport, JpaProperty}
-import nirvana.hall.orm.services.ActiveRecord
+import nirvana.hall.orm.services.{ActiveRecordInstance, ActiveRecord}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.Before
 import org.springframework.jdbc.datasource.DriverManagerDataSource
@@ -46,7 +46,8 @@ class BaseOrmTestCase {
     registry.shutdown()
   }
 }
-object ModelA{
+object ModelA extends ActiveRecordInstance[ModelA]{
+
 }
 @Entity
 @Table(name = "model_a")

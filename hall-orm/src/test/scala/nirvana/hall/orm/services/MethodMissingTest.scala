@@ -24,6 +24,8 @@ class MethodMissingTest {
       override def propertyAccessor: PropertyAccess = propertyAccess
     }
     modelA1.a
+
+    modelA1.find_by_name("asdfasdf")
   }
 }
 

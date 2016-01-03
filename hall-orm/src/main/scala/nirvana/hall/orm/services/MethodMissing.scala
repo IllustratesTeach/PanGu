@@ -20,6 +20,7 @@ trait MethodMissing[A] extends Dynamic{
   def applyDynamicNamed(name:String)(params:(String,Any)*):List[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A]
   def applyDynamic(name:String)(params:Any*):List[A]=macro HallOrmMacroDefine.findDynamicImpl[A]
   def selfFind(name:String)(params:Any*): List[A]={
+    println("name:",name)
     params.foreach(println)
     Nil
   }
