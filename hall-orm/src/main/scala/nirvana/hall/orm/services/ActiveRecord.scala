@@ -3,6 +3,7 @@ package nirvana.hall.orm.services
 import javax.persistence.{Id, EntityManager, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
+import org.slf4j.LoggerFactory
 
 import scala.collection.{GenTraversableOnce, JavaConversions}
 import scala.collection.generic.CanBuildFrom
@@ -18,6 +19,7 @@ import ActiveRecord._
  * @since 2016-01-03
  */
 object ActiveRecord {
+  private val logger = LoggerFactory getLogger getClass
   var objectLocator:ObjectLocator= _
   def save[T](record:T):T={
     getService[EntityService].save(record)
@@ -33,6 +35,7 @@ object ActiveRecord {
       case None =>
         dsl.ql
     }
+    logger.debug("ql:{}",fullQl)
     val query = entityManager.createQuery(fullQl)
 
     dsl.params.zipWithIndex.foreach{
@@ -128,9 +131,9 @@ trait ActiveRecordInstance[A] extends Dynamic{
     val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null"))
     key match{
       case _:Int|_:String|_:Long=>
-        Relation[A]("from %s where %s=?".format(clazz.getSimpleName,primaryKey.getName),Seq(key))
+        Relation[A]("from %s where %s=?1".format(clazz.getSimpleName,primaryKey.getName),Seq(key))
       case keys:Array[_] =>
-        Relation[A]("from %s where %s IN (?)".format(clazz.getSimpleName,primaryKey.getName),Seq(key))
+        Relation[A]("from %s where %s IN (?1)".format(clazz.getSimpleName,primaryKey.getName),Seq(key))
       case None =>
         Relation[A]("from %s".format(clazz.getSimpleName),Seq())
     }

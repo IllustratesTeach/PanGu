@@ -38,9 +38,9 @@ object HallOrmMacroDefine {
         if(attrs.length != params.length){
           c.error(c.enclosingPosition, s"name's length ${attrs.length} !=  parameter's length ${params.length}.")
         }
-        attrs.foreach{attr=>
+        attrs.zipWithIndex.foreach{case (attr,index)=>
           if(expectedNames.contains(attr)){
-            ql += " and %s=?".format(attr)
+            ql += " and %s=?%s".format(attr,index+1)
           }else{
             c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${attr} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
           }
@@ -107,6 +107,7 @@ object HallOrmMacroDefine {
     //validate params
     val trees = params.map(_.tree).toList
     val parameterValues = mutable.Buffer[Tree]()
+    var i = 1
     trees.foreach {
       case Apply(_,Literal(Constant(_name: String))::value::Nil) =>
         if(_name.isEmpty)
@@ -114,7 +115,8 @@ object HallOrmMacroDefine {
         else if(!expectedNames.contains(_name))
           c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${_name} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
         else {
-          ql += " and %s=?".format(_name)
+          ql += " and %s=?%s".format(_name,i)
+          i += 1
           parameterValues += value
         }
       case other =>
