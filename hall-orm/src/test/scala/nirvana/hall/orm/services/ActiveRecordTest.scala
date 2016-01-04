@@ -27,4 +27,15 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.delete()
     //Assert.assertEquals(0, ModelA.find_by_name("asdf").size)
   }
+  @Test
+  def test_find: Unit ={
+    val modelA = new ModelA
+    modelA.name = "asdf"
+    modelA.save()
+
+    Assert.assertNotNull(ModelA.find(modelA.id))
+    ModelA.find_by(name=1)
+    ModelA.where(name=2)
+    ModelA.where("from ModelA where name=?","asdf").offset(20).limit(10)
+  }
 }

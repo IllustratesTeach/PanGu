@@ -1,7 +1,7 @@
 package nirvana.hall.orm.services
 
 
-
+import scala.collection.mutable
 import scala.language.dynamics
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
@@ -24,17 +24,16 @@ object HallOrmMacroDefine {
                                        (name: c.Expr[String])
                                        (params:c.Expr[Any]*) : c.Expr[R] = {
     import c.universe._
-    val clazzName = c.weakTypeOf[E]
-    var ql = "from "+clazzName+" where 1=1"
-    //find class field
-    val expectedNames =  c.weakTypeOf[E].members
-      .filter(_.isTerm)
-      .filter(_.asTerm.isVar).map(_.name.toString.trim).toSeq
-
     val Literal(Constant(findMethod)) = name.tree
-    //val Ident(TermName(findMethod)) = name.tree
-    findMethod.toString.trim match {
+    val paramsTree = params.map(_.tree).toList
+    findMethod.toString.trim match{
       case find_by_pattern(attributes) =>
+        val clazzName = c.weakTypeOf[E]
+        var ql = "from "+clazzName+" where 1=1"
+        //find class field
+        val expectedNames =  c.weakTypeOf[E].members
+          .filter(_.isTerm)
+          .filter(_.asTerm.isVar).map(_.name.toString.trim).toSeq
         val attrs =  attributes.split("_and_")
         if(attrs.length != params.length){
           c.error(c.enclosingPosition, s"name's length ${attrs.length} !=  parameter's length ${params.length}.")
@@ -46,17 +45,24 @@ object HallOrmMacroDefine {
             c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${attr} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
           }
         }
+        val qlTree = Literal(Constant(ql))
+
+        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),paramsTree))
+      case "where" =>
+        val qlTree = paramsTree.head
+        val remainTree = paramsTree.drop(1)
+        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),remainTree))
       case other=>
         c.error(c.enclosingPosition, s"unsupport operation")
+        c.Expr[R](Literal(Constant(Nil)))
     }
-    val qlTree = Literal(Constant(ql))
 
-    c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("selfFind")), List(qlTree)),params.map(_.tree).toList))
   }
   def dslDynamicImplNamed[E: c.WeakTypeTag,R](c: whitebox.Context)
                                            (name: c.Expr[String])
                                            (params:c.Expr[(String,Any)]*):c.Expr[R] = {
     import c.universe._
+    val Literal(Constant(methodName:String)) = name.tree
     //find class field
     val expectedNames =  c.weakTypeOf[E].members
       .filter(_.isTerm)
@@ -64,14 +70,9 @@ object HallOrmMacroDefine {
     //validate params
     var order_str=""
 
-    //params.tree.foreach(println)
-
-    println("size:",params.size)
-
     val trees = params.map(_.tree).toList
-    println(trees)
     trees.foreach{
-      case Apply(_,Literal(Constant(_name: String))::Literal(Constant(value)) ::Nil) =>
+      case Apply(_,Literal(Constant(_name: String))::_) =>
         if(_name.isEmpty)
           c.error(c.enclosingPosition, s"name parameter is empty.")
         else if(!expectedNames.contains(_name))
@@ -81,10 +82,22 @@ object HallOrmMacroDefine {
     }
     //c.error(c.enclosingPosition,"asdf")
 
-    c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalOrder")), trees))
+    methodName match{
+      case "order" | "order_by" =>
+        c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalOrder")), trees))
+      case other=>
+        c.error(c.enclosingPosition, s"${other} unsupported.")
+        c.Expr[R](Literal(Constant(Nil)))
+    }
   }
-  def findDynamicImplNamed[E: c.WeakTypeTag](c: whitebox.Context)(name: c.Expr[String])(params:c.Expr[(String,Any)]*): c.Expr[List[E]] = {
+  def findDynamicImplNamed[E: c.WeakTypeTag,R](c: whitebox.Context)
+                                            (name: c.Expr[String])
+                                            (params:c.Expr[(String,Any)]*): c.Expr[R] = {
     import c.universe._
+
+    val clazzName = c.weakTypeOf[E]
+    var ql = "from "+clazzName+" where 1=1"
+
     val Literal(Constant(methodName:String)) = name.tree
     //find class field
     val expectedNames =  c.weakTypeOf[E].members
@@ -93,22 +106,27 @@ object HallOrmMacroDefine {
 
     //validate params
     val trees = params.map(_.tree).toList
-    trees.foreach{
-      case Apply(_,Literal(Constant(_name: String))::_) =>
+    val parameterValues = mutable.Buffer[Tree]()
+    trees.foreach {
+      case Apply(_,Literal(Constant(_name: String))::value::Nil) =>
         if(_name.isEmpty)
           c.error(c.enclosingPosition, s"name parameter is empty.")
         else if(!expectedNames.contains(_name))
           c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${_name} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
+        else {
+          ql += " and %s=?".format(_name)
+          parameterValues += value
+        }
       case other =>
           c.error(c.enclosingPosition, s"${other} unsupported.")
     }
 
-    val hql = Literal(Constant("from xxy"))
     methodName match{
-      case "find" =>
-        c.Expr[List[E]](Apply(Apply(Select(c.prefix.tree, TermName("selfFindNamed")), List(hql)),trees))
+      case "find_by" | "where" =>
+        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
       case other=>
-        c.Expr[List[E]](Apply(Select(c.prefix.tree, TermName("_"+other)),trees))
+        c.error(c.enclosingPosition, s"${other} unsupported.")
+        c.Expr[R](Literal(Constant(Nil)))
     }
   }
 }
