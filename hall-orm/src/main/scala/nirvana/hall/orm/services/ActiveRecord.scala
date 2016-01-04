@@ -22,6 +22,15 @@ object ActiveRecord {
   def delete[T](record:T): Unit ={
     getService[EntityService].delete(record)
   }
+  def find[T](dsl:QueryDSL[T]):Stream[T]={
+    val entityManager = ActiveRecord.getService[EntityManager]
+    val query = entityManager.createQuery(dsl.ql)
+    dsl.params.zipWithIndex.foreach{
+      case (value,index)=>
+        query.setParameter(index+1,value)
+    }
+    JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
+  }
   private[orm] def getService[T:ClassTag]:T={
     if(objectLocator == null)
       throw new IllegalStateException("object locator is null")
@@ -37,17 +46,30 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
-trait ActiveRecordInstance[A] extends Dynamic{
-  def applyDynamicNamed(name:String)(params:(String,Any)*):List[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A]
-  def applyDynamic(name:String)(params:Any*):List[A]=macro HallOrmMacroDefine.findDynamicImpl[A]
-  def selfFind(ql:String)(params:Any*): List[A]={
-    val entityManager = ActiveRecord.getService[EntityManager]
-    val query = entityManager.createQuery(ql)
-    params.zipWithIndex.foreach{
-      case (value,index)=>
-        query.setParameter(index+1,value)
+class QueryDSL[A](val ql:String,val params:Seq[Any]) extends Dynamic{
+  var limit:Int = -1
+  var offset:Int = -1
+  var orderBy:Option[String]=None
+  def applyDynamicNamed(name:String)(params:(String,Any)*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
+  def internalOrder(params:(String,Any)*):this.type= {
+    params.foreach{case (key,value)=>
+      orderBy match{
+        case Some(o) =>
+          orderBy = Some(o+",%s %s".format(key,value))
+        case None=>
+          orderBy = Some("%s %s".format(key,value))
+      }
     }
-    JavaConversions.asScalaBuffer[A](query.getResultList.asInstanceOf[java.util.List[A]]).toList
+    this
+  }
+}
+trait ActiveRecordInstance[A] extends Dynamic{
+
+  def applyDynamicNamed(name:String)(params:(String,Any)*):List[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A]
+  def applyDynamic(name:String)(params:Any*):QueryDSL[A]= macro HallOrmMacroDefine.findDynamicImpl[A,QueryDSL[A]]
+
+  def selfFind(ql:String)(params:Any*): QueryDSL[A]={
+    new QueryDSL[A](ql,params)
   }
   def selfFindNamed(name:String)(params:(String,Any)*): List[A]={
     params.foreach(println)
