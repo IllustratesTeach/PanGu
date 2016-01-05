@@ -15,17 +15,15 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.name = "asdf"
     modelA.save()
 
-    var dsl = ModelA.find_by_name_and_id("adsf1",1).order(name="asc",name="desc")
+    val dsl = ModelA.find_by_name_and_id("adsf1",1).order(name="asc",name="desc")
     Assert.assertEquals("name asc,name desc",dsl.orderBy.get)
     //Assert.assertEquals(1,list.size)
-    /*
-    list = ModelA.find_by_name_and_id("asdf",modelA.id)
-    Assert.assertEquals(1,list.size)
+    val size= ModelA.find_by_name_and_id("asdf",modelA.id).size
+    Assert.assertEquals(1,size)
     Assert.assertEquals(0, ModelA.find_by_name("fdsa").size)
-    */
 
     modelA.delete()
-    //Assert.assertEquals(0, ModelA.find_by_name("asdf").size)
+    Assert.assertEquals(0, ModelA.find_by_name("asdf").size)
   }
   @Test
   def test_find: Unit ={
