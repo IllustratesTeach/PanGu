@@ -47,7 +47,6 @@ class BaseOrmTestCase {
   }
 }
 object ModelA extends ActiveRecordInstance[ModelA]{
-
 }
 @Entity
 @Table(name = "model_a")

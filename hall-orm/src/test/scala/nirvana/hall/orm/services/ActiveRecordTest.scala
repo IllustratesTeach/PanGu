@@ -33,8 +33,16 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.name = "asdf"
     modelA.save()
 
-    val result = ModelA.find(modelA.id).headOption
-    Assert.assertTrue(result.isDefined)
+    var modelA1 = ModelA.take
+    Assert.assertEquals("asdf",modelA1.name)
+    modelA1 = ModelA.all.take
+    Assert.assertEquals("asdf",modelA1.name)
+
+    val result = ModelA.find(modelA.id)
+    Assert.assertEquals("asdf",result.name)
+
+    Assert.assertTrue(ModelA.where(name="asdf").exists())
+    Assert.assertFalse(ModelA.where(name="fdsa").exists())
 
     var size = ModelA.find_by(name="asdf").size
     Assert.assertEquals(1,size)
@@ -46,7 +54,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
     Assert.assertEquals(1,size)
 
     size = ModelA.where("from ModelA where name=?","asdf")
-      .offset(0).limit(10).order(name="asc").size
+      .offset(0).limit(10).asc("name").size
     Assert.assertEquals(1,size)
   }
 }
