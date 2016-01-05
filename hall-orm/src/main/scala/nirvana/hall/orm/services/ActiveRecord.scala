@@ -228,7 +228,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   def last(n:Int):Relation[A]= {
     take(n).internalOrder(primaryKey->"DESC")
   }
-  def all(implicit clazzTag:ClassTag[A]):Relation[A]= {
+  def all:Relation[A]= {
     internalFind(None)
   }
   def asc(fields:String*):Relation[A]={
