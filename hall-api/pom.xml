@@ -28,6 +28,10 @@
       <artifactId>hall-c</artifactId>
     </dependency>
     <dependency>
+      <groupId>nirvana</groupId>
+      <artifactId>hall-orm</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.ganshane.monad</groupId>
       <artifactId>monad-support</artifactId>
     </dependency>

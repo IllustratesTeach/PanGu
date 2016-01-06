@@ -13,6 +13,7 @@
     <module>hall-extractor</module>
     <module>hall-image</module>
     <module>hall-orm</module>
+    <module>hall-orm-generator</module>
     <module>hall-orm-macro</module>
     <module>hall-protocol</module>
     <module>hall-sdk</module>
@@ -39,6 +40,11 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-orm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
+        <artifactId>hall-orm-generator</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -60,7 +60,7 @@ object TestModule {
     val config = new HallApiConfig
     config.api.db.driver = "org.h2.Driver"
     config.api.db.user = "sa"
-    config.api.db.url = "jdbc:h2:mem:test"
+    config.api.db.url = "jdbc:h2:file:target/hall/db"
 
     config
   }
