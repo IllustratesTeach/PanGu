@@ -11,7 +11,7 @@ import scalikejdbc._
 /**
  * Created by songpeng on 15/12/7.
  */
-trait Sync62TPCardService {
+trait Sync7to6TPCardService {
   /**
    * 同步捺印卡到6.2
    * @param syncQueue

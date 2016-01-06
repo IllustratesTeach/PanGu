@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 15/12/7.
  */
-trait Sync62CaseService {
+trait Sync7to6CaseService {
   /**
    * 同步案件信息到62
    * @param syncQueue

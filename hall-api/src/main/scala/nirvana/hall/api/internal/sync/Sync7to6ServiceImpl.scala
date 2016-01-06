@@ -3,7 +3,7 @@ package nirvana.hall.api.internal.sync
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.entities._
 import nirvana.hall.api.services.AutoSpringDataSourceSession
-import nirvana.hall.api.services.sync.Sync62Service
+import nirvana.hall.api.services.sync.Sync7to6Service
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.GafisException
@@ -17,11 +17,11 @@ import scalikejdbc._
  * Created by songpeng on 15/12/1.
  */
 @EagerLoad
-class Sync62ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig)
-  extends Sync62Service
-  with Sync62CaseService
-  with Sync62LPCardService
-  with Sync62TPCardService{
+class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig)
+  extends Sync7to6Service
+  with Sync7to6CaseService
+  with Sync7to6LPCardService
+  with Sync7to6TPCardService{
 
   //上报标记(1:捺印;2:案件;3:现场)
   val UPLOAD_FLAG_TPCARD = "1"

@@ -9,7 +9,7 @@ import scalikejdbc.DBSession
  * 70上报62接口服务
  * Created by songpeng on 15/12/1.
  */
-trait Sync62Service {
+trait Sync7to6Service {
 
   /**
    * 处理上报队列任务

@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal.sync
 
 import nirvana.hall.api.entities.SyncQueue
-import nirvana.hall.api.services.sync.Sync62Service
+import nirvana.hall.api.services.sync.Sync7to6Service
 import org.apache.tapestry5.ioc.RegistryBuilder
 import org.junit.Test
 
@@ -20,7 +20,7 @@ class Sync62ServiceImplTest {
   val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
   def test_sync(): Unit ={
-    val syncService = registry.getService(classOf[Sync62Service])
+    val syncService = registry.getService(classOf[Sync7to6Service])
     val syncQueue = SyncQueue.find("8a8187e45165db66015165de33d10048").get
     syncService.doWork(syncQueue)
 

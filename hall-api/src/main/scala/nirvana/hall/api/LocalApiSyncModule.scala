@@ -13,7 +13,7 @@ import org.apache.tapestry5.ioc.ServiceBinder
 object LocalApiSyncModule {
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
-    binder.bind(classOf[Sync62Service], classOf[Sync62ServiceImpl]).eagerLoad()
+    binder.bind(classOf[Sync7to6Service], classOf[Sync7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
 

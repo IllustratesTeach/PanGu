@@ -10,7 +10,7 @@ import scalikejdbc._
 /**
  * Created by songpeng on 15/12/7.
  */
-trait Sync62LPCardService{
+trait Sync7to6LPCardService{
 
   /**
    * 同步现场卡片信息到62
