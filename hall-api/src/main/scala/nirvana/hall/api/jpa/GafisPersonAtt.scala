@@ -25,7 +25,7 @@ class GafisPersonAtt extends ActiveRecord {
   @Column(name = "IMG")
   var img: java.sql.Blob = _
   @Column(name = "TYPE", length = 2)
-  var `type`: java.lang.String = _
+  var typeCol: java.lang.String = _
   @Column(name = "PERSONID", length = 23)
   var personid: java.lang.String = _
   @Column(name = "GATHERDATANOSQLID", length = 10)
@@ -39,12 +39,12 @@ class GafisPersonAtt extends ActiveRecord {
 
   def this(pkId: java.lang.String, img: java.sql.Blob,
 
-  `type`: java.lang.String, personid: java.lang.String, gatherdatanosqlid: java.lang.String)
+  typeCol: java.lang.String, personid: java.lang.String, gatherdatanosqlid: java.lang.String)
   {
     this()
     this.pkId = pkId
     this.img = img
-    this.`type` = `type`
+    this.typeCol = typeCol
     this.personid = personid
     this.gatherdatanosqlid = gatherdatanosqlid
   }

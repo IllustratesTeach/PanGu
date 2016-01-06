@@ -27,7 +27,7 @@ class SyncStrategy extends ActiveRecord {
   @Column(name = "STRATEGY_QUERY", length = 500)
   var strategyQuery: java.lang.String = _
   @Column(name = "TYPE", length = 2)
-  var `type`: java.lang.String = _
+  var typeCol: java.lang.String = _
   @Column(name = "TARGETS", length = 500)
   var targets: java.lang.String = _
   @Column(name = "DELTAG", length = 2)
@@ -45,13 +45,13 @@ class SyncStrategy extends ActiveRecord {
 
   def this(pkId: java.lang.String, strategyName: java.lang.String, strategyQuery: java.lang.String,
 
-  `type`: java.lang.String, targets: java.lang.String, deltag: java.lang.String, flag: java.lang.String, hasPalm: java.lang.String)
+  typeCol: java.lang.String, targets: java.lang.String, deltag: java.lang.String, flag: java.lang.String, hasPalm: java.lang.String)
   {
     this()
     this.pkId = pkId
     this.strategyName = strategyName
     this.strategyQuery = strategyQuery
-    this.`type` = `type`
+    this.typeCol = typeCol
     this.targets = targets
     this.deltag = deltag
     this.flag = flag

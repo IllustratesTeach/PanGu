@@ -4,7 +4,7 @@ package nirvana.hall.api.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType, Version}
+import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -22,13 +22,12 @@ class GafisGatherOcxVersion extends ActiveRecord {
   @Id
   @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
   var pkId: java.lang.String = _
-  @Version
   @Column(name = "VERSION", length = 10)
   var version: java.lang.String = _
   @Column(name = "NAME", length = 30)
   var name: java.lang.String = _
   @Column(name = "TYPE", length = 2)
-  var `type`: java.lang.String = _
+  var ocxType: java.lang.String = _
   @Column(name = "REMARK", length = 300)
   var remark: java.lang.String = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -43,14 +42,12 @@ class GafisGatherOcxVersion extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, name: java.lang.String,
-
-  `type`: java.lang.String, remark: java.lang.String, createDatetime: java.util.Date, deletag: java.lang.String)
+  def this(pkId: java.lang.String, name: java.lang.String, ocxType: java.lang.String, remark: java.lang.String, createDatetime: java.util.Date, deletag: java.lang.String)
   {
     this()
     this.pkId = pkId
     this.name = name
-    this.`type` = `type`
+    this.ocxType = ocxType
     this.remark = remark
     this.createDatetime = createDatetime
     this.deletag = deletag

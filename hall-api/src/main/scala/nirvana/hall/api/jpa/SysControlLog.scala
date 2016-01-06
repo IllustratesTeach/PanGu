@@ -4,7 +4,7 @@ package nirvana.hall.api.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType, Version}
+import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -22,7 +22,6 @@ class SysControlLog extends ActiveRecord {
   @Id
   @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
   var pkId: java.lang.String = _
-  @Version
   @Column(name = "VERSION", length = 10)
   var version: java.lang.String = _
   @Column(name = "IP", length = 15)
