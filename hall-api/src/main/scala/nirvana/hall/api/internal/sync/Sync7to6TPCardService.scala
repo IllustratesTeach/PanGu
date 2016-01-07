@@ -1,8 +1,8 @@
 package nirvana.hall.api.internal.sync
 
-import com.google.protobuf.ByteString
-import nirvana.hall.api.entities._
-import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
+import nirvana.hall.api.jpa._
+import nirvana.hall.orm.services.Relation
+import nirvana.hall.protocol.v62.FPTProto.TPCard
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
@@ -19,8 +19,8 @@ trait Sync7to6TPCardService {
    * @return
    */
   def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-    val personId = syncQueue.uploadKeyid.get
-    syncQueue.opration.get match {
+    val personId = syncQueue.uploadKeyid
+    syncQueue.opration match {
       case "insert" =>
         addTPCard(facade, v62Config, personId)
       case "update" =>
@@ -53,10 +53,14 @@ trait Sync7to6TPCardService {
   }
 
   private def getTPCard(personId: String)(implicit session: DBSession): TPCard ={
-    val person = GafisPerson.find(personId).get
+    val person = GafisPerson.find(personId)
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(personId)
 
+    //TODO 修正下方的编译错误
+    throw new UnsupportedOperationException
+
+    /*
     //文本信息
     val textBuilder = tpCard.getTextBuilder
     person.name.foreach(textBuilder.setStrName)
@@ -116,13 +120,17 @@ trait Sync7to6TPCardService {
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
     tpCard.build()
+    */
   }
 
-  private def findGafisGatherFingerListByPersonId(personId: String)(implicit session: DBSession): Seq[GafisGatherFinger] ={
+  private def findGafisGatherFingerListByPersonId(personId: String): Relation[GafisGatherFinger] ={
+    GafisGatherFinger.find_by_personId(personId)
+    /*
     val ggf = GafisGatherFinger.syntax("ggf")
     withSQL {
       select.from(GafisGatherFinger as ggf).where.eq(ggf.personId, personId)
     }.map(GafisGatherFinger(ggf.resultName)).list().apply().toSeq
+    */
   }
 
 

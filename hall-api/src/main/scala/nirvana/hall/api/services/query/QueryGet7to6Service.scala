@@ -1,6 +1,6 @@
 package nirvana.hall.api.services.query
 
-import nirvana.hall.api.entities.GafisNormalqueryQueryque
+import nirvana.hall.api.jpa.GafisNormalqueryQueryque
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession

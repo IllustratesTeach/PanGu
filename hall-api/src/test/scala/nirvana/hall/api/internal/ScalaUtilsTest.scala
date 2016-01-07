@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.entities.CodeAjlb
+import nirvana.hall.api.jpa.CodeAjlb
 import nirvana.hall.protocol.sys.DictProto.CodeData
 import org.junit.{Assert, Test}
 

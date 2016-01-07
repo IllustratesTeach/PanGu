@@ -1,7 +1,8 @@
 package nirvana.hall.api.services.stamp
 
-import nirvana.hall.api.entities.{SysUser, GafisGatherPortrait}
+import nirvana.hall.api.jpa.GafisGatherPortrait
 import nirvana.hall.api.services.AutoSpringDataSourceSession
+import nirvana.hall.orm.services.Relation
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession
 
@@ -16,7 +17,7 @@ trait GatherPortraitService {
    * @param person
    * @return
    */
-  def queryGatherPortrait(person : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : List[GafisGatherPortrait]
+  def queryGatherPortrait(person : String)  : Relation[GafisGatherPortrait]
 
 
   /**
@@ -27,7 +28,7 @@ trait GatherPortraitService {
    * @return
    */
   @Transactional
-  def analysisGatherPortrait(personId : String,gatherData : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : String
+  def analysisGatherPortrait(personId : String,gatherData : String)  : String
 
 
   /**
@@ -36,7 +37,7 @@ trait GatherPortraitService {
    * @return
    */
   @Transactional
-  def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
+  def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait)  : Boolean
 
 
   /**
@@ -46,6 +47,6 @@ trait GatherPortraitService {
    * @return
    */
   @Transactional
-  def deleteGatherPortrait(personid : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply())  : Boolean
+  def deleteGatherPortrait(personid : String)  : Boolean
 
 }

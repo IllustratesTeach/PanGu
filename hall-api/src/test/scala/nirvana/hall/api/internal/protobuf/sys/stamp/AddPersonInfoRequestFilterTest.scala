@@ -1,14 +1,12 @@
 package nirvana.hall.api.internal.protobuf.sys.stamp
 
-import nirvana.hall.api.entities.GafisPerson
-import nirvana.hall.api.internal.stamp.GatherPersonServiceImpl
-import nirvana.hall.api.internal.{BaseServiceTestSupport}
+import nirvana.hall.api.internal.BaseServiceTestSupport
+import nirvana.hall.api.jpa.GafisPerson
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonResponse, QueryBasePersonRequest}
-import nirvana.hall.protocol.sys.stamp.SavePersonProto.{SavePersonResponse, SavePersonRequest}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
+import nirvana.hall.protocol.sys.stamp.SavePersonProto.{SavePersonRequest, SavePersonResponse}
 import nirvana.hall.protocol.sys.stamp.UpdatePersonProto.UpdatePersonRequest
-import org.junit.{Test, Assert}
+import org.junit.{Assert, Test}
 
 /**
  * Created by wangjue on 2015/11/4.
@@ -42,10 +40,10 @@ class AddPersonInfoRequestFilterTest extends BaseServiceTestSupport {
 
     val personInfo = protobufResponse.getExtension(QueryBasePersonResponse.cmd)
     Assert.assertTrue(personInfo != null)*/
-    val person = GafisPerson.find("CS520201511050001").get
+    val person = GafisPerson.find("CS520201511050001")
     println(person.name)
     println(person.spellname)
-    Assert.assertEquals("",person.name.get)
+    Assert.assertEquals("",person.name)
 
 
     //update
@@ -69,12 +67,12 @@ class AddPersonInfoRequestFilterTest extends BaseServiceTestSupport {
     //Assert.assertTrue(personInfo2 != null)
 
 
-    val person2 = GafisPerson.find("CS520201511050001").get
-    Assert.assertEquals("anmicc",person2.name.get)
+    val person2 = GafisPerson.find("CS520201511050001")
+    Assert.assertEquals("anmicc",person2.name)
 
 
-    val person3 = GafisPerson.findAll()
-    Assert.assertTrue(person3.size>=1)
+    val person3 = GafisPerson.all
+    Assert.assertTrue(person3.size >=1)
 
 
     /*val person : GafisPerson = GafisPerson.find("CS520201511050001").get

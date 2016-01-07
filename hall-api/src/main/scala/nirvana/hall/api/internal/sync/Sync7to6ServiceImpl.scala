@@ -1,7 +1,9 @@
 package nirvana.hall.api.internal.sync
 
+import java.util.Date
+
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.entities._
+import nirvana.hall.api.jpa._
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.api.services.sync.Sync7to6Service
 import nirvana.hall.v62.config.HallV62Config
@@ -45,7 +47,7 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
 
   //TODO 允许3次失败
   def findSyncQueue(implicit session: DBSession): Option[SyncQueue] ={
-    SyncQueue.findAllBy(sqls.eq(SyncQueue.sq.uploadStatus,UPLOAD_STATUS_WAIT).orderBy(SyncQueue.sq.createdate)).headOption
+    SyncQueue.find_by_uploadStatus(UPLOAD_STATUS_WAIT).asc("createdate").takeOption
   }
   def doWork: Unit ={
     //这里手动提交事务
@@ -66,7 +68,7 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
    */
   @Transactional
   override def doWork(syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-    val uploadFlag = syncQueue.uploadFlag.get
+    val uploadFlag = syncQueue.uploadFlag
     try {
       uploadFlag match {
         case UPLOAD_FLAG_TPCARD =>
@@ -91,10 +93,17 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
    * @param syncQueue
    */
   private def updateSyncQueueSucess(syncQueue: SyncQueue)(implicit session: DBSession): Unit ={
+    syncQueue.uploadStatus = UPLOAD_STATUS_SUCCESS
+    syncQueue.remark="success"
+    syncQueue.save()
+
+    //SyncQueue.where(pkId=syncQueue.pkId).update_set(uploadStatus=UPLOAD_STATUS_SUCCESS,remark="success").update()
+    /*
     withSQL{
       val column = SyncQueue.column
       update(SyncQueue).set(column.uploadStatus -> UPLOAD_STATUS_SUCCESS, column.remark -> "success").where.eq(column.pkId, syncQueue.pkId)
     }.update().apply()
+    */
   }
 
   private def updateSyncQueueFail(syncQueue: SyncQueue, exception: Exception)(implicit session: DBSession): Unit ={
@@ -104,14 +113,10 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
       case other =>
         other.getMessage
     }
-    withSQL{
-      val column = SyncQueue.column
-      update(SyncQueue).set(
-        column.uploadStatus -> UPLOAD_STATUS_FAIL,
-        column.remark -> message,
-        column.finishdate -> new DateTime()).where.eq(column.pkId, syncQueue.pkId)
-    }.update().apply()
+    syncQueue.uploadStatus = UPLOAD_STATUS_FAIL
+    syncQueue.remark=message
+    syncQueue.finishdate=new Date()
 
+    syncQueue.save()
   }
-
 }

@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal.sync
 
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.entities._
+import nirvana.hall.api.jpa._
 import nirvana.hall.api.internal.{ScalaUtils, WebAppClientUtils}
 import nirvana.hall.api.services.sync.SyncDictService
 import nirvana.hall.protocol.sys.DictProto._
@@ -55,49 +55,49 @@ class SyncDictServiceImpl(config: HallApiConfig) extends SyncDictService{
         dictType match {
           case DictType.CODE_AJLB =>
             val code = ScalaUtils.convertProtobufToScala[CodeAjlb](data)
-            CodeAjlb.create(code.code,code.name,code.deleteFlag,code.ord,code.remark,Option(data.getOther()))
+            new CodeAjlb(code.code,code.name,code.deleteFlag,code.ord,code.remark,data.getOther()).save()
           case DictType.CODE_CJLB =>
             val code = ScalaUtils.convertProtobufToScala[CodeCjlb](data)
-            CodeCjlb.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeCjlb(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_GJ =>
             val code = ScalaUtils.convertProtobufToScala[CodeGj](data)
-            CodeGj.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeGj(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_JJLY =>
             val code = ScalaUtils.convertProtobufToScala[CodeJjly](data)
-            CodeJjly.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeJjly(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_LY =>
             val code = ScalaUtils.convertProtobufToScala[CodeLy](data)
-            CodeLy.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeLy(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_MARRY =>
             val code = ScalaUtils.convertProtobufToScala[CodeMarry](data)
-            CodeMarry.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeMarry(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_MZ =>
             val code = ScalaUtils.convertProtobufToScala[CodeMz](data)
-            CodeMz.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeMz(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_RYLX =>
             val code = ScalaUtils.convertProtobufToScala[CodeRylx](data)
-            CodeRylx.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeRylx(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_TSRQ =>
             val code = ScalaUtils.convertProtobufToScala[CodeTsrq](data)
-            CodeTsrq.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeTsrq(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_TSSF =>
             val code = ScalaUtils.convertProtobufToScala[CodeTssf](data)
-            CodeTssf.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeTssf(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_WHCD =>
             val code = ScalaUtils.convertProtobufToScala[CodeWhcd](data)
-            CodeWhcd.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeWhcd(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_XB =>
             val code = ScalaUtils.convertProtobufToScala[CodeXb](data)
-            CodeXb.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeXb(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_ZC =>
             val code = ScalaUtils.convertProtobufToScala[CodeZc](data)
-            CodeZc.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeZc(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_ZJXY =>
             val code = ScalaUtils.convertProtobufToScala[CodeZjxy](data)
-            CodeZjxy.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeZjxy(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case DictType.CODE_ZZMM =>
             val code = ScalaUtils.convertProtobufToScala[CodeZzmm](data)
-            CodeZzmm.create(code.code,code.name,code.deleteFlag,code.ord,code.remark)
+            new CodeZzmm(code.code,code.name,code.deleteFlag,code.ord,code.remark).save()
           case _ =>
             Nil
         }
@@ -105,22 +105,26 @@ class SyncDictServiceImpl(config: HallApiConfig) extends SyncDictService{
       else if(f.hasExtension(GatherType.data)){
         val data = f.getExtension(GatherType.data)
         val o = ScalaUtils.convertProtobufToScala[GafisGatherType](data)
-        GafisGatherType.create(o.pkId,o.typeName,o.deleteFlag,o.createUserId,o.createDatetime,o.updateUserId,o.updateDatetime,o.menuId,o.personCategory,o.gatherCategory,o.parentId,o.ischildren,o.ruleId)
+        o.save()
+        //new GafisGatherType(o.pkId,o.typeName,o.deleteFlag,o.createUserId,o.createDatetime,o.updateUserId,o.updateDatetime,o.menuId,o.personCategory,o.gatherCategory,o.parentId,o.ischildren,o.ruleId).save()
       }
       else if(f.hasExtension(GatherNode.data)){
         val data = f.getExtension(GatherNode.data)
         val o = ScalaUtils.convertProtobufToScala[GafisGatherNode](data)
-        GafisGatherNode.create(o.pkId,o.nodeCode,o.nodeName,o.nodeRequest,o.deleteFlag,o.createUserId,o.createDatetime,o.updateUserId,o.updateDatetime,o.nodeImg)
+        o.save()
+        //new GafisGatherNode(o.pkId,o.nodeCode,o.nodeName,o.nodeRequest,o.deleteFlag,o.createUserId,o.createDatetime,o.updateUserId,o.updateDatetime,o.nodeImg).save()
       }
       else if(f.hasExtension(GatherTypeNodeField.data)){
         val data = f.getExtension(GatherTypeNodeField.data)
         val o = ScalaUtils.convertProtobufToScala[GafisGatherTypeNodeField](data)
-        GafisGatherTypeNodeField.create(o.pkId,o.typeId,o.nodeId,o.fieldId,o.required,o.departId)
+        o.save()
+        //new GafisGatherTypeNodeField(o.pkId,o.typeId,o.nodeId,o.fieldId,o.required,o.departId).save()
       }
       else if(f.hasExtension(Depart.data)){
         val data = f.getExtension(Depart.data)
         val o = ScalaUtils.convertProtobufToScala[SysDepart](data)
-        SysDepart.create(o.code,o.name,o.leader,o.remark,o.deleteFlag,o.isLeaf,o.parentId,o.deptLevel,o.longitude,o.latitude,o.phone,o.longName,o.isHaveChamber,o.chamberType,o.isSpecial,o.integrationType)
+        o.save()
+        //new SysDepart(o.code,o.name,o.leader,o.remark,o.deleteFlag,o.isLeaf,o.parentId,o.deptLevel,o.longitude,o.latitude,o.phone,o.longName,o.isHaveChamber,o.chamberType,o.isSpecial,o.integrationType).save()
       }
     }
 

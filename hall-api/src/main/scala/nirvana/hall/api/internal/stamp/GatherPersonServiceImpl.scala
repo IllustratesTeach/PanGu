@@ -1,14 +1,8 @@
 package nirvana.hall.api.internal.stamp
 
-import java.util.UUID
-import nirvana.hall.api.entities.{GafisGatherTypeNodeField, GafisGatherType, GafisPerson}
+import nirvana.hall.api.jpa.{GafisGatherType, GafisGatherTypeNodeField, GafisPerson}
 import nirvana.hall.api.services.stamp.GatherPersonService
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.springframework.transaction.annotation.Transactional
-import scalikejdbc._
-
-import scala.collection.immutable.HashMap
+import nirvana.hall.orm.services.Relation
 
 import scala.reflect.runtime.universe._
 
@@ -16,16 +10,18 @@ import scala.reflect.runtime.universe._
  * Created by wangjue on 2015/10/27.
  */
 class GatherPersonServiceImpl extends GatherPersonService{
-  val gp = GafisPerson.syntax("gp")
   /**
    * 捺印人员列表
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  override def queryGatherPersonList(start: Integer, limit: Integer) (implicit session: DBSession = GafisPerson.autoSession) : List[GafisPerson] = {
+  override def queryGatherPersonList(start: Integer, limit: Integer)  : Relation[GafisPerson] = {
+    GafisPerson.all.limit(limit).offset(start)
+    /*
     withSQL {
       select.from(GafisPerson as gp).limit(limit).offset(start)
     }.map(GafisPerson(gp)).list.apply()
+    */
   }
 
   /**
@@ -33,7 +29,10 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param personid
    * @param uplaodStatus(0:等待上报;1:正在上报;2:完成上报)
    */
-  override def uploadGatherPerson(personid: String, uplaodStatus: Integer) (implicit session: DBSession = GafisPerson.autoSession): Boolean = {
+  override def uploadGatherPerson(personid: String, uplaodStatus: Integer) : Boolean = {
+    GafisPerson.find_by_personid(personid).update_set(status=uplaodStatus).update()
+    true
+    /*
     try {
       withSQL {update(GafisPerson).set(GafisPerson.column.status -> uplaodStatus).
         where.eq(GafisPerson.column.personid,personid)}.
@@ -42,6 +41,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
     } catch {
       case exception: Exception => false
     }
+    */
   }
 
   /**
@@ -53,7 +53,9 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  override def queryGatherPersonBy(gatherDateStart: String, gatherDateEnd: String, name: String, idCard: String,start: Integer, limit: Integer) (implicit session: DBSession = GafisPerson.autoSession): List[GafisPerson] = {
+  override def queryGatherPersonBy(gatherDateStart: String, gatherDateEnd: String, name: String, idCard: String,start: Integer, limit: Integer) : Relation[GafisPerson] = {
+    GafisPerson.where("name=?1 and idcardno=?2 and gatherDate between ? ?").desc("gatheDate").limit(limit).offset(start)
+    /*
     withSQL {
       select.from(GafisPerson as gp).where.eq(GafisPerson.column.name,name).and.
         eq(GafisPerson.column.idcardno,idCard).and.between(GafisPerson.column.gatherDate,gatherDateStart,gatherDateEnd).
@@ -61,21 +63,22 @@ class GatherPersonServiceImpl extends GatherPersonService{
         limit(limit).
         offset(start)
     }.map(GafisPerson(gp.resultName)).list.apply()
+    */
 
   }
 
   /**
    * 捺印人员高级查询
    */
-  override def queryGatherPersonSeniorBy() (implicit session: DBSession = GafisPerson.autoSession): List[GafisPerson] = ???
+  override def queryGatherPersonSeniorBy() : Relation[GafisPerson] = ???
 
 
   /**
    * 人员采集类型查询
    * @return
    */
-  def queryGatherType() (implicit session: DBSession = GafisGatherType.autoSession) : List[GafisGatherType] = {
-    GafisGatherType.findAll()
+  def queryGatherType() : Relation[GafisGatherType] = {
+    GafisGatherType.all
   }
 
 
@@ -85,8 +88,9 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param gatherTypeId
    * @return
    */
-  def queryGatherTypeNodeFieldBy(gatherTypeId : String) (implicit session: DBSession = GafisGatherTypeNodeField.autoSession) : List[GafisGatherTypeNodeField] = {
-    GafisGatherTypeNodeField.findAllBy(sqls.eq(GafisGatherTypeNodeField.column.typeId,gatherTypeId))
+  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Relation[GafisGatherTypeNodeField] = {
+    GafisGatherTypeNodeField.find_by_typeId(gatherTypeId)
+    //GafisGatherTypeNodeField.findAllBy(sqls.eq(GafisGatherTypeNodeField.column.typeId,gatherTypeId))
   }
 
 
@@ -96,8 +100,8 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @return
    */
   def queryBasePersonInfo(personId : String) : Option[GafisPerson] = {
-    val p = GafisPerson.find(personId)
-    p
+    GafisPerson.find_by_personid(personId).takeOption
+    //Option(GafisPerson.find(personId))
   }
 
   /**
@@ -106,6 +110,8 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @return
    */
   def saveGatherPerson(personInfo : String) : GafisPerson = {
+      throw new UnsupportedOperationException
+    /*
     //构造函数
     val Constructorparams = defineConstructorParameter(personInfo)
     val index = getPropertyIndex("inputtime")
@@ -114,6 +120,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
 
     //println(ga.personid+"---"+ga.name.get)
     val person = createPerson(ga)
+    */
 
     /*updateGatherPerson(personInfo)
     val params = defineConstructorParameter(personInfo)
@@ -125,7 +132,6 @@ class GatherPersonServiceImpl extends GatherPersonService{
     println("创建日期："+parseDateTimeToString(p.inputtime.get))
     println(p.personid+"---------"+p.name.get+"-----"+p.dataSources.get+"-----"+p.gatherFingerNum.get)*/
 
-    person
   }
 
 
@@ -135,15 +141,19 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @return
    */
   def updateGatherPerson(personInfo : String) : GafisPerson = {
+    throw new UnsupportedOperationException
+    /*
     val params = defineConstructorParameter(personInfo)
     val personid = params(0).toString
-    val p = GafisPerson.find(personid).get
+    val p = GafisPerson.find(personid)
     params(getPropertyIndex("inputtime")) = p.inputtime
     params(getPropertyIndex("modifiedtime")) = Some(DateTime.now())
     val ga1 : GafisPerson = reflectObject[GafisPerson](params)
     val person = GafisPerson.save(ga1)
     person
+    */
   }
+  /*
 
 
 
@@ -238,7 +248,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
   }
 
 
-  def createPerson(person : GafisPerson) (implicit session: DBSession = GafisPerson.autoSession) : GafisPerson = {
+  def createPerson(person : GafisPerson)  : GafisPerson = {
     val column = GafisPerson.column
     withSQL {
       insert.into(GafisPerson).columns(
@@ -686,6 +696,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
       contrcaptureCode = person.contrcaptureCode)
 
   }
+  */
 
 
   //反射构造函数赋值

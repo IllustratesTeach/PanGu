@@ -1,12 +1,11 @@
 package nirvana.hall.api.internal.protobuf.sys.stamp
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.entities.GafisGatherFinger
 import nirvana.hall.api.internal.MsgBase64
-import nirvana.hall.api.services.{ProtobufRequestHandler, ProtobufRequestFilter}
 import nirvana.hall.api.services.stamp.GatherFingerPalmService
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.QueryFingerDataProto.{GatherData, QueryFingerDataResponse, QueryFingerDataRequest}
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
+import nirvana.hall.protocol.sys.stamp.QueryFingerDataProto.{GatherData, QueryFingerDataRequest, QueryFingerDataResponse}
 
 /**
  * Created by wangjue on 2015/11/18.
@@ -19,14 +18,14 @@ class QueryFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmServic
     if (protobufRequest.hasExtension(QueryFingerDataRequest.cmd)) {
       val request = protobufRequest.getExtension(QueryFingerDataRequest.cmd)
       val builder = QueryFingerDataResponse.newBuilder()
-      val fingerDatas : List[GafisGatherFinger] = gatherFingerPalmService.queryFingerDataByPersonId(request.getPersonId)
+      val fingerDatas = gatherFingerPalmService.queryFingerDataByPersonId(request.getPersonId)
       val data = GatherData.newBuilder()
       if (fingerDatas.size > 0) {
         for (finger <- fingerDatas) {
           data.setGatherFgp(finger.fgp)
-          data.setGatherFgpCase(finger.fgpCase.get.toInt)
+          data.setGatherFgpCase(finger.fgpCase.toInt)
           data.setLobtype(finger.lobtype)
-          data.setGroupId(finger.groupId.get.toInt)
+          data.setGroupId(finger.groupId.toInt)
           val byte = finger.gatherData.getBytes(0,finger.gatherData.length().toInt)
           val gatherData = MsgBase64.toBase64(byte)
           data.setGatherData(gatherData)

@@ -1,13 +1,13 @@
 package nirvana.hall.api.internal.stamp
 
 import java.util
+import java.util.Date
 import javax.sql.rowset.serial.SerialBlob
 
-import nirvana.hall.api.entities.{GafisGatherPalm, GafisGatherFinger}
 import nirvana.hall.api.internal.AnalysisData
+import nirvana.hall.api.jpa.{GafisGatherFinger, GafisGatherPalm}
 import nirvana.hall.api.services.stamp.GatherFingerPalmService
-import org.joda.time.DateTime
-import scalikejdbc._
+import nirvana.hall.orm.services.Relation
 
 /**
  * Created by wangjue on 2015/10/27.
@@ -20,8 +20,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param session
    * @return
    */
-  override def queryFingerInfoByPersonId(personId : String)(implicit session: DBSession = GafisGatherFinger.autoSession) : List[GafisGatherFinger] = {
-    GafisGatherFinger.findAllBy(sqls.eq(GafisGatherFinger.column.personId,personId))
+  override def queryFingerInfoByPersonId(personId : String): Relation[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId(personId)
   }
 
   /**
@@ -30,8 +30,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param session
    * @return
    */
-  override def queryFingerDataByPersonId(personId: String)(implicit session: DBSession): List[GafisGatherFinger] = {
-    GafisGatherFinger.findAllBy(sqls.eq(GafisGatherFinger.column.personId,personId).and.eq(GafisGatherFinger.column.lobtype,1).orderBy(GafisGatherFinger.column.fgp))
+  override def queryFingerDataByPersonId(personId: String): Relation[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId_and_lobtype(personId,1).asc("fgp")
   }
 
   /**
@@ -39,8 +39,9 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @param groupId
    */
-  override def queryFingerInfoBy(personId: String, groupId: Short) (implicit session: DBSession = GafisGatherFinger.autoSession) : List[GafisGatherFinger] = {
-    GafisGatherFinger.findAllBy(sqls.eq(GafisGatherFinger.column.personId,personId).and.eq(GafisGatherFinger.column.groupId,groupId))
+  override def queryFingerInfoBy(personId: String, groupId: Short)  : Relation[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId_and_groupId(personId,groupId)
+    //GafisGatherFinger.findAllBy(sqls.eq(GafisGatherFinger.column.personId,personId).and.eq(GafisGatherFinger.column.groupId,groupId))
   }
 
   /**
@@ -48,15 +49,16 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @param groupId
    */
-  override def queryPalmInfoBy(personId: String, groupId: Short) (implicit session: DBSession = GafisGatherPalm.autoSession) : List[GafisGatherPalm] = {
-    GafisGatherPalm.findAllBy(sqls.eq(GafisGatherPalm.column.personId,personId).and.eq(GafisGatherPalm.column.groupId,groupId))
+  override def queryPalmInfoBy(personId: String, groupId: Short)  : Relation[GafisGatherPalm] = {
+    GafisGatherPalm.find_by_personId_and_groupId(personId,groupId)
+    //GafisGatherPalm.findAllBy(sqls.eq(GafisGatherPalm.column.personId,personId).and.eq(GafisGatherPalm.column.groupId,groupId))
   }
 
   /**
    * 指掌纹添加
    * @param fingerPalmData
    */
-  override def addFingerPalmData(fingerPalmData: String,personId: String) (implicit session: DBSession) : String = {
+  override def addFingerPalmData(fingerPalmData: String,personId: String) : String = {
     val listData : util.List[util.HashMap[_, _]] = AnalysisData.analysisFinger(fingerPalmData);
     deleteFingerPalmData(personId);//采集指纹数据前删除旧数据
     for (v <- 0 to listData.size()-1) {
@@ -67,11 +69,29 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
       val groupId = map.get("groupId").toString
       val lobType = map.get("lobType").toString
       val gatherData : SerialBlob = map.get("gatherData").asInstanceOf[SerialBlob]
-      GafisGatherFinger.create(pkId,Some(personId),fgp.toShort,Some(groupId.toShort),lobType.toShort,None,
+      val finger = new GafisGatherFinger()
+        finger.pkId = pkId
+        finger.fgp = fgp.toShort
+        finger.lobtype = lobType.toShort
+        finger.inputtime = new Date()
+      finger.fgpCase = fgpCase
+      finger.groupId = groupId.toShort
+
+      //pkId,fgp.toShort,lobType.toShort,new Date(),new Date())
+
+      //gatherData 的二进制blob需要进行处理
+      if(2 >1)
+        throw new UnsupportedOperationException
+
+        finger
+
+        /*
+      new GafisGatherFinger(pkId,Some(personId),fgp.toShort,Some(groupId.toShort),lobType.toShort,None,
             DateTime.now(),None,Some(DateTime.now()),Some(fgpCase),None,None,None,None,gatherData,None,None,None)
+            */
     }
 
-    val info : List[GafisGatherFinger] = queryFingerInfoByPersonId(personId)
+    val info = queryFingerInfoByPersonId(personId)
 
     "success"
   }
@@ -80,7 +100,7 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * 删除指掌纹
    * @param person
    */
-  override def deleteFingerPalmData(person: String) (implicit session: DBSession) : Boolean = {
+  override def deleteFingerPalmData(person: String)  : Boolean = {
     try {
       deleteFingerData(person)
       true
@@ -89,12 +109,14 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
     }
   }
 
-  def deleteFingerData(personId: String) (implicit session: DBSession) = {
-    withSQL { delete.from(GafisGatherFinger).where.eq(GafisGatherFinger.column.personId, personId) }.update.apply()
+  def deleteFingerData(personId: String)  = {
+    GafisGatherFinger.find_by_personId(personId).delete()
+    //withSQL { delete.from(GafisGatherFinger).where.eq(GafisGatherFinger.column.personId, personId) }.update.apply()
   }
 
-  def deletePalmData(personId: String) (implicit session: DBSession) = {
-    withSQL { delete.from(GafisGatherPalm).where.eq(GafisGatherPalm.column.personId, personId) }.update.apply()
+  def deletePalmData(personId: String)  = {
+    GafisGatherPalm.find_by_personId(personId).delete()
+    //withSQL { delete.from(GafisGatherPalm).where.eq(GafisGatherPalm.column.personId, personId) }.update.apply()
   }
 
 

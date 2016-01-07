@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal.sync
 
-import nirvana.hall.api.entities.{GafisCaseFinger, GafisCase, SyncQueue}
+import nirvana.hall.api.jpa.{GafisCaseFinger, GafisCase, SyncQueue}
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
@@ -19,9 +19,9 @@ trait Sync7to6CaseService {
    * @param session
    * @return
    */
-  def syncCase(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
-    val caseId = syncQueue.uploadKeyid.get
-    syncQueue.opration.get match {
+  def syncCase(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue): Unit = {
+    val caseId = syncQueue.uploadKeyid
+    syncQueue.opration match {
       case "insert" =>
         addCase(facade, v62Config, caseId)
       case "update" =>
@@ -31,31 +31,35 @@ trait Sync7to6CaseService {
     }
   }
 
-  private def addCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+  private def addCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
     val caseInfo = getCase(caseId)
     val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
     facade.NET_GAFIS_CASE_Add(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
   }
-  private def updateCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+  private def updateCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
     val caseInfo = getCase(caseId)
     val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
     facade.NET_GAFIS_CASE_Update(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
   }
-  private def deleteCase(facade: V62Facade, v62Config: HallV62Config, caseId: String)(implicit session: DBSession): Unit ={
+  private def deleteCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
     facade.NET_GAFIS_CASE_Del(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort,
       if(caseId.indexOf("A") == 0) caseId.substring(1) else caseId)
   }
 
-  private def getCase(caseId: String)(implicit session: DBSession): Case = {
+  private def getCase(caseId: String): Case = {
     val caseBuilder = Case.newBuilder()
-    val caseInfo = GafisCase.find(caseId).get
+    val caseInfo = GafisCase.find(caseId)
     caseBuilder.setStrCaseID(caseId)
 
     val textBuilder = caseBuilder.getTextBuilder
-    caseInfo.caseClassCode.foreach(textBuilder.setStrCaseType1)
-    caseInfo.caseOccurDate.foreach(f => textBuilder.setStrCaseOccurDate(f))
-    caseInfo.caseOccurPlaceCode.foreach(textBuilder.setStrCaseOccurPlaceCode)
-    caseInfo.caseOccurPlaceDetail.foreach(textBuilder.setStrCaseOccurPlace)
+    textBuilder.setStrCaseType1(caseInfo.caseClassCode)
+    textBuilder.setStrCaseOccurDate(caseInfo.caseOccurDate.toString)
+    textBuilder.setStrCaseOccurPlaceCode(caseInfo.caseOccurPlaceCode)
+    textBuilder.setStrCaseOccurPlace(caseInfo.caseOccurPlaceDetail)
+
+    if(2>1) //TODO 修正注释代码的问题
+      throw new UnsupportedOperationException
+    /*
     caseInfo.remark.foreach(textBuilder.setStrComment)
     caseInfo.isMurder.foreach(f => textBuilder.setBPersonKilled("1".equals(f)))
     caseInfo.amount.foreach(textBuilder.setStrMoneyLost)
@@ -73,14 +77,18 @@ trait Sync7to6CaseService {
     caseInfo.caseState.foreach(f => textBuilder.setNCaseState(f))
 
     findCaseFingerIdsListByCaseId(caseId).foreach(caseBuilder.addStrFingerID)
+    */
 
     caseBuilder.build()
   }
 
-  private def findCaseFingerIdsListByCaseId(caseId: String)(implicit session: DBSession): Seq[String] = {
+  private def findCaseFingerIdsListByCaseId(caseId: String): Seq[String] = {
+      throw new UnsupportedOperationException
+    /*
     val fingerIds = ArrayBuffer[String]()
     SQL("select finger_id from " + GafisCaseFinger.tableName + " where case_id=? and deletag='1'").bind(caseId).foreach(rs => fingerIds += rs.string(1))
     fingerIds.toSeq
+    */
   }
 
 }

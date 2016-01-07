@@ -1,15 +1,12 @@
 package nirvana.hall.api.internal.protobuf.sys.stamp
 
-import java.io.PrintWriter
-
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.entities.GafisGatherPortrait
-import nirvana.hall.api.internal.{MsgBase64, ScalaUtils}
-import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.api.internal.MsgBase64
+import nirvana.hall.api.jpa.GafisGatherPortrait
 import nirvana.hall.api.services.stamp.GatherPortraitService
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.QueryPortraitProto.{PortraitInfo, QueryPortraitResponse, QueryPortraitRequest}
-import scalikejdbc._
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
+import nirvana.hall.protocol.sys.stamp.QueryPortraitProto.{PortraitInfo, QueryPortraitRequest, QueryPortraitResponse}
 
 /**
  * Created by wangjue on 2015/11/13.
@@ -23,11 +20,11 @@ class QueryPortraitRequestFilter (gatherPortraitService : GatherPortraitService)
       val request = protobufRequest.getExtension(QueryPortraitRequest.cmd)
       val personId = request.getPersonId
       val builder = QueryPortraitResponse.newBuilder()
-      val portraits : List[GafisGatherPortrait] = GafisGatherPortrait.findAllBy(sqls.eq(GafisGatherPortrait.column.personid,personId))
+      val portraits  = GafisGatherPortrait.find_by_personid(personId)
       val b = PortraitInfo.newBuilder()
       if (portraits.size > 0) {
         for (p <- portraits) {
-          b.setPersonid(p.personid.get)
+          b.setPersonid(p.personid)
           b.setFgp(p.fgp)
           val byte = p.gatherData.getBytes(129,p.gatherData.length().toInt)
           val data = MsgBase64.toBase64(byte)

@@ -1,6 +1,6 @@
 package nirvana.hall.api.services.sync
 
-import nirvana.hall.api.entities.SyncQueue
+import nirvana.hall.api.jpa.SyncQueue
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession

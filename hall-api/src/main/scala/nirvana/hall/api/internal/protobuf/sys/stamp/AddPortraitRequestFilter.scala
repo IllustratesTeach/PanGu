@@ -1,12 +1,10 @@
 package nirvana.hall.api.internal.protobuf.sys.stamp
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.entities.GafisGatherPortrait
-import nirvana.hall.api.services.{ProtobufRequestHandler, ProtobufRequestFilter}
-import nirvana.hall.api.services.stamp.{GatherPortraitService, GatherPersonService}
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.SavePortraitProto.{SavePortraitResponse, SavePortraitRequest}
-import scalikejdbc._
+import nirvana.hall.api.services.stamp.GatherPortraitService
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
+import nirvana.hall.protocol.sys.stamp.SavePortraitProto.{SavePortraitRequest, SavePortraitResponse}
 
 /**
  * Created by wangjue on 2015/11/13.

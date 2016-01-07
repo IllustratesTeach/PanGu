@@ -1,7 +1,9 @@
 package nirvana.hall.api.internal.query
 
+import java.util.Date
+
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.entities.{GafisQuery7to6, GafisNormalqueryQueryque}
+import nirvana.hall.api.jpa.{GafisNormalqueryQueryque, GafisQuery7to6}
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.api.services.query.Query7to6Service
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
@@ -12,7 +14,6 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
@@ -51,10 +52,13 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
    */
   @Transactional
   override def getMatchTask(implicit session: DBSession): Option[MatchTask] ={
+    val query = GafisNormalqueryQueryque.where("status=0 and syncTargetSid not null").desc("priority").asc("oraSid").takeOption
+    /*
     val query = GafisNormalqueryQueryque.findAllBy(
       sqls.eq(GafisNormalqueryQueryque.gnq.status, 0)
         .and.isNotNull(GafisNormalqueryQueryque.gnq.syncTargetSid)
         .orderBy(GafisNormalqueryQueryque.gnq.priority desc,GafisNormalqueryQueryque.gnq.oraSid)).headOption
+        */
 
     query.foreach(updateGafisNormalqueryQueryqueStatusMatching)
 
@@ -68,19 +72,24 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
    * @return
    */
   private def updateGafisNormalqueryQueryqueStatusMatching(queryque: GafisNormalqueryQueryque)(implicit session: DBSession): Unit ={
+    queryque.status = STATUS_MATCHING.toShort
+    queryque.begintime = new Date()
+    queryque.save()
+    /*
     withSQL{
       val column = GafisNormalqueryQueryque.column
       update(GafisNormalqueryQueryque).set(column.status -> STATUS_MATCHING, column.begintime -> new DateTime()).where.eq(column.pkId, queryque.pkId)
     }.update().apply()
+    */
   }
 
   private def convertGafisNormalqueryQueryque2MatchTask(query: GafisNormalqueryQueryque): MatchTask = {
     val matchTask = MatchTask.newBuilder()
-    matchTask.setMatchId(query.keyid.get)
-    matchTask.setMatchType(MatchType.valueOf(query.querytype.get+1))
-    matchTask.setObjectId(query.oraSid.get)//必填项，现在用于存放oraSid
-    matchTask.setPriority(query.priority.get)
-    matchTask.setScoreThreshold(query.minscore.get)
+    matchTask.setMatchId(query.keyid)
+    matchTask.setMatchType(MatchType.valueOf(query.querytype+1))
+    matchTask.setObjectId(query.oraSid)//必填项，现在用于存放oraSid
+    matchTask.setPriority(query.priority.toInt)
+    matchTask.setScoreThreshold(query.minscore)
 
     matchTask.build()
   }
@@ -106,7 +115,7 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
 
     //记录6.2的查询SID
     retval.foreach{ ret =>
-      GafisQuery7to6.create(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID))
+      new GafisQuery7to6(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID)).save()
     }
   }
 

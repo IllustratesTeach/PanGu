@@ -39,6 +39,14 @@ class CodeRylx extends ActiveRecord {
     this.code = code
   }
 
+  def this(code: java.lang.String, name: java.lang.String, deleteFlag: java.lang.String, ord: java.lang.Long, remark: java.lang.String) {
+    this()
+    this.code = code
+    this.name = name
+    this.deleteFlag = deleteFlag
+    this.ord = ord
+    this.remark = remark
+  }
   def this(code: java.lang.String, name: java.lang.String, deleteFlag: java.lang.String, ord: java.lang.Long, remark: java.lang.String, strtype: java.lang.String) {
     this()
     this.code = code

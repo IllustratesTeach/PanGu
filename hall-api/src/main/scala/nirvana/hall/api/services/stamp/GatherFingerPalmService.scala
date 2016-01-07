@@ -1,7 +1,8 @@
 package nirvana.hall.api.services.stamp
 
-import nirvana.hall.api.entities.{GafisGatherPalm, GafisGatherFinger, SysUser}
+import nirvana.hall.api.jpa.{GafisGatherFinger, GafisGatherPalm}
 import nirvana.hall.api.services.AutoSpringDataSourceSession
+import nirvana.hall.orm.services.Relation
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc.DBSession
 
@@ -17,7 +18,7 @@ trait GatherFingerPalmService {
    * @param session
    * @return
    */
-  def queryFingerInfoByPersonId(personId : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherFinger]
+  def queryFingerInfoByPersonId(personId : String) : Relation[GafisGatherFinger]
 
   /**
    * 查询指纹图像数据
@@ -25,7 +26,7 @@ trait GatherFingerPalmService {
    * @param session
    * @return
    */
-  def queryFingerDataByPersonId(personId : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherFinger]
+  def queryFingerDataByPersonId(personId : String)  : Relation[GafisGatherFinger]
 
 
   /**
@@ -33,7 +34,7 @@ trait GatherFingerPalmService {
    * @param personId
    * @param groupId
    */
-  def queryFingerInfoBy(personId : String,groupId : Short)  (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherFinger]
+  def queryFingerInfoBy(personId : String,groupId : Short)   : Relation[GafisGatherFinger]
 
 
   /**
@@ -41,7 +42,7 @@ trait GatherFingerPalmService {
    * @param personId
    * @param groupId
    */
-  def queryPalmInfoBy(personId : String,groupId : Short) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherPalm]
+  def queryPalmInfoBy(personId : String,groupId : Short)  : Relation[GafisGatherPalm]
 
 
   /**
@@ -49,7 +50,7 @@ trait GatherFingerPalmService {
    * @param fingerPalmData
    */
   @Transactional
-  def addFingerPalmData(fingerPalmData : String,personId: String)  (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : String
+  def addFingerPalmData(fingerPalmData : String,personId: String)   : String
 
 
   /**
@@ -57,7 +58,7 @@ trait GatherFingerPalmService {
    * @param person
    */
   @Transactional
-  def deleteFingerPalmData(person : String)  (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : Boolean
+  def deleteFingerPalmData(person : String)   : Boolean
 
 
 

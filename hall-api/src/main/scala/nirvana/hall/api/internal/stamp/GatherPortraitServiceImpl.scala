@@ -1,30 +1,28 @@
 package nirvana.hall.api.internal.stamp
 
 import java.util
-import java.util.UUID
+import java.util.{Date, UUID}
 import javax.sql.rowset.serial.SerialBlob
-import nirvana.hall.api.entities.{GafisGatherPortrait}
-import nirvana.hall.api.internal.{AnalysisData}
+
+import nirvana.hall.api.internal.AnalysisData
+import nirvana.hall.api.jpa.GafisGatherPortrait
 import nirvana.hall.api.services.stamp.GatherPortraitService
+import nirvana.hall.orm.services.Relation
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import scalikejdbc._
 
 
 /**
  * Created by wangjue on 2015/10/27.
  */
 class GatherPortraitServiceImpl extends GatherPortraitService{
-  val gpt = GafisGatherPortrait.syntax("gpt")
   /**
    * 人像信息查询
    * @param person
    * @return
    */
-  override def queryGatherPortrait(person: String) (implicit session: DBSession = GafisGatherPortrait.autoSession) : List[GafisGatherPortrait] = {
-    withSQL {
-      select.from(GafisGatherPortrait as gpt).where.eq(GafisGatherPortrait.column.personid,person)
-    }.map(GafisGatherPortrait(gpt.resultName)).list.apply()
+  override def queryGatherPortrait(person: String)  : Relation[GafisGatherPortrait] = {
+    GafisGatherPortrait.find_by_personid(person)
   }
 
 
@@ -34,17 +32,22 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @param gafisGatherPortrait
    * @return
    */
-  override def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait) (implicit session: DBSession = GafisGatherPortrait.autoSession) : Boolean = {
+  override def addGatherPortrait(gafisGatherPortrait: GafisGatherPortrait)  : Boolean = {
+    gafisGatherPortrait.pkId = UUID.randomUUID().toString.replace("-","")
+    gafisGatherPortrait.save()
+    true
+    /*
     try {
 
-      GafisGatherPortrait.create(UUID.randomUUID().toString.replace("-",""),gafisGatherPortrait.personid,
+      new GafisGatherPortrait(UUID.randomUUID().toString.replace("-",""),gafisGatherPortrait.personid,
           gafisGatherPortrait.fgp,gafisGatherPortrait.gatherData,gafisGatherPortrait.inputpsn,
-            new DateTime(),gafisGatherPortrait.modifiedpsn,Some(new DateTime()),
+            new DateTime(),gafisGatherPortrait.modifiedpsn,new DateTime()),
               gafisGatherPortrait.deletag,gafisGatherPortrait.gatherdatanosqlid)
       true
     } catch {
       case exception: Exception => false
     }
+    */
 
   }
 
@@ -54,7 +57,10 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @param session
    * @return
    */
-  override def deleteGatherPortrait(personid: String)(implicit session: DBSession): Boolean = {
+  override def deleteGatherPortrait(personid: String): Boolean = {
+    GafisGatherPortrait.find_by_personid(personid).delete()
+    true
+    /*
     try {
       withSQL {
         delete.from(GafisGatherPortrait).where.eq(GafisGatherPortrait.column.personid,personid)
@@ -63,6 +69,7 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
     } catch {
       case exception: Exception => false
     }
+    */
   }
 
   /**
@@ -72,7 +79,7 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @param session
    * @return
    */
-  override def analysisGatherPortrait(personId: String, faceData: String)(implicit session: DBSession): String = {
+  override def analysisGatherPortrait(personId: String, faceData: String): String = {
     val listData : util.List[util.HashMap[_, _]] = AnalysisData.analysisPortrait(faceData)
     deleteGatherPortrait(personId);//保存前删除人像
     for (v <- 0 to listData.size()-1) {
@@ -81,7 +88,15 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
       val fgp  = map.get("fgp").toString
       val gatherData : SerialBlob = map.get("gatherData").asInstanceOf[SerialBlob]
       val inputTime = DateTime.now()
-      GafisGatherPortrait.create(pkId,Some(personId),fgp,gatherData,None,inputTime,None,None,Some("1"),None)
+      val portrait = new GafisGatherPortrait()
+      portrait.pkId = pkId
+      portrait.personid = personId
+      portrait.fgp = fgp
+      portrait.gatherData = gatherData
+      portrait.inputtime = new Date()
+      portrait.deletag = "1"
+      portrait.save()
+      //GafisGatherPortrait.create(pkId,Some(personId),fgp,gatherData,None,inputTime,None,None,Some("1"),None)
     }
 
     /*val portraits : List[GafisGatherPortrait] = GafisGatherPortrait.findAllBy(sqls.eq(GafisGatherPortrait.column.personid,personId))

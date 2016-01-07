@@ -1,9 +1,8 @@
 package nirvana.hall.api.services.stamp
 
-import nirvana.hall.api.entities.{GafisGatherTypeNodeField, GafisGatherType, GafisPerson}
-import nirvana.hall.api.services.AutoSpringDataSourceSession
+import nirvana.hall.api.jpa.{GafisGatherType, GafisGatherTypeNodeField, GafisPerson}
+import nirvana.hall.orm.services.Relation
 import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.DBSession
 
 /**
  * 人员信息
@@ -17,7 +16,7 @@ trait GatherPersonService {
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  def queryGatherPersonList(start : Integer,limit : Integer) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisPerson]
+  def queryGatherPersonList(start : Integer,limit : Integer)  : Relation[GafisPerson]
 
 
   /**
@@ -27,12 +26,12 @@ trait GatherPersonService {
    * @param name  姓名
    * @param idCard  身份证号
    */
-  def queryGatherPersonBy(gatherDateStart: String,gatherDateEnd:String,name:String,idCard:String,start: Integer, limit: Integer) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisPerson]
+  def queryGatherPersonBy(gatherDateStart: String,gatherDateEnd:String,name:String,idCard:String,start: Integer, limit: Integer)  : Relation[GafisPerson]
 
   /**
    * 捺印人员高级查询
    */
-  def queryGatherPersonSeniorBy() (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisPerson]
+  def queryGatherPersonSeniorBy()  : Relation[GafisPerson]
 
 
   /**
@@ -41,14 +40,14 @@ trait GatherPersonService {
    * @param uplaodStatus(0:等待上报;1:正在上报;2:完成上报)
    */
   @Transactional
-  def uploadGatherPerson(personid : String,uplaodStatus : Integer) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : Boolean
+  def uploadGatherPerson(personid : String,uplaodStatus : Integer)  : Boolean
 
 
   /**
    * 人员采集类型查询
    * @return
    */
-  def queryGatherType() (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherType]
+  def queryGatherType()  : Relation[GafisGatherType]
 
 
   /**
@@ -56,7 +55,7 @@ trait GatherPersonService {
    * @param gatherTypeId
    * @return
    */
-  def queryGatherTypeNodeFieldBy(gatherTypeId : String) (implicit session: DBSession = AutoSpringDataSourceSession.apply()) : List[GafisGatherTypeNodeField]
+  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Relation[GafisGatherTypeNodeField]
 
 
   /**
