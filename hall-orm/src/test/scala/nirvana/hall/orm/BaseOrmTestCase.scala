@@ -5,12 +5,10 @@ import javax.persistence._
 import javax.sql.DataSource
 
 import nirvana.hall.orm.config.{HallOrmConfigSupport, JpaProperty}
-import nirvana.hall.orm.services.{ActiveRecordInstance, ActiveRecord}
+import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.Before
 import org.springframework.jdbc.datasource.DriverManagerDataSource
-import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
-import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.FileSystemUtils
 
 import scala.reflect.{ClassTag, classTag}
@@ -33,15 +31,19 @@ class BaseOrmTestCase {
       "nirvana.hall.orm.TestDataModule").map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
     //OpenSession In Thread
+    /*
     val entityManagerFactory= getService[EntityManagerFactory]
     val em = getService[EntityManager]
     val emHolder= new EntityManagerHolder(em)
     TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
+    */
   }
   def down: Unit ={
+    /*
     val emf: EntityManagerFactory = registry.getService(classOf[EntityManagerFactory])
     val emHolder: EntityManagerHolder = TransactionSynchronizationManager.unbindResource(emf).asInstanceOf[EntityManagerHolder]
     EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager)
+    */
 
     registry.shutdown()
   }

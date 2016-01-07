@@ -13,7 +13,7 @@ import org.apache.tapestry5.ioc.services.{PerthreadManager, ThreadCleanupListene
 import org.apache.tapestry5.ioc.{ObjectLocator, MethodAdviceReceiver, ScopeConstants, ServiceBinder}
 import org.slf4j.Logger
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
-import org.springframework.orm.jpa.{JpaTransactionManager, LocalContainerEntityManagerFactoryBean}
+import org.springframework.orm.jpa.{EntityManagerFactoryUtils, JpaTransactionManager, LocalContainerEntityManagerFactoryBean}
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.{AnnotationTransactionAttributeSource, Transactional}
 import org.springframework.transaction.interceptor.TransactionInterceptor
@@ -61,14 +61,20 @@ object HallOrmModule {
 
     perthreadManager.addThreadCleanupListener(new ThreadCleanupListener() {
       override def threadDidCleanup() {
-        if (manager.isOpen) manager.close()
+        EntityManagerFactoryUtils.closeEntityManager(manager)
+        //if (manager.isOpen) manager.close()
       }
     })
     manager
   }
   @EagerLoad
-  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,objectLocator:ObjectLocator):PlatformTransactionManager={
-    val transactionManager = new JpaTransactionManager()
+  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,objectLocator:ObjectLocator,@Local entityManager: EntityManager):PlatformTransactionManager={
+    val transactionManager = new JpaTransactionManager(){
+      override def createEntityManagerForTransaction(): EntityManager = {
+        //super.createEntityManagerForTransaction()
+        entityManager
+      }
+    }
     transactionManager.setEntityManagerFactory(entityManagerFactory)
     transactionManager.afterPropertiesSet()
 
