@@ -1,5 +1,7 @@
 package nirvana.hall.orm.services
 
+import java.util.Date
+
 import nirvana.hall.orm.{BaseOrmTestCase, ModelA}
 import org.junit.{Assert, Test}
 
@@ -57,5 +59,18 @@ class ActiveRecordTest extends BaseOrmTestCase{
 
     ModelA.where("name=?1","asdf").update_set(name="asdf").update()
     ModelA.where("name=?1","asdf").delete()
+  }
+  @Test
+  def test_lob: Unit ={
+    val modelA = new ModelA()
+    modelA.clob= Range(1,10000).mkString(",")
+    modelA.blob= Range(1,10000).mkString(",").getBytes()
+    modelA.save()
+  }
+  @Test
+  def test_date: Unit ={
+    val modelA = new ModelA()
+    modelA.date = new Date()
+    modelA.save()
   }
 }

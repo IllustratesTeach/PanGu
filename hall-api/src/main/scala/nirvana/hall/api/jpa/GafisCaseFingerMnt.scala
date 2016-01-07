@@ -4,7 +4,7 @@ package nirvana.hall.api.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
+import javax.persistence._
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -26,10 +26,12 @@ class GafisCaseFingerMnt extends ActiveRecord {
   var fingerId: java.lang.String = _
   @Column(name = "CAPTURE_METHOD", length = 1)
   var captureMethod: java.lang.String = _
+  @Lob
   @Column(name = "FINGER_MNT")
-  var fingerMnt: java.sql.Blob = _
+  var fingerMnt: Array[Byte] = _
+  @Lob
   @Column(name = "FINGER_RIDGE")
-  var fingerRidge: java.sql.Blob = _
+  var fingerRidge: Array[Byte] = _
   @Column(name = "IS_MAIN_MNT", length = 1)
   var isMainMnt: java.lang.String = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -55,7 +57,7 @@ class GafisCaseFingerMnt extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, fingerId: java.lang.String, captureMethod: java.lang.String, fingerMnt: java.sql.Blob, fingerRidge: java.sql.Blob, isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, fingerMntNosqlId: java.lang.String, fingerRidgeNosqlId: java.lang.String) {
+  def this(pkId: java.lang.String, fingerId: java.lang.String, captureMethod: java.lang.String, fingerMnt: Array[Byte], fingerRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, fingerMntNosqlId: java.lang.String, fingerRidgeNosqlId: java.lang.String) {
     this()
     this.pkId = pkId
     this.fingerId = fingerId

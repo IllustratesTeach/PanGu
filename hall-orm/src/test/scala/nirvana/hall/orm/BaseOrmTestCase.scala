@@ -7,7 +7,7 @@ import javax.sql.DataSource
 import nirvana.hall.orm.config.{HallOrmConfigSupport, JpaProperty}
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
-import org.junit.Before
+import org.junit.{After, Before}
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -38,6 +38,7 @@ class BaseOrmTestCase {
     val emHolder= new EntityManagerHolder(em)
     TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
   }
+  @After
   def down: Unit ={
     val emf: EntityManagerFactory = registry.getService(classOf[EntityManagerFactory])
     val emHolder: EntityManagerHolder = TransactionSynchronizationManager.unbindResource(emf).asInstanceOf[EntityManagerHolder]
@@ -57,6 +58,15 @@ class ModelA extends ActiveRecord{
   @Column(name = "id")
   var id:Int = _
   var name:String = _
+  @Lob
+  @Column(length=100000)
+  var clob:String = _
+  @Lob
+  @Column(length=100000)
+  var blob:Array[Byte] = _
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "CASE_OCCUR_DATE", length = 23)
+  var date:java.util.Date = _
 }
 object TestDataModule{
   def buildDataSource: DataSource ={

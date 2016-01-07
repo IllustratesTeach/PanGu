@@ -4,7 +4,7 @@ package nirvana.hall.api.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
+import javax.persistence._
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -48,10 +48,12 @@ class GafisCaseFinger extends ActiveRecord {
   var thanStatus: java.lang.String = _
   @Column(name = "IS_ASSIST", length = 1)
   var isAssist: java.lang.String = _
+  @Lob
   @Column(name = "FINGER_IMG")
-  var fingerImg: java.sql.Blob = _
+  var fingerImg: Array[Byte] = _
+  @Lob
   @Column(name = "FINGER_CPR")
-  var fingerCpr: java.sql.Blob = _
+  var fingerCpr: Array[Byte] = _
   @Column(name = "LT_COUNT")
   var ltCount: java.lang.Long = _
   @Column(name = "LL_COUNT")
@@ -113,7 +115,7 @@ class GafisCaseFinger extends ActiveRecord {
     this.fingerId = fingerId
   }
 
-  def this(fingerId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgpGroup: java.lang.Short, fgp: java.lang.String, ridgeColor: java.lang.String, pattern: java.lang.String, mittensBegNo: java.lang.String, mittensEndNo: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, fingerImg: java.sql.Blob, fingerCpr: java.sql.Blob, ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, fingerCprNosqlId: java.lang.String, fingerImgNosqlId: java.lang.String, seq: java.lang.Long) {
+  def this(fingerId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgpGroup: java.lang.Short, fgp: java.lang.String, ridgeColor: java.lang.String, pattern: java.lang.String, mittensBegNo: java.lang.String, mittensEndNo: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, fingerImg: Array[Byte], fingerCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, fingerCprNosqlId: java.lang.String, fingerImgNosqlId: java.lang.String, seq: java.lang.Long) {
     this()
     this.fingerId = fingerId
     this.seqNo = seqNo
