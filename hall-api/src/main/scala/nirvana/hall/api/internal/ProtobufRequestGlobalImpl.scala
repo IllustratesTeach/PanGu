@@ -1,12 +1,11 @@
 package nirvana.hall.api.internal
 
 import monad.support.services.MonadException
-import nirvana.hall.api.entities.{SysUser, OnlineUser}
+import nirvana.hall.api.jpa.{OnlineUser, SysUser}
 import nirvana.hall.api.services.{AuthService, HallExceptionCode, ProtobufRequestGlobal}
 import org.apache.tapestry5.ioc.ScopeConstants
 import org.apache.tapestry5.ioc.annotations.Scope
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
-import scalikejdbc._
 
 /**
  * protobuf request global holder
@@ -26,7 +25,7 @@ class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufReques
       _onlineUser = authService.refreshToken(token)
       _onlineUser match {
         case Some(ou) =>
-          _currentUser = SysUser.findBy(sqls.eq(SysUser.column.loginName, ou.login))
+          _currentUser = SysUser.find_by_loginName(ou.login).takeOption
         case None =>
         //do nothing
       }

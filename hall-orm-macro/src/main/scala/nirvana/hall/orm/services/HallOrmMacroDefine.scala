@@ -28,8 +28,7 @@ object HallOrmMacroDefine {
     val paramsTree = params.map(_.tree).toList
     findMethod.toString.trim match{
       case find_by_pattern(attributes) =>
-        val clazzName = c.weakTypeOf[E]
-        var ql = "from "+clazzName+" where 1=1"
+        var ql = ""
         //find class field
         val expectedNames =  c.weakTypeOf[E].members
           .filter(_.isTerm)
@@ -45,6 +44,9 @@ object HallOrmMacroDefine {
             c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${attr} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
           }
         }
+
+        if(ql.length>0)
+          ql = "1=1"+ql
         val qlTree = Literal(Constant(ql))
 
         c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),paramsTree))
@@ -85,6 +87,8 @@ object HallOrmMacroDefine {
     methodName match{
       case "order" | "order_by" =>
         c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalOrder")), trees))
+      case "update_set"=>
+        c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalUpdate")), trees))
       case other=>
         c.error(c.enclosingPosition, s"${other} unsupported.")
         c.Expr[R](Literal(Constant(Nil)))
@@ -96,7 +100,7 @@ object HallOrmMacroDefine {
     import c.universe._
 
     val clazzName = c.weakTypeOf[E]
-    var ql = "from "+clazzName+" where 1=1"
+    var ql = ""
 
     val Literal(Constant(methodName:String)) = name.tree
     //find class field
@@ -122,6 +126,9 @@ object HallOrmMacroDefine {
       case other =>
           c.error(c.enclosingPosition, s"${other} unsupported.")
     }
+
+    if(ql.length>0)
+      ql ="1=1 " + ql
 
     methodName match{
       case "find_by" | "where" =>

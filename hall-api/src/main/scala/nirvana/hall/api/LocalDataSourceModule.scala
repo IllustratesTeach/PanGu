@@ -8,16 +8,10 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import monad.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.internal.TransactionAdvice
 import nirvana.hall.api.services.AutoSpringDataSourceSession
-import org.apache.tapestry5.ioc.MethodAdviceReceiver
-import org.apache.tapestry5.ioc.annotations.{EagerLoad, Local, Match, Startup}
+import org.apache.tapestry5.ioc.annotations.{EagerLoad, Startup}
 import org.apache.tapestry5.ioc.services.{PerthreadManager, RegistryShutdownHub}
 import org.slf4j.Logger
-import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.annotation.{AnnotationTransactionAttributeSource, Transactional}
-import org.springframework.transaction.interceptor.TransactionInterceptor
 import scalikejdbc.{GlobalSettings, LoggingSQLAndTimeSettings}
 
 /**
@@ -32,6 +26,7 @@ object LocalDataSourceModule {
     AutoSpringDataSourceSession.perthreadManager = perthreadManager
   }
 
+  /*
   @EagerLoad
   def buildPlatformTransactionManager(dataSource: DataSource):PlatformTransactionManager = {
     new DataSourceTransactionManager(dataSource)
@@ -52,6 +47,7 @@ object LocalDataSourceModule {
       }
     }
   }
+  */
   @EagerLoad
   def buildDataSource(config: HallApiConfig, hub: RegistryShutdownHub, logger: Logger): DataSource = {
     val hikariConfig = new HikariConfig();

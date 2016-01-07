@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.entities.SysUser
+import nirvana.hall.api.jpa.SysUser
 import org.springframework.transaction.annotation.Transactional
 
 /**

@@ -16,4 +16,8 @@ trait EntityService {
   def deleteById[T:ClassTag](id:Any)
   @Transactional
   def delete[T](entity:T)
+  @Transactional
+  def deleteRelation[T](relation: Relation[T]):Int
+  @Transactional
+  def updateRelation[T](relation: Relation[T]):Int
 }

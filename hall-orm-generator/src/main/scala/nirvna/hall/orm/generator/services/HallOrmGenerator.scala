@@ -63,6 +63,8 @@ class OrmExporter extends POJOExporter{
   def getJavaTypeName (p: Property, useGenerics: Boolean) :String ={
     getCfg2JavaTool.getJavaTypeName(p,useGenerics).trim match{
       case "int" => "Int"
+      case "long" => "Long"
+      case "short" => "Short"
       case other => other
     }
   }

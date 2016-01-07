@@ -67,6 +67,10 @@ object HallOrmModule {
     })
     manager
   }
+  @Startup
+  def provideObjectLocator(objectLocator: ObjectLocator)={
+    ActiveRecord.objectLocator = objectLocator
+  }
   @EagerLoad
   def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,objectLocator:ObjectLocator,@Local entityManager: EntityManager):PlatformTransactionManager={
     val transactionManager = new JpaTransactionManager(){

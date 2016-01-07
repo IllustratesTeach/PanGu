@@ -1,8 +1,7 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.entities.OnlineUser
+import nirvana.hall.api.jpa.OnlineUser
 import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.DBSession
 
 /**
  * auth service
@@ -14,7 +13,7 @@ trait AuthService {
    * find user name by token
    */
   @Transactional
-  def refreshToken(token: String)(implicit session: DBSession = AutoSpringDataSourceSession()): Option[OnlineUser]
+  def refreshToken(token: String): Option[OnlineUser]
 
   /**
    * login system.
@@ -22,7 +21,7 @@ trait AuthService {
    * @return token
    */
   @Transactional
-  def login(name: String)(implicit session: DBSession = AutoSpringDataSourceSession()): String
+  def login(name: String): String
   @Transactional
-  def logout(token: String)(implicit session: DBSession = AutoSpringDataSourceSession()): Unit
+  def logout(token: String): Unit
 }

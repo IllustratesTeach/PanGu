@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
-import scala.collection.{GenTraversableOnce, JavaConversions}
+import scala.collection.{mutable, GenTraversableOnce, JavaConversions}
 import scala.language.dynamics
 import scala.language.experimental.macros
 import scala.reflect.{ClassTag, classTag}
@@ -20,6 +20,7 @@ import scala.reflect.{ClassTag, classTag}
 object ActiveRecord {
   //logger
   private val logger = LoggerFactory getLogger getClass
+  @volatile
   var objectLocator:ObjectLocator= _
 
   /**
@@ -39,6 +40,12 @@ object ActiveRecord {
   def delete[T](record:T): Unit ={
     getService[EntityService].delete(record)
   }
+  def updateRelation[T](relation: Relation[T]):Int={
+    getService[EntityService].updateRelation(relation)
+  }
+  def deleteRelation[T](relation: Relation[T]):Int={
+    getService[EntityService].deleteRelation(relation)
+  }
 
   /**
    * find some records by Relation
@@ -48,16 +55,15 @@ object ActiveRecord {
    */
   private[services] def find[T](dsl:Relation[T]):Stream[T]={
     val entityManager = ActiveRecord.getService[EntityManager]
-    val fullQl = dsl.orderBy match{
-      case Some(order) =>
-        dsl.ql + " order by "+order
-      case None =>
-        dsl.ql
-    }
+
+    var fullQl = "from %s".format(dsl.entityClazz.getSimpleName)
+    dsl.queryClause.foreach{fullQl += " where %s".format(_)}
+    dsl.orderBy.foreach{fullQl += " order by %s".format(_)}
+
     logger.debug("ql:{}",fullQl)
     val query = entityManager.createQuery(fullQl)
 
-    dsl.params.zipWithIndex.foreach{
+    dsl.queryParams.zipWithIndex.foreach{
       case (value,index)=>
         query.setParameter(index+1,value)
     }
@@ -96,15 +102,28 @@ trait ActiveRecord {
 
 /**
  * query case class
- * @param ql query language
- * @param params query parameters
+ * @param entityClazz entity class
  * @param primaryKey primary key
  * @tparam A type parameter
  */
-case class Relation[A](ql:String, params:Seq[Any],primaryKey:String) extends Dynamic with Product{
-  private[services] var limit:Int = -1
-  private[services] var offset:Int = -1
-  private[services] var orderBy:Option[String]=None
+class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic{
+  def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
+    this(entityClazz,primaryKey)
+    if(query != null)
+      this.queryClause = Some(query)
+
+    this.queryParams = queryParams
+  }
+  private[orm] var limit:Int = -1
+  private[orm] var offset:Int = -1
+  private[orm] var orderBy:Option[String]=None
+
+  private[orm] var queryClause:Option[String] = None
+  private[orm] var queryParams:Seq[Any] = Nil
+
+  private[orm] var updateQl:Option[String] = None
+  private[orm] var updateParams:Seq[Any] = Nil
+
   private var underlying_result:Stream[A] = _
   private def executeQuery: Stream[A] = {
     if(underlying_result == null)
@@ -124,6 +143,30 @@ case class Relation[A](ql:String, params:Seq[Any],primaryKey:String) extends Dyn
     }
     this
   }
+  def internalUpdate(params:(String,Any)*): this.type ={
+    var ql = ""
+    var index = queryParams.size + 1
+    val updateParams = mutable.Buffer[Any]()
+    params.foreach{
+      case (key,value)=>
+        ql += "%s=?%s,".format(key,index)
+        index += 1
+        updateParams += value
+    }
+
+    this.updateParams = updateParams.toSeq
+    if(ql.length>0){
+      this.updateQl = Some(ql.dropRight(1))
+    }
+
+    this
+  }
+  def update():Int={
+    ActiveRecord.updateRelation(this)
+  }
+  def delete():Int = {
+    ActiveRecord.deleteRelation(this)
+  }
   def exists():Boolean= limit(1).headOption.isDefined
   def asc(fields:String*):this.type={
     internalOrder(fields.map((_,"asc")):_*)
@@ -136,10 +179,12 @@ case class Relation[A](ql:String, params:Seq[Any],primaryKey:String) extends Dyn
     this
   }
   def take:A= take(1).head
+  def takeOption:Option[A]= take(1).headOption
   def take(n:Int):Relation[A]={
     limit(n)
   }
   def first:A= first(1).head
+  def firstOption:Option[A]= first(1).headOption
   def first(n:Int):Relation[A]= {
     take(n).internalOrder(primaryKey-> "ASC")
   }
@@ -177,7 +222,6 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    */
   def applyDynamicNamed(name:String)(params:(String,Any)*):Relation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,Relation[A]]
   def applyDynamic(name:String)(params:Any*):Relation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
-
   /**
    * find_by and where function
    * @param ql query
@@ -185,7 +229,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @return Relation object
    */
   def internalWhere(ql:String)(params:Any*): Relation[A]={
-    Relation[A](ql,params,primaryKey)
+    new Relation[A](clazz,primaryKey,ql,params)
   }
 
   /**
@@ -208,11 +252,11 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   private def internalFind(key:Any):Relation[A]={
     key match{
       case _:Int|_:String|_:Long=>
-        Relation[A]("from %s where %s=?1".format(clazz.getSimpleName,primaryKey),Seq(key),primaryKey)
+        new Relation[A](clazz,primaryKey,"%s=?1".format(primaryKey),Seq(key))
       case keys:Array[_] =>
-        Relation[A]("from %s where %s IN (?1)".format(clazz.getSimpleName,primaryKey),Seq(key),primaryKey)
+        new Relation[A](clazz,primaryKey,"%s IN (?1)".format(primaryKey),Seq(key))
       case None =>
-        Relation[A]("from %s".format(clazz.getSimpleName),Seq(),primaryKey)
+        new Relation[A](clazz,primaryKey,null,Seq())
     }
   }
   //retrieving single object
@@ -237,6 +281,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   def desc(fields:String*):Relation[A]={
     internalFind(None).desc(fields:_*)
   }
+
   /*
   def find_each(start:Int=0,batchSize:Int = 100)(f:A=>Unit): Unit ={
 

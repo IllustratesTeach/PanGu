@@ -4,6 +4,7 @@ import javax.xml.bind.annotation._
 
 import monad.core.config.{ DatabaseConfigSupport, LocalStoreConfigSupport, LogFileSupport }
 import monad.support.services.WebServerConfigSupport
+import nirvana.hall.orm.config.HallOrmConfigSupport
 
 /**
  * hall api configuration
@@ -16,6 +17,7 @@ import monad.support.services.WebServerConfigSupport
 class HallApiConfig
     extends LogFileSupport
     with LocalStoreConfigSupport
+    with HallOrmConfigSupport
     with WebServerConfigSupport {
 
   @XmlElement(name = "api")
