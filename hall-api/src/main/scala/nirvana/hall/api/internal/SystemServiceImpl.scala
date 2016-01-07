@@ -1,10 +1,7 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.annotations.RequiresUser
 import nirvana.hall.api.services.{ProtobufRequestGlobal, SystemService}
 import org.apache.tapestry5.ioc.services.ClassNameLocator
-import org.springframework.transaction.annotation.Transactional
-import scalikejdbc._
 
 import scala.collection.mutable.ListBuffer
 
@@ -15,12 +12,14 @@ import scala.collection.mutable.ListBuffer
  */
 class SystemServiceImpl(protobufRequestGlobal: ProtobufRequestGlobal, classNameLocator: ClassNameLocator) extends SystemService {
 
+  /*
   @Transactional
   @RequiresUser
   override def deleteEntity(entity: String, id: Int)(implicit session: DBSession): Unit = {
     val userId = protobufRequestGlobal.userId
     SQL("delete from " + entity + " where id=? and user_id=?").bind(id, userId).executeUpdate().apply()
   }
+  */
 
 
   override def findAllProtocol(): Seq[String] = {

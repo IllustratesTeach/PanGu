@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal
 
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.entities._
+import nirvana.hall.api.jpa._
 import nirvana.hall.api.services.DictService
 import nirvana.hall.protocol.sys.DictProto._
 
@@ -30,65 +30,65 @@ class DictServiceImpl(config: HallApiConfig) extends DictService{
     //TODO 代码优化
     dictType match {
       case DictType.CODE_AJLB =>
-        CodeAjlb.findAll().map { f =>
+        CodeAjlb.all.map { f =>
           val data = CodeData.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
-          f.firstLetter.foreach(data.setOther)
+          data.setOther(f.firstLetter)
           DictData.newBuilder().setExtension(CodeData.data, data.build()).build()
         }.toSeq
       case DictType.CODE_CJLB =>
-        CodeCjlb.findAll().map(convert2CodeData).toSeq
+        CodeCjlb.all.map(convert2CodeData).toSeq
       case DictType.CODE_GJ =>
-        CodeGj.findAll().map(convert2CodeData).toSeq
+        CodeGj.all.map(convert2CodeData).toSeq
       case DictType.CODE_JJLY =>
-        CodeJjly.findAll().map(convert2CodeData).toSeq
+        CodeJjly.all.map(convert2CodeData).toSeq
       case DictType.CODE_LY =>
-        CodeLy.findAll().map(convert2CodeData).toSeq
+        CodeLy.all.map(convert2CodeData).toSeq
       case DictType.CODE_MARRY =>
-        CodeMarry.findAll().map(convert2CodeData).toSeq
+        CodeMarry.all.map(convert2CodeData).toSeq
       case DictType.CODE_MZ =>
-        CodeMz.findAll().map(convert2CodeData).toSeq
+        CodeMz.all.map(convert2CodeData).toSeq
       case DictType.CODE_RYLX =>
-        CodeRylx.findAll().map{ f =>
+        CodeRylx.all.map{ f =>
           val data = CodeData.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
-          f.strtype.foreach(data.setOther)
+          data.setOther(f.strtype)
           DictData.newBuilder().setExtension(CodeData.data, data.build()).build()
         }.toSeq
       case DictType.CODE_TSRQ =>
-        CodeTsrq.findAll().map(convert2CodeData).toSeq
+        CodeTsrq.all.map(convert2CodeData).toSeq
       case DictType.CODE_TSSF =>
-        CodeTssf.findAll().map(convert2CodeData).toSeq
+        CodeTssf.all.map(convert2CodeData).toSeq
       case DictType.CODE_WHCD =>
-        CodeWhcd.findAll().map(convert2CodeData).toSeq
+        CodeWhcd.all.map(convert2CodeData).toSeq
       case DictType.CODE_XB =>
-        CodeXb.findAll().map(convert2CodeData).toSeq
+        CodeXb.all.map(convert2CodeData).toSeq
       case DictType.CODE_ZC =>
-        CodeZc.findAll().map(convert2CodeData).toSeq
+        CodeZc.all.map(convert2CodeData).toSeq
       case DictType.CODE_ZJXY =>
-        CodeZjxy.findAll().map(convert2CodeData).toSeq
+        CodeZjxy.all.map(convert2CodeData).toSeq
       case DictType.CODE_ZZMM =>
-        CodeZzmm.findAll().map(convert2CodeData).toSeq
+        CodeZzmm.all.map(convert2CodeData).toSeq
       case DictType.GAFIS_GATHER_NODE =>
-        GafisGatherNode.findAll().map{ f =>
+        GafisGatherNode.all.map{ f =>
           val data = GatherNode.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
           DictData.newBuilder().setExtension(GatherNode.data, data.build()).build()
         }.toSeq
       case DictType.GAFIS_GATHER_TYPE =>
-        GafisGatherType.findAll().map{ f =>
+        GafisGatherType.all.map{ f =>
           val data = GatherType.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
           DictData.newBuilder().setExtension(GatherType.data, data.build()).build()
         }.toSeq
       case DictType.GAFIS_GATHER_TYPE_NODE_FIELD =>
-        GafisGatherTypeNodeField.findAll().map{ f =>
+        GafisGatherTypeNodeField.all.map{ f =>
           val data = GatherTypeNodeField.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
           DictData.newBuilder().setExtension(GatherTypeNodeField.data, data.build()).build()
         }.toSeq
       case DictType.SYS_DEPART =>
-        SysDepart.findAll().map{ f =>
+        SysDepart.all.map{ f =>
           val data = Depart.newBuilder()
           ScalaUtils.convertScalaToProtobuf(f, data)
           DictData.newBuilder().setExtension(Depart.data, data.build()).build()
@@ -107,27 +107,27 @@ class DictServiceImpl(config: HallApiConfig) extends DictService{
     // TODO 实现根据编号和名称检索以及分页，代码优化
     dictType match {
       case DictType.CODE_XB =>
-        CodeXb.findAll().map(f => (f.code, f.name.toString))
+        CodeXb.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_MZ =>
-        CodeMz.findAll().map(f => (f.code, f.name.toString))
+        CodeMz.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_GJ =>
-        CodeGj.findAll().map(f => (f.code, f.name.toString))
+        CodeGj.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_ZZMM =>
-        CodeZzmm.findAll().map(f => (f.code, f.name.toString))
+        CodeZzmm.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_WHCD =>
-        CodeWhcd.findAll().map(f => (f.code, f.name.toString))
+        CodeWhcd.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_ZJXY =>
-        CodeZjxy.findAll().map(f => (f.code, f.name.toString))
+        CodeZjxy.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_MARRY =>
-        CodeMarry.findAll().map(f => (f.code, f.name.toString))
+        CodeMarry.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_TSRQ =>
-        CodeTsrq.findAll().map(f => (f.code, f.name.toString))
+        CodeTsrq.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_JJLY =>
-        CodeJjly.findAll().map(f => (f.code, f.name.toString))
+        CodeJjly.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_TSSF =>
-        CodeTssf.findAll().map(f => (f.code, f.name.toString))
+        CodeTssf.all.map(f => (f.code, f.name.toString))
       case DictType.CODE_ZC =>
-        CodeZc.findAll().map(f => (f.code, f.name.toString))
+        CodeZc.all.map(f => (f.code, f.name.toString))
       case _ => Nil
     }
   }

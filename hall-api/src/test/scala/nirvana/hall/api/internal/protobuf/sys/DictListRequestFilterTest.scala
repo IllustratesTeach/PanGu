@@ -1,16 +1,16 @@
 package nirvana.hall.api.internal.protobuf.sys
 
-import nirvana.hall.api.internal.BaseServiceTestSupport
+import nirvana.hall.api.internal.JpaBaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.DictListProto.{DictListResponse, DictListRequest}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
+import nirvana.hall.protocol.sys.DictListProto.{DictListRequest, DictListResponse}
 import nirvana.hall.protocol.sys.DictProto.DictType
 import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 15/11/10.
  */
-class DictListRequestFilterTest extends BaseServiceTestSupport{
+class DictListRequestFilterTest extends JpaBaseServiceTestSupport{
 
   @Test
   def test_dictList(): Unit ={
