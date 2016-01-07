@@ -6,14 +6,14 @@ import javax.persistence.{EntityManager, EntityManagerFactory}
 import javax.sql.DataSource
 
 import nirvana.hall.orm.config.HallOrmConfigSupport
-import nirvana.hall.orm.internal.{EntityManagerCreatorImpl, EntityManagerTransactionAdvice, EntityServiceImpl}
-import nirvana.hall.orm.services.{ActiveRecord, EntityManagerCreator, EntityService}
+import nirvana.hall.orm.internal.{EntityManagerTransactionAdvice, EntityServiceImpl}
+import nirvana.hall.orm.services.{ActiveRecord, EntityService}
 import org.apache.tapestry5.ioc.annotations._
-import org.apache.tapestry5.ioc.services.{PerthreadManager, ThreadCleanupListener}
-import org.apache.tapestry5.ioc.{ObjectLocator, MethodAdviceReceiver, ScopeConstants, ServiceBinder}
+import org.apache.tapestry5.ioc.{MethodAdviceReceiver, ObjectLocator, ServiceBinder}
 import org.slf4j.Logger
+import org.springframework.orm.jpa.support.SharedEntityManagerBean
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
-import org.springframework.orm.jpa.{EntityManagerFactoryUtils, JpaTransactionManager, LocalContainerEntityManagerFactoryBean}
+import org.springframework.orm.jpa.{JpaTransactionManager, LocalContainerEntityManagerFactoryBean}
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.{AnnotationTransactionAttributeSource, Transactional}
 import org.springframework.transaction.interceptor.TransactionInterceptor
@@ -25,12 +25,12 @@ import org.springframework.transaction.interceptor.TransactionInterceptor
  */
 object HallOrmModule {
   def bind(binder:ServiceBinder): Unit ={
-    binder.bind(classOf[EntityManagerCreator],classOf[EntityManagerCreatorImpl])
     binder.bind(classOf[EntityService],classOf[EntityServiceImpl])
   }
   def buildEntityManagerFactory(dataSource: DataSource,
                                 configuration: util.Collection[String],
-                                ormConfig:HallOrmConfigSupport):EntityManagerFactory= {
+                                ormConfig:HallOrmConfigSupport,
+                                objectLocator: ObjectLocator):EntityManagerFactory= {
     val entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean
     val adapter = new HibernateJpaVendorAdapter
 
@@ -47,42 +47,30 @@ object HallOrmModule {
       properties.put(jpaProperty.name,jpaProperty.value)
     }
 
+    ActiveRecord.objectLocator = objectLocator
     entityManagerFactoryBean.setJpaProperties(properties)
     entityManagerFactoryBean.afterPropertiesSet()
     entityManagerFactoryBean.getObject
   }
 
-  @Scope(ScopeConstants.PERTHREAD)
-  def buildEntityManager(logger: Logger,
-                         @InjectService("PerthreadManager") perthreadManager: PerthreadManager,
-                         @Local entityManagerCreator: EntityManagerCreator,
-                          @Local entityManagerFactory: EntityManagerFactory):EntityManager={
-    val manager = entityManagerCreator.createEntityManager
+  //@Scope(ScopeConstants.PERTHREAD)
+  def buildEntityManager(logger: Logger,@Local entityManagerFactory: EntityManagerFactory):EntityManager={
+    val shared = new SharedEntityManagerBean()
+    shared.setEntityManagerFactory(entityManagerFactory)
+    shared.setEntityManagerInterface(classOf[EntityManager])
+    shared.afterPropertiesSet()
 
-    perthreadManager.addThreadCleanupListener(new ThreadCleanupListener() {
-      override def threadDidCleanup() {
-        EntityManagerFactoryUtils.closeEntityManager(manager)
-        //if (manager.isOpen) manager.close()
-      }
-    })
-    manager
+    shared.getObject
   }
   @Startup
   def provideObjectLocator(objectLocator: ObjectLocator)={
     ActiveRecord.objectLocator = objectLocator
   }
-  @EagerLoad
-  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,objectLocator:ObjectLocator,@Local entityManager: EntityManager):PlatformTransactionManager={
-    val transactionManager = new JpaTransactionManager(){
-      override def createEntityManagerForTransaction(): EntityManager = {
-        //super.createEntityManagerForTransaction()
-        entityManager
-      }
-    }
+  def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,@Local entityManager: EntityManager):PlatformTransactionManager={
+    val transactionManager = new JpaTransactionManager()
     transactionManager.setEntityManagerFactory(entityManagerFactory)
     transactionManager.afterPropertiesSet()
 
-    ActiveRecord.objectLocator = objectLocator
     transactionManager
   }
 

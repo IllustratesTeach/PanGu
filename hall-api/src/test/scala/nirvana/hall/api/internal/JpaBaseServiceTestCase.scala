@@ -1,15 +1,10 @@
 package nirvana.hall.api.internal
 
-import javax.persistence.{EntityManagerFactory, EntityManager}
-
-import nirvana.hall.api.config.{HallApiConfig}
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.jdbc.TransactionManagement
 import nirvana.hall.api.services.{ProtobufRequestGlobal, UserService}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.{After, Before}
-import org.springframework.orm.jpa.EntityManagerHolder
-import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  *
@@ -31,7 +26,7 @@ trait JpaBaseServiceTestSupport extends TransactionManagement {
     //新建用户
 
     val userService = registry.getService(classOf[UserService])
-    //userService.testCreateUser("jcai","password")
+    userService.testCreateUser("jcai","password")
     /*
     val registryRequest = RegistryRequest.newBuilder()
     registryRequest.setLogin("jcai")
@@ -42,12 +37,13 @@ trait JpaBaseServiceTestSupport extends TransactionManagement {
     */
 
 
-    setupTransactionManager(registry.getService(classOf[PlatformTransactionManager]))
+    /*
     //OpenSession In Thread
     val entityManagerFactory= registry.getService(classOf[EntityManagerFactory])
     val em = registry.getService(classOf[EntityManager])
     val emHolder= new EntityManagerHolder(em)
     TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
+    */
 
     token = userService.login("jcai", "password")._2.get
   }
@@ -71,7 +67,7 @@ object JpaTestModule {
     val config = new HallApiConfig
     config.api.db.driver = "org.h2.Driver"
     config.api.db.user = "sa"
-    config.api.db.url = "jdbc:h2:file:target/hall/db"
+    config.api.db.url = "jdbc:h2:mem:db"
 
     config
   }
