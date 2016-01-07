@@ -33,6 +33,8 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.name = "asdf"
     modelA.save()
 
+    ModelA.find_by_name(modelA.name)
+    ModelA.find_by_name(modelA.name)
     var modelA1 = ModelA.take
     Assert.assertEquals("asdf",modelA1.name)
     modelA1 = ModelA.all.take

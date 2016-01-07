@@ -49,16 +49,28 @@ object HallOrmMacroDefine {
           ql = "1=1"+ql
         val qlTree = Literal(Constant(ql))
 
-        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),paramsTree))
+        //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),paramsTree))
+        //c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
+        executeInternalWhere[c.type,R](c)(qlTree,paramsTree)
       case "where" =>
         val qlTree = paramsTree.head
         val remainTree = paramsTree.drop(1)
-        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),remainTree))
+        executeInternalWhere[c.type,R](c)(qlTree,remainTree)
+        //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),remainTree))
       case other=>
         c.error(c.enclosingPosition, s"unsupport operation")
         c.Expr[R](Literal(Constant(Nil)))
     }
 
+  }
+  private def executeInternalWhere[C <: whitebox.Context,R](c:C)(qlTree:c.universe.Tree,paramsTree:List[c.universe.Tree]): c.Expr[R]={
+    import c.universe._
+
+    val objectTree= q"ActiveRecord"
+    val clazzTree = Select(c.prefix.tree,TermName("clazz"))
+    val primaryKeyTree = Select(c.prefix.tree,TermName("primaryKey"))
+
+    c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
   }
   def dslDynamicImplNamed[E: c.WeakTypeTag,R](c: whitebox.Context)
                                            (name: c.Expr[String])
@@ -132,7 +144,9 @@ object HallOrmMacroDefine {
 
     methodName match{
       case "find_by" | "where" =>
-        c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
+        val qlTree = Literal(Constant(ql))
+        executeInternalWhere[c.type,R](c)(qlTree,parameterValues.toList)
+        //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
       case other=>
         c.error(c.enclosingPosition, s"${other} unsupported.")
         c.Expr[R](Literal(Constant(Nil)))

@@ -84,6 +84,15 @@ object ActiveRecord {
       throw new IllegalStateException("object locator is null")
     objectLocator.getService(classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
+  /**
+   * find_by and where function
+   * @param ql query
+   * @param params parameter values
+   * @return Relation object
+   */
+  def internalWhere[A](clazz:Class[A],primaryKey:String,ql:String)(params:Any*): Relation[A]={
+    new Relation[A](clazz,primaryKey,ql,params)
+  }
 }
 
 /**
@@ -100,6 +109,120 @@ trait ActiveRecord {
   }
 }
 
+/**
+ * query case class
+ * @param entityClazz entity class
+ * @param primaryKey primary key
+ * @tparam A type parameter
+ */
+class QueryRelation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic{
+  def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
+    this(entityClazz,primaryKey)
+    if(query != null)
+      this.queryClause = Some(query)
+    this.queryParams = queryParams
+  }
+  private[orm] var limit:Int = -1
+  private[orm] var offset:Int = -1
+  private[orm] var orderBy:Option[String]=None
+
+  private[orm] var queryClause:Option[String] = None
+  private[orm] var queryParams:Seq[Any] = Nil
+
+  private var underlying_result:Stream[A] = _
+  private def executeQuery: Stream[A] = {
+    //if(underlying_result == null)
+      //underlying_result = ActiveRecord.find(this)
+    underlying_result
+  }
+  def applyDynamicNamed(name:String)(params:(String,Any)*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
+  //def applyDynamic(name:String)(params:(Any*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
+  def internalOrder(params:(String,Any)*):this.type= {
+    params.foreach{case (key,value)=>
+      orderBy match{
+        case Some(o) =>
+          orderBy = Some(o+",%s %s".format(key,value))
+        case None=>
+          orderBy = Some("%s %s".format(key,value))
+      }
+    }
+    this
+  }
+  def exists():Boolean= limit(1).headOption.isDefined
+  def asc(fields:String*):this.type={
+    internalOrder(fields.map((_,"asc")):_*)
+  }
+  def desc(fields:String*):this.type={
+    internalOrder(fields.map((_,"desc")):_*)
+  }
+  def limit(n:Int):this.type={
+    limit=n
+    this
+  }
+  def take:A= take(1).head
+  def takeOption:Option[A]= take(1).headOption
+  def take(n:Int):QueryRelation[A]={
+    limit(n)
+  }
+  def first:A= first(1).head
+  def firstOption:Option[A]= first(1).headOption
+  def first(n:Int):QueryRelation[A]= {
+    take(n).internalOrder(primaryKey-> "ASC")
+  }
+  def last:A= last(1).head
+  def last(n:Int):QueryRelation[A]= {
+    take(n).internalOrder(primaryKey->"DESC")
+  }
+  def offset(n:Int): this.type={
+    offset = n
+    this
+  }
+  @inline final def size = executeQuery.size
+  @inline final def foreach[U](f: A => U) = executeQuery.foreach(f)
+  @inline final def head = executeQuery.head
+  @inline final def headOption = executeQuery.headOption
+  @inline final def tail = executeQuery.tail
+  @inline final def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =  executeQuery.map(f)
+  @inline final def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Stream[A], B, That]): That = executeQuery.flatMap(f)
+
+}
+class DeleteRelation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic{
+  def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
+    this(entityClazz,primaryKey)
+    if(query != null)
+      this.queryClause = Some(query)
+
+    this.queryParams = queryParams
+  }
+
+  private[orm] var queryClause:Option[String] = None
+  private[orm] var queryParams:Seq[Any] = Nil
+
+  def delete():Int = {
+    //ActiveRecord.deleteRelation(this)
+    0
+  }
+}
+class UpdateRelation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic{
+  def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
+    this(entityClazz,primaryKey)
+    if(query != null)
+      this.queryClause = Some(query)
+
+    this.queryParams = queryParams
+  }
+
+  private[orm] var queryClause:Option[String] = None
+  private[orm] var queryParams:Seq[Any] = Nil
+
+  private[orm] var updateQl:Option[String] = None
+  private[orm] var updateParams:Seq[Any] = Nil
+
+  def update():Int = {
+    //ActiveRecord.updateRelation(this)
+    0
+  }
+}
 /**
  * query case class
  * @param entityClazz entity class
@@ -210,18 +333,26 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * get model class and primary key
    */
 
-  private val clazz = clazzTag.runtimeClass.asInstanceOf[Class[A]]
-  private val field = clazz.getDeclaredFields.find(_.isAnnotationPresent(classOf[Id]))
-  private val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null")).getName
+  private[orm] val clazz = clazzTag.runtimeClass.asInstanceOf[Class[A]]
+  private[orm] val field = clazz.getDeclaredFields.find(_.isAnnotationPresent(classOf[Id]))
+  private[orm] val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null")).getName
 
   /**
-   * find and where method
+   * find_by and where method
    * @param name method name
    * @param params method parameter
    * @return relation query object
    */
   def applyDynamicNamed(name:String)(params:(String,Any)*):Relation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,Relation[A]]
+
+  /**
+   * find_by_xx_and_yy method
+   * @param name method name
+   * @param params parameter list
+   * @return Relation query instance
+   */
   def applyDynamic(name:String)(params:Any*):Relation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
+  /*
   /**
    * find_by and where function
    * @param ql query
@@ -231,6 +362,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   def internalWhere(ql:String)(params:Any*): Relation[A]={
     new Relation[A](clazz,primaryKey,ql,params)
   }
+  */
 
   /**
    * retrieving single object
