@@ -66,7 +66,7 @@ object HallOrmMacroDefine {
   private def executeInternalWhere[C <: whitebox.Context,R](c:C)(qlTree:c.universe.Tree,paramsTree:List[c.universe.Tree]): c.Expr[R]={
     import c.universe._
 
-    val objectTree= q"ActiveRecord"
+    val objectTree= q"nirvana.hall.orm.services.ActiveRecord"
     val clazzTree = Select(c.prefix.tree,TermName("clazz"))
     val primaryKeyTree = Select(c.prefix.tree,TermName("primaryKey"))
 

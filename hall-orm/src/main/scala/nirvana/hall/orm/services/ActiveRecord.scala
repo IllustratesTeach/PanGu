@@ -333,9 +333,9 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * get model class and primary key
    */
 
-  private[orm] val clazz = clazzTag.runtimeClass.asInstanceOf[Class[A]]
-  private[orm] val field = clazz.getDeclaredFields.find(_.isAnnotationPresent(classOf[Id]))
-  private[orm] val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null")).getName
+  val clazz = clazzTag.runtimeClass.asInstanceOf[Class[A]]
+  protected val field = clazz.getDeclaredFields.find(_.isAnnotationPresent(classOf[Id]))
+  val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null")).getName
 
   /**
    * find_by and where method
