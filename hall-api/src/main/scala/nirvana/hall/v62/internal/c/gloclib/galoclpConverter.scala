@@ -110,7 +110,7 @@ object galoclpConverter extends LoggerSupport{
     val text = card.getTextBuilder
     gCard.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
-      val textContent = new String(bytes).trim
+      val textContent = new String(bytes, AncientConstants.GBK_ENCODING).trim
       item szItemName match {
         case "SeqNo" =>
           text.setStrSeq(textContent)
@@ -256,7 +256,7 @@ object galoclpConverter extends LoggerSupport{
     text.setNCancelFlag(gCase.pstText_Data.length)
     gCase.pstText_Data.foreach{ item=>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
-      val textContent = new String(bytes).trim
+      val textContent = new String(bytes,AncientConstants.GBK_ENCODING).trim
       item szItemName match{
         case "CaseClass1Code" =>
           text.setStrCaseType1(textContent)
@@ -310,13 +310,15 @@ object galoclpConverter extends LoggerSupport{
           warn("{} not mapped", other)
       }
     }
-    val fingerIdList = caseInfo.getStrFingerIDList
-    gCase.pstFingerID_Data.foreach{ f=>
-      fingerIdList.add(f.szKey)
+    if(gCase.pstFingerID_Data != null){
+      gCase.pstFingerID_Data.foreach{ f=>
+        caseInfo.addStrFingerID(f.szKey)
+      }
     }
-    val palmIdList = caseInfo.getStrPalmIDList
-    gCase.pstPalmID_Data.foreach{ f=>
-      palmIdList.add(f.szKey)
+    if(gCase.pstPalmID_Data != null){
+      gCase.pstPalmID_Data.foreach{ f=>
+        caseInfo.addStrPalmID(f.szKey)
+      }
     }
     caseInfo.build()
   }

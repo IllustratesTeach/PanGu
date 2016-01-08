@@ -57,8 +57,9 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
 
     override def receiveByteArray(len: Int): ChannelBuffer = {
-      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
-      //ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
+      println("receiveByteArray:"+len)
+//      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
+      ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
     /**

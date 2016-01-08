@@ -41,7 +41,7 @@ object LocalProtobufModule {
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger], classNameLocator: ClassNameLocator, logger: Logger) {
     configuration.add(new ProtobufExtensionRegistryConfiger {
       override def config(registry: ExtensionRegistry): Unit = {
-        val packages = Seq("nirvana.hall.protocol.sys")
+        val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.v62")
         val contextClassLoader = Thread.currentThread().getContextClassLoader
         packages.foreach { packageName =>
           val it = classNameLocator.locateClassNames(packageName).iterator();

@@ -171,6 +171,7 @@ trait gnetcsr {
 
   protected def GAFIS_NETSCR_RecvLPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GLPCARDINFOSTRUCT) {
     val card = channel.receive[GLPCARDINFOSTRUCT]()
+    pstCard.szCardID = card.szCardID
     pstCard.bMicCanBeFreed = 0;
     pstCard.bTextCanBeFreed = 0;
     pstCard.nMicItemCount = card.nMicItemCount
@@ -205,6 +206,7 @@ trait gnetcsr {
   }
   protected def GAFIS_NETSCR_RecvTPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GTPCARDINFOSTRUCT) {
     val card = channel.receive[GTPCARDINFOSTRUCT]()
+    pstCard.szCardID = card.szCardID
     pstCard.bMicCanBeFreed = 0;
     pstCard.bTextCanBeFreed = 0;
     pstCard.nMicItemCount = card.nMicItemCount

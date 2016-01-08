@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.ByteString
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
@@ -161,7 +162,7 @@ object galoctpConverter {
     val text = card.getTextBuilder
     data.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
-      val textContent = new String(bytes).trim
+      val textContent = new String(bytes, AncientConstants.GBK_ENCODING).trim
       item szItemName match{
         case "Name" =>
           text.setStrName(textContent)
