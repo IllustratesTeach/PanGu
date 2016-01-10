@@ -13,17 +13,93 @@ import scala.reflect.macros.whitebox
  * @since 2016-01-08
  */
 object AncientDataMacroDefine {
+
   /**
    * find method
    */
-  def writeStream[M:c.WeakTypeTag,W:c.WeakTypeTag,SR:c.WeakTypeTag,IT:c.WeakTypeTag,L:c.WeakTypeTag](c: whitebox.Context)(dataSink:c.Expr[W]) : c.Expr[Unit] = {
+  def readStream[M:c.WeakTypeTag,W:c.WeakTypeTag,SR:c.WeakTypeTag,IT:c.WeakTypeTag,L:c.WeakTypeTag](c: whitebox.Context)(dataSource:c.Expr[W]) : c.Expr[M] = {
     import c.universe._
     import c.universe.definitions._
     val selfType = c.weakTypeOf[M]
+    val srArrayType = c.weakTypeOf[Array[SR]]
+    val STRING_CLASS = typeOf[String]
+    implicit val sr = c.weakTypeOf[SR]
+    def findDataSize(t:c.Type)={
+      getDataSizeInternal[c.type,SR,IT,L](c)(t)
+    }
+    val selfTree = Select(c.prefix.tree, TermName("model"))
+    val readBytesFromStreamReader =Select(c.prefix.tree, TermName("readBytesFromStreamReader"))
+
+    val buffer = mutable.Buffer[c.Tree]()
+    internalProcessField[c.type, Unit, IT, L](c)(selfType) { (symbol, length) =>
+      val tpe = symbol.info
+      def returnLengthOrThrowException:Int={
+        if(length == 0)
+          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+        length
+      }
+      def readByteArray(len:Int) = {
+        q"$readBytesFromStreamReader($dataSource,$len)"
+      }
 
 
-    println("stream impl",selfType)
+      val termName = symbol.setter
+      val valueTree = q"$selfTree.$termName"
 
+      tpe match {
+        case ByteTpe => buffer += q"$valueTree($dataSource.readByte())"
+        case ShortTpe | CharTpe => buffer += q"$valueTree($dataSource.readShort())"
+        case IntTpe => buffer += q"$valueTree($dataSource.readInt())"
+        case LongTpe => buffer += q"$valueTree($dataSource.readLong())"
+        case STRING_CLASS =>
+          val bytes = readByteArray(returnLengthOrThrowException)
+          buffer += q"$valueTree (new String($bytes).trim)"
+        case t if t <:< sr =>
+          buffer +=
+            q"""
+                val tmp = new $t
+                tmp.fromStreamReader($dataSource)
+                $valueTree(tmp)
+            """
+        case t  if t =:= typeOf[Array[Byte]] =>
+          val bytes = readByteArray(returnLengthOrThrowException)
+          buffer +=
+            q"""
+                $valueTree($bytes)
+             """
+        case TypeRef(pre,sym,args) if sym == srArrayType.typeSymbol =>
+          val len = returnLengthOrThrowException
+          val nestType = args.head
+          buffer +=
+            q"""
+                val tmpArr =  0.until($len)map({i=>
+                  val tmp = new $nestType
+                  tmp.fromStreamReader($dataSource)
+                  tmp
+                })
+          $valueTree(tmpArr.toArray)
+             """
+        case other =>
+          throw new IllegalArgumentException("type is not supported "+other)
+      }
+    }
+
+
+    val result = buffer.toSeq
+    //result.foreach(show(_))
+//    c.warning(c.enclosingPosition,s"${result}")
+    c.Expr[M](q" ..$result;$selfTree")
+  }
+
+
+  /**
+   * find method
+   */
+  def writeStream[M:c.WeakTypeTag,W:c.WeakTypeTag,SR:c.WeakTypeTag,IT:c.WeakTypeTag,L:c.WeakTypeTag](c: whitebox.Context)(dataSink:c.Expr[W]) : c.Expr[W] = {
+    import c.universe._
+    import c.universe.definitions._
+    val selfType = c.weakTypeOf[M]
+    val srArrayType = c.weakTypeOf[Array[SR]]
     val STRING_CLASS = typeOf[String]
     implicit val sr = c.weakTypeOf[SR]
     def findDataSize(t:c.Type)={
@@ -32,9 +108,7 @@ object AncientDataMacroDefine {
     val selfTree = Select(c.prefix.tree, TermName("model"))
 
     val buffer = mutable.Buffer[c.Tree]()
-    internalWriteStream(selfTree,selfType)
-    def internalWriteStream(selfTree:c.Tree,selfType:c.Type):Unit={
-      internalProcessField[c.type, Unit, IT, L](c)(selfType) { (symbol, length) =>
+    internalProcessField[c.type, Unit, IT, L](c)(selfType) { (symbol, length) =>
         val tpe = symbol.info
 
         def returnLengthOrThrowException: Int = {
@@ -42,14 +116,14 @@ object AncientDataMacroDefine {
             c.error(c.enclosingPosition, "@Length not defined at " + tpe)
           length
         }
-        def writeString(str: c.Tree, length: Int):c.Tree = {
-          val result = writeBytes(q"$str.getBytes",length)
+        def writeString(str: c.Tree, length: Int): c.Tree = {
+          val result = writeBytes(q"$str.getBytes", length)
           q"""
              if($str == null) $dataSink.writeZero($length) else $result
            """
         }
-        def writeBytes(bytes: c.Tree, length: Int) :c.Tree={
-            q"""
+        def writeBytes(bytes: c.Tree, length: Int): c.Tree = {
+          q"""
         val bytesLength = if($bytes == null) 0 else $bytes.length
         val zeroLength = $length - bytesLength
         if($bytes != null) {
@@ -83,12 +157,12 @@ object AncientDataMacroDefine {
             """
           case t if t =:= typeOf[Array[Byte]] =>
             buffer += writeBytes(q"$valueTree.asInstanceOf[Array[Byte]]", returnLengthOrThrowException)
-        case TypeRef(pre,sym,args) if args.head <:< sr => //Array of ScalaReflect
-        //case TypeRef(pre,sym,args) if sym == typeOf[Array[Model]].typeSymbol => //Array of ScalaReflect
-          val len = returnLengthOrThrowException
-          val type_len = findDataSize(args.head) //createAncientDataByType(args.head).getDataSize
+          //case TypeRef(pre,sym,args) if args.head <:< sr => //Array of ScalaReflect
+          case TypeRef(pre, sym, args) if sym == srArrayType.typeSymbol => //Array of ScalaReflect
+            val len = returnLengthOrThrowException
+            val type_len = findDataSize(args.head) //createAncientDataByType(args.head).getDataSize
           val totalLen = len * type_len
-          buffer += q"""
+            buffer += q"""
           var zeroLen:Int = $totalLen
           if($valueTree != null){
             val ancientDataArray = $valueTree.filterNot( _ == null)
@@ -103,13 +177,12 @@ object AncientDataMacroDefine {
             c.error(c.enclosingPosition, "type is not supported for " + other)
         }
       }
-    }
 
 
     val result = buffer.toSeq
     //result.foreach(show(_))
-    c.warning(c.enclosingPosition,s"${result}")
-    c.Expr[Unit](q" ..$result;Unit")
+    //c.warning(c.enclosingPosition,s"${result}")
+    c.Expr[W](q" ..$result;$dataSink")
   }
 
   def getDataSizeImpl[M:c.WeakTypeTag,SR:c.WeakTypeTag,IT:c.WeakTypeTag,L:c.WeakTypeTag](c: whitebox.Context) : c.Expr[Int] = {
@@ -173,9 +246,6 @@ object AncientDataMacroDefine {
       .toSeq.reverse // <----- must be reversed
       .collect {
       case m:TermSymbol if m.isVar && !m.annotations.exists(itType =:= _.tree.tpe)=>
-
-        c.warning(c.enclosingPosition,s"${m}")
-
       val lengthAnnotation = m.annotations.find (lengthType =:= _.tree.tpe)
       val length=
         lengthAnnotation.map(_.tree).map {

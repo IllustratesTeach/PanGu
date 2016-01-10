@@ -7,10 +7,12 @@ import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
+import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
 
 import scala.annotation.tailrec
+import scala.language.experimental.macros
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
@@ -360,5 +362,30 @@ trait ScalaReflect{
     writeToStreamWriter(data).array()
   }
 }
+
+trait Model
+object Model {
+  implicit class StreamSupport[M <: Model](val model: M) extends AnyVal {
+    def getDataSize:Int = macro AncientDataMacroDefine.getDataSizeImpl[M,Model,IgnoreTransfer,Length]
+    def writeToStreamWriter[T <: StreamWriter](dataSink:T):T= macro AncientDataMacroDefine.writeStream[M,T,Model,IgnoreTransfer,Length]
+    def fromStreamReader[T <: StreamReader](dataSource:T):M= macro AncientDataMacroDefine.readStream[M,T,Model,IgnoreTransfer,Length]
+    def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]={
+      dataSource match{
+        case ds:IDataSource =>
+          ds.readBytesByLength(len)
+        case channel:ChannelBuffer =>
+          channel.readBytes(len).array()
+        case isr:InputStreamReader =>
+          isr.readByteArray(len)
+        case iis:ImageInputStream=>
+          val r = new Array[Byte](len)
+          iis.readFully(r)
+          r
+      }
+    }
+  }
+}
+
 trait AncientData extends ScalaReflect{}
+//trait AncientData extends Model
 
