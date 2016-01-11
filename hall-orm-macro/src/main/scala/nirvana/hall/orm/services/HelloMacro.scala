@@ -10,7 +10,6 @@ object helloMacro {
   def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[String] = {
     import c.universe._
     val result = {
-      typeRef("A")
       TypeName("A").encodedName
 
       val str=TypeName("A")
