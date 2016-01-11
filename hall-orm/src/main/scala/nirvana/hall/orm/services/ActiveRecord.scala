@@ -139,7 +139,8 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
       underlying_result = ActiveRecord.find(this)
     underlying_result
   }
-  def applyDynamicNamed(name:String)(params:(String,Any)*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
+  //for update
+  def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
   //def applyDynamic(name:String)(params:(Any*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
   def internalOrder(params:(String,Any)*):this.type= {
     params.foreach{case (key,value)=>
@@ -152,7 +153,7 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
     }
     this
   }
-  def internalUpdate(params:(String,Any)*): this.type ={
+  def internalUpdate(params:(String,Any)*): Int={
     var ql = ""
     var index = queryParams.size + 1
     val updateParams = mutable.Buffer[Any]()
@@ -169,7 +170,6 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
     }
 
     ActiveRecord.updateRelation(this)
-    null
   }
   def delete():Int = {
     ActiveRecord.deleteRelation(this)
