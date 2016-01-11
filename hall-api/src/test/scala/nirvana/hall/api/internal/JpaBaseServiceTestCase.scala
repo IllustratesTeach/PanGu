@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal
 
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.internal.jdbc.TransactionManagement
 import nirvana.hall.api.services.{ProtobufRequestGlobal, UserService}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.{After, Before}
@@ -11,7 +10,7 @@ import org.junit.{After, Before}
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-06-01
  */
-trait JpaBaseServiceTestSupport extends TransactionManagement {
+trait JpaBaseServiceTestSupport {
   protected var registry: Registry = _
   protected var token: String = _
   @Before
