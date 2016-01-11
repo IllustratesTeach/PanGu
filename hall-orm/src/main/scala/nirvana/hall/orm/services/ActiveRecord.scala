@@ -239,7 +239,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * where(ql,parameters)
    * such as:
    *
-   * ModelA.find_name_and_code("jcai","1232")
+   * ModelA.find_by_name_and_code("jcai","1232")
    * ModelA.where("name=?1 and code=?2","jcai","1232")
    *
    * @param name method name
