@@ -72,6 +72,27 @@ object HallOrmMacroDefine {
 
     c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
   }
+  def orderByImpl[E: c.WeakTypeTag,R](c: whitebox.Context)(params:c.Expr[Any]*):c.Expr[R] = {
+    import c.universe._
+    //find class field
+    val expectedNames =  c.weakTypeOf[E].members
+      .filter(_.isTerm)
+      .filter(_.asTerm.isVar).map(_.name.toString.trim).toSeq
+    val trees = params.map(_.tree).toList
+    println(params.size)
+    trees.foreach{
+      case Apply(_,Literal(Constant(_name: String))::_) =>
+        if(_name.isEmpty)
+          c.error(c.enclosingPosition, s"name parameter is empty.")
+        else if(!expectedNames.contains(_name))
+          c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${_name} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
+      case Typed(expr,tpt)=>
+        c.error(c.enclosingPosition, s"expr:${expr.getClass} tpt:${tpt} unsupported.")
+      case other =>
+        c.error(c.enclosingPosition, s"${other}  unsupported.")
+    }
+    c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalOrder")), trees))
+  }
   def dslDynamicImplNamed[E: c.WeakTypeTag,R](c: whitebox.Context)
                                            (name: c.Expr[String])
                                            (params:c.Expr[(String,Any)]*):c.Expr[R] = {
@@ -85,14 +106,17 @@ object HallOrmMacroDefine {
     var order_str=""
 
     val trees = params.map(_.tree).toList
+    println(params.size)
     trees.foreach{
       case Apply(_,Literal(Constant(_name: String))::_) =>
         if(_name.isEmpty)
           c.error(c.enclosingPosition, s"name parameter is empty.")
         else if(!expectedNames.contains(_name))
           c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${_name} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
+      case Typed(expr,tpt)=>
+        c.error(c.enclosingPosition, s"expr:${expr.getClass} tpt:${tpt} unsupported.")
       case other =>
-        c.error(c.enclosingPosition, s"${other} unsupported.")
+        c.error(c.enclosingPosition, s"${other}  unsupported.")
     }
     //c.error(c.enclosingPosition,"asdf")
 

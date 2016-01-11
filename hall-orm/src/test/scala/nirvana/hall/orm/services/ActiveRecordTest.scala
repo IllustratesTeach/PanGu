@@ -19,6 +19,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
 
     val dsl = ModelA.find_by_name_and_id("adsf1",1).asc("name").desc("name")
     Assert.assertEquals("name asc,name desc",dsl.orderBy.get)
+    val dsl2 = ModelA.find_by_name_and_id("adsf1",1).order("name"->"asc","name"->"desc")
     //Assert.assertEquals(1,list.size)
     val size= ModelA.find_by_name_and_id("asdf",modelA.id).size
     Assert.assertEquals(1,size)

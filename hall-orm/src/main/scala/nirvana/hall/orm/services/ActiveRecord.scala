@@ -142,7 +142,9 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   //for update
   def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
   //def applyDynamic(name:String)(params:(Any*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
-  def internalOrder(params:(String,Any)*):this.type= {
+  //private def order(params:(String,String)*):this.type=macro HallOrmMacroDefine.orderByImpl[A,this.type]
+
+  def order(params:(String,Any)*):this.type= {
     params.foreach{case (key,value)=>
       orderBy match{
         case Some(o) =>
@@ -176,10 +178,10 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   }
   def exists():Boolean= limit(1).headOption.isDefined
   def asc(fields:String*):this.type={
-    internalOrder(fields.map((_,"asc")):_*)
+    order(fields.map((_,"asc")):_*)
   }
   def desc(fields:String*):this.type={
-    internalOrder(fields.map((_,"desc")):_*)
+    order(fields.map((_,"desc")):_*)
   }
   def limit(n:Int):this.type={
     limit=n
@@ -193,11 +195,11 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   def first:A= first(1).head
   def firstOption:Option[A]= first(1).headOption
   def first(n:Int):Relation[A]= {
-    take(n).internalOrder(primaryKey-> "ASC")
+    take(n).order(primaryKey-> "ASC")
   }
   def last:A= last(1).head
   def last(n:Int):Relation[A]= {
-    take(n).internalOrder(primaryKey->"DESC")
+    take(n).order(primaryKey->"DESC")
   }
   def offset(n:Int): Relation[A]={
     offset = n
@@ -236,17 +238,6 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @return Relation query instance
    */
   def applyDynamic(name:String)(params:Any*):Relation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
-  /*
-  /**
-   * find_by and where function
-   * @param ql query
-   * @param params parameter values
-   * @return Relation object
-   */
-  def internalWhere(ql:String)(params:Any*): Relation[A]={
-    new Relation[A](clazz,primaryKey,ql,params)
-  }
-  */
 
   /**
    * retrieving single object
@@ -282,11 +273,11 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   }
   def first:A= first(1).head
   def first(n:Int=1):Relation[A]= {
-    take(n).internalOrder(primaryKey-> "ASC")
+    take(n).order(primaryKey-> "ASC")
   }
   def last:A= last(1).head
   def last(n:Int):Relation[A]= {
-    take(n).internalOrder(primaryKey->"DESC")
+    take(n).order(primaryKey->"DESC")
   }
   def all:Relation[A]= {
     internalFind(None)
