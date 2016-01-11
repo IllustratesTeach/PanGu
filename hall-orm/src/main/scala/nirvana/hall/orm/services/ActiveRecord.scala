@@ -225,6 +225,9 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
 
   /**
    * find_by and where method
+   * sucha as:
+   * find_by(name="jcai",code="1232")
+   * where(name="jcai",code="1232")
    * @param name method name
    * @param params method parameter
    * @return relation query object
@@ -233,6 +236,12 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
 
   /**
    * find_by_xx_and_yy method
+   * where(ql,parameters)
+   * such as:
+   *
+   * ModelA.find_name_and_code("jcai","1232")
+   * ModelA.where("name=?1 and code=?2","jcai","1232")
+   *
    * @param name method name
    * @param params parameter list
    * @return Relation query instance
