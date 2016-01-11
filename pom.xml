@@ -436,6 +436,15 @@
               <arg>-encoding</arg>
               <arg>UTF-8</arg>
             </args>
+            <!--
+            <compilerPlugins>
+              <compilerPlugin>
+                <groupId>org.scalamacros</groupId>
+                <artifactId>paradise_${scala-release-version}</artifactId>
+                <version>2.1.0</version>
+              </compilerPlugin>
+            </compilerPlugins>
+            -->
           </configuration>
         </plugin>
         <plugin>
