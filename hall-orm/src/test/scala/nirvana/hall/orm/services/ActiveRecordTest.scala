@@ -59,7 +59,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
       .offset(0).limit(10).asc("name").size
     Assert.assertEquals(1,size)
 
-    ModelA.where("name=?1","asdf").update_set(name="asdf").update()
+    ModelA.where("name=?1","asdf").update(name="asdf")
     ModelA.where("name=?1","asdf").delete()
   }
   @Test

@@ -30,7 +30,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param uplaodStatus(0:等待上报;1:正在上报;2:完成上报)
    */
   override def uploadGatherPerson(personid: String, uplaodStatus: Integer) : Boolean = {
-    GafisPerson.find_by_personid(personid).update_set(status=uplaodStatus).update()
+    GafisPerson.find_by_personid(personid).update(status=uplaodStatus)
     true
     /*
     try {

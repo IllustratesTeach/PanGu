@@ -99,7 +99,7 @@ object HallOrmMacroDefine {
     methodName match{
       case "order" | "order_by" =>
         c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalOrder")), trees))
-      case "update_set"=>
+      case "update"=>
         c.Expr[R](Apply(Select(c.prefix.tree, TermName("internalUpdate")), trees))
       case other=>
         c.error(c.enclosingPosition, s"${other} unsupported.")

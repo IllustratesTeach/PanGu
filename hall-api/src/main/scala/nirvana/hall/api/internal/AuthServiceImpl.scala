@@ -31,7 +31,7 @@ class AuthServiceImpl extends AuthService {
    * find token by login name
    */
   override def refreshToken(token: String): Option[OnlineUser] = {
-    val result = OnlineUser.find_by_token(token).update_set(latestTime=ScalaUtils.currentTimeInSeconds).update()
+    val result = OnlineUser.find_by_token(token).update(latestTime=ScalaUtils.currentTimeInSeconds)
 
     if (result == 1) OnlineUser.find_by_token(token).takeOption else None
   }
@@ -45,7 +45,7 @@ class AuthServiceImpl extends AuthService {
     val currentTime = ScalaUtils.currentTimeInSeconds
     val uuidToken = UUID.randomUUID().toString.replaceAll("-", "")
 
-    val num = OnlineUser.where(login=name).update_set(loginTime=currentTime,latestTime=currentTime,token=uuidToken).update()
+    val num = OnlineUser.where(login=name).update(loginTime=currentTime,latestTime=currentTime,token=uuidToken)
 
     if( num == 0) {
       val onlineUser = new OnlineUser()

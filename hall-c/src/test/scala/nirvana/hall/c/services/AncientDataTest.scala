@@ -11,6 +11,7 @@ import org.xsocket.IDataSource
 
 import scala.language.experimental.macros
 
+import scala.reflect.runtime.universe._
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -29,6 +30,7 @@ class AncientDataTest {
 
     val buffer = ChannelBuffers.buffer(data.getDataSize)
     data.writeToStreamWriter(buffer)
+    val m = typeOf[java.lang.String]
 
     val data2 = new AncientDataModel
     data2.fromStreamReader(buffer)
@@ -40,6 +42,7 @@ class AncientDataTest {
 
     buffer.capacity()
     array.length
+
   }
 }
 class AncientDataModel2 extends ScalaReflect2 with Model{

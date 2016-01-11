@@ -282,11 +282,13 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
       this.updateQl = Some(ql.dropRight(1))
     }
 
-    this
-  }
-  def update():Int={
     ActiveRecord.updateRelation(this)
+    null
   }
+  /*
+  def update():Int={
+  }
+  */
   def delete():Int = {
     ActiveRecord.deleteRelation(this)
   }
