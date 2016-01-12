@@ -1,6 +1,6 @@
 package nirvana.hall.orm.internal
 
-import javax.persistence.EntityManager
+import javax.persistence.{Query, EntityManager}
 
 import nirvana.hall.orm.services.{ActiveRecord, EntityService, Relation}
 import org.slf4j.LoggerFactory
@@ -40,7 +40,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     relation.queryClause.foreach{fullQl += " where %s".format(_)}
     val query = entityManager.createQuery(fullQl)
 
-    setQueryParameter(relation)
+    setQueryParameter(query,relation)
 
     query.executeUpdate()
   }
@@ -53,7 +53,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
 
     val query = entityManager.createQuery(fullQl)
 
-    var index: Int = setQueryParameter(relation)
+    var index: Int = setQueryParameter(query,relation)
 
     relation.updateParams.foreach { value =>
       query.setParameter(index, value)
@@ -62,7 +62,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     query.executeUpdate()
   }
 
-  private def setQueryParameter[T](relation: Relation[T]): Int = {
+  private def setQueryParameter[T](query:Query,relation: Relation[T]): Int = {
     var index = 1
     relation.queryParams.foreach { value =>
       query.setParameter(index, value)
@@ -87,7 +87,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     logger.debug("ql:{}",fullQl)
     val query = entityManager.createQuery(fullQl)
 
-    setQueryParameter(relation)
+    setQueryParameter(query,relation)
 
     if(relation.offset > -1)
       query.setFirstResult(relation.offset)

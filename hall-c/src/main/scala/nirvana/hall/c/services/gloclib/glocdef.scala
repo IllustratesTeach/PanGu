@@ -147,7 +147,7 @@ object glocdef {
         // the on update the old item will be deleted
         class GAFISMICSTRUCT extends AncientData
         {
-        var cbSize:Int = _ ;		// size of this structure
+        var cbSize:Int = 64 ;		// size of this structure
         var nItemFlag:Byte = _ ;		// which item is used, GAMIC_ITEMFLAG_XXX, where xxx is MNT, BIN, IMG OR CPR
         var nItemType:Byte = _ ;		// type, palm or finger, GAMIC_ITEMTYPE_FINGER, GAMIC_ITEMTYPE_PALM, FACE, DATA
         var nItemData:Byte = _ ;		// if is finger, then it's finger index(1-10), if it's palm it's 1(right)2(left)
