@@ -1,13 +1,13 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.{EntityManager, Id, Transient}
+import javax.persistence.{Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
 import org.slf4j.LoggerFactory
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
-import scala.collection.{mutable, GenTraversableOnce, JavaConversions}
+import scala.collection.{GenTraversableOnce, mutable}
 import scala.language.dynamics
 import scala.language.experimental.macros
 import scala.reflect.{ClassTag, classTag}
@@ -49,31 +49,12 @@ object ActiveRecord {
 
   /**
    * find some records by Relation
-   * @param dsl relation object
+   * @param relation relation object
    * @tparam T type parameter
    * @return record stream
    */
-  private[services] def find[T](dsl:Relation[T]):Stream[T]={
-    val entityManager = ActiveRecord.getService[EntityManager]
-
-    var fullQl = "from %s".format(dsl.entityClazz.getSimpleName)
-    dsl.queryClause.foreach{fullQl += " where %s".format(_)}
-    dsl.orderBy.foreach{fullQl += " order by %s".format(_)}
-
-    logger.debug("ql:{}",fullQl)
-    val query = entityManager.createQuery(fullQl)
-
-    dsl.queryParams.zipWithIndex.foreach{
-      case (value,index)=>
-        query.setParameter(index+1,value)
-    }
-    if(dsl.offset > -1)
-      query.setFirstResult(dsl.offset)
-    if(dsl.limit > -1)
-      query.setMaxResults(dsl.limit)
-
-    //convert as scala stream
-    JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
+  private[services] def find[T](relation:Relation[T]):Stream[T]={
+    getService[EntityService].find(relation)
   }
 
   /**
@@ -139,10 +120,11 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
       underlying_result = ActiveRecord.find(this)
     underlying_result
   }
-  //for update
+
+  /**
+   * update method
+   */
   def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
-  //def applyDynamic(name:String)(params:(Any*):this.type=macro HallOrmMacroDefine.dslDynamicImplNamed[A,this.type]
-  //private def order(params:(String,String)*):this.type=macro HallOrmMacroDefine.orderByImpl[A,this.type]
 
   def order(params:(String,Any)*):this.type= {
     params.foreach{case (key,value)=>

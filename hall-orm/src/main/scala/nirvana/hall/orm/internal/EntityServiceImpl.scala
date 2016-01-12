@@ -2,9 +2,12 @@ package nirvana.hall.orm.internal
 
 import javax.persistence.EntityManager
 
-import nirvana.hall.orm.services.{EntityService, Relation}
+import nirvana.hall.orm.services.{ActiveRecord, EntityService, Relation}
+import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 
+import scala.collection.JavaConversions
+import scala.collection.immutable.Stream
 import scala.reflect.{ClassTag, classTag}
 
 /**
@@ -13,6 +16,7 @@ import scala.reflect.{ClassTag, classTag}
  * @since 2016-01-03
  */
 class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
+  private val logger = LoggerFactory getLogger getClass
   @Transactional
   override def save[T](entity: T): T = {
     entityManager.persist(entity)
@@ -62,5 +66,33 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
       index += 1
     }
     query.executeUpdate()
+  }
+  /**
+   * find some records by Relation
+   * @param relation relation object
+   * @tparam T type parameter
+   * @return record stream
+   */
+  def find[T](relation:Relation[T]):Stream[T]={
+    val entityManager = ActiveRecord.getService[EntityManager]
+
+    var fullQl = "from %s".format(relation.entityClazz.getSimpleName)
+    relation.queryClause.foreach{fullQl += " where %s".format(_)}
+    relation.orderBy.foreach{fullQl += " order by %s".format(_)}
+
+    logger.debug("ql:{}",fullQl)
+    val query = entityManager.createQuery(fullQl)
+
+    relation.queryParams.zipWithIndex.foreach{
+      case (value,index)=>
+        query.setParameter(index+1,value)
+    }
+    if(relation.offset > -1)
+      query.setFirstResult(relation.offset)
+    if(relation.limit > -1)
+      query.setMaxResults(relation.limit)
+
+    //convert as scala stream
+    JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
   }
 }
