@@ -1,8 +1,8 @@
 package nirvana.hall.orm.internal
 
-import javax.persistence.{Query, EntityManager}
+import javax.persistence.{EntityManager, Query}
 
-import nirvana.hall.orm.services.{ActiveRecord, EntityService, Relation}
+import nirvana.hall.orm.services.{EntityService, QuerySupport, Relation}
 import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 
@@ -73,28 +73,35 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
 
   /**
    * find some records by Relation
-   * @param relation relation object
+   * @param queryObj relation object
    * @tparam T type parameter
    * @return record stream
    */
-  def find[T](relation:Relation[T]):Stream[T]={
-    val entityManager = ActiveRecord.getService[EntityManager]
+  def find[T](queryObj:QuerySupport[T]):Stream[T]={
+    queryObj match {
+      case relation: Relation[T] =>
+        var fullQl = "from %s".format(relation.entityClazz.getSimpleName)
+        relation.queryClause.foreach {
+          fullQl += " where %s".format(_)
+        }
+        relation.orderBy.foreach {
+          fullQl += " order by %s".format(_)
+        }
 
-    var fullQl = "from %s".format(relation.entityClazz.getSimpleName)
-    relation.queryClause.foreach{fullQl += " where %s".format(_)}
-    relation.orderBy.foreach{fullQl += " order by %s".format(_)}
+        logger.debug("ql:{}", fullQl)
+        val query = entityManager.createQuery(fullQl)
 
-    logger.debug("ql:{}",fullQl)
-    val query = entityManager.createQuery(fullQl)
+        setQueryParameter(query, relation)
 
-    setQueryParameter(query,relation)
+        if (relation.offset > -1)
+          query.setFirstResult(relation.offset)
+        if (relation.limit > -1)
+          query.setMaxResults(relation.limit)
 
-    if(relation.offset > -1)
-      query.setFirstResult(relation.offset)
-    if(relation.limit > -1)
-      query.setMaxResults(relation.limit)
-
-    //convert as scala stream
-    JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
+        //convert as scala stream
+        JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
+      case other=>
+        throw new UnsupportedOperationException("%s unspported".format(other))
+    }
   }
 }

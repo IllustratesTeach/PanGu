@@ -1,6 +1,7 @@
 package nirvana.hall.orm.services
 
 import javax.persistence._
+import javax.persistence.criteria.Predicate
 
 import nirvana.hall.orm.{BaseOrmTestCase, ModelA}
 import org.junit.{Assert, Test}
@@ -26,6 +27,15 @@ class EntityManagerTest extends BaseOrmTestCase{
     transaction.commit(status)
     Assert.assertTrue(modelA.id>0)
 
+    val builder = entityManager.getCriteriaBuilder
+    val q = builder.createQuery(classOf[ModelA])
+    val p = q.from(classOf[ModelA])
+
+    val expr: Predicate = builder.equal(p.get("name"),"xxx")
+    q.where(Array(expr):_*)
+
+    val query = entityManager.createQuery(q);
+    query.getResultList
 
     val results = entityManager.createQuery("from ModelA").getResultList
     Assert.assertEquals(1,results.size())

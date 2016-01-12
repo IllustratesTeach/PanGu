@@ -1,5 +1,6 @@
 package nirvana.hall.orm.services
 
+import javax.persistence.criteria.CriteriaQuery
 import javax.persistence.{Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -58,7 +59,7 @@ object ActiveRecord {
    * @tparam T type parameter
    * @return record stream
    */
-  private[services] def find[T](relation:Relation[T]):Stream[T]={
+  private[services] def find[T](relation:QuerySupport[T]):Stream[T]={
     getService[EntityService].find(relation)
   }
 
@@ -94,6 +95,57 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
+class CriteriaRelation[A](val query:CriteriaQuery[A],val primaryKey:String) extends Dynamic{
+}
+trait QuerySupport[A]{
+  protected val primaryKey:String
+  private[orm] var limit:Int = -1
+  private[orm] var offset:Int = -1
+
+  private var underlying_result:Stream[A] = _
+  protected def executeQuery: Stream[A] = {
+    if(underlying_result == null)
+      underlying_result = ActiveRecord.find(this)
+    underlying_result
+  }
+  def order(params:(String,Any)*):this.type
+  def asc(fields:String*):this.type={
+    order(fields.map((_,"asc")):_*)
+  }
+  def desc(fields:String*):this.type={
+    order(fields.map((_,"desc")):_*)
+  }
+  def exists():Boolean= limit(1).headOption.isDefined
+  def limit(n:Int):this.type={
+    limit=n
+    this
+  }
+  def take:A= take(1).head
+  def takeOption:Option[A]= take(1).headOption
+  def take(n:Int):this.type={
+    limit(n)
+  }
+  def first:A= first(1).head
+  def firstOption:Option[A]= first(1).headOption
+  def first(n:Int):this.type= {
+    take(n).order(primaryKey-> "ASC")
+  }
+  def last:A= last(1).head
+  def last(n:Int):this.type= {
+    take(n).order(primaryKey->"DESC")
+  }
+  def offset(n:Int): this.type={
+    offset = n
+    this
+  }
+  @inline final def size = executeQuery.size
+  @inline final def foreach[U](f: A => U) = executeQuery.foreach(f)
+  @inline final def head = executeQuery.head
+  @inline final def headOption = executeQuery.headOption
+  @inline final def tail = executeQuery.tail
+  @inline final def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =  executeQuery.map(f)
+  @inline final def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Stream[A], B, That]): That = executeQuery.flatMap(f)
+}
 
 /**
  * query case class
@@ -101,7 +153,7 @@ trait ActiveRecord {
  * @param primaryKey primary key
  * @tparam A type parameter
  */
-class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic{
+class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic with QuerySupport[A]{
   def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
     this(entityClazz,primaryKey)
     if(query != null)
@@ -109,8 +161,6 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
 
     this.queryParams = queryParams
   }
-  private[orm] var limit:Int = -1
-  private[orm] var offset:Int = -1
   private[orm] var orderBy:Option[String]=None
 
   private[orm] var queryClause:Option[String] = None
@@ -119,12 +169,6 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   private[orm] var updateQl:Option[String] = None
   private[orm] var updateParams:Seq[Any] = Nil
 
-  private var underlying_result:Stream[A] = _
-  private def executeQuery: Stream[A] = {
-    if(underlying_result == null)
-      underlying_result = ActiveRecord.find(this)
-    underlying_result
-  }
 
   /**
    * update method
@@ -163,44 +207,6 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   def delete():Int = {
     ActiveRecord.deleteRelation(this)
   }
-  def exists():Boolean= limit(1).headOption.isDefined
-  def asc(fields:String*):this.type={
-    order(fields.map((_,"asc")):_*)
-  }
-  def desc(fields:String*):this.type={
-    order(fields.map((_,"desc")):_*)
-  }
-  def limit(n:Int):this.type={
-    limit=n
-    this
-  }
-  def take:A= take(1).head
-  def takeOption:Option[A]= take(1).headOption
-  def take(n:Int):Relation[A]={
-    limit(n)
-  }
-  def first:A= first(1).head
-  def firstOption:Option[A]= first(1).headOption
-  def first(n:Int):Relation[A]= {
-    take(n).order(primaryKey-> "ASC")
-  }
-  def last:A= last(1).head
-  def last(n:Int):Relation[A]= {
-    take(n).order(primaryKey->"DESC")
-  }
-  def offset(n:Int): Relation[A]={
-    offset = n
-    this
-  }
-  @inline final def size = executeQuery.size
-  @inline final def foreach[U](f: A => U) = executeQuery.foreach(f)
-  @inline final def filter[U](f: A => Boolean) = executeQuery.filter(f)
-  @inline final def head = executeQuery.head
-  @inline final def headOption = executeQuery.headOption
-  @inline final def tail = executeQuery.tail
-  @inline final def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =  executeQuery.map(f)
-  @inline final def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Stream[A], B, That]): That = executeQuery.flatMap(f)
-
 }
 abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extends Dynamic{
   /**
