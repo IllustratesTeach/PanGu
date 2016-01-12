@@ -23,6 +23,11 @@ object ActiveRecord {
   @volatile
   var objectLocator:ObjectLocator= _
 
+  case object NotNull
+  case object Null
+  case class Between(start:Any,end:Any)
+  case class Not(value:Any)
+
   /**
    * Saves the model.
    * If the model is new a record gets created in the database,otherwise

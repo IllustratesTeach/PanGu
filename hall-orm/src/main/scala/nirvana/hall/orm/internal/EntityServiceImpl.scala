@@ -40,10 +40,8 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     relation.queryClause.foreach{fullQl += " where %s".format(_)}
     val query = entityManager.createQuery(fullQl)
 
-    relation.queryParams.zipWithIndex.foreach {
-      case (value, index) =>
-        query.setParameter(index + 1, value)
-    }
+    setQueryParameter(relation)
+
     query.executeUpdate()
   }
 
@@ -55,18 +53,24 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
 
     val query = entityManager.createQuery(fullQl)
 
-    var index = 1
+    var index: Int = setQueryParameter(relation)
 
-    relation.queryParams.foreach { value =>
-      query.setParameter(index, value)
-      index += 1
-    }
     relation.updateParams.foreach { value =>
       query.setParameter(index, value)
       index += 1
     }
     query.executeUpdate()
   }
+
+  private def setQueryParameter[T](relation: Relation[T]): Int = {
+    var index = 1
+    relation.queryParams.foreach { value =>
+      query.setParameter(index, value)
+      index += 1
+    }
+    index
+  }
+
   /**
    * find some records by Relation
    * @param relation relation object
@@ -83,10 +87,8 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     logger.debug("ql:{}",fullQl)
     val query = entityManager.createQuery(fullQl)
 
-    relation.queryParams.zipWithIndex.foreach{
-      case (value,index)=>
-        query.setParameter(index+1,value)
-    }
+    setQueryParameter(relation)
+
     if(relation.offset > -1)
       query.setFirstResult(relation.offset)
     if(relation.limit > -1)
