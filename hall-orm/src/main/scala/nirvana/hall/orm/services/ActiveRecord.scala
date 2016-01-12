@@ -1,6 +1,6 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.criteria.CriteriaBuilder
+import javax.persistence.criteria.{CriteriaBuilder, Path, Predicate}
 import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -10,7 +10,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.language.experimental.macros
-import scala.language.{dynamics, postfixOps}
+import scala.language.{dynamics, postfixOps, reflectiveCalls}
 import scala.reflect.{ClassTag, classTag}
 
 /**
@@ -91,6 +91,11 @@ object ActiveRecord {
   }
 }
 
+trait WhereSupportObject[A] {
+  def where (restrictions: Predicate *):this.type
+  def criteriaBuilder:CriteriaBuilder
+  def path(field:String):Path[A]
+}
 /**
  * ActiveRecord trait
  */
@@ -123,6 +128,21 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     }
 
     this
+  }
+}
+
+abstract class UpdateCriteriaRelation[A](val entityClass:Class[A],val primaryKey:String) {
+  private[services] val builder:CriteriaBuilder
+  private[orm] lazy val query = builder.createCriteriaUpdate(entityClass)
+  private lazy val currentRoot = query.from(entityClass)
+  def eq(field:String,value:Any): Unit ={
+    query.where(Array(builder.equal(currentRoot.get(field),value)):_*)
+  }
+}
+trait WhereCondition[A] {
+  self:WhereSupportObject[A] =>
+  def eq(field:String,value:Any): this.type ={
+    where(criteriaBuilder.equal(path(field),value))
   }
 }
 trait QuerySupport[A] {
