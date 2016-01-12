@@ -1,15 +1,13 @@
 package nirvana.hall.v62.internal
 
 import java.net.InetAddress
-import java.nio.ByteBuffer
-
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.AncientData._
 import nirvana.hall.v62.services.{AncientClient, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
-import AncientData._
 
 import scala.reflect._
 
@@ -58,11 +56,11 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
 
     override def receiveByteArray(len: Int): ChannelBuffer = {
-      val destByteBuffer = ByteBuffer.allocate(len)
-      connection.read(destByteBuffer)
-      ChannelBuffers.wrappedBuffer(destByteBuffer)
+//      val destByteBuffer = ByteBuffer.allocate(len)
+//      connection.read(destByteBuffer)
+//      ChannelBuffers.wrappedBuffer(destByteBuffer)
 //      ChannelBuffers.wrappedBuffer(connection.readByteBufferByLength(len):_*)
-     //val dest ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
+      ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
     /**

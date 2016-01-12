@@ -74,7 +74,7 @@ trait gnetcsr {
       pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
     }
 
-    if(pstCase.pstText_Data.forall(x=>x.bIsPointer == 1 && x.nItemLen >0)){
+    if(pstCase.pstText_Data.exists(x=>x.bIsPointer == 1 && x.nItemLen >0)){
 
       pAns.nReturnValue = 1
       channel.writeMessage[NoneResponse](pAns)

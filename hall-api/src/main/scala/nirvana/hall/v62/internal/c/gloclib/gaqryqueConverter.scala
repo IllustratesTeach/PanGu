@@ -4,8 +4,9 @@ import java.nio.ByteBuffer
 
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.c.services.gloclib.{glocdef, gaqryque}
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest
 import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest.MatcherStatus
@@ -14,6 +15,8 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.protocol.sys.CommonProto.ResponseStatus
 import nirvana.hall.v62.config.HallV62Config
 import org.jboss.netty.buffer.ChannelBuffers
+import scala.collection.JavaConversions._
+
 
 /**
  * Created by songpeng on 15/12/9.
@@ -30,6 +33,7 @@ object gaqryqueConverter {
     queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().asInstanceOf[Byte]
     queryStruct.stSimpQry.nPriority = matchTask.getPriority.toByte
     queryStruct.stSimpQry.nFlag = (gaqryque.GAQRY_FLAG_USEFINGER).asInstanceOf[Byte]
+    queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
 
     matchTask.getMatchType match {
       case MatchType.FINGER_TT =>
@@ -88,6 +92,31 @@ object gaqryqueConverter {
 
     queryStruct.nItemFlagA = gaqryque.GAIFA_FLAG.asInstanceOf[Byte]
 
+    //特征数据
+    val matchType = matchTask.getMatchType.getNumber
+    if (matchType == MatchType.FINGER_LL.getNumber || matchType == MatchType.FINGER_LT.getNumber){
+      val mic = new GAFISMICSTRUCT
+      mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
+      mic.nMntLen = mic.pstMnt_Data.length
+      mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
+      mic.nItemData = 1
+      mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+      queryStruct.pstMIC_Data = Array(mic)
+    }else if(matchType == MatchType.FINGER_TT.getNumber || matchType == MatchType.FINGER_TL.getNumber){
+      queryStruct.pstMIC_Data =
+        matchTask.getTData.getMinutiaDataList.map{md=>
+          val mic = new GAFISMICSTRUCT
+          mic.pstMnt_Data = md.getMinutia.toByteArray
+          mic.nMntLen = mic.pstMnt_Data.length
+          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
+          mic.nItemData =  md.getPos.toByte//TODO pos 8to6???
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+
+          mic
+
+        }.toArray
+    }
+    queryStruct.nMICCount = queryStruct.pstMIC_Data.length
     queryStruct
   }
 
