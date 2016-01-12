@@ -24,51 +24,56 @@ import scala.util.control.NonFatal
 class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessageHandler,extensionRegistry: ExtensionRegistry)
   extends HttpServletRequestFilter with LoggerSupport{
   override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
-    val header = request.getHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER)
-    if(header != null){
-      val responseBuilder = BaseCommand.newBuilder()
-      responseBuilder.setStatus(CommandStatus.OK)
-      var baseRequest:BaseCommand = null
-      try {
-        baseRequest = CommandProto.BaseCommand
-          .getDefaultInstance
-          .getParserForType
-          .parseFrom(request.getInputStream, extensionRegistry)
-        val commandResponse = new CommandResponse{
-          override def writeMessage[T](commandRequest: BaseCommand, extension: GeneratedExtension[BaseCommand, T], value: T): ChannelFuture = {
-            responseBuilder.setExtension(extension, value).setTaskId(commandRequest.getTaskId).setStatus(CommandStatus.OK)
-            null
+    try {
+      val header = request.getHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER)
+      if (header != null) {
+        val responseBuilder = BaseCommand.newBuilder()
+        responseBuilder.setStatus(CommandStatus.OK)
+        var baseRequest: BaseCommand = null
+        try {
+          baseRequest = CommandProto.BaseCommand
+            .getDefaultInstance
+            .getParserForType
+            .parseFrom(request.getInputStream, extensionRegistry)
+          val commandResponse = new CommandResponse {
+            override def writeMessage[T](commandRequest: BaseCommand, extension: GeneratedExtension[BaseCommand, T], value: T): ChannelFuture = {
+              responseBuilder.setExtension(extension, value).setTaskId(commandRequest.getTaskId).setStatus(CommandStatus.OK)
+              null
+            }
+
+            override def writeErrorMessage[T](commandRequest: BaseCommand, message: String): ChannelFuture = {
+              responseBuilder.setTaskId(commandRequest.getTaskId).setStatus(CommandStatus.FAIL).setMsg(message)
+              null
+            }
           }
-
-          override def writeErrorMessage[T](commandRequest: BaseCommand, message: String): ChannelFuture = {
-            responseBuilder.setTaskId(commandRequest.getTaskId).setStatus(CommandStatus.FAIL).setMsg(message)
-            null
+          val result = serverMessageHandler.handle(baseRequest, commandResponse)
+          if (!result) {
+            responseBuilder.setStatus(CommandStatus.FAIL)
+            responseBuilder.setMsg("message not handled !")
           }
+        } catch {
+          case NonFatal(e) =>
+            error(e.getMessage, e)
+            responseBuilder.setStatus(CommandStatus.FAIL)
+            responseBuilder.setMsg(e.toString)
         }
-        val result = serverMessageHandler.handle(baseRequest,commandResponse)
-        if(!result) {
-          responseBuilder.setStatus(CommandStatus.FAIL)
-          responseBuilder.setMsg("message not handled !")
+        if (!responseBuilder.hasTaskId) {
+
+          if (baseRequest == null)
+            responseBuilder.setTaskId(-1L)
+          else
+            responseBuilder.setTaskId(baseRequest.getTaskId)
         }
-      }catch {
-        case NonFatal(e) =>
-          error(e.getMessage, e)
-          responseBuilder.setStatus(CommandStatus.FAIL)
-          responseBuilder.setMsg(e.toString)
+
+        writeProtobufMessage(response, responseBuilder.build())
+
+        true
+      } else {
+        handler.service(request, response)
       }
-      if(!responseBuilder.hasTaskId){
-
-        if(baseRequest == null)
-          responseBuilder.setTaskId(-1L)
-        else
-          responseBuilder.setTaskId(baseRequest.getTaskId)
-      }
-
-      writeProtobufMessage(response,responseBuilder.build())
-
-      true
-    }else{
-      handler.service(request,response)
+    }catch{
+      case NonFatal(e) =>
+        error(e.toString,e)
     }
   }
   private def writeProtobufMessage(response:HttpServletResponse,responseCommand:BaseCommand): Unit ={
