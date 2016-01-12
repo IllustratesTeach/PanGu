@@ -1,7 +1,6 @@
 package nirvana.hall.orm.services
 
 
-import scala.collection.mutable
 import scala.language.dynamics
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
@@ -135,9 +134,6 @@ object HallOrmMacroDefine {
                                             (params:c.Expr[(String,Any)]*): c.Expr[R] = {
     import c.universe._
 
-    val clazzName = c.weakTypeOf[E]
-    var ql = ""
-
     val Literal(Constant(methodName:String)) = name.tree
     //find class field
     val expectedNames =  c.weakTypeOf[E].members
@@ -146,30 +142,24 @@ object HallOrmMacroDefine {
 
     //validate params
     val trees = params.map(_.tree).toList
-    val parameterValues = mutable.Buffer[Tree]()
-    var i = 1
     trees.foreach {
       case Apply(_,Literal(Constant(_name: String))::value::Nil) =>
         if(_name.isEmpty)
           c.error(c.enclosingPosition, s"name parameter is empty.")
         else if(!expectedNames.contains(_name))
           c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${_name} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
-        else {
-          ql += " and %s=?%s".format(_name,i)
-          i += 1
-          parameterValues += value
-        }
       case other =>
           c.error(c.enclosingPosition, s"${other} unsupported.")
     }
 
-    if(ql.length>0)
-      ql ="1=1 " + ql
-
     methodName match{
       case "where" =>
-        val qlTree = Literal(Constant(ql))
-        executeInternalWhere[c.type,R](c)(qlTree,parameterValues.toList)
+        val objectTree= q"nirvana.hall.orm.services.ActiveRecord"
+        val clazzTree = Select(c.prefix.tree,TermName("clazz"))
+        val primaryKeyTree = Select(c.prefix.tree,TermName("primaryKey"))
+        val paramsTree = params.map(_.tree)
+        c.Expr[R](q"nirvana.hall.orm.services.ActiveRecord.createCriteriaRelation($clazzTree,$primaryKeyTree,..$paramsTree)")
+        //executeInternalWhere[c.type,R](c)(qlTree,parameterValues.toList)
         //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
       case other=>
         c.error(c.enclosingPosition, s"${other} unsupported.")

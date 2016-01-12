@@ -1,6 +1,6 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.criteria.CriteriaQuery
+import javax.persistence.criteria.{CriteriaBuilder, CriteriaQuery, Predicate}
 import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
 import scala.collection.{GenTraversableOnce, mutable}
-import scala.language.dynamics
+import scala.language.{postfixOps, dynamics}
 import scala.language.experimental.macros
 import scala.reflect.{ClassTag, classTag}
 
@@ -80,6 +80,16 @@ object ActiveRecord {
   def internalWhere[A](clazz:Class[A],primaryKey:String,ql:String)(params:Any*): Relation[A]={
     new Relation[A](clazz,primaryKey,ql,params)
   }
+  def createCriteriaRelation[A](clazz:Class[A],primaryKey:String,params:(String,Any)*):CriteriaRelation[A]={
+    val queryBuilder = getService[EntityManager].getCriteriaBuilder
+    val q = queryBuilder.createQuery(clazz)
+    val relation = new CriteriaRelation[A](clazz,primaryKey,q) {
+      override private[services] val builder: CriteriaBuilder = queryBuilder
+    }
+    params.foreach(relation.eq _ tupled)
+
+    relation
+  }
 }
 
 /**
@@ -95,9 +105,13 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
-class CriteriaRelation[A](val entityClass:Class[A],val query:CriteriaQuery[A],val primaryKey:String) extends  Dynamic with QuerySupport[A]{
-  private val builder = ActiveRecord.getService[EntityManager].getCriteriaBuilder
+abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String,val query:CriteriaQuery[A]) extends  Dynamic with QuerySupport[A]{
+  private[services] val builder:CriteriaBuilder;
   private val currentRoot = query.from(entityClass)
+  def eq(field:String,value:Any): Unit ={
+    val expr: Predicate = builder.equal(currentRoot.get(field),value)
+    query.where(Array(expr):_*)
+  }
   override def order(params: (String, Any)*): CriteriaRelation.this.type = {
     params.foreach{
       case (field,value)=>
@@ -242,7 +256,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param params method parameter
    * @return relation query object
    */
-  def applyDynamicNamed(name:String)(params:(String,Any)*):Relation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,Relation[A]]
+  def applyDynamicNamed(name:String)(params:(String,Any)*):CriteriaRelation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,CriteriaRelation[A]]
 
   /**
    * find_by_xx_and_yy method
