@@ -55,9 +55,9 @@ class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
    */
   override def getMessage: String = {
     val message = getSimpleMessage
-    if(gafisError.szFileName != null)
-      message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)
-    else
+//    if(gafisError.szFileName != null)
+//      message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)
+//    else
       message
   }
 }
