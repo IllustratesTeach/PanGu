@@ -13,9 +13,11 @@ class Query7to6ServiceImplTest {
     "nirvana.hall.api.LocalProtobufModule",
     "nirvana.hall.api.LocalApiServiceModule",
     "nirvana.hall.api.LocalApiSyncModule",
+    "nirvana.hall.orm.HallOrmModule",
+    "nirvana.hall.api.internal.JpaTestModule",
     "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.v62.internal.filter.TestModule",
-    "nirvana.hall.api.internal.TestModule").map(Class.forName)
+    "nirvana.hall.v62.internal.filter.TestModule"
+    ).map(Class.forName)
   val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
   def test_getMatchTask(): Unit ={

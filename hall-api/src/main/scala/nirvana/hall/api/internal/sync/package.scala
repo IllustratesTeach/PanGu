@@ -1,6 +1,7 @@
 package nirvana.hall.api.internal
 
-import org.joda.time.DateTime
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  * some implicit converter
@@ -8,9 +9,19 @@ import org.joda.time.DateTime
  */
 package object sync {
   implicit def string2Int(string: String): Int ={
-    Integer.parseInt(string)
+    if(string != null && string.length > 0)
+      Integer.parseInt(string)
+    else
+      0
   }
-  implicit def dateTime2String(date: DateTime): String = {
-    date.toString("yyyyMMdd")
+  implicit def date2String(date: Date): String = {
+//    date.toString("yyyyMMdd")
+    if (date != null)
+      new SimpleDateFormat("yyyyMMdd").format(date)
+    else ""
+  }
+  def isNonBlank(string: String):Boolean = string != null && string.length >0
+  def magicSet(value:String,fun:String=>Any){
+    if(isNonBlank(value)){ fun(value)}
   }
 }

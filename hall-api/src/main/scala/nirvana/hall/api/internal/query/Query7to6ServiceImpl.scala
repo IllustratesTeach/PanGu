@@ -2,18 +2,21 @@ package nirvana.hall.api.internal.query
 
 import java.util.Date
 
+import com.google.protobuf.ByteString
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.jpa.{GafisNormalqueryQueryque, GafisQuery7to6}
+import nirvana.hall.api.jpa.{GafisQuery7to6, GafisNormalqueryQueryque}
 import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.api.services.query.Query7to6Service
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
+import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.jboss.netty.buffer.ChannelBuffers
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
@@ -52,13 +55,14 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
    */
   @Transactional
   override def getMatchTask(implicit session: DBSession): Option[MatchTask] ={
-    val query = GafisNormalqueryQueryque.where("status=0 and syncTargetSid not null").desc("priority").asc("oraSid").takeOption
+    val query = GafisNormalqueryQueryque.where("status=0 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
     /*
     val query = GafisNormalqueryQueryque.findAllBy(
       sqls.eq(GafisNormalqueryQueryque.gnq.status, 0)
         .and.isNotNull(GafisNormalqueryQueryque.gnq.syncTargetSid)
         .orderBy(GafisNormalqueryQueryque.gnq.priority desc,GafisNormalqueryQueryque.gnq.oraSid)).headOption
         */
+//    val query = GafisNormalqueryQueryque.where(status=0.toShort).firstOption
 
     query.foreach(updateGafisNormalqueryQueryqueStatusMatching)
 
@@ -71,6 +75,7 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
    * @param session
    * @return
    */
+  @Transactional
   private def updateGafisNormalqueryQueryqueStatusMatching(queryque: GafisNormalqueryQueryque)(implicit session: DBSession): Unit ={
     queryque.status = STATUS_MATCHING.toShort
     queryque.begintime = new Date()
@@ -91,6 +96,17 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
     matchTask.setPriority(query.priority.toInt)
     matchTask.setScoreThreshold(query.minscore)
 
+    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
+    mics.foreach{mic =>
+      if(mic.bIsLatent == 1){
+        val ldata = LatentMatchData.newBuilder()
+        ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
+        matchTask.setLData(ldata)
+      }else{
+        //TODO pos 6to8 ???
+        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+      }
+    }
     matchTask.build()
   }
 
@@ -108,15 +124,15 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
     pstKey.nKeySize = key.size.asInstanceOf[Short]
     pstKey.pKey_Data = key
 
-    val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
-
     val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask)(v62Config)
-    val retval = facade.NET_GAFIS_QUERY_Submit(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
-
-    //记录6.2的查询SID
-    retval.foreach{ ret =>
-      new GafisQuery7to6(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID)).save()
-    }
+//    val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
+//    val retval = facade.NET_GAFIS_QUERY_Submit(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
+//    //记录6.2的查询SID
+//    retval.foreach{ ret =>
+//      new GafisQuery7to6(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID)).save()
+//    }
+    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct);
+    new GafisQuery7to6(matchTask.getObjectId, oraSid).save()
   }
 
 

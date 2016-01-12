@@ -26,8 +26,7 @@ class QueryFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmServic
           data.setGatherFgpCase(finger.fgpCase.toInt)
           data.setLobtype(finger.lobtype)
           data.setGroupId(finger.groupId.toInt)
-          val byte = finger.gatherData.getBytes(0,finger.gatherData.length().toInt)
-          val gatherData = MsgBase64.toBase64(byte)
+          val gatherData = MsgBase64.toBase64(finger.gatherData)
           data.setGatherData(gatherData)
           builder.addGatherData(data)
         }

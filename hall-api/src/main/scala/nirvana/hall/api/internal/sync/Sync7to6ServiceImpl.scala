@@ -11,7 +11,6 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.GafisException
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Transactional
 import scalikejdbc._
 
@@ -84,6 +83,7 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
     }
     catch {
       case e: Exception =>
+        e.printStackTrace()
         updateSyncQueueFail(syncQueue, e)
     }
   }
@@ -95,6 +95,7 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: 
   private def updateSyncQueueSucess(syncQueue: SyncQueue)(implicit session: DBSession): Unit ={
     syncQueue.uploadStatus = UPLOAD_STATUS_SUCCESS
     syncQueue.remark="success"
+    syncQueue.finishdate=new Date()
     syncQueue.save()
 
     //SyncQueue.where(pkId=syncQueue.pkId).update_set(uploadStatus=UPLOAD_STATUS_SUCCESS,remark="success").update()

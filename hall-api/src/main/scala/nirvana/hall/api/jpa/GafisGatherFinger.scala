@@ -4,7 +4,7 @@ package nirvana.hall.api.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
+import javax.persistence._
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -50,8 +50,9 @@ class GafisGatherFinger extends ActiveRecord {
   var mainPattern: java.lang.Short = _
   @Column(name = "VICE_PATTERN")
   var vicePattern: java.lang.Short = _
+  @Lob
   @Column(name = "GATHER_DATA", nullable = false)
-  var gatherData: java.sql.Blob = _
+  var gatherData: Array[Byte] = _
   @Column(name = "SEQ")
   var seq: java.lang.Long = _
   @Column(name = "FINGER_DATA_NOSQL_ID", length = 10)
@@ -60,7 +61,7 @@ class GafisGatherFinger extends ActiveRecord {
   var partitionCitycode: java.lang.String = _
 
 
-  def this(pkId: java.lang.String, fgp: Short, lobtype: Short, inputtime: java.util.Date, gatherData: java.sql.Blob) {
+  def this(pkId: java.lang.String, fgp: Short, lobtype: Short, inputtime: java.util.Date, gatherData: Array[Byte]) {
     this()
     this.pkId = pkId
     this.fgp = fgp
@@ -69,7 +70,7 @@ class GafisGatherFinger extends ActiveRecord {
     this.gatherData = gatherData
   }
 
-  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, fgpCase: java.lang.String, auditStatus: java.lang.Short, description: java.lang.String, mainPattern: java.lang.Short, vicePattern: java.lang.Short, gatherData: java.sql.Blob, seq: java.lang.Long, fingerDataNosqlId: java.lang.String, partitionCitycode: java.lang.String) {
+  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, fgpCase: java.lang.String, auditStatus: java.lang.Short, description: java.lang.String, mainPattern: java.lang.Short, vicePattern: java.lang.Short, gatherData: Array[Byte], seq: java.lang.Long, fingerDataNosqlId: java.lang.String, partitionCitycode: java.lang.String) {
     this()
     this.pkId = pkId
     this.personId = personId
