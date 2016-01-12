@@ -445,34 +445,34 @@ object galoctp {
   {
     var pszMICName_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszMICName_Data:Array[Byte] = _ // for pszMICName pointer ,struct:char;
+  var pszMICName_Data:String = "$$MIC" // for pszMICName pointer ,struct:char;
   var pszItemFlag_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszItemFlag_Data:Array[Byte] = _ // for pszItemFlag pointer ,struct:char;	// first byte Flag, second Type, third Data, fourth bIsLatent
+  var pszItemFlag_Data:String = "$$ItemFlag" // for pszItemFlag pointer ,struct:char;	// first byte Flag, second Type, third Data, fourth bIsLatent
   var pszItemType_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszItemType_Data:Array[Byte] = _ // for pszItemType pointer ,struct:char;
+  var pszItemType_Data:String = "$$ItemType" // for pszItemType pointer ,struct:char;
   var pszItemData_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszItemData_Data:Array[Byte] = _ // for pszItemData pointer ,struct:char;
+  var pszItemData_Data:String = "$$ItemData" // for pszItemData pointer ,struct:char;
   var pszIsLatent_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszIsLatent_Data:Array[Byte] = _ // for pszIsLatent pointer ,struct:char;
+  var pszIsLatent_Data:String = "$$IsLatent" // for pszIsLatent pointer ,struct:char;
   var pszMntName_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszMntName_Data:Array[Byte] = _ // for pszMntName pointer ,struct:char;
+  var pszMntName_Data:String = "$$Mnt" // for pszMntName pointer ,struct:char;
   var pszImgName_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszImgName_Data:Array[Byte] = _ // for pszImgName pointer ,struct:char;
+  var pszImgName_Data:String = "$$Img" // for pszImgName pointer ,struct:char;
   var pszCprName_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszCprName_Data:Array[Byte] = _ // for pszCprName pointer ,struct:char;
+  var pszCprName_Data:String = "$$Cpr" // for pszCprName pointer ,struct:char;
   var pszBinName_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszBinName_Data:Array[Byte] = _ // for pszBinName pointer ,struct:char;
+  var pszBinName_Data:String = "$$Bin" // for pszBinName pointer ,struct:char;
   var pszItemIndex_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
-  var pszItemIndex_Data:Array[Byte] = _ // for pszItemIndex pointer ,struct:char;
+  var pszItemIndex_Data:String = "$$ItemIndex" // for pszItemIndex pointer ,struct:char;
   } // GADB_MICSTREAMNAMESTRUCT;
 
   // GAFIS_TPCARD_Update::nOption
