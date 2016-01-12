@@ -224,9 +224,9 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
   val primaryKey = field.getOrElse(throw new IllegalStateException("primary key is null")).getName
 
   /**
-   * find_by and where method
+   * where method
    * sucha as:
-   * find_by(name="jcai",code="1232")
+   *
    * where(name="jcai",code="1232")
    * @param name method name
    * @param params method parameter

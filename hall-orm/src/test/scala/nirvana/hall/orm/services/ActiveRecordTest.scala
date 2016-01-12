@@ -47,7 +47,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
     Assert.assertTrue(ModelA.where(name="asdf").exists())
     Assert.assertFalse(ModelA.where(name="fdsa").exists())
 
-    var size = ModelA.find_by(name="asdf").size
+    var size = ModelA.where(name="asdf").size
     Assert.assertEquals(1,size)
 
     size = ModelA.find_by_name("asdf").limit(10).size

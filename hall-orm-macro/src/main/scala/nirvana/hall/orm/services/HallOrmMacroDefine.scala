@@ -167,7 +167,7 @@ object HallOrmMacroDefine {
       ql ="1=1 " + ql
 
     methodName match{
-      case "find_by" | "where" =>
+      case "where" =>
         val qlTree = Literal(Constant(ql))
         executeInternalWhere[c.type,R](c)(qlTree,parameterValues.toList)
         //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
