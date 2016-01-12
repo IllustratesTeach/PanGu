@@ -67,6 +67,17 @@ class ModelA extends ActiveRecord{
   @Column(name = "CASE_OCCUR_DATE", length = 23)
   var date:java.util.Date = _
 }
+object ModelB extends ActiveRecordInstance[ModelB]{
+}
+@Entity
+@Table(name = "model_B")
+@javax.persistence.SequenceGenerator(name = "entity_a_seq", sequenceName = "entity_a_seq")
+class ModelB extends ActiveRecord{
+  @Id
+  @Column(name = "id")
+  var id:Int = _
+  var name:String = _
+}
 object TestDataModule{
   def buildDataSource: DataSource ={
     val dbPath = "target/test.db"

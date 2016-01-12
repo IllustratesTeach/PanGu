@@ -2,7 +2,7 @@ package nirvana.hall.orm.services
 
 import java.util.Date
 
-import nirvana.hall.orm.{BaseOrmTestCase, ModelA}
+import nirvana.hall.orm.{ModelB, BaseOrmTestCase, ModelA}
 import org.junit.{Assert, Test}
 
 /**
@@ -15,13 +15,22 @@ class ActiveRecordTest extends BaseOrmTestCase{
   def test_update: Unit = {
     val modelA = new ModelA
     modelA.name = "asdf"
-    modelA.save()
+    modelA.save
     Assert.assertEquals(1,ModelA.all.size)
 
     val modeB = ModelA.find(modelA.id)
     modeB.name="fdsa"
-    modeB.save()
+    modeB.save
     Assert.assertEquals(1,ModelA.all.size)
+
+    var modelB = new ModelB
+    modelB.save
+    Assert.assertEquals(1,ModelB.all.size)
+    modelB = ModelB.find(modelB.id)
+    modelB.name="fdsa"
+    modelB.save
+    Assert.assertEquals(1,ModelB.all.size)
+
   }
 
   @Test
