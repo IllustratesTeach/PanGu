@@ -74,6 +74,7 @@ class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessag
     }catch{
       case NonFatal(e) =>
         error(e.toString,e)
+        throw e
     }
   }
   private def writeProtobufMessage(response:HttpServletResponse,responseCommand:BaseCommand): Unit ={
