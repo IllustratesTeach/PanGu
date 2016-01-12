@@ -12,6 +12,19 @@ import org.junit.{Assert, Test}
  */
 class ActiveRecordTest extends BaseOrmTestCase{
   @Test
+  def test_update: Unit = {
+    val modelA = new ModelA
+    modelA.name = "asdf"
+    modelA.save()
+    Assert.assertEquals(1,ModelA.all.size)
+
+    val modeB = ModelA.find(modelA.id)
+    modeB.name="fdsa"
+    modeB.save()
+    Assert.assertEquals(1,ModelA.all.size)
+  }
+
+  @Test
   def test_save: Unit ={
     val modelA = new ModelA
     modelA.name = "asdf"
