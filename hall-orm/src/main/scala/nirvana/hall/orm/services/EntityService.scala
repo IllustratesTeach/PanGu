@@ -19,6 +19,6 @@ trait EntityService {
   @Transactional
   def deleteRelation[T](relation: Relation[T]):Int
   @Transactional
-  def updateRelation[T](relation: Relation[T]):Int
+  def updateRelation[T](relation: QuerySupport[T]):Int
   def find[T](relation:QuerySupport[T]):Stream[T]
 }

@@ -46,20 +46,29 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
   }
 
   @Transactional
-  override def updateRelation[T](relation: Relation[T]): Int = {
-    var fullQl = "update %s set".format(relation.entityClazz.getSimpleName)
-    relation.updateQl.foreach{fullQl += " %s".format(_)}
-    relation.queryClause.foreach{fullQl += " where %s".format(_)}
+  override def updateRelation[T](updateObject: QuerySupport[T]): Int = {
+    updateObject match {
+      case relation: Relation[T] =>
+        var fullQl = "update %s set".format(relation.entityClazz.getSimpleName)
+        relation.updateQl.foreach {
+          fullQl += " %s".format(_)
+        }
+        relation.queryClause.foreach {
+          fullQl += " where %s".format(_)
+        }
 
-    val query = entityManager.createQuery(fullQl)
+        val query = entityManager.createQuery(fullQl)
 
-    var index: Int = setQueryParameter(query,relation)
+        var index: Int = setQueryParameter(query, relation)
 
-    relation.updateParams.foreach { value =>
-      query.setParameter(index, value)
-      index += 1
+        relation.updateParams.foreach { value =>
+          query.setParameter(index, value)
+          index += 1
+        }
+        query.executeUpdate()
+      case other =>
+        throw new UnsupportedOperationException
     }
-    query.executeUpdate()
   }
 
   private def setQueryParameter[T](query:Query,relation: Relation[T]): Int = {

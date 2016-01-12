@@ -1,6 +1,6 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.criteria.{CriteriaBuilder, CriteriaQuery, Predicate}
+import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
 import scala.collection.{GenTraversableOnce, mutable}
-import scala.language.{postfixOps, dynamics}
 import scala.language.experimental.macros
+import scala.language.{dynamics, postfixOps}
 import scala.reflect.{ClassTag, classTag}
 
 /**
@@ -46,7 +46,7 @@ object ActiveRecord {
   def delete[T](record:T): Unit ={
     getService[EntityService].delete(record)
   }
-  def updateRelation[T](relation: Relation[T]):Int={
+  def updateRelation[T](relation: QuerySupport[T]):Int={
     getService[EntityService].updateRelation(relation)
   }
   def deleteRelation[T](relation: Relation[T]):Int={
@@ -82,8 +82,7 @@ object ActiveRecord {
   }
   def createCriteriaRelation[A](clazz:Class[A],primaryKey:String,params:(String,Any)*):CriteriaRelation[A]={
     val queryBuilder = getService[EntityManager].getCriteriaBuilder
-    val q = queryBuilder.createQuery(clazz)
-    val relation = new CriteriaRelation[A](clazz,primaryKey,q) {
+    val relation = new CriteriaRelation[A](clazz,primaryKey) {
       override private[services] val builder: CriteriaBuilder = queryBuilder
     }
     params.foreach(relation.eq _ tupled)
@@ -105,12 +104,12 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
-abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String,val query:CriteriaQuery[A]) extends  Dynamic with QuerySupport[A]{
-  private[services] val builder:CriteriaBuilder;
-  private val currentRoot = query.from(entityClass)
+abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String) extends QuerySupport[A]{
+  private[services] val builder:CriteriaBuilder
+  private[orm] lazy val query = builder.createQuery(entityClass)
+  private lazy val currentRoot = query.from(entityClass)
   def eq(field:String,value:Any): Unit ={
-    val expr: Predicate = builder.equal(currentRoot.get(field),value)
-    query.where(Array(expr):_*)
+    query.where(Array(builder.equal(currentRoot.get(field),value)):_*)
   }
   override def order(params: (String, Any)*): CriteriaRelation.this.type = {
     params.foreach{
@@ -126,7 +125,7 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     this
   }
 }
-trait QuerySupport[A]{
+trait QuerySupport[A] {
   protected val primaryKey:String
   private[orm] var limit:Int = -1
   private[orm] var offset:Int = -1
@@ -137,6 +136,7 @@ trait QuerySupport[A]{
       underlying_result = ActiveRecord.find(this)
     underlying_result
   }
+
   def order(params:(String,Any)*):this.type
   def asc(fields:String*):this.type={
     order(fields.map((_,"asc")):_*)
@@ -183,7 +183,7 @@ trait QuerySupport[A]{
  * @param primaryKey primary key
  * @tparam A type parameter
  */
-class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynamic with QuerySupport[A]{
+class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QuerySupport[A] with Dynamic{
   def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
     this(entityClazz,primaryKey)
     if(query != null)
@@ -199,11 +199,11 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   private[orm] var updateQl:Option[String] = None
   private[orm] var updateParams:Seq[Any] = Nil
 
-
   /**
    * update method
    */
   def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
+
 
   def order(params:(String,Any)*):this.type= {
     params.foreach{case (key,value)=>
