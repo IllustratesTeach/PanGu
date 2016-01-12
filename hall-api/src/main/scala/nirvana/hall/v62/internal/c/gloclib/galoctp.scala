@@ -23,56 +23,34 @@ trait galoctp {
 
       try {
         buffer.markReaderIndex()
-        GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszItemIndex_Data)
-        pmic.nIndex = buffer.readByte()
-        buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
+        pmic.nIndex = GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer, streamParameter.pszItemIndex_Data)
       } catch {
         case e: Throwable => //
           buffer.resetReaderIndex()
       }
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszItemFlag_Data)
-      pmic.nItemFlag = buffer.readByte()
-      buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszItemType_Data)
-      pmic.nItemType = buffer.readByte()
-      buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszItemData_Data)
-      pmic.nItemData = buffer.readByte()
-      buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszIsLatent_Data)
-      pmic.bIsLatent = buffer.readByte()
-      buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
+      pmic.nItemFlag = GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer, streamParameter.pszItemFlag_Data)
+      pmic.nItemType = GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer, streamParameter.pszItemType_Data)
+      pmic.nItemData = GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer, streamParameter.pszItemData_Data)
+      pmic.bIsLatent = GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer, streamParameter.pszIsLatent_Data)
 
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszMntName_Data)
-      if(dataLength > 0) {
-        pmic.pstMnt_Data = buffer.readBytes(dataLength).array()
-        pmic.nMntLen = dataLength
-        buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      }
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszImgName_Data)
-      if(dataLength >0) {
-        pmic.pstImg_Data = buffer.readBytes(dataLength).array()
-        pmic.nImgLen = dataLength
-        buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      }
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszCprName_Data)
-      if(dataLength >0) {
-        pmic.pstCpr_Data = buffer.readBytes(dataLength).array()
-        pmic.nCprLen = dataLength
-        buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      }
-      dataLength = GAFIS_MIC_GetItemDataFromStream(buffer, streamParameter.pszBinName_Data)
-      if(dataLength >0) {
-        pmic.pstBin_Data = buffer.readBytes(dataLength).array()
-        pmic.nBinLen = dataLength
-        buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
-      }
+      pmic.pstMnt_Data = GAFIS_MIC_GetItemDataFromStreamByteArray(buffer, streamParameter.pszMntName_Data)
+      pmic.nMntLen = pmic.pstMnt_Data.length
+
+      pmic.pstImg_Data = GAFIS_MIC_GetItemDataFromStreamByteArray(buffer, streamParameter.pszImgName_Data)
+      pmic.nImgLen = pmic.pstImg_Data.length
+
+      pmic.pstCpr_Data = GAFIS_MIC_GetItemDataFromStreamByteArray(buffer, streamParameter.pszCprName_Data)
+      pmic.nCprLen = pmic.pstCpr_Data.length
+
+      pmic.pstBin_Data = GAFIS_MIC_GetItemDataFromStreamByteArray(buffer, streamParameter.pszBinName_Data)
+      pmic.nBinLen = pmic.pstBin_Data.length
+
       result += pmic
     }
 
     result.toSeq
   }
-  def GAFIS_MIC_GetItemDataFromStream(buffer:ChannelBuffer,pszExpectedName:String): Int={
+  private def GAFIS_MIC_GetItemDataFromStream(buffer:ChannelBuffer,pszExpectedName:String): Int={
     GADB_COL_CmpName(buffer.readBytes(32),pszExpectedName)
     val nLen = buffer.readInt()
     if(nLen > buffer.readableBytes()){
@@ -80,12 +58,24 @@ trait galoctp {
     }
     nLen
   }
+  private def GAFIS_MIC_GetItemDataFromStreamSingleByte(buffer:ChannelBuffer,pszExpectedName:String): Byte={
+    val dataLength = GAFIS_MIC_GetItemDataFromStream(buffer,pszExpectedName)
+    val byte = buffer.readByte()
+    buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
+    byte
+  }
+  private def GAFIS_MIC_GetItemDataFromStreamByteArray(buffer:ChannelBuffer,pszExpectedName:String): Array[Byte]={
+    val dataLength = GAFIS_MIC_GetItemDataFromStream(buffer,pszExpectedName)
+    val bytes = buffer.readBytes(dataLength).array()
+    buffer.skipBytes(UTIL_TO4ALIGN(dataLength) - dataLength)
+    bytes
+  }
   private def UTIL_TO4ALIGN(x:Int)=	((x + 3) / 4) * 4
 
 
-  def GADB_COL_CmpName(bytes:ChannelBuffer,expecteName:String) {
+  private def GADB_COL_CmpName(bytes:ChannelBuffer,expectedName:String) {
     val currentName= new String(bytes.array()).trim
-    if(!currentName.startsWith(expecteName))
-      throw new IllegalAccessException("expectName=%s actual =%s".format(expecteName,currentName))
+    if(!currentName.startsWith(expectedName))
+      throw new IllegalAccessException("expectName=%s actual =%s".format(expectedName,currentName))
   }
 }
