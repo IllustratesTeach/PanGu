@@ -2,7 +2,7 @@ package nirvana.hall.orm.internal
 
 import javax.persistence.{EntityManager, Query}
 
-import nirvana.hall.orm.services.{EntityService, QuerySupport, Relation}
+import nirvana.hall.orm.services.{CriteriaRelation, EntityService, QuerySupport, Relation}
 import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 
@@ -78,7 +78,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
    * @return record stream
    */
   def find[T](queryObj:QuerySupport[T]):Stream[T]={
-    queryObj match {
+    val query = queryObj match {
       case relation: Relation[T] =>
         var fullQl = "from %s".format(relation.entityClazz.getSimpleName)
         relation.queryClause.foreach {
@@ -93,15 +93,17 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
 
         setQueryParameter(query, relation)
 
-        if (relation.offset > -1)
-          query.setFirstResult(relation.offset)
-        if (relation.limit > -1)
-          query.setMaxResults(relation.limit)
-
-        //convert as scala stream
-        JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
+        query
+      case relation: CriteriaRelation[T] =>
+        entityManager.createQuery(relation.query)
       case other=>
         throw new UnsupportedOperationException("%s unspported".format(other))
     }
+    if (queryObj.offset > -1)
+      query.setFirstResult(queryObj.offset)
+    if (queryObj.limit > -1)
+      query.setMaxResults(queryObj.limit)
+    //convert as scala stream
+    JavaConversions.asScalaBuffer[T](query.getResultList.asInstanceOf[java.util.List[T]]).toStream
   }
 }

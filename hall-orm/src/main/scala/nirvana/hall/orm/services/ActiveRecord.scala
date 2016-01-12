@@ -1,7 +1,7 @@
 package nirvana.hall.orm.services
 
 import javax.persistence.criteria.CriteriaQuery
-import javax.persistence.{Id, Transient}
+import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
 import org.slf4j.LoggerFactory
@@ -95,7 +95,22 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
-class CriteriaRelation[A](val query:CriteriaQuery[A],val primaryKey:String) extends Dynamic{
+class CriteriaRelation[A](val entityClass:Class[A],val query:CriteriaQuery[A],val primaryKey:String) extends  Dynamic with QuerySupport[A]{
+  private val builder = ActiveRecord.getService[EntityManager].getCriteriaBuilder
+  private val currentRoot = query.from(entityClass)
+  override def order(params: (String, Any)*): CriteriaRelation.this.type = {
+    params.foreach{
+      case (field,value)=>
+        String.valueOf(value).toLowerCase match{
+          case "asc"=>
+            query.orderBy(builder.asc(currentRoot.get(field)))
+          case "desc"=>
+            query.orderBy(builder.desc(currentRoot.get(field)))
+        }
+    }
+
+    this
+  }
 }
 trait QuerySupport[A]{
   protected val primaryKey:String
@@ -140,6 +155,7 @@ trait QuerySupport[A]{
   }
   @inline final def size = executeQuery.size
   @inline final def foreach[U](f: A => U) = executeQuery.foreach(f)
+  @inline final def filter[U](f: A => Boolean) = executeQuery.filter(f)
   @inline final def head = executeQuery.head
   @inline final def headOption = executeQuery.headOption
   @inline final def tail = executeQuery.tail
