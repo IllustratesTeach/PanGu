@@ -194,6 +194,7 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends Dynami
   }
   @inline final def size = executeQuery.size
   @inline final def foreach[U](f: A => U) = executeQuery.foreach(f)
+  @inline final def filter[U](f: A => Boolean) = executeQuery.filter(f)
   @inline final def head = executeQuery.head
   @inline final def headOption = executeQuery.headOption
   @inline final def tail = executeQuery.tail
