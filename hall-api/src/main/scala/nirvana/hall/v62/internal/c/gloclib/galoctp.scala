@@ -80,7 +80,7 @@ trait galoctp {
     }
     nLen
   }
-  private def UTIL_TO4ALIGN(x:Int)=	((((x)+3)/4)*4)
+  private def UTIL_TO4ALIGN(x:Int)=	((x + 3) / 4) * 4
 
 
   def GADB_COL_CmpName(bytes:ChannelBuffer,expecteName:String) {

@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
-import org.junit.Test
+import org.junit.{Assert, Test}
 
 /**
  *
@@ -16,6 +16,7 @@ class galoctpTest {
     val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/mic.data"))
     val buffer=ChannelBuffers.wrappedBuffer(bytes)
     val ga = new galoctp {}
-    ga.GAFIS_MIC_GetDataFromStream(buffer)
+    val mics = ga.GAFIS_MIC_GetDataFromStream(buffer)
+    Assert.assertEquals(10,mics.length)
   }
 }
