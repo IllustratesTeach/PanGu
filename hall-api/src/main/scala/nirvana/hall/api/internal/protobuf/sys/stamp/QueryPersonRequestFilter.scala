@@ -2,11 +2,11 @@ package nirvana.hall.api.internal.protobuf.sys.stamp
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ScalaUtils
-import nirvana.hall.api.services.{ProtobufRequestHandler, ProtobufRequestFilter}
 import nirvana.hall.api.services.stamp.GatherPersonService
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
+import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.sys.stamp.PersonProto.PersonInfo
-import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonResponse, QueryBasePersonRequest}
+import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonRequest, QueryBasePersonResponse}
 
 /**
  * Created by wangjue on 2015/11/2.

@@ -20,7 +20,7 @@ class Query7to6ServiceImplTest {
     ).map(Class.forName)
   val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
-  def test_getMatchTask(): Unit ={
+  def test_sendQuery(): Unit ={
     val service = registry.getService(classOf[Query7to6Service])
 
     val task = service.getMatchTask

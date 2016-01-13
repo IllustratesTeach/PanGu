@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal.sync
 
-import nirvana.hall.api.jpa.{GafisCaseFinger, GafisCase, SyncQueue}
+import nirvana.hall.api.jpa.{GafisCase, GafisCaseFinger, SyncQueue}
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade

@@ -24,7 +24,7 @@ class Sync7to6ServiceImplTest {
   def test_sync(): Unit ={
     val syncService = registry.getService(classOf[Sync7to6Service])
     val syncQueue = SyncQueue.find("11")
-    syncService.doWork(syncQueue)
+    syncService.doTaskOfSyncQueue(syncQueue)
 
   }
 

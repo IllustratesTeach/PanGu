@@ -15,7 +15,7 @@ class SystemServiceImpl(protobufRequestGlobal: ProtobufRequestGlobal, classNameL
   /*
   @Transactional
   @RequiresUser
-  override def deleteEntity(entity: String, id: Int)(implicit session: DBSession): Unit = {
+  override def deleteEntity(entity: String, id: Int): Unit = {
     val userId = protobufRequestGlobal.userId
     SQL("delete from " + entity + " where id=? and user_id=?").bind(id, userId).executeUpdate().apply()
   }

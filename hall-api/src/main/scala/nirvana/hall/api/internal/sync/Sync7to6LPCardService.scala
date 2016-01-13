@@ -2,7 +2,7 @@ package nirvana.hall.api.internal.sync
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SyncQueue}
-import nirvana.hall.protocol.v62.FPTProto.{PatternType, FingerFgp, ImageType, LPCard}
+import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter

@@ -74,7 +74,7 @@ object HallOrmModule {
     transactionManager
   }
 
-   def buildTransactionInterceptor(transactionManager: PlatformTransactionManager): TransactionInterceptor = {
+   def buildTransactionInterceptor(@Local transactionManager: PlatformTransactionManager): TransactionInterceptor = {
     val transactionAttributeSource = new AnnotationTransactionAttributeSource
     val transactionInterceptor = new TransactionInterceptor(transactionManager, transactionAttributeSource)
     transactionInterceptor.afterPropertiesSet()
@@ -82,7 +82,7 @@ object HallOrmModule {
   }
 
   @Match(Array("*"))
-  def adviseTransactional(receiver: MethodAdviceReceiver, transactionInterceptor: TransactionInterceptor) {
+  def adviseTransactional(receiver: MethodAdviceReceiver, @Local transactionInterceptor: TransactionInterceptor) {
     for (m <- receiver.getInterface.getMethods) {
       if (receiver.getMethodAnnotation(m, classOf[Transactional]) != null)
         receiver.adviseMethod(m, new EntityManagerTransactionAdvice(transactionInterceptor, m))

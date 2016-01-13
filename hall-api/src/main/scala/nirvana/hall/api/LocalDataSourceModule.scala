@@ -8,11 +8,9 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import monad.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.services.AutoSpringDataSourceSession
-import org.apache.tapestry5.ioc.annotations.{EagerLoad, Startup}
-import org.apache.tapestry5.ioc.services.{PerthreadManager, RegistryShutdownHub}
+import org.apache.tapestry5.ioc.annotations.EagerLoad
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
-import scalikejdbc.{GlobalSettings, LoggingSQLAndTimeSettings}
 
 /**
  * 针对数据的操作
@@ -20,12 +18,6 @@ import scalikejdbc.{GlobalSettings, LoggingSQLAndTimeSettings}
  * @since 2015-10-06
  */
 object LocalDataSourceModule {
-  @Startup
-  def provideAutoSpringDataSource(dataSource: DataSource,perthreadManager: PerthreadManager): Unit ={
-    AutoSpringDataSourceSession.dataSource = dataSource
-    AutoSpringDataSourceSession.perthreadManager = perthreadManager
-  }
-
   /*
   @EagerLoad
   def buildPlatformTransactionManager(dataSource: DataSource):PlatformTransactionManager = {
@@ -103,15 +95,6 @@ object LocalDataSourceModule {
     val migrator = new Migrator(dataSource, databaseAdapter)
     //migrator.migrate(RemoveAllMigrations, "nirvana.hall.api.migration", false)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
-    //构建ScalaJdbc的数据库pool
-    //ConnectionPool.singleton(new DataSourceConnectionPool(dataSource))
-    GlobalSettings.loggingSQLAndTime = new LoggingSQLAndTimeSettings(
-      enabled = true,
-      singleLineMode = true,
-      logLevel = 'DEBUG)
-    GlobalSettings.jtaDataSourceCompatible = true
-
-    AutoSpringDataSourceSession.driverName = Some(config.api.db.driver)
 
     dataSource
   }

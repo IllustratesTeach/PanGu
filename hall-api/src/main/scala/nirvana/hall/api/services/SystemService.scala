@@ -9,7 +9,7 @@ trait SystemService {
   /*
   @Transactional
   @RequiresUser
-  def deleteEntity(entity: String, id: Int)(implicit session: DBSession = AutoSpringDataSourceSession.apply())
+  def deleteEntity(entity: String, id: Int)
   */
 
   def findAllProtocol(): Seq[String]

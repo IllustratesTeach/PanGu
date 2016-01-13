@@ -3,11 +3,10 @@ package nirvana.hall.api.internal.sync
 import com.google.protobuf.ByteString
 import nirvana.hall.api.jpa._
 import nirvana.hall.orm.services.Relation
-import nirvana.hall.protocol.v62.FPTProto.{ImageType, FingerFgp, TPCard}
+import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
-import scalikejdbc._
 
 /**
  * Created by songpeng on 15/12/7.
@@ -19,7 +18,7 @@ trait Sync7to6TPCardService {
    * @param session
    * @return
    */
-  def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue)(implicit session: DBSession): Unit = {
+  def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue): Unit = {
     val personId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
@@ -31,7 +30,7 @@ trait Sync7to6TPCardService {
     }
   }
 
-  private def addTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit = {
+  private def addTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
     val tpCard = getTPCard(personId)
     //数据转换为C的结构
     val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
@@ -41,19 +40,19 @@ trait Sync7to6TPCardService {
       personId, gTPCard)
   }
 
-  private def updateTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit = {
+  private def updateTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
     val tpCard = getTPCard(personId)
     val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
     facade.NET_GAFIS_FLIB_Update(v62Config.templateTable.dbId.toShort,
       v62Config.templateTable.tableId.toShort, personId, gTPCard)
   }
 
-  private def deleteTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String)(implicit session: DBSession): Unit = {
+  private def deleteTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
     facade.NET_GAFIS_FLIB_Del(v62Config.templateTable.dbId.toShort,
       v62Config.templateTable.tableId.toShort, personId)
   }
 
-  private def getTPCard(personId: String)(implicit session: DBSession): TPCard = {
+  private def getTPCard(personId: String): TPCard = {
     val person = GafisPerson.find(personId)
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(personId)

@@ -3,7 +3,7 @@ package nirvana.hall.api
 import com.google.protobuf.ExtensionRegistry
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
+import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import org.apache.tapestry5.ioc.Configuration
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.{ClassNameLocator, PipelineBuilder}

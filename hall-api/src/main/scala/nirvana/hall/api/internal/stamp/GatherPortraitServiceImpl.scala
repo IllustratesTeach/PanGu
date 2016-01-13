@@ -1,5 +1,6 @@
 package nirvana.hall.api.internal.stamp
 
+import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.sql.rowset.serial.SerialBlob
@@ -8,8 +9,6 @@ import nirvana.hall.api.internal.AnalysisData
 import nirvana.hall.api.jpa.GafisGatherPortrait
 import nirvana.hall.api.services.stamp.GatherPortraitService
 import nirvana.hall.orm.services.Relation
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 
 
 /**
@@ -54,7 +53,6 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
   /**
    * 覆盖删除人像
    * @param personid
-   * @param session
    * @return
    */
   override def deleteGatherPortrait(personid: String): Boolean = {
@@ -76,7 +74,6 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * 解析保存人像
    * @param personId
    * @param faceData
-   * @param session
    * @return
    */
   override def analysisGatherPortrait(personId: String, faceData: String): String = {
@@ -87,7 +84,7 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
       val pkId = map.get("pkid").toString
       val fgp  = map.get("fgp").toString
       val gatherData : SerialBlob = map.get("gatherData").asInstanceOf[SerialBlob]
-      val inputTime = DateTime.now()
+      val inputTime = new Date()
       val portrait = new GafisGatherPortrait()
       portrait.pkId = pkId
       portrait.personid = personId
@@ -120,18 +117,18 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
   }
 
   //格式化时间
-  def parseDateTime(time : String) : DateTime = {
+  def parseDateTime(time : String) : Date = {
     if (time == None || time.equals("") || time.isEmpty)
       null
     else
-      DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseDateTime(time)
+      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time)
   }
 
-  def parseDateTimeToString(time : DateTime) : String = {
+  def parseDateTimeToString(time : Date) : String = {
     if (time == null)
       ""
     else
-      time.toString("yyyy-MM-dd HH:mm:ss")
+      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time)
   }
 
 

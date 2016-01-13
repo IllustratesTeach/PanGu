@@ -1,10 +1,8 @@
 package nirvana.hall.api.services.stamp
 
 import nirvana.hall.api.jpa.GafisGatherPortrait
-import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.orm.services.Relation
 import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.DBSession
 
 /**
  * 人像
@@ -24,7 +22,6 @@ trait GatherPortraitService {
    * 解析人像
    * @param personId
    * @param gatherData
-   * @param session
    * @return
    */
   @Transactional
@@ -43,7 +40,6 @@ trait GatherPortraitService {
   /**
    * 覆盖删除人像
    * @param personid
-   * @param session
    * @return
    */
   @Transactional

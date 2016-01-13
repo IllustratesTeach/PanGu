@@ -97,6 +97,7 @@
       <artifactId>aopalliance</artifactId>
       <version>1.0</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.scalikejdbc</groupId>
       <artifactId>scalikejdbc_2.11</artifactId>
@@ -108,6 +109,7 @@
       <version>2.2.6</version>
       <scope>test</scope>
     </dependency>
+    -->
     <!-- lichen
     <dependency>
       <groupId>com.ganshane.lichen</groupId>

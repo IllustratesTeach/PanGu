@@ -1,15 +1,14 @@
 package nirvana.hall.api.internal.sync
 
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.jpa._
 import nirvana.hall.api.internal.{ScalaUtils, WebAppClientUtils}
+import nirvana.hall.api.jpa._
 import nirvana.hall.api.services.sync.SyncDictService
 import nirvana.hall.protocol.sys.DictProto._
 import nirvana.hall.protocol.sys.SyncDictProto.{SyncDictRequest, SyncDictResponse}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.{DBSession, SQL}
 
 import scala.collection.JavaConversions._
 
@@ -41,11 +40,10 @@ class SyncDictServiceImpl(config: HallApiConfig) extends SyncDictService{
    * 同步字典
    * @param dictType 字典类型
    * @param dictDataList 要同步的字典数据
-   * @param session
    * @return
    */
   @Transactional
-  def syncDict(dictType: DictType, dictDataList: Seq[DictData])(implicit session: DBSession): Unit = {
+  def syncDict(dictType: DictType, dictDataList: Seq[DictData]): Unit = {
     //删除原有的数据
     deleteDictData(dictType)
     dictDataList.foreach{ f =>
@@ -133,13 +131,14 @@ class SyncDictServiceImpl(config: HallApiConfig) extends SyncDictService{
   /**
    * 根据字典类型删除字典数据
    * @param dictType 字典类型
-   * @param session
    * @return
    */
-  def deleteDictData(dictType: DictType)(implicit session: DBSession): Unit ={
-    val tableName = dictType.toString
+  def deleteDictData(dictType: DictType): Unit ={
+    //TODO
+    throw new UnsupportedOperationException
+/*    val tableName = dictType.toString
     if(!tableName.isEmpty)
-      SQL("delete from "+ tableName).update().apply()
+      SQL("delete from "+ tableName).update().apply()*/
   }
 
 }

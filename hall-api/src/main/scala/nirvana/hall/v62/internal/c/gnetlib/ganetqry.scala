@@ -58,7 +58,7 @@ trait ganetqry {
     val response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(channel,response)
 
-    response.nReturnValue
+    ByteBuffer.wrap(response.nReturnValueRes).getInt
   }
   def NET_GAFIS_QUERY_Submit(nQryDBID:Short,nQryTID:Short,
                              pstKey:GADB_KEYARRAY,

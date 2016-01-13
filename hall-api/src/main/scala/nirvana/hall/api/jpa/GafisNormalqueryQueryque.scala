@@ -54,7 +54,7 @@ class GafisNormalqueryQueryque extends ActiveRecord {
   var mic: Array[Byte] = _
   @Lob
   @Column(name = "TEXTSQL")
-  var textsql: String = _
+  var textsql: java.lang.String = _
   @Lob
   @Column(name = "CANDHEAD")
   var candhead: Array[Byte] = _
@@ -88,8 +88,9 @@ class GafisNormalqueryQueryque extends ActiveRecord {
   var computerip: java.lang.String = _
   @Column(name = "COMPUTERNAME", length = 32)
   var computername: java.lang.String = _
+  @Lob
   @Column(name = "ORACOMMENT")
-  var oracomment: java.sql.Clob = _
+  var oracomment: java.lang.String = _
   @Column(name = "MAXSCORE")
   var maxscore: java.lang.Long = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -135,7 +136,7 @@ class GafisNormalqueryQueryque extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, oraSid: java.lang.Long, keyid: java.lang.String, querytype: java.lang.Short, status: java.lang.Short, priority: java.lang.Short, hitpossibility: java.lang.Short, verifyresult: java.lang.Short, flag: java.lang.Short, flagc: java.lang.Short, flagd: java.lang.Short, flage: java.lang.Short, flagg: java.lang.Short, qrycondition: Array[Byte], mic: Array[Byte], textsql: String, candhead: Array[Byte], candlist: Array[Byte], timeused: java.lang.Integer, maxcandnum: java.lang.Integer, curcandnum: java.lang.Integer, minscore: java.lang.Integer, startkey1: java.lang.String, endkey1: java.lang.String, startkey2: java.lang.String, endkey2: java.lang.String, username: java.lang.String, userunitcode: java.lang.String, finishtime: java.util.Date, computerip: java.lang.String, computername: java.lang.String, oracomment: java.sql.Clob, maxscore: java.lang.Long, createtime: java.util.Date, begintime: java.util.Date, deletag: java.lang.String, userid: java.lang.String, submittsystem: java.lang.String, prioritynew: java.lang.Short, handleresult: java.lang.Short, qryconditionNosqlId: java.lang.String, micNosqlId: java.lang.String, candheadNosqlId: java.lang.String, candlistNosqlId: java.lang.String, timeElapsed: java.lang.Long, recordNumMatched: java.lang.Long, matchProgress: java.lang.Short, messagetag: java.lang.Short, overtimetag: java.lang.Short, syncTargetSid: java.lang.String) {
+  def this(pkId: java.lang.String, oraSid: java.lang.Long, keyid: java.lang.String, querytype: java.lang.Short, status: java.lang.Short, priority: java.lang.Short, hitpossibility: java.lang.Short, verifyresult: java.lang.Short, flag: java.lang.Short, flagc: java.lang.Short, flagd: java.lang.Short, flage: java.lang.Short, flagg: java.lang.Short, qrycondition: Array[Byte], mic: Array[Byte], textsql: java.lang.String, candhead: Array[Byte], candlist: Array[Byte], timeused: java.lang.Integer, maxcandnum: java.lang.Integer, curcandnum: java.lang.Integer, minscore: java.lang.Integer, startkey1: java.lang.String, endkey1: java.lang.String, startkey2: java.lang.String, endkey2: java.lang.String, username: java.lang.String, userunitcode: java.lang.String, finishtime: java.util.Date, computerip: java.lang.String, computername: java.lang.String, oracomment: java.lang.String, maxscore: java.lang.Long, createtime: java.util.Date, begintime: java.util.Date, deletag: java.lang.String, userid: java.lang.String, submittsystem: java.lang.String, prioritynew: java.lang.Short, handleresult: java.lang.Short, qryconditionNosqlId: java.lang.String, micNosqlId: java.lang.String, candheadNosqlId: java.lang.String, candlistNosqlId: java.lang.String, timeElapsed: java.lang.Long, recordNumMatched: java.lang.Long, matchProgress: java.lang.Short, messagetag: java.lang.Short, overtimetag: java.lang.Short, syncTargetSid: java.lang.String) {
     this()
     this.pkId = pkId
     this.oraSid = oraSid

@@ -1,10 +1,8 @@
 package nirvana.hall.api.services.stamp
 
 import nirvana.hall.api.jpa.{GafisGatherFinger, GafisGatherPalm}
-import nirvana.hall.api.services.AutoSpringDataSourceSession
 import nirvana.hall.orm.services.Relation
 import org.springframework.transaction.annotation.Transactional
-import scalikejdbc.DBSession
 
 /**
  * 指掌纹
@@ -15,7 +13,6 @@ trait GatherFingerPalmService {
   /**
    * 通过人员ID查询
    * @param personId
-   * @param session
    * @return
    */
   def queryFingerInfoByPersonId(personId : String) : Relation[GafisGatherFinger]
@@ -23,7 +20,6 @@ trait GatherFingerPalmService {
   /**
    * 查询指纹图像数据
    * @param personId
-   * @param session
    * @return
    */
   def queryFingerDataByPersonId(personId : String)  : Relation[GafisGatherFinger]
