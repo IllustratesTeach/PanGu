@@ -40,6 +40,9 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
         val fingerDataList = fpt.getTpDataList.get(0).getFingerDataList
         for (i <- 0 to fingerDataList.size()-1) {
           val finger = fingerDataList.get(i)
+          if(finger.getDataLength ==0){
+            finger.getCenterPoint
+          }
           val fgp = finger.getFgp.toInt
           var fgpp = finger.getFgp.toInt//parse FingerPosition
           if (fgpp > 10) fgpp -= 10
@@ -57,10 +60,16 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
               //gafisImg.stHead.nCompressMethod = imgCompressMethod.toByte
           }
           gafisImg.bnData = finger.getImgData
-
+          gafisImg.stHead.nWidth =finger.getImgHorizontalLength.toShort
+          gafisImg.stHead.nHeight = finger.getImgVerticalLength.toShort
+          gafisImg.stHead.nResolution = finger.getDpi.toShort
           gafisImg.stHead.nImgSize = gafisImg.bnData.length
+          if(gafisImg.stHead.nImgSize == 0)
+            System.out.println(tpData.getPersonId+"_"+fgp+"图像长度为0");
+          else
+            streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
           //FileUtils.writeByteArrayToFile(new File("R04222222tt529222286.cpr"),gafisImg.toByteArray)
-          streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
+
         }
       }
 
