@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.stream.internal.adapter.daku.util.FPTObject
 import nirvana.hall.stream.services.FeatureSaverService
 import nirvana.hall.support.services.JdbcDatabase
 import org.apache.tapestry5.ioc.annotations.InjectService
@@ -25,6 +26,9 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
     override def save(id: Any, feature: ByteString): Unit = {
       val saveFingerSql : String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data)" +
         "values(sys_guid(),?,?,?,0,2,sysdate,gafis_gather_finger_seq.nextval,?)"
+
+      val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1)"
+
       debug("save record with id {}",id)
       val arr = id.asInstanceOf[String].split("_")
       val personId = arr(0)
@@ -34,6 +38,15 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       var fgpCase = 0
       if (fgp > 10) fgpCase = 1
       implicit val ds = dataSource
+      //保存人员信息
+      val pid = queryPersonIfById(personId)
+      if (pid == null || "".equals(pid)) {
+        //不存在
+        JdbcDatabase.update(savePersonSql) { ps =>
+          ps.setString(1, personId)
+        }
+      }
+      //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
         ps.setString(1,personId)
         ps.setInt(2,fgpDB)
@@ -43,6 +56,16 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       
     }
 
-
+  private def queryPersonIfById(personId : String) : String = {
+    val countSql = "select personid from gafis_person where personid = ?"
+    var id = ""
+    implicit val ds = dataSource
+    JdbcDatabase.queryWithPsSetter(countSql){ps =>
+      ps.setString(1,personId)
+    }{rs=>
+      id = rs.getString("personid")
+    }
+    id
+  }
 
 }

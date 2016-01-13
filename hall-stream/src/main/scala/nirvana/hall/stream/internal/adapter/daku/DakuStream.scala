@@ -1,6 +1,7 @@
 package nirvana.hall.stream.internal.adapter.daku
 
-import java.io.File
+import java.io.{PrintWriter, File}
+import javax.imageio.ImageIO
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
@@ -12,7 +13,7 @@ import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.stream.internal.adapter.daku.util.FPTObject
 import nirvana.hall.stream.services.StreamService
 import nirvana.hall.support.services.JdbcDatabase
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{IOUtils, FileUtils}
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, InjectService}
 
 /**
@@ -34,7 +35,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
       val tpData = fpt.getTpDataList.get(0)
       val id = queryPersonIfById(tpData)
       if (id == null || "".equals(id)) {//不存在
-        savePersonInfo(tpData)//保存人员信息
+        //savePersonInfo(tpData)//保存人员信息
         //解压提取特征
         val fingerDataList = fpt.getTpDataList.get(0).getFingerDataList
         for (i <- 0 to fingerDataList.size()-1) {
@@ -46,10 +47,19 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
           var imgCompressMethod = finger.getImgCompressMethod
           if (finger.getImgCompressMethod.startsWith("14") || finger.getImgCompressMethod.endsWith("31"))
             imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
-          gafisImg.stHead.bIsCompressed = 1
-          gafisImg.stHead.nCompressMethod = getCodeFromGAFISImage(imgCompressMethod).toByte
+          imgCompressMethod match {
+            case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE => //不压缩(glocdef对应代码不明确)
+              gafisImg.stHead.bIsCompressed = 0
+              gafisImg.stHead.nCompressMethod = 0.toByte
+            case other=>
+              gafisImg.stHead.bIsCompressed = 1
+              gafisImg.stHead.nCompressMethod = getCodeFromGAFISImage(imgCompressMethod).toByte
+              //gafisImg.stHead.nCompressMethod = imgCompressMethod.toByte
+          }
           gafisImg.bnData = finger.getImgData
+
           gafisImg.stHead.nImgSize = gafisImg.bnData.length
+          //FileUtils.writeByteArrayToFile(new File("R04222222tt529222286.cpr"),gafisImg.toByteArray)
           streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
         }
       }
@@ -99,8 +109,6 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
         glocdef.GAIMG_CPRMETHOD_TSINGHUA.toString
       case fpt4code.GAIMG_CPRMETHOD_BUPT_CODE => 	// beijing university of posts and telecommunications
         glocdef.GAIMG_CPRMETHOD_BUPT.toString
-      case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE => //不压缩(glocdef对应代码不明确)
-        glocdef.GAIMG_CPRMETHOD_JPG.toString
       case other=>
         throw new UnsupportedOperationException("%s compress not supported".format(codeFromFpt))
     }
