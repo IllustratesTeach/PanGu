@@ -74,7 +74,7 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
       SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"firm code is null");
       return NULL;
     }
-    int code_len = jenv->GetStringUTFLength(fun_name);
+    int code_len = jenv->GetStringUTFLength(code);
     if(code_len != 4){
       SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"firm code's length must be 4");
       return NULL;
