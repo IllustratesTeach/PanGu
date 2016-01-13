@@ -1,7 +1,6 @@
 package nirvana.hall.stream.internal.adapter.daku
 
 import java.io.File
-import java.util
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
@@ -100,7 +99,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
         glocdef.GAIMG_CPRMETHOD_TSINGHUA.toString
       case fpt4code.GAIMG_CPRMETHOD_BUPT_CODE => 	// beijing university of posts and telecommunications
         glocdef.GAIMG_CPRMETHOD_BUPT.toString
-      case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE =>
+      case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE => //不压缩(glocdef对应代码不明确)
         glocdef.GAIMG_CPRMETHOD_JPG.toString
       case other=>
         throw new UnsupportedOperationException("%s compress not supported".format(codeFromFpt))
