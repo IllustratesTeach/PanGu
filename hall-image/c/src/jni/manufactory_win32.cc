@@ -47,6 +47,9 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	{
 		GFP_FPT_BUPT_DCXX p = (GFP_FPT_BUPT_DCXX)GetProcAddress((HMODULE)hHandle, fun_name);
 		result =(jlong)p;
+	}else if(GAIMG_CPRMETHOD_GA10 == nFirmCode){
+		GFP_FPT_GA10_DECOMPRESS p=(GFP_FPT_GA10_DECOMPRESS)GetProcAddress((HMODULE)hHandle, fun_name);
+		result =(jlong)p;
 	}
 	else
 	{
@@ -79,7 +82,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  * Method:    decodeByManufactory
  * Signature: (J[B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
+JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
   (JNIEnv *jenv, jclass, jlong hHandle, jstring code,jint nFirmCode,jbyteArray cpr_data,jint dest_img_size){
     if(hHandle == NULL){
       SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"hHandle is null");
@@ -99,16 +102,23 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 	size_t cpr_data_length = jenv->GetArrayLength(cpr_data);
 	UCHAR* cpr_data_bin = (UCHAR*) jenv->GetByteArrayElements(cpr_data, JNI_FALSE);
 
+	
 	jbyteArray dest_img = jenv->NewByteArray(dest_img_size);
 	UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, JNI_FALSE);
 
 	UCHAR szResult[260] = {0};
 
+	int width = 0;
+	int height =0;
+	int ppi = 0;
 	int ret = 0;
 	if(nFirmCode == GAIMG_CPRMETHOD_BUPT){
 		//call dll function to decompress data
 		GFP_FPT_BUPT_DCXX p =(GFP_FPT_BUPT_DCXX)hHandle;
 		ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
+	}else if(GAIMG_CPRMETHOD_GA10 == nFirmCode){
+		GFP_FPT_GA10_DECOMPRESS p=(GFP_FPT_GA10_DECOMPRESS)hHandle;
+		ret=p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,&height,&width,&ppi,szResult);
 	}else{
 		//call dll function to decompress data
 		GA_FPT_DCXX p = (GA_FPT_DCXX)hHandle;
@@ -123,7 +133,25 @@ JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_de
 	jenv->ReleaseStringUTFChars(code,(char *)code_str);
 
 	ThrowExceptionByFPTCode(jenv,ret);
-	return dest_img;
+
+    //build OriginalImage object
+    jclass originalImageClass = jenv->FindClass("nirvana/hall/image/jni/OriginalImage");
+    jmethodID constructorId = jenv->GetMethodID(originalImageClass,"<init>","()V");
+    jobject originalImage = jenv->NewObject(originalImageClass,constructorId);
+
+    jmethodID widthMethod = jenv->GetMethodID(originalImageClass,"setWidth","(I)V");
+    jenv->CallVoidMethod(originalImage,widthMethod,width);
+
+    jmethodID heightMethod = jenv->GetMethodID(originalImageClass,"setHeight","(I)V");
+    jenv->CallVoidMethod(originalImage,heightMethod,height);
+
+    jmethodID dataMethod = jenv->GetMethodID(originalImageClass,"setData","([B)V");
+    jenv->CallVoidMethod(originalImage,dataMethod,dest_img);
+
+    jmethodID ppiMethod = jenv->GetMethodID(originalImageClass,"setPpi","(I)V");
+    jenv->CallVoidMethod(originalImage,ppiMethod,ppi);
+
+	return originalImage;
 }
 #endif
 
