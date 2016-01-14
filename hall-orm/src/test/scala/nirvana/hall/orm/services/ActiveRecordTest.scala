@@ -12,6 +12,23 @@ import org.junit.{Assert, Test}
  */
 class ActiveRecordTest extends BaseOrmTestCase{
   @Test
+  def test_find_by: Unit = {
+    val modelA = new ModelA
+    modelA.name = "asdf"
+    modelA.save
+    var size = ModelA.find_by(name="asdf",id=Gt(0)).size
+    Assert.assertEquals(1,size)
+
+    ModelA.find_by(name="asdf").update(name="fdsa")
+    size = ModelA.find_by(name="asdf",id=Gt(0)).size
+    Assert.assertEquals(0,size)
+
+    Assert.assertEquals(1,ModelA.all.size)
+
+    Assert.assertEquals(0,ModelA.find_by(name="asdf").delete)
+    Assert.assertEquals(1,ModelA.find_by(name="fdsa").delete)
+  }
+  @Test
   def test_update: Unit = {
     val modelA = new ModelA
     modelA.name = "asdf"
@@ -84,7 +101,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
 
     ModelA.where("name=?1","asdf").update(name="asdf")
     ModelA.find_by(name="asdf").update(name="asdf")
-    ModelA.where("name=?1","asdf").delete()
+    ModelA.where("name=?1","asdf").delete
   }
   @Test
   def test_lob: Unit ={

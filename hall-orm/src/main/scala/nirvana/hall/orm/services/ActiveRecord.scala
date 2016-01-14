@@ -49,7 +49,7 @@ object ActiveRecord {
   def updateRelation[T](relation: DynamicUpdateSupport[T]):Int={
     getService[EntityService].updateRelation(relation)
   }
-  def deleteRelation[T](relation: Relation[T]):Int={
+  def deleteRelation[T](relation: DynamicUpdateSupport[T]):Int={
     getService[EntityService].deleteRelation(relation)
   }
 
@@ -112,12 +112,19 @@ trait ActiveRecord {
 abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String)
   extends QuerySupport[A]
   with DynamicUpdateSupport[A]{
+  case class WrappedExpress(field:String,expr:BaseExpression)
   private[services] val builder:CriteriaBuilder
+
   private[orm] lazy val query = builder.createQuery(entityClass)
   private[orm] lazy val queryRoot = query.from(entityClass)
+
   private[orm] lazy val updatedQuery = builder.createCriteriaUpdate(entityClass)
   private[orm] lazy val updatedRoot = updatedQuery.from(entityClass)
-  private[orm] lazy val expressions = mutable.Buffer[BaseExpression]()
+
+  private[orm] lazy val deletedQuery = builder.createCriteriaDelete(entityClass)
+  private[orm] lazy val deletedRoot = deletedQuery.from(entityClass)
+
+  private[orm] lazy val expressions = mutable.Buffer[WrappedExpress]()
 
   val querySupport = new WhereSupportObject {
     override def criteriaBuilder: CriteriaBuilder = builder
@@ -129,8 +136,18 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     override def where(restrictions: Predicate*):Unit = updatedQuery.where(restrictions:_*)
     override def path[X](field: String): Path[X] =  updatedRoot.get(field)
   }
+  val deletedSupport = new WhereSupportObject {
+    override def criteriaBuilder: CriteriaBuilder = builder
+    override def where(restrictions: Predicate*):Unit = deletedQuery.where(restrictions:_*)
+    override def path[X](field: String): Path[X] =  deletedRoot.get(field)
+  }
   def eq(field:String,value:Any): Unit ={
-    expressions += Equal(field,value)
+    value match{
+      case expr:BaseExpression =>
+        expressions += WrappedExpress(field,expr)
+      case other=>
+        expressions += WrappedExpress(field,Equal(value))
+    }
   }
   override def order(params: (String, Any)*): CriteriaRelation.this.type = {
     params.foreach{
@@ -150,44 +167,34 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     super.executeQuery
   }
   private def expandExpressions(ws:WhereSupportObject): Unit ={
-    expressions.foreach{
-        case Equal(field:String,value:Any) =>
-            ws.where(ws.criteriaBuilder.equal(ws.path(field),value))
-        case NotNull(field:String) =>
-            ws.where(ws.criteriaBuilder.isNotNull(ws.path(field)))
-        case IsNull(field:String) =>
-            ws.where(ws.criteriaBuilder.isNull(ws.path(field)))
+    val criteriaExpressions = expressions.map{
+      case WrappedExpress(field,Equal(value:Any)) =>
+        ws.criteriaBuilder.equal(ws.path(field),value)
+      case WrappedExpress(field,NotNull) =>
+        ws.criteriaBuilder.isNotNull(ws.path(field))
+      case WrappedExpress(field,IsNull) =>
+        ws.criteriaBuilder.isNull(ws.path(field))
+      case WrappedExpress(field,Gt(value:Number)) =>
+        ws.criteriaBuilder.gt(ws.path[Number](field),value)
+      case WrappedExpress(field,Ge(value:Number)) =>
+        ws.criteriaBuilder.ge(ws.path[Number](field),value)
+      case WrappedExpress(field,Lt(value)) =>
+        ws.criteriaBuilder.lt(ws.path[Number](field),value)
+      case WrappedExpress(field,Le(value)) =>
+        ws.criteriaBuilder.le(ws.path[Number](field),value)
       /*
-      case Gt[Number](field:String,value:Number) =>
-          ws.where(ws.criteriaBuilder.gt(ws.path[Number](field),value))
-      case class Ge[T<:Number](field:String,value:T) =>
-        /*
-        override def execute(ws: WhereSupportObject): Unit = {
-          where(criteriaBuilder.ge(path[T](field),value))
-        }
+      case WrappedExpress(field,Between(x,y)) =>
+        ws.criteriaBuilder.between(ws.path[Number](field),x,y)
         */
-      }
-      case class Lt[T<:Number](field:String,value:T) =>
-        /*
-        where(criteriaBuilder.lt(path(field),value))
-        */
-      }
-      case class Le[T<:Number](field:String,value:T) =>
-        //where(criteriaBuilder.le(path(field),value))
-      }
-      case class Between[T<:Comparable[T]](field:String, x: T, y: T) =>
-        //where(criteriaBuilder.between(path(field),x,y))
-      }
-      case class Like(field:String,value:String) =>
-        //where(criteriaBuilder.like(path[String](field),value))
-      }
-      case class NotLike(field:String,value:String) =>
-        //where(criteriaBuilder.notLike(path[String](field),value))
-      }
-      */
+      case WrappedExpress(field,Like(value)) =>
+        ws.criteriaBuilder.like(ws.path[String](field),value)
+      case WrappedExpress(field,NotLike(value)) =>
+        ws.criteriaBuilder.notLike(ws.path[String](field),value)
       case other=>
         throw new UnsupportedOperationException
     }
+
+    ws.where(criteriaExpressions:_*)
   }
 
   override def internalUpdate(params: (String, Any)*): Int = {
@@ -199,6 +206,10 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     }
     ActiveRecord.updateRelation(this)
   }
+  def delete:Int = {
+    expandExpressions(deletedSupport)
+    ActiveRecord.deleteRelation(this)
+  }
 }
 trait DynamicUpdateSupport[A] extends Dynamic{
   /**
@@ -209,16 +220,16 @@ trait DynamicUpdateSupport[A] extends Dynamic{
 }
 
 sealed trait BaseExpression
-case class Equal(field:String,value:Any) extends BaseExpression
-case class NotNull(field:String) extends BaseExpression
-case class IsNull(field:String) extends BaseExpression
-case class Gt[T<:Number](field:String,value:T) extends BaseExpression
-case class Ge[T<:Number](field:String,value:T) extends BaseExpression
-case class Lt[T<:Number](field:String,value:T) extends BaseExpression
-case class Le[T<:Number](field:String,value:T) extends BaseExpression
-case class Between[T<:Comparable[T]](field:String, x: T, y: T) extends BaseExpression
-case class Like(field:String,value:String) extends BaseExpression
-case class NotLike(field:String,value:String) extends BaseExpression
+case class Equal(value:Any) extends BaseExpression
+case object NotNull extends BaseExpression
+case object IsNull extends BaseExpression
+case class Gt(value:Number) extends BaseExpression
+case class Ge(value:Number) extends BaseExpression
+case class Lt(value:Number) extends BaseExpression
+case class Le(value:Number) extends BaseExpression
+case class Between(x: Number, y: Number) extends BaseExpression
+case class Like(value:String) extends BaseExpression
+case class NotLike(value:String) extends BaseExpression
 
 trait QuerySupport[A] {
   protected val primaryKey:String
@@ -325,7 +336,7 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QueryS
 
     ActiveRecord.updateRelation(this)
   }
-  def delete():Int = {
+  def delete:Int = {
     ActiveRecord.deleteRelation(this)
   }
 }

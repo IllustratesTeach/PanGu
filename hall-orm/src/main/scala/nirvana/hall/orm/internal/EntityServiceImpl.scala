@@ -35,14 +35,24 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
   }
 
   @Transactional
-  override def deleteRelation[T](relation: Relation[T]): Int = {
-    var fullQl = "delete from %s".format(relation.entityClazz.getSimpleName)
-    relation.queryClause.foreach{fullQl += " where %s".format(_)}
-    val query = entityManager.createQuery(fullQl)
+  override def deleteRelation[T](updateSupport: DynamicUpdateSupport[T]): Int = {
+    updateSupport match {
+      case relation:Relation[T]=>
+        var fullQl = "delete from %s".format (relation.entityClazz.getSimpleName)
+        relation.queryClause.foreach {
+          fullQl += " where %s".format (_)
+        }
+        val query = entityManager.createQuery (fullQl)
 
-    setQueryParameter(query,relation)
+        setQueryParameter (query, relation)
 
-    query.executeUpdate()
+        query.executeUpdate()
+      case relation:CriteriaRelation[T] =>
+        val query = entityManager.createQuery(relation.deletedQuery)
+        query.executeUpdate()
+      case other =>
+        throw new UnsupportedOperationException
+    }
   }
 
   @Transactional
