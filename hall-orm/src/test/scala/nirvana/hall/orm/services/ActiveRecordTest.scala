@@ -83,6 +83,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
     Assert.assertEquals(1,size)
 
     ModelA.where("name=?1","asdf").update(name="asdf")
+    ModelA.find_by(name="asdf").update(name="asdf")
     ModelA.where("name=?1","asdf").delete()
   }
   @Test

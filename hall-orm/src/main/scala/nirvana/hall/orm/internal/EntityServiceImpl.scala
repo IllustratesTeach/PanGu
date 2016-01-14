@@ -2,7 +2,7 @@ package nirvana.hall.orm.internal
 
 import javax.persistence.{EntityManager, Query}
 
-import nirvana.hall.orm.services.{CriteriaRelation, EntityService, QuerySupport, Relation}
+import nirvana.hall.orm.services._
 import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 
@@ -46,7 +46,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
   }
 
   @Transactional
-  override def updateRelation[T](updateObject: QuerySupport[T]): Int = {
+  override def updateRelation[T](updateObject: DynamicUpdateSupport[T]): Int = {
     updateObject match {
       case relation: Relation[T] =>
         var fullQl = "update %s set".format(relation.entityClazz.getSimpleName)
@@ -65,6 +65,9 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
           query.setParameter(index, value)
           index += 1
         }
+        query.executeUpdate()
+      case relation:CriteriaRelation[T] =>
+        val query = entityManager.createQuery(relation.updatedQuery)
         query.executeUpdate()
       case other =>
         throw new UnsupportedOperationException

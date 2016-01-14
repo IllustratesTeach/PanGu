@@ -1,6 +1,6 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.criteria.{CriteriaBuilder, Path, Predicate}
+import javax.persistence.criteria.{Predicate, CriteriaBuilder, Path}
 import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
-import scala.collection.{GenTraversableOnce, mutable}
+import scala.collection.{mutable, GenTraversableOnce}
 import scala.language.experimental.macros
 import scala.language.{dynamics, postfixOps, reflectiveCalls}
 import scala.reflect.{ClassTag, classTag}
@@ -46,7 +46,7 @@ object ActiveRecord {
   def delete[T](record:T): Unit ={
     getService[EntityService].delete(record)
   }
-  def updateRelation[T](relation: QuerySupport[T]):Int={
+  def updateRelation[T](relation: DynamicUpdateSupport[T]):Int={
     getService[EntityService].updateRelation(relation)
   }
   def deleteRelation[T](relation: Relation[T]):Int={
@@ -91,10 +91,10 @@ object ActiveRecord {
   }
 }
 
-trait WhereSupportObject[A] {
-  def where (restrictions: Predicate *):this.type
+trait WhereSupportObject {
+  def where (restrictions: Predicate *):Unit
   def criteriaBuilder:CriteriaBuilder
-  def path(field:String):Path[A]
+  def path[X](field:String):Path[X]
 }
 /**
  * ActiveRecord trait
@@ -109,42 +109,117 @@ trait ActiveRecord {
     ActiveRecord.delete(this)
   }
 }
-abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String) extends QuerySupport[A]{
+abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String)
+  extends QuerySupport[A]
+  with DynamicUpdateSupport[A]{
   private[services] val builder:CriteriaBuilder
   private[orm] lazy val query = builder.createQuery(entityClass)
-  private lazy val currentRoot = query.from(entityClass)
+  private[orm] lazy val queryRoot = query.from(entityClass)
+  private[orm] lazy val updatedQuery = builder.createCriteriaUpdate(entityClass)
+  private[orm] lazy val updatedRoot = updatedQuery.from(entityClass)
+  private[orm] lazy val expressions = mutable.Buffer[BaseExpression]()
+
+  val querySupport = new WhereSupportObject {
+    override def criteriaBuilder: CriteriaBuilder = builder
+    override def where(restrictions: Predicate*):Unit = query.where(restrictions:_*)
+    override def path[X](field: String): Path[X] =  queryRoot.get(field)
+  }
+  val updatedSupport = new WhereSupportObject {
+    override def criteriaBuilder: CriteriaBuilder = builder
+    override def where(restrictions: Predicate*):Unit = updatedQuery.where(restrictions:_*)
+    override def path[X](field: String): Path[X] =  updatedRoot.get(field)
+  }
   def eq(field:String,value:Any): Unit ={
-    query.where(Array(builder.equal(currentRoot.get(field),value)):_*)
+    expressions += Equal(field,value)
   }
   override def order(params: (String, Any)*): CriteriaRelation.this.type = {
     params.foreach{
       case (field,value)=>
         String.valueOf(value).toLowerCase match{
           case "asc"=>
-            query.orderBy(builder.asc(currentRoot.get(field)))
+            query.orderBy(builder.asc(queryRoot.get(field)))
           case "desc"=>
-            query.orderBy(builder.desc(currentRoot.get(field)))
+            query.orderBy(builder.desc(queryRoot.get(field)))
         }
     }
-
     this
   }
+
+  override protected def executeQuery: scala.Stream[A] = {
+    expandExpressions(querySupport)
+    super.executeQuery
+  }
+  private def expandExpressions(ws:WhereSupportObject): Unit ={
+    expressions.foreach{
+        case Equal(field:String,value:Any) =>
+            ws.where(ws.criteriaBuilder.equal(ws.path(field),value))
+        case NotNull(field:String) =>
+            ws.where(ws.criteriaBuilder.isNotNull(ws.path(field)))
+        case IsNull(field:String) =>
+            ws.where(ws.criteriaBuilder.isNull(ws.path(field)))
+      /*
+      case Gt[Number](field:String,value:Number) =>
+          ws.where(ws.criteriaBuilder.gt(ws.path[Number](field),value))
+      case class Ge[T<:Number](field:String,value:T) =>
+        /*
+        override def execute(ws: WhereSupportObject): Unit = {
+          where(criteriaBuilder.ge(path[T](field),value))
+        }
+        */
+      }
+      case class Lt[T<:Number](field:String,value:T) =>
+        /*
+        where(criteriaBuilder.lt(path(field),value))
+        */
+      }
+      case class Le[T<:Number](field:String,value:T) =>
+        //where(criteriaBuilder.le(path(field),value))
+      }
+      case class Between[T<:Comparable[T]](field:String, x: T, y: T) =>
+        //where(criteriaBuilder.between(path(field),x,y))
+      }
+      case class Like(field:String,value:String) =>
+        //where(criteriaBuilder.like(path[String](field),value))
+      }
+      case class NotLike(field:String,value:String) =>
+        //where(criteriaBuilder.notLike(path[String](field),value))
+      }
+      */
+      case other=>
+        throw new UnsupportedOperationException
+    }
+  }
+
+  override def internalUpdate(params: (String, Any)*): Int = {
+    expandExpressions(updatedSupport)
+
+    params.foreach{
+      case (field,value) =>
+        updatedQuery.set(field,value)
+    }
+    ActiveRecord.updateRelation(this)
+  }
+}
+trait DynamicUpdateSupport[A] extends Dynamic{
+  /**
+   * update method
+   */
+  def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
+  def internalUpdate(params:(String,Any)*): Int
 }
 
-abstract class UpdateCriteriaRelation[A](val entityClass:Class[A],val primaryKey:String) {
-  private[services] val builder:CriteriaBuilder
-  private[orm] lazy val query = builder.createCriteriaUpdate(entityClass)
-  private lazy val currentRoot = query.from(entityClass)
-  def eq(field:String,value:Any): Unit ={
-    query.where(Array(builder.equal(currentRoot.get(field),value)):_*)
-  }
-}
-trait WhereCondition[A] {
-  self:WhereSupportObject[A] =>
-  def eq(field:String,value:Any): this.type ={
-    where(criteriaBuilder.equal(path(field),value))
-  }
-}
+sealed trait BaseExpression
+case class Equal(field:String,value:Any) extends BaseExpression
+case class NotNull(field:String) extends BaseExpression
+case class IsNull(field:String) extends BaseExpression
+case class Gt[T<:Number](field:String,value:T) extends BaseExpression
+case class Ge[T<:Number](field:String,value:T) extends BaseExpression
+case class Lt[T<:Number](field:String,value:T) extends BaseExpression
+case class Le[T<:Number](field:String,value:T) extends BaseExpression
+case class Between[T<:Comparable[T]](field:String, x: T, y: T) extends BaseExpression
+case class Like(field:String,value:String) extends BaseExpression
+case class NotLike(field:String,value:String) extends BaseExpression
+
 trait QuerySupport[A] {
   protected val primaryKey:String
   private[orm] var limit:Int = -1
@@ -203,7 +278,7 @@ trait QuerySupport[A] {
  * @param primaryKey primary key
  * @tparam A type parameter
  */
-class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QuerySupport[A] with Dynamic{
+class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QuerySupport[A] with DynamicUpdateSupport[A]{
   def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
     this(entityClazz,primaryKey)
     if(query != null)
@@ -219,10 +294,6 @@ class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QueryS
   private[orm] var updateQl:Option[String] = None
   private[orm] var updateParams:Seq[Any] = Nil
 
-  /**
-   * update method
-   */
-  def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
 
 
   def order(params:(String,Any)*):this.type= {
@@ -288,7 +359,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param params parameter list
    * @return Relation query instance
    */
-  def applyDynamic(name:String)(params:Any*):CriteriaRelation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
+  def applyDynamic(name:String)(params:Any*):CriteriaRelation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,CriteriaRelation[A]]
 
   /**
    * where(ql,parameters)

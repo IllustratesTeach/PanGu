@@ -45,7 +45,7 @@ class AuthServiceImpl extends AuthService {
     val currentTime = ScalaUtils.currentTimeInSeconds
     val uuidToken = UUID.randomUUID().toString.replaceAll("-", "")
 
-    val num = OnlineUser.where(login=name).update(loginTime=currentTime,latestTime=currentTime,token=uuidToken)
+    val num = OnlineUser.find_by(login=name).update(loginTime=currentTime,latestTime=currentTime,token=uuidToken)
 
     if( num == 0) {
       val onlineUser = new OnlineUser()
