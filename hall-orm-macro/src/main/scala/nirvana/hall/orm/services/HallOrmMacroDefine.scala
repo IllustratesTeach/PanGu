@@ -37,39 +37,39 @@ object HallOrmMacroDefine {
           c.error(c.enclosingPosition, s"name's length ${attrs.length} !=  parameter's length ${params.length}.")
         }
         attrs.zipWithIndex.foreach{case (attr,index)=>
-          if(expectedNames.contains(attr)){
-            ql += " and %s=?%s".format(attr,index+1)
-          }else{
+          if(!expectedNames.contains(attr)){
             c.error(c.enclosingPosition, s"${c.weakTypeOf[E]}#${attr} not found. Expected fields are ${expectedNames.mkString("#", ", #", "")}.")
           }
         }
+        val tupleParameters = attrs.zip(paramsTree).map{
+          case (attr,parameterTree) =>
+            q"($attr,$parameterTree)"
+        }.toList
 
-        if(ql.length>0)
-          ql = "1=1"+ql
-        val qlTree = Literal(Constant(ql))
 
-        //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),paramsTree))
-        //c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
-        executeInternalWhere[c.type,R](c)(qlTree,paramsTree)
+        executeInternalWhere[c.type,R](c)(tupleParameters)
+        /*
       case "where" =>
         val qlTree = paramsTree.head
         val remainTree = paramsTree.drop(1)
         executeInternalWhere[c.type,R](c)(qlTree,remainTree)
         //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(qlTree)),remainTree))
+        */
       case other=>
         c.error(c.enclosingPosition, s"unsupport operation")
         c.Expr[R](Literal(Constant(Nil)))
     }
 
   }
-  private def executeInternalWhere[C <: whitebox.Context,R](c:C)(qlTree:c.universe.Tree,paramsTree:List[c.universe.Tree]): c.Expr[R]={
+  private def executeInternalWhere[C <: whitebox.Context,R](c:C)(paramsTree:List[c.universe.Tree]): c.Expr[R]={
     import c.universe._
 
-    val objectTree= q"nirvana.hall.orm.services.ActiveRecord"
     val clazzTree = Select(c.prefix.tree,TermName("clazz"))
     val primaryKeyTree = Select(c.prefix.tree,TermName("primaryKey"))
 
-    c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
+    c.Expr[R](q"nirvana.hall.orm.services.ActiveRecord.createCriteriaRelation($clazzTree,$primaryKeyTree,..$paramsTree)")
+
+    //c.Expr[R](Apply(Apply(Select(objectTree, TermName("internalWhere")), List(clazzTree,primaryKeyTree,qlTree)),paramsTree))
   }
   def orderByImpl[E: c.WeakTypeTag,R](c: whitebox.Context)(params:c.Expr[Any]*):c.Expr[R] = {
     import c.universe._
@@ -153,14 +153,8 @@ object HallOrmMacroDefine {
     }
 
     methodName match{
-      case "where" =>
-        val objectTree= q"nirvana.hall.orm.services.ActiveRecord"
-        val clazzTree = Select(c.prefix.tree,TermName("clazz"))
-        val primaryKeyTree = Select(c.prefix.tree,TermName("primaryKey"))
-        val paramsTree = params.map(_.tree)
-        c.Expr[R](q"nirvana.hall.orm.services.ActiveRecord.createCriteriaRelation($clazzTree,$primaryKeyTree,..$paramsTree)")
-        //executeInternalWhere[c.type,R](c)(qlTree,parameterValues.toList)
-        //c.Expr[R](Apply(Apply(Select(c.prefix.tree, TermName("internalWhere")), List(Literal(Constant(ql)))),parameterValues.toList))
+      case "find_by" =>
+        executeInternalWhere[c.type,R](c)(trees)
       case other=>
         c.error(c.enclosingPosition, s"${other} unsupported.")
         c.Expr[R](Literal(Constant(Nil)))

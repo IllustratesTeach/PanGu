@@ -40,7 +40,7 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.save()
 
     val dsl = ModelA.find_by_name_and_id("adsf1",1).asc("name").desc("name")
-    Assert.assertEquals("name asc,name desc",dsl.orderBy.get)
+    //Assert.assertEquals("name asc,name desc",dsl.orderBy.get)
     val dsl2 = ModelA.find_by_name_and_id("adsf1",1).order("name"->"asc","name"->"desc")
     //Assert.assertEquals(1,list.size)
     val size= ModelA.find_by_name_and_id("asdf",modelA.id).size
@@ -66,16 +66,16 @@ class ActiveRecordTest extends BaseOrmTestCase{
     val result = ModelA.find(modelA.id)
     Assert.assertEquals("asdf",result.name)
 
-    Assert.assertTrue(ModelA.where(name="asdf").exists())
-    Assert.assertFalse(ModelA.where(name="fdsa").exists())
+    Assert.assertTrue(ModelA.find_by(name="asdf").exists())
+    Assert.assertFalse(ModelA.find_by(name="fdsa").exists())
 
-    var size = ModelA.where(name="asdf").size
+    var size = ModelA.find_by(name="asdf").size
     Assert.assertEquals(1,size)
 
     size = ModelA.find_by_name("asdf").limit(10).size
     Assert.assertEquals(1,size)
 
-    size = ModelA.where(name="asdf",id=modelA.id).size
+    size = ModelA.find_by(name="asdf",id=modelA.id).size
     Assert.assertEquals(1,size)
 
     size = ModelA.where("name=?1","asdf")

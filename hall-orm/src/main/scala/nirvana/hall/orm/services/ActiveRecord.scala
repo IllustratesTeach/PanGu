@@ -78,7 +78,7 @@ object ActiveRecord {
    * @return Relation object
    */
   def internalWhere[A](clazz:Class[A],primaryKey:String,ql:String)(params:Any*): Relation[A]={
-    new Relation[A](clazz,primaryKey,ql,params)
+    new Relation[A](clazz,primaryKey,ql,params.toSeq)
   }
   def createCriteriaRelation[A](clazz:Class[A],primaryKey:String,params:(String,Any)*):CriteriaRelation[A]={
     val queryBuilder = getService[EntityManager].getCriteriaBuilder
@@ -271,7 +271,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * where method
    * sucha as:
    *
-   * where(name="jcai",code="1232")
+   * find_by(name="jcai",code="1232")
    * @param name method name
    * @param params method parameter
    * @return relation query object
@@ -280,17 +280,27 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
 
   /**
    * find_by_xx_and_yy method
-   * where(ql,parameters)
    * such as:
    *
    * ModelA.find_by_name_and_code("jcai","1232")
-   * ModelA.where("name=?1 and code=?2","jcai","1232")
    *
    * @param name method name
    * @param params parameter list
    * @return Relation query instance
    */
-  def applyDynamic(name:String)(params:Any*):Relation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
+  def applyDynamic(name:String)(params:Any*):CriteriaRelation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,Relation[A]]
+
+  /**
+   * where(ql,parameters)
+   * ModelA.where("name=?1 and code=?2","jcai","1232")
+   * @param ql query language
+   * @param parameters parameters
+   * @return Realtion Object
+   */
+  def where(ql:String,parameters:Any*): Relation[A]={
+    ActiveRecord.internalWhere(clazz,primaryKey,ql)(parameters:_*)
+  }
+
 
   /**
    * retrieving single object
