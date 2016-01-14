@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;I)J
  */
 JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLibrary
-  (JNIEnv *, jclass, jstring, jint);
+  (JNIEnv *, jclass, jstring, jstring,jint firmCode,jint);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BI)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
-  (JNIEnv *, jclass, jlong, jstring, jstring, jbyteArray, jint);
+  (JNIEnv *, jclass, jlong, jstring, jint, jbyteArray, jint);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter

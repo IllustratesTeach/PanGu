@@ -1,6 +1,18 @@
 #ifndef MANUFACTORY_WIN32_H_
 #define MANUFACTORY_WIN32_H_
 #ifdef WIN32
+#include <Windows.h>
+
+#define GFP_FPT_DECOMPRESS_DLL				"FPT_DC%s.DLL"
+#define GFP_FPT_DC_PROCNAME				"FPT_DC%s"
+
+#define GFP_FPT_GA10_DCDLLNAME				"FPT_DC00.dll"
+#define GFP_FPT_GA10_DCPROCNAME			"FPT_Decompress"
+
+#define GFP_FPT_GA10_CPDLLNAME				"FPT_CP00.dll"
+#define GFP_FPT_GA10_CPPROCNAME			"FPT_Compress"
+
+
 //define function type
 typedef int (PASCAL *GA_FPT_DCXX)(
 unsigned char	code[4],
@@ -26,6 +38,7 @@ int *pnCol,
 int *pnResolution,
 unsigned char strBuf[256]
 );
+
 
 
 #define	GAIMG_CPRMETHOD_DEFAULT		0	// by xgw supplied method
