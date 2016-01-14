@@ -20,12 +20,6 @@ import org.junit.{Assert, Test}
  */
 class FirmDecoderImplTest extends BaseJniTest{
   @Test
-  def test_decode_1700: Unit = {
-    val decoder = new FirmDecoderImpl("support")
-    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1700.data"))
-    decoder.decode("1700", cprData, 640, 640, 500)
-  }
-  @Test
   def test_decode_gafisimg{
     val decoder = new FirmDecoderImpl("support")
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
@@ -46,14 +40,6 @@ class FirmDecoderImplTest extends BaseJniTest{
 
     val originBytes = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data.uncompressed"))
     Assert.assertArrayEquals(originBytes,dest.bnData)
-  }
-  @Test
-  def test_decode_1400_vi_wsq{
-    val decoder = new FirmDecoderImpl("support")
-    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
-    Range(0,409600).foreach{ i=>
-      decoder.decode("1400",cprData,640,640,500)
-    }
   }
   @Test
   def test_draw{

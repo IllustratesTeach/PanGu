@@ -12,7 +12,7 @@ public class NativeImageConverter {
      * @param dll_path dll path
      * @return dll handler
      */
-    public static native long loadLibrary(String dll_path,int option);
+    public static native long loadLibrary(String dll_path,String funName,int cprMethod,int option);
 
     /**
      * free library
@@ -27,7 +27,7 @@ public class NativeImageConverter {
      * @param cpr_data compressed data
      * @return source data
      */
-    public static native byte[] decodeByManufactory(long handle,String function,String code,byte[] cpr_data,int dest_img_size);
+    public static native OriginalImage decodeByManufactory(long handle,String code,int cprMethod,byte[] cpr_data,int dest_img_size);
 
     /**
      * decode compressed data by WSQ

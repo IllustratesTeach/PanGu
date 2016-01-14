@@ -8,7 +8,7 @@ import monad.core.MonadCoreSymbols
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.image.jni.{OriginalImage, NativeImageConverter}
+import nirvana.hall.image.jni.NativeImageConverter
 import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
@@ -30,37 +30,13 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
 
   /**
    * decode compressed data using firm's algorithm
-   * @param code firm code,such as "1300"
-   * @param cpr_data compressed data
-   * @param width image width
-   * @param height image height
    * @return original image data
    */
-  @deprecated
-  def decode(code:String,cpr_data:Array[Byte],width:Int,height:Int,dpi:Int): OriginalImage={
-    code match{
-      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE =>
-        try{
-          //lock.lock()
-          NativeImageConverter.decodeByWSQ(cpr_data)
-        }finally{
-          //lock.unlock()
-        }
-      case other=>
-        val dll = findDllHandle(code)
-        val destImgSize = width * height
-        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,code,cpr_data,destImgSize);
-        val img = new OriginalImage
-        img.setWidth(width)
-        img.setHeight(height)
-        img.setData(originalData)
-        img
-    }
-  }
   def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT={
     if(gafisImg.stHead.bIsCompressed == 0)
       return gafisImg
 
+    val cprMethod = gafisImg.stHead.nCompressMethod.toInt
     val firmCode = getCodeFromGAFISImage(gafisImg)
 
     val destImg = new GAFISIMAGESTRUCT
@@ -94,13 +70,23 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
       case other=>
         val width = gafisImg.stHead.nWidth
         val height = gafisImg.stHead.nHeight
-        val dll = findDllHandle(firmCode)
+        val dll = findDllHandle(firmCode,cprMethod)
         val destImgSize = width *  height
-        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,dll.functionName,
-          firmCode,gafisImg.bnData,destImgSize)
+        val cprData = gafisImg.bnData
+        if(destImgSize == 0)
+          throw new IllegalStateException("width or height is zero!")
+        if(cprData == null ||cprData.length == 0)
+          throw new IllegalStateException("compressed data is zero!")
+        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
 
-        destImg.stHead.nImgSize = originalData.size
-        destImg.bnData = originalData
+        destImg.bnData = originalData.getData
+        destImg.stHead.nImgSize = destImg.bnData.length
+        if(originalData.getWidth>0)
+          destImg.stHead.nWidth =originalData.getWidth.toShort
+        if(originalData.getHeight>0)
+          destImg.stHead.nHeight=originalData.getHeight.toShort
+        if(originalData.getPpi>0)
+          destImg.stHead.nResolution = originalData.getPpi.toShort
     }
 
     destImg
@@ -149,14 +135,14 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
    * @param code "1300"
    * @return
    */
-  private def findDllHandle(code:String):Dll = {
+  private def findDllHandle(code:String,cprMethod:Int):Dll = {
     var dll = dlls.get(code)
     if(dll == null) {
       try {
         lock.lock()
         dll = dlls.get(code)
         if(dll == null){
-          loadSingleDll(code)
+          loadSingleDll(code,cprMethod)
           dll = dlls.get(code)
         }
       }finally{
@@ -165,13 +151,18 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
     }
     dll
   }
-  private def loadSingleDll(code:String): Unit ={
+  private def loadSingleDll(code:String,cprMethod:Int): Unit ={
     if (code.length != 4) {
       throw new IllegalArgumentException("code length must be 4")
     }
     val prefix = code.take(2)
     val dllName = "FPT_DC%s.dll".format(prefix)
-    val functionName = "FPT_DC%s".format(prefix)
+    val functionName = {
+      if(cprMethod == glocdef.GAIMG_CPRMETHOD_GA10)
+        "FPT_Decompress"
+        else
+        "FPT_DC%s".format(prefix)
+    }
     val files = FileUtils.listFiles(new File(serverHome + "/dll"), new AbstractFileFilter {
       override def accept(dir: File, name: String): Boolean = name == dllName
     }, new AbstractFileFilter {
@@ -182,7 +173,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
     } else if (files.size > 1) {
       throw new IllegalStateException("duplicate dll [%s]".format(dllName))
     }
-    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath, 0)
+    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
     dlls.put(code, Dll(dllName,functionName,handle))
   }
 }
