@@ -1,17 +1,12 @@
 #ifdef WIN32
 
+#include "manufactory_win32.h"
+
 #include "nirvana_hall_image_jni_NativeImageConverter.h"
 
 #include "jni_helper.h"
 
-//define function type
-typedef int (*GA_FPT_DCXX)(
-    unsigned char	code[4],
-    unsigned char	*cp_data,
-    int			length,
-    unsigned char	*img,
-    unsigned char	buf[256]
-    );
+
 
 static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
 {
