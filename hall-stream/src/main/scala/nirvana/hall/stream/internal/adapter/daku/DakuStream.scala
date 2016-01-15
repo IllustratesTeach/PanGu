@@ -31,48 +31,53 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
     val it = files.iterator()
     while (it.hasNext) {
       val fptFile = it.next()
-      val fpt = FPTObject.parseOfFile(fptFile)
-      val tpData = fpt.getTpDataList.get(0)
-      val id = queryPersonIfById(tpData)
-      if (id == null || "".equals(id)) {//不存在
+      try {
+        val fpt = FPTObject.parseOfFile(fptFile)
+        val tpData = fpt.getTpDataList.get(0)
+        val id = queryPersonIfById(tpData)
+        if (id == null || "".equals(id)) {//不存在
         //savePersonInfo(tpData)//保存人员信息
         //解压提取特征
         val fingerDataList = fpt.getTpDataList.get(0).getFingerDataList
-        for (i <- 0 to fingerDataList.size()-1) {
-          val finger = fingerDataList.get(i)
-          if(finger.getDataLength ==0){
-            finger.getCenterPoint
-          }
-          val fgp = finger.getFgp.toInt
-          var fgpp = finger.getFgp.toInt//parse FingerPosition
-          if (fgpp > 10) fgpp -= 10
-          val gafisImg = new GAFISIMAGESTRUCT
-          var imgCompressMethod = finger.getImgCompressMethod
-          if (finger.getImgCompressMethod.startsWith("14") || finger.getImgCompressMethod.endsWith("31"))
-            imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
-          imgCompressMethod match {
-            case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE => //不压缩(glocdef对应代码不明确)
-              gafisImg.stHead.bIsCompressed = 0
-              gafisImg.stHead.nCompressMethod = 0.toByte
-            case other=>
-              gafisImg.stHead.bIsCompressed = 1
-              gafisImg.stHead.nCompressMethod = getCodeFromGAFISImage(imgCompressMethod).toByte
+          for (i <- 0 to fingerDataList.size()-1) {
+            val finger = fingerDataList.get(i)
+            if(finger.getDataLength ==0){
+              finger.getCenterPoint
+            }
+            val fgp = finger.getFgp.toInt
+            var fgpp = finger.getFgp.toInt//parse FingerPosition
+            if (fgpp > 10) fgpp -= 10
+            val gafisImg = new GAFISIMAGESTRUCT
+            var imgCompressMethod = finger.getImgCompressMethod
+            if (finger.getImgCompressMethod.startsWith("14") || finger.getImgCompressMethod.endsWith("31"))
+              imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
+            imgCompressMethod match {
+              case fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE => //不压缩(glocdef对应代码不明确)
+                gafisImg.stHead.bIsCompressed = 0
+                gafisImg.stHead.nCompressMethod = 0.toByte
+              case other=>
+                gafisImg.stHead.bIsCompressed = 1
+                gafisImg.stHead.nCompressMethod = getCodeFromGAFISImage(imgCompressMethod).toByte
               //gafisImg.stHead.nCompressMethod = imgCompressMethod.toByte
-          }
-          gafisImg.bnData = finger.getImgData
-          gafisImg.stHead.nWidth =finger.getImgHorizontalLength.toShort
-          gafisImg.stHead.nHeight = finger.getImgVerticalLength.toShort
-          gafisImg.stHead.nResolution = finger.getDpi.toShort
-          gafisImg.stHead.nImgSize = gafisImg.bnData.length
-          if(gafisImg.stHead.nImgSize == 0)
-            System.out.println(tpData.getPersonId+"_"+fgp+"图像长度为0");
-          else
-            streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
-          //FileUtils.writeByteArrayToFile(new File("R04222222tt529222286.cpr"),gafisImg.toByteArray)
+            }
+            gafisImg.bnData = finger.getImgData
+            gafisImg.stHead.nWidth =finger.getImgHorizontalLength.toShort
+            gafisImg.stHead.nHeight = finger.getImgVerticalLength.toShort
+            gafisImg.stHead.nResolution = finger.getDpi.toShort
+            gafisImg.stHead.nImgSize = gafisImg.bnData.length
+            if(gafisImg.stHead.nImgSize == 0)
+              debug("图像长度为0! {}",tpData.getPersonId+"_"+fgp)
+            else
+              streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
+            //FileUtils.writeByteArrayToFile(new File("R04222222tt529222286.cpr"),gafisImg.toByteArray)
 
+          }
         }
       }
-
+      catch {
+        case e:Throwable=>
+          debug("FPT解析失败！ {}",fptFile.getName)
+      }
     }
 
   }
