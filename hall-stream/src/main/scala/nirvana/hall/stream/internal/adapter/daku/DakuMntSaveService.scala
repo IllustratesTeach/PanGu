@@ -38,14 +38,14 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       var fgpCase = 0
       if (fgp > 10) fgpCase = 1
       implicit val ds = dataSource
-      //保存人员信息
-      val pid = queryPersonIfById(personId)
+      //保存人员信息(确认特征提取成功后新增人员信息，多线程操作可能存在问题)
+      /*val pid = queryPersonIfById(personId)
       if (pid == null || "".equals(pid)) {
         //不存在
         JdbcDatabase.update(savePersonSql) { ps =>
           ps.setString(1, personId)
         }
-      }
+      }*/
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
         ps.setString(1,personId)

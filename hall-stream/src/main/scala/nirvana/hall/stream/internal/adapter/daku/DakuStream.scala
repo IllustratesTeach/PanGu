@@ -36,7 +36,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
         val tpData = fpt.getTpDataList.get(0)
         val id = queryPersonIfById(tpData)
         if (id == null || "".equals(id)) {//不存在
-        //savePersonInfo(tpData)//保存人员信息
+          savePersonInfo(tpData)//保存人员信息
         //解压提取特征
         val fingerDataList = fpt.getTpDataList.get(0).getFingerDataList
           for (i <- 0 to fingerDataList.size()-1) {
@@ -65,11 +65,14 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
             gafisImg.stHead.nHeight = finger.getImgVerticalLength.toShort
             gafisImg.stHead.nResolution = finger.getDpi.toShort
             gafisImg.stHead.nImgSize = gafisImg.bnData.length
+            //debug("导出图像数据 {}",tpData.getPersonId+"_"+fgp)
+            //FileUtils.writeByteArrayToFile(new File("cpr\\"+tpData.getPersonId+"_"+fgp+".cpr"),gafisImg.toByteArray)
+
             if(gafisImg.stHead.nImgSize == 0)
               debug("图像长度为0! {}",tpData.getPersonId+"_"+fgp)
             else
               streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
-            //FileUtils.writeByteArrayToFile(new File("R04222222tt529222286.cpr"),gafisImg.toByteArray)
+
 
           }
         }
