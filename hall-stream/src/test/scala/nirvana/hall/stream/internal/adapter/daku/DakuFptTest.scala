@@ -8,7 +8,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.stream.internal.adapter.bianjian.BianjianTestSymobls
 import nirvana.hall.stream.internal.adapter.daku.util.FPTObject
 import nirvana.hall.stream.services.StreamService
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.junit.{Assert, Test}
 import org.mockito.Mockito
@@ -26,6 +26,19 @@ class DakuFptTest {
     val list = fpt.getTpDataList
     Assert.assertTrue(list.size()>0)
   }
+
+  @Test
+  def getFpt : Unit = {
+    val fpt_dir = "G:\\backup\\"
+    val files  = FileUtils.listFiles(new File(fpt_dir),Array[String]("fpt"),true)
+    val it = files.iterator()
+    while (it.hasNext) {
+      val fptFile = it.next()
+      println(fptFile.getName)
+    }
+  }
+
+
 
   @Test
   def decodeFptData : Unit = {
