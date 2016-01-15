@@ -37,7 +37,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
   @Transactional
   override def deleteRelation[T](updateSupport: DynamicUpdateSupport[T]): Int = {
     updateSupport match {
-      case relation:Relation[T]=>
+      case relation:QlRelation[T]=>
         var fullQl = "delete from %s".format (relation.entityClazz.getSimpleName)
         relation.queryClause.foreach {
           fullQl += " where %s".format (_)
@@ -58,7 +58,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
   @Transactional
   override def updateRelation[T](updateObject: DynamicUpdateSupport[T]): Int = {
     updateObject match {
-      case relation: Relation[T] =>
+      case relation: QlRelation[T] =>
         var fullQl = "update %s set".format(relation.entityClazz.getSimpleName)
         relation.updateQl.foreach {
           fullQl += " %s".format(_)
@@ -84,7 +84,7 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
     }
   }
 
-  private def setQueryParameter[T](query:Query,relation: Relation[T]): Int = {
+  private def setQueryParameter[T](query:Query,relation: QlRelation[T]): Int = {
     var index = 1
     relation.queryParams.foreach { value =>
       query.setParameter(index, value)
@@ -99,9 +99,9 @@ class EntityServiceImpl(entityManager:EntityManager) extends EntityService {
    * @tparam T type parameter
    * @return record stream
    */
-  def find[T](queryObj:QuerySupport[T]):Stream[T]={
+  def find[T](queryObj:Relation[T]):Stream[T]={
     val query = queryObj match {
-      case relation: Relation[T] =>
+      case relation: QlRelation[T] =>
         var fullQl = "from %s".format(relation.entityClazz.getSimpleName)
         relation.queryClause.foreach {
           fullQl += " where %s".format(_)

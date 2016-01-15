@@ -56,7 +56,7 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @return
    */
   override def deleteGatherPortrait(personid: String): Boolean = {
-    GafisGatherPortrait.find_by_personid(personid).delete()
+    GafisGatherPortrait.find_by_personid(personid).delete
     true
     /*
     try {

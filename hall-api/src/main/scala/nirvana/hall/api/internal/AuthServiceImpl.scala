@@ -22,7 +22,7 @@ class AuthServiceImpl extends AuthService {
     periodicExecutor.addJob(new CronSchedule("0 0/10 * * * ? *"), "delete-expired-user", new Runnable {
       override def run(): Unit = {
         val expiredTime = ScalaUtils.currentTimeInSeconds - EXPIRED_PERIOD
-        OnlineUser.where("latestTime<?1",expiredTime).delete()
+        OnlineUser.where("latestTime<?1",expiredTime).delete
       }
     })
   }

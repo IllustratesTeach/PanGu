@@ -55,7 +55,7 @@ object ActiveRecord {
    * @tparam T type parameter
    * @return record stream
    */
-  private[services] def find[T](relation:QuerySupport[T]):Stream[T]={
+  private[services] def find[T](relation:Relation[T]):Stream[T]={
     getService[EntityService].find(relation)
   }
 
@@ -73,8 +73,8 @@ object ActiveRecord {
    * @param params parameter values
    * @return Relation object
    */
-  def internalWhere[A](clazz:Class[A],primaryKey:String,ql:String)(params:Any*): Relation[A]={
-    new Relation[A](clazz,primaryKey,ql,params.toSeq)
+  def internalWhere[A](clazz:Class[A],primaryKey:String,ql:String)(params:Any*): QlRelation[A]={
+    new QlRelation[A](clazz,primaryKey,ql,params.toSeq)
   }
   def createCriteriaRelation[A](clazz:Class[A],primaryKey:String,params:(String,Any)*):CriteriaRelation[A]={
     val queryBuilder = getService[EntityManager].getCriteriaBuilder
@@ -101,7 +101,7 @@ trait ActiveRecord {
   }
 }
 abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:String)
-  extends QuerySupport[A]
+  extends Relation[A]
   with DynamicUpdateSupport[A]{
   case class WrappedExpress(field:String,expr:BaseExpression)
   private[services] val builder:CriteriaBuilder
@@ -229,7 +229,7 @@ trait DynamicUpdateSupport[A] extends Dynamic{
 }
 
 
-trait QuerySupport[A] {
+trait Relation[A] {
   protected val primaryKey:String
   private[orm] var limit:Int = -1
   private[orm] var offset:Int = -1
@@ -287,7 +287,7 @@ trait QuerySupport[A] {
  * @param primaryKey primary key
  * @tparam A type parameter
  */
-class Relation[A](val entityClazz:Class[A],val primaryKey:String) extends QuerySupport[A] with DynamicUpdateSupport[A]{
+class QlRelation[A](val entityClazz:Class[A],val primaryKey:String) extends Relation[A] with DynamicUpdateSupport[A]{
   def this(entityClazz:Class[A],primaryKey:String,query:String,queryParams:Seq[Any]){
     this(entityClazz,primaryKey)
     if(query != null)
@@ -385,7 +385,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param parameters parameters
    * @return Realtion Object
    */
-  def where(ql:String,parameters:Any*): Relation[A]={
+  def where(ql:String,parameters:Any*): QlRelation[A]={
     ActiveRecord.internalWhere(clazz,primaryKey,ql)(parameters:_*)
   }
 
@@ -404,39 +404,39 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param keys key array
    * @return query object
    */
-  def find(keys:Array[Any]):Relation[A]={
+  def find(keys:Array[Any]):QlRelation[A]={
     internalFind(keys)
   }
-  private def internalFind(key:Any):Relation[A]={
+  private def internalFind(key:Any):QlRelation[A]={
     key match{
       case _:Int|_:String|_:Long=>
-        new Relation[A](clazz,primaryKey,"%s=?1".format(primaryKey),Seq(key))
+        new QlRelation[A](clazz,primaryKey,"%s=?1".format(primaryKey),Seq(key))
       case keys:Array[_] =>
-        new Relation[A](clazz,primaryKey,"%s IN (?1)".format(primaryKey),Seq(key))
+        new QlRelation[A](clazz,primaryKey,"%s IN (?1)".format(primaryKey),Seq(key))
       case None =>
-        new Relation[A](clazz,primaryKey,null,Seq())
+        new QlRelation[A](clazz,primaryKey,null,Seq())
     }
   }
   //retrieving single object
   def take:A= take(1).head
-  def take(n:Int):Relation[A]={
+  def take(n:Int):QlRelation[A]={
     internalFind(None).limit(n)
   }
   def first:A= first(1).head
-  def first(n:Int=1):Relation[A]= {
+  def first(n:Int=1):QlRelation[A]= {
     take(n).order(primaryKey-> "ASC")
   }
   def last:A= last(1).head
-  def last(n:Int):Relation[A]= {
+  def last(n:Int):QlRelation[A]= {
     take(n).order(primaryKey->"DESC")
   }
-  def all:Relation[A]= {
+  def all:QlRelation[A]= {
     internalFind(None)
   }
-  def asc(fields:String*):Relation[A]={
+  def asc(fields:String*):QlRelation[A]={
     internalFind(None).asc(fields:_*)
   }
-  def desc(fields:String*):Relation[A]={
+  def desc(fields:String*):QlRelation[A]={
     internalFind(None).desc(fields:_*)
   }
 

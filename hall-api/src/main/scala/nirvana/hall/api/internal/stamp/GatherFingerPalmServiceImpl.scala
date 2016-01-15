@@ -110,12 +110,12 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
   }
 
   def deleteFingerData(personId: String)  = {
-    GafisGatherFinger.find_by_personId(personId).delete()
+    GafisGatherFinger.find_by_personId(personId).delete
     //withSQL { delete.from(GafisGatherFinger).where.eq(GafisGatherFinger.column.personId, personId) }.update.apply()
   }
 
   def deletePalmData(personId: String)  = {
-    GafisGatherPalm.find_by_personId(personId).delete()
+    GafisGatherPalm.find_by_personId(personId).delete
     //withSQL { delete.from(GafisGatherPalm).where.eq(GafisGatherPalm.column.personId, personId) }.update.apply()
   }
 
