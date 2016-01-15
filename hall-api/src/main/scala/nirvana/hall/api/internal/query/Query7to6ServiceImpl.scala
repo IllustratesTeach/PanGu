@@ -93,8 +93,9 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
         ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
         matchTask.setLData(ldata)
       }else{
-        //TODO pos 6to8 ???
-        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+        //TODO pos 6to8 ??? 平面？？？
+        if(mic.nItemData <= 10)
+          matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
       }
     }
     matchTask.build()
@@ -119,7 +120,7 @@ class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig:
 //    retval.foreach{ ret =>
 //      new GafisQuery7to6(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID)).save()
 //    }
-    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct);
+    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct)
     new GafisQuery7to6(matchTask.getObjectId, oraSid).save()
   }
 

@@ -35,6 +35,7 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConf
 
       if(gaQueryStruct.stSimpQry.nStatus >= 2){//判断是否已经完成比对
         addMatchResult(queryque.pkId, gaQueryStruct)
+        doWork
       }
     }
   }
@@ -54,7 +55,6 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConf
   def doWork: Unit ={
     getGafisNormalqueryQueryqueMatching().foreach{ queryque =>
       getQueryAndSaveMatchResult(queryque)
-      doWork
     }
   }
 

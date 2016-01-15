@@ -156,10 +156,15 @@
       <artifactId>ejb3-persistence</artifactId>
       <version>1.0.2.GA</version>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.oracle</groupId>-->
+      <!--<artifactId>ojdbc14</artifactId>-->
+      <!--<version>10.2.0.3</version>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>com.oracle</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <version>10.2.0.3</version>
+      <artifactId>ojdbc6</artifactId>
+      <version>11.2.0.3.0</version>
     </dependency>
   </dependencies>
   <build>
