@@ -24,7 +24,7 @@ import scala.collection.JavaConversions._
  */
 class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) extends FirmDecoder{
   private val dlls = new ConcurrentHashMap[String,Dll]()
-  private case class Dll(fileName:String,functionName:String,Handle:Long)
+  private case class Dll(Handle:Long,lock:ReentrantLock)
   private val lock = new ReentrantLock()
   private val wsqDecoder = new WsqDecoder
 
@@ -77,7 +77,17 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
           throw new IllegalStateException("width or height is zero!")
         if(cprData == null ||cprData.length == 0)
           throw new IllegalStateException("compressed data is zero!")
-        val originalData = NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
+        val originalData =
+          if(cprMethod == glocdef.GAIMG_CPRMETHOD_GFS){//GFS support multi-thread
+            NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
+          }else{
+            try{
+              dll.lock.lock()
+              NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
+            }finally{
+              dll.lock.unlock()
+            }
+          }
 
         destImg.bnData = originalData.getData
         destImg.stHead.nImgSize = destImg.bnData.length
@@ -174,7 +184,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
       throw new IllegalStateException("duplicate dll [%s]".format(dllName))
     }
     val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
-    dlls.put(code, Dll(dllName,functionName,handle))
+    dlls.put(code, Dll(handle,new ReentrantLock()))
   }
 }
 
