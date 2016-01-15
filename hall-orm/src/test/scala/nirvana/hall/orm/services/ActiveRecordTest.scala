@@ -2,6 +2,7 @@ package nirvana.hall.orm.services
 
 import java.util.Date
 
+import nirvana.hall.orm.services.QueryExpression.{Like, NotNull, Between, Gt}
 import nirvana.hall.orm.{ModelB, BaseOrmTestCase, ModelA}
 import org.junit.{Assert, Test}
 
@@ -18,6 +19,8 @@ class ActiveRecordTest extends BaseOrmTestCase{
     modelA.save
     Array(1).sum
     var size = ModelA.find_by(name="asdf",id=Gt(0),name=NotNull,name=Like("a%"),id=Between(0,10000)).size
+    Assert.assertEquals(1,size)
+    size = ModelA.find_by.eq("name","asdf").gt("id",0).notNull("name").like("name","a%").between("id",0,10000).size
     Assert.assertEquals(1,size)
 
     ModelA.find_by(name="asdf").update(name="fdsa")

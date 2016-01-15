@@ -3,6 +3,7 @@ package nirvana.hall.orm.services
 import javax.persistence.criteria.{CriteriaBuilder, Path, Predicate}
 import javax.persistence.{EntityManager, Id, Transient}
 
+import nirvana.hall.orm.services.QueryExpression._
 import org.apache.tapestry5.ioc.ObjectLocator
 import org.slf4j.LoggerFactory
 
@@ -23,11 +24,6 @@ object ActiveRecord {
   private val logger = LoggerFactory getLogger getClass
   @volatile
   var objectLocator:ObjectLocator= _
-
-  case object NotNull
-  case object Null
-  case class Between(start:Any,end:Any)
-  case class Not(value:Any)
 
   /**
    * Saves the model.
@@ -91,11 +87,6 @@ object ActiveRecord {
   }
 }
 
-trait WhereSupportObject {
-  def where (restrictions: Predicate *):Unit
-  def criteriaBuilder:CriteriaBuilder
-  def path[X](field:String):Path[X]
-}
 /**
  * ActiveRecord trait
  */
@@ -126,28 +117,35 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
 
   private[orm] lazy val expressions = mutable.Buffer[WrappedExpress]()
 
-  val querySupport = new WhereSupportObject {
+  private sealed trait WhereSupportObject {
+    def where (restrictions: Predicate *):Unit
+    def criteriaBuilder:CriteriaBuilder
+    def path[X](field:String):Path[X]
+  }
+  private val querySupport = new WhereSupportObject {
     override def criteriaBuilder: CriteriaBuilder = builder
     override def where(restrictions: Predicate*):Unit = query.where(restrictions:_*)
     override def path[X](field: String): Path[X] =  queryRoot.get(field)
   }
-  val updatedSupport = new WhereSupportObject {
+  private val updatedSupport = new WhereSupportObject {
     override def criteriaBuilder: CriteriaBuilder = builder
     override def where(restrictions: Predicate*):Unit = updatedQuery.where(restrictions:_*)
     override def path[X](field: String): Path[X] =  updatedRoot.get(field)
   }
-  val deletedSupport = new WhereSupportObject {
+  private val deletedSupport = new WhereSupportObject {
     override def criteriaBuilder: CriteriaBuilder = builder
     override def where(restrictions: Predicate*):Unit = deletedQuery.where(restrictions:_*)
     override def path[X](field: String): Path[X] =  deletedRoot.get(field)
   }
-  def eq(field:String,value:Any): Unit ={
+  def eq(field:String,value:Any): this.type ={
     value match{
       case expr:BaseExpression =>
         expressions += WrappedExpress(field,expr)
       case other=>
         expressions += WrappedExpress(field,Equal(value))
     }
+
+    this
   }
   override def order(params: (String, Any)*): CriteriaRelation.this.type = {
     params.foreach{
@@ -161,6 +159,16 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     }
     this
   }
+  def notNull(field:String):this.type= eq(field,NotNull)
+  def isNull(field:String):this.type= eq(field,IsNull)
+  def gt(field:String,value:Number):this.type= eq(field,Gt(value))
+  def ge(field:String,value:Number):this.type= eq(field,Ge(value))
+  def lt(field:String,value:Number):this.type= eq(field,Lt(value))
+  def le(field:String,value:Number):this.type= eq(field,Le(value))
+  def between[T](field:String,x:T,y:T):this.type= eq(field,Between(x,y))
+  def like(field:String,value:String):this.type= eq(field,Like(value))
+  def notLike(field:String,value:String):this.type= eq(field,NotLike(value))
+
 
   override protected def executeQuery: scala.Stream[A] = {
     expandExpressions(querySupport)
@@ -220,17 +228,6 @@ trait DynamicUpdateSupport[A] extends Dynamic{
   def internalUpdate(params:(String,Any)*): Int
 }
 
-sealed trait BaseExpression
-case class Equal(value:Any) extends BaseExpression
-case object NotNull extends BaseExpression
-case object IsNull extends BaseExpression
-case class Gt(value:Number) extends BaseExpression
-case class Ge(value:Number) extends BaseExpression
-case class Lt(value:Number) extends BaseExpression
-case class Le(value:Number) extends BaseExpression
-case class Between[T](x: T, y: T) extends BaseExpression
-case class Like(value:String) extends BaseExpression
-case class NotLike(value:String) extends BaseExpression
 
 trait QuerySupport[A] {
   protected val primaryKey:String
@@ -360,6 +357,14 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @return relation query object
    */
   def applyDynamicNamed(name:String)(params:(String,Any)*):CriteriaRelation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,CriteriaRelation[A]]
+  def selectDynamic(field:String):CriteriaRelation[A]={
+    field match{
+      case "find_by"=>
+        ActiveRecord.createCriteriaRelation(clazz,primaryKey)
+      case other=>
+        throw new IllegalAccessException("unpported!")
+    }
+  }
 
   /**
    * find_by_xx_and_yy method
