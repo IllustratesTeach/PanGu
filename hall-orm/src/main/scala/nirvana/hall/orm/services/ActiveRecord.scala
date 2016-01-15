@@ -1,6 +1,6 @@
 package nirvana.hall.orm.services
 
-import javax.persistence.criteria.{Predicate, CriteriaBuilder, Path}
+import javax.persistence.criteria.{CriteriaBuilder, Path, Predicate}
 import javax.persistence.{EntityManager, Id, Transient}
 
 import org.apache.tapestry5.ioc.ObjectLocator
@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.Stream
-import scala.collection.{mutable, GenTraversableOnce}
+import scala.collection.{GenTraversableOnce, mutable}
 import scala.language.experimental.macros
 import scala.language.{dynamics, postfixOps, reflectiveCalls}
 import scala.reflect.{ClassTag, classTag}
@@ -182,10 +182,11 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
         ws.criteriaBuilder.lt(ws.path[Number](field),value)
       case WrappedExpress(field,Le(value)) =>
         ws.criteriaBuilder.le(ws.path[Number](field),value)
-      /*
-      case WrappedExpress(field,Between(x,y)) =>
-        ws.criteriaBuilder.between(ws.path[Number](field),x,y)
-        */
+      case WrappedExpress(field,Between(x:java.lang.Long,y:java.lang.Long)) =>
+        ws.criteriaBuilder.between(ws.path[java.lang.Long](field),x,y)
+      case WrappedExpress(field,Between(x:Integer,y:Integer)) =>
+        ws.criteriaBuilder.between(ws.path[Integer](field),x,y)
+        //addBetween(ws,field,x,y)
       case WrappedExpress(field,Like(value)) =>
         ws.criteriaBuilder.like(ws.path[String](field),value)
       case WrappedExpress(field,NotLike(value)) =>
@@ -227,7 +228,7 @@ case class Gt(value:Number) extends BaseExpression
 case class Ge(value:Number) extends BaseExpression
 case class Lt(value:Number) extends BaseExpression
 case class Le(value:Number) extends BaseExpression
-case class Between(x: Number, y: Number) extends BaseExpression
+case class Between[T](x: T, y: T) extends BaseExpression
 case class Like(value:String) extends BaseExpression
 case class NotLike(value:String) extends BaseExpression
 
