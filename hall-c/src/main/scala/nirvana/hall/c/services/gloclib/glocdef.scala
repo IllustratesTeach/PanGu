@@ -125,7 +125,8 @@ object glocdef {
            */
           override def fromStreamReader(dataSource: StreamReader): GAFISIMAGESTRUCT.this.type = {
             super.fromStreamReader(dataSource)
-            bnData = readBytesFromStreamReader(dataSource,stHead.nImgSize)
+            if(stHead.nImgSize > 0)
+              bnData = readBytesFromStreamReader(dataSource,stHead.nImgSize)
 
             this
           }

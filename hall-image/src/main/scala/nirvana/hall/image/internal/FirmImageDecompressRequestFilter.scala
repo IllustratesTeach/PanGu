@@ -21,6 +21,8 @@ class FirmImageDecompressRequestFilter(firmDecoder: FirmDecoder) extends RpcServ
       val is = request.getCprData.newInput()
       val gafisImg = new GAFISIMAGESTRUCT
       gafisImg.fromStreamReader(is)
+      if(gafisImg.stHead.nImgSize == 0)
+        throw new IllegalArgumentException("image data length is zero.")
 
       val originalImg = firmDecoder.decode(gafisImg)
       val firmResponseBuilder = FirmImageDecompressResponse.newBuilder()

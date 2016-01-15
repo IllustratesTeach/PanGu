@@ -78,15 +78,15 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
         if(cprData == null ||cprData.length == 0)
           throw new IllegalStateException("compressed data is zero!")
         val originalData =
-          if(cprMethod == glocdef.GAIMG_CPRMETHOD_GFS){//GFS support multi-thread
-            NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
-          }else{
+          if(cprMethod == glocdef.GAIMG_CPRMETHOD_PKU){
             try{
               dll.lock.lock()
               NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
             }finally{
               dll.lock.unlock()
             }
+          }else{
+            NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
           }
 
         destImg.bnData = originalData.getData
