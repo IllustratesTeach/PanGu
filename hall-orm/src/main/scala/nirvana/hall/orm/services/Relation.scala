@@ -190,7 +190,7 @@ trait DynamicUpdateSupport[A] extends Dynamic{
   /**
    * update method
    */
-  def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.dslDynamicImplNamed[A,Int]
+  def applyDynamicNamed(name:String)(params:(String,Any)*):Int=macro HallOrmMacroDefine.updateMethodImpl[A,Int]
   def internalUpdate(params:(String,Any)*): Int
 }
 

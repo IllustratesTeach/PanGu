@@ -116,7 +116,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param params method parameter
    * @return relation query object
    */
-  def applyDynamicNamed(name:String)(params:(String,Any)*):CriteriaRelation[A]=macro HallOrmMacroDefine.findDynamicImplNamed[A,CriteriaRelation[A]]
+  def applyDynamicNamed(name:String)(params:(String,Any)*):CriteriaRelation[A]=macro HallOrmMacroDefine.findByNamedParameterImpl[A,CriteriaRelation[A]]
   def selectDynamic(field:String):CriteriaRelation[A]={
     field match{
       case "find_by"=>
@@ -136,7 +136,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
    * @param params parameter list
    * @return Relation query instance
    */
-  def applyDynamic(name:String)(params:Any*):CriteriaRelation[A]= macro HallOrmMacroDefine.findDynamicImpl[A,CriteriaRelation[A]]
+  def applyDynamic(name:String)(params:Any*):CriteriaRelation[A]= macro HallOrmMacroDefine.findByMethodImpl[A,CriteriaRelation[A]]
 
   /**
    * where(ql,parameters)
