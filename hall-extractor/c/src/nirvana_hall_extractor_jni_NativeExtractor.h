@@ -2,6 +2,7 @@
 #include <jni.h>
 /* Header for class nirvana_hall_extractor_jni_NativeExtractor */
 
+#include "nirvana/kernel.h"
 #ifndef _Included_nirvana_hall_extractor_jni_NativeExtractor
 #define _Included_nirvana_hall_extractor_jni_NativeExtractor
 #ifdef __cplusplus
@@ -15,6 +16,7 @@ extern "C" {
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
   (JNIEnv *, jclass, jbyteArray, jbyteArray,jbyte, jbyte, jbyte);
 
+int GAFIS_ExtractMNT_All_NewTTFea(XGWMNTEXTRACTSTR *MntExtStr);
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ExtractMNT_AllWithNewFeature

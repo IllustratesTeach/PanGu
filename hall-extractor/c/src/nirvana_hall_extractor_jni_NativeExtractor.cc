@@ -2,7 +2,6 @@
 #include "nirvana_hall_extractor_jni_NativeExtractor.h"
 
 #include "../../../hall-image/c/src/jni/jni_helper.h"
-#include "nirvana/kernel.h"
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
@@ -43,7 +42,6 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
 }
 #ifdef LINUX
 
-int GAFIS_ExtractMNT_All_NewTTFea(XGWMNTEXTRACTSTR *MntExtStr);
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
