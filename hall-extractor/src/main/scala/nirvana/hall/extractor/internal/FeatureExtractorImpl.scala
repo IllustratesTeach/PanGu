@@ -13,7 +13,7 @@ import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
 import org.jboss.netty.buffer.ChannelBuffers
@@ -35,27 +35,28 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @param featureType feature type
    * @return GAFISIMAGESTRUCT
    */
-  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType): GAFISIMAGESTRUCT = {
+  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): GAFISIMAGESTRUCT = {
     if(img.stHead.bIsCompressed == 1)
       throw new IllegalArgumentException("compressed image unspported!")
     val imgData = img.toByteArray
-    val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType)
+    val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType,newFeatureTry)
 
     new GAFISIMAGESTRUCT().fromByteArray(mntData)
   }
-  override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType): Array[Byte]= {
+  override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Array[Byte]= {
     val image = readByteArrayAsGAFISIMAGE(is)
     val originalImgData = image.toByteArray
     val imgHead = image.stHead
 
+    val newFeature = newFeatureTry == NewFeatureTry.V2
 
     val (feature,isLatent) = featureType match {
       case FeatureType.FingerTemplate =>
         image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-        (new FINGERMNTSTRUCT,0)
+        if(newFeature) (new FINGERMNTSTRUCT_NEWTT,0) else (new FINGERMNTSTRUCT,0)
       case FeatureType.FingerLatent =>
         image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-        (new FINGERLATMNTSTRUCT,1)
+        if(newFeature) (new FINGERLATMNTSTRUCT,1) else (new FINGERLATMNTSTRUCT,1)
       case FeatureType.PalmTemplate =>
         image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
         (new PALMMNTSTRUCT,0)
@@ -77,7 +78,12 @@ class FeatureExtractorImpl extends FeatureExtractor{
     imgHead.writeToStreamWriter(mntBuffer)
 
     val mntData = mntBuffer.array()
-    NativeExtractor.ExtractMNT_All(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+
+    if(newFeature)
+      NativeExtractor.ExtractMNT_AllWithNewFeature(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+    else
+      NativeExtractor.ExtractMNT_All(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+
     mntData
   }
   private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={

@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
 
 /**
  * extract feature from image
@@ -21,7 +21,8 @@ trait FeatureExtractor {
    */
   def extractByGAFISIMG(img:GAFISIMAGESTRUCT,
                         fingerPos:FingerPosition,
-                        featureType:FeatureType):GAFISIMAGESTRUCT
+                        featureType:FeatureType,
+                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):GAFISIMAGESTRUCT
 
   /**
    * extract feature from image data
@@ -32,5 +33,6 @@ trait FeatureExtractor {
    */
   def extractByGAFISIMGBinary(imgData:InputStream,
                         fingerPos:FingerPosition,
-                        featureType:FeatureType):Array[Byte]
+                        featureType:FeatureType,
+                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):Array[Byte]
 }

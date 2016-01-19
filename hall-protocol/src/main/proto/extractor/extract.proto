@@ -24,6 +24,10 @@ enum	FingerPosition
   FINGER_L_RING	= 9;	//左环
   FINGER_L_LITTLE	= 10;	//左小
 }
+enum NewFeatureTry{
+  V1 = 0; //老的
+  V2 = 1; //新版本
+}
 /* send request to image server */
 message ExtractRequest{
   extend monad.rpc.protocol.BaseCommand {
@@ -38,6 +42,7 @@ message ExtractRequest{
   required bytes img_data = 1;
   required FingerPosition position = 2;
   required FeatureType mnt_type = 3;
+  optional NewFeatureTry feature_try= 4[default = V1];
 }
 
 /* response */

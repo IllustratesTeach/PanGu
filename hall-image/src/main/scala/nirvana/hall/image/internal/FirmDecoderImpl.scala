@@ -8,6 +8,7 @@ import monad.core.MonadCoreSymbols
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.image.config.ImageConfigSupport
 import nirvana.hall.image.jni.NativeImageConverter
 import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
@@ -22,9 +23,9 @@ import scala.collection.JavaConversions._
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
-class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) extends FirmDecoder{
+class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,imageConfigSupport: ImageConfigSupport) extends FirmDecoder{
   private val dlls = new ConcurrentHashMap[String,Dll]()
-  private case class Dll(Handle:Long,lock:ReentrantLock)
+  private case class Dll(Handle:Long,lockOpt:Option[ReentrantLock])
   private val lock = new ReentrantLock()
   private val wsqDecoder = new WsqDecoder
 
@@ -77,18 +78,17 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
           throw new IllegalStateException("width or height is zero!")
         if(cprData == null ||cprData.length == 0)
           throw new IllegalStateException("compressed data is zero!")
-        val originalData =
-          if(cprMethod == glocdef.GAIMG_CPRMETHOD_PKU){
+        val originalData = dll.lockOpt match{
+          case Some(locker)=>
             try{
-              dll.lock.lock()
+              locker.lock()
               NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
             }finally{
-              dll.lock.unlock()
+              locker.unlock()
             }
-          }else{
+          case None=>
             NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
-          }
-
+        }
         destImg.bnData = originalData.getData
         destImg.stHead.nImgSize = destImg.bnData.length
         if(originalData.getWidth>0)
@@ -184,7 +184,15 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String) e
       throw new IllegalStateException("duplicate dll [%s]".format(dllName))
     }
     val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
-    dlls.put(code, Dll(handle,new ReentrantLock()))
+    val dllPropertyOpt = imageConfigSupport.image.dllConcurrent.find(_.name == dllName)
+    val isConcurrent =
+    dllPropertyOpt match {
+      case Some(dllProperty) =>
+        dllProperty.isConcurrent
+      case None =>
+        false
+    }
+    dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }
 }
 

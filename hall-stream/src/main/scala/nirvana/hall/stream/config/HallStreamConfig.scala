@@ -28,4 +28,6 @@ class HallStreamConfig {
   var extractThread:Int = 2
   @XmlElement(name="save_feature_thread_num")
   var saveFeatureThread:Int = 2
+  @XmlElement(name="is_new_feature")
+  var isNewFeature:Boolean = false
 }

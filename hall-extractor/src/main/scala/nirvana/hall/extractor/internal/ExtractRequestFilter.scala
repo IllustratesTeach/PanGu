@@ -17,7 +17,8 @@ class ExtractRequestFilter(extractor:FeatureExtractor) extends RpcServerMessageF
       val extractRequest = commandRequest.getExtension(ExtractRequest.cmd)
       val mntData = extractor.extractByGAFISIMGBinary(extractRequest.getImgData.newInput(),
         extractRequest.getPosition,
-        extractRequest.getMntType)
+        extractRequest.getMntType,
+        extractRequest.getFeatureTry)
 
       val extractResponseBuilder = ExtractResponse.newBuilder()
       extractResponseBuilder.setMntData(ByteString.copyFrom(mntData))
