@@ -34,6 +34,11 @@
           <xs:documentation>save feature data thread</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="xs:boolean" name="is_new_feature" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>whether is new feature</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
