@@ -13,4 +13,6 @@ object DakuSymobls {
   val RPC_EXTRACT_URL="rpc.extract.url"
 
   val FPT_DIR="hall.stream.daku.fpt.dir"
+
+  val ERROR_FPT_DIR="hall.stream.daku.error.dir"
 }

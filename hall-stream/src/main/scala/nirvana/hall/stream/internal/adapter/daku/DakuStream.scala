@@ -27,6 +27,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
 
   def startStream(): Unit ={
     val fpt_dir = System.getProperty(DakuSymobls.FPT_DIR)
+    val error_fpt_dir = System.getProperty(DakuSymobls.ERROR_FPT_DIR)
     val files  = FileUtils.listFiles(new File(fpt_dir),Array[String]("fpt"),true)
     val it = files.iterator()
     while (it.hasNext) {
@@ -73,13 +74,13 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
             else
               streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
 
-
           }
         }
       }
       catch {
         case e:Throwable=>
           debug("FPT解析失败！ {}",fptFile.getName)
+          FileUtils.copyFile(fptFile,new File(error_fpt_dir,fptFile.getName))
       }
     }
 
@@ -93,13 +94,12 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
     }{rs=>
       id = rs.getString("personid")
     }
-    println(id)
     id
   }
 
   //保存人员信息
   private def savePersonInfo(tpData : FPTObject.FPTtpData) : Unit = {
-    val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1)"
+    val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate)"
     JdbcDatabase.update(savePersonSql){ps =>
       ps.setString(1,tpData.getPersonId)
     }
