@@ -2,6 +2,7 @@ package nirvana.hall.stream.internal
 
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractRequest, ExtractResponse, FingerPosition}
 import nirvana.hall.stream.services.ExtractService
@@ -11,7 +12,8 @@ import nirvana.hall.support.services.RpcHttpClient
 /**
  * Created by songpeng on 15/12/15.
  */
-class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient) extends ExtractService{
+class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient)
+  extends ExtractService  with LoggerSupport{
   /**
    * extract service
    * @param img image data
@@ -36,6 +38,7 @@ class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient) extends Extr
           throw new IllegalAccessException("response haven't ExtractResponse")
         }
       case CommandStatus.FAIL =>
+        info("FPT特征提取失败！ {}",baseResponse.getMsg)
         throw new IllegalAccessException("fail to extractor,server message:%s".format(baseResponse.getMsg))
     }
   }
