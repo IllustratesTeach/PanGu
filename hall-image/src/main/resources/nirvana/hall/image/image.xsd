@@ -35,6 +35,41 @@
           <xs:documentation>配置Web服务器相关参数</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="imageType" name="image" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>图像处理相关配置</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="imageType">
+    <xs:sequence>
+      <xs:element type="dllsType" name="dll_properties" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>定义dll的并发特性</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dllsType">
+  <xs:sequence>
+    <xs:element type="dllType" name="dll" maxOccurs="unbounded" minOccurs="1">
+      <xs:annotation>
+        <xs:documentation>定义dll的属性</xs:documentation>
+      </xs:annotation>
+    </xs:element>
+  </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dllType">
+    <xs:attribute type="xs:string" name="name" use="required">
+      <xs:annotation>
+        <xs:documentation>dll的名称</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute type="xs:boolean" name="is_concurrent" use="required">
+      <xs:annotation>
+        <xs:documentation>是否支持并发</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 </xs:schema>

@@ -8,6 +8,7 @@ import javax.imageio.ImageIO
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
 import nirvana.hall.c.services.AncientData._
 import org.apache.commons.io.IOUtils
@@ -21,7 +22,7 @@ import org.junit.{Assert, Test}
 class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_decode_gafisimg{
-    val decoder = new FirmDecoderImpl("support")
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.bIsCompressed = 1.toByte

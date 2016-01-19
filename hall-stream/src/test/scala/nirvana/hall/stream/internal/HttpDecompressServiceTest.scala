@@ -24,40 +24,45 @@ class HttpDecompressServiceTest {
     val httpClient = new RpcHttpClientImpl(registry)
 
     val service = new HttpDecompressService("http://10.1.7.98:9001/image",httpClient)
-    val executor = Executors.newFixedThreadPool(10)
+    val executor = Executors.newFixedThreadPool(5)
 
     val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/cpr-1"),Array("cpr"),true)
     val it = files.iterator()
-    val countDownLatch = new CountDownLatch(files.size())
+    val loop = 100
+    val countDownLatch = new CountDownLatch(files.size() * loop)
     while(it.hasNext){
       val file = it.next()
       executor.execute(new Runnable {
         override def run(): Unit = {
-          var gafisImg:GAFISIMAGESTRUCT = null
-          try {
-            println("begin to decompress " + file)
-            val request = FirmImageDecompressRequest.newBuilder()
-            val is = new FileInputStream(file)
-            val data = IOUtils.toByteArray(is)
+          0.until(loop).foreach { i =>
+            var gafisImg: GAFISIMAGESTRUCT = null
+            try {
+              //            println("begin to decompress " + file)
+              val request = FirmImageDecompressRequest.newBuilder()
+              val is = new FileInputStream(file)
+              val data = IOUtils.toByteArray(is)
+              IOUtils.closeQuietly(is)
 
-            gafisImg = new GAFISIMAGESTRUCT
-            gafisImg.fromByteArray(data)
-            /*
+              gafisImg = new GAFISIMAGESTRUCT
+              gafisImg.fromByteArray(data)
+              println(gafisImg.stHead.nCompressMethod)
+              /*
           gafisImg.stHead.bIsCompressed = 1
           gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
           gafisImg.bnData = bnData
           gafisImg.stHead.nImgSize = bnData.length
           */
 
-            request.setCprData(ByteString.copyFrom(data))
-            val result = service.decompress(request.build())
-            Assert.assertTrue(result.isDefined)
-            println("finish to decompress " + file)
-          }catch{
-            case e:Throwable=>
-              println("fail to decompress ....",e.toString)
-          }finally{
-            countDownLatch.countDown()
+              request.setCprData(ByteString.copyFrom(data))
+              val result = service.decompress(request.build())
+              Assert.assertTrue(result.isDefined)
+              //            println("finish to decompress " + file)
+            } catch {
+              case e: Throwable =>
+                println("fail to decompress ....", e.toString)
+            } finally {
+              countDownLatch.countDown()
+            }
           }
         }
       })
