@@ -18,4 +18,8 @@ public class NativeExtractor{
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
+    public static native void ExtractMNT_AllWithNewFeature(byte[] img,byte[] mnt,
+                                             byte finger_pos,
+                                             byte ExtractMode,
+                                             byte belatent);
 }

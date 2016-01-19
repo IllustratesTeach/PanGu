@@ -15,6 +15,13 @@ extern "C" {
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
   (JNIEnv *, jclass, jbyteArray, jbyteArray,jbyte, jbyte, jbyte);
 
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    ExtractMNT_AllWithNewFeature
+ * Signature: ([B[BBBB)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1AllWithNewFeature
+    (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
 #ifdef __cplusplus
 }
 #endif
