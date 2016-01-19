@@ -14,7 +14,19 @@
     <address>127.0.0.1:3333</address>
   </zk>
   <web>
-    <bind>127.0.0.1:9001</bind>
+    <bind>0.0.0.0:9001</bind>
   </web>
+  <image>
+    <dll_properties>
+      <dll name="FPT_DC00.dll" is_concurrent="true"/>
+      <dll name="FPT_DC11.dll" is_concurrent="true"/>
+      <dll name="FPT_DC12.dll" is_concurrent="true"/>
+      <dll name="FPT_DC13.dll" is_concurrent="false"/>
+      <dll name="FPT_DC17.dll" is_concurrent="true"/>
+      <dll name="FPT_DC18.dll" is_concurrent="true"/>
+      <dll name="FPT_DC19.dll" is_concurrent="true"/>
+      <dll name="FPT_DC22.dll" is_concurrent="true"/>
+    </dll_properties>
+  </image>
 </hall_image>
 
