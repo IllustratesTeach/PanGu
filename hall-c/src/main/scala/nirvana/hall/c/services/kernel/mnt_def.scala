@@ -9,8 +9,23 @@ import nirvana.hall.c.services.AncientData
  * @since 2015-12-11
  */
 object mnt_def {
+  //2016.1.19
+  final val MAXTTFEASIZE = 3320
+  class FINGERMNTSTRUCT_NEWTT extends FINGERMNTSTRUCT{
+    var MNT:FINGERMNTSTRUCT = _
+    @Length(MAXTTFEASIZE)
+    var pTTFea:Array[Byte] = _
+  }
 
-    final val FTPMNTSIZE = 180				//不能动
+  class FINGERLATMNTSTRUCT_NEWTT extends FINGERLATMNTSTRUCT {
+    var MNT:FINGERLATMNTSTRUCT = _
+    @Length(MAXTTFEASIZE)
+    var pTTFea:Array[Byte] = _
+  }
+
+
+
+  final val FTPMNTSIZE = 180				//不能动
     final val FLPMNTSIZE = 80				//不能动
 
     final val PTPMNTSIZE = 1200
