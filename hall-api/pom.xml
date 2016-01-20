@@ -151,11 +151,13 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>ejb3-persistence</artifactId>
       <version>1.0.2.GA</version>
     </dependency>
+    -->
     <!--<dependency>-->
       <!--<groupId>com.oracle</groupId>-->
       <!--<artifactId>ojdbc14</artifactId>-->
