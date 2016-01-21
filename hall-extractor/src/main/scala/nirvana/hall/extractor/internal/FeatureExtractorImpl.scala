@@ -56,7 +56,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
         if(newFeature) (new FINGERMNTSTRUCT_NEWTT,0) else (new FINGERMNTSTRUCT,0)
       case FeatureType.FingerLatent =>
         image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-        if(newFeature) (new FINGERLATMNTSTRUCT,1) else (new FINGERLATMNTSTRUCT,1)
+        if(newFeature) (new FINGERLATMNTSTRUCT_NEWTT,1) else (new FINGERLATMNTSTRUCT,1)
       case FeatureType.PalmTemplate =>
         image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
         (new PALMMNTSTRUCT,0)
