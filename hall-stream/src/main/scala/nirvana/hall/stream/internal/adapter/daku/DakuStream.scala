@@ -100,7 +100,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
 
   //保存人员信息
   private def savePersonInfo(tpData : FPTObject.FPTtpData) : Unit = {
-    val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate)"
+    val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date,data_in) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate,2)"
     JdbcDatabase.update(savePersonSql){ps =>
       ps.setString(1,tpData.getPersonId)
     }

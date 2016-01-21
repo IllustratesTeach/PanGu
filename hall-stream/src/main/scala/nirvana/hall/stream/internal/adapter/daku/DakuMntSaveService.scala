@@ -29,7 +29,7 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
 
       //val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate)"
 
-      //debug("save record with id {}",id)
+      debug("save record with id {}",id)
       val arr = id.asInstanceOf[String].split("_")
       val personId = arr(0)
       val fgp = arr(1).toInt
@@ -47,12 +47,12 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
         }
       }*/
       //保存指纹特征信息
-      /*JdbcDatabase.update(saveFingerSql) { ps =>
+      JdbcDatabase.update(saveFingerSql) { ps =>
         ps.setString(1,personId)
         ps.setInt(2,fgpDB)
         ps.setInt(3,fgpCase)
         ps.setBytes(4,feature.toByteArray)
-      }*/
+      }
       
     }
 
