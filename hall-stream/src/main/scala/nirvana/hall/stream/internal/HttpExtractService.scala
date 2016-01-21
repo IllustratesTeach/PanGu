@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, ExtractRequest, ExtractResponse, FingerPosition}
-import nirvana.hall.stream.config.HallStreamConfig
+import nirvana.hall.stream.config.{NirvanaHallStreamConfig, HallStreamConfig}
 import nirvana.hall.stream.services.ExtractService
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.support.services.RpcHttpClient
@@ -12,7 +12,7 @@ import nirvana.hall.support.services.RpcHttpClient
 /**
  * Created by songpeng on 15/12/15.
  */
-class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient,config:HallStreamConfig) extends ExtractService{
+class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient,config:NirvanaHallStreamConfig) extends ExtractService{
   /**
    * extract service
    * @param img image data
@@ -25,7 +25,7 @@ class HttpExtractService(url: String, rpcHttpClient: RpcHttpClient,config:HallSt
     img.writeToStreamWriter(imgData)
     request.setImgData(imgData.toByteString)
 
-    if(config.isNewFeature)
+    if(config.stream.isNewFeature)
       request.setFeatureTry(NewFeatureTry.V2)
     else
       request.setFeatureTry(NewFeatureTry.V1)
