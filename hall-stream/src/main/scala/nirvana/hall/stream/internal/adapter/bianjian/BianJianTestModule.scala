@@ -3,7 +3,7 @@ package nirvana.hall.stream.internal.adapter.bianjian
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import nirvana.hall.stream.config.HallStreamConfig
+import nirvana.hall.stream.config.{NirvanaHallStreamConfig, HallStreamConfig}
 import nirvana.hall.stream.internal.{HttpExtractService, HttpDecompressService}
 import nirvana.hall.stream.services.{ExtractService, DecompressService, FeatureSaverService}
 import nirvana.hall.support.services.RpcHttpClient
@@ -36,7 +36,7 @@ object BianjianTestModule {
     new HttpDecompressService(url,rpcHttpClient)
   }
   @EagerLoad
-  def buildExtractService(rpcHttpClient: RpcHttpClient,config:HallStreamConfig):ExtractService={
+  def buildExtractService(rpcHttpClient: RpcHttpClient,config:NirvanaHallStreamConfig):ExtractService={
     val url = System.getProperty(BianjianTestSymobls.RPC_EXTRACT_URL)
     new HttpExtractService(url,rpcHttpClient,config)
   }
