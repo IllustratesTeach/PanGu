@@ -122,7 +122,7 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
       case "find_by"=>
         ActiveRecord.createCriteriaRelation(clazz,primaryKey)
       case other=>
-        throw new IllegalAccessException("unpported!")
+        throw new IllegalAccessException("unsupported!")
     }
   }
 
