@@ -4,7 +4,7 @@ import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{SystemEnvDetectorSupport, TapestryIocContainerSupport}
 import nirvana.hall.stream.services.StreamService
-import nirvana.hall.stream.{HallStreamSymbols, HallStreamModule}
+import nirvana.hall.stream.{HallStreamModule, HallStreamSymbols}
 import org.slf4j.LoggerFactory
 
 /**

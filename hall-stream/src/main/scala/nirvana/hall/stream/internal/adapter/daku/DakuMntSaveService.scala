@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.services.kernel.mnt_def.{FINGERMNTSTRUCT_NEWTT, FINGERMNTSTRUCT}
 import nirvana.hall.stream.internal.adapter.daku.util.FPTObject
 import nirvana.hall.stream.services.FeatureSaverService
 import nirvana.hall.support.services.JdbcDatabase
@@ -46,12 +47,18 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
           ps.setString(1, personId)
         }
       }*/
+      val featureBytes= feature.toByteArray
+      if(logger.isDebugEnabled()){
+        val featureStruct = new FINGERMNTSTRUCT_NEWTT
+        featureStruct.fromByteArray(featureBytes)
+        debug("minuita number is {} for {}",featureStruct.cm,personId)
+      }
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
         ps.setString(1,personId)
         ps.setInt(2,fgpDB)
         ps.setInt(3,fgpCase)
-        ps.setBytes(4,feature.toByteArray)
+        ps.setBytes(4,featureBytes)
       }
       
     }

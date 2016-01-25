@@ -34,8 +34,8 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
       try {
         val fpt = FPTObject.parseOfFile(fptFile)
         val tpData = fpt.getTpDataList.get(0)
-        val id = queryPersonIfById(tpData)
-        if (id == null || "".equals(id)) {//不存在
+        //val id = queryPersonIfById(tpData)
+        //if (id == null || "".equals(id)) {//不存在
           savePersonInfo(tpData)//保存人员信息
         //处理完成重命名
         FileUtils.moveFile(fptFile,new File(fptFile.toString+"t"))
@@ -76,7 +76,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
               streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
 
           }
-        }
+        //}
       }
       catch {
         case e:Throwable=>
