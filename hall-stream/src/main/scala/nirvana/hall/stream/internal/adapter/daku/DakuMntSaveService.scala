@@ -28,7 +28,7 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       val saveFingerSql : String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data)" +
         "values(sys_guid(),?,?,?,0,2,sysdate,gafis_gather_finger_seq.nextval,?)"
 
-      //val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate)"
+      val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate)"
 
       debug("save record with id {}",id)
       val arr = id.asInstanceOf[String].split("_")
@@ -40,18 +40,25 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       if (fgp > 10) fgpCase = 1
       implicit val ds = dataSource
       //保存人员信息(确认特征提取成功后新增人员信息，多线程操作可能存在问题)
-      /*val pid = queryPersonIfById(personId)
+      val pid = queryPersonIfById(personId)
       if (pid == null || "".equals(pid)) {
-        //不存在
-        JdbcDatabase.update(savePersonSql) { ps =>
-          ps.setString(1, personId)
+        try {
+          //不存在
+          JdbcDatabase.update(savePersonSql) { ps =>
+            ps.setString(1, personId)
+          }
         }
-      }*/
+        catch {
+          case e:Throwable=>
+            warn("fail to save person",e)
+        }
+
+      }
       val featureBytes= feature.toByteArray
       if(logger.isDebugEnabled()){
         val featureStruct = new FINGERMNTSTRUCT_NEWTT
         featureStruct.fromByteArray(featureBytes)
-        debug("minuita number is {} for {}",featureStruct.cm,personId)
+        debug("minuita number is {} for {}",featureStruct.MNT.cm.toInt,personId)
       }
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>

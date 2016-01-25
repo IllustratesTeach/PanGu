@@ -28,15 +28,23 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
     val fpt_dir = System.getProperty(DakuSymobls.FPT_DIR)
     val error_fpt_dir = System.getProperty(DakuSymobls.ERROR_FPT_DIR)
     val files  = FileUtils.listFiles(new File(fpt_dir),Array[String]("fpt"),true)
+    val total = files.size()
+    info("start stream,total files:{}",total)
+    var i = 0;
+    val mask = (1 << 12) -1
     val it = files.iterator()
     while (it.hasNext) {
+      i += 1
+      if( (i & mask) == 0){
+        info("{} processed,waiting:{} total:{}",i,total-i,total)
+      }
       val fptFile = it.next()
       try {
         val fpt = FPTObject.parseOfFile(fptFile)
         val tpData = fpt.getTpDataList.get(0)
         //val id = queryPersonIfById(tpData)
         //if (id == null || "".equals(id)) {//不存在
-          savePersonInfo(tpData)//保存人员信息
+        //savePersonInfo(tpData)//保存人员信息
         //处理完成重命名
         FileUtils.moveFile(fptFile,new File(fptFile.toString+"t"))
         //解压提取特征

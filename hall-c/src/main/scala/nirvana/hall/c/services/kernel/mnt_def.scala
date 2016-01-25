@@ -11,13 +11,13 @@ import nirvana.hall.c.services.AncientData
 object mnt_def {
   //2016.1.19
   final val MAXTTFEASIZE = 3320
-  class FINGERMNTSTRUCT_NEWTT extends FINGERMNTSTRUCT{
+  class FINGERMNTSTRUCT_NEWTT extends AncientData{
     var MNT:FINGERMNTSTRUCT = _
     @Length(MAXTTFEASIZE)
     var pTTFea:Array[Byte] = _
   }
 
-  class FINGERLATMNTSTRUCT_NEWTT extends FINGERLATMNTSTRUCT {
+  class FINGERLATMNTSTRUCT_NEWTT extends AncientData{
     var MNT:FINGERLATMNTSTRUCT = _
     @Length(MAXTTFEASIZE)
     var pTTFea:Array[Byte] = _
