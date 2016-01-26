@@ -1,9 +1,8 @@
 package nirvana.hall.api.internal
 
 import java.util.UUID
-
-import nirvana.hall.api.jpa.OnlineUser
 import nirvana.hall.api.services.AuthService
+import nirvana.hall.v70.jpa.OnlineUser
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.transaction.annotation.Transactional

@@ -1,8 +1,8 @@
 package nirvana.hall.api.internal;
 
-import nirvana.hall.api.internal.blob.coder.TPCardHelper;
-import nirvana.hall.api.internal.blob.coder.TPCardObject;
-import nirvana.hall.api.internal.blob.entity.TPBlobData;
+import nirvana.hall.v70.internal.blob.coder.TPCardHelper;
+import nirvana.hall.v70.internal.blob.coder.TPCardObject;
+import nirvana.hall.v70.internal.blob.entity.TPBlobData;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.util.ArrayList;

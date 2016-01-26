@@ -1,11 +1,13 @@
 package nirvana.hall.v70
 
 import nirvana.hall.api.internal._
-import nirvana.hall.api.internal.protobuf.sys._
-import nirvana.hall.api.internal.protobuf.sys.stamp._
-import nirvana.hall.api.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
+import nirvana.hall.v70.internal.filter.stamp._
+import nirvana.hall.v70.internal.filter.sys._
+import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
+import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
+import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
+import nirvana.hall.v70.services.sys.{UserService, DictService}
 import org.apache.tapestry5.ioc.annotations.{Contribute, Local, Match}
 import org.apache.tapestry5.ioc.{MethodAdviceReceiver, OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core

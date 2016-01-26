@@ -16,6 +16,6 @@ object LocalV70Module {
     XmlLoader.parseXML[HallV70Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v70/v70.xsd")))
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
+    configuration.add("nirvana.hall.v70.jpa")
   }
 }

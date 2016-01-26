@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.jpa.CodeAjlb
+import nirvana.hall.v70.jpa.CodeAjlb
 import org.junit.Test
 
 /**

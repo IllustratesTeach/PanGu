@@ -1,8 +1,8 @@
 package nirvana.hall.api.internal
 
 import monad.support.services.MonadException
-import nirvana.hall.api.jpa.{OnlineUser, SysUser}
 import nirvana.hall.api.services.{AuthService, HallExceptionCode, ProtobufRequestGlobal}
+import nirvana.hall.v70.jpa.{SysUser, OnlineUser}
 import org.apache.tapestry5.ioc.ScopeConstants
 import org.apache.tapestry5.ioc.annotations.Scope
 import org.apache.tapestry5.ioc.internal.util.InternalUtils

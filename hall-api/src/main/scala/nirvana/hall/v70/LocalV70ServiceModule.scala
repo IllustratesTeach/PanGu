@@ -1,9 +1,9 @@
 package nirvana.hall.v70
 
-import nirvana.hall.api.internal.query.{QueryGet7to6ServiceImpl, Query7to6ServiceImpl}
-import nirvana.hall.api.internal.sync.{Sync7to6ServiceImpl, SyncDictServiceImpl}
-import nirvana.hall.api.services.query.{QueryGet7to6Service, Query7to6Service}
-import nirvana.hall.api.services.sync.{Sync7to6Service, SyncDictService}
+import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6ServiceImpl}
+import nirvana.hall.v70.internal.sync.{Sync7to6ServiceImpl, SyncDictServiceImpl}
+import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
+import nirvana.hall.v70.services.sync.{Sync7to6Service, SyncDictService}
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**

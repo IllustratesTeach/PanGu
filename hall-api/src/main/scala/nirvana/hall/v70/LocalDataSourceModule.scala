@@ -93,8 +93,8 @@ object LocalDataSourceModule {
     val vendor = Vendor.forDriver(driverClassName)
     val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.api.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
-    //migrator.migrate(RemoveAllMigrations, "nirvana.hall.api.migration", false)
-    migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
+    //migrator.migrate(RemoveAllMigrations, "nirvana.hall.v70.migration", false)
+    migrator.migrate(InstallAllMigrations, "nirvana.hall.v70.migration", searchSubPackages = false)
 
     dataSource
   }

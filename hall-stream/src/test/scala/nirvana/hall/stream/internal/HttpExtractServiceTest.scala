@@ -6,7 +6,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.stream.config.HallStreamConfig
+import nirvana.hall.stream.config.NirvanaHallStreamConfig
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import org.junit.{Assert, Test}
 
@@ -20,8 +20,8 @@ class HttpExtractServiceTest{
     val registry = ExtensionRegistry.newInstance()
     ExtractProto.registerAllExtensions(registry)
     val httpClient = new RpcHttpClientImpl(registry)
-    val config = new HallStreamConfig
-    config.isNewFeature = true
+    val config = new NirvanaHallStreamConfig
+    config.stream.isNewFeature = true
     val service = new HttpExtractService("http://10.1.7.144:9002/extractor", httpClient,config)
     val is = getClass.getResourceAsStream("/wsq.data.uncompressed")
     val img = ByteString.readFrom(is).toByteArray
