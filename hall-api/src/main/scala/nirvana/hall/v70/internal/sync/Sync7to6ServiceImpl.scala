@@ -3,12 +3,10 @@ package nirvana.hall.v70.internal.sync
 import java.util.Date
 import javax.persistence.EntityManagerFactory
 
-import nirvana.hall.v70.services.sync.Sync7to6Service
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.GafisException
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.jpa.SyncQueue
+import nirvana.hall.v70.services.sync.Sync7to6Service
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -19,7 +17,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Created by songpeng on 15/12/1.
  */
 @EagerLoad
-class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Config: HallV70Config)
+class Sync7to6ServiceImpl(v70Config: HallV70Config)
   extends Sync7to6Service
   with Sync7to6CaseService
   with Sync7to6LPCardService
@@ -71,11 +69,11 @@ class Sync7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Config: 
     try {
       uploadFlag match {
         case UPLOAD_FLAG_TPCARD =>
-          syncTPCard(facade, v62Config, syncQueue)
+          syncTPCard(syncQueue)
         case UPLOAD_FLAG_CASE =>
-          syncCase(facade, v62Config, syncQueue)
+          syncCase(syncQueue)
         case UPLOAD_FLAG_LPCARD =>
-          syncLPCard(facade, v62Config, syncQueue)
+          syncLPCard(syncQueue)
         case other =>
           throw new RuntimeException("unknown uploadFlag " + other)
       }

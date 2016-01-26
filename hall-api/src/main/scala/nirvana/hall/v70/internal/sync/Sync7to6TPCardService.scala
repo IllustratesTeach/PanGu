@@ -3,10 +3,8 @@ package nirvana.hall.v70.internal.sync
 import com.google.protobuf.ByteString
 import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
-import nirvana.hall.v70.jpa.{SyncQueue, GafisPerson, GafisGatherFinger, CodeGj}
+import nirvana.hall.v70.jpa.{CodeGj, GafisGatherFinger, GafisPerson, SyncQueue}
 
 /**
  * Created by songpeng on 15/12/7.
@@ -17,38 +15,36 @@ trait Sync7to6TPCardService {
    * @param syncQueue
    * @return
    */
-  def syncTPCard(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue): Unit = {
+  def syncTPCard(syncQueue: SyncQueue): Unit = {
     val personId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
-        addTPCard(facade, v62Config, personId)
+        addTPCard(personId)
       case "update" =>
-        updateTPCard(facade, v62Config, personId)
+        updateTPCard(personId)
       case "delete" =>
-        deleteTPCard(facade, v62Config, personId)
+        deleteTPCard(personId)
     }
   }
 
-  private def addTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
+  private def addTPCard(personId: String): Unit = {
     val tpCard = getTPCard(personId)
     //数据转换为C的结构
     val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
-    //上报
-    facade.NET_GAFIS_FLIB_Add(v62Config.templateTable.dbId.toShort,
-      v62Config.templateTable.tableId.toShort,
-      personId, gTPCard)
+    //TODO
+    throw new UnsupportedOperationException
   }
 
-  private def updateTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
+  private def updateTPCard(personId: String): Unit = {
     val tpCard = getTPCard(personId)
     val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
-    facade.NET_GAFIS_FLIB_Update(v62Config.templateTable.dbId.toShort,
-      v62Config.templateTable.tableId.toShort, personId, gTPCard)
+    //TODO
+    throw new UnsupportedOperationException
   }
 
-  private def deleteTPCard(facade: V62Facade, v62Config: HallV62Config, personId: String): Unit = {
-    facade.NET_GAFIS_FLIB_Del(v62Config.templateTable.dbId.toShort,
-      v62Config.templateTable.tableId.toShort, personId)
+  private def deleteTPCard(personId: String): Unit = {
+    //TODO
+    throw new UnsupportedOperationException
   }
 
   private def getTPCard(personId: String): TPCard = {

@@ -33,8 +33,8 @@ object HallApiApp
       Class.forName("nirvana.hall.v70.LocalV70Module"),
       Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
       Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
-      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
-      Class.forName("nirvana.hall.v62.LocalV62Module"),
+//      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
+//      Class.forName("nirvana.hall.v62.LocalV62Module"),
       //公共配置
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("nirvana.hall.api.LocalApiWebModule"),

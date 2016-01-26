@@ -1,10 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
 import nirvana.hall.protocol.v62.FPTProto.Case
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
-import nirvana.hall.v70.jpa.{SyncQueue, GafisCaseFinger, GafisCase}
+import nirvana.hall.v70.jpa.{GafisCase, GafisCaseFinger, SyncQueue}
 
 /**
  * Created by songpeng on 15/12/7.
@@ -15,31 +12,32 @@ trait Sync7to6CaseService {
    * @param syncQueue
    * @return
    */
-  def syncCase(facade: V62Facade, v62Config: HallV62Config, syncQueue: SyncQueue): Unit = {
+  def syncCase(syncQueue: SyncQueue): Unit = {
     val caseId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
-        addCase(facade, v62Config, caseId)
+        addCase(caseId)
       case "update" =>
-        updateCase(facade, v62Config, caseId)
+        updateCase(caseId)
       case "delete" =>
-        deleteCase(facade, v62Config, caseId)
+        deleteCase(caseId)
     }
   }
 
-  private def addCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
+  private def addCase(caseId: String): Unit ={
     val caseInfo = getCase(caseId)
-    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
-    facade.NET_GAFIS_CASE_Add(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
+    //TODO
+    throw new UnsupportedOperationException
   }
-  private def updateCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
+  private def updateCase(caseId: String): Unit ={
+    //TODO
     val caseInfo = getCase(caseId)
-    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
-    facade.NET_GAFIS_CASE_Update(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort, gCase)
+    throw new UnsupportedOperationException
   }
-  private def deleteCase(facade: V62Facade, v62Config: HallV62Config, caseId: String): Unit ={
-    facade.NET_GAFIS_CASE_Del(v62Config.caseTable.dbId.toShort, v62Config.caseTable.tableId.toShort,
-      if(caseId.indexOf("A") == 0) caseId.substring(1) else caseId)
+  private def deleteCase(caseId: String): Unit ={
+    //TODO
+    throw new UnsupportedOperationException
+
   }
 
   private def getCase(caseId: String): Case = {

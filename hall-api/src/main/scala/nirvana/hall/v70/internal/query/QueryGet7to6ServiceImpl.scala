@@ -4,13 +4,10 @@ import java.io.ByteArrayOutputStream
 import java.util.Date
 import javax.persistence.EntityManagerFactory
 
-import nirvana.hall.v70.services.query.QueryGet7to6Service
 import nirvana.hall.c.services.gloclib.gaqryque
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
-import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.{GafisQuery7to6, GafisNormalqueryQueryque}
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6}
+import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -20,7 +17,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * Created by songpeng on 15/12/30.
  */
-class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Config: HallV70Config)
+class QueryGet7to6ServiceImpl(v70Config: HallV70Config)
   extends QueryGet7to6Service{
 
   private val STATUS_MATCHING:Short = 1//任务状态，正在比对
@@ -29,7 +26,7 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Conf
   @Transactional
   override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque): Unit = {
     val queryId = GafisQuery7to6.find_by_oraSid(queryque.oraSid).takeOption.map(_.queryId)
-    if(queryId.isDefined){
+/*    if(queryId.isDefined){
       val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(queryId.get)
       val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstQry)
 
@@ -37,7 +34,10 @@ class QueryGet7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Conf
         addMatchResult(queryque.pkId, gaQueryStruct)
         doWork
       }
-    }
+    }*/
+
+    //TODO
+    throw new UnsupportedOperationException
   }
 
   @PostInjection

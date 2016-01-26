@@ -8,6 +8,7 @@ import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6Servic
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync.{Sync7to6ServiceImpl, SyncDictServiceImpl}
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
+import nirvana.hall.v70.internal.{LPCardServiceImpl, CaseInfoServiceImpl, QueryServiceImpl, TPCardServiceImpl}
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sync.{Sync7to6Service, SyncDictService}
@@ -28,6 +29,11 @@ object LocalV70ServiceModule {
     binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])
     binder.bind(classOf[GatherFingerPalmService], classOf[GatherFingerPalmServiceImpl])
     binder.bind(classOf[GatherPortraitService], classOf[GatherPortraitServiceImpl])
+
+    binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
+    binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
+    binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
+    binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
 
     //定时服务
     binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
