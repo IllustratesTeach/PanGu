@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter.tp
+package nirvana.hall.v62.internal.filter
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.ProtobufRequestHandler

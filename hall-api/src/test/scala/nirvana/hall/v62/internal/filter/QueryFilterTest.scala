@@ -1,10 +1,10 @@
-package nirvana.hall.v62.internal.filter.qry
+package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.v62.qry.QueryProto.{QueryGetRequest, QuerySendRequest}
-import org.apache.tapestry5.ioc.{RegistryBuilder, Registry}
+import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
 /**

@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter.lp
+package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}

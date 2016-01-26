@@ -16,7 +16,7 @@ class Sync7to6ServiceImplTest {
     "nirvana.hall.orm.HallOrmModule",
     "nirvana.hall.v70.LocalV70ServiceModule",
     "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.v62.internal.filter.TestModule"
+    "nirvana.hall.api.internal.filter.TestModule"
     ).map(Class.forName)
   val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
