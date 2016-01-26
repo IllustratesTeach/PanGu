@@ -1,4 +1,4 @@
-package nirvana.hall.api
+package nirvana.hall.v70
 
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.protobuf.sys._

@@ -5,7 +5,7 @@ package nirvana.hall.api.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
-import nirvana.hall.api.{HallApiConstants, HallApiModule}
+import nirvana.hall.api.{HallApiConstants, HallApiModule, HallApiSymbols}
 import org.slf4j.LoggerFactory
 
 /**
@@ -24,21 +24,32 @@ object HallApiApp
     val config = HallApiModule.buildHallApiConfig(serverHome)
     configLogger(config.logFile, "API", "egf", "nirvana.hall")
 
+//    LocalV70Module.buildHallV70Config(serverHome)
+
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall api server ....")
-
     val classes = List[Class[_]](
-//      Class.forName("monad.core.ProtobufProcessorModule"),
-      Class.forName("nirvana.hall.api.LocalDataSourceModule"),
-      Class.forName("nirvana.hall.api.LocalProtobufModule"),
-      Class.forName("nirvana.hall.api.LocalApiWebModule"),
-      Class.forName("nirvana.hall.api.LocalApiServiceModule"),
-      Class.forName("nirvana.hall.api.LocalApiSyncModule"),
+      Class.forName("nirvana.hall.orm.HallOrmModule"),
+      Class.forName("nirvana.hall.v70.LocalV70Module"),
+      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
+      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
       Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
       Class.forName("nirvana.hall.v62.LocalV62Module"),
-      Class.forName("nirvana.hall.orm.HallOrmModule"),
-      Class.forName("nirvana.hall.api.HallApiModule"))
-    startServer(config.web, "nirvana.hall.api", classes: _*)
+      //公共配置
+      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      Class.forName("nirvana.hall.api.LocalApiWebModule"),
+      Class.forName("nirvana.hall.api.HallApiModule")
+    )
+
+    /*
+    load other module from system property.
+    */
+    val extraModules = System.getProperty(HallApiSymbols.API_EXTRA_MODULE_CLASS)
+    val finalClasses =  if(extraModules!= null)
+      extraModules.split(",").map(Class.forName) ++:  classes
+    else classes
+
+    startServer(config.web, "nirvana.hall.api", finalClasses: _*)
     val version = readVersionNumber("META-INF/maven/nirvana/hall-api/version.properties")
     printTextWithNative(logger, HallApiConstants.HALL_TEXT_LOGO, "api@" + config.web.bind, version, 0)
     logger.info("hall api server started")

@@ -4,7 +4,6 @@ import java.util.Date
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.{GafisNormalqueryQueryque, GafisQuery7to6}
 import nirvana.hall.api.services.query.Query7to6Service
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
@@ -14,6 +13,7 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
+import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.jboss.netty.buffer.ChannelBuffers
@@ -24,14 +24,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * Created by songpeng on 15/12/9.
  */
-class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, apiConfig: HallApiConfig)
+class Query7to6ServiceImpl(facade:V62Facade, v62Config:HallV62Config, v70Config: HallV70Config)
   extends Query7to6Service{
 
   private val STATUS_MATCHING =1.toShort//任务状态，正在比对
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, entityManagerFactory: EntityManagerFactory): Unit = {
-    periodicExecutor.addJob(new CronSchedule(apiConfig.sync62Cron), "query-70to62", new Runnable {
+    periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-70to62", new Runnable {
       override def run(): Unit = {
         try {
           val emHolder = new EntityManagerHolder(entityManagerFactory.createEntityManager())

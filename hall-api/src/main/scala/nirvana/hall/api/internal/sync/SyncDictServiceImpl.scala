@@ -1,11 +1,11 @@
 package nirvana.hall.api.internal.sync
 
-import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.{ScalaUtils, WebAppClientUtils}
 import nirvana.hall.api.jpa._
 import nirvana.hall.api.services.sync.SyncDictService
 import nirvana.hall.protocol.sys.DictProto._
 import nirvana.hall.protocol.sys.SyncDictProto.{SyncDictRequest, SyncDictResponse}
+import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +15,7 @@ import scala.collection.JavaConversions._
 /**
  * Created by songpeng on 15/12/7.
  */
-class SyncDictServiceImpl(config: HallApiConfig) extends SyncDictService{
+class SyncDictServiceImpl(config: HallV70Config) extends SyncDictService{
   /**
    * 访问远程服务器，同步字典
    */
