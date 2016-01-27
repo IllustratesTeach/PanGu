@@ -158,7 +158,7 @@ class Logic2Rec extends AncientData{
   @Length(2)
   var sendFingerCount: String = _
   @IgnoreTransfer
-  var fingers:Array[FingerData] = _
+  var fingers:Array[FingerLData] = _
   @IgnoreTransfer
   var logicEnd:Byte= FPTFile.FS // GS
 
@@ -189,7 +189,7 @@ class Logic2Rec extends AncientData{
     if(sendFingerCount.nonEmpty && sendFingerCount.toInt >0){
       val fingerCount = sendFingerCount.toInt
       fingers =  0.until(fingerCount).map{i=>
-        new FingerData().fromStreamReader(dataSource)
+        new FingerLData().fromStreamReader(dataSource)
       }.toArray
     }else{
       logicEnd = dataSource.readByte()
@@ -264,7 +264,7 @@ class FingerTData extends AncientData{
   }
 
 }
-class FingerData extends AncientData{
+class FingerLData extends AncientData{
   @Length(6)
   var dataLength: String = _
   @Length(2)
@@ -327,7 +327,7 @@ class FingerData extends AncientData{
     stream
   }
 
-  override def fromStreamReader(dataSource: StreamReader): FingerData.this.type = {
+  override def fromStreamReader(dataSource: StreamReader): FingerLData.this.type = {
     super.fromStreamReader(dataSource)
     if(customInfoLength.nonEmpty){
       this.customInfo = readBytesFromStreamReader(dataSource,customInfoLength.toInt)
