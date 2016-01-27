@@ -50,7 +50,8 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
         }
         catch {
           case e:Throwable=>
-            warn("fail to save person",e)
+            if(e.toString.indexOf("PK_GAFIS_PERSON_PERSONID") == -1)
+              warn("fail to save person",e)
         }
 
       }

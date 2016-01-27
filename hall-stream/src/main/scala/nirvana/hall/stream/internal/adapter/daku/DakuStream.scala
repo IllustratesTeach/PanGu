@@ -79,7 +79,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
             //FileUtils.writeByteArrayToFile(new File("cpr\\"+tpData.getPersonId+"_"+fgp+".cpr"),gafisImg.toByteArray)
 
             if(gafisImg.stHead.nImgSize == 0)
-              debug("图像长度为0! {}",tpData.getPersonId+"_"+fgp)
+              info("图像长度为0! {}",tpData.getPersonId+"_"+fgp)
             else
               streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
 
@@ -88,7 +88,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
       }
       catch {
         case e:Throwable=>
-          debug("FPT解析失败！ {}",fptFile.getName)
+          info("FPT解析失败！ {}",fptFile.getName)
           FileUtils.copyFile(fptFile,new File(error_fpt_dir,fptFile.getName))
       }
     }
