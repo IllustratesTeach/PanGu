@@ -166,7 +166,8 @@ class Logic2Rec extends AncientData{
     var count = super.getDataSize
     if(fingers != null)
       fingers.foreach(count += _.getDataSize)
-    count += 1
+    else
+      count += 1
 
     count
   }
@@ -438,7 +439,8 @@ class Logic3Rec extends AncientData{
     var count = super.getDataSize
     if(fingers != null)
       fingers.foreach(count += _.getDataSize)
-    count += 1
+    else
+      count += 1
     count
   }
 
@@ -446,9 +448,10 @@ class Logic3Rec extends AncientData{
     super.writeToStreamWriter(stream)
     if(fingers != null)
       fingers.foreach(_.writeToStreamWriter(stream))
-
-    val dataSink = converter(stream)
-    dataSink.writeByte(logicEnd)
+    else {
+      val dataSink = converter(stream)
+      dataSink.writeByte(logicEnd)
+    }
 
     stream
   }
