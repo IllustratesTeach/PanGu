@@ -81,7 +81,7 @@ class DakuStream (@InjectService("MntDataSource") dataSource:DataSource,streamSe
             if(gafisImg.stHead.nImgSize == 0)
               info("图像长度为0! {}",tpData.getPersonId+"_"+fgp)
             else
-              streamService.pushEvent(tpData.getPersonId+"_"+fgp,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
+              streamService.pushEvent(tpData.getPersonId+"_"+fgp+"&"+fptFile.getPath,gafisImg,getFingerPosition(fgpp), FeatureType.FingerTemplate)
 
           }
         //}

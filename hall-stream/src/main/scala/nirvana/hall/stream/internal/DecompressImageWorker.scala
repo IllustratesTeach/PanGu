@@ -35,7 +35,7 @@ class DecompressImageWorker(decompressService: DecompressService)
       }catch{
         case e:Throwable=>
           val msg = "fail to decompress for data [%s]".format(t.id)
-          info(msg)
+          info(msg+"-"+e.toString)
           throw new RuntimeException(msg,e)
       }
     }else{

@@ -31,7 +31,8 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date,data_in) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate,2)"
 
       //debug("save record with id {}",id)
-      val arr = id.asInstanceOf[String].split("_")
+      val pid_fgp = id.asInstanceOf[String].substring(0,id.asInstanceOf[String].indexOf("&"))
+      val arr = pid_fgp.asInstanceOf[String].split("_")
       val personId = arr(0)
       val fgp = arr(1).toInt
       var fgpDB = fgp
@@ -59,7 +60,7 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       //if(logger.isDebugEnabled()){
         val featureStruct = new FINGERMNTSTRUCT_NEWTT
         featureStruct.fromByteArray(featureBytes)
-        info("minuita number is {} for {}",featureStruct.MNT.cm.toInt,id)
+        info("minuita number is {} for {}",featureStruct.MNT.cm.toInt,pid_fgp)
       //}
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
