@@ -137,10 +137,10 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
 
 
   override protected def executeQuery: scala.Stream[A] = {
-    expandExpressions(querySupport)
+    rewindExpressions(querySupport)
     super.executeQuery
   }
-  private def expandExpressions(ws:WhereSupportObject): Unit ={
+  private def rewindExpressions(ws:WhereSupportObject): Unit ={
     val criteriaExpressions = expressions.map{
       case WrappedExpress(field,Equal(value:Any)) =>
         ws.criteriaBuilder.equal(ws.path(field),value)
@@ -173,7 +173,7 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
   }
 
   override def internalUpdate(params: (String, Any)*): Int = {
-    expandExpressions(updatedSupport)
+    rewindExpressions(updatedSupport)
 
     params.foreach{
       case (field,value) =>
@@ -182,7 +182,7 @@ abstract class CriteriaRelation[A](val entityClass:Class[A],val primaryKey:Strin
     ActiveRecord.updateRelation(this)
   }
   def delete:Int = {
-    expandExpressions(deletedSupport)
+    rewindExpressions(deletedSupport)
     ActiveRecord.deleteRelation(this)
   }
 }
