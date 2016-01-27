@@ -36,6 +36,8 @@ object AncientData extends WrapAsStreamWriter{
     def readShort(): Short
     def readInt(): Int
     def readLong(): Long
+    def markReaderIndex():Unit
+    def resetReaderIndex():Unit
   }
   type StreamWriter = {
     def writeByte(byte:Int)
@@ -83,7 +85,10 @@ object AncientData extends WrapAsStreamWriter{
  * wrap netty's ChannelBuffer and xSocket's IDataSink
  */
 trait WrapAsStreamWriter {
-  implicit def asStreamReader(is:InputStream):StreamReader = new InputStreamReader(is)
+  implicit def asStreamReader(is:InputStream):StreamReader = new InputStreamReader(is){
+    def markReaderIndex():Unit={is.mark(1000)}
+    def resetReaderIndex():Unit={is.reset()}
+  }
   implicit def asStreamWriter(output: OutputStream): StreamWriter = new {
     private val arr = new Array[Byte](8)
     private val tmp = ByteBuffer.wrap(arr)
@@ -313,6 +318,8 @@ trait ScalaReflect{
    */
   def fromStreamReader(dataSource: StreamReader): this.type ={
     internalProcessField{(symbol,length)=>
+      //println("read "+symbol+" ..." )
+
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
         if(length == 0)
@@ -330,7 +337,7 @@ trait ScalaReflect{
         case LongTpe => field.set(dataSource.readLong())
         case AncientData.STRING_CLASS =>
           val bytes = readByteArray(returnLengthOrThrowException)
-          field.set(new String(bytes).trim)
+          field.set(new String(bytes,"GBK").trim)
         case t if t <:< typeOf[ScalaReflect] =>
           val ancientData = createAncientDataByType(t)
           ancientData.fromStreamReader(dataSource)
@@ -348,7 +355,7 @@ trait ScalaReflect{
           }
           field.set(ancientDataArray)
         case other =>
-          throw new IllegalArgumentException("type is not supported "+other)
+          throw new IllegalArgumentException("type is not supported "+symbol)
       }
     }
 
