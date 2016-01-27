@@ -2,7 +2,7 @@ package nirvana.hall.c.services
 
 import javax.imageio.stream.ImageInputStream
 
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
 import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
@@ -19,6 +19,19 @@ import scala.reflect.runtime.universe._
  */
 class AncientDataTest {
 
+  @Test
+  def test_len_ref: Unit ={
+    val data = new AncientDataModel3
+    data.length = 3
+    data.data = Array[Byte](1,2,3)
+    Assert.assertEquals(7,data.getDataSize)
+    val buffer = ChannelBuffers.buffer(data.getDataSize)
+    data.writeToStreamWriter(buffer)
+
+    val data2 = new AncientDataModel3
+    data2.fromStreamReader(buffer)
+    Assert.assertArrayEquals(data.data,data2.data)
+  }
   @Test
   def test_len: Unit ={
     val data = new AncientDataModel
@@ -45,10 +58,15 @@ class AncientDataTest {
 
   }
 }
-class AncientDataModel2 extends ScalaReflect2 with Model{
+class AncientDataModel3 extends AncientData {
+  var length:Int = _
+  @LengthRef("length")
+  var data:Array[Byte] = _
+}
+class AncientDataModel2 extends AncientData {
   var f1:Short = _
 }
-class AncientDataModel extends ScalaReflect2 with Model{
+class AncientDataModel extends AncientData {
   var f1:Short = _
   var f2:Byte = _
   var f3:AncientDataModel2 = new AncientDataModel2

@@ -5,7 +5,7 @@ import java.io.{OutputStream, InputStream}
 import java.nio.ByteBuffer
 import javax.imageio.stream.ImageInputStream
 
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
 import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
@@ -36,6 +36,10 @@ object AncientData extends WrapAsStreamWriter{
     def readShort(): Short
     def readInt(): Int
     def readLong(): Long
+    def markReaderIndex():Unit
+    def resetReaderIndex():Unit
+  }
+  trait MarkStreamReaderSupport{
     def markReaderIndex():Unit
     def resetReaderIndex():Unit
   }
@@ -171,14 +175,14 @@ trait ScalaReflect{
   /**
    * find primitive data type length
    */
-  private def findPrimitiveTypeLength(term:Symbol,tpe:Type,length:Int):Int={
+  private def findPrimitiveTypeLength(term:Symbol,tpe:Type,length:Option[Int]):Int={
     def returnLengthOrThrowException:Int={
-      if(length == 0)
+      if(length.isEmpty)
         throw new IllegalArgumentException("@Length not defined at "+term)
-      length
+      length.get
     }
     def throwExceptionIfLengthGTZeroOrGet[T](value:T): T={
-      if(length !=0)
+      if(length.isDefined)
         throw new IllegalArgumentException("@Length wrong defined at "+term)
       value
     }
@@ -195,7 +199,7 @@ trait ScalaReflect{
         if(args.length != 1)
           throw new IllegalArgumentException("only support one type parameter in Array.")
         //using recursive call to find length
-        returnLengthOrThrowException * findPrimitiveTypeLength(term,args.head,0)
+        returnLengthOrThrowException * findPrimitiveTypeLength(term,args.head,None)
       case other =>
         throw new IllegalArgumentException("type is not supported "+other)
     }
@@ -211,7 +215,7 @@ trait ScalaReflect{
     }
     dataSize
   }
-  private def internalProcessField[T :ClassTag](processor:(Symbol,Int)=>T):Array[T]={
+  private def internalProcessField[T :ClassTag](processor:(Symbol,Option[Int])=>T):Array[T]={
     clazzType.members
       .filter(_.isTerm)
       .filter(_.asTerm.isVar)
@@ -223,9 +227,27 @@ trait ScalaReflect{
       val length = lengthAnnotation.map(_.tree).map{
         case Apply(fun, AssignOrNamedArg(name,Literal(Constant(value)))::Nil)=>
           value.asInstanceOf[Int]
-      }.sum
+      }
+
+      //find @LengthRef annotation and get value
+      val lengthRefAnnotation = m.annotations.find (typeOf[LengthRef] =:= _.tree.tpe)
+      val lengthRef = lengthRefAnnotation.map(_.tree).map{
+        case Apply(fun, AssignOrNamedArg(name,Literal(Constant(refFieldName)))::Nil)=>
+
+          val fieldName = refFieldName.asInstanceOf[String]
+          val termSymbol = clazzType.decl(TermName(fieldName)).asTerm
+          val value = instanceMirror.reflectField(termSymbol).get
+          if(value == null) {
+            0
+          } else {
+            val stringValue = value.toString.trim()
+            if (stringValue.isEmpty) 0 else stringValue.toInt
+          }
+      }
+      if(length.isDefined  && lengthRef.isDefined )
+        throw new IllegalStateException("@Length and @LengthRef both defined at "+m)
       //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
-      processor(m,length)
+      processor(m,if(length.isDefined) length else lengthRef)
     }.toArray
   }
   private def createAncientDataByType(t: universe.Type): ScalaReflect = {
@@ -246,9 +268,9 @@ trait ScalaReflect{
     internalProcessField{(symbol,length)=>
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
-        if(length == 0)
+        if(length.isEmpty)
           throw new IllegalArgumentException("@Lenght not defined "+tpe)
-        length
+        length.get
       }
       def writeString(str:String,length:Int): Unit ={
         if(str == null) writeBytes(null,length) else writeBytes(str.getBytes,length)
@@ -322,9 +344,9 @@ trait ScalaReflect{
 
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
-        if(length == 0)
+        if(length.isEmpty)
           throw new IllegalArgumentException("@Lenght not defined "+tpe)
-        length
+        length.get
       }
       def readByteArray(len:Int): Array[Byte]= readBytesFromStreamReader(dataSource,len)
 

@@ -12,8 +12,10 @@ import javax.imageio.{IIOException, ImageReadParam, ImageReader, ImageTypeSpecif
 
 import com.sun.imageio.plugins.bmp.BMPMetadata
 import com.sun.imageio.plugins.common.{I18N, ImageUtil}
+import nirvana.hall.c.services.AncientData.StreamReader
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGEHEADSTRUCT
 import nirvana.hall.support.HallSupportConstants
+import GAFISImageReaderSpi._
 
 /**
  * gafis image reader spi
@@ -25,6 +27,15 @@ object GAFISImageReaderSpi{
   val formatNames: Array[String] = Array("gfs", "GFS")
   val entensions: Array[String] = Array("gfs")
   val mimeType: Array[String] = Array("image/gfs")
+
+  implicit def asStreamReader(is:ImageInputStream):StreamReader = new {
+    def readByte(): Byte = is.readByte()
+    def readShort(): Short = is.readShort()
+    def readInt(): Int = is.readInt()
+    def readLong(): Long = is.readLong()
+    def markReaderIndex():Unit={is.mark()}
+    def resetReaderIndex():Unit={is.reset()}
+  }
 }
 class GAFISImageReaderSpi extends ImageReaderSpi(
   "Oracle Corporation",
@@ -67,7 +78,7 @@ class GAFISImageReaderSpi extends ImageReaderSpi(
   }
 }
 class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator){
-  private var iis:ImageInputStream = _
+  private var iis:ImageInputStream= _
   private val head = new GAFISIMAGEHEADSTRUCT
   private var width:Int = _
   private var height:Int = _

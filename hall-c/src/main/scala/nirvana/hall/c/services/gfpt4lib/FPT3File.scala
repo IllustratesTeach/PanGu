@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import nirvana.hall.c.annotations.{Length, IgnoreTransfer}
+import nirvana.hall.c.annotations.{LengthRef, Length, IgnoreTransfer}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{FPTHead, LogicHeadV3}
@@ -157,16 +157,14 @@ class Logic2Rec extends AncientData{
   var fingerCount: String = _
   @Length(2)
   var sendFingerCount: String = _
-  @IgnoreTransfer
+  @LengthRef("sendFingerCount")
   var fingers:Array[FingerLData] = _
   @IgnoreTransfer
   var logicEnd:Byte= FPTFile.FS // GS
 
   override def getDataSize: Int = {
     var count = super.getDataSize
-    if(fingers != null)
-      fingers.foreach(count += _.getDataSize)
-    else
+    if(fingers == null)
       count += 1
 
     count
@@ -174,9 +172,7 @@ class Logic2Rec extends AncientData{
 
   override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
     super.writeToStreamWriter(stream)
-    if(fingers != null)
-      fingers.foreach(_.writeToStreamWriter(stream))
-    else{
+    if(fingers == null){
       val dataSink = converter(stream)
       dataSink.writeByte(logicEnd)
     }
@@ -186,12 +182,7 @@ class Logic2Rec extends AncientData{
   override def fromStreamReader(dataSource: StreamReader): this.type = {
     super.fromStreamReader(dataSource)
 
-    if(sendFingerCount.nonEmpty && sendFingerCount.toInt >0){
-      val fingerCount = sendFingerCount.toInt
-      fingers =  0.until(fingerCount).map{i=>
-        new FingerLData().fromStreamReader(dataSource)
-      }.toArray
-    }else{
+    if(sendFingerCount.isEmpty || sendFingerCount.toInt ==0){
       logicEnd = dataSource.readByte()
     }
 
@@ -230,39 +221,21 @@ class FingerTData extends AncientData{
   var feature: Array[Byte] = _
   @Length(4)
   var customInfoLength:String = "0"
-  @IgnoreTransfer
+  @LengthRef("customInfoLength")
   var customInfo : Array[Byte] = _
-  @IgnoreTransfer
-  var body = new FingerDataBody
-
-  override def getDataSize: Int = {
-    var count = super.getDataSize
-    if(customInfoLength.nonEmpty){
-      count += customInfoLength.toInt
-    }
-    count + body.getDataSize
-  }
-
-  override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
-    super.writeToStreamWriter(stream)
-    val dataSink = converter(stream)
-    if(customInfo != null)
-      dataSink.writeBytes(customInfo)
-
-    body.writeToStreamWriter(stream)
-
-    stream
-  }
-
-  override def fromStreamReader(dataSource: StreamReader): FingerTData.this.type = {
-    super.fromStreamReader(dataSource)
-    if(customInfoLength.nonEmpty){
-      this.customInfo = readBytesFromStreamReader(dataSource,customInfoLength.toInt)
-    }
-    body.fromStreamReader(dataSource)
-    this
-  }
-
+  @Length(3)
+  var imgHorizontalLength: String = _
+  @Length(3)
+  var imgVerticalLength: String = _
+  @Length(3)
+  var dpi: String = _
+  @Length(4)
+  var imgCompressMethod: String = _
+  @Length(6)
+  var imgDataLength: String = "0"
+  @LengthRef("imgDataLength")
+  var imgData: Array[Byte] = _
+  var fingerDataEnd:Byte= FPTFile.GS // GS
 }
 class FingerLData extends AncientData{
   @Length(6)
@@ -303,40 +276,8 @@ class FingerLData extends AncientData{
   var feature: Array[Byte] = _
   @Length(4)
   var customInfoLength:String = "0"
-  @IgnoreTransfer
+  @LengthRef("customInfoLength")
   var customInfo : Array[Byte] = _
-  @IgnoreTransfer
-  var body = new FingerDataBody
-
-  override def getDataSize: Int = {
-    var count = super.getDataSize
-    if(customInfoLength.nonEmpty){
-      count += customInfoLength.toInt
-    }
-    count + body.getDataSize
-  }
-
-  override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
-    super.writeToStreamWriter(stream)
-    val dataSink = converter(stream)
-    if(customInfo != null)
-      dataSink.writeBytes(customInfo)
-
-    body.writeToStreamWriter(stream)
-
-    stream
-  }
-
-  override def fromStreamReader(dataSource: StreamReader): FingerLData.this.type = {
-    super.fromStreamReader(dataSource)
-    if(customInfoLength.nonEmpty){
-      this.customInfo = readBytesFromStreamReader(dataSource,customInfoLength.toInt)
-    }
-    body.fromStreamReader(dataSource)
-    this
-  }
-}
-class FingerDataBody extends AncientData{
   @Length(3)
   var imgHorizontalLength: String = _
   @Length(3)
@@ -347,38 +288,9 @@ class FingerDataBody extends AncientData{
   var imgCompressMethod: String = _
   @Length(6)
   var imgDataLength: String = "0"
-  @IgnoreTransfer
+  @LengthRef("imgDataLength")
   var imgData: Array[Byte] = _
-  @IgnoreTransfer
   var fingerDataEnd:Byte= FPTFile.GS // GS
-
-  override def getDataSize: Int = {
-    var count = super.getDataSize
-    count += imgDataLength.toInt + 1
-    count
-  }
-
-  override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
-    super.writeToStreamWriter(stream)
-    val dataSink = converter(stream)
-    if(imgData != null)
-      dataSink.writeBytes(imgData)
-
-    dataSink.writeByte(fingerDataEnd)
-
-    stream
-  }
-
-  override def fromStreamReader(dataSource: StreamReader): FingerDataBody.this.type = {
-    super.fromStreamReader(dataSource)
-    if(this.imgDataLength.nonEmpty){
-      val imgLength = this.imgDataLength.toInt
-      imgData = readBytesFromStreamReader(dataSource,imgLength)
-    }
-
-    this.fingerDataEnd =  dataSource.readByte()
-    this
-  }
 }
 
 class Logic3Rec extends AncientData{
@@ -430,25 +342,21 @@ class Logic3Rec extends AncientData{
   var remark: String = null
   @Length(2)
   var sendFingerCount: String = _
-  @IgnoreTransfer
+  @LengthRef("sendFingerCount")
   var fingers:Array[FingerTData] = _
   @IgnoreTransfer
   var logicEnd:Byte= FPTFile.FS // GS
 
   override def getDataSize: Int = {
     var count = super.getDataSize
-    if(fingers != null)
-      fingers.foreach(count += _.getDataSize)
-    else
+    if(fingers == null)
       count += 1
     count
   }
 
   override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
     super.writeToStreamWriter(stream)
-    if(fingers != null)
-      fingers.foreach(_.writeToStreamWriter(stream))
-    else {
+    if(fingers == null){
       val dataSink = converter(stream)
       dataSink.writeByte(logicEnd)
     }
@@ -459,12 +367,7 @@ class Logic3Rec extends AncientData{
   override def fromStreamReader(dataSource: StreamReader): this.type = {
     super.fromStreamReader(dataSource)
 
-    if(sendFingerCount.nonEmpty && sendFingerCount.toInt >0){
-      val fingerCount = sendFingerCount.toInt
-      fingers =  0.until(fingerCount).map{i=>
-        new FingerTData().fromStreamReader(dataSource)
-      }.toArray
-    }else{
+    if(sendFingerCount.isEmpty || sendFingerCount.toInt == 0){
       logicEnd = dataSource.readByte()
     }
 
