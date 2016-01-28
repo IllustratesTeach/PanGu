@@ -3,12 +3,11 @@ package nirvana.hall.c.services.gfpt4lib
 import java.nio.charset.Charset
 
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.{LengthRef, Length, IgnoreTransfer}
+import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead, LogicHeadV3}
 
-import scala.collection.mutable
 import scala.language.reflectiveCalls
 
 /**
@@ -61,22 +60,8 @@ object FPT3File {
      */
     override def fromStreamReader(dataSource: StreamReader, encoding: Charset = AncientConstants.UTF8_ENCODING): this.type = {
       super.fromStreamReader(dataSource, encoding)
-      dataSource.markReaderIndex()
-      val head = new LogicHeadV3
-      head.fromStreamReader(dataSource, encoding)
-      dataSource.resetReaderIndex()
-
-      val logic2Buffer = mutable.Buffer[Logic2Rec]()
-      val logic3Buffer = mutable.Buffer[Logic3Rec]()
-      head.dataType match {
-        case FPTFile.V3_LOGIC_DATA_TYPE_2 =>
-          logic2Buffer += new Logic2Rec().fromStreamReader(dataSource, encoding)
-        case FPTFile.V3_LOGIC_DATA_TYPE_3 =>
-          logic3Buffer += new Logic3Rec().fromStreamReader(dataSource, encoding)
-      }
-
-      logic2Recs = logic2Buffer.toArray
-      logic3Recs = logic3Buffer.toArray
+      logic2Recs = FPTFile.readLogic[Logic2Rec](logic1Rec.lpCount,dataSource,encoding)
+      logic3Recs = FPTFile.readLogic[Logic3Rec](logic1Rec.tpCount,dataSource,encoding)
 
       this
     }
@@ -88,9 +73,9 @@ object FPT3File {
     @Length(1)
     var dataType: String = "1"
     @Length(6)
-    var tpCount: String = _
-    @Length(6)
     var lpCount: String = _
+    @Length(6)
+    var tpCount: String = _
     @Length(14)
     var sendTime: String = _
     @Length(12)

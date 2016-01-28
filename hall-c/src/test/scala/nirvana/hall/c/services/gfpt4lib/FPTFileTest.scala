@@ -25,4 +25,10 @@ class FPTFileTest {
     Assert.assertEquals(fpt3.logic1Rec.fileLength.toInt,fpt3.getDataSize)
     Assert.assertEquals(690,new Logic1Rec().getDataSize)
   }
+  @Test
+  def test_read_fpt4:Unit={
+    val fpt4 = new FPT4File
+    fpt4.fromStreamReader(getClass.getResourceAsStream("/fpt4.fpt")) //,AncientConstants.GBK_ENCODING)
+    Assert.assertEquals(fpt4.logic02Recs.head.fingers.size ,fpt4.logic02Recs.head.sendFingerCount.toInt)
+  }
 }

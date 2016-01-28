@@ -240,6 +240,7 @@ trait ScalaReflect{
       .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
       .toSeq.reverse // <----- must be reversed
       .map{ m =>
+      //println("process ",m)
       //find @Length annotation and get value
       val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
       val length = lengthAnnotation.map(_.tree).map{

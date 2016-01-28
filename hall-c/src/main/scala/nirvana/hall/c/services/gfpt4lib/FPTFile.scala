@@ -8,6 +8,7 @@ import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 
 import scala.language.reflectiveCalls
+import scala.reflect._
 
 /**
  * fpt file
@@ -18,8 +19,14 @@ object FPTFile {
   val FS:Byte= 28
   val GS:Byte= 29
 
-  val V3_LOGIC_DATA_TYPE_2="2"
-  val V3_LOGIC_DATA_TYPE_3="3"
+  def readLogic[T <:AncientData : ClassTag](strNum:String,dataSource:StreamReader,encoding:Charset): Array[T]={
+    val num = if(strNum == null || strNum.isEmpty) 0 else strNum.toInt
+    val seq = 0 until num map {i =>
+      val value = classTag[T].runtimeClass.newInstance().asInstanceOf[T].fromStreamReader(dataSource, encoding)
+      value
+    }
+    seq.toArray
+  }
   class FPTHead extends AncientData{
     @Length(3)
     var flag:String = _
@@ -27,6 +34,12 @@ object FPTFile {
     var majorVersion:String = _
     @Length(2)
     var minorVersion:String = _
+  }
+  class LogicHeadV4 extends AncientData{
+    @Length(8)
+    var fileLength: String = _
+    @Length(2)
+    var dataType:String = _
   }
   class LogicHeadV3 extends AncientData{
     @Length(8)
