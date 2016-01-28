@@ -3,8 +3,10 @@ package nirvana.hall.c.services
 import java._
 import java.io.{OutputStream, InputStream}
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 import javax.imageio.stream.ImageInputStream
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
 import nirvana.hall.orm.services.AncientDataMacroDefine
@@ -176,6 +178,7 @@ trait ScalaReflect{
    * find primitive data type length
    */
   private def findPrimitiveTypeLength(term:Symbol,tpe:Type,length:Option[Int]):Int={
+    //println("process term "+term+" length:"+length)
     def returnLengthOrThrowException:Int={
       if(length.isEmpty)
         throw new IllegalArgumentException("@Length not defined at "+term)
@@ -195,11 +198,26 @@ trait ScalaReflect{
         returnLengthOrThrowException
       case t if t <:< typeOf[ScalaReflect] =>
         throwExceptionIfLengthGTZeroOrGet(createAncientDataByType(t).getDataSize)
-      case TypeRef(pre,sym,args) if sym == typeOf[Array[_]].typeSymbol =>
-        if(args.length != 1)
-          throw new IllegalArgumentException("only support one type parameter in Array.")
-        //using recursive call to find length
-        returnLengthOrThrowException * findPrimitiveTypeLength(term,args.head,None)
+      case t  if t =:= typeOf[Array[Byte]] =>
+        returnLengthOrThrowException
+      case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol => //Array of ScalaReflect
+        val len = returnLengthOrThrowException
+        val value = instanceMirror.reflectField(term.asInstanceOf[TermSymbol]).get
+        if(value==null){
+          len * findPrimitiveTypeLength(term,args.head,None)
+        }else {
+          var finalLength = 0
+          val type_len = createAncientDataByType(args.head).getDataSize
+          var zeroLen = type_len * len
+          val ancientDataArray = value.asInstanceOf[Array[AncientData]].filterNot(_ == null)
+          ancientDataArray.foreach { x =>
+            finalLength += x.getDataSize
+            zeroLen -= type_len
+          }
+          finalLength += zeroLen
+
+          finalLength
+        }
       case other =>
         throw new IllegalArgumentException("type is not supported "+other)
     }
@@ -241,7 +259,10 @@ trait ScalaReflect{
             0
           } else {
             val stringValue = value.toString.trim()
-            if (stringValue.isEmpty) 0 else stringValue.toInt
+            if (stringValue.isEmpty) 0 else {
+              //println(stringValue,stringValue.toInt)
+              stringValue.toInt
+            }
           }
       }
       if(length.isDefined  && lengthRef.isDefined )
@@ -266,6 +287,7 @@ trait ScalaReflect{
   def writeToStreamWriter[T](stream:T)(implicit converter:T=> StreamWriter): T= {
     val dataSink = converter(stream)
     internalProcessField{(symbol,length)=>
+      //println("process "+symbol)
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
         if(length.isEmpty)
@@ -276,6 +298,7 @@ trait ScalaReflect{
         if(str == null) writeBytes(null,length) else writeBytes(str.getBytes,length)
       }
       def writeBytes(bytes:Array[Byte],length:Int): Unit ={
+        //println(length)
         val bytesLength = if(bytes == null) 0 else bytes.length
         val zeroLength = length - bytesLength
         if(bytes != null) {
@@ -338,9 +361,9 @@ trait ScalaReflect{
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
    */
-  def fromStreamReader(dataSource: StreamReader): this.type ={
+  def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
     internalProcessField{(symbol,length)=>
-      //println("read "+symbol+" ..." )
+      ////println("read "+symbol+" ..." )
 
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
@@ -359,10 +382,10 @@ trait ScalaReflect{
         case LongTpe => field.set(dataSource.readLong())
         case AncientData.STRING_CLASS =>
           val bytes = readByteArray(returnLengthOrThrowException)
-          field.set(new String(bytes,"GBK").trim)
+          field.set(new String(bytes,encoding).trim)
         case t if t <:< typeOf[ScalaReflect] =>
           val ancientData = createAncientDataByType(t)
-          ancientData.fromStreamReader(dataSource)
+          ancientData.fromStreamReader(dataSource,encoding)
           field.set(ancientData)
         case t  if t =:= typeOf[Array[Byte]] =>
           val bytes = readByteArray(returnLengthOrThrowException)
@@ -373,7 +396,7 @@ trait ScalaReflect{
           val ancientDataArray = lang.reflect.Array.newInstance(sampleClass,len)
 
           0 until len foreach {i=>
-            lang.reflect.Array.set(ancientDataArray,i,createAncientDataByType(args.head).fromStreamReader(dataSource))
+            lang.reflect.Array.set(ancientDataArray,i,createAncientDataByType(args.head).fromStreamReader(dataSource,encoding))
           }
           field.set(ancientDataArray)
         case other =>
@@ -383,8 +406,8 @@ trait ScalaReflect{
 
     this
   }
-  def fromByteArray(data: Array[Byte]):this.type = {
-    fromStreamReader(ChannelBuffers.wrappedBuffer(data))
+  def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
+    fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
   }
   def toByteArray:Array[Byte]={
     val data = ChannelBuffers.buffer(getDataSize)

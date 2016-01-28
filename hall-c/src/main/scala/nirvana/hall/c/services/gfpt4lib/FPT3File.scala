@@ -1,5 +1,8 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.nio.charset.Charset
+
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{LengthRef, Length, IgnoreTransfer}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData._
@@ -49,24 +52,25 @@ class FPT3File extends AncientData{
     stream
   }
 
+
   /**
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
    */
-  override def fromStreamReader(dataSource: StreamReader): FPT3File.this.type = {
-    super.fromStreamReader(dataSource)
+  override def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type = {
+    super.fromStreamReader(dataSource,encoding)
     dataSource.markReaderIndex()
     val head = new LogicHeadV3
-    head.fromStreamReader(dataSource)
+    head.fromStreamReader(dataSource,encoding)
     dataSource.resetReaderIndex()
 
     val logic2Buffer = mutable.Buffer[Logic2Rec]()
     val logic3Buffer = mutable.Buffer[Logic3Rec]()
     head.dataType match{
       case FPTFile.V3_LOGIC_DATA_TYPE_2 =>
-        logic2Buffer += new Logic2Rec().fromStreamReader(dataSource)
+        logic2Buffer += new Logic2Rec().fromStreamReader(dataSource,encoding)
       case FPTFile.V3_LOGIC_DATA_TYPE_3 =>
-        logic3Buffer += new Logic3Rec().fromStreamReader(dataSource)
+        logic3Buffer += new Logic3Rec().fromStreamReader(dataSource,encoding)
     }
 
     logic2Recs = logic2Buffer.toArray
@@ -179,8 +183,8 @@ class Logic2Rec extends AncientData{
     stream
   }
 
-  override def fromStreamReader(dataSource: StreamReader): this.type = {
-    super.fromStreamReader(dataSource)
+  override def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type = {
+    super.fromStreamReader(dataSource,encoding)
 
     if(sendFingerCount.isEmpty || sendFingerCount.toInt ==0){
       logicEnd = dataSource.readByte()
@@ -364,8 +368,8 @@ class Logic3Rec extends AncientData{
     stream
   }
 
-  override def fromStreamReader(dataSource: StreamReader): this.type = {
-    super.fromStreamReader(dataSource)
+  override def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type = {
+    super.fromStreamReader(dataSource,encoding)
 
     if(sendFingerCount.isEmpty || sendFingerCount.toInt == 0){
       logicEnd = dataSource.readByte()

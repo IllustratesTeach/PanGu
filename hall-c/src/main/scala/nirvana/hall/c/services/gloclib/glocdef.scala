@@ -1,5 +1,8 @@
 package nirvana.hall.c.services.gloclib
 
+import java.nio.charset.Charset
+
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 import nirvana.hall.c.services.ghpcbase.ghpcdef.GAFIS_UUIDStruct
@@ -123,8 +126,8 @@ object glocdef {
            * convert channel buffer data as object
            * @param dataSource netty channel buffer
            */
-          override def fromStreamReader(dataSource: StreamReader): GAFISIMAGESTRUCT.this.type = {
-            super.fromStreamReader(dataSource)
+          override def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type = {
+            super.fromStreamReader(dataSource,encoding)
             if(stHead.nImgSize > 0)
               bnData = readBytesFromStreamReader(dataSource,stHead.nImgSize)
 
