@@ -2,7 +2,7 @@ package nirvana.hall.v70.internal.sync
 
 import nirvana.hall.protocol.v62.FPTProto.Case
 import nirvana.hall.protocol.v62.lp.CaseProto._
-import nirvana.hall.v70.jpa.{GafisCase, GafisCaseFinger, SyncQueue}
+import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCase, SyncQueue}
 
 /**
  * Created by songpeng on 15/12/7.
@@ -46,37 +46,10 @@ trait Sync7to6CaseService {
   }
 
   private def getCase(caseId: String): Case = {
-    val caseBuilder = Case.newBuilder()
-    val caseInfo = GafisCase.find(caseId)
-    caseBuilder.setStrCaseID(caseId)
+    val gafisCase = GafisCase.find(caseId)
+    val fingerIds = GafisCaseFinger.find_by_caseId(caseId).map(f => f.fingerId)
 
-    val textBuilder = caseBuilder.getTextBuilder
-    magicSet(caseInfo.caseClassCode, textBuilder.setStrCaseType1)
-    magicSet(caseInfo.caseOccurDate, textBuilder.setStrCaseOccurDate)
-    magicSet(caseInfo.caseOccurPlaceCode, textBuilder.setStrCaseOccurPlaceCode)
-    magicSet(caseInfo.caseOccurPlaceDetail, textBuilder.setStrCaseOccurPlace)
-
-    magicSet(caseInfo.remark, textBuilder.setStrComment)
-    if("1".equals(caseInfo.isMurder))
-      textBuilder.setBPersonKilled(true)
-    magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
-    magicSet(caseInfo.extractUnitCode, textBuilder.setStrExtractUnitCode)
-    magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
-    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
-    magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
-    magicSet(caseInfo.suspiciousAreaCode, textBuilder.setStrSuspArea1Code)
-    textBuilder.setNSuperviseLevel(caseInfo.assistLevel)
-    magicSet(caseInfo.assistDeptCode, textBuilder.setStrXieChaRequestUnitCode)
-    magicSet(caseInfo.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
-    magicSet(caseInfo.assistDate, textBuilder.setStrXieChaDate)
-    textBuilder.setNCaseState(caseInfo.assistSign)
-    textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
-    textBuilder.setNCaseState(caseInfo.caseState)
-
-    GafisCaseFinger.find_by_caseId(caseId).foreach(f => caseBuilder.addStrFingerID(f.fingerId))
-    caseBuilder.setNCaseFingerCount(caseBuilder.getStrFingerIDCount)
-
-    caseBuilder.build()
+    ProtobufConverter.convertGafisCase2Case(gafisCase, fingerIds)
   }
 
 }

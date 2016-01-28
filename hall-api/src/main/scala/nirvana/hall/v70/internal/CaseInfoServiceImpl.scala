@@ -2,6 +2,8 @@ package nirvana.hall.v70.internal
 
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.v70.internal.sync.ProtobufConverter
+import nirvana.hall.v70.jpa.GafisCase
 
 /**
  * Created by songpeng on 16/1/26.
@@ -13,7 +15,10 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   override def addCaseInfo(caseAddRequest: CaseAddRequest): CaseAddResponse = {
-    throw new UnsupportedOperationException
+    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseAddRequest.getCase)
+    gafisCase.save()
+
+    CaseAddResponse.newBuilder().build()
   }
 
   /**
@@ -22,7 +27,10 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   override def updateCaseInfo(caseUpdateRequest: CaseUpdateRequest): CaseUpdateResponse = {
-    throw new UnsupportedOperationException
+    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseUpdateRequest.getCase)
+    gafisCase.save()
+
+    CaseUpdateResponse.newBuilder().build()
   }
 
   /**
@@ -31,7 +39,10 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   override def getCaseInfo(caseGetRequest: CaseGetRequest): CaseGetResponse = {
-    throw new UnsupportedOperationException
+    val gafisCase = GafisCase.find(caseGetRequest.getCaseId)
+    val caseInfo = ProtobufConverter.convertGafisCase2Case(gafisCase)
+
+    CaseGetResponse.newBuilder().setCase(caseInfo).build()
   }
 
   /**
@@ -40,6 +51,9 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   override def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse = {
-    throw new UnsupportedOperationException
+    val gafisCase = GafisCase.find(caseDelRequest.getCaseId)
+    gafisCase.delete()
+
+    CaseDelResponse.newBuilder().build()
   }
 }

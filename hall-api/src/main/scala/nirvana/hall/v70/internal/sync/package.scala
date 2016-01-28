@@ -14,7 +14,7 @@ import nirvana.hall.protocol.sys.CommonProto.BaseRequest
  */
 package object sync {
   implicit def string2Int(string: String): Int ={
-    if(string != null && string.length > 0)
+    if(isNonBlank(string))
       Integer.parseInt(string)
     else
       0
@@ -23,6 +23,11 @@ package object sync {
     if (date != null)
       new SimpleDateFormat("yyyyMMdd").format(date)
     else ""
+  }
+  implicit def string2Date(date: String): Date= {
+    if (date != null && date.length == 8)
+      new SimpleDateFormat("yyyyMMdd").parse(date)
+    else null
   }
   def isNonBlank(string: String):Boolean = string != null && string.length >0
   def magicSet(value:String,fun:String=>Any){
