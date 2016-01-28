@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import nirvana.hall.c.annotations.Length
+import nirvana.hall.c.annotations.{IgnoreTransfer, LengthRef, Length}
 
 /**
  *
@@ -71,97 +71,104 @@ class Logic01Rec{
   var fs:Byte = FPTFile.FS //FS
 }
 
-class Logic02RecHead{
+class Logic02RecHead {
   @Length(6)
-  var index :String = _
+  var index: String = _
   @Length(4)
-  var systemType :String = _
+  var systemType: String = _
   @Length(23)
-  var personId :String = _
+  var personId: String = _
   @Length(23)
-  var cardId :String = _
+  var cardId: String = _
   @Length(30)
-  var personName :String = _
+  var personName: String = _
   @Length(30)
-  var alias :String = _
+  var alias: String = _
   @Length(1)
-  var gender :String = _
+  var gender: String = _
   @Length(8)
-  var birthday :String = _
+  var birthday: String = _
   @Length(3)
-  var nativeplace :String = _
+  var nativeplace: String = _
   @Length(2)
-  var nation :String = _
+  var nation: String = _
   @Length(18)
-  var idCardNo :String = _
+  var idCardNo: String = _
   @Length(3)
-  var certificateType :String = _
+  var certificateType: String = _
   @Length(20)
-  var certificateNo :String = _
+  var certificateNo: String = _
   @Length(6)
-  var door :String = _
+  var door: String = _
   @Length(70)
-  var doorDetail :String = _
+  var doorDetail: String = _
   @Length(6)
-  var address :String = _
+  var address: String = _
   @Length(70)
-  var addressDetail :String = _
+  var addressDetail: String = _
   @Length(2)
-  var category :String = _
+  var category: String = _
   @Length(6)
-  var caseClass1Code :String = _
+  var caseClass1Code: String = _
   @Length(6)
-  var caseClass2Code :String = _
+  var caseClass2Code: String = _
   @Length(6)
-  var caseClass3Code :String = _
+  var caseClass3Code: String = _
   @Length(1)
-  var isCriminal :String = _
+  var isCriminal: String = _
   @Length(1024)
-  var criminalInfo :String = _
+  var criminalInfo: String = _
   @Length(12)
-  var gatherUnitCode :String = _
+  var gatherUnitCode: String = _
   @Length(70)
-  var gatherUnitName :String = _
+  var gatherUnitName: String = _
   @Length(30)
-  var gatherName :String = _
+  var gatherName: String = _
   @Length(8)
-  var gatherDate :String = _
+  var gatherDate: String = _
   @Length(1)
-  var assistLevel :String = _
+  var assistLevel: String = _
   @Length(6)
-  var bonus :String = _
+  var bonus: String = _
   @Length(5)
-  var assistPurpose :String = _
+  var assistPurpose: String = _
   @Length(23)
-  var relatedPersonId :String = _
+  var relatedPersonId: String = _
   @Length(23)
-  var relatedCaseId :String = _
+  var relatedCaseId: String = _
   @Length(1)
-  var assistTimeLimit :String = _
+  var assistTimeLimit: String = _
   @Length(512)
-  var assistAskingInfo :String = _
+  var assistAskingInfo: String = _
   @Length(12)
-  var assistUnitCode :String = _
+  var assistUnitCode: String = _
   @Length(70)
-  var assistUnitName :String = _
+  var assistUnitName: String = _
   @Length(8)
-  var assistDate :String = _
+  var assistDate: String = _
   @Length(30)
-  var contact :String = _
+  var contact: String = _
   @Length(40)
-  var contactPhone :String = _
+  var contactPhone: String = _
   @Length(30)
-  var approver :String = _
+  var approver: String = _
   @Length(512)
-  var remark :String = _
+  var remark: String = _
   @Length(1)
-  var isAssist :String = _
+  var isAssist: String = _
   @Length(6)
-  var portraitDataLength :String = _
+  var portraitDataLength: String = _
+  @LengthRef("portraitDataLength")
+  var portraitData: Array[Byte] = _
   @Length(2)
-  var sendFingerCount :String = _
-
-
+  var sendFingerCount: String = _
+  @LengthRef("sendFingerCount")
+  var fingers:Array[FingerTData] = _
+  @IgnoreTransfer
+  @IgnoreTransfer
+  var logicEnd: Byte = FPTFile.FS // FS
+}
+class FingerTData{
   @Length(7)
   var dataLength :String = _
   @Length(2)
@@ -190,7 +197,8 @@ class Logic02RecHead{
   var feature :String = _
   @Length(6)
   var customInfoLength :String = _
-
+  @LengthRef("customInfoLength")
+  var customInfo:Array[Byte]= _
   @Length(3)
   var imgHorizontalLength :String = _
   @Length(3)
@@ -201,7 +209,9 @@ class Logic02RecHead{
   var imgCompressMethod :String = _
   @Length(6)
   var imgDataLength :String = _
+  @LengthRef("imgDataLength")
+  var imgData:String = _
   @Length(1)
-  var end :String = _
+  var end :Byte= FPTFile.GS
 }
 

@@ -2,6 +2,7 @@ package nirvana.hall.c.services.gfpt4lib
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
+import nirvana.hall.c.services.gfpt4lib.FPT3File.{FPT3File, Logic1Rec}
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
