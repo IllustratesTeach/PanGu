@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
 import nirvana.hall.protocol.v62.FPTProto.Case
+import nirvana.hall.protocol.v62.lp.CaseProto._
 import nirvana.hall.v70.jpa.{GafisCase, GafisCaseFinger, SyncQueue}
 
 /**
@@ -13,31 +14,35 @@ trait Sync7to6CaseService {
    * @return
    */
   def syncCase(syncQueue: SyncQueue): Unit = {
-    val caseId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
-        addCase(caseId)
+        addCase(syncQueue)
       case "update" =>
-        updateCase(caseId)
+        updateCase(syncQueue)
       case "delete" =>
-        deleteCase(caseId)
+        deleteCase(syncQueue)
     }
   }
 
-  private def addCase(caseId: String): Unit ={
-    val caseInfo = getCase(caseId)
-    //TODO
-    throw new UnsupportedOperationException
-  }
-  private def updateCase(caseId: String): Unit ={
-    //TODO
-    val caseInfo = getCase(caseId)
-    throw new UnsupportedOperationException
-  }
-  private def deleteCase(caseId: String): Unit ={
-    //TODO
-    throw new UnsupportedOperationException
+  private def addCase(syncQueue: SyncQueue): Unit ={
+    val caseInfo = getCase(syncQueue.uploadKeyid)
+    val request= CaseAddRequest.newBuilder().setCase(caseInfo).build()
 
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, CaseAddRequest.cmd, request, CaseAddResponse.newBuilder())
+  }
+
+  private def updateCase(syncQueue: SyncQueue): Unit ={
+    val caseInfo = getCase(syncQueue.uploadKeyid)
+    val request= CaseUpdateRequest.newBuilder().setCase(caseInfo).build()
+    val response = CaseUpdateResponse.newBuilder()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, CaseUpdateRequest.cmd, request, response)
+  }
+  private def deleteCase(syncQueue: SyncQueue): Unit ={
+    val request = CaseDelRequest.newBuilder().setCaseId(syncQueue.uploadKeyid).build()
+    val response = CaseDelResponse.newBuilder()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort,CaseDelRequest.cmd, request, response)
   }
 
   private def getCase(caseId: String): Case = {

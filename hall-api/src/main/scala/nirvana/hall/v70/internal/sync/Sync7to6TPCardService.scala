@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal.sync
 import com.google.protobuf.ByteString
 import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
-import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
+import nirvana.hall.protocol.v62.tp.TPCardProto._
 import nirvana.hall.v70.jpa.{CodeGj, GafisGatherFinger, GafisPerson, SyncQueue}
 
 /**
@@ -16,35 +16,34 @@ trait Sync7to6TPCardService {
    * @return
    */
   def syncTPCard(syncQueue: SyncQueue): Unit = {
-    val personId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
-        addTPCard(personId)
+        addTPCard(syncQueue)
       case "update" =>
-        updateTPCard(personId)
+        updateTPCard(syncQueue)
       case "delete" =>
-        deleteTPCard(personId)
+        deleteTPCard(syncQueue)
     }
   }
 
-  private def addTPCard(personId: String): Unit = {
-    val tpCard = getTPCard(personId)
-    //数据转换为C的结构
-    val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
-    //TODO
-    throw new UnsupportedOperationException
+  private def addTPCard(syncQueue: SyncQueue): Unit = {
+    val tpCard = getTPCard(syncQueue.uploadKeyid)
+    val request = TPCardAddRequest.newBuilder().setCard(tpCard).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort,TPCardAddRequest.cmd, request, TPCardAddResponse.newBuilder())
   }
 
-  private def updateTPCard(personId: String): Unit = {
-    val tpCard = getTPCard(personId)
-    val gTPCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCard)
-    //TODO
-    throw new UnsupportedOperationException
+  private def updateTPCard(syncQueue: SyncQueue): Unit = {
+    val tpCard = getTPCard(syncQueue.uploadKeyid)
+    val request = TPCardUpdateRequest.newBuilder().setCard(tpCard).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, TPCardUpdateRequest.cmd, request, TPCardUpdateResponse.newBuilder())
   }
 
-  private def deleteTPCard(personId: String): Unit = {
-    //TODO
-    throw new UnsupportedOperationException
+  private def deleteTPCard(syncQueue: SyncQueue): Unit = {
+    val request = TPCardDelRequest.newBuilder().setCardId(syncQueue.uploadKeyid).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, TPCardDelRequest.cmd, request,TPCardDelResponse.newBuilder())
   }
 
   private def getTPCard(personId: String): TPCard = {

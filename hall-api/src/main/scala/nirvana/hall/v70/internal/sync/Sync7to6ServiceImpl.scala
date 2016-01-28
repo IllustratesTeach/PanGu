@@ -75,7 +75,7 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config)
         case UPLOAD_FLAG_LPCARD =>
           syncLPCard(syncQueue)
         case other =>
-          throw new RuntimeException("unknown uploadFlag " + other)
+          throw new UnsupportedOperationException("unknown uploadFlag " + other)
       }
       updateSyncQueueSucess(syncQueue)
     }

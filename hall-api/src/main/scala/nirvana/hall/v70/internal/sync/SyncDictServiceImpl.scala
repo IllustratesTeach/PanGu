@@ -1,6 +1,6 @@
 package nirvana.hall.v70.internal.sync
 
-import nirvana.hall.api.internal.{ScalaUtils, WebAppClientUtils}
+import nirvana.hall.api.internal.{ScalaUtils, WebHttpClientUtils}
 import nirvana.hall.v70.services.sync.SyncDictService
 import nirvana.hall.protocol.sys.DictProto._
 import nirvana.hall.protocol.sys.SyncDictProto.{SyncDictRequest, SyncDictResponse}
@@ -28,7 +28,7 @@ class SyncDictServiceImpl(config: HallV70Config) extends SyncDictService{
           val response = SyncDictResponse.newBuilder()
           DictType.values().foreach{ f =>
             request.setDictType(f)
-            WebAppClientUtils.call(config.syncDict.url, request.build(), response)
+            WebHttpClientUtils.call(config.syncDict.url, request.build(), response)
             syncDict(f, response.getDictDataList.toSeq)
           }
         }

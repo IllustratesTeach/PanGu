@@ -34,8 +34,9 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
       responseBuilder.setStatus(ResponseStatus.OK)
       try {
         val baseRequest = BaseRequest.getDefaultInstance.getParserForType.parseFrom(request.getInputStream, extensionRegistry)
-        val token = baseRequest.getToken
-        protobufRequestGlobal.store(token)
+        // TODO 暂时取消登录验证
+//        val token = baseRequest.getToken
+//        protobufRequestGlobal.store(token)
         //val baseRequest = BaseRequest.newBuilder().mergeFrom(request.getInputStream, extensionRegistry).build()
         protobufHandler.handle(baseRequest, responseBuilder)
       }

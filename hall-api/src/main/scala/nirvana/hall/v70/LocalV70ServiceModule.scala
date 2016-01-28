@@ -1,6 +1,5 @@
 package nirvana.hall.v70
 
-import nirvana.hall.api.internal.{AuthServiceImpl, RequiresUserAdvisorImpl, SystemServiceImpl}
 import nirvana.hall.api.services._
 import nirvana.hall.v70.internal.filter.stamp._
 import nirvana.hall.v70.internal.filter.sys.{DictListRequestFilter, LoginRequestFilter, SyncDictRequestFilter}
@@ -8,7 +7,7 @@ import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6Servic
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync.{Sync7to6ServiceImpl, SyncDictServiceImpl}
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
-import nirvana.hall.v70.internal.{LPCardServiceImpl, CaseInfoServiceImpl, QueryServiceImpl, TPCardServiceImpl}
+import nirvana.hall.v70.internal.{CaseInfoServiceImpl, LPCardServiceImpl, QueryServiceImpl, TPCardServiceImpl}
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sync.{Sync7to6Service, SyncDictService}
@@ -21,10 +20,7 @@ import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
  */
 object LocalV70ServiceModule {
   def bind(binder: ServiceBinder): Unit = {
-    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
-    binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
     binder.bind(classOf[UserService], classOf[UserServiceImpl])
-    binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
     binder.bind(classOf[DictService], classOf[DictServiceImpl])
     binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])
     binder.bind(classOf[GatherFingerPalmService], classOf[GatherFingerPalmServiceImpl])

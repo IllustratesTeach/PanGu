@@ -1,10 +1,10 @@
 package nirvana.hall.api
 
 import nirvana.hall.api.internal._
-import nirvana.hall.api.internal.filter.{QueryFilter, CaseInfoFilter, LPCardFilter, TPCardFilter}
+import nirvana.hall.api.internal.filter.{CaseInfoFilter, LPCardFilter, QueryFilter, TPCardFilter}
 import nirvana.hall.api.services._
-import org.apache.tapestry5.ioc.annotations.{Contribute, Local, Match}
-import org.apache.tapestry5.ioc.{MethodAdviceReceiver, OrderedConfiguration, ServiceBinder}
+import org.apache.tapestry5.ioc.annotations.Contribute
+import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core
 
 /**
@@ -15,6 +15,9 @@ import org.apache.tapestry5.services.Core
 object LocalApiServiceModule {
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[ProtobufRequestGlobal], classOf[ProtobufRequestGlobalImpl]).withMarker(classOf[Core])
+    binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
+    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+    binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
   }
 
   @Contribute(classOf[ProtobufRequestHandler])
@@ -25,8 +28,8 @@ object LocalApiServiceModule {
     configuration.addInstance("QueryFilter", classOf[QueryFilter])
   }
 
-  @Match(Array("*"))
-  def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
-    advisor.addAdvice(receiver)
-  }
+//  @Match(Array("*"))
+//  def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
+//    advisor.addAdvice(receiver)
+//  }
 }

@@ -2,7 +2,7 @@ package nirvana.hall.v70.internal.sync
 
 import com.google.protobuf.ByteString
 import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
-import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
+import nirvana.hall.protocol.v62.lp.LPCardProto._
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SyncQueue}
 
 /**
@@ -16,34 +16,34 @@ trait Sync7to6LPCardService {
    * @return
    */
   def syncLPCard(syncQueue: SyncQueue): Unit = {
-    val fingerId = syncQueue.uploadKeyid
     syncQueue.opration match {
       case "insert" =>
-        addLPCard(fingerId)
+        addLPCard(syncQueue)
       case "update" =>
-        updateLPCard(fingerId)
+        updateLPCard(syncQueue)
       case "delete" =>
-        deleteLPCard(fingerId)
+        deleteLPCard(syncQueue)
     }
   }
 
-  private def addLPCard(fingerId: String): Unit = {
-    val lpCard = getLPCard(fingerId)
-    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
-    //TODO
-    throw new UnsupportedOperationException
+  private def addLPCard(syncQueue: SyncQueue): Unit = {
+    val lpCard = getLPCard(syncQueue.uploadKeyid)
+    val request = LPCardAddRequest.newBuilder().setCard(lpCard).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardAddRequest.cmd, request, LPCardAddResponse.newBuilder())
   }
 
-  private def updateLPCard(fingerId: String): Unit = {
-    val lpCard = getLPCard(fingerId)
-    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
-    //TODO
-    throw new UnsupportedOperationException
+  private def updateLPCard(syncQueue: SyncQueue): Unit = {
+    val lpCard = getLPCard(syncQueue.uploadKeyid)
+    val request = LPCardUpdateRequest.newBuilder().setCard(lpCard).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardUpdateRequest.cmd, request, LPCardUpdateResponse.newBuilder())
   }
 
-  private def deleteLPCard(fingerId: String): Unit = {
-    //TODO
-    throw new UnsupportedOperationException
+  private def deleteLPCard(syncQueue: SyncQueue): Unit = {
+    val request = LPCardDelRequest.newBuilder().setCardId(syncQueue.uploadKeyid).build()
+
+    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardDelRequest.cmd, request, LPCardDelResponse.newBuilder())
   }
 
   private def getLPCard(fingerId: String): LPCard = {

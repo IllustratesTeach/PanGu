@@ -4,7 +4,6 @@ import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
-import org.apache.tapestry5.ioc.Configuration
 import org.apache.tapestry5.ioc.annotations.Symbol
 
 /**
@@ -16,8 +15,5 @@ object HallApiModule {
   def buildHallApiConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
     val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-api.xml")
     XmlLoader.parseXML[HallApiConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/api/api.xsd")))
-  }
-  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
   }
 }
