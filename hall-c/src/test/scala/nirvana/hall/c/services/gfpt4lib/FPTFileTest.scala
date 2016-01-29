@@ -3,6 +3,7 @@ package nirvana.hall.c.services.gfpt4lib
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPT3File.{FPT3File, Logic1Rec}
+import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
@@ -17,6 +18,9 @@ class FPTFileTest {
     val is = getClass.getResourceAsStream("/fpt3.fpt")
     val fpt=FPTFile.parseFromInputStream(is)
     Assert.assertTrue(fpt.isLeft)
+    val is2 = getClass.getResourceAsStream("/fpt4.fpt")
+    val fpt2=FPTFile.parseFromInputStream(is2)
+    Assert.assertTrue(fpt2.isRight)
   }
   @Test
   def test_head: Unit ={

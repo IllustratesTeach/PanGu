@@ -6,7 +6,7 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData._
-import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead, LogicHeadV3}
+import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
 
 import scala.language.reflectiveCalls
 
@@ -16,7 +16,12 @@ import scala.language.reflectiveCalls
  * @since 2016-01-27
  */
 object FPT3File {
-
+  class LogicHeadV3 extends AncientData{
+    @Length(8)
+    var fileLength: String = _
+    @Length(1)
+    var dataType:String = _
+  }
   class FPT3File extends AncientData {
     var head: FPTHead = new FPTHead
     var logic1Rec = new Logic1Rec
