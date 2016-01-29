@@ -139,8 +139,7 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 	//release string
 	jenv->ReleaseStringUTFChars(code,(char *)code_str);
 
-	ThrowExceptionByFPTCode(jenv,ret);
-
+	if(ret == 1){
     //build OriginalImage object
     jclass originalImageClass = jenv->FindClass("nirvana/hall/image/jni/OriginalImage");
     jmethodID constructorId = jenv->GetMethodID(originalImageClass,"<init>","()V");
@@ -158,7 +157,11 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
     jmethodID ppiMethod = jenv->GetMethodID(originalImageClass,"setPpi","(I)V");
     jenv->CallVoidMethod(originalImage,ppiMethod,ppi);
 
-	return originalImage;
+		return originalImage;
+	}else{
+		ThrowExceptionByFPTCode(jenv,ret);
+		return NULL;
+	}
 }
 #endif
 

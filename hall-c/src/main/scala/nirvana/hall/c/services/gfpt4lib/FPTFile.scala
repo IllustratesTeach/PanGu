@@ -1,14 +1,17 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.io.InputStream
 import java.nio.charset.Charset
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
+import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 
 import scala.language.reflectiveCalls
 import scala.reflect._
+import nirvana.hall.c.services.AncientData._
 
 /**
  * fpt file
@@ -18,7 +21,27 @@ import scala.reflect._
 object FPTFile {
   val FS:Byte= 28
   val GS:Byte= 29
+  val FPT_FLAG="FPT"
+  val FPT_V3="03"
+  val FPT_V4="04"
+  def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.UTF8_ENCODING): Either[FPT3File,FPT4File]= {
+    val streamReader:StreamReader = stream
+    val head = new FPTHead
+    streamReader.markReaderIndex()
+    head.fromStreamReader(stream,encoding)
+    streamReader.resetReaderIndex()
 
+    if(head.flag != FPT_FLAG)
+      throw new IllegalArgumentException("FPT expected.")
+    head.majorVersion match{
+      case FPT_V3=>
+        Left(new FPT3File().fromStreamReader(streamReader))
+      case FPT_V4 =>
+        Right(new FPT4File().fromStreamReader(streamReader))
+      case other =>
+        throw new UnsupportedOperationException(other+" unsupported,only 03 or 04.")
+    }
+  }
   def readLogic[T <:AncientData : ClassTag](strNum:String,dataSource:StreamReader,encoding:Charset): Array[T]={
     val num = if(strNum == null || strNum.isEmpty) 0 else strNum.toInt
     val seq = 0 until num map {i =>
