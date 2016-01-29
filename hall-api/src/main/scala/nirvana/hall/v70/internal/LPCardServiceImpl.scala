@@ -34,7 +34,7 @@ class LPCardServiceImpl extends LPCardService{
   override def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse = {
     val fingerId = lPCardGetRequest.getCardId
     val caseFinger = GafisCaseFinger.find(fingerId)
-    val caseFingerMnt = GafisCaseFingerMnt.find_by_fingerid(fingerId).firstOption.get
+    val caseFingerMnt = GafisCaseFingerMnt.find_by_fingerId(fingerId).firstOption.get
     val lpCard = ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
 
     LPCardGetResponse.newBuilder().setCard(lpCard).build()

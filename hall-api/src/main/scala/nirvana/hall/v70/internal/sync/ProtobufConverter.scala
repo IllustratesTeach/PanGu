@@ -61,7 +61,7 @@ object ProtobufConverter {
 
     gafisCase
   }
-  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String] = None): Case = {
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String] = null): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
 
@@ -158,7 +158,7 @@ object ProtobufConverter {
     lpCard.build()
   }
 
-  def convertGafisPerson2TPCard(person: GafisPerson, fingerList: Relation[GafisGatherFinger] = None): TPCard={
+  def convertGafisPerson2TPCard(person: GafisPerson, fingerList: Relation[GafisGatherFinger] = null): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
 
