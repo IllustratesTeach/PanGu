@@ -1,13 +1,13 @@
 package nirvana.hall.c.services
 
 import java._
-import java.io.{OutputStream, InputStream}
+import java.io.{BufferedInputStream, InputStream, OutputStream}
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
+import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
 import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
@@ -84,6 +84,8 @@ object AncientData extends WrapAsStreamWriter{
       AncientData.readByteArray(is,tmp,8)
       ByteBuffer.wrap(tmp).getLong
     }
+    def markReaderIndex():Unit={is.mark(1000)}
+    def resetReaderIndex():Unit={is.reset()}
   }
 }
 
@@ -91,9 +93,8 @@ object AncientData extends WrapAsStreamWriter{
  * wrap netty's ChannelBuffer and xSocket's IDataSink
  */
 trait WrapAsStreamWriter {
-  implicit def asStreamReader(is:InputStream):StreamReader = new InputStreamReader(is){
-    def markReaderIndex():Unit={is.mark(1000)}
-    def resetReaderIndex():Unit={is.reset()}
+  implicit def asStreamReader(is:InputStream):StreamReader = {
+    if(is.markSupported()) new InputStreamReader(is) else new InputStreamReader(new BufferedInputStream(is))
   }
   implicit def asStreamWriter(output: OutputStream): StreamWriter = new {
     private val arr = new Array[Byte](8)
