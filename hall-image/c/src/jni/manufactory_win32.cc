@@ -112,18 +112,25 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 	int height =0;
 	int ppi = 0;
 	int ret = 0;
-	if(nFirmCode == GAIMG_CPRMETHOD_BUPT){
-		//call dll function to decompress data
-		GFP_FPT_BUPT_DCXX p =(GFP_FPT_BUPT_DCXX)hHandle;
-		ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
-	}else if(GAIMG_CPRMETHOD_GA10 == nFirmCode){
-		GFP_FPT_GA10_DECOMPRESS p=(GFP_FPT_GA10_DECOMPRESS)hHandle;
-		ret=p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,&height,&width,&ppi,szResult);
-	}else{
-		//call dll function to decompress data
-		GA_FPT_DCXX p = (GA_FPT_DCXX)hHandle;
-		ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
+	__try{
+
+    if(nFirmCode == GAIMG_CPRMETHOD_BUPT){
+      //call dll function to decompress data
+      GFP_FPT_BUPT_DCXX p =(GFP_FPT_BUPT_DCXX)hHandle;
+      ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
+    }else if(GAIMG_CPRMETHOD_GA10 == nFirmCode){
+      GFP_FPT_GA10_DECOMPRESS p=(GFP_FPT_GA10_DECOMPRESS)hHandle;
+      ret=p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,&height,&width,&ppi,szResult);
+    }else{
+      //call dll function to decompress data
+      GA_FPT_DCXX p = (GA_FPT_DCXX)hHandle;
+      ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
+    }
 	}
+	__except(EXCEPTION_EXECUTE_HANDLER){
+		ret = -100;
+	}
+
 
 	//free byte array elements
 	jenv->ReleaseByteArrayElements(cpr_data,(jbyte*)cpr_data_bin,JNI_ABORT);
