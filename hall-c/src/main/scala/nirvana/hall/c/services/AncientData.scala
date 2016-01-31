@@ -8,7 +8,7 @@ import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
-import nirvana.hall.c.services.AncientData.{InputStreamReader, StreamReader, StreamWriter}
+import nirvana.hall.c.services.AncientData._
 import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
@@ -33,15 +33,12 @@ object AncientData extends WrapAsStreamWriter{
   val STRING_CLASS = typeOf[String]
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
-  type StreamReader = {
+  trait StreamReader {
     def readByte(): Byte
     def readShort(): Short
     def readInt(): Int
     def readLong(): Long
-    def markReaderIndex():Unit
-    def resetReaderIndex():Unit
-  }
-  trait MarkStreamReaderSupport{
+    def readByteArray(len: Int): Array[Byte]
     def markReaderIndex():Unit
     def resetReaderIndex():Unit
   }
@@ -60,7 +57,7 @@ object AncientData extends WrapAsStreamWriter{
       readByteArray(is,data,size-n,n)
     }
   }
-  class InputStreamReader(is:InputStream){
+  class InputStreamReader(is:InputStream) extends StreamReader{
     def readByteArray(len: Int): Array[Byte] = {
       val data = new Array[Byte](len)
       AncientData.readByteArray(is,data,len)
@@ -87,15 +84,50 @@ object AncientData extends WrapAsStreamWriter{
     def markReaderIndex():Unit={is.mark(1000)}
     def resetReaderIndex():Unit={is.reset()}
   }
+  class ImageInputStreamReader(is:ImageInputStream) extends StreamReader{
+    def readByte(): Byte = is.readByte()
+    def readShort(): Short = is.readShort()
+    def readInt(): Int = is.readInt()
+    def readLong(): Long = is.readLong()
+    def markReaderIndex():Unit={is.mark()}
+    def resetReaderIndex():Unit={is.reset()}
+    def readByteArray(len: Int): Array[Byte] = {
+      val r = new Array[Byte](len)
+      is.readFully(r)
+      r
+    }
+  }
+  class DataSourceReader(is:IDataSource) extends StreamReader{
+    def readByte(): Byte = is.readByte()
+    def readShort(): Short = is.readShort()
+    def readInt(): Int = is.readInt()
+    def readLong(): Long = is.readLong()
+    def markReaderIndex():Unit={throw new UnsupportedOperationException}
+    def resetReaderIndex():Unit={throw new UnsupportedOperationException}
+    def readByteArray(len: Int): Array[Byte] =  is.readBytesByLength(len)
+  }
+  class ChannelBufferReader(is:ChannelBuffer) extends StreamReader{
+    def readByte(): Byte = is.readByte()
+    def readShort(): Short = is.readShort()
+    def readInt(): Int = is.readInt()
+    def readLong(): Long = is.readLong()
+    def markReaderIndex():Unit={is.markReaderIndex()}
+    def resetReaderIndex():Unit={is.resetReaderIndex()}
+    def readByteArray(len: Int): Array[Byte] =  {val r=new Array[Byte](len);is.readBytes(r);r}
+  }
 }
 
 /**
  * wrap netty's ChannelBuffer and xSocket's IDataSink
  */
 trait WrapAsStreamWriter {
+  implicit def asStreamReader(is:IDataSource):StreamReader = new DataSourceReader(is)
+  implicit def asStreamReader(is:ChannelBuffer):StreamReader = new ChannelBufferReader(is)
   implicit def asStreamReader(is:InputStream):StreamReader = {
     if(is.markSupported()) new InputStreamReader(is) else new InputStreamReader(new BufferedInputStream(is))
   }
+  implicit def asStreamReader(is:ImageInputStream):StreamReader = new ImageInputStreamReader(is)
+
   implicit def asStreamWriter(output: OutputStream): StreamWriter = new {
     private val arr = new Array[Byte](8)
     private val tmp = ByteBuffer.wrap(arr)
@@ -345,20 +377,7 @@ trait ScalaReflect{
     }
     stream
   }
-  protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]={
-    dataSource match{
-      case ds:IDataSource =>
-        ds.readBytesByLength(len)
-      case channel:ChannelBuffer =>
-        channel.readBytes(len).array()
-      case isr:InputStreamReader =>
-        isr.readByteArray(len)
-      case iis:ImageInputStream=>
-        val r = new Array[Byte](len)
-        iis.readFully(r)
-        r
-    }
-  }
+  protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]= dataSource.readByteArray(len)
   /**
    * convert channel buffer data as object
    * @param dataSource netty channel buffer
@@ -417,26 +436,17 @@ trait ScalaReflect{
   }
 }
 
+
 trait Model
 object Model {
   implicit class StreamSupport[M <: Model](val model: M) extends AnyVal {
-    def getDataSize:Int = macro AncientDataMacroDefine.getDataSizeImpl[M,Model,IgnoreTransfer,Length]
-    def writeToStreamWriter[T <: StreamWriter](dataSink:T):T= macro AncientDataMacroDefine.writeStream[M,T,Model,IgnoreTransfer,Length]
-    def fromStreamReader[T <: StreamReader](dataSource:T):M= macro AncientDataMacroDefine.readStream[M,T,Model,IgnoreTransfer,Length]
-    def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]={
-      dataSource match{
-        case ds:IDataSource =>
-          ds.readBytesByLength(len)
-        case channel:ChannelBuffer =>
-          channel.readBytes(len).array()
-        case isr:InputStreamReader =>
-          isr.readByteArray(len)
-        case iis:ImageInputStream=>
-          val r = new Array[Byte](len)
-          iis.readFully(r)
-          r
-      }
-    }
+    def getDataSize: Int = macro AncientDataMacroDefine.getDataSizeImpl[M, Model, IgnoreTransfer, Length]
+
+    def writeToStreamWriter[T <: StreamWriter](dataSink: T): T = macro AncientDataMacroDefine.writeStream[M, T, Model, IgnoreTransfer, Length]
+
+    def fromStreamReader[T <: StreamReader](dataSource: T): M = macro AncientDataMacroDefine.readStream[M, T, Model, IgnoreTransfer, Length]
+
+    def readBytesFromStreamReader(dataSource: StreamReader, len: Int): Array[Byte] = dataSource.readByteArray(len)
   }
 }
 

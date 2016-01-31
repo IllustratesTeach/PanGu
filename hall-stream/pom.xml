@@ -43,6 +43,10 @@
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.11</artifactId>
+    </dependency>
     <!-- tapestry framework -->
     <dependency>
       <groupId>org.apache.tapestry</groupId>

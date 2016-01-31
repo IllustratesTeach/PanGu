@@ -104,6 +104,7 @@
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
       </dependency>
+
       <dependency>
         <groupId>org.apache.tapestry</groupId>
         <artifactId>tapestry-core</artifactId>
@@ -130,6 +131,12 @@
         <groupId>net.spy</groupId>
         <artifactId>spymemcached</artifactId>
         <version>2.11.4</version>
+      </dependency>
+      <!-- spark library -->
+      <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-core_2.11</artifactId>
+        <version>1.6.0</version>
       </dependency>
       <!-- disruptor -->
       <dependency>
@@ -273,17 +280,17 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.5</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.5</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.5</version>
       </dependency>
       <!-- zookeeper -->
       <dependency>
