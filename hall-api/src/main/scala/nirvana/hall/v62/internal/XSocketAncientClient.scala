@@ -18,11 +18,7 @@ import scala.reflect._
  */
 class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTimeoutSecs:Int) extends AncientClient with LoggerSupport{
   def executeInChannel[T](action:ChannelOperator=>T): T={
-    val connection = new BlockingConnection(InetAddress.getByName(host),port,connectionTimeoutSecs*1000) with MarkStreamReaderSupport{
-      override def markReaderIndex(): Unit = markReadPosition()
-
-      override def resetReaderIndex(): Unit = removeReadMark()
-    }
+    val connection = new BlockingConnection(InetAddress.getByName(host),port,connectionTimeoutSecs*1000)
     connection.setReadTimeoutMillis(readTimeoutSecs * 1000)
     val channelHolder = new XSocketChannelOperator(connection)
     try{
@@ -31,7 +27,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
       connection.close()
     }
   }
-  class XSocketChannelOperator(connection:IBlockingConnection with MarkStreamReaderSupport) extends ChannelOperator{
+  class XSocketChannelOperator(connection:IBlockingConnection) extends ChannelOperator{
     /**
      * write message to channel
      * @param data data written

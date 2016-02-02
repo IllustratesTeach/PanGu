@@ -3,13 +3,13 @@ package nirvana.hall.v62.services
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicReferenceArray
 
-import nirvana.hall.c.annotations.{Length, IgnoreTransfer}
-import nirvana.hall.c.services.{ScalaReflect, AncientData}
+import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 import org.xsocket.datagram.UserDatagram
-import AncientData._
 
 /**
  *
@@ -101,7 +101,7 @@ class AncientDataTest {
   }
 }
 
-class M extends ScalaReflect{
+class M extends AncientData{
   var i:Int = _
   var s:Short = _
   @IgnoreTransfer
@@ -116,11 +116,11 @@ class M extends ScalaReflect{
 
 }
 //2
-class N extends ScalaReflect {
+class N extends AncientData {
   @Length(2)
   var aN:Array[Byte]= _
 }
-class Wrong extends ScalaReflect {
+class Wrong extends AncientData {
   @Length(19)
   var m:Int = _
 }
