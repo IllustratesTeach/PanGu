@@ -9,12 +9,12 @@ import javax.imageio.stream.ImageInputStream
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData._
-import nirvana.hall.orm.services.AncientDataMacroDefine
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.{IDataSink, IDataSource}
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
+import scala.language.reflectiveCalls
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
@@ -29,7 +29,7 @@ import scala.reflect.runtime.universe.definitions._
  */
 object AncientData extends WrapAsStreamWriter{
   //global scala reflect mirror
-  val mirror = universe.runtimeMirror(getClass.getClassLoader)
+  val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   val STRING_CLASS = typeOf[String]
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
@@ -201,6 +201,7 @@ trait WrapAsStreamWriter {
 
 trait ScalaReflect{
   private val instanceMirror = AncientData.mirror.reflect(this)
+//  private val clazzSymbol = typeOf[this.type].typeSymbol
   private val clazzSymbol = instanceMirror.symbol
   private val clazzType = clazzSymbol.asType.toType
 
@@ -223,10 +224,10 @@ trait ScalaReflect{
       value
     }
     tpe match {
-      case ByteTpe => throwExceptionIfLengthGTZeroOrGet(1)
-      case ShortTpe | CharTpe => throwExceptionIfLengthGTZeroOrGet(2)
-      case IntTpe => throwExceptionIfLengthGTZeroOrGet(4)
-      case LongTpe => throwExceptionIfLengthGTZeroOrGet(8)
+      case t if t<:< ByteTpe => throwExceptionIfLengthGTZeroOrGet(1)
+      case t if t<:< ShortTpe | t <:< CharTpe => throwExceptionIfLengthGTZeroOrGet(2)
+      case t if t <:< IntTpe => throwExceptionIfLengthGTZeroOrGet(4)
+      case t if t <:< LongTpe => throwExceptionIfLengthGTZeroOrGet(8)
       case AncientData.STRING_CLASS =>
         returnLengthOrThrowException
       case t if t <:< typeOf[ScalaReflect] =>
@@ -252,7 +253,7 @@ trait ScalaReflect{
           finalLength
         }
       case other =>
-        throw new IllegalArgumentException("type is not supported "+other)
+        throw new IllegalArgumentException("type is not supported "+other+" for:"+term)
     }
   }
 
@@ -262,7 +263,7 @@ trait ScalaReflect{
    */
   def getDataSize:Int={
     if(dataSize == 0) {
-      dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol,symbol.info,length)).sum
+      dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol,symbol.asTerm.typeSignature,length)).sum
     }
     dataSize
   }
@@ -344,10 +345,10 @@ trait ScalaReflect{
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val value = instanceMirror.reflectField(termSymbol).get
       tpe match {
-        case ByteTpe => dataSink.writeByte(value.asInstanceOf[Byte])
-        case ShortTpe | CharTpe => dataSink.writeShort(value.asInstanceOf[Short])
-        case IntTpe => dataSink.writeInt(value.asInstanceOf[Int])
-        case LongTpe => dataSink.writeLong(value.asInstanceOf[Long])
+        case t if t <:< ByteTpe => dataSink.writeByte(value.asInstanceOf[Byte])
+        case t if t <:< ShortTpe | t <:< CharTpe => dataSink.writeShort(value.asInstanceOf[Short])
+        case t if t <:< IntTpe => dataSink.writeInt(value.asInstanceOf[Int])
+        case t if t <:< LongTpe => dataSink.writeLong(value.asInstanceOf[Long])
         case AncientData.STRING_CLASS =>
           writeString(value.asInstanceOf[String],returnLengthOrThrowException)
         case t if t <:< typeOf[ScalaReflect] => //inherit ScalaReflect
@@ -397,10 +398,10 @@ trait ScalaReflect{
       val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
       val field = instanceMirror.reflectField(termSymbol)
       tpe match {
-        case ByteTpe => field.set(dataSource.readByte())
-        case ShortTpe | CharTpe => field.set(dataSource.readShort())
-        case IntTpe => field.set(dataSource.readInt())
-        case LongTpe => field.set(dataSource.readLong())
+        case t if t <:< ByteTpe => field.set(dataSource.readByte())
+        case t if t <:< ShortTpe | t<:< CharTpe => field.set(dataSource.readShort())
+        case t if t<:< IntTpe => field.set(dataSource.readInt())
+        case t if t<:< LongTpe => field.set(dataSource.readLong())
         case AncientData.STRING_CLASS =>
           val bytes = readByteArray(returnLengthOrThrowException)
           field.set(new String(bytes,encoding).trim)
@@ -437,6 +438,7 @@ trait ScalaReflect{
 }
 
 
+/*
 trait Model
 object Model {
   implicit class StreamSupport[M <: Model](val model: M) extends AnyVal {
@@ -449,6 +451,7 @@ object Model {
     def readBytesFromStreamReader(dataSource: StreamReader, len: Int): Array[Byte] = dataSource.readByteArray(len)
   }
 }
+*/
 
 trait AncientData extends ScalaReflect{}
 //trait AncientData extends Model
