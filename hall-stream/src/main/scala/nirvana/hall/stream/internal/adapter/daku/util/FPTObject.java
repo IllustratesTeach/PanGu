@@ -177,7 +177,6 @@ public final class FPTObject {
         }else{
             throw new RuntimeException("FPT文件格式错误");
         }
-        in.close();
         return fptObject;
     }
     /**

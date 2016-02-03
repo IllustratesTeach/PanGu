@@ -15,4 +15,6 @@ object DakuSymobls {
   val FPT_DIR="hall.stream.daku.fpt.dir"
 
   val ERROR_FPT_DIR="hall.stream.daku.error.dir"
+
+  val FPT_FILE_SERVER = "hall.stream.daku.fpt.file.server"
 }

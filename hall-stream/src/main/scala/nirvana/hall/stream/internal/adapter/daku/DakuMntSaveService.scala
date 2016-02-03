@@ -1,6 +1,7 @@
 package nirvana.hall.stream.internal.adapter.daku
 
 import java.io.{File, PrintWriter}
+import java.util.Date
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
@@ -9,6 +10,7 @@ import nirvana.hall.c.services.kernel.mnt_def.{FINGERMNTSTRUCT_NEWTT, FINGERMNTS
 import nirvana.hall.stream.internal.adapter.daku.util.FPTObject
 import nirvana.hall.stream.services.FeatureSaverService
 import nirvana.hall.support.services.JdbcDatabase
+import org.apache.commons.io.FileUtils
 import org.apache.tapestry5.ioc.annotations.InjectService
 import org.springframework.transaction.PlatformTransactionManager
 
@@ -31,16 +33,27 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
       val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date,data_in) values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate,2)"
 
       //debug("save record with id {}",id)
-      val pid_fgp = id.asInstanceOf[String].substring(0,id.asInstanceOf[String].indexOf("&"))
-      val arr = pid_fgp.asInstanceOf[String].split("_")
+
+      val fpt_path = id.toString.substring(id.toString.indexOf("&")+1)
+      val pid_fgp = id.toString.substring(0,id.toString.indexOf("&"))
+      val arr = pid_fgp.toString.split("_")
       val personId = arr(0)
+
       val fgp = arr(1).toInt
       var fgpDB = fgp
       if (fgpDB > 10) fgpDB -= 10
       var fgpCase = 0
       if (fgp > 10) fgpCase = 1
+
+
+      val featureBytes= feature.toByteArray
+      val featureStruct = new FINGERMNTSTRUCT_NEWTT
+      featureStruct.fromByteArray(featureBytes)
+      info("minuita number is {} for {}",featureStruct.MNT.cm.toInt,pid_fgp)
+
+
       implicit val ds = dataSource
-      //保存人员信息(确认特征提取成功后新增人员信息，多线程操作可能存在问题)
+      //保存人员信息
       val pid = queryPersonIfById(personId)
       if (pid == null || "".equals(pid)) {
         try {
@@ -48,6 +61,9 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
           JdbcDatabase.update(savePersonSql) { ps =>
             ps.setString(1, personId)
           }
+          val recordProcessLineFile = new File("recordProcessLine.txt")
+          FileUtils.writeStringToFile(recordProcessLineFile,"process file:["+fpt_path+"],date:"+new Date);
+          println("record process file and line:"+fpt_path)
         }
         catch {
           case e:Throwable=>
@@ -56,12 +72,7 @@ class DakuMntSaveService(@InjectService("MntDataSource") dataSource:DataSource,p
         }
 
       }
-      val featureBytes= feature.toByteArray
-      //if(logger.isDebugEnabled()){
-        val featureStruct = new FINGERMNTSTRUCT_NEWTT
-        featureStruct.fromByteArray(featureBytes)
-        info("minuita number is {} for {}",featureStruct.MNT.cm.toInt,pid_fgp)
-      //}
+
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
         ps.setString(1,personId)
