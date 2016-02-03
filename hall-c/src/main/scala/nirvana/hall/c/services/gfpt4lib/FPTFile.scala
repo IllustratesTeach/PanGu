@@ -35,8 +35,11 @@ object FPTFile {
   def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.UTF8_ENCODING): Either[FPT3File,FPT4File]= {
     val streamReader:StreamReader = stream
     val head = new FPTHead
+    if(stream.available() < head.getDataSize){
+      throw new IllegalArgumentException("file length(%s) too small ".format(stream.available()))
+    }
     streamReader.markReaderIndex()
-    head.fromStreamReader(stream,encoding)
+    head.fromStreamReader(streamReader,encoding)
     streamReader.resetReaderIndex()
 
     if(head.flag != FPT_FLAG)

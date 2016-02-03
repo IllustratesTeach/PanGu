@@ -1,10 +1,12 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.io.{File, FileInputStream}
+
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPT3File.{FPT3File, Logic1Rec}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 /**
@@ -13,6 +15,23 @@ import org.junit.{Assert, Test}
  * @since 2016-01-27
  */
 class FPTFileTest {
+  @Test
+  def test_performance: Unit ={
+    val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/fpt-file"),Array[String]("fpt","FPT"),true)
+    val it = files.iterator()
+    while(it.hasNext){
+      val file = it.next()
+      println("processing "+file.getName)
+      try {
+        val is = new FileInputStream(file)
+        FPTFile.parseFromInputStream(is)
+        IOUtils.closeQuietly(is)
+      }catch{
+        case e:Throwable=>
+          e.printStackTrace()
+      }
+    }
+  }
   @Test
   def test_parse: Unit ={
     val is = getClass.getResourceAsStream("/fpt3.fpt")
