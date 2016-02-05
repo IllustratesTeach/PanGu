@@ -262,6 +262,7 @@ trait ScalaReflect{
    * @return data size
    */
   def getDataSize:Int={
+    //TODO 针对@LengthRef类型的需要重新计算
     if(dataSize == 0) {
       dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol,symbol.asTerm.typeSignature,length)).sum
     }
