@@ -1,11 +1,7 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import java.nio.charset.Charset
-
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
+import nirvana.hall.c.annotations.{Length, LengthRef}
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
 
 /**
@@ -22,38 +18,99 @@ object FPT4File {
   }
   class FPT4File extends AncientData {
     var head: FPTHead = new FPTHead
-    var logic01Rec = new Logic01Rec
-    @IgnoreTransfer
+    //var logic01Rec = new Logic01Rec
+    @Length(12)
+    var fileLength: String = _
+    @Length(2)
+    var dataType: String = "1"
+    @Length(6)
+    var tpCount: String = _
+    @Length(6)
+    var lpCount: String = _
+
+    @Length(6)
+    var tl_ltCount: String = _
+    @Length(6)
+    var ttCount: String = _
+    @Length(6)
+    var llCount: String = _
+    @Length(6)
+    var lpRequestCount: String = _
+    @Length(6)
+    var tpRequestCount: String = _
+    @Length(6)
+    var ltCandidateCount: String = _
+    @Length(6)
+    var tlCandidateCount: String = _
+    @Length(6)
+    var ttCandidateCount: String = _
+    @Length(6)
+    var llCandidateCount: String = _
+    @Length(6)
+    var customCandidateCount: String = _
+
+
+    @Length(14)
+    var sendTime: String = _
+    @Length(12)
+    var receiveUnitCode: String = _
+    @Length(12)
+    var sendUnitCode: String = _
+    @Length(70)
+    var sendUnitName: String = _
+    @Length(30)
+    var sender: String = _
+    /**
+     * 发送单位系统类型
+     * 1900 东方金指
+     * 1300 北大高科
+     * 1700 北京海鑫
+     * 1800 小日本NEC
+     * 1200 北京邮电大学
+     * 1100 北京刑科所
+     */
+    @Length(4)
+    var sendUnitSystemType: String = _
+    @Length(10)
+    var sid: String = _
+    @Length(512)
+    var remark: String = _
+    var fs: Byte = FPTFile.FS //FS
+
+    @LengthRef("tpCount")
     var logic02Recs: Array[Logic02Rec] = _
-    @IgnoreTransfer
+    @LengthRef("lpCount")
     var logic03Recs: Array[Logic03Rec] = _
-    @IgnoreTransfer
+
+    @LengthRef("tl_ltCount")
     var logic04Recs: Array[Logic04Rec] = _
-    @IgnoreTransfer
+    @LengthRef("ttCount")
     var logic05Recs: Array[Logic05Rec] = _
-    @IgnoreTransfer
+    @LengthRef("llCount")
     var logic06Recs: Array[Logic06Rec] = _
-    @IgnoreTransfer
+    @LengthRef("lpRequestCount")
     var logic07Recs: Array[Logic07Rec] = _
-    @IgnoreTransfer
+    @LengthRef("tpRequestCount")
     var logic08Recs: Array[Logic08Rec] = _
-    @IgnoreTransfer
+    @LengthRef("ltCandidateCount")
     var logic09Recs: Array[Logic09Rec] = _
-    @IgnoreTransfer
+    @LengthRef("tlCandidateCount")
     var logic10Recs: Array[Logic10Rec] = _
-    @IgnoreTransfer
+    @LengthRef("ttCandidateCount")
     var logic11Recs: Array[Logic11Rec] = _
-    @IgnoreTransfer
+    @LengthRef("llCandidateCount")
     var logic12Recs: Array[Logic12Rec] = _
-    @IgnoreTransfer
+    @LengthRef("customCandidateCount")
     var logic99Recs: Array[Logic99Rec] = _
 
+    /*
     /**
      * calculate data size and return.
      * @return data size
      */
     override def getDataSize: Int = {
       var count = super.getDataSize
+      /*
       Array(logic02Recs,
         logic03Recs,
         logic04Recs,
@@ -68,6 +125,7 @@ object FPT4File {
         logic99Recs)
         .filterNot(_ == null)
         .foreach(_.foreach(count += _.getDataSize))
+        */
 
       count
     }
@@ -78,6 +136,7 @@ object FPT4File {
      */
     override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
       super.writeToStreamWriter(stream)
+      /*
       Array(logic02Recs,
         logic03Recs,
         logic04Recs,
@@ -92,6 +151,7 @@ object FPT4File {
         logic99Recs)
         .filterNot(_ == null)
         .foreach(_.foreach(_.writeToStreamWriter(stream)))
+        */
 
       stream
     }
@@ -103,6 +163,7 @@ object FPT4File {
      */
     override def fromStreamReader(dataSource: StreamReader, encoding: Charset = AncientConstants.UTF8_ENCODING): this.type = {
       super.fromStreamReader(dataSource, encoding)
+      /*
 
       logic02Recs = FPTFile.readLogic[Logic02Rec](logic01Rec.tpCount, dataSource, encoding)
       logic03Recs = FPTFile.readLogic[Logic03Rec](logic01Rec.lpCount, dataSource, encoding)
@@ -116,9 +177,11 @@ object FPT4File {
       logic11Recs = FPTFile.readLogic[Logic11Rec](logic01Rec.ttCandidateCount, dataSource, encoding)
       logic12Recs = FPTFile.readLogic[Logic12Rec](logic01Rec.llCandidateCount, dataSource, encoding)
       logic99Recs = FPTFile.readLogic[Logic99Rec](logic01Rec.customCandidateCount, dataSource, encoding)
+      */
 
       this
     }
+    */
   }
 
   class Logic01Rec extends AncientData {
@@ -278,7 +341,7 @@ object FPT4File {
 
     // GS
     override protected def getFingerDataCount: Int = {
-      if (sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
+      if (sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
     }
   }
 
@@ -325,7 +388,6 @@ object FPT4File {
     var imgDataLength: String = _
     @LengthRef("imgDataLength")
     var imgData: String = _
-    @Length(1)
     var end: Byte = FPTFile.GS
   }
 
@@ -392,7 +454,7 @@ object FPT4File {
 
     // GS
     override protected def getFingerDataCount: Int = {
-      if (sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
+      if (sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
     }
   }
 

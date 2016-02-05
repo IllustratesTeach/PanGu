@@ -24,8 +24,23 @@ class FPTFileTest {
       println("processing "+file.getName)
       try {
         val is = new FileInputStream(file)
-        FPTFile.parseFromInputStream(is)
+        val result = FPTFile.parseFromInputStream(is)
         IOUtils.closeQuietly(is)
+        result match{
+          case Right(fpt4)=>
+            assert(fpt4.fileLength.toInt == fpt4.getDataSize)
+            val tpCount = fpt4.tpCount.toInt
+            if(tpCount > 0){
+              assert(tpCount == fpt4.logic02Recs.size)
+              fpt4.logic02Recs.foreach{tp=>
+                val fingerCount = tp.sendFingerCount.toInt
+                assert(fingerCount == tp.fingers.size)
+                tp.fingers.foreach{tData=>
+                  println("compress method "+tData.imgCompressMethod)
+                }
+              }
+            }
+        }
       }catch{
         case e:Throwable=>
           e.printStackTrace()
@@ -59,5 +74,6 @@ class FPTFileTest {
     val fpt4 = new FPT4File
     fpt4.fromStreamReader(getClass.getResourceAsStream("/fpt4.fpt")) //,AncientConstants.GBK_ENCODING)
     Assert.assertEquals(fpt4.logic02Recs.head.fingers.size ,fpt4.logic02Recs.head.sendFingerCount.toInt)
+    Assert.assertEquals(fpt4.getDataSize,fpt4.fileLength.toInt)
   }
 }
