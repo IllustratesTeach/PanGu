@@ -19,6 +19,7 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.universe.definitions._
+import scala.util.control.NonFatal
 
 
 /**
@@ -304,7 +305,12 @@ trait ScalaReflect{
       if(length.isDefined  && lengthRef.isDefined )
         throw new IllegalStateException("@Length and @LengthRef both defined at "+m)
       //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
-      processor(m,if(length.isDefined) length else lengthRef)
+      try {
+        processor(m, if (length.isDefined) length else lengthRef)
+      }catch{
+        case NonFatal(e)=>
+          throw new RuntimeException("fail to process "+m,e)
+      }
     }.toArray
   }
   private def createAncientDataByType(t: universe.Type): ScalaReflect = {
