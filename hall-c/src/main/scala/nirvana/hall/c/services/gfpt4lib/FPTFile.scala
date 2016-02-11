@@ -14,6 +14,8 @@ import scala.language.reflectiveCalls
 import scala.reflect._
 import nirvana.hall.c.services.AncientData._
 
+import scala.util.control.NonFatal
+
 /**
  * fpt file
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -25,6 +27,11 @@ object FPTFile {
   val FPT_FLAG="FPT"
   val FPT_V3="03"
   val FPT_V4="04"
+  class FPTParseException(message:String,cause:Throwable) extends RuntimeException(message,cause){
+    def this(message:String){
+      this(message,null)
+    }
+  }
 
   /**
    * parse fpt file from InputStream
@@ -36,21 +43,26 @@ object FPTFile {
     val streamReader:StreamReader = stream
     val head = new FPTHead
     if(stream.available() < head.getDataSize){
-      throw new IllegalArgumentException("file length(%s) too small ".format(stream.available()))
+      throw new FPTParseException("file length(%s) too small ".format(stream.available()))
     }
-    streamReader.markReaderIndex()
-    head.fromStreamReader(streamReader,encoding)
-    streamReader.resetReaderIndex()
+    try {
+      streamReader.markReaderIndex()
+      head.fromStreamReader(streamReader, encoding)
+      streamReader.resetReaderIndex()
 
-    if(head.flag != FPT_FLAG)
-      throw new IllegalArgumentException("FPT expected.")
-    head.majorVersion match{
-      case FPT_V3=>
-        Left(new FPT3File().fromStreamReader(streamReader,encoding))
-      case FPT_V4 =>
-        Right(new FPT4File().fromStreamReader(streamReader,encoding))
-      case other =>
-        throw new UnsupportedOperationException(other+" unsupported,only 03 or 04.")
+      if (head.flag != FPT_FLAG)
+        throw new IllegalArgumentException("FPT expected.")
+      head.majorVersion match {
+        case FPT_V3 =>
+          Left(new FPT3File().fromStreamReader(streamReader, encoding))
+        case FPT_V4 =>
+          Right(new FPT4File().fromStreamReader(streamReader, encoding))
+        case other =>
+          throw new UnsupportedOperationException(other + " unsupported,only 03 or 04.")
+      }
+    }catch{
+      case NonFatal(e)=>
+        throw new FPTParseException(e.toString,e)
     }
   }
   private[gfpt4lib] def readLogic[T <:AncientData : ClassTag](strNum:String,dataSource:StreamReader,encoding:Charset): Array[T]={

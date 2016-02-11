@@ -1,11 +1,7 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import java.nio.charset.Charset
-
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
+import nirvana.hall.c.annotations.{Length, LengthRef}
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
 
 import scala.language.reflectiveCalls
@@ -24,55 +20,6 @@ object FPT3File {
   }
   class FPT3File extends AncientData {
     var head: FPTHead = new FPTHead
-    var logic1Rec = new Logic1Rec
-    @IgnoreTransfer
-    var logic2Recs: Array[Logic2Rec] = _
-    @IgnoreTransfer
-    var logic3Recs: Array[Logic3Rec] = _
-
-    /**
-     * calculate data size and return.
-     * @return data size
-     */
-    override def getDataSize: Int = {
-      var count = super.getDataSize
-      if (logic2Recs != null)
-        logic2Recs.foreach(count += _.getDataSize)
-      if (logic3Recs != null)
-        logic3Recs.foreach(count += _.getDataSize)
-
-      count
-    }
-
-    /**
-     * serialize to channel buffer
-     * @param stream netty channel buffer
-     */
-    override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
-      super.writeToStreamWriter(stream)
-      if (logic2Recs != null)
-        logic2Recs.foreach(_.writeToStreamWriter(stream))
-      if (logic3Recs != null)
-        logic3Recs.foreach(_.writeToStreamWriter(stream))
-
-      stream
-    }
-
-
-    /**
-     * convert channel buffer data as object
-     * @param dataSource netty channel buffer
-     */
-    override def fromStreamReader(dataSource: StreamReader, encoding: Charset = AncientConstants.UTF8_ENCODING): this.type = {
-      super.fromStreamReader(dataSource, encoding)
-      logic2Recs = FPTFile.readLogic[Logic2Rec](logic1Rec.lpCount,dataSource,encoding)
-      logic3Recs = FPTFile.readLogic[Logic3Rec](logic1Rec.tpCount,dataSource,encoding)
-
-      this
-    }
-  }
-
-  class Logic1Rec extends AncientData {
     @Length(12)
     var fileLength: String = _
     @Length(1)
@@ -106,7 +53,12 @@ object FPT3File {
     var sid: String = _
     @Length(512)
     var remark: String = _
-    var fs: Byte = FPTFile.FS //FS
+
+    var fs: Byte = FPTFile.FS
+    @LengthRef("lpCount")
+    var logic2Recs: Array[Logic2Rec] = _
+    @LengthRef("tpCount")
+    var logic3Recs: Array[Logic3Rec] = _
   }
 
   class Logic2Rec extends DynamicFingerData{
@@ -159,7 +111,7 @@ object FPT3File {
 
     // GS
     override protected def getFingerDataCount: Int = {
-      if(sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
+      if(sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
     }
   }
 
@@ -321,7 +273,7 @@ object FPT3File {
 
     // GS
     override protected def getFingerDataCount: Int = {
-      if(sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
+      if(sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
     }
   }
 }
