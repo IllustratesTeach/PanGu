@@ -4,7 +4,7 @@ import java.util.Date
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ByteString
-import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.api.internal.WebHttpClientUtils
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
@@ -106,10 +106,10 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
    */
   override def sendQuery(matchTask: MatchTask): Unit = {
     val key = matchTask.getMatchId.getBytes()
-    val pstKey = new GADB_KEYARRAY
-    pstKey.nKeyCount = 1
-    pstKey.nKeySize = key.size.asInstanceOf[Short]
-    pstKey.pKey_Data = key
+//    val pstKey = new GADB_KEYARRAY
+//    pstKey.nKeyCount = 1
+//    pstKey.nKeySize = key.size.asInstanceOf[Short]
+//    pstKey.pKey_Data = key
 
 //    val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
 //    val retval = facade.NET_GAFIS_QUERY_Submit(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
@@ -122,6 +122,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
 //    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct)
 //    new GafisQuery7to6(matchTask.getObjectId, oraSid).save()
 
+    WebHttpClientUtils.call("http://"+ip+":"+port, extension, request, responseBuilder)
     //TODO
     throw new UnsupportedOperationException
   }

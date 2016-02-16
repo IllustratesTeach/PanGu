@@ -16,8 +16,8 @@ class LPCardServiceImpl extends LPCardService{
    */
   override def addLPCard(lPCardAddRequest: LPCardAddRequest): LPCardAddResponse = {
     val lpCard = lPCardAddRequest.getCard
-    val caseFinger = ProtobufConverter.convertLPCard2CaseFinger(lpCard)
-    val caseFingerMnt = ProtobufConverter.convertLPCard2CaseFingerMnt(lpCard)
+    val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+    val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
     //TODO 记录操作信息，创建人等
     caseFinger.save()
@@ -47,8 +47,8 @@ class LPCardServiceImpl extends LPCardService{
    */
   override def updateLPCard(lPCardUpdateRequest: LPCardUpdateRequest): LPCardUpdateResponse = {
     val lpCard = lPCardUpdateRequest.getCard
-    val caseFinger = ProtobufConverter.convertLPCard2CaseFinger(lpCard)
-    val caseFingerMnt = ProtobufConverter.convertLPCard2CaseFingerMnt(lpCard)
+    val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+    val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
     //TODO 记录操作信息，创建人等
 //    caseFinger.save()

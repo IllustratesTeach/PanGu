@@ -13,6 +13,7 @@ class QueryServiceImpl extends QueryService{
    * @return
    */
   override def sendQuery(querySendRequest: QuerySendRequest): QuerySendResponse = {
+
     throw new UnsupportedOperationException
   }
 
