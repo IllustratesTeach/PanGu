@@ -1,33 +1,23 @@
 package nirvana.hall.v70.internal.sync
 
-import java.text.SimpleDateFormat
-import java.util.{Date, UUID}
+import java.util.UUID
 
 import com.google.protobuf.ByteString
 import nirvana.hall.orm.services.Relation
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.protocol.v62.FPTProto._
+import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.jpa._
+import org.jboss.netty.buffer.ChannelBuffers
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/28.
  */
 object ProtobufConverter {
-  /**
-   * protobuf的日期格式转换
-   * @param date yyyyMMddk
-   * @return
-   */
-  implicit def string2Date(date: String): Date= {
-    if (date != null && date.length == 8)
-      new SimpleDateFormat("yyyyMMdd").parse(date)
-    else null
-  }
-  implicit def string2Int(string: String): Int ={
-    if(isNonBlank(string))
-      Integer.parseInt(string)
-    else
-      0
-  }
 
   /**
    * 案件信息转换
@@ -95,7 +85,7 @@ object ProtobufConverter {
     caseBuilder.build()
   }
 
-  def convertLPCard2CaseFinger(lpCard: LPCard): GafisCaseFinger = {
+  def convertLPCard2GafisCaseFinger(lpCard: LPCard): GafisCaseFinger = {
     val caseFinger = new GafisCaseFinger()
     caseFinger.fingerId = lpCard.getStrCardID
     val text = lpCard.getText
@@ -113,7 +103,7 @@ object ProtobufConverter {
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray
     caseFinger
   }
-  def convertLPCard2CaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
+  def convertLPCard2GafisCaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
     //TODO 主键生成策略???
     val caseFingerMnt = new GafisCaseFingerMnt(UUID.randomUUID().toString)
     caseFingerMnt.fingerId = lpCard.getStrCardID
@@ -161,6 +151,7 @@ object ProtobufConverter {
   def convertGafisPerson2TPCard(person: GafisPerson, fingerList: Relation[GafisGatherFinger] = null): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
+    tpCard.setStrPersonID(person.personid)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
@@ -217,5 +208,115 @@ object ProtobufConverter {
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
     tpCard.build()
+  }
+
+  def convertTPCard2GafisPerson(tpCard: TPCard): GafisPerson={
+    val person = new GafisPerson()
+    person.personid = tpCard.getStrCardID
+    val text = tpCard.getText
+    person.name = text.getStrName
+    person.aliasname = text.getStrAliasName
+    person.sexCode = text.getNSex.toString
+    person.birthdayed = text.getStrBirthDate
+    person.idcardno = text.getStrIdentityNum
+    person.birthCode = text.getStrBirthAddrCode
+    person.birthdetail = text.getStrBirthAddr
+    person.address = text.getStrAddrCode
+    person.addressdetail = text.getStrAddr
+    person.personCategory = text.getStrPersonType
+    person.caseClasses = text.getStrCaseType1
+    person.caseClasses2 = text.getStrCaseType2
+    person.caseClasses3 = text.getStrCaseType3
+    person.gatherdepartcode = text.getStrPrintUnitCode
+    person.gatherdepartname = text.getStrPrintUnitName
+    person.gatherusername = text.getStrPrinter
+    person.gatherDate = text.getStrPrintDate
+    person.remark = text.getStrComment
+
+    person.nativeplaceCode = text.getStrNation//TODO ???字典
+    person.nationCode = text.getStrRace
+    person.certificatetype = text.getStrCertifType
+    person.certificateid = text.getStrCertifID
+
+    person.assistSign = text.getNXieChaFlag.toString
+    person.assistLevel = text.getNXieChaLevel.toString
+    person.assistBonus = text.getStrPremium
+    person.assistDate = text.getStrXieChaDate
+    person.assistDeptCode = text.getStrXieChaRequestUnitCode
+    person.assistDeptName = text.getStrXieChaRequestUnitName
+    person.assistPurpose = text.getStrXieChaForWhat
+    person.assistRefPerson = text.getStrRelPersonNo
+    person.assistRefCase = text.getStrRelCaseNo
+    person.validDate = text.getStrXieChaTimeLimit
+    person.assistContacts = text.getStrXieChaContacter
+    person.assistNumber = text.getStrXieChaTelNo
+    person.assistApproval = text.getStrShenPiBy
+
+    person
+  }
+
+  def convertTPCard2GafisGatherFinger(tpCard: TPCard): Seq[GafisGatherFinger] = {
+    val fingerList = new ArrayBuffer[GafisGatherFinger]()
+    val personId = tpCard.getStrCardID
+    val iter = tpCard.getBlobList.iterator()
+    while (iter.hasNext){
+      val blob = iter.next()
+      //指纹
+      val finger = new GafisGatherFinger()
+      finger.personId = personId
+      finger.gatherData = blob.getStImageBytes.toByteArray
+      finger.fgp = blob.getFgp.getNumber.toShort
+      finger.fgpCase = if(blob.getBPlain) "1" else "0"
+      finger.groupId = 1: Short
+      finger.lobtype = 1: Short
+      fingerList += finger
+      //特征
+      val mnt = new GafisGatherFinger()
+      mnt.personId = personId
+      mnt.gatherData = blob.getStImageBytes.toByteArray
+      mnt.fgp = blob.getFgp.getNumber.toShort
+      mnt.fgpCase = if(blob.getBPlain) "1" else "0"
+      mnt.groupId = 0: Short
+      mnt.lobtype = 0: Short
+      fingerList += mnt
+    }
+
+    fingerList.toSeq
+  }
+
+  def convertMatchTask2GafisNormalqueryQueryque(matchTask: MatchTask): GafisNormalqueryQueryque={
+
+    throw new UnsupportedOperationException
+  }
+
+  def convertGafisNormalqueryQueryque2MatchTask(gafisQuery: GafisNormalqueryQueryque): MatchTask = {
+
+    val matchTask = MatchTask.newBuilder()
+    matchTask.setMatchId(gafisQuery.keyid)
+    matchTask.setMatchType(MatchType.valueOf(gafisQuery.querytype+1))
+    matchTask.setObjectId(gafisQuery.oraSid)//必填项，现在用于存放oraSid
+    matchTask.setPriority(gafisQuery.priority.toInt)
+    matchTask.setScoreThreshold(gafisQuery.minscore)
+
+    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(gafisQuery.mic))
+    mics.foreach{mic =>
+      if(mic.bIsLatent == 1){
+        val ldata = LatentMatchData.newBuilder()
+        ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
+        matchTask.setLData(ldata)
+      }else{
+        mic.nItemType match {
+          case 1 =>
+            matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+          case 8 =>
+            matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData+10)
+          case 2 =>
+            //TODO 掌纹
+        }
+      }
+    }
+    matchTask.build()
+
+    throw new UnsupportedOperationException
   }
 }
