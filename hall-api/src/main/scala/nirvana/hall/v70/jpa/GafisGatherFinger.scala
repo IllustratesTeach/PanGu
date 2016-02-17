@@ -57,8 +57,6 @@ class GafisGatherFinger extends ActiveRecord {
   var seq: java.lang.Long = _
   @Column(name = "FINGER_DATA_NOSQL_ID", length = 10)
   var fingerDataNosqlId: java.lang.String = _
-  @Column(name = "PARTITION_CITYCODE", length = 8)
-  var partitionCitycode: java.lang.String = _
 
 
   def this(pkId: java.lang.String, fgp: Short, lobtype: Short, inputtime: java.util.Date, gatherData: Array[Byte]) {
@@ -70,7 +68,7 @@ class GafisGatherFinger extends ActiveRecord {
     this.gatherData = gatherData
   }
 
-  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, fgpCase: java.lang.String, auditStatus: java.lang.Short, description: java.lang.String, mainPattern: java.lang.Short, vicePattern: java.lang.Short, gatherData: Array[Byte], seq: java.lang.Long, fingerDataNosqlId: java.lang.String, partitionCitycode: java.lang.String) {
+  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, fgpCase: java.lang.String, auditStatus: java.lang.Short, description: java.lang.String, mainPattern: java.lang.Short, vicePattern: java.lang.Short, gatherData: Array[Byte], seq: java.lang.Long, fingerDataNosqlId: java.lang.String) {
     this()
     this.pkId = pkId
     this.personId = personId
@@ -89,7 +87,6 @@ class GafisGatherFinger extends ActiveRecord {
     this.gatherData = gatherData
     this.seq = seq
     this.fingerDataNosqlId = fingerDataNosqlId
-    this.partitionCitycode = partitionCitycode
   }
 
 

@@ -1,9 +1,12 @@
 package nirvana.hall.v70.internal
 
+import java.util.Date
+
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.v62.lp.LPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
@@ -14,13 +17,22 @@ class LPCardServiceImpl extends LPCardService{
    * @param lPCardAddRequest
    * @return
    */
+  @Transactional
   override def addLPCard(lPCardAddRequest: LPCardAddRequest): LPCardAddResponse = {
     val lpCard = lPCardAddRequest.getCard
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
-    //TODO 记录操作信息，创建人等
+    //TODO 没有card_id
+    caseFinger.inputpsn = Gafis70Constants.INPUTPSN
+    caseFinger.inputtime = new Date()
+    caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
+
+    caseFingerMnt.pkId = CommonUtils.getUUID()
+    caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
+    caseFingerMnt.inputtime = new Date()
+    caseFingerMnt.isMainMnt = "1"
     caseFingerMnt.save()
 
     LPCardAddResponse.newBuilder().build()
@@ -45,17 +57,25 @@ class LPCardServiceImpl extends LPCardService{
    * @param lPCardUpdateRequest
    * @return
    */
+  @Transactional
   override def updateLPCard(lPCardUpdateRequest: LPCardUpdateRequest): LPCardUpdateResponse = {
     val lpCard = lPCardUpdateRequest.getCard
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
-    //TODO 记录操作信息，创建人等
-//    caseFinger.save()
-//    caseFingerMnt.save()
+    caseFinger.modifiedpsn = Gafis70Constants.INPUTPSN
+    caseFinger.modifiedtime = new Date()
+    caseFinger.deletag = Gafis70Constants.DELETAG_USE
+    caseFinger.save()
+
+    //先删除，后插入
+    GafisCaseFingerMnt.where("fingerId=?1", caseFinger.fingerId).delete
+    caseFingerMnt.pkId = CommonUtils.getUUID()
+    caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
+    caseFingerMnt.inputtime = new Date()
+    caseFingerMnt.save()
 
     LPCardUpdateResponse.newBuilder().build()
-    throw new UnsupportedOperationException
   }
 
   /**
@@ -63,6 +83,7 @@ class LPCardServiceImpl extends LPCardService{
    * @param lPCardDelRequest
    * @return
    */
+  @Transactional
   override def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse = {
     val cardId = lPCardDelRequest.getCardId
     GafisCaseFingerMnt.where("fingerId=?1", cardId).delete

@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v70.internal.filter
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.ProtobufRequestHandler
@@ -15,8 +15,11 @@ class LPCardFilterTest {
   val modules = Seq[String](
     "nirvana.hall.api.LocalProtobufModule",
     "nirvana.hall.api.LocalApiServiceModule",
-    "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
+    "nirvana.hall.orm.HallOrmModule",
+    "nirvana.hall.v70.internal.filter.TestModule",
+    "nirvana.hall.v70.LocalV70ServiceModule",
+    "nirvana.hall.v70.LocalDataSourceModule"
+  ).map(Class.forName)
   protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
 
   @Test

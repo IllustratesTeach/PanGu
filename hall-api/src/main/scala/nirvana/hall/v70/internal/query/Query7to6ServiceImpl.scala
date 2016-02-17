@@ -4,7 +4,6 @@ import java.util.Date
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.WebHttpClientUtils
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
@@ -122,7 +121,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
 //    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct)
 //    new GafisQuery7to6(matchTask.getObjectId, oraSid).save()
 
-    WebHttpClientUtils.call("http://"+ip+":"+port, extension, request, responseBuilder)
+//    WebHttpClientUtils.call("http://"+ip+":"+port, extension, request, responseBuilder)
     //TODO
     throw new UnsupportedOperationException
   }

@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v70.internal.filter
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.ProtobufRequestHandler
@@ -18,8 +18,11 @@ class TPCardFilterTest {
   val modules = Seq[String](
     "nirvana.hall.api.LocalProtobufModule",
     "nirvana.hall.api.LocalApiServiceModule",
-    "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
+    "nirvana.hall.orm.HallOrmModule",
+    "nirvana.hall.v70.internal.filter.TestModule",
+    "nirvana.hall.v70.LocalV70ServiceModule",
+    "nirvana.hall.v70.LocalDataSourceModule"
+  ).map(Class.forName)
   protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
   def test_add: Unit ={
@@ -51,8 +54,8 @@ class TPCardFilterTest {
     textBuilder.setStrPrinter ("1")
     textBuilder.setStrPrintDate ("20150121")
     textBuilder.setStrComment ("中国CHINA")
-    textBuilder.setStrNation ("CHINA")
-    textBuilder.setStrRace ("asdf")
+    textBuilder.setStrNation ("139")
+    textBuilder.setStrRace ("01")
     textBuilder.setStrCertifType ("1")
     textBuilder.setStrCertifID ("1")
     textBuilder.setBHasCriminalRecord (true)
@@ -62,7 +65,7 @@ class TPCardFilterTest {
     textBuilder.setStrXieChaRequestUnitName ("asdfasdf")
     textBuilder.setStrXieChaRequestUnitCode ("123")
     textBuilder.setNXieChaLevel (1)
-    textBuilder.setStrXieChaForWhat ("哈哈哈哈哈")
+    textBuilder.setStrXieChaForWhat ("11111")
     textBuilder.setStrRelPersonNo ("12")
     textBuilder.setStrRelCaseNo ("12")
     textBuilder.setStrXieChaTimeLimit ("12")
@@ -127,18 +130,18 @@ class TPCardFilterTest {
     textBuilder.setStrPrinter ("1")
     textBuilder.setStrPrintDate ("20150121")
     textBuilder.setStrComment ("中国CHINA")
-    textBuilder.setStrNation ("CHINA")
-    textBuilder.setStrRace ("asdf")
+    textBuilder.setStrNation ("100")
+    textBuilder.setStrRace ("01")
     textBuilder.setStrCertifType ("1")
     textBuilder.setStrCertifID ("1")
     textBuilder.setBHasCriminalRecord (true)
     textBuilder.setStrCriminalRecordDesc ("asdf")
-    textBuilder.setStrPremium ("asdf")
+    textBuilder.setStrPremium ("100")
     textBuilder.setNXieChaFlag (1)
     textBuilder.setStrXieChaRequestUnitName ("asdfasdf")
     textBuilder.setStrXieChaRequestUnitCode ("123")
     textBuilder.setNXieChaLevel (1)
-    textBuilder.setStrXieChaForWhat ("哈哈哈哈哈")
+    textBuilder.setStrXieChaForWhat ("11111")
     textBuilder.setStrRelPersonNo ("12")
     textBuilder.setStrRelCaseNo ("12")
     textBuilder.setStrXieChaTimeLimit ("12")

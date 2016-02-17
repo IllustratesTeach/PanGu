@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.protocol.v62.lp.LPCardProto._
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
@@ -12,6 +13,7 @@ trait LPCardService {
    * @param lPCardAddRequest
    * @return
    */
+  @Transactional
   def addLPCard(lPCardAddRequest: LPCardAddRequest): LPCardAddResponse
 
   /**
@@ -19,6 +21,7 @@ trait LPCardService {
    * @param lPCardDelRequest
    * @return
    */
+  @Transactional
   def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse
 
   /**
@@ -26,6 +29,7 @@ trait LPCardService {
    * @param lPCardUpdateRequest
    * @return
    */
+  @Transactional
   def updateLPCard(lPCardUpdateRequest: LPCardUpdateRequest): LPCardUpdateResponse
 
   /**

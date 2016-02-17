@@ -1,7 +1,5 @@
 package nirvana.hall.v70.internal.sync
 
-import java.util.UUID
-
 import com.google.protobuf.ByteString
 import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -79,7 +77,8 @@ object ProtobufConverter {
     textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
     textBuilder.setNCaseState(caseInfo.caseState)
 
-    fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
+    if(fingerIds != null)
+      fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
     caseBuilder.setNCaseFingerCount(caseBuilder.getStrFingerIDCount)
 
     caseBuilder.build()
@@ -92,7 +91,7 @@ object ProtobufConverter {
     caseFinger.seqNo = text.getStrSeq
     caseFinger.remainPlace = text.getStrRemainPlace
     caseFinger.ridgeColor = text.getStrRidgeColor
-    caseFinger.isCorpse = text.getBDeadBody.toString
+    caseFinger.isCorpse = if(text.getBDeadBody) "1" else "0"
     caseFinger.corpseNo = text.getStrDeadPersonNo
     caseFinger.isAssist = text.getNXieChaState.toString
     caseFinger.matchStatus = text.getNBiDuiState.toString
@@ -104,13 +103,11 @@ object ProtobufConverter {
     caseFinger
   }
   def convertLPCard2GafisCaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
-    //TODO 主键生成策略???
-    val caseFingerMnt = new GafisCaseFingerMnt(UUID.randomUUID().toString)
+    val caseFingerMnt = new GafisCaseFingerMnt()
     caseFingerMnt.fingerId = lpCard.getStrCardID
     val blob = lpCard.getBlob
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
     caseFingerMnt.captureMethod = blob.getStrMntExtractMethod
-    caseFingerMnt.deletag = "1"
 
     caseFingerMnt
   }
@@ -164,8 +161,7 @@ object ProtobufConverter {
     magicSet(person.birthCode, textBuilder.setStrBirthAddrCode)
     magicSet(person.birthdetail, textBuilder.setStrBirthAddr)
     magicSet(person.nationCode, textBuilder.setStrRace)
-    if(isNonBlank(person.nativeplaceCode))
-      textBuilder.setStrNation(CodeGj.find(person.nativeplaceCode).name)
+    magicSet(person.nativeplaceCode, textBuilder.setStrNation)
     magicSet(person.caseClasses, textBuilder.setStrCaseType1)
     magicSet(person.caseClasses2, textBuilder.setStrCaseType2)
     magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
@@ -233,7 +229,7 @@ object ProtobufConverter {
     person.gatherDate = text.getStrPrintDate
     person.remark = text.getStrComment
 
-    person.nativeplaceCode = text.getStrNation//TODO ???字典
+    person.nativeplaceCode = text.getStrNation
     person.nationCode = text.getStrRace
     person.certificatetype = text.getStrCertifType
     person.certificateid = text.getStrCertifID
@@ -273,7 +269,7 @@ object ProtobufConverter {
       //特征
       val mnt = new GafisGatherFinger()
       mnt.personId = personId
-      mnt.gatherData = blob.getStImageBytes.toByteArray
+      mnt.gatherData = blob.getStMntBytes.toByteArray
       mnt.fgp = blob.getFgp.getNumber.toShort
       mnt.fgpCase = if(blob.getBPlain) "1" else "0"
       mnt.groupId = 0: Short

@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.protocol.v62.lp.CaseProto._
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
@@ -12,6 +13,7 @@ trait CaseInfoService {
    * @param caseAddRequest
    * @return
    */
+  @Transactional
   def addCaseInfo(caseAddRequest: CaseAddRequest): CaseAddResponse
 
   /**
@@ -19,6 +21,7 @@ trait CaseInfoService {
    * @param caseDelRequest
    * @return
    */
+  @Transactional
   def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse
 
   /**
@@ -26,6 +29,7 @@ trait CaseInfoService {
    * @param caseUpdateRequest
    * @return
    */
+  @Transactional
   def updateCaseInfo(caseUpdateRequest: CaseUpdateRequest): CaseUpdateResponse
 
   /**

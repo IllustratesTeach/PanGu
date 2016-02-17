@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.protocol.v62.tp.TPCardProto._
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
@@ -12,6 +13,7 @@ trait TPCardService {
    * @param tPCardAddRequest
    * @return
    */
+  @Transactional
   def addTPCard(tPCardAddRequest: TPCardAddRequest): TPCardAddResponse
 
   /**
@@ -19,6 +21,7 @@ trait TPCardService {
    * @param tPCardDelRequest
    * @return
    */
+  @Transactional
   def delTPCard(tPCardDelRequest: TPCardDelRequest): TPCardDelResponse
 
   /**
@@ -26,6 +29,7 @@ trait TPCardService {
    * @param tPCardUpdateRequest
    * @return
    */
+  @Transactional
   def updateTPCard(tPCardUpdateRequest: TPCardUpdateRequest): TPCardUpdateResponse
 
   /**

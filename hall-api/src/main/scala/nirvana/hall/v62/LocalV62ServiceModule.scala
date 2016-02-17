@@ -1,10 +1,8 @@
 package nirvana.hall.v62
 
-import nirvana.hall.api.internal.filter.{QueryFilter, CaseInfoFilter, LPCardFilter, TPCardFilter}
 import nirvana.hall.api.services._
 import nirvana.hall.v62.internal._
-import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
-import org.apache.tapestry5.ioc.annotations.Contribute
+import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
  * local v62 service module
@@ -19,11 +17,4 @@ object LocalV62ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
   }
 
-  @Contribute(classOf[ProtobufRequestHandler])
-  def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
-    configuration.addInstance("TPCardAddFilter", classOf[TPCardFilter])
-    configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
-    configuration.addInstance("CaseFilter", classOf[CaseInfoFilter])
-    configuration.addInstance("QueryFilter", classOf[QueryFilter])
-  }
 }

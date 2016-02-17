@@ -1,11 +1,12 @@
 package nirvana.hall.v70.internal
 
-import java.util.{Date, UUID}
+import java.util.Date
 
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.v62.tp.TPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisPerson}
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
@@ -16,16 +17,18 @@ class TPCardServiceImpl extends TPCardService{
    * @param tPCardAddRequest
    * @return
    */
+  @Transactional
   override def addTPCard(tPCardAddRequest: TPCardAddRequest): TPCardAddResponse = {
     val tpCard = tPCardAddRequest.getCard
     val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
     person.inputtime = new Date()
-    person.inputpsn = "1"
+    person.inputpsn = Gafis70Constants.INPUTPSN
     person.save()
     fingerList.foreach{finger =>
-      finger.pkId = UUID.randomUUID().toString
+      finger.pkId = CommonUtils.getUUID()
       finger.inputtime = new Date()
+      finger.inputpsn = Gafis70Constants.INPUTPSN
       finger.save()
     }
 
@@ -37,6 +40,7 @@ class TPCardServiceImpl extends TPCardService{
    * @param tPCardDelRequest
    * @return
    */
+  @Transactional
   override def delTPCard(tPCardDelRequest: TPCardDelRequest): TPCardDelResponse = {
     val personId = tPCardDelRequest.getCardId
     //删除指纹
@@ -66,7 +70,26 @@ class TPCardServiceImpl extends TPCardService{
    * @param tPCardUpdateRequest
    * @return
    */
+  @Transactional
   override def updateTPCard(tPCardUpdateRequest: TPCardUpdateRequest): TPCardUpdateResponse = {
-    throw new UnsupportedOperationException
+    val tpCard = tPCardUpdateRequest.getCard
+    val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+    val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+
+    person.modifiedpsn = Gafis70Constants.INPUTPSN
+    person.modifiedtime = new Date()
+    person.deletag = Gafis70Constants.DELETAG_USE
+
+    //删除指纹
+    GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+
+    fingerList.foreach{finger =>
+      finger.pkId = CommonUtils.getUUID()
+      finger.inputtime = new Date()
+      finger.inputpsn = Gafis70Constants.INPUTPSN
+      finger.save()
+    }
+
+    TPCardUpdateResponse.newBuilder().build()
   }
 }
