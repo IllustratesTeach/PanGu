@@ -1,0 +1,390 @@
+package nirvana.hall.v70.internal.blob.coder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import nirvana.hall.v70.internal.blob.util.AFISHelper;
+
+public class CNTPCardTextIdCnv {
+	public static String toName(int id) {
+		switch (id) {
+		case 10:
+			return "ID";
+		case 11:
+			return "MISPERSONID";
+		case 12:
+			return "NAME";
+		case 13:
+			return "ALIAS";
+		case 14:
+			return "NAMEPINYIN";
+		case 15:
+			return "BIRTHDATE";
+		case 16:
+			return "SEXCODE";
+		case 17:
+			return "NATION";
+		case 18:
+			return "NATIONALITY";
+		case 19:
+			return "SHENFENID";
+		case 20:
+			return "CERTIFICATETYPE";
+		case 21:
+			return "CERTIFICATECODE";
+		case 22:
+			return "HUKOUPLACECODE";
+		case 23:
+			return "HUKOUPLACE";
+		case 24:
+			return "ADDRESSCODE";
+		case 25:
+			return "ADDRESS";
+		case 26:
+			return "CASECLASS1CODE";
+		case 27:
+			return "CASECLASS2CODE";
+		case 28:
+			return "CASECLASS3CODE";
+		case 29:
+			return "ISCRIMINALRECORD";
+		case 30:
+			return "PERSONCLASSCODE";
+		case 40:
+			return "PRINTDATE";
+		case 41:
+			return "PRINTERNAME";
+		case 42:
+			return "PRINTERUNITCODE";
+		case 43:
+			return "PRINTERUNITNAME";
+		case 50:
+			return "COMMENTS";
+		case 51:
+			return "CRIMINALRECORD";
+		case 52:
+			return "RCN";
+		case 53:
+			return "CASENUM";
+		case 100:
+			return "DBID";
+		case 101:
+			return "UPDATEUSER";
+		case 102:
+			return "UPDATETIME";
+		case 103:
+			return "IS_DNA_CAPTURED";
+		case 104:
+			return "DNA_1";
+		case 105:
+			return "DNA_2";
+		case 106:
+			return "FormerName1";
+		case 107:
+			return "FormerName2";
+		case 108:
+			return "FamilyName";
+		case 109:
+			return "GivenName";
+		case 110:
+			return "MiddleName";
+		case 111:
+			return "Height";
+		case 112:
+			return "FootLength";
+		case 113:
+			return "BloodType";
+		case 114:
+			return "Weight";
+		case 115:
+			return "Accent";
+		case 116:
+			return "HairColor";
+		case 117:
+			return "EyeColor";
+		case 118:
+			return "EducationLevel";
+		case 119:
+			return "EmployerName";
+		case 120:
+			return "EmployerAddress";
+		case 121:
+			return "EmployerUnitCode";
+		case 122:
+			return "HuKouPcsName";
+		case 123:
+			return "HuKouPcsUnitCode";
+		case 124:
+			return "ResidencePcsName";
+		case 125:
+			return "ResidencePcsUnitCode";
+		case 126:
+			return "MaritalStatus";
+		case 127:
+			return "Email1";
+		case 128:
+			return "Email2";
+		case 129:
+			return "ContactPhone1";
+		case 130:
+			return "ContactPhone2";
+		case 131:
+			return "DeathDate";
+		case 132:
+			return "BodyFeature";
+		case 133:
+			return "BodyType";
+		case 134:
+			return "HeadType";
+		case 135:
+			return "JobTitle";
+		case 136:
+			return "QQ";
+		case 137:
+			return "Occupation";
+		case 138:
+			return "BirthPlace";
+		case 139:
+			return "BirthPlaceUnitCode";
+		case 31:
+		case 32:
+		case 33:
+		case 34:
+		case 35:
+		case 36:
+		case 37:
+		case 38:
+		case 39:
+		case 44:
+		case 45:
+		case 46:
+		case 47:
+		case 48:
+		case 49:
+		case 54:
+		case 55:
+		case 56:
+		case 57:
+		case 58:
+		case 59:
+		case 60:
+		case 61:
+		case 62:
+		case 63:
+		case 64:
+		case 65:
+		case 66:
+		case 67:
+		case 68:
+		case 69:
+		case 70:
+		case 71:
+		case 72:
+		case 73:
+		case 74:
+		case 75:
+		case 76:
+		case 77:
+		case 78:
+		case 79:
+		case 80:
+		case 81:
+		case 82:
+		case 83:
+		case 84:
+		case 85:
+		case 86:
+		case 87:
+		case 88:
+		case 89:
+		case 90:
+		case 91:
+		case 92:
+		case 93:
+		case 94:
+		case 95:
+		case 96:
+		case 97:
+		case 98:
+		case 99:
+		}
+		return null;
+	}
+
+	public static Map<String, Object> toName(Map<Integer, Object> idMaps) {
+		if (AFISHelper.isEmpty(idMaps))
+			return null;
+
+		Map maps = new HashMap();
+
+		for (Map.Entry it : idMaps.entrySet()) {
+			String name;
+			if ((it.getKey() == null)
+					|| ((name = toName(((Integer) it.getKey()).intValue())) == null))
+				continue;
+			maps.put(name, it.getValue());
+		}
+		return maps.isEmpty() ? null : maps;
+	}
+
+	public static Integer toId(String name) {
+		if (AFISHelper.isEmpty(name))
+			return null;
+		if (name.equalsIgnoreCase("ID"))
+			return Integer.valueOf(10);
+		if (name.equalsIgnoreCase("MISPERSONID"))
+			return Integer.valueOf(11);
+		if (name.equalsIgnoreCase("NAME"))
+			return Integer.valueOf(12);
+		if (name.equalsIgnoreCase("ALIAS"))
+			return Integer.valueOf(13);
+		if (name.equalsIgnoreCase("NAMEPINYIN"))
+			return Integer.valueOf(14);
+		if (name.equalsIgnoreCase("BIRTHDATE"))
+			return Integer.valueOf(15);
+		if (name.equalsIgnoreCase("SEXCODE"))
+			return Integer.valueOf(16);
+		if (name.equalsIgnoreCase("NATION"))
+			return Integer.valueOf(17);
+		if (name.equalsIgnoreCase("NATIONALITY"))
+			return Integer.valueOf(18);
+		if (name.equalsIgnoreCase("SHENFENID"))
+			return Integer.valueOf(19);
+		if (name.equalsIgnoreCase("CERTIFICATETYPE"))
+			return Integer.valueOf(20);
+		if (name.equalsIgnoreCase("CERTIFICATECODE"))
+			return Integer.valueOf(21);
+		if (name.equalsIgnoreCase("HUKOUPLACECODE"))
+			return Integer.valueOf(22);
+		if (name.equalsIgnoreCase("HUKOUPLACE"))
+			return Integer.valueOf(23);
+		if (name.equalsIgnoreCase("ADDRESSCODE"))
+			return Integer.valueOf(24);
+		if (name.equalsIgnoreCase("ADDRESS"))
+			return Integer.valueOf(25);
+		if (name.equalsIgnoreCase("CASECLASS1CODE"))
+			return Integer.valueOf(26);
+		if (name.equalsIgnoreCase("CASECLASS2CODE"))
+			return Integer.valueOf(27);
+		if (name.equalsIgnoreCase("CASECLASS3CODE"))
+			return Integer.valueOf(28);
+		if (name.equalsIgnoreCase("ISCRIMINALRECORD"))
+			return Integer.valueOf(29);
+		if (name.equalsIgnoreCase("PERSONCLASSCODE"))
+			return Integer.valueOf(30);
+		if (name.equalsIgnoreCase("PRINTDATE"))
+			return Integer.valueOf(40);
+		if (name.equalsIgnoreCase("PRINTERNAME"))
+			return Integer.valueOf(41);
+		if (name.equalsIgnoreCase("PRINTERUNITCODE"))
+			return Integer.valueOf(42);
+		if (name.equalsIgnoreCase("PRINTERUNITNAME"))
+			return Integer.valueOf(43);
+		if (name.equalsIgnoreCase("COMMENTS"))
+			return Integer.valueOf(50);
+		if (name.equalsIgnoreCase("CRIMINALRECORD"))
+			return Integer.valueOf(51);
+		if (name.equalsIgnoreCase("RCN"))
+			return Integer.valueOf(52);
+		if (name.equalsIgnoreCase("CASENUM"))
+			return Integer.valueOf(53);
+		if (name.equalsIgnoreCase("DBID"))
+			return Integer.valueOf(100);
+		if (name.equalsIgnoreCase("UPDATEUSER"))
+			return Integer.valueOf(101);
+		if (name.equalsIgnoreCase("UPDATETIME"))
+			return Integer.valueOf(102);
+		if (name.equalsIgnoreCase("IS_DNA_CAPTURED"))
+			return Integer.valueOf(103);
+		if (name.equalsIgnoreCase("DNA_1"))
+			return Integer.valueOf(104);
+		if (name.equalsIgnoreCase("DNA_2"))
+			return Integer.valueOf(105);
+		if (name.equalsIgnoreCase("FormerName1"))
+			return Integer.valueOf(106);
+		if (name.equalsIgnoreCase("FormerName2"))
+			return Integer.valueOf(107);
+		if (name.equalsIgnoreCase("FamilyName"))
+			return Integer.valueOf(108);
+		if (name.equalsIgnoreCase("GivenName"))
+			return Integer.valueOf(109);
+		if (name.equalsIgnoreCase("MiddleName"))
+			return Integer.valueOf(110);
+		if (name.equalsIgnoreCase("Height"))
+			return Integer.valueOf(111);
+		if (name.equalsIgnoreCase("FootLength"))
+			return Integer.valueOf(112);
+		if (name.equalsIgnoreCase("BloodType"))
+			return Integer.valueOf(113);
+		if (name.equalsIgnoreCase("Weight"))
+			return Integer.valueOf(114);
+		if (name.equalsIgnoreCase("Accent"))
+			return Integer.valueOf(115);
+		if (name.equalsIgnoreCase("HairColor"))
+			return Integer.valueOf(116);
+		if (name.equalsIgnoreCase("EyeColor"))
+			return Integer.valueOf(117);
+		if (name.equalsIgnoreCase("EducationLevel"))
+			return Integer.valueOf(118);
+		if (name.equalsIgnoreCase("EmployerName"))
+			return Integer.valueOf(119);
+		if (name.equalsIgnoreCase("EmployerAddress"))
+			return Integer.valueOf(120);
+		if (name.equalsIgnoreCase("EmployerUnitCode"))
+			return Integer.valueOf(121);
+		if (name.equalsIgnoreCase("HuKouPcsName"))
+			return Integer.valueOf(122);
+		if (name.equalsIgnoreCase("HuKouPcsUnitCode"))
+			return Integer.valueOf(123);
+		if (name.equalsIgnoreCase("ResidencePcsName"))
+			return Integer.valueOf(124);
+		if (name.equalsIgnoreCase("ResidencePcsUnitCode"))
+			return Integer.valueOf(125);
+		if (name.equalsIgnoreCase("MaritalStatus"))
+			return Integer.valueOf(126);
+		if (name.equalsIgnoreCase("Email1"))
+			return Integer.valueOf(127);
+		if (name.equalsIgnoreCase("Email2"))
+			return Integer.valueOf(128);
+		if (name.equalsIgnoreCase("ContactPhone1"))
+			return Integer.valueOf(129);
+		if (name.equalsIgnoreCase("ContactPhone2"))
+			return Integer.valueOf(130);
+		if (name.equalsIgnoreCase("DeathDate"))
+			return Integer.valueOf(131);
+		if (name.equalsIgnoreCase("BodyFeature"))
+			return Integer.valueOf(132);
+		if (name.equalsIgnoreCase("BodyType"))
+			return Integer.valueOf(133);
+		if (name.equalsIgnoreCase("HeadType"))
+			return Integer.valueOf(134);
+		if (name.equalsIgnoreCase("JobTitle"))
+			return Integer.valueOf(135);
+		if (name.equalsIgnoreCase("QQ"))
+			return Integer.valueOf(136);
+		if (name.equalsIgnoreCase("Occupation"))
+			return Integer.valueOf(137);
+		if (name.equalsIgnoreCase("BirthPlace"))
+			return Integer.valueOf(138);
+		if (name.equalsIgnoreCase("BirthPlaceUnitCode")) {
+			return Integer.valueOf(139);
+		}
+		return null;
+	}
+
+	public static Map<Integer, Object> toId(Map<String, Object> nameMaps) {
+		if (AFISHelper.isEmpty(nameMaps))
+			return null;
+
+		Map maps = new HashMap();
+
+		for (Map.Entry it : nameMaps.entrySet()) {
+			Integer id;
+			if ((it.getKey() == null)
+					|| ((id = toId((String) it.getKey())) == null))
+				continue;
+			maps.put(id, it.getValue());
+		}
+		return maps.isEmpty() ? null : maps;
+	}
+}

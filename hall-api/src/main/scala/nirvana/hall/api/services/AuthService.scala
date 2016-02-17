@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.jpa.OnlineUser
+import nirvana.hall.v70.jpa.OnlineUser
 import org.springframework.transaction.annotation.Transactional
 
 /**

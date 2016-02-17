@@ -1,13 +1,10 @@
 package nirvana.hall.api
 
 import nirvana.hall.api.internal._
-import nirvana.hall.api.internal.protobuf.sys._
-import nirvana.hall.api.internal.protobuf.sys.stamp._
-import nirvana.hall.api.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
+import nirvana.hall.api.internal.filter.{CaseInfoFilter, LPCardFilter, QueryFilter, TPCardFilter}
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
-import org.apache.tapestry5.ioc.annotations.{Contribute, Local, Match}
-import org.apache.tapestry5.ioc.{MethodAdviceReceiver, OrderedConfiguration, ServiceBinder}
+import org.apache.tapestry5.ioc.annotations.Contribute
+import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core
 
 /**
@@ -17,31 +14,22 @@ import org.apache.tapestry5.services.Core
  */
 object LocalApiServiceModule {
   def bind(binder: ServiceBinder): Unit = {
-    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
     binder.bind(classOf[ProtobufRequestGlobal], classOf[ProtobufRequestGlobalImpl]).withMarker(classOf[Core])
-    binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
-    binder.bind(classOf[UserService], classOf[UserServiceImpl])
     binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
-    binder.bind(classOf[DictService], classOf[DictServiceImpl])
-    binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])
-    binder.bind(classOf[GatherFingerPalmService], classOf[GatherFingerPalmServiceImpl])
-    binder.bind(classOf[GatherPortraitService], classOf[GatherPortraitServiceImpl])
+    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+    binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
   }
+
   @Contribute(classOf[ProtobufRequestHandler])
   def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
-    configuration.addInstance("LoginRequestFilter", classOf[LoginRequestFilter])
-    configuration.addInstance("SyncDictRequestFilter", classOf[SyncDictRequestFilter])
-    configuration.addInstance("DictListRequestFilter", classOf[DictListRequestFilter])
-    configuration.addInstance("QueryPersonRequestFilter", classOf[QueryPersonRequestFilter])
-    configuration.addInstance("AddPersonInfoRequestFilter", classOf[AddPersonInfoRequestFilter])
-    configuration.addInstance("UpdatePersonRequestFilter", classOf[UpdatePersonRequestFilter])
-    configuration.addInstance("AddPortraitRequestFilter", classOf[AddPortraitRequestFilter])
-    configuration.addInstance("QueryPortraitRequestFilter", classOf[QueryPortraitRequestFilter])
-    configuration.addInstance("AddFingerRequestFilter", classOf[AddFingerRequestFilter])
-    configuration.addInstance("QueryFingerRequestFilter", classOf[QueryFingerRequestFilter])
+    configuration.addInstance("TPCardFilter", classOf[TPCardFilter])
+    configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
+    configuration.addInstance("CaseFilter", classOf[CaseInfoFilter])
+    configuration.addInstance("QueryFilter", classOf[QueryFilter])
   }
-  @Match(Array("*"))
-  def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
-    advisor.addAdvice(receiver)
-  }
+
+//  @Match(Array("*"))
+//  def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
+//    advisor.addAdvice(receiver)
+//  }
 }

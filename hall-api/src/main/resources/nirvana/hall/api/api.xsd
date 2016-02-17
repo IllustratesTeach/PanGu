@@ -23,40 +23,6 @@
           <xs:documentation>配置Web服务器相关参数</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="apiType" name="api" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>api 相关参数配置</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="syncDictType" name="sync_dict" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>脱机采集字典同步相关参数配置</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="cronType" name="sync62_cron" default="0 0 * * * ? *">
-        <xs:annotation>
-          <xs:documentation>同步62数据定时任务</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="apiType">
-    <xs:sequence>
-      <xs:element type="databaseType" name="database" minOccurs="1" maxOccurs="1"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="syncDictType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>7.0的hall-api服务器URL</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="cronType" name="cron" default="0 0 0 * * ? *">
-        <xs:annotation>
-          <xs:documentation>字典同步定时器</xs:documentation>
-        </xs:annotation>
-      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

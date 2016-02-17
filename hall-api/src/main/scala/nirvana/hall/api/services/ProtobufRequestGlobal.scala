@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.jpa.SysUser
+import nirvana.hall.v70.jpa.SysUser
 
 /**
  * protobuf request global

@@ -1,7 +1,8 @@
 package nirvana.hall.api.internal
 
-import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.services.{ProtobufRequestGlobal, UserService}
+import nirvana.hall.api.services.ProtobufRequestGlobal
+import nirvana.hall.v70.config.HallV70Config
+import nirvana.hall.v70.services.sys.UserService
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
 import org.junit.{After, Before}
 
@@ -62,15 +63,19 @@ trait JpaBaseServiceTestSupport {
   }
 }
 object JpaTestModule {
-  def buildHallApiConfig() = {
-    val config = new HallApiConfig
-    config.api.db.driver = "org.h2.Driver"
-    config.api.db.user = "sa"
-    config.api.db.url = "jdbc:h2:mem:db"
+  def buildHallV70Config() = {
+    val config = new HallV70Config
+//    config.api.db.driver = "org.h2.Driver"
+//    config.api.db.user = "sa"
+//    config.api.db.url = "jdbc:h2:mem:db"
 
+    config.api.db.driver = "oracle.jdbc.driver.OracleDriver"
+    config.api.db.url = "jdbc:oracle:thin:gafis_qd/gafis@10.1.7.151:1521:GAFISNEW7"
+    config.api.db.user = "gafis_qd"
+    config.api.db.password = "gafis"
     config
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
+    configuration.add("nirvana.hall.v70.jpa")
   }
 }
