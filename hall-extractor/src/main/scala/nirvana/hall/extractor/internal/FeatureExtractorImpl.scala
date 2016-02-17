@@ -69,6 +69,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val mntBuffer = ChannelBuffers.buffer(imgHead.getDataSize + feature.getDataSize)
     //add head information
+    //NOTICE don't use imageHead to original data
     imgHead.bIsCompressed = 0
     imgHead.nCompressMethod = 0
     imgHead.nImgSize = feature.getDataSize
