@@ -1,6 +1,10 @@
 package nirvana.hall.v70.internal.sync
 
+import java.io.ByteArrayOutputStream
+
 import com.google.protobuf.ByteString
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
@@ -11,6 +15,7 @@ import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.JavaConversions._
 
 /**
  * Created by songpeng on 16/1/28.
@@ -281,8 +286,45 @@ object ProtobufConverter {
   }
 
   def convertMatchTask2GafisNormalqueryQueryque(matchTask: MatchTask): GafisNormalqueryQueryque={
+    val gafisQuery = new GafisNormalqueryQueryque()
+    gafisQuery.keyid = matchTask.getMatchId
+    gafisQuery.querytype = (matchTask.getMatchType.getNumber - 1).toShort
+    gafisQuery.priority = matchTask.getPriority.toShort
+    gafisQuery.minscore = matchTask.getScoreThreshold
+    gafisQuery.flag = 1.toShort //指纹
 
-    throw new UnsupportedOperationException
+    //特征mic
+    val matchType = matchTask.getMatchType.getNumber
+    if (matchType == MatchType.FINGER_LL.getNumber || matchType == MatchType.FINGER_LT.getNumber){
+      val mic = new GAFISMICSTRUCT
+      mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
+      mic.nMntLen = mic.pstMnt_Data.length
+      mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
+      mic.nItemData = 1
+      mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+      gafisQuery.mic = mic.toByteArray
+    }else if(matchType == MatchType.FINGER_TT.getNumber || matchType == MatchType.FINGER_TL.getNumber){
+      val micBuf = new ByteArrayOutputStream()
+      matchTask.getTData.getMinutiaDataList.foreach{ md =>
+        val mic = new GAFISMICSTRUCT
+        mic.pstMnt_Data = md.getMinutia.toByteArray
+        mic.nMntLen = mic.pstMnt_Data.length
+        mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
+        mic.nItemData =  md.getPos.toByte
+        mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+
+        micBuf.write(mic.toByteArray)
+      }
+      gafisQuery.mic = micBuf.toByteArray
+    }
+
+    gafisQuery.oraSid = 1L
+    gafisQuery.status = 0.toShort
+
+    //TODO textsql 文本
+
+    gafisQuery.save()
+
   }
 
   def convertGafisNormalqueryQueryque2MatchTask(gafisQuery: GafisNormalqueryQueryque): MatchTask = {

@@ -4,12 +4,14 @@ import java.util.Date
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.internal.WebHttpClientUtils
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
+import nirvana.hall.protocol.v62.qry.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
+import nirvana.hall.v70.jpa.{GafisQuery7to6, GafisNormalqueryQueryque, SyncTarget}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -46,8 +48,8 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
   }
 
   private def doWork: Unit ={
-    getMatchTask.foreach{ matchTask =>
-      sendQuery(matchTask)
+    getGafisNormalqueryQueryque.foreach{ gafisQuery =>
+      sendQuery(gafisQuery)
       doWork
     }
 
@@ -58,21 +60,14 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
    * @return
    */
   @Transactional
-  override def getMatchTask: Option[MatchTask] ={
-    val query = GafisNormalqueryQueryque.where("status=0 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
+  override def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque] ={
+    val gafisQuery = GafisNormalqueryQueryque.where("status=0 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
+    // 更新状态为正在比对
+    gafisQuery.foreach{ query =>
+      GafisNormalqueryQueryque.where("pkId=?1", query.pkId).update(status=STATUS_MATCHING, begintime=new Date())
+    }
 
-    query.foreach(updateGafisNormalqueryQueryqueStatusMatching)
-
-    query.map(convertGafisNormalqueryQueryque2MatchTask)
-  }
-
-  /**
-   * 更新状态为正在比对
-   * @param queryque
-   * @return
-   */
-  private def updateGafisNormalqueryQueryqueStatusMatching(queryque: GafisNormalqueryQueryque): Unit ={
-    GafisNormalqueryQueryque.where("pkId=?1", queryque.pkId).update(status=STATUS_MATCHING, begintime=new Date())
+    gafisQuery
   }
 
   private def convertGafisNormalqueryQueryque2MatchTask(query: GafisNormalqueryQueryque): MatchTask = {
@@ -90,9 +85,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
         ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
         matchTask.setLData(ldata)
       }else{
-        //TODO pos 6to8 ??? 平面？？？
-        if(mic.nItemData <= 10)
-          matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
       }
     }
     matchTask.build()
@@ -100,32 +93,22 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
 
   /**
    * 发送比对任务
-   * @param matchTask
+   * @param gafisQuery
    * @return
    */
-  override def sendQuery(matchTask: MatchTask): Unit = {
-    val key = matchTask.getMatchId.getBytes()
-//    val pstKey = new GADB_KEYARRAY
-//    pstKey.nKeyCount = 1
-//    pstKey.nKeySize = key.size.asInstanceOf[Short]
-//    pstKey.pKey_Data = key
+  @Transactional
+  override def sendQuery(gafisQuery: GafisNormalqueryQueryque): Unit = {
+    val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
 
-//    val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
-//    val retval = facade.NET_GAFIS_QUERY_Submit(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
-//    //记录6.2的查询SID
-//    retval.foreach{ ret =>
-//      new GafisQuery7to6(matchTask.getObjectId,gaqryqueConverter.convertSixByteArrayToLong(ret.nSID)).save()
-//    }
+    val request = QuerySendRequest.newBuilder().addMatchTask(matchTask)
+    val responseBuilder = QuerySendResponse.newBuilder()
 
-//    val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask)(v62Config)
-//    val oraSid = facade.NET_GAFIS_QUERY_Add(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, queryStruct)
-//    new GafisQuery7to6(matchTask.getObjectId, oraSid).save()
+    val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)
 
-//    WebHttpClientUtils.call("http://"+ip+":"+port, extension, request, responseBuilder)
-    //TODO
-    throw new UnsupportedOperationException
+    //TODO orasid的实际值丢失， 可能是ExtensionRegistry的问题
+    WebHttpClientUtils.call("http://"+syncTarget.targetIp+":"+syncTarget.targetPort, QuerySendRequest.cmd, request.build(), responseBuilder)
+
+    new GafisQuery7to6(gafisQuery.oraSid, responseBuilder.getOraSid).save()
   }
-
-
 
 }

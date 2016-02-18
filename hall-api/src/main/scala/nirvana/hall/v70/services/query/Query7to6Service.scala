@@ -1,6 +1,6 @@
 package nirvana.hall.v70.services.query
 
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -11,14 +11,14 @@ trait Query7to6Service {
 
   /**
    * 发送比对任务
-   * @param matchTask
+   * @param gafisQuery
    * @return
    */
-  def sendQuery(matchTask: MatchTask)
+  def sendQuery(gafisQuery: GafisNormalqueryQueryque)
 
   /**
    * 获取比对任务，一条
    */
   @Transactional
-  def getMatchTask: Option[MatchTask]
+  def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque]
 }

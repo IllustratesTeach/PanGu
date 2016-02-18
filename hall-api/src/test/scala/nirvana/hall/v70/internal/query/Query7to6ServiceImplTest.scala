@@ -1,28 +1,28 @@
 package nirvana.hall.v70.internal.query
 
 import nirvana.hall.v70.services.query.Query7to6Service
-import org.apache.tapestry5.ioc.RegistryBuilder
+import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 15/12/28.
  */
 class Query7to6ServiceImplTest {
-  val modules = Seq[String](
+  private val modules = Seq[String](
     "nirvana.hall.api.LocalProtobufModule",
-    "nirvana.hall.v70.LocalDataSourceModule",
-    "nirvana.hall.v70.LocalV70ServiceModule",
+    "nirvana.hall.api.LocalApiServiceModule",
     "nirvana.hall.orm.HallOrmModule",
-    "nirvana.hall.api.internal.JpaTestModule",
-    "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.api.internal.filter.TestModule"
-    ).map(Class.forName)
-  val registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
+    "nirvana.hall.v70.internal.filter.TestModule",
+    "nirvana.hall.v70.LocalV70ServiceModule",
+    "nirvana.hall.v70.LocalDataSourceModule"
+  ).map(Class.forName)
+
+  protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
   @Test
   def test_sendQuery(): Unit ={
     val service = registry.getService(classOf[Query7to6Service])
 
-    val task = service.getMatchTask
+    val task = service.getGafisNormalqueryQueryque
 
     Assert.assertNotNull(task)
 
