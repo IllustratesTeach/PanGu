@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.protocol.v62.qry.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 
@@ -17,7 +17,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    */
   override def sendQuery(querySendRequest: QuerySendRequest): QuerySendResponse = {
     val response = QuerySendResponse.newBuilder()
-    val matchTask = querySendRequest.getMatchTaskList.get(0)
+    val matchTask = querySendRequest.getMatchTask
     val key = matchTask.getMatchId.getBytes()
     val pstKey = new GADB_KEYARRAY
     pstKey.nKeyCount = 1

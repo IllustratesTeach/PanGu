@@ -7,8 +7,8 @@ import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
-import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{Case, ImageType, LPCard}
+import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable

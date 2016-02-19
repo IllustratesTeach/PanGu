@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -15,16 +15,16 @@ message GatherNodeType {
 
 //采集节点查询请求
 message QueryGatherNodeTypeRequest {
-    extend BaseRequest {
-        optional QueryGatherNodeTypeRequest cmd = 302;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherNodeTypeRequest cmd = 10217;
     }
     required string typeId = 1;
 }
 
 //返回采集节点信息
 message QueryGatherNodeTypeResponse {
-    extend BaseResponse {
-        optional QueryGatherNodeTypeResponse cmd = 302;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherNodeTypeResponse cmd = 10218;
     }
     repeated GatherNodeType nodeType = 1;
 

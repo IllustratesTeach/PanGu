@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.v62.tp.TPCardProto._
+import nirvana.hall.protocol.api.TPCardProto._
 import org.springframework.transaction.annotation.Transactional
 
 /**

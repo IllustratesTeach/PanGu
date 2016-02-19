@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
-import nirvana.hall.protocol.v62.lp.LPCardProto._
+import nirvana.hall.protocol.api.LPCardProto._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 

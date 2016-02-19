@@ -1,0 +1,35 @@
+package api;
+import "monad/rpc/protocol/command.proto";
+import "matcher/match_task_query.proto";
+import "matcher/match_result.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "QueryProto";
+
+//发送查询
+message QuerySendRequest {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QuerySendRequest cmd = 10031;
+    }
+    required matcher.MatchTask matchTask = 1;
+}
+message QuerySendResponse {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QuerySendResponse cmd = 10032;
+    }
+    required int64 ora_sid = 1;
+}
+
+//获取查询结果
+message QueryGetRequest {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QueryGetRequest cmd = 10033;
+    }
+    required int64 ora_sid = 1;
+}
+message QueryGetResponse {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QueryGetResponse cmd = 10034;
+    }
+    required matcher.MatchResultRequest matchResult = 1;
+}

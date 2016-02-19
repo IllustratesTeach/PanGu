@@ -5,8 +5,8 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
-import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, TPCard}
+import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
 import scala.collection.JavaConversions._

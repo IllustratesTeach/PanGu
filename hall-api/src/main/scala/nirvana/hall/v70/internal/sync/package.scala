@@ -5,8 +5,8 @@ import java.util.Date
 
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
 import com.google.protobuf.Message
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.api.internal.WebHttpClientUtils
-import nirvana.hall.protocol.sys.CommonProto.BaseRequest
 
 /**
  * some implicit converter
@@ -35,7 +35,7 @@ package object sync {
   }
 
 
-  def httpCall[T](ip: String, port: String, extension: GeneratedExtension[BaseRequest, T], request: T, responseBuilder: Message.Builder): Unit ={
+  def httpCall[T](ip: String, port: String, extension: GeneratedExtension[BaseCommand, T], request: T, responseBuilder: Message.Builder): Unit ={
     WebHttpClientUtils.call("http://"+ip+":"+port, extension, request, responseBuilder)
   }
 

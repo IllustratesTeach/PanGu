@@ -1,21 +1,21 @@
 package sys;
-import "sys/Common.proto";
 import "sys/Dict.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys";
 option java_outer_classname = "DictListProto";
 
 //获取字典列表请求
 message DictListRequest {
-  extend BaseRequest {
-    optional DictListRequest cmd = 111;
+  extend monad.rpc.protocol.BaseCommand {
+    optional DictListRequest cmd = 10111;
   }
   required DictType dictType = 1;
 }
 //获取字典列表的响应
 message DictListResponse {
-  extend BaseResponse {
-    optional DictListResponse cmd = 111;
+  extend monad.rpc.protocol.BaseCommand {
+    optional DictListResponse cmd = 10112;
   }
   message Dict {
     required string code = 1;

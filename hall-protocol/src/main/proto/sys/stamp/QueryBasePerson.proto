@@ -1,6 +1,6 @@
 package sys.stamp;
-import "sys/Common.proto";
 import "sys/stamp/Person.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -8,15 +8,15 @@ option java_outer_classname = "QueryBasePersonProto";
 
 //人员基本查询
 message QueryBasePersonRequest {
-    extend BaseRequest {
-        optional QueryBasePersonRequest cmd = 313;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryBasePersonRequest cmd = 10209;
     }
     optional string personid = 1;
 }
 
 message QueryBasePersonResponse {
-    extend BaseResponse {
-        optional QueryBasePersonResponse cmd = 313;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryBasePersonResponse cmd = 10210;
     }
     repeated PersonInfo personInfo = 1;
 

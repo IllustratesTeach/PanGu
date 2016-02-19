@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.sys
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.internal.BaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
 import nirvana.hall.protocol.sys.LoginProto.{LoginResponse, LoginRequest}
 import org.junit.{Assert, Test}
 
@@ -20,10 +20,10 @@ class LoginRequestFilterTest extends BaseServiceTestSupport{
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(101)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(LoginRequest.cmd, loginRequest.build())
-    val protobufResponse = BaseResponse.newBuilder()
-    protobufResponse.setStatus(ResponseStatus.OK)
+    val protobufResponse = BaseCommand.newBuilder()
+    protobufResponse.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertTrue(protobufResponse.hasExtension(LoginResponse.cmd))

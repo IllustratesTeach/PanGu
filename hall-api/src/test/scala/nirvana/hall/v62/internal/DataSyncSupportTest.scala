@@ -2,8 +2,8 @@ package nirvana.hall.v62.internal
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{Case, FingerFgp, LPCard, TPCard}
+import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.{Case, FingerFgp, LPCard, TPCard}
 import nirvana.hall.v62.services.{DatabaseTable, V62ServerAddress}
 import org.junit.Test
 

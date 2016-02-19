@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.sys
 
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.api.internal.JpaBaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
 import nirvana.hall.protocol.sys.DictListProto.{DictListRequest, DictListResponse}
 import nirvana.hall.protocol.sys.DictProto.DictType
 import org.junit.{Assert, Test}
@@ -15,8 +15,8 @@ class DictListRequestFilterTest extends JpaBaseServiceTestSupport{
   @Test
   def test_dictList(): Unit ={
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(101)
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
+    val protobufResponse = BaseCommand.newBuilder()
 
     val request = DictListRequest.newBuilder()
     request.setDictType(DictType.CODE_XB)

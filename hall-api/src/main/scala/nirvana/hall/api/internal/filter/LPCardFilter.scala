@@ -1,14 +1,14 @@
 package nirvana.hall.api.internal.filter
 
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.api.services.{LPCardService, ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
-import nirvana.hall.protocol.v62.lp.LPCardProto._
+import nirvana.hall.protocol.api.LPCardProto._
 
 /**
  * Created by songpeng on 15/11/15.
  */
 class LPCardFilter(lPCardService: LPCardService) extends ProtobufRequestFilter{
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if(protobufRequest.hasExtension(LPCardAddRequest.cmd)) {
       val request = protobufRequest.getExtension(LPCardAddRequest.cmd)
       val response = lPCardService.addLPCard(request)

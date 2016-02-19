@@ -4,10 +4,10 @@ import java.io.OutputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import com.google.protobuf.ExtensionRegistry
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.{ProtobufRequestGlobal, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, ResponseStatus, BaseResponse}
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
 import org.apache.tapestry5.ioc.services.PerthreadManager
 import org.apache.tapestry5.services._
@@ -30,10 +30,10 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
   override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
     val header = request.getHeader(PROTOBUF_HEADER)
     if (header != null) {
-      val responseBuilder = BaseResponse.newBuilder()
-      responseBuilder.setStatus(ResponseStatus.OK)
+      val responseBuilder = BaseCommand.newBuilder()
+      responseBuilder.setStatus(CommandStatus.OK)
       try {
-        val baseRequest = BaseRequest.getDefaultInstance.getParserForType.parseFrom(request.getInputStream, extensionRegistry)
+        val baseRequest = BaseCommand.getDefaultInstance.getParserForType.parseFrom(request.getInputStream, extensionRegistry)
         // TODO 暂时取消登录验证
 //        val token = baseRequest.getToken
 //        protobufRequestGlobal.store(token)
@@ -43,8 +43,8 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
       catch {
         case NonFatal(e) =>
           error(e.getMessage, e)
-          responseBuilder.setStatus(ResponseStatus.FAIL)
-          responseBuilder.setMessage(e.toString)
+          responseBuilder.setStatus(CommandStatus.FAIL)
+          responseBuilder.setMsg(e.toString)
       }
 
       //ouput protobuf stream
@@ -57,8 +57,8 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
         response.setHeader(HALL_TOKEN_HEADER,protobufRequestGlobal.token())
 
         val baseResponse = responseBuilder.build()
-        if (baseResponse.getStatus == ResponseStatus.FAIL) {
-          response.setHeader(PROTOBUF_ERROR, ResponseStatus.FAIL.toString)
+        if (baseResponse.getStatus == CommandStatus.FAIL) {
+          response.setHeader(PROTOBUF_ERROR, CommandStatus.FAIL.toString)
         }
         os = response.getOutputStream
         responseBuilder.build().writeTo(os)

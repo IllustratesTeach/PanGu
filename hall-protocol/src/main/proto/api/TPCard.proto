@@ -1,0 +1,56 @@
+package api;
+import "api/FPTData.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "TPCardProto";
+
+//新增
+message TPCardAddRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardAddRequest cmd = 10041;
+    }
+    required TPCard card = 1;
+}
+message TPCardAddResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardAddResponse cmd = 10042;
+    }
+}
+//删除
+message TPCardDelRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardDelRequest cmd = 10043;
+    }
+    required string card_id = 1;
+}
+message TPCardDelResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardDelResponse cmd = 10044;
+    }
+}
+//修改
+message TPCardUpdateRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardUpdateRequest cmd = 10045;
+    }
+    required TPCard card = 1;
+}
+message TPCardUpdateResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardUpdateResponse cmd = 10046;
+    }
+}
+//查询
+message TPCardGetRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardGetRequest cmd = 10047;
+    }
+    required string card_id = 1;
+}
+message TPCardGetResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional TPCardGetResponse cmd = 10048;
+    }
+    required TPCard card = 1;
+}

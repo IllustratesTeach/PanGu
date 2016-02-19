@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -15,16 +15,16 @@ message GatherData {
 
 //指纹图像数据查询请求
 message QueryFingerDataRequest {
-    extend BaseRequest {
-        optional QueryFingerDataRequest cmd = 304;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryFingerDataRequest cmd = 10211;
     }
     required string personId = 1;//捺印编号
 }
 
 //返回采集流程
 message QueryFingerDataResponse {
-    extend BaseResponse {
-        optional QueryFingerDataResponse cmd = 304;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryFingerDataResponse cmd = 10212;
     }
     repeated GatherData gatherData = 1;
 

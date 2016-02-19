@@ -1,10 +1,10 @@
 package nirvana.hall.v70.internal.filter
 
 import com.google.protobuf.ByteString
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, ImageType, PatternType}
-import nirvana.hall.protocol.v62.lp.LPCardProto._
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, PatternType}
+import nirvana.hall.protocol.api.LPCardProto._
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
@@ -45,12 +45,12 @@ class LPCardFilterTest {
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(LPCardAddRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_del(): Unit ={
@@ -58,12 +58,12 @@ class LPCardFilterTest {
     requestBuilder.setCardId("12345601")
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(LPCardDelRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_update(): Unit ={
@@ -88,12 +88,12 @@ class LPCardFilterTest {
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(LPCardUpdateRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_get(): Unit ={
@@ -101,12 +101,12 @@ class LPCardFilterTest {
     requestBuilder.setCardId("12345601")
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(LPCardGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
     Assert.assertNotNull(protobufResponse.getExtension(LPCardGetResponse.cmd).getCard)
   }
 

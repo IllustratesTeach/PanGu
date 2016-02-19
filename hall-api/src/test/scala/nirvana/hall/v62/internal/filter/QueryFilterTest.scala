@@ -1,9 +1,9 @@
 package nirvana.hall.v62.internal.filter
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.services.ProtobufRequestHandler
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.qry.QueryProto.{QueryGetRequest, QuerySendRequest}
+import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QuerySendRequest}
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
@@ -20,7 +20,7 @@ class QueryFilterTest {
   @Test
   def test_sendQuery: Unit ={
     val requestBuilder = QuerySendRequest.newBuilder()
-    val matchTask = requestBuilder.addMatchTaskBuilder()
+    val matchTask = requestBuilder.getMatchTaskBuilder()
     matchTask.setMatchId("P3702000000002015129996")
     matchTask.setMatchType(MatchType.FINGER_TT)
     matchTask.setPriority(1)
@@ -28,13 +28,13 @@ class QueryFilterTest {
     matchTask.setObjectId(1)
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(QuerySendRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
 
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
 
   @Test
@@ -42,12 +42,12 @@ class QueryFilterTest {
     val requestBuilder = QueryGetRequest.newBuilder()
     requestBuilder.setOraSid(0)
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(QueryGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
 
   }
 }

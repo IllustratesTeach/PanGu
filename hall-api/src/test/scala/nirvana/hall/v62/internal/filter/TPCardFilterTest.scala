@@ -1,11 +1,11 @@
 package nirvana.hall.v62.internal.filter
 
 import com.google.protobuf.ByteString
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.FPTProto
-import nirvana.hall.protocol.v62.FPTProto.{FingerFgp, TPCard}
-import nirvana.hall.protocol.v62.tp.TPCardProto._
+import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, TPCard}
+import nirvana.hall.protocol.api.TPCardProto._
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
@@ -76,26 +76,26 @@ class TPCardFilterTest {
     TPCardAdd.setCard(tpCard.build())
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(TPCardAddRequest.cmd, TPCardAdd.build())
-    val protobufResponse = BaseResponse.newBuilder()
-    protobufResponse.setStatus(ResponseStatus.OK)
+    val protobufResponse = BaseCommand.newBuilder()
+    protobufResponse.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertTrue(protobufResponse.hasExtension(TPCardAddResponse.cmd))
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_del: Unit ={
     val requestBuilder = TPCardDelRequest.newBuilder()
     requestBuilder.setCardId("1234567890")
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(TPCardDelRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
     handler.handle(protobufRequest.build(), protobufResponse)
 
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_update: Unit ={
@@ -150,13 +150,13 @@ class TPCardFilterTest {
     requestBuilder.setCard(tpCard)
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(TPCardUpdateRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertTrue(protobufResponse.hasExtension(TPCardUpdateResponse.cmd))
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_get: Unit ={
@@ -164,13 +164,13 @@ class TPCardFilterTest {
     requestBuilder.setCardId("1234567890")
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(TPCardGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
     handler.handle(protobufRequest.build(), protobufResponse)
 
     Assert.assertTrue(protobufResponse.hasExtension(TPCardGetResponse.cmd))
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
     Assert.assertNotNull(protobufResponse.getExtension(TPCardGetResponse.cmd).getCard)
   }
 

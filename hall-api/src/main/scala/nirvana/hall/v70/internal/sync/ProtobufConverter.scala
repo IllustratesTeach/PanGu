@@ -9,7 +9,7 @@ import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.v62.FPTProto._
+import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers

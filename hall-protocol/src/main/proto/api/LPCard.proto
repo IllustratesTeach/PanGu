@@ -1,0 +1,56 @@
+package api;
+import "api/FPTData.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "LPCardProto";
+
+//添加现场指纹
+message LPCardAddRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardAddRequest cmd = 10021;
+    }
+    required LPCard card = 1;
+}
+message LPCardAddResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardAddResponse cmd = 10022;
+    }
+}
+//删除现场指纹
+message LPCardDelRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardDelRequest cmd = 10023;
+    }
+    required string card_id = 1;
+}
+message LPCardDelResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardDelResponse cmd = 10024;
+    }
+}
+//更新现场指纹
+message LPCardUpdateRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardUpdateRequest cmd = 10025;
+    }
+    required LPCard card = 1;
+}
+message LPCardUpdateResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardUpdateResponse cmd = 10026;
+    }
+}
+//查询现场指纹
+message LPCardGetRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardGetRequest cmd = 10027;
+    }
+    required string card_id = 1;
+}
+message LPCardGetResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardGetResponse cmd = 10028;
+    }
+    optional LPCard card = 1;
+}

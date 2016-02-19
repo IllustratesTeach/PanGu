@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.CaseProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisCase
 import org.springframework.transaction.annotation.Transactional

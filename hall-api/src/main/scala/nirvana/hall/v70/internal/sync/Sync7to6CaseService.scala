@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
-import nirvana.hall.protocol.v62.FPTProto.Case
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.protocol.api.CaseProto._
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCase, SyncQueue}
 
 /**

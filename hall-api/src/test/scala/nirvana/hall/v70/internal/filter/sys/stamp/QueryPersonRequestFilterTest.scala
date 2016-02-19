@@ -1,11 +1,10 @@
 package nirvana.hall.v70.internal.filter.sys.stamp
 
-import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonResponse, QueryBasePersonRequest}
-import org.junit.{Assert, Test}
+import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import nirvana.hall.api.internal.BaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
-import nirvana.hall.protocol.sys.stamp.QueryPersonProto.{QueryPersonResponse}
+import nirvana.hall.protocol.sys.stamp.QueryBasePersonProto.{QueryBasePersonRequest, QueryBasePersonResponse}
+import org.junit.{Assert, Test}
 
 /**
  * Created by wangjue on 2015/11/2.
@@ -19,10 +18,10 @@ class QueryPersonRequestFilterTest extends BaseServiceTestSupport {
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(QueryBasePersonRequest.cmd, queryRequest.build())
-    val protobufResponse = BaseResponse.newBuilder()
-    protobufResponse.setStatus(ResponseStatus.OK)
+    val protobufResponse = BaseCommand.newBuilder()
+    protobufResponse.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
     val personInfo = protobufResponse.getExtension(QueryBasePersonResponse.cmd)
 

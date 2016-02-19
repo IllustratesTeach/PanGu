@@ -6,7 +6,7 @@ import java.io.{Closeable, IOException}
 
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
 import com.google.protobuf.{GeneratedMessage, Message}
-import nirvana.hall.protocol.sys.CommonProto.BaseRequest
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.support.HallSupportConstants
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
@@ -62,12 +62,12 @@ object WebHttpClientUtils {
     }
   }
 
-  def call[T](url: String,extension: GeneratedExtension[BaseRequest, T], request: T,  responseBuilder: Message.Builder) {
+  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], request: T,  responseBuilder: Message.Builder) {
     val httpClient: CloseableHttpClient = createHttpClient
     try {
       val post: HttpPost = new HttpPost(url)
       post.setHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER, HallSupportConstants.HTTP_PROTOBUF_HEADER_VALUE)
-      val baseRequest= BaseRequest.newBuilder().setExtension(extension, request).setToken("1").setVersion(1).build()
+      val baseRequest= BaseCommand.newBuilder().setExtension(extension, request).setTaskId(1).build()
 
       val reqEntity: ByteArrayEntity = new ByteArrayEntity(baseRequest.toByteArray)
       post.setEntity(reqEntity)

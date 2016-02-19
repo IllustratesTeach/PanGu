@@ -1,21 +1,21 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 option java_outer_classname = "PersonInfoProto";
 
 
 message PersonInfoRequest{
-    extend BaseRequest{
-        optional PersonInfoRequest cmd = 213;
+    extend monad.rpc.protocol.BaseCommand{
+        optional PersonInfoRequest cmd = 10207;
     }
     optional string personid = 1;
 }
 
 
 message PersonInfoResponse{
-    extend BaseResponse{
-        optional PersonInfoResponse cmd = 214;
+    extend monad.rpc.protocol.BaseCommand{
+        optional PersonInfoResponse cmd = 10208;
     }
     optional string fgp = 1;
     optional string gatherData = 2;

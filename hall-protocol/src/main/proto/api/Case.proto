@@ -1,0 +1,57 @@
+package api;
+import "api/FPTData.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "CaseProto";
+
+//添加案件
+message CaseAddRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseAddRequest cmd = 10011;
+    }
+    required Case case = 1;
+}
+message CaseAddResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseAddResponse cmd = 10012;
+    }
+}
+//删除案件
+message CaseDelRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseDelRequest cmd = 10013;
+    }
+    required string case_id = 1;
+}
+message CaseDelResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseDelResponse cmd = 10014;
+    }
+}
+//更新案件
+message CaseUpdateRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseUpdateRequest cmd = 10015;
+    }
+    required Case case = 1;
+}
+message CaseUpdateResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseUpdateResponse cmd = 10016;
+    }
+}
+//查询案件
+message CaseGetRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseGetRequest cmd = 10017;
+    }
+    required string case_id = 1;
+}
+
+message CaseGetResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseGetResponse cmd = 10018;
+    }
+    optional Case case = 1;
+}

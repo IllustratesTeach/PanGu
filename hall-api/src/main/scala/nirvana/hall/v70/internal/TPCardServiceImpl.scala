@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.TPCardService
-import nirvana.hall.protocol.v62.tp.TPCardProto._
+import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisPerson}
 import org.springframework.transaction.annotation.Transactional

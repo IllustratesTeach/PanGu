@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,15 +7,15 @@ option java_outer_classname = "ObtainPersonCardProto";
 
 
 message ObtainPersonCardRequest{
-    extend BaseRequest{
-        optional ObtainPersonCardRequest cmd = 205;
+    extend monad.rpc.protocol.BaseCommand{
+        optional ObtainPersonCardRequest cmd = 10203;
     }
     optional string personid = 1;
 }
 
 message ObtainPersonCardResponse{
-    extend BaseResponse{
-        optional ObtainPersonCardResponse cmd = 206;
+    extend monad.rpc.protocol.BaseCommand{
+        optional ObtainPersonCardResponse cmd = 10204;
     }
     optional string name = 1;                       //姓名
     optional string aliasname = 2;                  //别名

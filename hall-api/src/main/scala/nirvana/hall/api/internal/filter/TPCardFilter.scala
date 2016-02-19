@@ -1,8 +1,8 @@
 package nirvana.hall.api.internal.filter
 
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler, TPCardService}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
-import nirvana.hall.protocol.v62.tp.TPCardProto._
+import nirvana.hall.protocol.api.TPCardProto._
 
 /**
  * Add TPCard Filter
@@ -11,7 +11,7 @@ import nirvana.hall.protocol.v62.tp.TPCardProto._
  */
 class TPCardFilter(tpCardService: TPCardService) extends ProtobufRequestFilter{
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if(protobufRequest.hasExtension(TPCardAddRequest.cmd)){
       val request = protobufRequest.getExtension(TPCardAddRequest.cmd)
       val response = tpCardService.addTPCard(request)

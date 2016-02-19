@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
-import nirvana.hall.protocol.v62.FPTProto.TPCard
-import nirvana.hall.protocol.v62.tp.TPCardProto._
+import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisPerson, SyncQueue}
 
 /**

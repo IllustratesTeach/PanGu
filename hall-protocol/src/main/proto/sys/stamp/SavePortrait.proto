@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,16 +7,16 @@ option java_outer_classname = "SavePortraitProto";
 
 //人像保存请求
 message SavePortraitRequest {
-    extend BaseRequest {
-        optional SavePortraitRequest cmd = 307;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SavePortraitRequest cmd = 10223;
     }
     required string personId = 1;
     required string gatherData = 2;
 }
 
 message SavePortraitResponse {
-    extend BaseResponse {
-        optional SavePortraitResponse cmd = 307;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SavePortraitResponse cmd = 10234;
     }
     optional string next = 1;
 }

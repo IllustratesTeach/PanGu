@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,8 +7,8 @@ option java_outer_classname = "SaveFingerDataProto";
 
 //指纹采集保存请求
 message SaveFingerDataRequest {
-    extend BaseRequest {
-        optional SaveFingerDataRequest cmd = 308;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SaveFingerDataRequest cmd = 10227;
     }
     optional string personId = 1;   //指纹编号
     optional string fingerData = 2; //指纹数据
@@ -17,8 +17,8 @@ message SaveFingerDataRequest {
 }
 
 message SaveFingerDataResponse {
-    extend BaseResponse {
-        optional SaveFingerDataResponse cmd = 308;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SaveFingerDataResponse cmd = 10228;
     }
     optional string saveStatus = 1;
 

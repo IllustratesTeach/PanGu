@@ -18,6 +18,7 @@ object LocalApiWebModule {
   def provideProtobufFilter(configuration: OrderedConfiguration[HttpServletRequestFilter]): Unit = {
     configuration.addInstance("protobuf", classOf[ProtobufServletFilter], "after:GZIP")
   }
+
   def contributeComponentClassResolver(configuration: Configuration[LibraryMapping]) {
     configuration.add(new LibraryMapping("api", "nirvana.hall.api"))
   }

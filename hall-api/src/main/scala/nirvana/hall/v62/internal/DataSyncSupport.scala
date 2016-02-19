@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.protocol.v62.FPTProto.{Case, LPCard, TPCard}
+import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}

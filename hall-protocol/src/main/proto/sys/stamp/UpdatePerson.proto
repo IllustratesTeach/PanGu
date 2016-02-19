@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,15 +7,15 @@ option java_outer_classname = "UpdatePersonProto";
 
 //人员修改请求
 message UpdatePersonRequest {
-    extend BaseRequest {
-        optional UpdatePersonRequest cmd = 311;
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdatePersonRequest cmd = 10237;
     }
     required string personInfo = 1;
 }
 
 message UpdatePersonResponse {
-    extend BaseResponse {
-        optional UpdatePersonResponse cmd = 311;
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdatePersonResponse cmd = 10238;
     }
     optional string next = 1;
 

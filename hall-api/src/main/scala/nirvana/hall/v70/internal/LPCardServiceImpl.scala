@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.LPCardService
-import nirvana.hall.protocol.v62.lp.LPCardProto._
+import nirvana.hall.protocol.api.LPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
 import org.springframework.transaction.annotation.Transactional

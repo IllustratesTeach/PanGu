@@ -1,19 +1,19 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 option java_outer_classname = "DelPersonProto";
 
 
 message DelPersonRequest{
-    extend BaseRequest{
-        optional DelPersonRequest cmd = 211;
+    extend monad.rpc.protocol.BaseCommand{
+        optional DelPersonRequest cmd = 10201;
     }
     optional string personid = 1;
 }
 
 message DelPersonResponse{
-    extend BaseResponse{
-        optional DelPersonResponse cmd = 212;
+    extend monad.rpc.protocol.BaseCommand{
+        optional DelPersonResponse cmd = 10202;
     }
 }

@@ -4,7 +4,7 @@ import java.io.File
 
 import nirvana.hall.c.services.afiskernel
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
-import nirvana.hall.protocol.v62.FPTProto.FingerFgp
+import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.Test

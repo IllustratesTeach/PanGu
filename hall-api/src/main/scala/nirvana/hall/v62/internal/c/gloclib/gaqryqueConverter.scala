@@ -12,7 +12,6 @@ import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest
 import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.sys.CommonProto.ResponseStatus
 import nirvana.hall.v62.config.HallV62Config
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -110,7 +109,7 @@ object gaqryqueConverter {
           mic.pstMnt_Data = md.getMinutia.toByteArray
           mic.nMntLen = mic.pstMnt_Data.length
           mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
-          mic.nItemData =  md.getPos.toByte//TODO pos 8to6???
+          mic.nItemData =  md.getPos.toByte
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
 
           mic
@@ -147,7 +146,7 @@ object gaqryqueConverter {
         maxScore = candData.nScore
     }
     matchResultRequest.setMaxScore(maxScore)
-    matchResultRequest.setStatus(MatcherStatus.newBuilder().setCode(ResponseStatus.OK.getNumber));
+    matchResultRequest.setStatus(MatcherStatus.newBuilder().setMsg("sucess"));
 
     matchResultRequest.build()
   }

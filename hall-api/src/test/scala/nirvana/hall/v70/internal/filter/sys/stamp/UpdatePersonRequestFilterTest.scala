@@ -1,9 +1,9 @@
 package nirvana.hall.v70.internal.filter.sys.stamp
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import org.junit.{Assert, Test}
 import nirvana.hall.api.internal.BaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
 import nirvana.hall.protocol.sys.stamp.UpdatePersonProto.{UpdatePersonResponse, UpdatePersonRequest}
 
 /**
@@ -18,10 +18,10 @@ class UpdatePersonRequestFilterTest extends BaseServiceTestSupport {
 
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(UpdatePersonRequest.cmd, updateRequest.build())
-    val protobufResponse = BaseResponse.newBuilder()
-    protobufResponse.setStatus(ResponseStatus.OK)
+    val protobufResponse = BaseCommand.newBuilder()
+    protobufResponse.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
 
     val personInfo = protobufResponse.getExtension(UpdatePersonResponse.cmd)

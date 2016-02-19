@@ -1,21 +1,21 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 option java_outer_classname = "WordsInfoProto";
 
 
 message WordsInfoRequest{
-    extend BaseRequest{
-        optional WordsInfoRequest cmd = 207;
+    extend monad.rpc.protocol.BaseCommand{
+        optional WordsInfoRequest cmd = 10241;
     }
     optional string personid = 1;
 }
 
 
 message WordsInfoResponse{
-    extend BaseResponse{
-        optional WordsInfoResponse cmd = 208;
+    extend monad.rpc.protocol.BaseCommand{
+        optional WordsInfoResponse cmd = 10242;
     }
     optional string personid = 1;               //捺印卡号
     optional string name = 2;                   //姓名

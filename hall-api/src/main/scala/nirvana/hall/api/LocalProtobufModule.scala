@@ -1,9 +1,9 @@
 package nirvana.hall.api
 
 import com.google.protobuf.ExtensionRegistry
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import org.apache.tapestry5.ioc.Configuration
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.{ClassNameLocator, PipelineBuilder}
@@ -20,9 +20,9 @@ object LocalProtobufModule {
   def buildProtobufRequestHandler(pipelineBuilder: PipelineBuilder, logger: Logger,
                                   configuration: java.util.List[ProtobufRequestFilter]): ProtobufRequestHandler = {
     val terminator = new ProtobufRequestHandler {
-      override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder): Boolean = {
-        responseBuilder.setStatus(ResponseStatus.FAIL)
-        responseBuilder.setMessage("request not handle")
+      override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder): Boolean = {
+        responseBuilder.setStatus(CommandStatus.FAIL)
+        responseBuilder.setMsg("request not handle")
         true
       }
     }

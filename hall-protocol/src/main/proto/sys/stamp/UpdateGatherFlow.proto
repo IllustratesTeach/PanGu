@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,15 +7,15 @@ option java_outer_classname = "UpdateGatherFlowProto";
 
 //采集流程修改请求
 message UpdateGatherFlowRequest {
-    extend BaseRequest {
-        optional UpdateGatherFlowRequest cmd = 310;
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdateGatherFlowRequest cmd = 10235;
     }
     required string personInfo = 1;
 }
 
 message UpdateGatherFlowResponse {
-    extend BaseResponse {
-        optional UpdateGatherFlowResponse cmd = 310;
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdateGatherFlowResponse cmd = 10236;
     }
     optional string saveStatus = 1;
 

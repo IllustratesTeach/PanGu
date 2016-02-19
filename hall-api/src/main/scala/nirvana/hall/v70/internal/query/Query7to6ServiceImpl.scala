@@ -8,7 +8,7 @@ import nirvana.hall.api.internal.WebHttpClientUtils
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.v62.qry.QueryProto.{QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.jpa.{GafisQuery7to6, GafisNormalqueryQueryque, SyncTarget}
@@ -100,7 +100,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
   override def sendQuery(gafisQuery: GafisNormalqueryQueryque): Unit = {
     val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
 
-    val request = QuerySendRequest.newBuilder().addMatchTask(matchTask)
+    val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
     val responseBuilder = QuerySendResponse.newBuilder()
 
     val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)

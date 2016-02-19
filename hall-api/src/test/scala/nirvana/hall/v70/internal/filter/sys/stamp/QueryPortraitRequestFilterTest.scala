@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.sys.stamp
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.internal.BaseServiceTestSupport
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
 import nirvana.hall.protocol.sys.stamp.QueryPortraitProto.{QueryPortraitResponse, QueryPortraitRequest}
 import nirvana.hall.protocol.sys.stamp.SavePersonProto.{SavePersonResponse, SavePersonRequest}
 import org.junit.{Assert, Test}
@@ -20,10 +20,10 @@ class QueryPortraitRequestFilterTest extends BaseServiceTestSupport{
     val handler = registry.getService(classOf[ProtobufRequestHandler])
 
     //add person
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(SavePersonRequest.cmd, addRequest.build())
-    val protobufResponse = BaseResponse.newBuilder()
-    protobufResponse.setStatus(ResponseStatus.OK)
+    val protobufResponse = BaseCommand.newBuilder()
+    protobufResponse.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest.build(), protobufResponse)
     val personid = protobufResponse.getExtension(SavePersonResponse.cmd).getPersonInfo(0).getPersonid
     Assert.assertEquals("CS520201511050001",personid)
@@ -33,10 +33,10 @@ class QueryPortraitRequestFilterTest extends BaseServiceTestSupport{
     //query
     val queryRequest = QueryPortraitRequest.newBuilder()
     queryRequest.setPersonId("CS520201511050001")
-    val protobufRequest1 = BaseRequest.newBuilder().setToken("asdfa").setVersion(103)
+    val protobufRequest1 = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest1.setExtension(QueryPortraitRequest.cmd, queryRequest.build())
-    val protobufResponse1 = BaseResponse.newBuilder()
-    protobufResponse1.setStatus(ResponseStatus.OK)
+    val protobufResponse1 = BaseCommand.newBuilder()
+    protobufResponse1.setStatus(CommandStatus.OK)
     handler.handle(protobufRequest1.build(), protobufResponse1)
     val pid = protobufResponse.getExtension(QueryPortraitResponse.cmd).getPortraitInfo(0).getPersonid
     val fgp = protobufResponse.getExtension(QueryPortraitResponse.cmd).getPortraitInfo(0).getFgp

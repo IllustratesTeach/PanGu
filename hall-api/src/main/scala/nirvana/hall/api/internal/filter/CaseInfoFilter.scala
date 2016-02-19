@@ -1,14 +1,14 @@
 package nirvana.hall.api.internal.filter
 
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.api.services.{CaseInfoService, ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.CaseProto._
 
 /**
   * Created by songpeng on 15/11/15.
   */
 class CaseInfoFilter(caseInfoService: CaseInfoService) extends ProtobufRequestFilter{
-   override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+   override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
      if(protobufRequest.hasExtension(CaseAddRequest.cmd)){//增加案件
        val request = protobufRequest.getExtension(CaseAddRequest.cmd)
        val response = caseInfoService.addCaseInfo(request)

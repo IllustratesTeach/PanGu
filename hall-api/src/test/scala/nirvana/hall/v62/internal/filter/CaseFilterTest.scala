@@ -1,8 +1,8 @@
 package nirvana.hall.v62.internal.filter
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.api.services.ProtobufRequestHandler
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.CaseProto._
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{Assert, Test}
 
@@ -43,26 +43,26 @@ class CaseFilterTest {
      textBuilder.setStrSuspArea1Code("520100")
 
      val handler = registry.getService(classOf[ProtobufRequestHandler])
-     val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+     val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
      protobufRequest.setExtension(CaseAddRequest.cmd, requestBuilder.build())
-     val protobufResponse = BaseResponse.newBuilder()
+     val protobufResponse = BaseCommand.newBuilder()
 
      handler.handle(protobufRequest.build(), protobufResponse)
 
-     Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+     Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
    }
   @Test
   def test_del(): Unit ={
     val requestBuilder = CaseDelRequest.newBuilder()
     requestBuilder.setCaseId("123456")
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(CaseDelRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
 
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_update(): Unit ={
@@ -90,25 +90,25 @@ class CaseFilterTest {
     textBuilder.setStrSuspArea1Code("520300")
 
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(CaseUpdateRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
   }
   @Test
   def test_get(): Unit ={
     val requestBuilder = CaseGetRequest.newBuilder()
     requestBuilder.setCaseId("123456")
     val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseRequest.newBuilder().setToken("asdf").setVersion(102)
+    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
     protobufRequest.setExtension(CaseGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseResponse.newBuilder()
+    val protobufResponse = BaseCommand.newBuilder()
 
     handler.handle(protobufRequest.build(), protobufResponse)
 
-    Assert.assertEquals(ResponseStatus.OK,protobufResponse.getStatus)
+    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
     Assert.assertNotNull(protobufResponse.getExtension(CaseGetResponse.cmd).getCase.getText)
   }
 

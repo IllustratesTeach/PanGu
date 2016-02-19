@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest
 
 import com.google.protobuf.ExtensionRegistry
 import monad.core.services.ProtobufProcessor
-import nirvana.hall.protocol.sys.CommonProto.BaseRequest
+import monad.rpc.protocol.CommandProto.BaseCommand
 import nirvana.hall.protocol.sys.LoginProto.{LoginResponse, LoginRequest}
 import org.slf4j.Logger
 
@@ -28,7 +28,7 @@ class LoginApi {
     try {
       val extensionRegistry: ExtensionRegistry = null;
       //val request:BaseRequest = BaseRequest.getDefaultInstance.getParserForType.parseFrom(request.getInputStream,extensionRegistry)
-      val baseRequest = BaseRequest.newBuilder().mergeFrom(request.getInputStream, extensionRegistry)
+      val baseRequest = BaseCommand.newBuilder().mergeFrom(request.getInputStream, extensionRegistry)
       val loginRequest = baseRequest.getExtension(LoginRequest.cmd);
       val loginRequestBuilder = LoginRequest.newBuilder().mergeFrom(request.getInputStream, extensionRegistry)
       processor.process(loginRequestBuilder.build())

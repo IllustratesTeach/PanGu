@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.v62.qry.QueryProto.{QueryGetResponse, QueryGetRequest, QuerySendResponse, QuerySendRequest}
+import nirvana.hall.protocol.api.QueryProto.{QueryGetResponse, QueryGetRequest, QuerySendResponse, QuerySendRequest}
 
 /**
  * Created by songpeng on 16/1/26.

@@ -1,9 +1,9 @@
 package nirvana.hall.v70.internal.filter.stamp
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.MsgBase64
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.sys.stamp.QueryPortraitProto.{PortraitInfo, QueryPortraitRequest, QueryPortraitResponse}
 import nirvana.hall.v70.jpa.GafisGatherPortrait
 import nirvana.hall.v70.services.stamp.GatherPortraitService
@@ -15,7 +15,7 @@ class QueryPortraitRequestFilter (gatherPortraitService : GatherPortraitService)
   extends ProtobufRequestFilter
   with LoggerSupport {
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if (protobufRequest.hasExtension(QueryPortraitRequest.cmd)) {
       val request = protobufRequest.getExtension(QueryPortraitRequest.cmd)
       val personId = request.getPersonId
@@ -33,8 +33,8 @@ class QueryPortraitRequestFilter (gatherPortraitService : GatherPortraitService)
         }
         responseBuilder.setExtension(QueryPortraitResponse.cmd, builder.build())
       } else {
-        responseBuilder.setStatus(ResponseStatus.FAIL)
-        responseBuilder.setMessage("no data");
+        responseBuilder.setStatus(CommandStatus.FAIL)
+        responseBuilder.setMsg("no data");
       }
       true
     } else {

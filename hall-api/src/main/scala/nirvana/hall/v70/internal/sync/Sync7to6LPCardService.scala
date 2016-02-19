@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
-import nirvana.hall.protocol.v62.FPTProto.LPCard
-import nirvana.hall.protocol.v62.lp.LPCardProto._
+import nirvana.hall.protocol.api.FPTProto.LPCard
+import nirvana.hall.protocol.api.LPCardProto._
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SyncQueue}
 
 /**

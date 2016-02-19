@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.CaseProto._
 import org.springframework.transaction.annotation.Transactional
 
 /**

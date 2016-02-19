@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.protocol.v62.lp.CaseProto._
+import nirvana.hall.protocol.api.CaseProto._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 

@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.protocol.v62.FPTProto.Case
+import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.c.services.gloclib.galoclp.GCASEINFOSTRUCT
 import org.junit.{Test, Assert}
 

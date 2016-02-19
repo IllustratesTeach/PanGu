@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -7,15 +7,15 @@ option java_outer_classname = "SaveFingerRemarkProto";
 
 //指纹备注图片上传请求
 message SaveFingerRemarkRequest {
-    extend BaseRequest {
-        optional SaveFingerRemarkRequest cmd = 309;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SaveFingerRemarkRequest cmd = 10229;
     }
     required string personInfo = 1;
 }
 
 message SaveFingerRemarkResponse {
-    extend BaseResponse {
-        optional SaveFingerRemarkResponse cmd = 309;
+    extend monad.rpc.protocol.BaseCommand {
+        optional SaveFingerRemarkResponse cmd = 10230;
     }
     optional string saveStatus = 1;
 

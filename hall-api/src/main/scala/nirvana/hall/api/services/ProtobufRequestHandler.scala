@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.sys.CommonProto.{BaseResponse, BaseRequest}
+import monad.rpc.protocol.CommandProto.BaseCommand
 
 /**
  * handle {@link BaseRequest}
@@ -14,8 +14,8 @@ trait ProtobufRequestHandler {
    * @param responseBuilder response builder
    * @return true if handle
    */
-  def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder): Boolean
+  def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder): Boolean
 }
 trait ProtobufRequestFilter {
-  def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean
+  def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean
 }

@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.sys
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{ResponseStatus, BaseResponse, BaseRequest}
 import nirvana.hall.protocol.sys.LoginProto.{LoginResponse, LoginRequest}
 import nirvana.hall.v70.services.sys.UserService
 
@@ -15,7 +15,7 @@ class LoginRequestFilter(userService: UserService)
     extends ProtobufRequestFilter
     with LoggerSupport {
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if (protobufRequest.hasExtension(LoginRequest.cmd)) {
       val request = protobufRequest.getExtension(LoginRequest.cmd)
       debug("name:{} pass:{}", request.getLogin, request.getPassword)
@@ -27,8 +27,8 @@ class LoginRequestFilter(userService: UserService)
           builder.setToken(token)
           responseBuilder.setExtension(LoginResponse.cmd, builder.build())
         case _ =>
-          responseBuilder.setStatus(ResponseStatus.FAIL)
-          responseBuilder.setMessage("invalid user");
+          responseBuilder.setStatus(CommandStatus.FAIL)
+          responseBuilder.setMsg("invalid user");
       }
       true
     }

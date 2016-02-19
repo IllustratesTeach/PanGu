@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.stamp
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.sys.stamp.SaveFingerDataProto.{SaveFingerDataRequest, SaveFingerDataResponse}
 import nirvana.hall.v70.services.stamp.GatherFingerPalmService
 
@@ -13,7 +13,7 @@ class AddFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmService)
   extends ProtobufRequestFilter
   with LoggerSupport {
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if (protobufRequest.hasExtension(SaveFingerDataRequest.cmd)) {
       val request = protobufRequest.getExtension(SaveFingerDataRequest.cmd)
       val builder = SaveFingerDataResponse.newBuilder()
@@ -22,8 +22,8 @@ class AddFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmService)
         builder.setSaveStatus("success")
         responseBuilder.setExtension(SaveFingerDataResponse.cmd, builder.build())
       } else {
-        responseBuilder.setStatus(ResponseStatus.FAIL)
-        responseBuilder.setMessage("add fail");
+        responseBuilder.setStatus(CommandStatus.FAIL)
+        responseBuilder.setMsg("add fail");
       }
       true
     } else {

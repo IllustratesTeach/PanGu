@@ -1,9 +1,9 @@
 package nirvana.hall.v70.internal.filter.stamp
 
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.MsgBase64
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse, ResponseStatus}
 import nirvana.hall.protocol.sys.stamp.QueryFingerDataProto.{GatherData, QueryFingerDataRequest, QueryFingerDataResponse}
 import nirvana.hall.v70.services.stamp.GatherFingerPalmService
 
@@ -14,7 +14,7 @@ class QueryFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmServic
   extends ProtobufRequestFilter
   with LoggerSupport {
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if (protobufRequest.hasExtension(QueryFingerDataRequest.cmd)) {
       val request = protobufRequest.getExtension(QueryFingerDataRequest.cmd)
       val builder = QueryFingerDataResponse.newBuilder()
@@ -32,8 +32,8 @@ class QueryFingerRequestFilter (gatherFingerPalmService : GatherFingerPalmServic
         }
         responseBuilder.setExtension(QueryFingerDataResponse.cmd,builder.build())
       } else {
-        responseBuilder.setStatus(ResponseStatus.FAIL)
-        responseBuilder.setMessage("fail");
+        responseBuilder.setStatus(CommandStatus.FAIL)
+        responseBuilder.setMsg("fail");
       }
     } else {
       handler.handle(protobufRequest, responseBuilder)

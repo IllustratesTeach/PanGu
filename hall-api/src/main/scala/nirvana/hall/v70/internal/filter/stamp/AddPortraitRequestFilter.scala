@@ -1,8 +1,8 @@
 package nirvana.hall.v70.internal.filter.stamp
 
+import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
-import nirvana.hall.protocol.sys.CommonProto.{BaseRequest, BaseResponse}
 import nirvana.hall.protocol.sys.stamp.SavePortraitProto.{SavePortraitRequest, SavePortraitResponse}
 import nirvana.hall.v70.services.stamp.GatherPortraitService
 
@@ -13,7 +13,7 @@ class AddPortraitRequestFilter (gatherPortraitService : GatherPortraitService)
   extends ProtobufRequestFilter
   with LoggerSupport{
 
-  override def handle(protobufRequest: BaseRequest, responseBuilder: BaseResponse.Builder, handler: ProtobufRequestHandler): Boolean = {
+  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
     if (protobufRequest.hasExtension(SavePortraitRequest.cmd)) {
       val request = protobufRequest.getExtension(SavePortraitRequest.cmd)
       val builder = SavePortraitResponse.newBuilder()

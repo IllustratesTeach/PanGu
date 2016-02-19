@@ -1,5 +1,5 @@
 package sys.stamp;
-import "sys/Common.proto";
+import "monad/rpc/protocol/command.proto";
 
 option java_package = "nirvana.hall.protocol.sys.stamp";
 
@@ -14,8 +14,8 @@ message GatherFlow {
 
 //采集流程查询请求
 message QueryGatherFlowRequest {
-    extend BaseRequest {
-        optional QueryGatherFlowRequest cmd = 301;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherFlowRequest cmd = 10215;
     }
     required string personId = 1;//捺印编号
     optional int32 ord = 2;      //采集次序
@@ -23,8 +23,8 @@ message QueryGatherFlowRequest {
 
 //返回采集流程
 message QueryGatherFlowResponse {
-    extend BaseResponse {
-        optional QueryGatherFlowResponse cmd = 301;
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherFlowResponse cmd = 10216;
     }
     repeated GatherFlow flow = 1;
 
