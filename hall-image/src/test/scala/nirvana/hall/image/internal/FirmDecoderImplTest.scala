@@ -1,25 +1,37 @@
 package nirvana.hall.image.internal
 
-import java.awt.{RenderingHints, AlphaComposite, Font, Color}
-import java.awt.image.{DataBufferByte, BufferedImage}
+import java.awt.image.{BufferedImage, DataBufferByte}
+import java.awt.{AlphaComposite, Color, Font, RenderingHints}
 import java.io.File
 import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
+import monad.support.services.XmlLoader
+import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
-import nirvana.hall.c.services.AncientData._
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
+import scala.io.Source
+import scala.collection.JavaConversions._
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
 class FirmDecoderImplTest extends BaseJniTest{
+  @Test
+  def test_parse_xml: Unit ={
+    val content = Source.fromInputStream(getClass.getResourceAsStream("/test_config.xml")).mkString
+    val config = XmlLoader.parseXML[HallImageConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/image/image.xsd")))
+    val dllName = "FPT_DC11.dll"
+    val dllPropertyOpt = config.image.dllConcurrent.find(_.name == dllName)
+    println(dllPropertyOpt)
+    println(XmlLoader.toXml(config))
+  }
   @Test
   def test_decode_gafisimg{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)

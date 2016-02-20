@@ -28,6 +28,7 @@ public class NativeImageConverter {
      * @return source data
      */
     public static native OriginalImage decodeByManufactory(long handle,String code,int cprMethod,byte[] cpr_data,int dest_img_size);
+    public static native void decodeByGFS(byte[] cprData,byte[] originData);
 
     /**
      * decode compressed data by WSQ

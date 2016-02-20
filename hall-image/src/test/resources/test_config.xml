@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014,2015 Jun Tsai. All rights
+
+reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_image>
+  <log_file>
+
+    /log/nirvana.hall.image.log</log_file>
+  <local_store_dir>
+
+    /config/local</local_store_dir>
+  <rpc>
+    <bind>10.1.7.10:5559</bind>
+
+
+  </rpc>
+  <zk>
+    <address>10.1.7.102:3333</address>
+  </zk>
+  <web>
+
+
+    <bind>10.1.7.10:9001</bind>
+
+    <max_conn_count>200</max_conn_count>
+    <request_buffer_size_kb>420</request_buffer_size_kb>
+    <response_buffer_size_kb>420</response_buffer_size_kb>
+
+  </web>
+  <image>
+    <dll_properties>
+      <dll name="FPT_DC00.dll" is_concurrent="true"/>
+
+
+      <dll name="FPT_DC11.dll" is_concurrent="false"/>
+      <dll name="FPT_DC12.dll"
+
+           is_concurrent="true"/>
+      <dll name="FPT_DC13.dll" is_concurrent="true"/>
+      <dll
+
+          name="FPT_DC17.dll" is_concurrent="true"/>
+      <dll name="FPT_DC18.dll"
+
+           is_concurrent="true"/>
+      <dll name="FPT_DC19.dll" is_concurrent="true"/>
+      <dll
+
+          name="FPT_DC22.dll" is_concurrent="true"/>
+    </dll_properties>
+  </image>
+</hall_image>
+
