@@ -17,6 +17,7 @@ import org.apache.tapestry5.ioc.annotations.Symbol
 import org.jnbis.WsqDecoder
 
 import scala.collection.JavaConversions._
+import scala.util.control.NonFatal
 
 /**
  * firm decoder
@@ -78,25 +79,30 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
           throw new IllegalStateException("width or height is zero!")
         if(cprData == null ||cprData.length == 0)
           throw new IllegalStateException("compressed data is zero!")
-        val originalData = dll.lockOpt match{
-          case Some(locker)=>
-            try{
-              locker.lock()
-              NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
-            }finally{
-              locker.unlock()
-            }
-          case None=>
-            NativeImageConverter.decodeByManufactory(dll.Handle,firmCode,cprMethod,cprData,destImgSize)
+        try {
+          val originalData = dll.lockOpt match {
+            case Some(locker) =>
+              try {
+                locker.lock()
+                NativeImageConverter.decodeByManufactory(dll.Handle, firmCode, cprMethod, cprData, destImgSize)
+              } finally {
+                locker.unlock()
+              }
+            case None =>
+              NativeImageConverter.decodeByManufactory(dll.Handle, firmCode, cprMethod, cprData, destImgSize)
+          }
+          destImg.bnData = originalData.getData
+          destImg.stHead.nImgSize = destImg.bnData.length
+          if (originalData.getWidth > 0)
+            destImg.stHead.nWidth = originalData.getWidth.toShort
+          if (originalData.getHeight > 0)
+            destImg.stHead.nHeight = originalData.getHeight.toShort
+          if (originalData.getPpi > 0)
+            destImg.stHead.nResolution = originalData.getPpi.toShort
+        }catch{
+          case NonFatal(e)=>
+            throw new IllegalAccessException("code:"+gafisImg.stHead.nCompressMethod +" e:"+e.toString)
         }
-        destImg.bnData = originalData.getData
-        destImg.stHead.nImgSize = destImg.bnData.length
-        if(originalData.getWidth>0)
-          destImg.stHead.nWidth =originalData.getWidth.toShort
-        if(originalData.getHeight>0)
-          destImg.stHead.nHeight=originalData.getHeight.toShort
-        if(originalData.getPpi>0)
-          destImg.stHead.nResolution = originalData.getPpi.toShort
     }
 
     destImg
@@ -190,8 +196,9 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       case Some(dllProperty) =>
         dllProperty.isConcurrent
       case None =>
-        false
+        true
     }
+    println("%s loaded,isConcurrent:%s".format(dllName,isConcurrent))
     dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }
 }
