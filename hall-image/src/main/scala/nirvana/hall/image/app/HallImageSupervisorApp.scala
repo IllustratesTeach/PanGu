@@ -15,11 +15,13 @@ import scala.collection.mutable.ArrayBuffer
  */
 object HallImageSupervisorApp extends LoggerSupport {
   def main(args: Array[String]): Unit = {
+    if(args != null)
+      println("image jvm args:"+args.toSeq)
     while (true)
-      startDecompressProcess()
+      startDecompressProcess(args)
   }
 
-  def startDecompressProcess(): Unit = {
+  def startDecompressProcess(jvmOptions:Array[String]): Unit = {
     val javaBinary = System.getProperty("java.home") + "/bin/java"
     val classPath = System.getProperty("java.class.path")
     // Create and start the worker
@@ -29,6 +31,8 @@ object HallImageSupervisorApp extends LoggerSupport {
     commandParameters.appendAll(properties)
     commandParameters += "-classpath"
     commandParameters += classPath
+    if(jvmOptions != null)
+      commandParameters ++= jvmOptions
 
     commandParameters += "nirvana.hall.image.app.HallImageApp"
     //"nirvana.hall.image.internal.FirmMain"
