@@ -2,11 +2,13 @@ package nirvana.hall.image.app
 
 import java.io.{IOException, InputStream, OutputStream}
 import java.lang.ProcessBuilder.Redirect
+import java.util.concurrent.{CountDownLatch, TimeUnit}
 
 import monad.support.services.LoggerSupport
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
+import scala.util.control.NonFatal
 
 /**
  * supervise hall image app
@@ -14,14 +16,38 @@ import scala.collection.mutable.ArrayBuffer
  * @since 2016-02-15
  */
 object HallImageSupervisorApp extends LoggerSupport {
+  private val max = 4
+
   def main(args: Array[String]): Unit = {
     if(args != null)
-      println("image jvm args:"+args.toSeq)
-    while (true)
-      startDecompressProcess(args)
+      info("image jvm args:"+args.toSeq)
+    var process:Option[Process] = None
+    val countDown = new CountDownLatch(1)
+
+    var n = Integer.MAX_VALUE
+    while (true) {
+      if(n> max || countDown.await(15,TimeUnit.MINUTES)){
+        //first stop process
+        process.foreach { p =>
+          try {
+            info("destroy process...")
+            p.destroy()
+          } catch{
+            case NonFatal(e)=>
+              println(e.printStackTrace())
+          }
+        }
+        info("start process...")
+        process = Some(startDecompressProcess(args))
+        info("process stared!")
+        n = 0
+      }else{
+        n += 1
+      }
+    }
   }
 
-  def startDecompressProcess(jvmOptions:Array[String]): Unit = {
+  def startDecompressProcess(jvmOptions:Array[String]): Process = {
     val javaBinary = System.getProperty("java.home") + "/bin/java"
     val classPath = System.getProperty("java.class.path")
     // Create and start the worker
@@ -47,8 +73,7 @@ object HallImageSupervisorApp extends LoggerSupport {
     sys.addShutdownHook {
       worker.destroy()
     }
-
-    worker.waitFor()
+    worker
   }
 
   /**
