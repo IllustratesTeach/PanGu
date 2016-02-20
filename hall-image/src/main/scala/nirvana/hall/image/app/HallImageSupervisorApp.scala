@@ -16,38 +16,48 @@ import scala.util.control.NonFatal
  * @since 2016-02-15
  */
 object HallImageSupervisorApp extends LoggerSupport {
-  private val max = 4
+  private val maxWaitingRestartCount = 4
+  @volatile
+  private var waitingRestartCount = 0
+  @volatile
+  private  var process:Option[Process] = None
 
   def main(args: Array[String]): Unit = {
     if(args != null)
       info("image jvm args:"+args.toSeq)
-    var process:Option[Process] = None
-    val countDown = new CountDownLatch(1)
-
-    var n = Integer.MAX_VALUE
+    new RestartThread("restart-image-thread").start()
     while (true) {
-      if(n> max || countDown.await(15,TimeUnit.MINUTES)){
-        //first stop process
-        process.foreach { p =>
-          try {
-            info("destroy process...")
-            p.destroy()
-          } catch{
-            case NonFatal(e)=>
-              println(e.printStackTrace())
+      info("start process...")
+      process = Some(startDecompressProcess(args))
+      info("process started")
+      waitingRestartCount = 0
+      process.get.waitFor()
+    }
+  }
+  private class RestartThread(name:String) extends Thread(name){
+    setDaemon(true)
+    override def run(): Unit = {
+      val countDown = new CountDownLatch(1)
+      while (true) {
+        if(waitingRestartCount > maxWaitingRestartCount || countDown.await(15,TimeUnit.MINUTES)){
+          //first stop process
+          process.foreach { p =>
+            try {
+              info("destroy process...")
+              p.destroy()
+            } catch{
+              case NonFatal(e)=>
+                error(e.toString,e)
+            }
           }
+          waitingRestartCount = 0
+        }else{
+          waitingRestartCount += 1
         }
-        info("start process...")
-        process = Some(startDecompressProcess(args))
-        info("process stared!")
-        n = 0
-      }else{
-        n += 1
       }
     }
   }
-
-  def startDecompressProcess(jvmOptions:Array[String]): Process = {
+  private def startDecompressProcess(jvmOptions:Array[String]): Process = {
     val javaBinary = System.getProperty("java.home") + "/bin/java"
     val classPath = System.getProperty("java.class.path")
     // Create and start the worker
