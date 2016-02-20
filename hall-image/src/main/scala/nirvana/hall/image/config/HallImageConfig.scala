@@ -1,7 +1,7 @@
 package nirvana.hall.image.config
 
 import java.util
-import javax.xml.bind.annotation.{XmlElementWrapper, XmlElement, XmlRootElement, XmlType}
+import javax.xml.bind.annotation._
 
 import monad.core.config.{LocalStoreConfigSupport, ZkClientConfigSupport, HeartbeatConfigSupport, LogFileSupport}
 import monad.rpc.config.RpcBindSupport
@@ -36,8 +36,8 @@ class ImageConfig{
 }
 @XmlRootElement(name="dll")
 class DllConfig{
-  @XmlElement(name="name")
+  @XmlAttribute(name="name")
   var name:String = _
-  @XmlElement(name="is_concurrent")
+  @XmlAttribute(name="is_concurrent")
   var isConcurrent:Boolean = _
 }
