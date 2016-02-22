@@ -2,7 +2,8 @@ package nirvana.hall.api.config
 
 import javax.xml.bind.annotation._
 
-import monad.core.config.{LocalStoreConfigSupport, LogFileSupport}
+import monad.core.config.{HeartbeatConfigSupport, ZkClientConfigSupport, LocalStoreConfigSupport, LogFileSupport}
+import monad.rpc.config.RpcBindSupport
 import monad.support.services.WebServerConfigSupport
 
 /**
@@ -15,9 +16,8 @@ import monad.support.services.WebServerConfigSupport
 @XmlRootElement(name = "hall_api")
 class HallApiConfig
     extends LogFileSupport
+    with RpcBindSupport
+    with WebServerConfigSupport
     with LocalStoreConfigSupport
-    with WebServerConfigSupport {
-
-}
-
-
+    with ZkClientConfigSupport
+    with HeartbeatConfigSupport

@@ -1,7 +1,8 @@
 package nirvana.hall.api.internal.filter
 
 import monad.rpc.protocol.CommandProto.BaseCommand
-import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler, TPCardService}
+import monad.rpc.services.{CommandResponse, RpcServerMessageHandler, RpcServerMessageFilter}
+import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.TPCardProto._
 
 /**
@@ -9,34 +10,34 @@ import nirvana.hall.protocol.api.TPCardProto._
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-04
  */
-class TPCardFilter(tpCardService: TPCardService) extends ProtobufRequestFilter{
+class TPCardFilter(tpCardService: TPCardService) extends RpcServerMessageFilter{
 
-  override def handle(protobufRequest: BaseCommand, responseBuilder: BaseCommand.Builder, handler: ProtobufRequestHandler): Boolean = {
-    if(protobufRequest.hasExtension(TPCardAddRequest.cmd)){
-      val request = protobufRequest.getExtension(TPCardAddRequest.cmd)
+  override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
+    if(commandRequest.hasExtension(TPCardAddRequest.cmd)){
+      val request = commandRequest.getExtension(TPCardAddRequest.cmd)
       val response = tpCardService.addTPCard(request)
-      responseBuilder.setExtension(TPCardAddResponse.cmd,response)
+      commandResponse.writeMessage(commandRequest, TPCardAddResponse.cmd, response)
       true
     }//删除
-    else if(protobufRequest.hasExtension(TPCardDelRequest.cmd)){
-      val request = protobufRequest.getExtension(TPCardDelRequest.cmd)
+    else if(commandRequest.hasExtension(TPCardDelRequest.cmd)){
+      val request = commandRequest.getExtension(TPCardDelRequest.cmd)
       val response = tpCardService.delTPCard(request)
-      responseBuilder.setExtension(TPCardDelResponse.cmd, response)
+      commandResponse.writeMessage(commandRequest, TPCardDelResponse.cmd, response)
       true
     }//修改
-    else if(protobufRequest.hasExtension(TPCardUpdateRequest.cmd)){
-      val request = protobufRequest.getExtension(TPCardUpdateRequest.cmd)
+    else if(commandRequest.hasExtension(TPCardUpdateRequest.cmd)){
+      val request = commandRequest.getExtension(TPCardUpdateRequest.cmd)
       val response = tpCardService.updateTPCard(request)
-      responseBuilder.setExtension(TPCardUpdateResponse.cmd, response)
+      commandResponse.writeMessage(commandRequest, TPCardUpdateResponse.cmd, response)
       true
     }//查询
-    else if(protobufRequest.hasExtension(TPCardGetRequest.cmd)){
-      val request = protobufRequest.getExtension(TPCardGetRequest.cmd)
+    else if(commandRequest.hasExtension(TPCardGetRequest.cmd)){
+      val request = commandRequest.getExtension(TPCardGetRequest.cmd)
       val response = tpCardService.getTPCard(request)
-      responseBuilder.setExtension(TPCardGetResponse.cmd, response)
+      commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response)
       true
     }else{
-      handler.handle(protobufRequest,responseBuilder)
+      handler.handle(commandRequest, commandResponse)
     }
   }
 }

@@ -24,8 +24,6 @@ object HallApiApp
     val config = HallApiModule.buildHallApiConfig(serverHome)
     configLogger(config.logFile, "API", "egf", "nirvana.hall")
 
-//    LocalV70Module.buildHallV70Config(serverHome)
-
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall api server ....")
     val classes = List[Class[_]](
@@ -38,8 +36,12 @@ object HallApiApp
 //      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
 //      Class.forName("nirvana.hall.v62.LocalV62Module"),
       //公共配置
-      Class.forName("nirvana.hall.api.LocalProtobufModule"),
-      Class.forName("nirvana.hall.api.LocalApiWebModule"),
+      Class.forName("monad.core.LocalMonadCoreModule"),
+      Class.forName("monad.rpc.LocalRpcModule"),
+      Class.forName("monad.rpc.LocalRpcServerModule"),
+//      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
+
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
       Class.forName("nirvana.hall.api.HallApiModule")
     )

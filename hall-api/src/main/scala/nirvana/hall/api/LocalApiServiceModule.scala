@@ -1,9 +1,15 @@
 package nirvana.hall.api
 
+import monad.core.MonadCoreConstants
+import monad.core.config.ZkClientConfigSupport
+import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
+import monad.support.services.ZookeeperTemplate
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.filter.{CaseInfoFilter, LPCardFilter, QueryFilter, TPCardFilter}
 import nirvana.hall.api.services._
-import org.apache.tapestry5.ioc.annotations.Contribute
+import org.apache.tapestry5.ioc.annotations.{EagerLoad, Contribute}
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.apache.tapestry5.services.Core
 
@@ -20,14 +26,30 @@ object LocalApiServiceModule {
     binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
   }
 
-  @Contribute(classOf[ProtobufRequestHandler])
-  def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
+  @Contribute(classOf[RpcServerMessageHandler])
+  def provideProtobufFilter(configuration: OrderedConfiguration[RpcServerMessageFilter]): Unit = {
     configuration.addInstance("TPCardFilter", classOf[TPCardFilter])
     configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
     configuration.addInstance("CaseFilter", classOf[CaseInfoFilter])
     configuration.addInstance("QueryFilter", classOf[QueryFilter])
   }
 
+  //增加EagerLoad,避免出现deadlock
+  @EagerLoad
+  def buildZookeeperTemplate(config: ZkClientConfigSupport, periodExecutor: PeriodicExecutor, hub: RegistryShutdownHub): ZookeeperTemplate = {
+    val rootZk = new ZookeeperTemplate(config.zk.address)
+    rootZk.start(null)
+    rootZk.createPersistPath(config.zk.root + MonadCoreConstants.MACHINES)
+    rootZk.createPersistPath(config.zk.root + MonadCoreConstants.HEARTBEATS)
+    rootZk.createPersistPath(config.zk.root + MonadCoreConstants.ERRORS)
+    rootZk.shutdown()
+
+    val zk = new ZookeeperTemplate(config.zk.address, Some(config.zk.root), config.zk.timeoutInMills)
+    zk.start(hub)
+    zk.startCheckFailed(periodExecutor)
+
+    zk
+  }
 //  @Match(Array("*"))
 //  def adviseAuth(@Local advisor: RequiresUserAdvisor, receiver: MethodAdviceReceiver) {
 //    advisor.addAdvice(receiver)

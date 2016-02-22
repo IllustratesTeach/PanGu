@@ -5,17 +5,15 @@
 -->
 
 <hall_api>
-    <log_file>${server.home}/log/hall.api.log</log_file>
+    <log_file>${server.home}/log/monad.api.log</log_file>
     <local_store_dir>${server.home}/config/local.api</local_store_dir>
+    <rpc>
+        <bind>127.*:5559</bind>
+    </rpc>
+    <zk>
+        <address>192.168.99.100:3333</address>
+    </zk>
     <web>
-      <bind>127.0.0.1:9081</bind>
+      <bind>0.0.0.0:8080</bind>
     </web>
-    <api>
-      <database>
-        <driver>org.h2.Driver</driver>
-        <user>sa</user>
-        <url>jdbc:h2:mem:hall</url>
-      </database>
-    </api>
-    <sync62_cron>0 * * * * ? *</sync62_cron>
 </hall_api>
