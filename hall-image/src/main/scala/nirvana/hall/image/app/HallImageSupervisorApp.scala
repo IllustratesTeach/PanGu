@@ -2,7 +2,7 @@ package nirvana.hall.image.app
 
 import java.io.{IOException, InputStream, OutputStream}
 import java.lang.ProcessBuilder.Redirect
-import java.util.concurrent.{CountDownLatch, TimeUnit}
+import java.util.concurrent.{CountDownLatch, Executors, TimeUnit}
 
 import monad.support.services.LoggerSupport
 
@@ -20,28 +20,39 @@ object HallImageSupervisorApp extends LoggerSupport {
   @volatile
   private var waitingRestartCount = 0
   @volatile
-  private  var process:Option[Process] = None
+  private  var processes:Array[Process] = _
+  private val executors = Executors.newCachedThreadPool()
 
   def main(args: Array[String]): Unit = {
     if(args != null)
       info("image jvm args:"+args.toSeq)
-    new RestartThread("restart-image-thread").start()
-    while (true) {
-      info("start process...")
-      process = Some(startDecompressProcess(args))
-      info("process started")
-      waitingRestartCount = 0
-      process.get.waitFor()
+    val portStart = System.getProperty("server.port.start").toInt
+    val numProcess = System.getProperty("server.process.num").toInt
+
+    processes = new Array[Process](numProcess)
+    0.until(numProcess).foreach{ i=>
+      executors.execute{new Runnable {
+        override def run(): Unit = {
+          while (true) {
+            info("start process ["+i+"]...")
+            val process = startDecompressProcess(args,portStart+i)
+            processes(i) = process
+            info("process ["+i+"] started")
+            process.waitFor()
+          }
+        }
+      }}
     }
+    executors.execute(new RestartThread())
+    Thread.currentThread().join()
   }
-  private class RestartThread(name:String) extends Thread(name){
-    setDaemon(true)
+  private class RestartThread extends Runnable{
     override def run(): Unit = {
       val countDown = new CountDownLatch(1)
       while (true) {
         if(waitingRestartCount > maxWaitingRestartCount || countDown.await(15,TimeUnit.MINUTES)){
           //first stop process
-          process.foreach { p =>
+          processes.foreach { p =>
             try {
               info("destroy process...")
               p.destroy()
@@ -57,7 +68,7 @@ object HallImageSupervisorApp extends LoggerSupport {
       }
     }
   }
-  private def startDecompressProcess(jvmOptions:Array[String]): Process = {
+  private def startDecompressProcess(jvmOptions:Array[String],port:Int): Process = {
     val javaBinary = System.getProperty("java.home") + "/bin/java"
     val classPath = System.getProperty("java.class.path")
     // Create and start the worker
@@ -69,6 +80,8 @@ object HallImageSupervisorApp extends LoggerSupport {
     commandParameters += classPath
     if(jvmOptions != null)
       commandParameters ++= jvmOptions
+
+    commandParameters += "-Dserver.port="+port
 
     commandParameters += "nirvana.hall.image.app.HallImageApp"
     //"nirvana.hall.image.internal.FirmMain"
