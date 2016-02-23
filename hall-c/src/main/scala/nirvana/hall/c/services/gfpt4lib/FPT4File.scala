@@ -10,11 +10,20 @@ import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
  * @since 2016-01-27
  */
 object FPT4File {
+  private lazy val headSize = 10
+  private lazy val FingerTData_StaticLength = new FingerTData().getStaticSize
+  private lazy val Logic02Rec_StaticLength= new Logic02Rec().getStaticSize
   class LogicHeadV4 extends AncientData{
     @Length(8)
     var fileLength: String = _
     @Length(2)
     var dataType:String = _
+
+    /**
+     * calculate data size and return.
+     * @return data size
+     */
+    override def getDataSize: Int = headSize
   }
   class FPT4File extends AncientData {
     var head: FPTHead = new FPTHead
@@ -103,145 +112,6 @@ object FPT4File {
     @LengthRef("customCandidateCount")
     var logic99Recs: Array[Logic99Rec] = _
 
-    /*
-    /**
-     * calculate data size and return.
-     * @return data size
-     */
-    override def getDataSize: Int = {
-      var count = super.getDataSize
-      /*
-      Array(logic02Recs,
-        logic03Recs,
-        logic04Recs,
-        logic05Recs,
-        logic06Recs,
-        logic07Recs,
-        logic08Recs,
-        logic09Recs,
-        logic10Recs,
-        logic11Recs,
-        logic12Recs,
-        logic99Recs)
-        .filterNot(_ == null)
-        .foreach(_.foreach(count += _.getDataSize))
-        */
-
-      count
-    }
-
-    /**
-     * serialize to channel buffer
-     * @param stream netty channel buffer
-     */
-    override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
-      super.writeToStreamWriter(stream)
-      /*
-      Array(logic02Recs,
-        logic03Recs,
-        logic04Recs,
-        logic05Recs,
-        logic06Recs,
-        logic07Recs,
-        logic08Recs,
-        logic09Recs,
-        logic10Recs,
-        logic11Recs,
-        logic12Recs,
-        logic99Recs)
-        .filterNot(_ == null)
-        .foreach(_.foreach(_.writeToStreamWriter(stream)))
-        */
-
-      stream
-    }
-
-
-    /**
-     * convert channel buffer data as object
-     * @param dataSource netty channel buffer
-     */
-    override def fromStreamReader(dataSource: StreamReader, encoding: Charset = AncientConstants.UTF8_ENCODING): this.type = {
-      super.fromStreamReader(dataSource, encoding)
-      /*
-
-      logic02Recs = FPTFile.readLogic[Logic02Rec](logic01Rec.tpCount, dataSource, encoding)
-      logic03Recs = FPTFile.readLogic[Logic03Rec](logic01Rec.lpCount, dataSource, encoding)
-      logic04Recs = FPTFile.readLogic[Logic04Rec](logic01Rec.tl_ltCount, dataSource, encoding)
-      logic05Recs = FPTFile.readLogic[Logic05Rec](logic01Rec.ttCount, dataSource, encoding)
-      logic06Recs = FPTFile.readLogic[Logic06Rec](logic01Rec.llCount, dataSource, encoding)
-      logic07Recs = FPTFile.readLogic[Logic07Rec](logic01Rec.lpRequestCount, dataSource, encoding)
-      logic08Recs = FPTFile.readLogic[Logic08Rec](logic01Rec.tpRequestCount, dataSource, encoding)
-      logic09Recs = FPTFile.readLogic[Logic09Rec](logic01Rec.ltCandidateCount, dataSource, encoding)
-      logic10Recs = FPTFile.readLogic[Logic10Rec](logic01Rec.tlCandidateCount, dataSource, encoding)
-      logic11Recs = FPTFile.readLogic[Logic11Rec](logic01Rec.ttCandidateCount, dataSource, encoding)
-      logic12Recs = FPTFile.readLogic[Logic12Rec](logic01Rec.llCandidateCount, dataSource, encoding)
-      logic99Recs = FPTFile.readLogic[Logic99Rec](logic01Rec.customCandidateCount, dataSource, encoding)
-      */
-
-      this
-    }
-    */
-  }
-
-  class Logic01Rec extends AncientData {
-    @Length(12)
-    var fileLength: String = _
-    @Length(2)
-    var dataType: String = "1"
-    @Length(6)
-    var tpCount: String = _
-    @Length(6)
-    var lpCount: String = _
-
-    @Length(6)
-    var tl_ltCount: String = _
-    @Length(6)
-    var ttCount: String = _
-    @Length(6)
-    var llCount: String = _
-    @Length(6)
-    var lpRequestCount: String = _
-    @Length(6)
-    var tpRequestCount: String = _
-    @Length(6)
-    var ltCandidateCount: String = _
-    @Length(6)
-    var tlCandidateCount: String = _
-    @Length(6)
-    var ttCandidateCount: String = _
-    @Length(6)
-    var llCandidateCount: String = _
-    @Length(6)
-    var customCandidateCount: String = _
-
-
-    @Length(14)
-    var sendTime: String = _
-    @Length(12)
-    var receiveUnitCode: String = _
-    @Length(12)
-    var sendUnitCode: String = _
-    @Length(70)
-    var sendUnitName: String = _
-    @Length(30)
-    var sender: String = _
-    /**
-     * 发送单位系统类型
-     * 1900 东方金指
-     * 1300 北大高科
-     * 1700 北京海鑫
-     * 1800 小日本NEC
-     * 1200 北京邮电大学
-     * 1100 北京刑科所
-     */
-    @Length(4)
-    var sendUnitSystemType: String = _
-    @Length(10)
-    var sid: String = _
-    @Length(512)
-    var remark: String = _
-    var fs: Byte = FPTFile.FS //FS
   }
 
   class Logic02Rec extends DynamicFingerData {
@@ -339,6 +209,22 @@ object FPT4File {
     @LengthRef("sendFingerCount")
     var fingers: Array[FingerTData] = _
 
+
+    def getStaticSize:Int={
+      super.getDataSize
+    }
+
+    override def getDataSize: Int = {
+      var len = Logic02Rec_StaticLength
+      if(portraitDataLength != null && portraitDataLength.nonEmpty)
+        len += portraitDataLength.toInt
+      if(getFingerDataCount > 0)
+        len -=1
+      if(fingers != null)
+        fingers.foreach( len+= _.getDataSize)
+      len
+    }
+
     // GS
     override protected def getFingerDataCount: Int = {
       if (sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
@@ -389,6 +275,23 @@ object FPT4File {
     @LengthRef("imgDataLength")
     var imgData: Array[Byte]= _
     var end: Byte = FPTFile.GS
+
+    def getStaticSize:Int={
+      super.getDataSize
+    }
+    /**
+     * calculate data size and return.
+     * @return data size
+     */
+    override def getDataSize: Int = {
+      var len =  FingerTData_StaticLength
+      if(customInfoLength !=null && customInfoLength.nonEmpty)
+        len += customInfoLength.toInt
+      if(imgDataLength != null && imgDataLength.nonEmpty)
+        len += imgDataLength.toInt
+
+      len
+    }
   }
 
   class Logic03Rec extends DynamicFingerData {
@@ -451,6 +354,8 @@ object FPT4File {
     var fingerCount: String = _
     @Length(2)
     var sendFingerCount: String = _
+    @LengthRef("sendFingerCount")
+    var fingers: Array[FingerLData] = _
 
     // GS
     override protected def getFingerDataCount: Int = {
@@ -458,7 +363,7 @@ object FPT4File {
     }
   }
 
-  class FingerLData {
+  class FingerLData extends AncientData{
     @Length(7)
     var dataLength: String = _
     @Length(2)
@@ -516,10 +421,9 @@ object FPT4File {
     @Length(4)
     var imgCompressMethod: String = _
     @Length(6)
-    var imgDataLenght: String = _
+    var imgDataLength: String = _
     @Length(6)
     var imgData: Array[Byte] = _
-    @Length(1)
     var end: Byte = FPTFile.GS
   }
 

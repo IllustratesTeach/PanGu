@@ -87,8 +87,15 @@ class FPTFileTest {
   }
   @Test
   def test_read_fpt4:Unit={
-    val fpt4 = new FPT4File
+    var fpt4 = new FPT4File
     fpt4.fromStreamReader(getClass.getResourceAsStream("/fpt4.fpt")) //,AncientConstants.GBK_ENCODING)
+    Assert.assertEquals(fpt4.logic02Recs.head.fingers.size ,fpt4.logic02Recs.head.sendFingerCount.toInt)
+    Assert.assertEquals(fpt4.getDataSize,fpt4.fileLength.toInt)
+    val bytes = fpt4.toByteArray
+    Assert.assertEquals(fpt4.getDataSize,bytes.size)
+
+    fpt4 = new FPT4File
+    fpt4.fromByteArray(bytes)
     Assert.assertEquals(fpt4.logic02Recs.head.fingers.size ,fpt4.logic02Recs.head.sendFingerCount.toInt)
     Assert.assertEquals(fpt4.getDataSize,fpt4.fileLength.toInt)
   }
