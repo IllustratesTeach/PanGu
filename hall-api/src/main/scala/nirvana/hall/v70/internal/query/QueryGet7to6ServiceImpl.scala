@@ -1,12 +1,13 @@
 package nirvana.hall.v70.internal.query
 
-import java.io.ByteArrayOutputStream
 import java.util.Date
 import javax.persistence.EntityManagerFactory
 
-import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse}
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6}
+import nirvana.hall.v70.internal.sync.ProtobufConverter
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, SyncTarget}
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -17,7 +18,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * Created by songpeng on 15/12/30.
  */
-class QueryGet7to6ServiceImpl(v70Config: HallV70Config)
+class QueryGet7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient)
   extends QueryGet7to6Service{
 
   private val STATUS_MATCHING:Short = 1//任务状态，正在比对
@@ -25,19 +26,22 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config)
 
   @Transactional
   override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque): Unit = {
-    val queryId = GafisQuery7to6.find_by_oraSid(queryque.oraSid).takeOption.map(_.queryId)
-/*    if(queryId.isDefined){
-      val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(queryId.get)
-      val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(v62Config.queryTable.dbId.toShort, v62Config.queryTable.tableId.toShort, pstQry)
+    val queryId = GafisQuery7to6.find(queryque.oraSid).queryId
 
-      if(gaQueryStruct.stSimpQry.nStatus >= 2){//判断是否已经完成比对
-        addMatchResult(queryque.pkId, gaQueryStruct)
-        doWork
-      }
-    }*/
+    val syncTagert = SyncTarget.find(queryque.syncTargetSid)
 
-    //TODO
-    throw new UnsupportedOperationException
+    val request = QueryGetRequest.newBuilder().setOraSid(queryId)
+
+    val baseResponse = rpcHttpClient.call("http://"+ syncTagert.targetIp+":"+ syncTagert.targetPort, QueryGetRequest.cmd, request.build())
+    val queryGetResponse = baseResponse.getExtension(QueryGetResponse.cmd)
+    val matchResult = queryGetResponse.getMatchResult
+
+    ProtobufConverter.convertMatchResult2GafisNormalqueryQueryque(matchResult, queryque)
+
+    queryque.finishtime = new Date()
+    queryque.status = STATUS_FINISH
+
+    queryque.save()
   }
 
   @PostInjection
@@ -61,27 +65,4 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config)
   override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
     GafisNormalqueryQueryque.where("status=?1 and syncTargetSid is not null", STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
   }
-
-  /**
-   * 保存比对结果
-   * @param gaQueryStruct
-   */
-  @Transactional
-  private def addMatchResult(pkId: String, gaQueryStruct: gaqryque.GAQUERYSTRUCT): Unit ={
-    val candDataBuffer = new ByteArrayOutputStream()
-    gaQueryStruct.pstCand_Data.foreach{candData =>
-      candDataBuffer.write(candData.toByteArray)
-    }
-    GafisNormalqueryQueryque.where("pkId=?1", pkId).update(
-      status = STATUS_FINISH,
-      curcandnum = gaQueryStruct.stSimpQry.nCurCandidateNum,
-      candhead = gaQueryStruct.pstCandHead_Data.toByteArray,
-      candlist = candDataBuffer.toByteArray,
-      hitpossibility = gaQueryStruct.stSimpQry.nHitPossibility.toShort,
-      verifyresult = gaQueryStruct.stSimpQry.nVerifyResult.toShort,
-      finishtime = new Date()
-    )
-
-  }
-
 }

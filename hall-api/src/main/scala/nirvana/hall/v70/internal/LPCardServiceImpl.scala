@@ -23,7 +23,6 @@ class LPCardServiceImpl extends LPCardService{
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
-    //TODO 没有card_id
     caseFinger.inputpsn = Gafis70Constants.INPUTPSN
     caseFinger.inputtime = new Date()
     caseFinger.deletag = Gafis70Constants.DELETAG_USE

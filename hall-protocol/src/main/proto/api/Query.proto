@@ -31,5 +31,5 @@ message QueryGetResponse {
     extend monad.rpc.protocol.BaseCommand{
         optional QueryGetResponse cmd = 10034;
     }
-    required matcher.MatchResultRequest matchResult = 1;
+    required matcher.MatchResult matchResult = 1;
 }

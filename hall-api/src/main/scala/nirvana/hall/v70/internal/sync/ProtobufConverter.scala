@@ -1,21 +1,25 @@
 package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.util.Date
 
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.orm.services.Relation
+import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.internal.c.gloclib.galoctp
+import nirvana.hall.v70.internal.CommonUtils
 import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/28.
@@ -136,7 +140,8 @@ object ProtobufConverter {
 //    magicSet(caseFinger.developMethod, blobBuilder.setStrMntExtractMethod)
     blobBuilder.setStImageBytes(ByteString.copyFrom(caseFinger.fingerImg))
     //特征
-    blobBuilder.setStMntBytes(ByteString.copyFrom(caseFingerMnt.fingerMnt))
+    if(caseFingerMnt.fingerMnt != null)
+      blobBuilder.setStMntBytes(ByteString.copyFrom(caseFingerMnt.fingerMnt))
     magicSet(caseFingerMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
     //指位
     if (isNonBlank(caseFinger.fgp))
@@ -328,7 +333,6 @@ object ProtobufConverter {
   }
 
   def convertGafisNormalqueryQueryque2MatchTask(gafisQuery: GafisNormalqueryQueryque): MatchTask = {
-
     val matchTask = MatchTask.newBuilder()
     matchTask.setMatchId(gafisQuery.keyid)
     matchTask.setMatchType(MatchType.valueOf(gafisQuery.querytype+1))
@@ -357,4 +361,51 @@ object ProtobufConverter {
 
     throw new UnsupportedOperationException
   }
+
+  def convertMatchResult2GafisNormalqueryQueryque(matchResult: MatchResult, gafisQuery: GafisNormalqueryQueryque = new GafisNormalqueryQueryque()): GafisNormalqueryQueryque ={
+    gafisQuery.maxcandnum = matchResult.getCandidateNum
+    gafisQuery.recordNumMatched = matchResult.getRecordNumMatched
+    gafisQuery.maxscore = matchResult.getMaxScore.toLong
+    //如果有候选队列，处理状态为待处理0,比中状态0;否则已处理1,没有比中1
+    if(matchResult.getCandidateNum > 0){
+      gafisQuery.hitpossibility = 0.toShort
+      gafisQuery.verifyresult = 0.toShort
+    }else{
+      gafisQuery.hitpossibility = 99.toShort
+      gafisQuery.verifyresult = 1.toShort
+    }
+
+    gafisQuery.candlist = convertMatchResult2CandList(matchResult)
+
+    gafisQuery
+  }
+
+  private def convertMatchResult2CandList(matchResult: MatchResult): Array[Byte] = {
+    val result = new ByteArrayOutputStream()
+    val queryType = 0
+    val candIter = matchResult.getCandidateResultList.iterator()
+    var index = 0//比对排名
+    while(candIter.hasNext){
+      index += 1
+      val cand = candIter.next()
+      result.write(new Array[Byte](4))
+      result.write(CommonUtils.int2Byte(cand.getScore))
+      result.write(cand.getObjectId.getBytes())
+      result.write(new Array[Byte](32 - cand.getObjectId.getBytes().length + 2))
+      val dbId = if (queryType == 0 || queryType == 2) 1 else 2
+      result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
+      result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
+      result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
+      result.write(cand.getPos.toByte)
+      result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
+      result.write(CommonUtils.getAFISDateTime(new Date()))
+      result.write(new Array[Byte](2 + 2 + 2 + 2))
+      result.write(new Array[Byte](8+2))
+      result.write(CommonUtils.int2Byte(index))
+      result.write(new Array[Byte](2))
+    }
+
+    result.toByteArray
+  }
+
 }

@@ -18,4 +18,7 @@ object TestModule {
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.v70.jpa")
   }
+//  def bind(binder: ServiceBinder): Unit = {
+//    binder.bind(classOf[RpcHttpClient],classOf[RpcHttpClientImpl]).withId("RpcHttpClient")
+//  }
 }

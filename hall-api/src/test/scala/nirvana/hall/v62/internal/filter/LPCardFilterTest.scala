@@ -1,24 +1,16 @@
 package nirvana.hall.v62.internal.filter
 
 import com.google.protobuf.ByteString
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
-import nirvana.hall.api.services.ProtobufRequestHandler
+import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, PatternType}
 import nirvana.hall.protocol.api.LPCardProto._
-import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
+import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 15/11/15.
  */
-class LPCardFilterTest {
-  val modules = Seq[String](
-    "nirvana.hall.api.LocalProtobufModule",
-    "nirvana.hall.api.LocalApiServiceModule",
-    "nirvana.hall.v62.LocalV62ServiceModule",
-    "nirvana.hall.v62.internal.filter.TestModule").map(Class.forName)
-  protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
-
+class LPCardFilterTest extends BaseV62TestCase{
   @Test
   def test_add(): Unit ={
     val requestBuilder = LPCardAddRequest.newBuilder()
@@ -40,27 +32,20 @@ class LPCardFilterTest {
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
 
+    val lpCardService = getService[LPCardService]
+    val response = lpCardService.addLPCard(requestBuilder.build())
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(LPCardAddRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
-
-    handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    Assert.assertNotNull(response)
   }
   @Test
   def test_del(): Unit ={
     val requestBuilder = LPCardDelRequest.newBuilder()
     requestBuilder.setCardId("12345601")
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(LPCardDelRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
+    val lpCardService = getService[LPCardService]
+    val response = lpCardService.delLPCard(requestBuilder.build())
 
-    handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    Assert.assertNotNull(response)
   }
   @Test
   def test_update(): Unit ={
@@ -83,28 +68,20 @@ class LPCardFilterTest {
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
 
+    val lpCardService = getService[LPCardService]
+    val response = lpCardService.updateLPCard(requestBuilder.build())
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(LPCardUpdateRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
-
-    handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    Assert.assertNotNull(response)
   }
   @Test
   def test_get(): Unit ={
     val requestBuilder = LPCardGetRequest.newBuilder()
     requestBuilder.setCardId("12345601")
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(LPCardGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
+    val lpCardService = getService[LPCardService]
+    val response = lpCardService.getLPCard(requestBuilder.build())
 
-    handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
-    Assert.assertNotNull(protobufResponse.getExtension(LPCardGetResponse.cmd).getCard)
+    Assert.assertNotNull(response.getCard)
   }
 
 }

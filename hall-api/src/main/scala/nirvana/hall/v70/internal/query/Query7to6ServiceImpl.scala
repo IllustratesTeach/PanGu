@@ -1,17 +1,17 @@
 package nirvana.hall.v70.internal.query
 
 import java.util.Date
-import javax.persistence.EntityManagerFactory
+import javax.persistence.{EntityManager, EntityManagerFactory}
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.WebHttpClientUtils
+import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.{GafisQuery7to6, GafisNormalqueryQueryque, SyncTarget}
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, SyncTarget}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * Created by songpeng on 15/12/9.
  */
-class Query7to6ServiceImpl(v70Config: HallV70Config)
+class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient, entityManager: EntityManager)
   extends Query7to6Service{
 
   private val STATUS_MATCHING =1.toShort//任务状态，正在比对
@@ -101,14 +101,12 @@ class Query7to6ServiceImpl(v70Config: HallV70Config)
     val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
 
     val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
-    val responseBuilder = QuerySendResponse.newBuilder()
 
     val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)
 
-    //TODO orasid的实际值丢失， 可能是ExtensionRegistry的问题
-    WebHttpClientUtils.call("http://"+syncTarget.targetIp+":"+syncTarget.targetPort, QuerySendRequest.cmd, request.build(), responseBuilder)
-
-    new GafisQuery7to6(gafisQuery.oraSid, responseBuilder.getOraSid).save()
+    val respnose = rpcHttpClient.call("http://"+syncTarget.targetIp+":"+syncTarget.targetPort, QuerySendRequest.cmd, request.build())
+    val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
+    new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
   }
 
 }

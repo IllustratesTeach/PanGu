@@ -91,12 +91,3 @@ message MatchTask {
   //纹型
   optional int32 ridge_pattern = 11;
 }
-/* 查询比对任务,根据优先级来取比对任务 */
-message MatchTaskQueryRequest {
-  /* 比对任务一次返回量 */
-  optional uint32 size = 1 [default = 10];
-}
-
-message MatchTaskQueryResponse {
-  repeated MatchTask matchTask = 1;
-}

@@ -23,7 +23,7 @@ class SystemServiceImpl(protobufRequestGlobal: ProtobufRequestGlobal, classNameL
 
 
   override def findAllProtocol(): Seq[String] = {
-    val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.v62")
+    val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.api")
     //val contextClassLoader = Thread.currentThread().getContextClassLoader
     val buff = new ListBuffer[String]()
     packages.foreach { packageName =>

@@ -8,8 +8,8 @@ import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
-import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest
-import nirvana.hall.protocol.matcher.MatchResult.MatchResultRequest.MatcherStatus
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
@@ -126,29 +126,29 @@ object gaqryqueConverter {
     pstQry
   }
 
-  def convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct: GAQUERYSTRUCT): MatchResultRequest ={
-    val matchResultRequest = MatchResultRequest.newBuilder()
+  def convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct: GAQUERYSTRUCT): MatchResult={
+    val matchResult = MatchResult.newBuilder()
 
     val queryId = gaQueryStruct.stSimpQry.nQueryID
-    matchResultRequest.setMatchId(convertSixByteArrayToLong(queryId)+"")
+    matchResult.setMatchId(convertSixByteArrayToLong(queryId)+"")
 
     val pstCandData = gaQueryStruct.pstCand_Data
-    matchResultRequest.setCandidateNum(pstCandData.length)
+    matchResult.setCandidateNum(pstCandData.length)
 
     var maxScore = 0
 
     pstCandData.foreach{ candData =>
-      val matchResult = matchResultRequest.addCandidateResultBuilder()
-      matchResult.setObjectId(convertSixByteArrayToLong(candData.nSID))
-      matchResult.setPos(candData.nIndex)
-      matchResult.setScore(candData.nScore)
+      val cand = matchResult.addCandidateResultBuilder()
+      cand.setObjectId(candData.szKey)
+      cand.setPos(candData.nIndex)
+      cand.setScore(candData.nScore)
       if(maxScore < candData.nScore)
         maxScore = candData.nScore
     }
-    matchResultRequest.setMaxScore(maxScore)
-    matchResultRequest.setStatus(MatcherStatus.newBuilder().setMsg("sucess"));
+    matchResult.setMaxScore(maxScore)
+    matchResult.setStatus(MatcherStatus.newBuilder().setMsg("sucess"))
 
-    matchResultRequest.build()
+    matchResult.build()
   }
 
   /**

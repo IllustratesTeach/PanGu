@@ -1,6 +1,8 @@
 package nirvana.hall.v70
 
 import nirvana.hall.api.services._
+import nirvana.hall.support.internal.RpcHttpClientImpl
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6ServiceImpl}
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync.{Sync7to6ServiceImpl, SyncDictServiceImpl}
@@ -17,6 +19,7 @@ import org.apache.tapestry5.ioc.ServiceBinder
  */
 object LocalV70ServiceModule {
   def bind(binder: ServiceBinder): Unit = {
+    binder.bind(classOf[RpcHttpClient],classOf[RpcHttpClientImpl]).withId("RpcHttpClient")
     binder.bind(classOf[UserService], classOf[UserServiceImpl])
     binder.bind(classOf[DictService], classOf[DictServiceImpl])
     binder.bind(classOf[GatherPersonService], classOf[GatherPersonServiceImpl])

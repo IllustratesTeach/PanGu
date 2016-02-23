@@ -1,25 +1,14 @@
 package nirvana.hall.v70.internal.filter
 
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
-import nirvana.hall.api.services.ProtobufRequestHandler
+import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.CaseProto._
-import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
+import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.{Assert, Test}
 
 /**
  * Created by songpeng on 16/2/17.
  */
-class CaseFilterTest {
-
-  private val modules = Seq[String](
-    "nirvana.hall.api.LocalProtobufModule",
-    "nirvana.hall.api.LocalApiServiceModule",
-    "nirvana.hall.orm.HallOrmModule",
-    "nirvana.hall.v70.internal.filter.TestModule",
-    "nirvana.hall.v70.LocalV70ServiceModule",
-    "nirvana.hall.v70.LocalDataSourceModule"
-    ).map(Class.forName)
-  protected var registry:Registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
+class CaseFilterTest extends BaseV70TestCase{
 
   @Test
   def test_add(): Unit ={
@@ -46,27 +35,17 @@ class CaseFilterTest {
     textBuilder.setStrPremium("1000")
     textBuilder.setStrSuspArea1Code("520100")
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(CaseAddRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
-
-    handler.handle(protobufRequest.build(), protobufResponse)
-
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    val caseInfoService = getService[CaseInfoService]
+    val response = caseInfoService.addCaseInfo(requestBuilder.build())
+    Assert.assertNotNull(response)
   }
   @Test
   def test_del(): Unit ={
     val requestBuilder = CaseDelRequest.newBuilder()
     requestBuilder.setCaseId("123456")
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(CaseDelRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
-
-    handler.handle(protobufRequest.build(), protobufResponse)
-
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    val caseInfoService = getService[CaseInfoService]
+    val response = caseInfoService.delCaseInfo(requestBuilder.build())
+    Assert.assertNotNull(response)
   }
   @Test
   def test_update(): Unit ={
@@ -93,27 +72,19 @@ class CaseFilterTest {
     textBuilder.setStrPremium("10000")
     textBuilder.setStrSuspArea1Code("520300")
 
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(CaseUpdateRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
-
-    handler.handle(protobufRequest.build(), protobufResponse)
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
+    val caseInfoService = getService[CaseInfoService]
+    val response = caseInfoService.updateCaseInfo(requestBuilder.build())
+    Assert.assertNotNull(response)
   }
   @Test
   def test_get(): Unit ={
     val requestBuilder = CaseGetRequest.newBuilder()
     requestBuilder.setCaseId("123456")
-    val handler = registry.getService(classOf[ProtobufRequestHandler])
-    val protobufRequest = BaseCommand.newBuilder().setTaskId(1)
-    protobufRequest.setExtension(CaseGetRequest.cmd, requestBuilder.build())
-    val protobufResponse = BaseCommand.newBuilder()
 
-    handler.handle(protobufRequest.build(), protobufResponse)
+    val caseInfoService = getService[CaseInfoService]
+    val response = caseInfoService.getCaseInfo(requestBuilder.build())
 
-    Assert.assertEquals(CommandStatus.OK,protobufResponse.getStatus)
-    Assert.assertNotNull(protobufResponse.getExtension(CaseGetResponse.cmd).getCase.getText)
+    Assert.assertNotNull(response.getCase)
   }
 
 }

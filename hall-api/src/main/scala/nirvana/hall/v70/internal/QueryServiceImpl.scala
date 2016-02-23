@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal
 
 import java.util.Date
+import javax.persistence.EntityManager
 
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
@@ -9,7 +10,7 @@ import nirvana.hall.v70.internal.sync.ProtobufConverter
 /**
  * Created by songpeng on 16/1/26.
  */
-class QueryServiceImpl extends QueryService{
+class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
    * 发送查询任务
    * @param querySendRequest
@@ -18,7 +19,9 @@ class QueryServiceImpl extends QueryService{
   override def sendQuery(querySendRequest: QuerySendRequest): QuerySendResponse = {
     val matchTask = querySendRequest.getMatchTask
     val gafisQuery = ProtobufConverter.convertMatchTask2GafisNormalqueryQueryque(matchTask)
-    gafisQuery.oraSid = 1L//TODO 查询序列
+    val query = entityManager.createNativeQuery("select SEQ_ORASID.nextval from dual")
+
+    gafisQuery.oraSid = query.getResultList.get(0).asInstanceOf[Long]//TODO 查询序列
     gafisQuery.pkId = CommonUtils.getUUID()
     gafisQuery.createtime = new Date()
     gafisQuery.deletag = Gafis70Constants.DELETAG_USE
@@ -35,6 +38,7 @@ class QueryServiceImpl extends QueryService{
    * @return
    */
   override def getQuery(queryGetRequest: QueryGetRequest): QueryGetResponse = {
+
     throw new UnsupportedOperationException
   }
 }
