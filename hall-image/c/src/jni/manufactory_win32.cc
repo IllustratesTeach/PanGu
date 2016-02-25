@@ -77,6 +77,12 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 	  }
 }
 
+LONG	WINAPI	DBG_DumpExcept(LPEXCEPTION_POINTERS exceptInfo)
+{
+ return 1;
+}
+
+
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    decodeByManufactory
@@ -107,6 +113,8 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 	UCHAR* dest_img_bin = (UCHAR*)jenv->GetByteArrayElements(dest_img, JNI_FALSE);
 
 	UCHAR szResult[260] = {0};
+
+  SetUnhandledExceptionFilter(DBG_DumpExcept);
 
 	int width = 0;
 	int height =0;

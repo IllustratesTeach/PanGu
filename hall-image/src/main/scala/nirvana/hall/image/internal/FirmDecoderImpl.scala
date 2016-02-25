@@ -78,7 +78,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
         destImg.stHead.bIsCompressed = 0
         destImg.stHead.nCompressMethod = 0
-        destImg.stHead.nBits = 8
+        if(destImg.stHead.nBits <=0)
+          destImg.stHead.nBits = 8
 
         destImg.stHead.nResolution = gafisImg.stHead.nResolution
         if(destImg.stHead.nResolution == 0)
@@ -88,7 +89,10 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val width = gafisImg.stHead.nWidth
         val height = gafisImg.stHead.nHeight
         val dll = findDllHandle(firmCode,cprMethod)
-        val destImgSize = width *  height
+
+        val bits = Helper_GetBitsPerPixel(gafisImg.stHead.nBits)
+        val destImgSize = Helper_GetImageSize(width,height,bits)
+
         val cprData = gafisImg.bnData
         if(destImgSize == 0)
           throw new IllegalStateException("width or height is zero!")
@@ -120,8 +124,30 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         }
     }
 
+    destImg.stHead.bIsCompressed = 0
+    destImg.stHead.nCompressMethod = 0
+    destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
+    destImg.stHead.nImgSize = destImg.bnData.length
+
+    if(gafisImg.stHead.nFlag & glocdef.GAIMG_FLAG_WHITERIDGE == glocdef.GAIMG_FLAG_WHITERIDGE){
+      val bnData = destImg.bnData
+      val len = bnData.length
+      0 until len foreach{i=>
+        bnData(i) = ~bnData(i)
+      }
+    }
+
+
     destImg
   }
+  private def Helper_GetBitsPerPixel(nBitsPerPixel:Int):Int={
+    if ( nBitsPerPixel < 1 ) 8  else nBitsPerPixel
+  }
+
+  private def Helper_GetImageSize(nWidth:Int, nHeight:Int, nBitsPerPixel:Int):Int={
+    (nWidth * nBitsPerPixel + 7) / 8 * nHeight
+  }
+
   private def getCodeFromGAFISImage(gafisImg: GAFISIMAGESTRUCT): String ={
     val codeFromImage =  gafisImg.stHead.nCompressMethod.toInt
     codeFromImage match{
