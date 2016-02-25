@@ -4,6 +4,7 @@ import java.io.{File, FileInputStream}
 import java.util.concurrent.{CountDownLatch, Executors}
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
+import nirvana.hall.c.services.AncientData.AncientDataException
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.c.services.gfpt4lib.FPTFile.FPTParseException
 import nirvana.hall.c.services.gloclib.glocdef
@@ -26,7 +27,7 @@ class HttpDecompressServiceTest {
     FirmImageDecompressProto.registerAllExtensions(registry)
     val httpClient = new RpcHttpClientImpl(registry)
 
-    val service = new HttpDecompressService("http://127.0.0.1:9001/image",httpClient)
+    val service = new HttpDecompressService("http://127.0.0.1:9999/image",httpClient)
     val executor = Executors.newFixedThreadPool(5)
 
 
@@ -130,6 +131,7 @@ class HttpDecompressServiceTest {
 
       }catch{
         case e:FPTParseException =>
+        case e:AncientDataException =>
           //do nothing
         case e:Throwable=>
           e.printStackTrace()

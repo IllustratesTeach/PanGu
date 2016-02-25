@@ -20,6 +20,8 @@ object HallImageSupervisorApp extends LoggerSupport {
   @volatile
   private var waitingRestartCount = 0
   @volatile
+  private  var running = true
+  @volatile
   private  var processes:Array[Process] = _
   private val executors = Executors.newCachedThreadPool()
 
@@ -33,7 +35,7 @@ object HallImageSupervisorApp extends LoggerSupport {
     0.until(numProcess).foreach{ i=>
       executors.execute{new Runnable {
         override def run(): Unit = {
-          while (true) {
+          while (running) {
             info("start process ["+i+"]...")
             val process = startDecompressProcess(args,portStart+i)
             processes(i) = process
@@ -44,13 +46,16 @@ object HallImageSupervisorApp extends LoggerSupport {
       }}
     }
     executors.execute(new RestartThread())
+    sys.addShutdownHook{
+      running = false
+    }
     Thread.currentThread().join()
   }
   private class RestartThread extends Runnable{
     override def run(): Unit = {
       val countDown = new CountDownLatch(1)
       while (true) {
-        if(waitingRestartCount > maxWaitingRestartCount || countDown.await(15,TimeUnit.MINUTES)){
+        if(running && waitingRestartCount > maxWaitingRestartCount || countDown.await(15,TimeUnit.MINUTES)){
           //first stop process
           processes.foreach { p =>
             try {
@@ -104,7 +109,7 @@ object HallImageSupervisorApp extends LoggerSupport {
    */
   private def redirectStreamsToStderr(stdout: InputStream, stderr: InputStream) {
     try {
-      new RedirectThread(stdout, null, "stdout reader for decompress").start()
+      new RedirectThread(stdout, System.out, "stdout reader for decompress").start()
       new RedirectThread(stderr, System.err, "stderr reader for decompress").start()
     } catch {
       case e: Exception =>
