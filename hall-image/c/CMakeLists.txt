@@ -41,18 +41,27 @@ ADD_LIBRARY(hall-image4j SHARED ${HALL_IMAGE_JNI_SOURCES})
 
 IF(WIN32)
 
-    IF($ARCH MATCHES "w64")
+    IF(${ARCH} MATCHES "w64")
+        FIND_LIBRARY(GAFISTOOLS
+                NAME gafistools64
+                PATHS "${KERNEL_DIR}\\build-w64\\src"
+                DOC "gafistools64 release library")
         FIND_LIBRARY(TCPRDLL
                 NAME tcprdll64
                 PATHS "${KERNEL_DIR}\\build-w64\\src"
-                DOC "texfdll release library")
+                DOC "tcprdll  release library")
+
     ELSE()
+        FIND_LIBRARY(GAFISTOOLS
+                NAME gafistools
+                PATHS "${KERNEL_DIR}\\build-w32\\src"
+                DOC "gafistools release library")
         FIND_LIBRARY(TCPRDLL
                 NAME tcprdll
                 PATHS "${KERNEL_DIR}\\build-w32\\src"
-                DOC "texfdll release library")
+                DOC "tcprdll release library")
     ENDIF()
-    TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL})
+    TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL} ${GAFISTOOLS})
 ELSE()
     TARGET_LINK_LIBRARIES(hall-image4j nirvana-kernel)
 ENDIF()
