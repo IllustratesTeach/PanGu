@@ -129,6 +129,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
     destImg.stHead.nImgSize = destImg.bnData.length
 
+    /*
     if(gafisImg.stHead.nFlag & glocdef.GAIMG_FLAG_WHITERIDGE == glocdef.GAIMG_FLAG_WHITERIDGE){
       val bnData = destImg.bnData
       val len = bnData.length
@@ -136,6 +137,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         bnData(i) = ~bnData(i)
       }
     }
+    */
 
 
     destImg
