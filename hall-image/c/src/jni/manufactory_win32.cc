@@ -7,6 +7,10 @@
 #include "jni_helper.h"
 
 
+LONG	WINAPI	DBG_DumpExcept(LPEXCEPTION_POINTERS exceptInfo)
+{
+ return 1;
+}
 
 static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
 {
@@ -62,6 +66,7 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	if(result == NULL){
 	  FreeLibrary((HMODULE)hHandle);
 	}
+  SetUnhandledExceptionFilter(DBG_DumpExcept);
 	return result;
 }
 
@@ -77,10 +82,6 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 	  }
 }
 
-LONG	WINAPI	DBG_DumpExcept(LPEXCEPTION_POINTERS exceptInfo)
-{
- return 1;
-}
 
 
 /*
@@ -114,7 +115,6 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 
 	UCHAR szResult[260] = {0};
 
-  SetUnhandledExceptionFilter(DBG_DumpExcept);
 
 	int width = 0;
 	int height =0;
