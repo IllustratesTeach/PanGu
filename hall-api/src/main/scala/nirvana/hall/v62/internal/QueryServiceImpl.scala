@@ -47,9 +47,13 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     val response = QueryGetResponse.newBuilder()
     val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(queryGetRequest.getOraSid)
     val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(config.queryTable.dbId.toShort, config.queryTable.tableId.toShort, pstQry)
-
-    val matchResult = gaqryqueConverter.convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct)
-    response.setMatchResult(matchResult)
+    if(gaQueryStruct.stSimpQry.nStatus >= 2){//比对完成
+      val matchResult = gaqryqueConverter.convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct)
+      response.setMatchResult(matchResult)
+      response.setIsComplete(true)
+    }else{
+      response.setIsComplete(false)
+    }
 
     response.build()
   }

@@ -34,14 +34,14 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpCl
 
     val baseResponse = rpcHttpClient.call("http://"+ syncTagert.targetIp+":"+ syncTagert.targetPort, QueryGetRequest.cmd, request.build())
     val queryGetResponse = baseResponse.getExtension(QueryGetResponse.cmd)
-    val matchResult = queryGetResponse.getMatchResult
+    if(queryGetResponse.getIsComplete){
+      val matchResult = queryGetResponse.getMatchResult
+      ProtobufConverter.convertMatchResult2GafisNormalqueryQueryque(matchResult, queryque)
 
-    ProtobufConverter.convertMatchResult2GafisNormalqueryQueryque(matchResult, queryque)
-
-    queryque.finishtime = new Date()
-    queryque.status = STATUS_FINISH
-
-    queryque.save()
+      queryque.finishtime = new Date()
+      queryque.status = STATUS_FINISH
+      queryque.save()
+    }
   }
 
   @PostInjection

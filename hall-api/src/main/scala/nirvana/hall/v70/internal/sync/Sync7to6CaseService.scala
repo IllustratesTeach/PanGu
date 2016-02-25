@@ -1,7 +1,9 @@
 package nirvana.hall.v70.internal.sync
 
+import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.protocol.api.CaseProto._
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCase, SyncQueue}
 
 /**
@@ -13,36 +15,43 @@ trait Sync7to6CaseService {
    * @param syncQueue
    * @return
    */
-  def syncCase(syncQueue: SyncQueue): Unit = {
+  def syncCase(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
     syncQueue.opration match {
       case "insert" =>
-        addCase(syncQueue)
+        addCase(syncQueue, rpcHttpClient)
       case "update" =>
-        updateCase(syncQueue)
+        updateCase(syncQueue, rpcHttpClient)
       case "delete" =>
-        deleteCase(syncQueue)
+        deleteCase(syncQueue, rpcHttpClient)
     }
   }
 
-  private def addCase(syncQueue: SyncQueue): Unit ={
+  private def addCase(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit ={
     val caseInfo = getCase(syncQueue.uploadKeyid)
     val request= CaseAddRequest.newBuilder().setCase(caseInfo).build()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort, CaseAddRequest.cmd, request, CaseAddResponse.newBuilder())
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, CaseAddRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
 
-  private def updateCase(syncQueue: SyncQueue): Unit ={
+  private def updateCase(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit ={
     val caseInfo = getCase(syncQueue.uploadKeyid)
     val request= CaseUpdateRequest.newBuilder().setCase(caseInfo).build()
-    val response = CaseUpdateResponse.newBuilder()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort, CaseUpdateRequest.cmd, request, response)
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, CaseUpdateRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
-  private def deleteCase(syncQueue: SyncQueue): Unit ={
+  private def deleteCase(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit ={
     val request = CaseDelRequest.newBuilder().setCaseId(syncQueue.uploadKeyid).build()
-    val response = CaseDelResponse.newBuilder()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort,CaseDelRequest.cmd, request, response)
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, CaseDelRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
 
   private def getCase(caseId: String): Case = {

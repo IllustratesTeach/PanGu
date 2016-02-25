@@ -1,11 +1,11 @@
 package nirvana.hall.api
 
 import com.google.protobuf.ExtensionRegistry
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
+import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
 import org.apache.tapestry5.ioc.Configuration
-import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad, ServiceId}
+import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId}
 import org.apache.tapestry5.ioc.services.{ClassNameLocator, PipelineBuilder}
 import org.slf4j.Logger
 
@@ -28,7 +28,7 @@ object LocalProtobufModule {
     }
     pipelineBuilder.build(logger, classOf[ProtobufRequestHandler], classOf[ProtobufRequestFilter], configuration, terminator)
   }
-  @EagerLoad
+/*  @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
     val registry = ExtensionRegistry.newInstance()
     val it = configruation.iterator()
@@ -36,17 +36,17 @@ object LocalProtobufModule {
       it.next().config(registry)
 
     registry
-  }
+  }*/
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger], classNameLocator: ClassNameLocator, logger: Logger) {
     configuration.add(new ProtobufExtensionRegistryConfiger {
       override def config(registry: ExtensionRegistry): Unit = {
-        val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.v62")
+        val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.api")
         val contextClassLoader = Thread.currentThread().getContextClassLoader
         packages.foreach { packageName =>
-          val it = classNameLocator.locateClassNames(packageName).iterator();
+          val it = classNameLocator.locateClassNames(packageName).iterator()
           while (it.hasNext) {
-            val protobufClass = contextClassLoader.loadClass(it.next());
+            val protobufClass = contextClassLoader.loadClass(it.next())
             logger.debug("registry class {}", protobufClass)
             protobufClass.getMethod("registerAllExtensions", classOf[ExtensionRegistry]).invoke(null, registry)
           }

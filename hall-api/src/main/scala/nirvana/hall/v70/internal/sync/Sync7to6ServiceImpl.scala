@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal.sync
 import java.util.Date
 import javax.persistence.EntityManagerFactory
 
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.services.GafisException
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.jpa.SyncQueue
@@ -17,7 +18,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Created by songpeng on 15/12/1.
  */
 @EagerLoad
-class Sync7to6ServiceImpl(v70Config: HallV70Config)
+class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient)
   extends Sync7to6Service
   with Sync7to6CaseService
   with Sync7to6LPCardService
@@ -69,11 +70,11 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config)
     try {
       uploadFlag match {
         case UPLOAD_FLAG_TPCARD =>
-          syncTPCard(syncQueue)
+          syncTPCard(syncQueue, rpcHttpClient)
         case UPLOAD_FLAG_CASE =>
-          syncCase(syncQueue)
+          syncCase(syncQueue, rpcHttpClient)
         case UPLOAD_FLAG_LPCARD =>
-          syncLPCard(syncQueue)
+          syncLPCard(syncQueue, rpcHttpClient)
         case other =>
           throw new UnsupportedOperationException("unknown uploadFlag " + other)
       }
@@ -100,7 +101,6 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config)
 
   @Transactional
   private def updateSyncQueueFail(syncQueue: SyncQueue, exception: Exception): Unit ={
-    //TODO open session in thread
     val message = exception match {
       case e: GafisException =>
         e.getSimpleMessage

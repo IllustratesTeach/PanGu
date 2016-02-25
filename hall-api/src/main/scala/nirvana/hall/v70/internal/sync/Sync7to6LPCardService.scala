@@ -1,7 +1,9 @@
 package nirvana.hall.v70.internal.sync
 
+import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.protocol.api.LPCardProto._
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SyncQueue}
 
 /**
@@ -14,35 +16,44 @@ trait Sync7to6LPCardService {
    * @param syncQueue
    * @return
    */
-  def syncLPCard(syncQueue: SyncQueue): Unit = {
+  def syncLPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
     syncQueue.opration match {
       case "insert" =>
-        addLPCard(syncQueue)
+        addLPCard(syncQueue, rpcHttpClient)
       case "update" =>
-        updateLPCard(syncQueue)
+        updateLPCard(syncQueue, rpcHttpClient)
       case "delete" =>
-        deleteLPCard(syncQueue)
+        deleteLPCard(syncQueue, rpcHttpClient)
     }
   }
 
-  private def addLPCard(syncQueue: SyncQueue): Unit = {
+  private def addLPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
     val lpCard = getLPCard(syncQueue.uploadKeyid)
     val request = LPCardAddRequest.newBuilder().setCard(lpCard).build()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardAddRequest.cmd, request, LPCardAddResponse.newBuilder())
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, LPCardAddRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
 
-  private def updateLPCard(syncQueue: SyncQueue): Unit = {
+  private def updateLPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
     val lpCard = getLPCard(syncQueue.uploadKeyid)
     val request = LPCardUpdateRequest.newBuilder().setCard(lpCard).build()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardUpdateRequest.cmd, request, LPCardUpdateResponse.newBuilder())
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, LPCardUpdateRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
 
-  private def deleteLPCard(syncQueue: SyncQueue): Unit = {
+  private def deleteLPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
     val request = LPCardDelRequest.newBuilder().setCardId(syncQueue.uploadKeyid).build()
 
-    httpCall(syncQueue.targetIp, syncQueue.targetPort, LPCardDelRequest.cmd, request, LPCardDelResponse.newBuilder())
+    val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, LPCardDelRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.FAIL){
+      println(baseResponse.getMsg)
+    }
   }
 
   private def getLPCard(fingerId: String): LPCard = {

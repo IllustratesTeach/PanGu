@@ -133,7 +133,7 @@ object gaqryqueConverter {
     matchResult.setMatchId(convertSixByteArrayToLong(queryId)+"")
 
     val pstCandData = gaQueryStruct.pstCand_Data
-    matchResult.setCandidateNum(pstCandData.length)
+    matchResult.setCandidateNum(gaQueryStruct.nCandLen)
 
     var maxScore = 0
 
@@ -146,7 +146,7 @@ object gaqryqueConverter {
         maxScore = candData.nScore
     }
     matchResult.setMaxScore(maxScore)
-    matchResult.setStatus(MatcherStatus.newBuilder().setMsg("sucess"))
+    matchResult.setStatus(MatcherStatus.newBuilder().setMsg("success").setCode(0))
 
     matchResult.build()
   }
