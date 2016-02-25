@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import java.io.InputStream
+import java.io.{FileInputStream, File, InputStream}
 import java.nio.charset.Charset
 
 import nirvana.hall.c.AncientConstants
@@ -9,6 +9,7 @@ import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import org.apache.commons.io.IOUtils
 
 import scala.language.reflectiveCalls
 import scala.reflect._
@@ -61,6 +62,8 @@ object FPTFile {
           throw new UnsupportedOperationException(other + " unsupported,only 03 or 04.")
       }
     }catch{
+      case e:AncientDataException=>
+        throw e
       case NonFatal(e)=>
         throw new FPTParseException(e.toString,e)
     }
@@ -109,6 +112,20 @@ object FPTFile {
         logicEnd = dataSource.readByte()
       }
       this
+    }
+  }
+  def main(args:Array[String]): Unit ={
+    val fis = new FileInputStream(new File(args(0)))
+    try {
+      val fpt = FPTFile.parseFromInputStream(fis)
+      fpt match{
+        case Left(ftp3)=>
+          val head = ftp3.head
+        case Right(ftp4)=>
+          val head = ftp4.head
+      }
+    }finally{
+      IOUtils.closeQuietly(fis)
     }
   }
 }

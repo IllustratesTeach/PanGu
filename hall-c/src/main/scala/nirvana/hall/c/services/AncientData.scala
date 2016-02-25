@@ -116,6 +116,12 @@ object AncientData extends WrapAsStreamWriter{
     def resetReaderIndex():Unit={is.resetReaderIndex()}
     def readByteArray(len: Int): Array[Byte] =  {val r=new Array[Byte](len);is.readBytes(r);r}
   }
+  class AncientDataException(message:String) extends RuntimeException(message){
+    def this(message:String,cause:Throwable){
+      this(message)
+      super.initCause(cause)
+    }
+  }
 }
 
 /**
@@ -216,12 +222,12 @@ trait ScalaReflect{
     //println("process term "+term+" length:"+length)
     def returnLengthOrThrowException:Int={
       if(length.isEmpty)
-        throw new IllegalArgumentException("@Length not defined at "+term)
+        throw new AncientDataException("@Length not defined at "+term)
       length.get
     }
     def throwExceptionIfLengthGTZeroOrGet[T](value:T): T={
       if(length.isDefined)
-        throw new IllegalArgumentException("@Length wrong defined at "+term)
+        throw new AncientDataException("@Length wrong defined at "+term)
       value
     }
     tpe match {
@@ -254,7 +260,7 @@ trait ScalaReflect{
           finalLength
         }
       case other =>
-        throw new IllegalArgumentException("type is not supported "+other+" for:"+term)
+        throw new AncientDataException("type is not supported "+other+" for:"+term)
     }
   }
 
@@ -284,32 +290,35 @@ trait ScalaReflect{
           value.asInstanceOf[Int]
       }
 
-      //find @LengthRef annotation and get value
-      val lengthRefAnnotation = m.annotations.find (typeOf[LengthRef] =:= _.tree.tpe)
-      val lengthRef = lengthRefAnnotation.map(_.tree).map{
-        case Apply(fun, AssignOrNamedArg(name,Literal(Constant(refFieldName)))::Nil)=>
-
-          val fieldName = refFieldName.asInstanceOf[String]
-          val termSymbol = clazzType.decl(TermName(fieldName)).asTerm
-          val value = instanceMirror.reflectField(termSymbol).get
-          if(value == null) {
-            0
-          } else {
-            val stringValue = value.toString.trim()
-            if (stringValue.isEmpty) 0 else {
-              //println(stringValue,stringValue.toInt)
-              stringValue.toInt
-            }
-          }
-      }
-      if(length.isDefined  && lengthRef.isDefined )
-        throw new IllegalStateException("@Length and @LengthRef both defined at "+m)
-      //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
       try {
+        //find @LengthRef annotation and get value
+        val lengthRefAnnotation = m.annotations.find(typeOf[LengthRef] =:= _.tree.tpe)
+        val lengthRef = lengthRefAnnotation.map(_.tree).map {
+          case Apply(fun, AssignOrNamedArg(name, Literal(Constant(refFieldName))) :: Nil) =>
+
+            val fieldName = refFieldName.asInstanceOf[String]
+            val termSymbol = clazzType.decl(TermName(fieldName)).asTerm
+            val value = instanceMirror.reflectField(termSymbol).get
+            if (value == null) {
+              0
+            } else {
+              val stringValue = value.toString.trim()
+              if (stringValue.isEmpty) 0
+              else {
+                //println(stringValue,stringValue.toInt)
+                stringValue.toInt
+              }
+            }
+        }
+        if (length.isDefined && lengthRef.isDefined)
+          throw new AncientDataException("@Length and @LengthRef both defined at " + m)
+        //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
         processor(m, if (length.isDefined) length else lengthRef)
       }catch{
+        case e:AncientDataException =>
+          throw new AncientDataException(m+"->"+e.getMessage,e)
         case NonFatal(e)=>
-          throw new RuntimeException("fail to process "+m,e)
+          throw new AncientDataException(m.toString+","+e.toString,e)
       }
     }.toArray
   }
@@ -333,7 +342,7 @@ trait ScalaReflect{
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
         if(length.isEmpty)
-          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+          throw new AncientDataException("@Lenght not defined "+tpe)
         length.get
       }
       def writeString(str:String,length:Int): Unit ={
@@ -380,7 +389,7 @@ trait ScalaReflect{
           }
           dataSink.writeZero(zeroLen)
         case other =>
-          throw new IllegalArgumentException("type is not supported "+other)
+          throw new AncientDataException("type is not supported "+other)
       }
     }
     stream
@@ -397,7 +406,7 @@ trait ScalaReflect{
       val tpe = symbol.info
       def returnLengthOrThrowException:Int={
         if(length.isEmpty)
-          throw new IllegalArgumentException("@Lenght not defined "+tpe)
+          throw new AncientDataException("@Lenght not defined "+tpe)
         length.get
       }
       def readByteArray(len:Int): Array[Byte]= readBytesFromStreamReader(dataSource,len)
@@ -429,7 +438,7 @@ trait ScalaReflect{
           }
           field.set(ancientDataArray)
         case other =>
-          throw new IllegalArgumentException("type is not supported "+symbol)
+          throw new AncientDataException("type is not supported "+symbol)
       }
     }
 
