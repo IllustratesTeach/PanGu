@@ -241,7 +241,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       case None =>
         true
     }
-    println("%s loaded,isConcurrent:%s".format(dllName,isConcurrent))
+    System.err.println("%s loaded,isConcurrent:%s".format(dllName,isConcurrent))
     dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }
 }
