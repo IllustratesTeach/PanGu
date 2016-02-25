@@ -104,7 +104,7 @@ object HallImageSupervisorApp extends LoggerSupport {
    */
   private def redirectStreamsToStderr(stdout: InputStream, stderr: InputStream) {
     try {
-      new RedirectThread(stdout, System.err, "stdout reader for decompress").start()
+      new RedirectThread(stdout, null, "stdout reader for decompress").start()
       new RedirectThread(stderr, System.err, "stderr reader for decompress").start()
     } catch {
       case e: Exception =>
@@ -127,13 +127,16 @@ object HallImageSupervisorApp extends LoggerSupport {
           val buf = new Array[Byte](1024)
           var len = in.read(buf)
           while (len != -1) {
-            out.write(buf, 0, len)
-            out.flush()
+            if(out != null) {
+              out.write(buf, 0, len)
+              out.flush()
+            }
             len = in.read(buf)
           }
         } {
           if (propagateEof) {
-            out.close()
+            if(out != null)
+              out.close()
           }
         }
       }
