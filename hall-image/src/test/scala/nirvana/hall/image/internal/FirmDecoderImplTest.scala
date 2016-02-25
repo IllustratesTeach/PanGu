@@ -33,6 +33,28 @@ class FirmDecoderImplTest extends BaseJniTest{
     println(XmlLoader.toXml(config))
   }
   @Test
+  def test_decode_gafisimg_1900{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 1.toByte
+    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_GFS.toByte
+    gafisImg.stHead.nWidth = 640
+    gafisImg.stHead.nHeight= 640
+    gafisImg.bnData = cprData
+    gafisImg.stHead.nImgSize = cprData.length
+
+    val output = ByteString.newOutput(gafisImg.getDataSize)
+    gafisImg.writeToStreamWriter(output)
+    val byteStringData = output.toByteString
+    gafisImg.fromStreamReader(byteStringData.newInput())
+
+    val dest = decoder.decode(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
+
+  }
+  @Test
   def test_decode_gafisimg{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))

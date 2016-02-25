@@ -1,11 +1,12 @@
 package nirvana.hall.image.jni
 
+import java.io.File
 import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.support.services.GAFISImageReaderSpi
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 /**
@@ -32,6 +33,8 @@ class NativeImageConverterTest extends BaseJniTest{
             val gafisImg = new GAFISIMAGESTRUCT
             gafisImg.fromByteArray(img)
 
+            FileUtils.writeByteArrayToFile(new File("1900-"+seq+".data"),img)
+
             /*
             val destImg = new GAFISIMAGESTRUCT
             destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray)
@@ -41,9 +44,11 @@ class NativeImageConverterTest extends BaseJniTest{
 
             val destImgBytes = new Array[Byte](gafisImg.stHead.getDataSize + gafisImg.stHead.nWidth * gafisImg.stHead.nHeight)
             NativeImageConverter.decodeByGFS(gafisImg.toByteArray,destImgBytes)
+            val dest = new GAFISIMAGESTRUCT().fromByteArray(destImgBytes)
+            dest.stHead
+            seq +=1
             /*
             val destImgBmp= ImageIO.read(new ByteArrayInputStream(destImgBytes))
-            seq +=1
             ImageIO.write(destImgBmp, "bmp", new File(seq+".bmp"));
             */
           }

@@ -1,17 +1,15 @@
 package nirvana.hall.image
 
 import com.google.protobuf.ExtensionRegistry
-import monad.core.MonadCoreConstants
-import monad.core.config.ZkClientConfigSupport
-import monad.rpc.services.{ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
-import monad.support.services.ZookeeperTemplate
+import monad.rpc.protocol.CommandProto.BaseCommand
+import monad.rpc.services.{CommandResponse, ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
 import nirvana.hall.image.internal.{FirmDecoderImpl, FirmImageDecompressRequestFilter}
 import nirvana.hall.image.services.FirmDecoder
 import nirvana.hall.protocol.image.FirmImageDecompressProto
-import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
-import org.apache.tapestry5.ioc.services.RegistryShutdownHub
-import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
+import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId, Contribute}
+import org.apache.tapestry5.ioc.services.PipelineBuilder
 import org.apache.tapestry5.ioc.{Configuration, OrderedConfiguration, ServiceBinder}
+import org.slf4j.Logger
 
 /**
  *
@@ -22,6 +20,7 @@ object LocalHallImageModule {
   def bind(binder:ServiceBinder): Unit ={
     binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
   }
+  /*
   //增加EagerLoad,避免出现deadlock
   @EagerLoad
   def buildZookeeperTemplate(config: ZkClientConfigSupport, periodExecutor: PeriodicExecutor, hub: RegistryShutdownHub): ZookeeperTemplate = {
@@ -38,10 +37,33 @@ object LocalHallImageModule {
 
     zk
   }
+  */
+  @EagerLoad
+  def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
+    val registry = ExtensionRegistry.newInstance()
+    val it = configruation.iterator()
+    while (it.hasNext)
+      it.next().config(registry)
+
+    registry
+  }
+  @ServiceId("RpcServerMessageHandler")
+  def buildRpcServerMessageHandler(pipelineBuilder: PipelineBuilder, logger: Logger,
+                                   configuration: java.util.List[RpcServerMessageFilter])
+  : RpcServerMessageHandler = {
+    val terminator = new RpcServerMessageHandler {
+      /**
+       * @param commandRequest message command
+       * @return handled if true .
+       */
+      override def handle(commandRequest: BaseCommand, response: CommandResponse): Boolean = false
+    }
+    pipelineBuilder.build(logger, classOf[RpcServerMessageHandler], classOf[RpcServerMessageFilter], configuration, terminator)
+  }
 
   @Contribute(classOf[RpcServerMessageHandler])
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
-    configuration.addInstance("FirmImageDecompressReques", classOf[FirmImageDecompressRequestFilter])
+    configuration.addInstance("FirmImageDecompressRequest", classOf[FirmImageDecompressRequestFilter])
   }
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {

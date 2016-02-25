@@ -28,9 +28,9 @@ object HallImageApp
       val logger = LoggerFactory getLogger getClass
       logger.info("Starting image server ....")
       val classes = List[Class[_]](
-        Class.forName("monad.core.LocalMonadCoreModule"),
-        Class.forName("monad.rpc.LocalRpcModule"),
-        Class.forName("monad.rpc.LocalRpcServerModule"),
+//        Class.forName("monad.core.LocalMonadCoreModule"),
+//        Class.forName("monad.rpc.LocalRpcModule"),
+//        Class.forName("monad.rpc.LocalRpcServerModule"),
 
         Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
 

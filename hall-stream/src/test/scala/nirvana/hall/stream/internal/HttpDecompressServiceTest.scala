@@ -26,7 +26,7 @@ class HttpDecompressServiceTest {
     FirmImageDecompressProto.registerAllExtensions(registry)
     val httpClient = new RpcHttpClientImpl(registry)
 
-    val service = new HttpDecompressService("http://127.0.0.1:9999/image",httpClient)
+    val service = new HttpDecompressService("http://127.0.0.1:9001/image",httpClient)
     val executor = Executors.newFixedThreadPool(5)
 
 
