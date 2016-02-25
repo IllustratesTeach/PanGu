@@ -7,6 +7,10 @@
 #include "jni_helper.h"
 
 
+LONG	WINAPI	DBG_DumpExcept(LPEXCEPTION_POINTERS exceptInfo)
+{
+ return 1;
+}
 
 static void ThrowExceptionByFPTCode(JNIEnv* jenv,int nCode)
 {
@@ -78,10 +82,6 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 	  }
 }
 
-LONG	WINAPI	DBG_DumpExcept(LPEXCEPTION_POINTERS exceptInfo)
-{
- return 1;
-}
 
 
 /*
