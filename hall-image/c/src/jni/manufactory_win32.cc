@@ -62,6 +62,7 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	if(result == NULL){
 	  FreeLibrary((HMODULE)hHandle);
 	}
+  SetUnhandledExceptionFilter(DBG_DumpExcept);
 	return result;
 }
 
@@ -114,7 +115,6 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 
 	UCHAR szResult[260] = {0};
 
-  SetUnhandledExceptionFilter(DBG_DumpExcept);
 
 	int width = 0;
 	int height =0;
