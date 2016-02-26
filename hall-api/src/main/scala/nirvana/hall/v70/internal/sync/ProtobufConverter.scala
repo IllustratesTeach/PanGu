@@ -363,16 +363,20 @@ object ProtobufConverter {
   }
 
   def convertMatchResult2GafisNormalqueryQueryque(matchResult: MatchResult, gafisQuery: GafisNormalqueryQueryque = new GafisNormalqueryQueryque()): GafisNormalqueryQueryque ={
-    gafisQuery.maxcandnum = matchResult.getCandidateNum
+    gafisQuery.curcandnum = matchResult.getCandidateNum
     gafisQuery.recordNumMatched = matchResult.getRecordNumMatched
-    gafisQuery.maxscore = matchResult.getMaxScore.toLong
+    if(gafisQuery.querytype != 0){//如果不是TT查询，查中概率=最大分数/10
+      gafisQuery.hitpossibility = (matchResult.getMaxScore /10).toShort
+    }else{
+      gafisQuery.hitpossibility = matchResult.getMaxScore.toShort
+    }
     //如果有候选队列，处理状态为待处理0,比中状态0;否则已处理1,没有比中1
     if(matchResult.getCandidateNum > 0){
-      gafisQuery.hitpossibility = 0.toShort
       gafisQuery.verifyresult = 0.toShort
+      gafisQuery.handleresult = 0.toShort
     }else{
-      gafisQuery.hitpossibility = 99.toShort
-      gafisQuery.verifyresult = 1.toShort
+      gafisQuery.verifyresult = 99.toShort
+      gafisQuery.handleresult = 1.toShort
     }
 
     gafisQuery.candlist = convertMatchResult2CandList(matchResult)

@@ -59,6 +59,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpCl
   def doWork: Unit ={
     getGafisNormalqueryQueryqueMatching().foreach{ queryque =>
       getQueryAndSaveMatchResult(queryque)
+      doWork
     }
   }
 
