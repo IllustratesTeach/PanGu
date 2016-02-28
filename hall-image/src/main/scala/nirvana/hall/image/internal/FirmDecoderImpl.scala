@@ -200,10 +200,13 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       try {
         lock.lock()
         dll = dlls.get(code)
-        if(dll == null){
-          loadSingleDll(code,cprMethod)
+        if (dll == null) {
+          loadSingleDll(code, cprMethod)
           dll = dlls.get(code)
         }
+      }catch{
+        case e:Throwable=>
+          throw new IllegalAccessException("cprMethod:"+cprMethod+" "+e.getMessage)
       }finally{
         lock.unlock()
       }
