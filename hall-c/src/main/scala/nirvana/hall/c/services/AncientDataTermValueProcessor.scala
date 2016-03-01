@@ -1,5 +1,6 @@
 package nirvana.hall.c.services
 
+import java.lang
 import java.nio.charset.Charset
 
 import nirvana.hall.c.services.AncientData._
@@ -45,13 +46,16 @@ object TermValueProcessor{
   sealed trait TermValueProcessor{
     val term:TermSymbol
     def calLength(valueManipulate: ValueManipulate,length:Option[Int]):Int
-    def writeToStreamWriter(stream:StreamWriter,valueManipulate: ValueManipulate,length: Option[Int],encoding:Charset)
+    def writeToStreamWriter(stream:StreamWriter,valueManipulate: ValueManipulate,length: Option[Int],encoding:Charset):Unit
+    def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset):Unit
   }
   class ByteProcessor(override val term:TermSymbol) extends TermValueProcessor{
     override def calLength(value: ValueManipulate, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,1)
-
     override def writeToStreamWriter(stream: StreamWriter, valueManipulate: ValueManipulate, length: Option[Int],encoding:Charset): Unit = {
       stream.writeByte(valueManipulate.get.asInstanceOf[Byte])
+    }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      valueManipulate.set(dataSource.readByte())
     }
   }
   class ShortProcessor(val term:TermSymbol) extends TermValueProcessor{
@@ -59,17 +63,26 @@ object TermValueProcessor{
     override def writeToStreamWriter(stream: StreamWriter, valueManipulate: ValueManipulate, length: Option[Int],encoding:Charset): Unit = {
       stream.writeShort(valueManipulate.get.asInstanceOf[Short])
     }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      valueManipulate.set(dataSource.readShort())
+    }
   }
   class IntProcessor(val term:TermSymbol) extends TermValueProcessor{
     override def calLength(value: ValueManipulate, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,4)
     override def writeToStreamWriter(stream: StreamWriter, valueManipulate: ValueManipulate, length: Option[Int],encoding:Charset): Unit = {
       stream.writeInt(valueManipulate.get.asInstanceOf[Int])
     }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      valueManipulate.set(dataSource.readInt())
+    }
   }
   class LongProcessor(val term:TermSymbol) extends TermValueProcessor{
     override def calLength(value: ValueManipulate, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,8)
     override def writeToStreamWriter(stream: StreamWriter, valueManipulate: ValueManipulate, length: Option[Int],encoding:Charset): Unit = {
       stream.writeLong(valueManipulate.get.asInstanceOf[Long])
+    }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      valueManipulate.set(dataSource.readLong())
     }
   }
   class StringProcessor(val term:TermSymbol) extends TermValueProcessor{
@@ -79,12 +92,20 @@ object TermValueProcessor{
       val value = valueManipulate.get
       if(value == null) writeBytes(stream,null,valueLength) else writeBytes(stream,value.asInstanceOf[String].getBytes(encoding.name()),valueLength)
     }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      val bytes = dataSource.readByteArray(calLength(valueManipulate,length))
+      valueManipulate.set(new String(bytes,encoding).trim)
+    }
   }
   class ByteArrayProcessor(val term:TermSymbol) extends TermValueProcessor{
     override def calLength(value: ValueManipulate, length: Option[Int]): Int= returnLengthOrThrowException(term,length)
 
     override def writeToStreamWriter(stream: StreamWriter, valueManipulate: ValueManipulate, length: Option[Int], encoding: Charset): Unit = {
       writeBytes(stream,valueManipulate.get.asInstanceOf[Array[Byte]],calLength(valueManipulate,length))
+    }
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length:Option[Int],encoding: Charset): Unit = {
+      val bytes = dataSource.readByteArray(calLength(valueManipulate,length))
+      valueManipulate.set(bytes)
     }
   }
   class AncientDataProcessor(val term:TermSymbol,tpe:Type) extends TermValueProcessor{
@@ -107,6 +128,12 @@ object TermValueProcessor{
       }else{
         value.asInstanceOf[AncientData].writeToStreamWriter(stream)
       }
+    }
+
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length: Option[Int], encoding: Charset): Unit = {
+      val ancientData = createAncientDataByType(tpe)
+      ancientData.fromStreamReader(dataSource,encoding)
+      valueManipulate.set(ancientData)
     }
   }
   class AncientDataArrayProcessor(val term:TermSymbol,tpe:Type) extends TermValueProcessor{
@@ -145,6 +172,16 @@ object TermValueProcessor{
         }
       }
       stream.writeZero(zeroLen)
+    }
+
+    override def fromStreamReader(dataSource: StreamReader, valueManipulate: ValueManipulate, length: Option[Int], encoding: Charset): Unit = {
+      val len = returnLengthOrThrowException(term,length)
+      val sampleClass = createAncientDataByType(tpe).getClass
+      val ancientDataArray = lang.reflect.Array.newInstance(sampleClass,len)
+      0 until len foreach {i=>
+        lang.reflect.Array.set(ancientDataArray,i,sampleClass.newInstance().fromStreamReader(dataSource,encoding))
+      }
+      valueManipulate.set(ancientDataArray)
     }
   }
 

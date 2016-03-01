@@ -1,6 +1,5 @@
 package nirvana.hall.c.services
 
-import java._
 import java.io.{BufferedInputStream, InputStream, OutputStream}
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -32,7 +31,7 @@ object AncientData extends WrapAsStreamWriter{
   //global scala reflect mirror
   val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   val STRING_CLASS = typeOf[String]
-  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(TermSymbol,Option[Either[Int,TermSymbol]])]]()
+  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(TermValueProcessor,Option[Either[Int,TermSymbol]])]]()
   val staticSize = new ConcurrentHashMap[Class[_],Int]()
 
   type TermAction[T]=(TermSymbol,Option[Int])=>T
@@ -231,7 +230,7 @@ trait ScalaReflect{
   /**
    * find primitive data type length
    */
-  private def findPrimitiveTypeLength(term:TermSymbol,tpe:Type):TermValueProcessor={
+  private def findTermProcessor(term:TermSymbol,tpe:Type):TermValueProcessor={
     tpe match {
       case t if t<:< ByteTpe =>  new ByteProcessor(term)
       case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessor(term)
@@ -247,16 +246,6 @@ trait ScalaReflect{
     }
   }
 
-  private def tmpMap(symbol:TermSymbol,length:Option[Either[Int,TermSymbol]]):(TermSymbol,Option[Int])={
-    length match {
-      case Some(Right(l))=>
-        (symbol,Some(findRefValue(l)))
-      case Some(Left(l))=>
-        (symbol,Some(l))
-      case None=>
-        (symbol,None)
-    }
-  }
   private def findLength(lengthDef:Option[Either[Int,TermSymbol]]):Option[Int]={
     lengthDef match {
       case Some(Right(l))=>
@@ -274,18 +263,16 @@ trait ScalaReflect{
    */
   def getDataSize:Int={
     //TODO 针对@LengthRef类型的需要重新计算
-    if(dataSize == 0) {
-      dataSize = internalProcessField.map{
-        case(symbol,lengthDef)=>
-          (findPrimitiveTypeLength(symbol,symbol.asTerm.typeSignature),lengthDef)
-      }.map{case (processor,lengthDef) =>
+    //if(dataSize == 0) {
+      dataSize = internalProcessField
+      .map{case (processor,lengthDef) =>
         processor.calLength(ValueManipulate(instanceMirror,processor.term),findLength(lengthDef))
       }.sum
-      //dataSize = internalProcessField((symbol,length)=>findPrimitiveTypeLength(symbol,symbol.asTerm.typeSignature,length)).sum
-    }
+      //dataSize = internalProcessField((symbol,length)=>findTermProcessor(symbol,symbol.asTerm.typeSignature,length)).sum
+    //}
     dataSize
   }
-  private def internalProcessField:Seq[(TermSymbol,Option[Either[Int,TermSymbol]])]={
+  private def internalProcessField:Seq[(TermValueProcessor,Option[Either[Int,TermSymbol]])]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
       members = clazzType.members
@@ -315,7 +302,7 @@ trait ScalaReflect{
             throw new AncientDataException("@Length and @LengthRef both defined at " + m)
           //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
 
-          (m.asInstanceOf[TermSymbol], if (length.isDefined) length else lengthRef)
+          (findTermProcessor(m.asTerm,m.asTerm.typeSignature), if (length.isDefined) length else lengthRef)
         } catch {
           case e: AncientDataException =>
             throw new AncientDataException(m + "->" + e.getMessage, e)
@@ -348,10 +335,7 @@ trait ScalaReflect{
    */
   def writeToStreamWriter[T](stream:T,encoding:Charset=AncientConstants.UTF8_ENCODING)(implicit converter:T=> StreamWriter): T= {
     val dataSink = converter(stream)
-    internalProcessField.map{
-      case(symbol,lengthDef)=>
-        (findPrimitiveTypeLength(symbol,symbol.asTerm.typeSignature),lengthDef)
-    }.foreach{
+    internalProcessField.foreach{
       case (processor,lengthDef) =>
       processor.writeToStreamWriter(dataSink,ValueManipulate(instanceMirror,processor.term),findLength(lengthDef),encoding)
     }
@@ -363,48 +347,10 @@ trait ScalaReflect{
    * @param dataSource netty channel buffer
    */
   def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
-    internalProcessField.map(tmpMap _ tupled).foreach{case (symbol,length)=>
-      ////println("read "+symbol+" ..." )
-
-      val tpe = symbol.info
-      def returnLengthOrThrowException:Int={
-        if(length.isEmpty)
-          throw new AncientDataException("@Lenght not defined "+tpe)
-        length.get
-      }
-      def readByteArray(len:Int): Array[Byte]= readBytesFromStreamReader(dataSource,len)
-
-      val termSymbol = clazzType.decl(symbol.name.toTermName).asTerm
-      val field = instanceMirror.reflectField(termSymbol)
-      tpe match {
-        case t if t <:< ByteTpe => field.set(dataSource.readByte())
-        case t if t <:< ShortTpe | t<:< CharTpe => field.set(dataSource.readShort())
-        case t if t<:< IntTpe => field.set(dataSource.readInt())
-        case t if t<:< LongTpe => field.set(dataSource.readLong())
-        case AncientData.STRING_CLASS =>
-          val bytes = readByteArray(returnLengthOrThrowException)
-          field.set(new String(bytes,encoding).trim)
-        case t if t <:< typeOf[ScalaReflect] =>
-          val ancientData = createAncientDataByType(t)
-          ancientData.fromStreamReader(dataSource,encoding)
-          field.set(ancientData)
-        case t  if t =:= typeOf[Array[Byte]] =>
-          val bytes = readByteArray(returnLengthOrThrowException)
-          field.set(bytes)
-        case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol =>
-          val len = returnLengthOrThrowException
-          val sampleClass = createAncientDataByType(args.head).getClass
-          val ancientDataArray = lang.reflect.Array.newInstance(sampleClass,len)
-
-          0 until len foreach {i=>
-            lang.reflect.Array.set(ancientDataArray,i,createAncientDataByType(args.head).fromStreamReader(dataSource,encoding))
-          }
-          field.set(ancientDataArray)
-        case other =>
-          throw new AncientDataException("type is not supported "+symbol)
-      }
+    internalProcessField.foreach{
+      case (processor,lengthDef) =>
+        processor.fromStreamReader(dataSource,ValueManipulate(instanceMirror,processor.term),findLength(lengthDef),encoding)
     }
-
     this
   }
   def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
