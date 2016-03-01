@@ -8,6 +8,7 @@ import nirvana.hall.c.services.TermValueProcessor._
 
 import scala.language.experimental.macros
 import scala.language.reflectiveCalls
+import scala.reflect.runtime._
 import scala.reflect.runtime.universe._
 
 /**
@@ -35,6 +36,14 @@ object TermValueProcessor{
       dataSink.writeBytes(bytes)
     }
     dataSink.writeZero(zeroLength)
+  }
+  def createAncientDataByType(t: universe.Type): AncientData = {
+    val classType = t.typeSymbol.asClass
+    val constructor = classType.primaryConstructor.asMethod
+    AncientData.mirror
+      .reflectClass(classType)
+      .reflectConstructor(constructor)()
+      .asInstanceOf[AncientData]
   }
 }
 
