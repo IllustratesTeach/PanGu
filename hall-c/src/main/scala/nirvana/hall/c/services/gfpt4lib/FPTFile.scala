@@ -97,7 +97,12 @@ object FPTFile {
       count
     }
 
-    override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
+
+    /**
+     * serialize to channel buffer
+     * @param stream netty channel buffer
+     */
+    override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
       super.writeToStreamWriter(stream)
       if (getFingerDataCount == 0){
         val dataSink = converter(stream)

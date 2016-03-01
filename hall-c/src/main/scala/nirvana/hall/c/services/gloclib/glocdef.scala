@@ -110,7 +110,7 @@ object glocdef {
            * serialize to channel buffer
            * @param stream netty channel buffer
            */
-          override def writeToStreamWriter[T](stream: T)(implicit converter: (T) => StreamWriter): T = {
+          override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
             if(bnData == null)
               throw new IllegalStateException("bnData is null")
             if(bnData.length != stHead.nImgSize)
