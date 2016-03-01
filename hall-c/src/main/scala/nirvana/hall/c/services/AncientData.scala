@@ -34,17 +34,7 @@ object AncientData extends WrapAsStreamWriter{
   val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(TermValueProcessor,Option[Either[Int,TermSymbol]])]]()
   val staticSize = new ConcurrentHashMap[Class[_],Int]()
 
-  type TermAction[T]=(TermSymbol,Option[Int])=>T
 
-
-  def createAncientDataByType(t: universe.Type): AncientData = {
-    val classType = t.typeSymbol.asClass
-    val constructor = classType.primaryConstructor.asMethod
-    AncientData.mirror
-      .reflectClass(classType)
-      .reflectConstructor(constructor)()
-      .asInstanceOf[AncientData]
-  }
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
   trait StreamReader {
     def readByte(): Byte
@@ -246,27 +236,51 @@ trait ScalaReflect{
     }
   }
 
+  private def findRefValue(termSymbol:TermSymbol): Int={
+    val value = instanceMirror.reflectField(termSymbol).get
+    if (value == null) {
+      0
+    } else {
+      val stringValue = value.toString.trim()
+      if (stringValue.isEmpty) 0
+      else {
+        //println(stringValue,stringValue.toInt)
+        stringValue.toInt
+      }
+    }
+  }
   private def findLength(lengthDef:Option[Either[Int,TermSymbol]]):Option[Int]={
     lengthDef match {
-      case Some(Right(l))=>
-        Some(findRefValue(l))
-      case Some(Left(l))=>
-        Some(l)
+      case Some(Right(refTerm))=>
+        Some(findRefValue(refTerm))
+      case Some(Left(length))=>
+        Some(length)
       case None=>
         None
     }
-
+  }
+  private def tryIgnoreAncientDataException[T](term:TermSymbol)(fun: =>T): T={
+    try {
+      fun
+    }catch {
+      case e: AncientDataException =>
+        throw new AncientDataException(term + "->" + e.getMessage, e)
+      case NonFatal(e) =>
+        throw new AncientDataException(term.toString + "," + e.toString, e)
+    }
   }
   /**
    * calculate data size and return.
    * @return data size
    */
-  def getDataSize:Int={
+  def getDataSize:Int= {
     //TODO 针对@LengthRef类型的需要重新计算
     //if(dataSize == 0) {
       dataSize = internalProcessField
       .map{case (processor,lengthDef) =>
-        processor.calLength(ValueManipulate(instanceMirror,processor.term),findLength(lengthDef))
+        tryIgnoreAncientDataException[Int](processor.term){
+          processor.calLength(ValueManipulate(instanceMirror, processor.term), findLength(lengthDef))
+        }
       }.sum
       //dataSize = internalProcessField((symbol,length)=>findTermProcessor(symbol,symbol.asTerm.typeSignature,length)).sum
     //}
@@ -315,19 +329,7 @@ trait ScalaReflect{
 
     members
   }
-  private def findRefValue(termSymbol:TermSymbol): Int={
-    val value = instanceMirror.reflectField(termSymbol).get
-    if (value == null) {
-      0
-    } else {
-      val stringValue = value.toString.trim()
-      if (stringValue.isEmpty) 0
-      else {
-        //println(stringValue,stringValue.toInt)
-        stringValue.toInt
-      }
-    }
-  }
+
 
   /**
    * serialize to channel buffer
@@ -337,7 +339,9 @@ trait ScalaReflect{
     val dataSink = converter(stream)
     internalProcessField.foreach{
       case (processor,lengthDef) =>
-      processor.writeToStreamWriter(dataSink,ValueManipulate(instanceMirror,processor.term),findLength(lengthDef),encoding)
+        tryIgnoreAncientDataException(processor.term) {
+          processor.writeToStreamWriter(dataSink, ValueManipulate(instanceMirror, processor.term), findLength(lengthDef), encoding)
+        }
     }
     stream
   }
@@ -349,7 +353,9 @@ trait ScalaReflect{
   def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
     internalProcessField.foreach{
       case (processor,lengthDef) =>
-        processor.fromStreamReader(dataSource,ValueManipulate(instanceMirror,processor.term),findLength(lengthDef),encoding)
+        tryIgnoreAncientDataException(processor.term) {
+          processor.fromStreamReader(dataSource, ValueManipulate(instanceMirror, processor.term), findLength(lengthDef), encoding)
+        }
     }
     this
   }
