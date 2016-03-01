@@ -109,8 +109,13 @@ object gaqryqueConverter {
           mic.pstMnt_Data = md.getMinutia.toByteArray
           mic.nMntLen = mic.pstMnt_Data.length
           mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
-          mic.nItemData =  md.getPos.toByte
-          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+          if(md.getPos > 10){//平面指纹
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_TPLAIN.asInstanceOf[Byte]
+            mic.nItemData = (md.getPos - 10).toByte
+          }else{
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+            mic.nItemData =  md.getPos.toByte
+          }
 
           mic
 
