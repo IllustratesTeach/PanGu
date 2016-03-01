@@ -15,7 +15,7 @@ object JniLoader extends LoggerSupport {
   private final val IMAGE_LIBRARY = new runtime.Library("hall-image4j", getClass)
 
   def loadJniLibrary(serverHome: String, logFile: String) {
-      val file = new File(serverHome)
+    val file = new File(serverHome)
     val path = System.getProperty(HallImageConstants.HALL_IMAGE_PATH_KEY)
     if (path == null)
       System.setProperty(HallImageConstants.HALL_IMAGE_PATH_KEY, file.getAbsolutePath + "/dll")
