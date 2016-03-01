@@ -11,8 +11,6 @@ import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
  */
 object FPT4File {
   private lazy val headSize = 10
-  private lazy val FingerTData_StaticLength = new FingerTData().getStaticSize
-  private lazy val Logic02Rec_StaticLength= new Logic02Rec().getStaticSize
   class LogicHeadV4 extends AncientData{
     @Length(8)
     var fileLength: String = _
@@ -209,22 +207,6 @@ object FPT4File {
     @LengthRef("sendFingerCount")
     var fingers: Array[FingerTData] = _
 
-
-    def getStaticSize:Int={
-      super.getDataSize
-    }
-
-    override def getDataSize: Int = {
-      var len = Logic02Rec_StaticLength
-      if(portraitDataLength != null && portraitDataLength.nonEmpty)
-        len += portraitDataLength.toInt
-      if(getFingerDataCount > 0)
-        len -=1
-      if(fingers != null)
-        fingers.foreach( len+= _.getDataSize)
-      len
-    }
-
     // GS
     override protected def getFingerDataCount: Int = {
       if (sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
@@ -275,23 +257,6 @@ object FPT4File {
     @LengthRef("imgDataLength")
     var imgData: Array[Byte]= _
     var end: Byte = FPTFile.GS
-
-    def getStaticSize:Int={
-      super.getDataSize
-    }
-    /**
-     * calculate data size and return.
-     * @return data size
-     */
-    override def getDataSize: Int = {
-      var len =  FingerTData_StaticLength
-      if(customInfoLength !=null && customInfoLength.nonEmpty)
-        len += customInfoLength.toInt
-      if(imgDataLength != null && imgDataLength.nonEmpty)
-        len += imgDataLength.toInt
-
-      len
-    }
   }
 
   class Logic03Rec extends DynamicFingerData {
