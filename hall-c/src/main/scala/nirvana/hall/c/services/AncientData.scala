@@ -4,6 +4,7 @@ import java._
 import java.io.{BufferedInputStream, InputStream, OutputStream}
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
+import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.stream.ImageInputStream
 
 import nirvana.hall.c.AncientConstants
@@ -32,6 +33,7 @@ object AncientData extends WrapAsStreamWriter{
   //global scala reflect mirror
   val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   val STRING_CLASS = typeOf[String]
+  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(TermSymbol,Option[Int])]]()
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
   trait StreamReader {
@@ -276,50 +278,59 @@ trait ScalaReflect{
     dataSize
   }
   private def internalProcessField[T :ClassTag](processor:(Symbol,Option[Int])=>T):Array[T]={
-    clazzType.members
-      .filter(_.isTerm)
-      .filter(_.asTerm.isVar)
-      .filterNot(_.annotations.exists (typeOf[IgnoreTransfer] =:= _.tree.tpe))
-      .toSeq.reverse // <----- must be reversed
-      .map{ m =>
-      //println("process ",m)
-      //find @Length annotation and get value
-      val lengthAnnotation = m.annotations.find (typeOf[Length] =:= _.tree.tpe)
-      val length = lengthAnnotation.map(_.tree).map{
-        case Apply(fun, AssignOrNamedArg(name,Literal(Constant(value)))::Nil)=>
-          value.asInstanceOf[Int]
-      }
-
-      try {
-        //find @LengthRef annotation and get value
-        val lengthRefAnnotation = m.annotations.find(typeOf[LengthRef] =:= _.tree.tpe)
-        val lengthRef = lengthRefAnnotation.map(_.tree).map {
-          case Apply(fun, AssignOrNamedArg(name, Literal(Constant(refFieldName))) :: Nil) =>
-
-            val fieldName = refFieldName.asInstanceOf[String]
-            val termSymbol = clazzType.decl(TermName(fieldName)).asTerm
-            val value = instanceMirror.reflectField(termSymbol).get
-            if (value == null) {
-              0
-            } else {
-              val stringValue = value.toString.trim()
-              if (stringValue.isEmpty) 0
-              else {
-                //println(stringValue,stringValue.toInt)
-                stringValue.toInt
-              }
-            }
+    var members = reflectCaches.get(getClass)
+    if(members == null) {
+      members = clazzType.members
+        .filter(_.isTerm)
+        .filter(_.asTerm.isVar)
+        .filterNot(_.annotations.exists(typeOf[IgnoreTransfer] =:= _.tree.tpe))
+        .toSeq.reverse // <----- must be reversed
+        .map { m =>
+        //println("process ",m)
+        //find @Length annotation and get value
+        val lengthAnnotation = m.annotations.find(typeOf[Length] =:= _.tree.tpe)
+        val length = lengthAnnotation.map(_.tree).map {
+          case Apply(fun, AssignOrNamedArg(name, Literal(Constant(value))) :: Nil) =>
+            value.asInstanceOf[Int]
         }
-        if (length.isDefined && lengthRef.isDefined)
-          throw new AncientDataException("@Length and @LengthRef both defined at " + m)
-        //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
-        processor(m, if (length.isDefined) length else lengthRef)
-      }catch{
-        case e:AncientDataException =>
-          throw new AncientDataException(m+"->"+e.getMessage,e)
-        case NonFatal(e)=>
-          throw new AncientDataException(m.toString+","+e.toString,e)
+
+        try {
+          //find @LengthRef annotation and get value
+          val lengthRefAnnotation = m.annotations.find(typeOf[LengthRef] =:= _.tree.tpe)
+          val lengthRef = lengthRefAnnotation.map(_.tree).map {
+            case Apply(fun, AssignOrNamedArg(name, Literal(Constant(refFieldName))) :: Nil) =>
+
+              val fieldName = refFieldName.asInstanceOf[String]
+              val termSymbol = clazzType.decl(TermName(fieldName)).asTerm
+              val value = instanceMirror.reflectField(termSymbol).get
+              if (value == null) {
+                0
+              } else {
+                val stringValue = value.toString.trim()
+                if (stringValue.isEmpty) 0
+                else {
+                  //println(stringValue,stringValue.toInt)
+                  stringValue.toInt
+                }
+              }
+          }
+          if (length.isDefined && lengthRef.isDefined)
+            throw new AncientDataException("@Length and @LengthRef both defined at " + m)
+          //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
+          (m.asInstanceOf[TermSymbol], if (length.isDefined) length else lengthRef)
+        } catch {
+          case e: AncientDataException =>
+            throw new AncientDataException(m + "->" + e.getMessage, e)
+          case NonFatal(e) =>
+            throw new AncientDataException(m.toString + "," + e.toString, e)
+        }
       }
+      reflectCaches.putIfAbsent(getClass,members)
+    }
+
+    members.map{
+      case (m,length)=>
+        processor(m,length)
     }.toArray
   }
   private def createAncientDataByType(t: universe.Type): ScalaReflect = {
