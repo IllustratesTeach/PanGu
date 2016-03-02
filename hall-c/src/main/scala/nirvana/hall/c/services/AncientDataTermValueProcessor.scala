@@ -74,7 +74,7 @@ sealed trait AncientDataTermValueProcessor{
  * byte processor ancient data
  * @param term field term
  */
-class ByteProcessorAncientData(override val term:TermSymbol) extends AncientDataTermValueProcessor{
+class ByteProcessor(override val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,1)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     stream.writeByte(valueManipulation.get.asInstanceOf[Byte])
@@ -83,7 +83,7 @@ class ByteProcessorAncientData(override val term:TermSymbol) extends AncientData
     valueManipulation.set(dataSource.readByte())
   }
 }
-class ShortProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueProcessor{
+class ShortProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,2)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     stream.writeShort(valueManipulation.get.asInstanceOf[Short])
@@ -92,7 +92,7 @@ class ShortProcessorAncientData(val term:TermSymbol) extends AncientDataTermValu
     valueManipulation.set(dataSource.readShort())
   }
 }
-class IntProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueProcessor{
+class IntProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,4)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     stream.writeInt(valueManipulation.get.asInstanceOf[Int])
@@ -101,7 +101,7 @@ class IntProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueP
     valueManipulation.set(dataSource.readInt())
   }
 }
-class LongProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueProcessor{
+class LongProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,8)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     stream.writeLong(valueManipulation.get.asInstanceOf[Long])
@@ -110,7 +110,7 @@ class LongProcessorAncientData(val term:TermSymbol) extends AncientDataTermValue
     valueManipulation.set(dataSource.readLong())
   }
 }
-class StringProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueProcessor{
+class StringProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= returnLengthOrThrowException(term,length)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     val valueLength = computeLength(valueManipulation,length)
@@ -122,7 +122,7 @@ class StringProcessorAncientData(val term:TermSymbol) extends AncientDataTermVal
     valueManipulation.set(new String(bytes,encoding).trim)
   }
 }
-class ByteArrayProcessorAncientData(val term:TermSymbol) extends AncientDataTermValueProcessor{
+class ByteArrayProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= returnLengthOrThrowException(term,length)
 
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int], encoding: Charset): Unit = {
@@ -133,7 +133,7 @@ class ByteArrayProcessorAncientData(val term:TermSymbol) extends AncientDataTerm
     valueManipulation.set(bytes)
   }
 }
-class AncientDataProcessorAncientData(val term:TermSymbol,tpe:Type) extends AncientDataTermValueProcessor{
+class AncientDataProcessor(val term:TermSymbol,tpe:Type) extends AncientDataTermValueProcessor{
   private lazy val typeInstance = createAncientDataByType(tpe)
   private lazy val typeClass = typeInstance.getClass
   private lazy val typeLength= typeInstance.getDataSize
@@ -163,7 +163,7 @@ class AncientDataProcessorAncientData(val term:TermSymbol,tpe:Type) extends Anci
     valueManipulation.set(ancientData)
   }
 }
-class AncientDataArrayProcessorAncientData(val term:TermSymbol,tpe:Type) extends AncientDataTermValueProcessor{
+class AncientDataArrayProcessor(val term:TermSymbol,tpe:Type) extends AncientDataTermValueProcessor{
   private lazy val typeInstance = createAncientDataByType(tpe)
   private lazy val typeClass = typeInstance.getClass
   private lazy val typeLength = typeInstance.getDataSize

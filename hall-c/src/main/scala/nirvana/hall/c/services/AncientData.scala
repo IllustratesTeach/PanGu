@@ -130,7 +130,7 @@ object AncientData extends AncientDataStreamWrapper{
 
 
 
-trait ScalaReflect{
+trait AncientData{
   private lazy val instanceMirror = AncientData.mirror.reflect(this)
 //  private val clazzSymbol = typeOf[this.type].typeSymbol
   private lazy val clazzSymbol = instanceMirror.symbol
@@ -141,15 +141,15 @@ trait ScalaReflect{
    */
   private def createTermProcessorByType(term:TermSymbol,tpe:Type):AncientDataTermValueProcessor={
     tpe match {
-      case t if t<:< ByteTpe =>  new ByteProcessorAncientData(term)
-      case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessorAncientData(term)
-      case t if t <:< IntTpe => new IntProcessorAncientData(term)
-      case t if t <:< LongTpe => new LongProcessorAncientData(term)
-      case AncientData.STRING_CLASS => new StringProcessorAncientData(term)
-      case t if t <:< typeOf[AncientData] => new AncientDataProcessorAncientData(term,t)
-      case t  if t =:= typeOf[Array[Byte]] => new ByteArrayProcessorAncientData(term)
-      case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol => //Array of ScalaReflect
-        new AncientDataArrayProcessorAncientData(term,args.head)
+      case t if t<:< ByteTpe =>  new ByteProcessor(term)
+      case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessor(term)
+      case t if t <:< IntTpe => new IntProcessor(term)
+      case t if t <:< LongTpe => new LongProcessor(term)
+      case AncientData.STRING_CLASS => new StringProcessor(term)
+      case t if t <:< typeOf[AncientData] => new AncientDataProcessor(term,t)
+      case t  if t =:= typeOf[Array[Byte]] => new ByteArrayProcessor(term)
+      case TypeRef(pre,sym,args) if sym == typeOf[Array[AncientData]].typeSymbol => //Array of ScalaReflect
+        new AncientDataArrayProcessor(term,args.head)
       case other =>
         throw new AncientDataException("type is not supported "+other+" for:"+term)
     }
@@ -161,11 +161,7 @@ trait ScalaReflect{
       0
     } else {
       val stringValue = value.toString.trim()
-      if (stringValue.isEmpty) 0
-      else {
-        //println(stringValue,stringValue.toInt)
-        stringValue.toInt
-      }
+      if (stringValue.isEmpty) 0 else  stringValue.toInt
     }
   }
   private def findLength(lengthDef:Option[Either[Int,TermSymbol]]):Option[Int]={
@@ -298,6 +294,4 @@ object Model {
 }
 */
 
-trait AncientData extends ScalaReflect{}
-//trait AncientData extends Model
 
