@@ -1,10 +1,14 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.nio.charset.Charset
+
 import nirvana.hall.c.annotations.{Length, LengthRef}
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
+import nirvana.hall.c.services.AncientData.StreamReader
+import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead, FPTParseException}
 
 import scala.language.reflectiveCalls
+import scala.util.control.NonFatal
 
 /**
  * fpt3 file
@@ -59,6 +63,59 @@ object FPT3File {
     var logic2Recs: Array[Logic2Rec] = _
     @LengthRef("tpCount")
     var logic3Recs: Array[Logic3Rec] = _
+
+    private def tryReadLogic(dataSource:StreamReader,encoding:Charset): Unit ={
+      dataSource.markReaderIndex()
+      val head = new LogicHeadV3()
+      head.fromStreamReader(dataSource, encoding)
+      dataSource.resetReaderIndex()
+      head.dataType.trim match {
+        case "3" =>
+          if(logic3Recs == null)
+            logic3Recs = Array[Logic3Rec](new Logic3Rec)
+          else{
+            val tmp = logic3Recs
+            logic3Recs = new Array[Logic3Rec](logic3Recs.length+1)
+            System.arraycopy(tmp,0,logic3Recs,0,tmp.length)
+            logic3Recs(tmp.length) = new Logic3Rec
+          }
+          tpCount = logic3Recs.length.toString
+          logic3Recs.last.fromStreamReader(dataSource)
+        case "2" =>
+          if(logic2Recs == null)
+            logic2Recs = Array[Logic2Rec](new Logic2Rec)
+          else{
+            val tmp = logic2Recs
+            logic2Recs = new Array[Logic2Rec](logic2Recs.length+1)
+            System.arraycopy(tmp,0,logic2Recs,0,tmp.length)
+            logic2Recs(tmp.length) = new Logic2Rec
+          }
+          logic2Recs.last.fromStreamReader(dataSource)
+          lpCount = logic2Recs.length.toString
+        case other=>
+          throw new FPTParseException("wrong data type %s for fpt3".format(other))
+      }
+    }
+    /**
+     * convert channel buffer data as object
+     * @param dataSource netty channel buffer
+     */
+    override def fromStreamReader(dataSource: StreamReader, encoding: Charset): FPT3File.this.type = {
+      super.fromStreamReader(dataSource, encoding)
+
+      //for BigData test,retry read logic head from stream
+      if(tpCount == null || tpCount.isEmpty){
+        try {
+          0 until 100 foreach{i=>
+            tryReadLogic(dataSource,encoding)
+          }
+        }catch{
+          case NonFatal(e)=>
+            //do nothing
+        }
+      }
+      this
+    }
   }
 
   class Logic2Rec extends DynamicFingerData{

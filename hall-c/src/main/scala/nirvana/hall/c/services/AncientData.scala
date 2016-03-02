@@ -1,6 +1,6 @@
 package nirvana.hall.c.services
 
-import java.io.{BufferedInputStream, InputStream, OutputStream}
+import java.io.{EOFException, BufferedInputStream, InputStream, OutputStream}
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
@@ -31,7 +31,7 @@ object AncientData extends WrapAsStreamWriter{
   //global scala reflect mirror
   val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   val STRING_CLASS = typeOf[String]
-  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(TermValueProcessor,Option[Either[Int,TermSymbol]])]]()
+  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]]()
   val staticSize = new ConcurrentHashMap[Class[_],Int]()
 
 
@@ -56,6 +56,8 @@ object AncientData extends WrapAsStreamWriter{
   @tailrec
   def readByteArray(is:InputStream,data:Array[Byte],size:Int,offset:Int=0): Unit ={
     val n = is.read(data,offset,size)
+    if(n < 0 )
+      throw new EOFException("No more data in stream")
     if(n != size){
       readByteArray(is,data,size-n,n)
     }
@@ -220,17 +222,17 @@ trait ScalaReflect{
   /**
    * find primitive data type length
    */
-  private def findTermProcessor(term:TermSymbol,tpe:Type):TermValueProcessor={
+  private def findTermProcessor(term:TermSymbol,tpe:Type):AncientDataTermValueProcessor={
     tpe match {
-      case t if t<:< ByteTpe =>  new ByteProcessor(term)
-      case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessor(term)
-      case t if t <:< IntTpe => new IntProcessor(term)
-      case t if t <:< LongTpe => new LongProcessor(term)
-      case AncientData.STRING_CLASS => new StringProcessor(term)
-      case t if t <:< typeOf[AncientData] => new AncientDataProcessor(term,t)
-      case t  if t =:= typeOf[Array[Byte]] => new ByteArrayProcessor(term)
+      case t if t<:< ByteTpe =>  new ByteProcessorAncientData(term)
+      case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessorAncientData(term)
+      case t if t <:< IntTpe => new IntProcessorAncientData(term)
+      case t if t <:< LongTpe => new LongProcessorAncientData(term)
+      case AncientData.STRING_CLASS => new StringProcessorAncientData(term)
+      case t if t <:< typeOf[AncientData] => new AncientDataProcessorAncientData(term,t)
+      case t  if t =:= typeOf[Array[Byte]] => new ByteArrayProcessorAncientData(term)
       case TypeRef(pre,sym,args) if sym == typeOf[Array[ScalaReflect]].typeSymbol => //Array of ScalaReflect
-        new AncientDataArrayProcessor(term,args.head)
+        new AncientDataArrayProcessorAncientData(term,args.head)
       case other =>
         throw new AncientDataException("type is not supported "+other+" for:"+term)
     }
@@ -274,19 +276,15 @@ trait ScalaReflect{
    * @return data size
    */
   def getDataSize:Int= {
-    //TODO 针对@LengthRef类型的需要重新计算
-    //if(dataSize == 0) {
-      dataSize = internalProcessField
+    dataSize = internalProcessField
       .map{case (processor,lengthDef) =>
-        tryIgnoreAncientDataException[Int](processor.term){
-          processor.calLength(ValueManipulate(instanceMirror, processor.term), findLength(lengthDef))
-        }
-      }.sum
-      //dataSize = internalProcessField((symbol,length)=>findTermProcessor(symbol,symbol.asTerm.typeSignature,length)).sum
-    //}
+      tryIgnoreAncientDataException[Int](processor.term){
+        processor.calLength(ValueManipulate(instanceMirror, processor.term), findLength(lengthDef))
+      }
+    }.sum
     dataSize
   }
-  private def internalProcessField:Seq[(TermValueProcessor,Option[Either[Int,TermSymbol]])]={
+  private def internalProcessField:Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
       members = clazzType.members

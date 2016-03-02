@@ -77,6 +77,14 @@ class FPTFileTest {
     Assert.assertTrue(fpt2.isRight)
   }
   @Test
+  def test_read_no_tpCount: Unit ={
+    val fpt3 = new FPT3File
+    fpt3.fromStreamReader(getClass.getResourceAsStream("/no-tp-count.fpt3"),AncientConstants.GBK_ENCODING)
+    Assert.assertEquals(1,fpt3.logic3Recs.size)
+    val fpt3_2= new FPT3File().fromByteArray(fpt3.toByteArray)
+    Assert.assertEquals(fpt3.fileLength.toInt,fpt3.getDataSize)
+  }
+  @Test
   def test_read_fpt3: Unit ={
     val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/fpt3.fpt"))
     val fpt3 = new FPT3File
