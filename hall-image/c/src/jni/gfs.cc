@@ -4,7 +4,7 @@
 #include "jni_helper.h"
 
 #include <jni.h>
-#ifdef DISABLE_GFS
+#ifndef DISABLE_GFS
 JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByGFS
    (JNIEnv *jenv, jclass, jbyteArray compressed_img, jbyteArray original_data){
 
