@@ -50,8 +50,10 @@ IF(WIN32)
                 NAME tcprdll64
                 PATHS "${KERNEL_DIR}\\build-w64\\src"
                 DOC "tcprdll  release library")
+    TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL} ${GAFISTOOLS})
 
     ELSE()
+        ADD_DEFINITIONS(-DDISABLE_GFS)
         FIND_LIBRARY(GAFISTOOLS
                 NAME gafistools
                 PATHS "${KERNEL_DIR}\\build-w32\\src"
@@ -60,8 +62,8 @@ IF(WIN32)
                 NAME tcprdll
                 PATHS "${KERNEL_DIR}\\build-w32\\src"
                 DOC "tcprdll release library")
+#    TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL} ${GAFISTOOLS})
     ENDIF()
-    TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL} ${GAFISTOOLS})
 ELSE()
     TARGET_LINK_LIBRARIES(hall-image4j nirvana-kernel)
 ENDIF()

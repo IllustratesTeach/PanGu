@@ -118,6 +118,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
                     dll.isOk = false
                     NativeImageConverter.freeLibrary(dll.Handle)
                   }
+                  throw e
               } finally {
                 locker.unlock()
               }
