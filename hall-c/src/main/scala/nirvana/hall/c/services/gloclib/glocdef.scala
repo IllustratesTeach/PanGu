@@ -18,7 +18,80 @@ object glocdef {
       final val GA_TRUE = 1
       final val GA_FALSE = 0
 
+  //gafis7数据头
+  class GAFIS7LOB_HEADSTRUCT extends AncientData
+  {
+    var	nSize:Int = 64
+    @Length(4)
+    var	sMagic:Array[Byte]= "BLOB".getBytes();	//!< "BLOB"
+    // to here is 8 bytes long.
+    var	nType:Byte = _;		//!< 结构的类型。1
+    var	bnRes:Byte = _;	// 保留字节。
+    var	nMajorVer:Byte = _;
+    var	nMinorVer:Byte = _;
+    var	nCompressMethod:Byte = _;
+    var	nCprVendorId:Byte = _;
+    var	nCprProductId:Byte = _;
+    var	nSubBlockType:Byte = _;
+    // to here is 16 bytes long.
+    var	nDataSize:Int = _;		// 数据的长度，不包括当前头部信息。
+    @Length(4)
+    var	bnRes_Head0:Array[Byte] = _;
+    // to here is 24 bytes long.
+    var	nBty:Byte = _;
+    var	nFgp:Byte = _;
+    var	nViewId:Byte = _;
+    var	bnRes1:Byte = _;
+    @Length(4)
+    var	bnRes2:Array[Byte] = _;
+    // to here is 32 bytes long.
+    @Length(2)
+    var	bnRes3:Array[Byte] = _;
+    var	nSigAlg:Byte = _;
+    var	bIsLatent:Byte = _;
+    // to here is 36 bytes long.
+    @Length(16)
+    var	bnSignature:Array[Byte] = _;
+    // to here is 52 bytes long.
+    var	nDeviceType:Byte = _;
+    var	nObjectType:Byte = _;
+    @Length(10)
+    var	bnRes9:Array[Byte] = _;
+  } //GAFIS7LOB_HEADSTRUCT;	// 64 bytes long.
 
+  class	GAFIS7LOB_IMGHEADSTRUCT extends AncientData
+  {
+    var	nSize:Int = 64
+    @Length(4)
+    var	sMagic:Array[Byte] = "IMGE".getBytes();	//!< "IMGE"
+    // to here is 8 bytes long.
+    var	nType:Byte = 2;		//!< 结构的类型。2
+    var	bnRes:Byte = _;	// 保留字节。
+    var	nMajorVer:Byte = _;
+    var	nMinorVer:Byte = _;
+    var	nCompressMethod:Byte = _;
+    var	nCprVendorId:Byte = _;
+    var	nCprProductId:Byte = _;
+    var	nSubBlockType:Byte = _;
+    // to here is 16 bytes long.
+    var	nDataSize:Int = _;		// 数据的长度，不包括当前头部信息。
+    @Length(4)
+    var	bnRes_Head0:Array[Byte] = _;
+    // to here is 24 bytes long.
+    var	nBitsPerPixel:Byte = _;
+    var	nColorSpace:Byte = _;
+    @Length(2)
+    var	bnRes2:Array[Byte] = _;
+    // to here is 28 bytes long.
+    var	nWidth:Int = _;
+    var	nHeight:Int = _;
+    var	nResolution:Short= _;
+    var	nQualDesc:Byte= _;
+    var	nImgDesc:Byte= _;
+    // to here is 40 bytes long.
+    @Length(24)
+    var	bnRes5:Array[Byte] = _;
+  } //GAFIS7LOB_IMGHEADSTRUCT;	// 64 bytes long.
 
       // the following structure represents a general image's head, we
       // may apply many methods to it
@@ -92,7 +165,28 @@ object glocdef {
         // which cpr format we can refer to nCompressMethod flag
         // originally, for uncompressed image, this flag is not
         // used
-
+  object GAFIS7_CPRMETHOD
+  {
+    final val CPRCODE_NOCOMPRESS	 = 0
+    final val CPRCODE_WSQ20		 = 1
+    final val CPRCODE_JPEGB		 = 2
+    final val CPRCODE_JPEGL		 = 3
+    final val CPRCODE_JP2000		 = 4	// jpeg 2000有损压缩
+    final val CPRCODE_JP2000LS	 = 5	// jpeg 2000 无损压缩
+    final val CPRCODE_PNG			 = 6
+    final val CPRCODE_FAS			 = 31	// 传真压缩
+    final val CPRCODE_USERDEFINED	 = 99	// 用户自定义。
+    final val CPRCODE_XGW			 = 101
+    final val CPRCODE_XGW_EZW		 = 102
+    final val CPRCODE_COGENT		 = 103	// COGENT
+    final val CPRCODE_NEC			 = 104	// NEC
+    final val CPRCODE_QH			 = 105	// 清华
+    final val CPRCODE_GAB			 = 106	// 公安部
+    final val CPRCODE_BEIYOU		 = 107	// 北邮
+    final val CPRCODE_WSG			 = 108	// 王曙光
+    final val CPRCODE_ZIP			 = 109
+    final val CPRCODE_GZIP		 = 110
+  } //GAFIS7CPRMETHOD;
 
         // GAFISIMAGEHEADSTRUCT::nQualDesc
         final val GAFIS_QUALDESC_NORMAL = 0	// normal image, quality description not set.

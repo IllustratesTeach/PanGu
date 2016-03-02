@@ -3,12 +3,11 @@ package nirvana.hall.v70.internal.stamp
 import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
-import javax.sql.rowset.serial.SerialBlob
 
 import nirvana.hall.api.internal.AnalysisData
-import nirvana.hall.v70.services.stamp.GatherPortraitService
 import nirvana.hall.orm.services.Relation
 import nirvana.hall.v70.jpa.GafisGatherPortrait
+import nirvana.hall.v70.services.stamp.GatherPortraitService
 
 
 /**
@@ -83,13 +82,13 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
       val map : util.HashMap[_, _] = listData.get(v)
       val pkId = map.get("pkid").toString
       val fgp  = map.get("fgp").toString
-      val gatherData : SerialBlob = map.get("gatherData").asInstanceOf[SerialBlob]
+      val gatherData = map.get("gatherData")
       val inputTime = new Date()
       val portrait = new GafisGatherPortrait()
       portrait.pkId = pkId
       portrait.personid = personId
       portrait.fgp = fgp
-      portrait.gatherData = gatherData
+      portrait.gatherData = gatherData.asInstanceOf[Array[Byte]]
       portrait.inputtime = new Date()
       portrait.deletag = "1"
       portrait.save()

@@ -4,7 +4,7 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisPerson, SyncQueue}
+import nirvana.hall.v70.jpa.{GafisGatherPortrait, GafisGatherFinger, GafisPerson, SyncQueue}
 
 /**
  * Created by songpeng on 15/12/7.
@@ -55,11 +55,17 @@ trait Sync7to6TPCardService {
     }
   }
 
+  /**
+   * 查询捺印卡信息
+   * @param personId
+   * @return
+   */
   private def getTPCard(personId: String): TPCard = {
     val person = GafisPerson.find(personId)
+    val photos = GafisGatherPortrait.find_by_personid(personId)
     val fingers = GafisGatherFinger.find_by_personId(personId)
 
-    ProtobufConverter.convertGafisPerson2TPCard(person, fingers)
+    ProtobufConverter.convertGafisPerson2TPCard(person, photos, fingers)
   }
 
 }

@@ -1,6 +1,6 @@
 package nirvana.hall.v70.internal.filter.stamp
 
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
+import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.MsgBase64
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
@@ -26,7 +26,8 @@ class QueryPortraitRequestFilter (gatherPortraitService : GatherPortraitService)
         for (p <- portraits) {
           b.setPersonid(p.personid)
           b.setFgp(p.fgp)
-          val byte = p.gatherData.getBytes(129,p.gatherData.length().toInt)
+          val byte = new Array[Byte](p.gatherData.size - 128)
+          System.arraycopy(p.gatherData, 128, byte, 0, byte.length)
           val data = MsgBase64.toBase64(byte)
           b.setGatherData(data)
           builder.addPortraitInfo(b)

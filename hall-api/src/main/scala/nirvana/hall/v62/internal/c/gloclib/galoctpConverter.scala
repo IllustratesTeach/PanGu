@@ -1,12 +1,14 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import java.io.ByteArrayOutputStream
+
 import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
-import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
+import nirvana.hall.protocol.api.FPTProto.{FaceFgp, FingerFgp, ImageType, TPCard}
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
 import scala.collection.JavaConversions._
@@ -106,6 +108,17 @@ object galoctpConverter {
           mic.nImgLen = mic.pstImg_Data.length
           flag |= glocdef.GAMIC_ITEMFLAG_IMG
         }
+//        //头部特征转换7to6
+//        val sMagic = Array[Byte](4)
+//        val imageBytes = blob.getStImageBytes.toByteArray
+//        System.arraycopy(imageBytes, 4, sMagic,0, 4)
+//        if("BLOB".equals(new String(sMagic))){//gafis7
+//          val headData = Array[Byte](64)
+//          System.arraycopy(imageBytes, 64, headData,0, 64)
+//          val gafis7Head= new GAFIS7LOB_IMGHEADSTRUCT
+//          gafis7Head.fromByteArray(headData)
+//          val gafis6Head = convertHead7to6(gafis7Head)
+//        }
       }
 
       //TODO 纹线数据？
@@ -124,8 +137,32 @@ object galoctpConverter {
           if(blob.hasFgp){
             mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte]
           }
-        case FPTProto.ImageType.IMAGETYPE_FACE =>
+        case FPTProto.ImageType.IMAGETYPE_FACE => //人像
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_FACE.asInstanceOf[Byte]
+          blob.getFacefgp match {
+            case FaceFgp.FACE_FRONT => mic.nItemData = 1
+            case FaceFgp.FACE_LEFT => mic.nItemData = 2
+            case FaceFgp.FACE_RIGHT => mic.nItemData = 3
+          }
+
+          val sMagic = new Array[Byte](4)
+          val imageBytes = blob.getStImageBytes.toByteArray
+          System.arraycopy(imageBytes, 4, sMagic,0, 4)
+          if("BLOB".equals(new String(sMagic))){//gafis7
+            val headData = new Array[Byte](64)
+            System.arraycopy(imageBytes, 64, headData,0, 64)
+            val gafis7Head= new GAFIS7LOB_IMGHEADSTRUCT
+            gafis7Head.fromByteArray(headData)
+            val gafis6Head = convertHead7to6(gafis7Head)
+            val data = new ByteArrayOutputStream()
+            data.write(gafis6Head.toByteArray)
+            data.write(imageBytes, 128, imageBytes.length-128)
+
+            mic.pstCpr_Data = data.toByteArray
+            mic.nCprLen = mic.pstCpr_Data.length
+            mic.pstImg_Data = null
+            mic.nImgLen=0
+          }
         case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
@@ -236,6 +273,11 @@ object galoctpConverter {
           data.setBPlain(true)
         case glocdef.GAMIC_ITEMTYPE_FACE =>
           data.setType(ImageType.IMAGETYPE_FACE)
+          mic.nItemData match {
+            case 1 => data.setFacefgp(FaceFgp.FACE_FRONT)
+            case 2 => data.setFacefgp(FaceFgp.FACE_LEFT)
+            case 3 => data.setFacefgp(FaceFgp.FACE_RIGHT)
+          }
         case glocdef.GAMIC_ITEMTYPE_DATA =>
           data.setType(ImageType.IMAGETYPE_CARDIMG)
         case glocdef.GAMIC_ITEMTYPE_PALM =>
@@ -249,4 +291,42 @@ object galoctpConverter {
     card.build()
   }
 
+  def convertHead7to6(gafis7Head: GAFIS7LOB_IMGHEADSTRUCT): GAFISIMAGEHEADSTRUCT = {
+    val gafis6Head = new GAFISIMAGEHEADSTRUCT
+
+    gafis6Head.nWidth = gafis7Head.nWidth.toShort
+    gafis6Head.nHeight = gafis7Head.nHeight.toShort
+    gafis6Head.nCompressMethod = gafis7Head.nCompressMethod
+    gafis6Head.nImgSize = gafis7Head.nDataSize
+    gafis6Head.nResolution = gafis7Head.nResolution
+    gafis6Head.bIsCompressed = 0
+    if(gafis7Head.nCompressMethod != 0) {
+      gafis6Head.bIsCompressed = 1
+      gafis6Head.nCaptureMethod = convertCprMethod7to6(gafis7Head.nCompressMethod.toInt).toByte
+    }
+    gafis6Head
+  }
+
+  def convertCprMethod7to6(g7Method: Int): Int={
+    g7Method match {
+      case GAFIS7_CPRMETHOD.CPRCODE_NOCOMPRESS =>
+        glocdef.GAIMG_CPRMETHOD_DEFAULT
+      case GAFIS7_CPRMETHOD.CPRCODE_XGW =>
+        glocdef.GAIMG_CPRMETHOD_XGW
+      case GAFIS7_CPRMETHOD.CPRCODE_XGW_EZW =>
+        glocdef.GAIMG_CPRMETHOD_XGW_EZW
+      case GAFIS7_CPRMETHOD.CPRCODE_USERDEFINED =>
+        glocdef.GAIMG_CPRMETHOD_XGW
+      case GAFIS7_CPRMETHOD.CPRCODE_JP2000 =>
+        glocdef.GAIMG_CPRMETHOD_JPG
+      case GAFIS7_CPRMETHOD.CPRCODE_JP2000LS=>
+        glocdef.GAIMG_CPRMETHOD_JPG
+      case GAFIS7_CPRMETHOD.CPRCODE_JPEGB=>
+        glocdef.GAIMG_CPRMETHOD_JPG
+      case GAFIS7_CPRMETHOD.CPRCODE_JPEGL=>
+        glocdef.GAIMG_CPRMETHOD_JPG
+      case other =>
+        glocdef.GAIMG_CPRMETHOD_DEFAULT
+    }
+  }
 }

@@ -5,7 +5,7 @@ import java.util.Date
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisPerson}
+import nirvana.hall.v70.jpa.{GafisGatherPortrait, GafisGatherFinger, GafisPerson}
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -58,9 +58,10 @@ class TPCardServiceImpl extends TPCardService{
   override def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse = {
     val personId = tPCardGetRequest.getCardId
     val person = GafisPerson.find(personId)
+    val photoList = GafisGatherPortrait.find_by_personid(personId)
     val fingerList = GafisGatherFinger.find_by_personId(personId)
 
-    val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, fingerList)
+    val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList)
 
     TPCardGetResponse.newBuilder().setCard(tpCard).build()
   }

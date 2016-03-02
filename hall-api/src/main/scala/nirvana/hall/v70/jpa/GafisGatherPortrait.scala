@@ -4,7 +4,7 @@ package nirvana.hall.v70.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
+import javax.persistence._
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -26,8 +26,9 @@ class GafisGatherPortrait extends ActiveRecord {
   var personid: java.lang.String = _
   @Column(name = "FGP", nullable = false, length = 1)
   var fgp: java.lang.String = _
+  @Lob
   @Column(name = "GATHER_DATA", nullable = false)
-  var gatherData: java.sql.Blob = _
+  var gatherData: Array[Byte] = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -44,7 +45,7 @@ class GafisGatherPortrait extends ActiveRecord {
   var gatherdatanosqlid: java.lang.String = _
 
 
-  def this(pkId: java.lang.String, fgp: java.lang.String, gatherData: java.sql.Blob, inputtime: java.util.Date) {
+  def this(pkId: java.lang.String, fgp: java.lang.String, gatherData: Array[Byte], inputtime: java.util.Date) {
     this()
     this.pkId = pkId
     this.fgp = fgp
@@ -52,7 +53,7 @@ class GafisGatherPortrait extends ActiveRecord {
     this.inputtime = inputtime
   }
 
-  def this(pkId: java.lang.String, personid: java.lang.String, fgp: java.lang.String, gatherData: java.sql.Blob, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, gatherdatanosqlid: java.lang.String) {
+  def this(pkId: java.lang.String, personid: java.lang.String, fgp: java.lang.String, gatherData: Array[Byte], inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, gatherdatanosqlid: java.lang.String) {
     this()
     this.pkId = pkId
     this.personid = personid

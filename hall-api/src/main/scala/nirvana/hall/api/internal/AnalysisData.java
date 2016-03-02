@@ -35,7 +35,7 @@ public class AnalysisData {
                 byte[] gatherData = data.getData();
                 map.put("pkid", pkid);
                 map.put("fgp", fgp);
-                map.put("gatherData", new SerialBlob(gatherData));
+                map.put("gatherData", gatherData);
                 list.add(map);
             }
         } catch (Exception ex) {

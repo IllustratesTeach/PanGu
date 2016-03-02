@@ -2,7 +2,9 @@ package nirvana.hall.api.internal
 
 import java.util.UUID
 import nirvana.hall.api.services.AuthService
+import nirvana.hall.orm.services.ActiveRecord
 import nirvana.hall.v70.jpa.OnlineUser
+import org.apache.tapestry5.ioc.ObjectLocator
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.transaction.annotation.Transactional
@@ -17,11 +19,12 @@ class AuthServiceImpl extends AuthService {
   //过期时间，TODO 做成可配置
   private val EXPIRED_PERIOD = 30 * 60
   @PostInjection
-  def startUp(periodicExecutor: PeriodicExecutor): Unit = {
+  def startUp(periodicExecutor: PeriodicExecutor, objectLocator: ObjectLocator): Unit = {
+    ActiveRecord.objectLocator = objectLocator
     periodicExecutor.addJob(new CronSchedule("0 0/10 * * * ? *"), "delete-expired-user", new Runnable {
       override def run(): Unit = {
-        val expiredTime = ScalaUtils.currentTimeInSeconds - EXPIRED_PERIOD
-        OnlineUser.where("latestTime<?1",expiredTime).delete
+//        val expiredTime = ScalaUtils.currentTimeInSeconds - EXPIRED_PERIOD
+//        OnlineUser.where("latestTime<?1",expiredTime).delete
       }
     })
   }

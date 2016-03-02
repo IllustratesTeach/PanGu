@@ -155,7 +155,7 @@ object ProtobufConverter {
     lpCard.build()
   }
 
-  def convertGafisPerson2TPCard(person: GafisPerson, fingerList: Relation[GafisGatherFinger] = null): TPCard={
+  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Relation[GafisGatherPortrait], fingerList: Relation[GafisGatherFinger] = null): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)
@@ -213,6 +213,18 @@ object ProtobufConverter {
       blobBuilder.setBPlain("1".equals(finger.fgpCase))
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
+    //人像数据
+    photoList.foreach{ photo =>
+      val blobBuilder = tpCard.addBlobBuilder()
+      blobBuilder.setStImageBytes(ByteString.copyFrom(photo.gatherData))
+      blobBuilder.setType(ImageType.IMAGETYPE_FACE)
+      photo.fgp match {
+        case "1" => blobBuilder.setFacefgp(FaceFgp.FACE_FRONT)
+        case "2" => blobBuilder.setFacefgp(FaceFgp.FACE_LEFT)
+        case "3" => blobBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
+      }
+    }
+
     tpCard.build()
   }
 
