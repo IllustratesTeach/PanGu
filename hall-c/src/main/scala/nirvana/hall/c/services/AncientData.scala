@@ -1,6 +1,6 @@
 package nirvana.hall.c.services
 
-import java.io.{EOFException, BufferedInputStream, InputStream, OutputStream}
+import java.io.{EOFException, InputStream}
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
@@ -10,7 +10,7 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.xsocket.{IDataSink, IDataSource}
+import org.xsocket.IDataSource
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
@@ -27,12 +27,11 @@ import scala.util.control.NonFatal
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
-object AncientData extends WrapAsStreamWriter{
+object AncientData extends AncientDataStreamWrapper{
   //global scala reflect mirror
-  val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
-  val STRING_CLASS = typeOf[String]
-  val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]]()
-  val staticSize = new ConcurrentHashMap[Class[_],Int]()
+  lazy val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
+  lazy val STRING_CLASS = typeOf[String]
+  lazy val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]]()
 
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
@@ -128,101 +127,19 @@ object AncientData extends WrapAsStreamWriter{
   }
 }
 
-/**
- * wrap netty's ChannelBuffer and xSocket's IDataSink
- */
-trait WrapAsStreamWriter {
-  implicit def asStreamReader(is:IDataSource):StreamReader = new DataSourceReader(is)
-  implicit def asStreamReader(is:ChannelBuffer):StreamReader = new ChannelBufferReader(is)
-  implicit def asStreamReader(is:InputStream):StreamReader = {
-    if(is.markSupported()) new InputStreamReader(is) else new InputStreamReader(new BufferedInputStream(is))
-  }
-  implicit def asStreamReader(is:ImageInputStream):StreamReader = new ImageInputStreamReader(is)
 
-  implicit def asStreamWriter(output: OutputStream): StreamWriter = new {
-    private val arr = new Array[Byte](8)
-    private val tmp = ByteBuffer.wrap(arr)
-    def writeShort(i: Int): Unit = {
-      tmp.position(0)
-      tmp.putShort(i.toShort)
-      output.write(arr,0,2)
-    }
-    def writeInt(i: Int): Unit = {
-      tmp.position(0)
-      tmp.putInt(i)
-      output.write(arr,0,4)
-    }
-    def writeBytes(src: Array[Byte]): Unit = {
-      output.write(src)
-    }
-    def writeLong(i: Long): Unit = {
-      tmp.position(0)
-      tmp.putLong(i)
-      output.write(arr,0,8)
-    }
-    def writeByte(byte: Int): Unit = output.write(byte)
-    def writeZero(length: Int): Unit = {
-      if (length == 0) {
-        return
-      }
-      if (length < 0) {
-        throw new IllegalArgumentException("length must be 0 or greater than 0.")
-      }
-      val nLong = length >>> 3
-      val nBytes = length & 7
-      0 until nLong foreach (x => writeLong(0))
-      if (nBytes == 4) {
-        writeInt(0)
-      } else if (nBytes < 4) {
-        0 until nBytes foreach (x => writeByte(0))
-      } else {
-        writeInt(0)
-        0 until (nBytes - 4) foreach (x => writeByte(0))
-      }
-    }
-  }
-  implicit def asStreamWriter(dataSink: IDataSink): StreamWriter = new {
-    def writeShort(i: Int): Unit = dataSink.write(i.toShort)
-    def writeInt(i: Int): Unit = dataSink.write(i)
-    def writeBytes(src: Array[Byte]): Unit = dataSink.write(src, 0, src.length)
-    def writeLong(i: Long): Unit = dataSink.write(i)
-    def writeByte(byte: Int): Unit = dataSink.write(byte.toByte)
-    def writeZero(length: Int): Unit = {
-      if (length == 0) {
-        return
-      }
-      if (length < 0) {
-        throw new IllegalArgumentException("length must be 0 or greater than 0.")
-      }
-      val nLong = length >>> 3
-      val nBytes = length & 7
-      0 until nLong foreach (x => writeLong(0))
-      if (nBytes == 4) {
-        writeInt(0)
-      } else if (nBytes < 4) {
-        0 until nBytes foreach (x => writeByte(0))
-      } else {
-        writeInt(0)
-        0 until (nBytes - 4) foreach (x => writeByte(0))
-      }
-    }
-  }
-}
 
 
 trait ScalaReflect{
-  private val instanceMirror = AncientData.mirror.reflect(this)
+  private lazy val instanceMirror = AncientData.mirror.reflect(this)
 //  private val clazzSymbol = typeOf[this.type].typeSymbol
-  private val clazzSymbol = instanceMirror.symbol
-  private val clazzType = clazzSymbol.asType.toType
-
-  //self type data size by member data type
-  private var dataSize:Int = 0
+  private lazy val clazzSymbol = instanceMirror.symbol
+  private lazy val clazzType = clazzSymbol.asType.toType
 
   /**
-   * find primitive data type length
+   * create term processor
    */
-  private def findTermProcessor(term:TermSymbol,tpe:Type):AncientDataTermValueProcessor={
+  private def createTermProcessorByType(term:TermSymbol,tpe:Type):AncientDataTermValueProcessor={
     tpe match {
       case t if t<:< ByteTpe =>  new ByteProcessorAncientData(term)
       case t if t<:< ShortTpe | t <:< CharTpe => new ShortProcessorAncientData(term)
@@ -238,7 +155,7 @@ trait ScalaReflect{
     }
   }
 
-  private def findRefValue(termSymbol:TermSymbol): Int={
+  private def findReferenceLength(termSymbol:TermSymbol): Int={
     val value = instanceMirror.reflectField(termSymbol).get
     if (value == null) {
       0
@@ -254,7 +171,7 @@ trait ScalaReflect{
   private def findLength(lengthDef:Option[Either[Int,TermSymbol]]):Option[Int]={
     lengthDef match {
       case Some(Right(refTerm))=>
-        Some(findRefValue(refTerm))
+        Some(findReferenceLength(refTerm))
       case Some(Left(length))=>
         Some(length)
       case None=>
@@ -276,13 +193,12 @@ trait ScalaReflect{
    * @return data size
    */
   def getDataSize:Int= {
-    dataSize = internalProcessField
+    internalProcessField
       .map{case (processor,lengthDef) =>
       tryIgnoreAncientDataException[Int](processor.term){
-        processor.calLength(ValueManipulate(instanceMirror, processor.term), findLength(lengthDef))
+        processor.computeLength(ValueManipulation(instanceMirror, processor.term), findLength(lengthDef))
       }
     }.sum
-    dataSize
   }
   private def internalProcessField:Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]={
     var members = reflectCaches.get(getClass)
@@ -314,7 +230,7 @@ trait ScalaReflect{
             throw new AncientDataException("@Length and @LengthRef both defined at " + m)
           //val length = lengthAnnotation.map(_.tree.children.tail.head.children(1).asInstanceOf[Literal].value.value.asInstanceOf[Int]).sum
 
-          (findTermProcessor(m.asTerm,m.asTerm.typeSignature), if (length.isDefined) length else lengthRef)
+          (createTermProcessorByType(m.asTerm,m.asTerm.typeSignature), if (length.isDefined) length else lengthRef)
         } catch {
           case e: AncientDataException =>
             throw new AncientDataException(m + "->" + e.getMessage, e)
@@ -338,7 +254,7 @@ trait ScalaReflect{
     internalProcessField.foreach{
       case (processor,lengthDef) =>
         tryIgnoreAncientDataException(processor.term) {
-          processor.writeToStreamWriter(dataSink, ValueManipulate(instanceMirror, processor.term), findLength(lengthDef), encoding)
+          processor.writeToStreamWriter(dataSink, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
         }
     }
     stream
@@ -352,7 +268,7 @@ trait ScalaReflect{
     internalProcessField.foreach{
       case (processor,lengthDef) =>
         tryIgnoreAncientDataException(processor.term) {
-          processor.fromStreamReader(dataSource, ValueManipulate(instanceMirror, processor.term), findLength(lengthDef), encoding)
+          processor.fromStreamReader(dataSource, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
         }
     }
     this
