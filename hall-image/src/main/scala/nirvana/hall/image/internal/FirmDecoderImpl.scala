@@ -26,7 +26,10 @@ import scala.util.control.NonFatal
  */
 class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,imageConfigSupport: ImageConfigSupport) extends FirmDecoder{
   private val dlls = new ConcurrentHashMap[String,Dll]()
-  private case class Dll(Handle:Long,lockOpt:Option[ReentrantLock])
+  private case class Dll(Handle:Long,lockOpt:Option[ReentrantLock]){
+    @volatile
+    var isOk = true
+  }
   private val lock = new ReentrantLock()
   private val wsqDecoder = new WsqDecoder
 
@@ -103,7 +106,18 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
             case Some(locker) =>
               try {
                 locker.lock()
-                NativeImageConverter.decodeByManufactory(dll.Handle, firmCode, cprMethod, cprData, destImgSize)
+                if(dll.isOk) {
+                  NativeImageConverter.decodeByManufactory(dll.Handle, firmCode, cprMethod, cprData, destImgSize)
+                }else{
+                  throw new IllegalAccessException("%s dll is unloaded".format(firmCode))
+                }
+              }catch{
+                case e:ArithmeticException =>
+                  if(e.toString.indexOf("-100")>0){//unload dll
+                    dlls.remove(firmCode)
+                    dll.isOk = false
+                    NativeImageConverter.freeLibrary(dll.Handle)
+                  }
               } finally {
                 locker.unlock()
               }

@@ -31,8 +31,7 @@ class HttpDecompressServiceTest {
     val executor = Executors.newFixedThreadPool(5)
 
 
-
-    val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/fpt-files/2/error"),Array[String]("fpt","FPT","fptt"),true)
+    val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/daku-fpt-error"),Array[String]("fpt","FPT","fptt"),true)
     val it = files.iterator()
     while(it.hasNext){
       val file = it.next()

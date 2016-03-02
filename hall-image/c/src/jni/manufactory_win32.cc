@@ -120,7 +120,7 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 	int height =0;
 	int ppi = 0;
 	int ret = 0;
-	//__try{
+	__try{
 
     if(nFirmCode == GAIMG_CPRMETHOD_BUPT){
       //call dll function to decompress data
@@ -134,17 +134,20 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
       GA_FPT_DCXX p = (GA_FPT_DCXX)hHandle;
       ret = p(code_str,cpr_data_bin,cpr_data_length,dest_img_bin,szResult);
     }
-	/*}
+	}
 	__except(EXCEPTION_EXECUTE_HANDLER){
 		ret = -100;
 	}
-	*/
+
 
 
 	//free byte array elements
 	jenv->ReleaseByteArrayElements(cpr_data,(jbyte*)cpr_data_bin,JNI_ABORT);
 	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,0);
 
+  if(ret != 1){
+  	printf("unable to decompress,ret:%d firmCode:%s msg:%s",ret,code_str,szResult);
+  }
 	//release string
 	jenv->ReleaseStringUTFChars(code,(char *)code_str);
 
