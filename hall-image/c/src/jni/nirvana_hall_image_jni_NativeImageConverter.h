@@ -7,6 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved);
+
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    loadLibrary

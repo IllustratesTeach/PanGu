@@ -1,10 +1,11 @@
 package nirvana.hall.image.app
 
-import java.io.{IOException, InputStream, OutputStream}
+import java.io.{File, IOException, InputStream, OutputStream}
 import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.{CountDownLatch, Executors, TimeUnit}
 
 import monad.support.services.LoggerSupport
+import org.apache.commons.io.FileUtils
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
@@ -87,11 +88,17 @@ object HallImageSupervisorApp extends LoggerSupport {
       commandParameters ++= jvmOptions
 
     commandParameters += "-Dserver.port="+port
+    val serverHome = new File(System.getProperty("server.home")).getAbsolutePath
+    commandParameters += "-Dserver.home="+serverHome
 
     commandParameters += "nirvana.hall.image.app.HallImageApp"
     //"nirvana.hall.image.internal.FirmMain"
 
+    val workDirectory = new File("worker"+port)
+    FileUtils.forceMkdir(workDirectory)
+
     val pb = new ProcessBuilder(commandParameters: _*)
+    pb.directory(workDirectory)
     val workerEnv = pb.environment()
     pb.redirectErrorStream(true)
     pb.redirectOutput(Redirect.PIPE)
