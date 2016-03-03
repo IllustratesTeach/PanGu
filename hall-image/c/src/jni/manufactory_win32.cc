@@ -1,5 +1,6 @@
 #ifdef WIN32
 
+#include <jni.h>
 #include <crtdbg.h>
 
 #include "manufactory_win32.h"
@@ -177,16 +178,17 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 		return NULL;
 	}
 }
-#endif
-#ifdef WIN32
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved){
+  printf("begin init ...\n");
+  fflush(stdout);
   _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
   _CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDERR );
-  return JNI_VERSION_1_7;
+  return JNI_VERSION_1_6;
 }
 #else
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved){
-  return JNI_VERSION_1_7;
+  return JNI_VERSION_1_6;
 }
 
 #endif
