@@ -182,7 +182,14 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved){
   printf("begin init ...\n");
   fflush(stdout);
-  _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG );
+
+  _CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_FILE );
+  _CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDERR );
+
+  _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
+  _CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDERR );
+
+  _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE );
   _CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDERR );
   return JNI_VERSION_1_6;
 }

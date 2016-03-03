@@ -1,7 +1,7 @@
 package nirvana.hall.stream.internal
 
 import java.io.{File, FileInputStream}
-import java.util.concurrent.{CountDownLatch, Executors}
+import java.util.concurrent.{TimeUnit, CountDownLatch, Executors}
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
 import nirvana.hall.c.services.AncientData.AncientDataException
@@ -63,7 +63,6 @@ class HttpDecompressServiceTest {
                 tp.fingers.foreach{tData=>
                   method = tData.imgCompressMethod
                   //println("compress method "+tData.imgCompressMethod)
-                  if(method == "1700"){
                     val gafisImg = new GAFISIMAGESTRUCT
                     gafisImg.stHead.nWidth = tData.imgHorizontalLength.toShort
                     gafisImg.stHead.nHeight = tData.imgVerticalLength.toShort
@@ -88,7 +87,6 @@ class HttpDecompressServiceTest {
                       }}
                     }
 
-                  }
                 }
               }
             }
@@ -103,8 +101,9 @@ class HttpDecompressServiceTest {
                 tp.fingers.foreach{tData=>
                   method = tData.imgCompressMethod
                   //println("compress method "+tData.imgCompressMethod)
-                  if(method == "1700"){
                     val gafisImg = new GAFISIMAGESTRUCT
+                  gafisImg.stHead.nWidth = tData.imgHorizontalLength.toShort
+                  gafisImg.stHead.nHeight = tData.imgVerticalLength.toShort
                     gafisImg.stHead.bIsCompressed = 1
                     gafisImg.stHead.nCompressMethod= glocdef.GAIMG_CPRMETHOD_COGENT
                     gafisImg.stHead.nImgSize = tData.imgDataLength.toInt
@@ -122,7 +121,6 @@ class HttpDecompressServiceTest {
                       }
                     })
 
-                  }
                 }
               }
             }
@@ -137,6 +135,9 @@ class HttpDecompressServiceTest {
         //          println(file.getAbsolutePath+" \n\te:"+e.toString)
       }
     }
+
+    executor.shutdown()
+    executor.awaitTermination(10,TimeUnit.MINUTES)
   }
   @Test
   def test_daiku: Unit ={
