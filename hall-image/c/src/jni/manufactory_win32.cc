@@ -139,6 +139,7 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
     }
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER){
+		abort();
 		ret = -100;
 	}
 
