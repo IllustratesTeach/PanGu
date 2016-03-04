@@ -150,7 +150,8 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
 	jenv->ReleaseByteArrayElements(dest_img,(jbyte*)dest_img_bin,0);
 
   if(ret != 1){
-  	printf("unable to decompress,ret:%d firmCode:%s msg:%s",ret,code_str,szResult);
+  	printf("unable to decompress,ret:%d firmCode:%s msg:%s \n",ret,code_str,szResult);
+  	fflush(stdout);
   }
 	//release string
 	jenv->ReleaseStringUTFChars(code,(char *)code_str);

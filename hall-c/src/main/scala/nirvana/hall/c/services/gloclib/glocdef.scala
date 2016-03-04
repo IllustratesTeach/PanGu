@@ -149,8 +149,9 @@ object glocdef {
       final val GAIMG_CPRMETHOD_RMTZIP = 106	// compressmethod provide by communication server(GAFIS)
       final val GAIMG_CPRMETHOD_LCW = 107	// compress method provide by lucas wang.
       final val GAIMG_CPRMETHOD_JPG = 108	// jpeg method.
-      final val GAIMG_CPRMETHOD_MORPHO = 109	//!< 广东测试时提供的压缩算法，MORPHO(SAGEM)
-        final val GAIMG_CPRMETHOD_MAXVALUE = 109
+      final val GAIMG_CPRMETHOD_MORPHO = 109	// MORPHO
+      final val GAIMG_CPRMETHOD_HLXT = 110	//汉林信通
+        final val GAIMG_CPRMETHOD_MAXVALUE = 110
 
         final val GAIMG_IMAGETYPE_UNKNOWN = 0x0
         final val GAIMG_IMAGETYPE_FINGER = 0x1

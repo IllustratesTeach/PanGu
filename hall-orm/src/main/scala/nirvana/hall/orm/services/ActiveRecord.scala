@@ -20,7 +20,7 @@ object ActiveRecord {
   //logger
   private val logger = LoggerFactory getLogger getClass
   @volatile
-  var objectLocator:ObjectLocator= _
+  private[orm] var objectLocator:ObjectLocator= _
 
   /**
    * Saves the model.
