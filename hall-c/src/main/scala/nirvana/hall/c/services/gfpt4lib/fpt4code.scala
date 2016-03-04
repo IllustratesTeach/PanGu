@@ -130,7 +130,7 @@ object fpt4code {
     var dpi:String
     var fgp:String
   }
-  def FPTFingerDataToGafisImage(personId: String, tData: FPTFingerData): GAFISIMAGESTRUCT = {
+  def FPTFingerDataToGafisImage(tData: FPTFingerData): GAFISIMAGESTRUCT = {
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.bIsCompressed = 1
     gafisImg.stHead.nCompressMethod = fptCprMethodToGafisCode(tData.imgCompressMethod).toByte
