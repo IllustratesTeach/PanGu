@@ -27,6 +27,8 @@ object HallOrmModule {
   def bind(binder:ServiceBinder): Unit ={
     binder.bind(classOf[EntityService],classOf[EntityServiceImpl])
   }
+
+  @EagerLoad
   def buildEntityManagerFactory(dataSource: DataSource,
                                 configuration: util.Collection[String],
                                 ormConfig:HallOrmConfigSupport,
@@ -61,10 +63,6 @@ object HallOrmModule {
     shared.afterPropertiesSet()
 
     shared.getObject
-  }
-  @Startup
-  def provideObjectLocator(objectLocator: ObjectLocator)={
-    ActiveRecord.objectLocator = objectLocator
   }
   def buildJpaTransactionManager(entityManagerFactory:EntityManagerFactory,@Local entityManager: EntityManager):PlatformTransactionManager={
     val transactionManager = new JpaTransactionManager()
