@@ -89,8 +89,19 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
           destImg.stHead.nResolution = 500 //default ppi
 
       case other=>
-        val width = gafisImg.stHead.nWidth
-        val height = gafisImg.stHead.nHeight
+
+        /**
+         * 大库测试时候，发现虽然宽度和高度是500,但是实际输出还是640X640,
+         * 所以此处最小buffer作为640X640
+         */
+        var width = gafisImg.stHead.nWidth
+        if(width < 640) width = 640
+        var height = gafisImg.stHead.nHeight
+        if(height < 640) height = 640
+
+        destImg.stHead.nWidth = width
+        destImg.stHead.nHeight = height
+
         val dll = findDllHandle(firmCode,cprMethod)
 
         val bits = Helper_GetBitsPerPixel(gafisImg.stHead.nBits)
@@ -107,6 +118,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
               try {
                 locker.lock()
                 if(dll.isOk) {
+//                  System.err.println("preparing decompress %s cprMethod:%s cprDataLength:%s destImgSize:%s width:%s height:%s".format(firmCode,cprMethod,cprData.length,destImgSize,width,height))
                   NativeImageConverter.decodeByManufactory(dll.Handle, firmCode, cprMethod, cprData, destImgSize)
                 }else{
                   throw new IllegalAccessException("%s dll is unloaded".format(firmCode))
@@ -133,6 +145,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
             destImg.stHead.nHeight = originalData.getHeight.toShort
           if (originalData.getPpi > 0)
             destImg.stHead.nResolution = originalData.getPpi.toShort
+          if(destImg.stHead.nImgSize != destImg.stHead.nHeight * destImg.stHead.nHeight)
+            System.err.println("decompress %s success imgSize:%s width:%s,height:%s".format(firmCode,destImg.stHead.nImgSize,destImg.stHead.nWidth,destImg.stHead.nHeight))
         }catch{
           case NonFatal(e)=>
             throw new IllegalAccessException("code:"+gafisImg.stHead.nCompressMethod +" e:"+e.toString)
@@ -250,7 +264,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     } else if (files.size > 1) {
       throw new IllegalStateException("duplicate dll [%s]".format(dllName))
     }
-    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
     val dllPropertyOpt = imageConfigSupport.image.dllConcurrent.find(_.name == dllName)
     val isConcurrent =
     dllPropertyOpt match {
@@ -259,6 +272,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       case None =>
         true
     }
+    System.err.println("prepare loading %s,isConcurrent:%s".format(dllName,isConcurrent))
+    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
     System.err.println("%s loaded,isConcurrent:%s".format(dllName,isConcurrent))
     dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }
