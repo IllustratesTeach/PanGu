@@ -127,15 +127,60 @@ object AncientData extends AncientDataStreamWrapper{
   }
 }
 
-
-
-
 trait AncientData{
   private lazy val instanceMirror = AncientData.mirror.reflect(this)
 //  private val clazzSymbol = typeOf[this.type].typeSymbol
   private lazy val clazzSymbol = instanceMirror.symbol
   private lazy val clazzType = clazzSymbol.asType.toType
 
+  /**
+   * calculate data size and return.
+   * @return data size
+   */
+  def getDataSize:Int= {
+    internalProcessField
+      .map{case (processor,lengthDef) =>
+      tryIgnoreAncientDataException[Int](processor.term){
+        processor.computeLength(ValueManipulation(instanceMirror, processor.term), findLength(lengthDef))
+      }
+    }.sum
+  }
+
+  /**
+   * serialize to channel buffer
+   * @param stream netty channel buffer
+   */
+  def writeToStreamWriter[T](stream:T,encoding:Charset=AncientConstants.UTF8_ENCODING)(implicit converter:T=> StreamWriter): T= {
+    val dataSink = converter(stream)
+    internalProcessField.foreach{
+      case (processor,lengthDef) =>
+        tryIgnoreAncientDataException(processor.term) {
+          processor.writeToStreamWriter(dataSink, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
+        }
+    }
+    stream
+  }
+  protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]= dataSource.readByteArray(len)
+  /**
+   * convert channel buffer data as object
+   * @param dataSource netty channel buffer
+   */
+  def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
+    internalProcessField.foreach{
+      case (processor,lengthDef) =>
+        tryIgnoreAncientDataException(processor.term) {
+          processor.fromStreamReader(dataSource, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
+        }
+    }
+    this
+  }
+  def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
+    fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
+  }
+  def toByteArray:Array[Byte]={
+    val data = ChannelBuffers.buffer(getDataSize)
+    writeToStreamWriter(data).array()
+  }
   /**
    * create term processor
    */
@@ -184,18 +229,6 @@ trait AncientData{
         throw new AncientDataException(term.toString + "," + e.toString, e)
     }
   }
-  /**
-   * calculate data size and return.
-   * @return data size
-   */
-  def getDataSize:Int= {
-    internalProcessField
-      .map{case (processor,lengthDef) =>
-      tryIgnoreAncientDataException[Int](processor.term){
-        processor.computeLength(ValueManipulation(instanceMirror, processor.term), findLength(lengthDef))
-      }
-    }.sum
-  }
   private def internalProcessField:Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
@@ -240,42 +273,6 @@ trait AncientData{
     members
   }
 
-
-  /**
-   * serialize to channel buffer
-   * @param stream netty channel buffer
-   */
-  def writeToStreamWriter[T](stream:T,encoding:Charset=AncientConstants.UTF8_ENCODING)(implicit converter:T=> StreamWriter): T= {
-    val dataSink = converter(stream)
-    internalProcessField.foreach{
-      case (processor,lengthDef) =>
-        tryIgnoreAncientDataException(processor.term) {
-          processor.writeToStreamWriter(dataSink, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
-        }
-    }
-    stream
-  }
-  protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]= dataSource.readByteArray(len)
-  /**
-   * convert channel buffer data as object
-   * @param dataSource netty channel buffer
-   */
-  def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
-    internalProcessField.foreach{
-      case (processor,lengthDef) =>
-        tryIgnoreAncientDataException(processor.term) {
-          processor.fromStreamReader(dataSource, ValueManipulation(instanceMirror, processor.term), findLength(lengthDef), encoding)
-        }
-    }
-    this
-  }
-  def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
-    fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
-  }
-  def toByteArray:Array[Byte]={
-    val data = ChannelBuffers.buffer(getDataSize)
-    writeToStreamWriter(data).array()
-  }
 }
 
 
