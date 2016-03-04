@@ -4,7 +4,7 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.jpa.{GafisGatherPortrait, GafisGatherFinger, GafisPerson, SyncQueue}
+import nirvana.hall.v70.jpa._
 
 /**
  * Created by songpeng on 15/12/7.
@@ -27,7 +27,7 @@ trait Sync7to6TPCardService {
   }
 
   private def addTPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
-    val tpCard = getTPCard(syncQueue.uploadKeyid)
+    val tpCard = getTPCard(syncQueue.uploadKeyid, "1".equals(syncQueue.hasPalm))
     val request = TPCardAddRequest.newBuilder().setCard(tpCard).build()
 
     val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, TPCardAddRequest.cmd, request)
@@ -37,7 +37,7 @@ trait Sync7to6TPCardService {
   }
 
   private def updateTPCard(syncQueue: SyncQueue, rpcHttpClient: RpcHttpClient): Unit = {
-    val tpCard = getTPCard(syncQueue.uploadKeyid)
+    val tpCard = getTPCard(syncQueue.uploadKeyid, "1".equals(syncQueue.hasPalm))
     val request = TPCardUpdateRequest.newBuilder().setCard(tpCard).build()
 
     val baseResponse = rpcHttpClient.call("http://"+syncQueue.targetIp+":"+syncQueue.targetPort, TPCardUpdateRequest.cmd, request)
@@ -60,12 +60,13 @@ trait Sync7to6TPCardService {
    * @param personId
    * @return
    */
-  private def getTPCard(personId: String): TPCard = {
+  //TODO 改用TPCardService
+  private def getTPCard(personId: String, hasPalm: Boolean): TPCard = {
     val person = GafisPerson.find(personId)
     val photos = GafisGatherPortrait.find_by_personid(personId)
     val fingers = GafisGatherFinger.find_by_personId(personId)
 
-    ProtobufConverter.convertGafisPerson2TPCard(person, photos, fingers)
+    ProtobufConverter.convertGafisPerson2TPCard(person, photos, fingers, null)
   }
 
 }

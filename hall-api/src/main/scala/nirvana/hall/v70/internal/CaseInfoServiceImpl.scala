@@ -50,8 +50,11 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   override def getCaseInfo(caseGetRequest: CaseGetRequest): CaseGetResponse = {
-    val gafisCase = GafisCase.find(caseGetRequest.getCaseId)
-    val caseInfo = ProtobufConverter.convertGafisCase2Case(gafisCase)
+    val gafisCase = GafisCase.findOption(caseGetRequest.getCaseId)
+    if(gafisCase.isEmpty){
+      throw new RuntimeException("记录不存在!");
+    }
+    val caseInfo = ProtobufConverter.convertGafisCase2Case(gafisCase.get)
 
     CaseGetResponse.newBuilder().setCase(caseInfo).build()
   }
@@ -63,9 +66,7 @@ class CaseInfoServiceImpl extends CaseInfoService{
    */
   @Transactional
   override def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse = {
-    val gafisCase = GafisCase.find(caseDelRequest.getCaseId)
-    gafisCase.delete()
-
+    GafisCase.where("caseId=?1", caseDelRequest.getCaseId).delete
     CaseDelResponse.newBuilder().build()
   }
 }

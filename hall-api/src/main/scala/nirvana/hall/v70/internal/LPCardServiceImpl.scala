@@ -86,7 +86,7 @@ class LPCardServiceImpl extends LPCardService{
   override def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse = {
     val cardId = lPCardDelRequest.getCardId
     GafisCaseFingerMnt.where("fingerId=?1", cardId).delete
-    GafisCaseFinger.find(cardId).delete()
+    GafisCaseFinger.where("fingerId=?1",cardId).delete
 
     LPCardDelResponse.newBuilder().build()
   }

@@ -87,9 +87,12 @@ enum	FingerFgp
 }
 
 //掌位	//当前FPT4.0不支持掌纹
-//enum	PalmFgp
-//{
-//}
+enum	PalmFgp
+{
+	PALM_UNKNOWN	= 0;//未知
+	PALM_RIGHT		= 1;//右掌
+	PALM_LEFT		= 2;//左掌
+}
 
 //脸位
 enum	FaceFgp
@@ -171,7 +174,7 @@ message	TPCard
 		optional bool			bPlain = 7;
 		optional string			strMntExtractMethod = 8;				//GAFIS结构中无
 		optional FaceFgp		facefgp = 9 [default = FACE_UNKNOWN];	//脸位
-		//optional PalmFgp		palmfgp = 10;							//目前不支持掌纹
+		optional PalmFgp		palmfgp = 10 [default = PALM_UNKNOWN];	//掌位
 	}
 
 	required string		strCardID = 1;

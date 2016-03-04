@@ -8,7 +8,7 @@ import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
-import nirvana.hall.protocol.api.FPTProto.{FaceFgp, FingerFgp, ImageType, TPCard}
+import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
 import scala.collection.JavaConversions._
@@ -261,27 +261,34 @@ object galoctpConverter {
         data.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
       if(mic.pstCpr_Data != null)
         data.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
-      data.setFgp(FingerFgp.valueOf(mic.nItemData))
       mic.nItemType match {
         case glocdef.GAIMG_IMAGETYPE_FINGER =>
           data.setType(ImageType.IMAGETYPE_FINGER)
+          data.setFgp(FingerFgp.valueOf(mic.nItemData))
         case glocdef.GAMIC_ITEMTYPE_PLAINFINGER =>
           //四联指,不确定
           data.setType(ImageType.IMAGETYPE_UNKNOWN)
         case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
           data.setType(ImageType.IMAGETYPE_FINGER)
           data.setBPlain(true)
+          data.setFgp(FingerFgp.valueOf(mic.nItemData))
         case glocdef.GAMIC_ITEMTYPE_FACE =>
           data.setType(ImageType.IMAGETYPE_FACE)
           mic.nItemData match {
             case 1 => data.setFacefgp(FaceFgp.FACE_FRONT)
             case 2 => data.setFacefgp(FaceFgp.FACE_LEFT)
             case 3 => data.setFacefgp(FaceFgp.FACE_RIGHT)
+            case other => data.setFacefgp(FaceFgp.FACE_UNKNOWN)
           }
         case glocdef.GAMIC_ITEMTYPE_DATA =>
           data.setType(ImageType.IMAGETYPE_CARDIMG)
         case glocdef.GAMIC_ITEMTYPE_PALM =>
           data.setType(ImageType.IMAGETYPE_PALM)
+          mic.nItemData match {
+            case 1 => data.setPalmfgp(PalmFgp.PALM_RIGHT)
+            case 2 => data.setPalmfgp(PalmFgp.PALM_LEFT)
+            case other => data.setPalmfgp(PalmFgp.PALM_UNKNOWN)
+          }
         case glocdef.GAMIC_ITEMTYPE_VOICE =>
           data.setType(ImageType.IMAGETYPE_VOICE)
         case other =>

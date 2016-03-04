@@ -4,7 +4,7 @@ package nirvana.hall.v70.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table, Temporal, TemporalType}
+import javax.persistence._
 
 import nirvana.hall.orm.services.{ActiveRecord, ActiveRecordInstance};
 
@@ -18,7 +18,6 @@ object GafisGatherPalm extends ActiveRecordInstance[GafisGatherPalm]
 )
 class GafisGatherPalm extends ActiveRecord {
 
-
   @Id
   @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
   var pkId: java.lang.String = _
@@ -30,8 +29,9 @@ class GafisGatherPalm extends ActiveRecord {
   var groupId: java.lang.Short = _
   @Column(name = "LOBTYPE", nullable = false)
   var lobtype: Short = _
+  @Lob
   @Column(name = "GATHER_DATA", nullable = false)
-  var gatherData: java.sql.Blob = _
+  var gatherData: Array[Byte] = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -48,7 +48,7 @@ class GafisGatherPalm extends ActiveRecord {
   var palmDataNosqlId: java.lang.String = _
 
 
-  def this(pkId: java.lang.String, fgp: Short, lobtype: Short, gatherData: java.sql.Blob, inputtime: java.util.Date) {
+  def this(pkId: java.lang.String, fgp: Short, lobtype: Short, gatherData: Array[Byte], inputtime: java.util.Date) {
     this()
     this.pkId = pkId
     this.fgp = fgp
@@ -57,7 +57,7 @@ class GafisGatherPalm extends ActiveRecord {
     this.inputtime = inputtime
   }
 
-  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, gatherData: java.sql.Blob, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, seq: java.lang.Long, palmDataNosqlId: java.lang.String) {
+  def this(pkId: java.lang.String, personId: java.lang.String, fgp: Short, groupId: java.lang.Short, lobtype: Short, gatherData: Array[Byte], inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, seq: java.lang.Long, palmDataNosqlId: java.lang.String) {
     this()
     this.pkId = pkId
     this.personId = personId

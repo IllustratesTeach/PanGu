@@ -61,7 +61,7 @@ class TPCardServiceImpl extends TPCardService{
     val photoList = GafisGatherPortrait.find_by_personid(personId)
     val fingerList = GafisGatherFinger.find_by_personId(personId)
 
-    val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList)
+    val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
 
     TPCardGetResponse.newBuilder().setCard(tpCard).build()
   }

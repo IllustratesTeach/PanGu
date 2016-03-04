@@ -151,12 +151,21 @@ abstract class ActiveRecordInstance[A](implicit val clazzTag:ClassTag[A]) extend
 
 
   /**
-   * retrieving single object
+   * retrieving single object，must exist
    * @param key primary key
    * @return entity object
    */
   def find(key:Any):A={
     internalFind(key).head
+  }
+
+  /**
+   * retrieving single object，may not exist
+   * @param key primary key
+   * @return entity object
+   */
+  def findOption(key:Any):Option[A]={
+    internalFind(key).headOption
   }
 
   /**

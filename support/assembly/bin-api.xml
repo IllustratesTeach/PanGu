@@ -20,6 +20,34 @@
       <outputDirectory>config</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>../support/config</directory>
+      <includes>
+        <include>hall-v62.xml.example</include>
+      </includes>
+      <outputDirectory>config</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../support/config</directory>
+      <includes>
+        <include>hall-v70.xml.example</include>
+      </includes>
+      <outputDirectory>config</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/hall/api</directory>
+      <includes>
+        <include>api.xsd</include>
+      </includes>
+      <outputDirectory>doc/xsd</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/hall/v70</directory>
+      <includes>
+        <include>v70.xsd</include>
+      </includes>
+      <outputDirectory>doc/xsd</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>src/main/resources/hall/api</directory>
       <includes>
         <include>api.xsd</include>
