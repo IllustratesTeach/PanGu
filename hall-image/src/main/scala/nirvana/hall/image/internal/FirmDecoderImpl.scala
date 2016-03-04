@@ -204,6 +204,10 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         fpt4code.GAIMG_CPRMETHOD_TSINGHUA_CODE
       case glocdef.GAIMG_CPRMETHOD_BUPT => 	// beijing university of posts and telecommunications
         fpt4code.GAIMG_CPRMETHOD_BUPT_CODE
+      case glocdef.GAIMG_CPRMETHOD_MORPHO =>
+        fpt4code.GAIMG_CPRMETHOD_MORPHO_CODE
+      case glocdef.GAIMG_CPRMETHOD_HLXT =>
+        fpt4code.GAIMG_CPRMETHOD_HLXT_CODE
       case glocdef.GAIMG_CPRMETHOD_RMTZIP => 	// compressmethod provide by communication server(GAFIS)
         throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
       case glocdef.GAIMG_CPRMETHOD_LCW => 	// compress method provide by lucas wang.
