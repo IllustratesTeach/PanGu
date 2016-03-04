@@ -42,7 +42,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       return gafisImg
 
     val cprMethod = gafisImg.stHead.nCompressMethod.toInt
-    val firmCode = getCodeFromGAFISImage(gafisImg)
+    val firmCode = fpt4code.gafisCprCodeToFPTCode(gafisImg.stHead.nCompressMethod)
 
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray)
@@ -179,49 +179,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     (nWidth * nBitsPerPixel + 7) / 8 * nHeight
   }
 
-  private def getCodeFromGAFISImage(gafisImg: GAFISIMAGESTRUCT): String ={
-    val codeFromImage =  gafisImg.stHead.nCompressMethod.toInt
-    codeFromImage match{
-      case glocdef.GAIMG_CPRMETHOD_DEFAULT => 	// by xgw supplied method
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_XGW => 	// by xgw supplied method.
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_XGW_EZW => 	// 许公望的EZW压缩方法：适合低倍率高保真的压缩.
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_GA10 => 	// 公安部10倍压缩方法
-        fpt4code.GAIMG_CPRMETHOD_GA10_CODE
-      case glocdef.GAIMG_CPRMETHOD_GFS => 	// golden
-        fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
-      case glocdef.GAIMG_CPRMETHOD_PKU => 	// call pku's compress method
-        fpt4code.GAIMG_CPRMETHOD_PKU_CODE
-      case glocdef.GAIMG_CPRMETHOD_COGENT => 	// cogent compress method
-        fpt4code.GAIMG_CPRMETHOD_COGENT_CODE
-      case glocdef.GAIMG_CPRMETHOD_WSQ => 	// was method
-        fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
-      case glocdef.GAIMG_CPRMETHOD_NEC => 	// nec compress method
-        fpt4code.GAIMG_CPRMETHOD_NEC_CODE
-      case glocdef.GAIMG_CPRMETHOD_TSINGHUA => 	// tsing hua
-        fpt4code.GAIMG_CPRMETHOD_TSINGHUA_CODE
-      case glocdef.GAIMG_CPRMETHOD_BUPT => 	// beijing university of posts and telecommunications
-        fpt4code.GAIMG_CPRMETHOD_BUPT_CODE
-      case glocdef.GAIMG_CPRMETHOD_MORPHO =>
-        fpt4code.GAIMG_CPRMETHOD_MORPHO_CODE
-      case glocdef.GAIMG_CPRMETHOD_HLXT =>
-        fpt4code.GAIMG_CPRMETHOD_HLXT_CODE
-      case glocdef.GAIMG_CPRMETHOD_RMTZIP => 	// compressmethod provide by communication server(GAFIS)
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_LCW => 	// compress method provide by lucas wang.
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_JPG => 	// jpeg method.
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_MORPHO => 	//!< 广东测试时提供的压缩算法，MORPHO(SAGEM)
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case glocdef.GAIMG_CPRMETHOD_MAXVALUE =>
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-      case other=>
-        throw new UnsupportedOperationException("%s compress not supported".format(codeFromImage))
-    }
-  }
   /**
    * find dll handle by code
    * @param code "1300"
@@ -282,21 +239,4 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }
 }
-
-/*
-  #define UTIL_FPT4LIB_AFISSYSTEM_CODE		"1900"
-
-  #define	GAIMG_CPRMETHOD_NOCPR_CODE			"0000"			// 不压缩
-  #define	GAIMG_CPRMETHOD_GA10_CODE			"0010"			// 公安部10压缩
-  #define	GAIMG_CPRMETHOD_EGFS_CODE			"1900"			// 东方金指
-  #define GAIMG_CPRMETHOD_EGFS_WSQ_CODE  "0131"      //东方金指WSQ3.1压缩
-  #define	GAIMG_CPRMETHOD_PKU_CODE			"1300"			// 北大高科
-  #define GAIMG_CPRMETHOD_WSQ_CODE        "1400"         //WSQ压缩方法
-  #define	GAIMG_CPRMETHOD_COGENT_CODE			"1700"			// 北京海鑫
-  #define	GAIMG_CPRMETHOD_NEC_CODE			"1800"			// 小日本NEC
-  #define	GAIMG_CPRMETHOD_BUPT_CODE			"1200"			// 北京邮电大学
-  #define	GAIMG_CPRMETHOD_TSINGHUA_CODE		"1100"			// 北京刑科所
-  #define	GAIMG_CPRMETHOD_MORPHO_CODE			"2201"			// 广东测试提供的数据，SAGEM MORPHO
-*/
-
 
