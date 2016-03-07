@@ -34,7 +34,7 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
   override def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse = {
     val cardId = lPCardGetRequest.getCardId
     val gCard = new GLPCARDINFOSTRUCT
-    facade.NET_GAFIS_FLIB_Get(config.latentTable.dbId.toShort, config.latentTable.tableId.toShort, cardId, gCard)
+    facade.NET_GAFIS_FLIB_Get(config.latentTable.dbId.toShort, config.latentTable.tableId.toShort, cardId, gCard, null, 3)
     val card = galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard)
     card.toBuilder.setStrCardID(cardId)
 

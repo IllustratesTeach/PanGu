@@ -177,6 +177,7 @@ trait gnetcsr {
     pstCard.nMicItemCount = card.nMicItemCount
     pstCard.nTextItemCount = card.nTextItemCount
     pstCard.nExtraInfoLen = card.nExtraInfoLen
+    pstCard.stAdmData = card.stAdmData//操作信息
 
 
     pAns.nReturnValue = 1

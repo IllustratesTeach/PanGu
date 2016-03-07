@@ -52,7 +52,7 @@ object ProtobufConverter {
     gafisCase.caseState = text.getNCaseState.toString
     gafisCase.assistBonus = text.getStrPremium
     gafisCase.assistSign = text.getNXieChaState.toString
-    gafisCase.assistRevokeSign = text.getNCancelFlag.toString
+//    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
     gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
     gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
 
@@ -106,6 +106,9 @@ object ProtobufConverter {
     caseFinger.matchStatus = text.getNBiDuiState.toString
     caseFinger.mittensBegNo = text.getStrStart
     caseFinger.mittensEndNo = text.getStrEnd
+    caseFinger.caseId = text.getStrCaseId
+    caseFinger.developMethod = text.getStrCaptureMethod
+    caseFinger.remark = text.getStrComment
 
     val blob = lpCard.getBlob
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray

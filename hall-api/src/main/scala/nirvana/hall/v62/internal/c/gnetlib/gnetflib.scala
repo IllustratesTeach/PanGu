@@ -29,6 +29,7 @@ trait gnetflib {
    * @param pszKey 卡号
    * @param pItemInfo 要获取的卡片信息
    * @param pItemInd 默认为null，当指定具体的类型（指位，掌纹，指纹，人像）才会传值
+   * @param nOption 如果是3，获取操作信息stAdmData
    */
   def NET_GAFIS_FLIB_Get(nDBID:Short,nTableID:Short,
     pszKey:String,
