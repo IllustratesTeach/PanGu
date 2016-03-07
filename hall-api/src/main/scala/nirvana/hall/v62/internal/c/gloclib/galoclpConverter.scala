@@ -47,6 +47,8 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "LatStart",text.getStrStart)
       appendTextStruct(buffer, "LatEnd",text.getStrEnd)
 
+      appendTextStruct(buffer, "Comment",text.getStrComment)
+      appendTextStruct(buffer, "CaptureMethod",text.getStrCaptureMethod)
 
       data.pstText_Data = buffer.toArray
       data.nTextItemCount = buffer.size.asInstanceOf[Short]
@@ -106,6 +108,9 @@ object galoclpConverter extends LoggerSupport{
     val card = LPCard.newBuilder()
     card.setStrCardID(gCard.szCardID)
     val text = card.getTextBuilder
+    if(gCard.stAdmData.szCaseID != null){
+      text.setStrCaseId(gCard.stAdmData.szCaseID)
+    }
     gCard.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
       val textContent = new String(bytes, AncientConstants.GBK_ENCODING).trim
@@ -129,6 +134,10 @@ object galoclpConverter extends LoggerSupport{
             text.setStrStart(textContent)
           case "LatEnd" =>
             text.setStrEnd(textContent)
+          case "CaptureMethod" =>
+            text.setStrCaptureMethod(textContent)
+          case "Comment" =>
+            text.setStrComment(textContent)
           case other =>
         }
       }

@@ -39,7 +39,7 @@ object HallApiApp
       Class.forName("monad.core.LocalMonadCoreModule"),
       Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("monad.rpc.LocalRpcServerModule"),
-//      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
 
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
@@ -50,6 +50,7 @@ object HallApiApp
     load other module from system property.
     */
     val extraModules = System.getProperty(HallApiSymbols.API_EXTRA_MODULE_CLASS)
+    logger.info("extraModules: "+extraModules)
     val finalClasses =  if(extraModules!= null)
       extraModules.split(",").map(Class.forName) ++:  classes
     else classes

@@ -235,6 +235,9 @@ message	LPCard
 		optional int32	nBiDuiState = 7;
 		optional string	strStart = 8;
 		optional string	strEnd = 9;
+		optional string	strCaseId= 10;//案件编号
+		optional string strCaptureMethod = 11;//提取方式
+		optional string	strComment= 12;//备注
 	}
 
 	message	LPCardBlob

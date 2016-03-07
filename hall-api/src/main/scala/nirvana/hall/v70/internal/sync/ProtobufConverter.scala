@@ -292,27 +292,47 @@ object ProtobufConverter {
     val iter = tpCard.getBlobList.iterator()
     while (iter.hasNext){
       val blob = iter.next()
-      //指纹
-      val finger = new GafisGatherFinger()
-      finger.personId = personId
-      finger.gatherData = blob.getStImageBytes.toByteArray
-      finger.fgp = blob.getFgp.getNumber.toShort
-      finger.fgpCase = if(blob.getBPlain) "1" else "0"
-      finger.groupId = 1: Short
-      finger.lobtype = 1: Short
-      fingerList += finger
-      //特征
-      val mnt = new GafisGatherFinger()
-      mnt.personId = personId
-      mnt.gatherData = blob.getStMntBytes.toByteArray
-      mnt.fgp = blob.getFgp.getNumber.toShort
-      mnt.fgpCase = if(blob.getBPlain) "1" else "0"
-      mnt.groupId = 0: Short
-      mnt.lobtype = 0: Short
-      fingerList += mnt
+      if(blob.getType == ImageType.IMAGETYPE_FINGER){
+        //指纹
+        val finger = new GafisGatherFinger()
+        finger.personId = personId
+        finger.gatherData = blob.getStImageBytes.toByteArray
+        finger.fgp = blob.getFgp.getNumber.toShort
+        finger.fgpCase = if(blob.getBPlain) "1" else "0"
+        finger.groupId = 1: Short
+        finger.lobtype = 1: Short
+        fingerList += finger
+        //特征
+        val mnt = new GafisGatherFinger()
+        mnt.personId = personId
+        mnt.gatherData = blob.getStMntBytes.toByteArray
+        mnt.fgp = blob.getFgp.getNumber.toShort
+        mnt.fgpCase = if(blob.getBPlain) "1" else "0"
+        mnt.groupId = 0: Short
+        mnt.lobtype = 0: Short
+        fingerList += mnt
+      }
     }
 
     fingerList.toSeq
+  }
+
+  def convertTPCard2GafisGatherPortrait(tpCard: TPCard): Seq[GafisGatherPortrait]={
+    val portaitList = new ArrayBuffer[GafisGatherPortrait]()
+    val personId = tpCard.getStrCardID
+    val blobIter = tpCard.getBlobList.iterator()
+    while (blobIter.hasNext){
+      val blob = blobIter.next()
+      if(blob.getType == ImageType.IMAGETYPE_FACE){
+        val portrait = new GafisGatherPortrait()
+        portrait.fgp = blob.getFacefgp.getNumber.toString
+        portrait.gatherData = blob.getStImageBytes.toByteArray
+        portrait.personid = personId
+
+        portaitList += portrait
+      }
+    }
+    portaitList.toSeq
   }
 
   def convertMatchTask2GafisNormalqueryQueryque(matchTask: MatchTask): GafisNormalqueryQueryque={
