@@ -137,19 +137,22 @@ object gaqryqueConverter {
     val queryId = gaQueryStruct.stSimpQry.nQueryID
     matchResult.setMatchId(convertSixByteArrayToLong(queryId)+"")
 
-    val pstCandData = gaQueryStruct.pstCand_Data
-    matchResult.setCandidateNum(gaQueryStruct.pstCand_Data.length)
-
     var maxScore = 0
-
-    pstCandData.foreach{ candData =>
-      val cand = matchResult.addCandidateResultBuilder()
-      cand.setObjectId(candData.szKey)
-      cand.setPos(candData.nIndex)
-      cand.setScore(candData.nScore)
-      if(maxScore < candData.nScore)
-        maxScore = candData.nScore
+    val pstCandData = gaQueryStruct.pstCand_Data
+    if(gaQueryStruct.pstCand_Data != null){
+      matchResult.setCandidateNum(gaQueryStruct.pstCand_Data.length)
+      pstCandData.foreach{ candData =>
+        val cand = matchResult.addCandidateResultBuilder()
+        cand.setObjectId(candData.szKey)
+        cand.setPos(candData.nIndex)
+        cand.setScore(candData.nScore)
+        if(maxScore < candData.nScore)
+          maxScore = candData.nScore
+      }
+    }else{
+      matchResult.setCandidateNum(0)
     }
+
     matchResult.setMaxScore(maxScore)
     matchResult.setStatus(MatcherStatus.newBuilder().setMsg("success").setCode(0))
 
