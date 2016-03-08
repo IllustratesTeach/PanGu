@@ -292,6 +292,7 @@ object galoctpConverter {
         case glocdef.GAMIC_ITEMTYPE_VOICE =>
           data.setType(ImageType.IMAGETYPE_VOICE)
         case other =>
+          data.setType(ImageType.IMAGETYPE_UNKNOWN)
       }
     }
 

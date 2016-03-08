@@ -286,6 +286,11 @@ object ProtobufConverter {
     person.assistNumber = text.getStrXieChaTelNo
     person.assistApproval = text.getStrShenPiBy
 
+    //数据校验
+    if(person.idcardno.length > 18){
+      person.idcardno = person.idcardno.substring(0, 18)
+    }
+
     person
   }
 

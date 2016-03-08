@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.query
 
 import java.util.Date
-import javax.persistence.EntityManagerFactory
+import javax.persistence.{EntityManager, EntityManagerFactory}
 
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
@@ -19,6 +19,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Created by songpeng on 15/12/30.
  */
 class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
+                              entityManager: EntityManager,
                               queryRemoteService: QueryRemoteService,
                               tPCardRemoteService: TPCardRemoteService,
                               lPCardRemoteService: LPCardRemoteService,
@@ -56,6 +57,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             if(person.isEmpty){
               val tpCard = tPCardRemoteService.getTPCard(cand.getObjectId, syncTagert.targetIp, syncTagert.targetPort)
               val gafisPerson = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+              val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
+              gafisPerson.sid = sid
               gafisPerson.deletag = Gafis70Constants.DELETAG_USE
               gafisPerson.inputtime = new Date()
               gafisPerson.inputpsn = Gafis70Constants.INPUTPSN
@@ -108,14 +111,27 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                   gafisCase.deletag = Gafis70Constants.DELETAG_USE
                   gafisCase.inputtime = new Date()
                   gafisCase.inputpsn = Gafis70Constants.INPUTPSN
+                  gafisCase.createUnitCode= "370200000000"
+                  gafisCase.caseSource = "4"
                   gafisCase.save()
+                  //逻辑库
+                  val logicDb = GafisLogicDb.find_by_logicCategory_and_logicName("1", "默认库").take
+                  val logicDbCase = new GafisLogicDbCase()
+                  logicDbCase.pkId = CommonUtils.getUUID()
+                  logicDbCase.logicDbPkid = logicDb.pkId
+                  logicDbCase.casePkid = gafisCase.caseId
+                  logicDbCase.save()
                 }
               }
 
               val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+              val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
+              val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
+              caseFinger.sid = sid
               caseFinger.deletag = Gafis70Constants.DELETAG_USE
               caseFinger.inputtime = new Date()
               caseFinger.inputpsn = Gafis70Constants.INPUTPSN
+              caseFinger.creatorUnitCode = "370200000000"
               caseFinger.save()
               val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
               caseFingerMnt.pkId = CommonUtils.getUUID()
