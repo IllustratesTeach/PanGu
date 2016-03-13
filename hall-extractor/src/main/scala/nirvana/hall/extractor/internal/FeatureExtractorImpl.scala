@@ -1,5 +1,6 @@
 package nirvana.hall.extractor.internal
 
+import java.awt.Image
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
 import java.io.{ByteArrayInputStream, InputStream}
@@ -13,14 +14,15 @@ import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
+import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
  * implements FeatureExtractor
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-11
  */
 class FeatureExtractorImpl extends FeatureExtractor{
@@ -30,7 +32,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
   private val COLOR_GRAY_SPACE=  ColorSpace.getInstance(ColorSpace.CS_GRAY);
   /**
    * extract feature from image data
-   * @param img image data
+    *
+    * @param img image data
    * @param fingerPos finger position
    * @param featureType feature type
    * @return GAFISIMAGESTRUCT
@@ -99,10 +102,10 @@ class FeatureExtractorImpl extends FeatureExtractor{
         dstImage
     }
 
-    val originalHead = img.getProperty(HallSupportConstants.GAFIS_IMG_HEAD_KEY).asInstanceOf[GAFISIMAGEHEADSTRUCT]
+    val originalHeadObject = img.getProperty(HallSupportConstants.GAFIS_IMG_HEAD_KEY)
     val gafisImg = new GAFISIMAGESTRUCT
     val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
-    if(originalHead == null) {
+    if(originalHeadObject == null || originalHeadObject == Image.UndefinedProperty) {
       gafisImg.stHead.nResolution = 500
       gafisImg.stHead.nWidth = grayImg.getWidth.toShort
       gafisImg.stHead.nHeight = grayImg.getHeight.toShort
@@ -110,6 +113,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
       gafisImg.stHead.nImgSize = grayImg.getWidth * grayImg.getHeight
       gafisImg.bnData = dataBuffer
     }else{
+      val originalHead = originalHeadObject.asInstanceOf[GAFISIMAGEHEADSTRUCT]
       gafisImg.bnData = new Array[Byte](originalHead.nImgSize)
       gafisImg.stHead = originalHead
       System.arraycopy(dataBuffer,0,gafisImg.bnData,0,originalHead.nImgSize)
