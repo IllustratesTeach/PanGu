@@ -86,7 +86,7 @@ class FirmDecoderImplTest extends BaseJniTest{
     g.setFont(new Font("Monaco",Font.BOLD,50))
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,0.01f))
     g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    g.drawString("PT.ALDIN",200,300)
+    g.drawString("INAFIS",200,300)
     /*
     g.setFont(new Font("Monaco",Font.BOLD,10))
     g.drawString("PT.ALDINO",10,10)
