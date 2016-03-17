@@ -266,6 +266,8 @@ object FPT4File {
     @Length(4)
     var systemType: String = _
     @Length(23)
+    var caseId: String = _
+    @Length(23)
     var cardId: String = _
     @Length(6)
     var caseClass1Code: String = _
