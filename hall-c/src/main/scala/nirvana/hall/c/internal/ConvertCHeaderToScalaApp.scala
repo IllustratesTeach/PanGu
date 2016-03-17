@@ -8,18 +8,20 @@ import scala.io.Source
 
 /**
  * convert C/C++ header file to scala application
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-06
  */
 object ConvertCHeaderToScalaApp {
   private val definePattern = "#define[\\s]+([^\\s]+)[\\s]+([^$]+)$".r
-  private val structBeginPattern = "typedef[\\s]+struct[\\s]+(tag)?([A-Za-z0-9_]+)([^$]*)$".r
+  private val structBeginPattern = "[\\s\\t]*typedef[\\s]+struct[\\s]+(tag)?([A-Za-z0-9_]+)([^$]*)$".r
   private val structElement = "(?i)^[\\s\\t]*([a-zA-Z_0-9]+)([\\s\\t\\*]+)([A-Z0-9_a-z]+)(\\[([0-9\\*\\-\\+a-z_]+)\\])?([\\s\\S]+)$".r
   private val charType="(?i)UCHAR|CHAR|VOID".r
   private val structEndPattern ="[\\s\\t]*}([^$]*)$".r
   private var structBegin = false
   def main(args:Array[String]): Unit ={
-    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/gloclib/gacodetb.h")
+    val file = new File("/Users/jcai/workspace/finger/gafis-6/include/gfpt4lib/fpt4util.h")
+    //val file = new File("/Users/jcai/workspace/finger/nirvana-kernel/include/nirvana/mnt_checker_def.h")
     val content = Source.fromFile(file,AncientConstants.GBK_ENCODING.name().intern()).getLines()
     content
       .filterNot(_.startsWith("#ifndef"))
