@@ -35,6 +35,7 @@ object FPTLDataToMNTDISP {
 
     mntDisp.stCm.nMntCnt = fingerLData.featureCount.toShort
 
+    mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fingerLData.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
 
     mntDisp
@@ -82,6 +83,8 @@ object FPTLDataToMNTDISP {
   }
   def UTIL_Direction_FPT2MntDisp(direction:String):(Short,Short)=
   {
+    if(direction.length!=6)
+      return (0,0)
 
     val fca = UTIL_Angle_FPT2MntDisp(direction.take(3).trim().toInt)
 
@@ -99,9 +102,10 @@ object FPTLDataToMNTDISP {
     nFPTAngle.toShort
   }
 
-  def UTIL_CoreDelta_FPT2MntDisp(CoreDelta:String, stCoreDelta:AFISCOREDELTASTRUCT , nType:Int)=
+  def UTIL_CoreDelta_FPT2MntDisp(CoreDelta:String, stCoreDelta:AFISCOREDELTASTRUCT , nType:Int):Unit=
   {
-
+    if(CoreDelta.length != 14)
+      return
     val szCoreDelta = UTIL_FPT4LIB_StrTrimSpace(CoreDelta, UTIL_FPT4LIB_STRTRIM_STYLE_LEFT)
     stCoreDelta.x = szCoreDelta.take(3).toShort
 
@@ -167,6 +171,7 @@ object FPTLDataToMNTDISP {
     if(FPTMnt == null || FPTMnt.length < (9*nmntCnt))
       throw new IllegalArgumentException("mnt length not equals:f(%s) < n(%s)".format(FPTMnt.length,9*nmntCnt))
     0 until nmntCnt foreach{i=>
+      pstmnt(i)=new AFISMNTPOINTSTRUCT
       UTIL_Minutia_OneFPT2MntDisp(FPTMnt.substring(i*9 ,i*9+9), pstmnt(i));
     }
   }
