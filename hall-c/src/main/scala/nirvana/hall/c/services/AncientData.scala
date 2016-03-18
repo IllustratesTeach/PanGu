@@ -1,7 +1,7 @@
 package nirvana.hall.c.services
 
 import java.io.{EOFException, InputStream}
-import java.nio.ByteBuffer
+import java.nio.{ByteOrder, ByteBuffer}
 import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.stream.ImageInputStream
@@ -24,6 +24,7 @@ import scala.util.control.NonFatal
 /**
  * support to serialize/deserialize data
  * TODO using byte transformation to convert data
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-10-29
  */
@@ -135,6 +136,7 @@ trait AncientData{
 
   /**
    * calculate data size and return.
+ *
    * @return data size
    */
   def getDataSize:Int= {
@@ -148,6 +150,7 @@ trait AncientData{
 
   /**
    * serialize to channel buffer
+ *
    * @param stream netty channel buffer
    */
   def writeToStreamWriter[T](stream:T,encoding:Charset=AncientConstants.UTF8_ENCODING)(implicit converter:T=> StreamWriter): T= {
@@ -163,6 +166,7 @@ trait AncientData{
   protected def readBytesFromStreamReader(dataSource:StreamReader,len:Int): Array[Byte]= dataSource.readByteArray(len)
   /**
    * convert channel buffer data as object
+ *
    * @param dataSource netty channel buffer
    */
   def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type ={
@@ -177,8 +181,8 @@ trait AncientData{
   def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
     fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
   }
-  def toByteArray:Array[Byte]={
-    val data = ChannelBuffers.buffer(getDataSize)
+  def toByteArray(byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN):Array[Byte]={
+    val data = ChannelBuffers.buffer(byteOrder,getDataSize)
     writeToStreamWriter(data).array()
   }
   /**
