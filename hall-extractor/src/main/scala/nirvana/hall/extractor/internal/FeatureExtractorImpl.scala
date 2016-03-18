@@ -41,14 +41,14 @@ class FeatureExtractorImpl extends FeatureExtractor{
   override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): GAFISIMAGESTRUCT = {
     if(img.stHead.bIsCompressed == 1)
       throw new IllegalArgumentException("compressed image unspported!")
-    val imgData = img.toByteArray
+    val imgData = img.toByteArray()
     val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType,newFeatureTry)
 
     new GAFISIMAGESTRUCT().fromByteArray(mntData)
   }
   override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Array[Byte]= {
     val image = readByteArrayAsGAFISIMAGE(is)
-    val originalImgData = image.toByteArray
+    val originalImgData = image.toByteArray()
     val imgHead = image.stHead
 
     val newFeature = newFeatureTry == NewFeatureTry.V2

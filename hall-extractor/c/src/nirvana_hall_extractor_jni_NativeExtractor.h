@@ -2,7 +2,6 @@
 #include <jni.h>
 /* Header for class nirvana_hall_extractor_jni_NativeExtractor */
 
-#include "nirvana/kernel.h"
 #ifndef _Included_nirvana_hall_extractor_jni_NativeExtractor
 #define _Included_nirvana_hall_extractor_jni_NativeExtractor
 #ifdef __cplusplus
@@ -11,19 +10,27 @@ extern "C" {
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ExtractMNT_All
- * Signature: ([B[BBB)V
+ * Signature: ([B[BBBB)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
-  (JNIEnv *, jclass, jbyteArray, jbyteArray,jbyte, jbyte, jbyte);
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
 
-int GAFIS_ExtractMNT_All_NewTTFea(XGWMNTEXTRACTSTR *MntExtStr);
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ExtractMNT_AllWithNewFeature
  * Signature: ([B[BBBB)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1AllWithNewFeature
-    (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
+
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    ConvertFPTLatentMNT2Std
+ * Signature: ([B[B)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFPTLatentMNT2Std
+  (JNIEnv *, jclass, jbyteArray, jbyteArray);
+
 #ifdef __cplusplus
 }
 #endif

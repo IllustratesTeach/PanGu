@@ -309,8 +309,10 @@ class GAFIS_PorePointData extends AncientData
   // GAFIS_PFCOMMONMNTSTRUCT; // size is 25KB=1024*25 bytes
 
   class GAFIS_MNTINNERDATA extends AncientData {
-    var pData_Ptr: Int = _
-    //using 4 byte as pointer
+    //FIXME 在64位编译模式下，出现多8个字节的问题，这里补充8个字节
+    @Length(8)
+    var bRes:Array[Byte]= _
+    var pData_Ptr: Int = _ //using 4 byte as pointer
     @IgnoreTransfer
     var pData_Data: Array[Byte] = _
     // for pData pointer ,struct:void;

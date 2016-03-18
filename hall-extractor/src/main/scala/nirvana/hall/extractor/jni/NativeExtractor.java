@@ -1,5 +1,6 @@
 package nirvana.hall.extractor.jni;
 
+
 /**
  * extractor
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -22,4 +23,5 @@ public class NativeExtractor{
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
+    public static native void ConvertFPTLatentMNT2Std(byte[] dispMnt, byte[] stdMnt);
 }

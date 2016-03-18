@@ -81,7 +81,7 @@ class FPTFileTest {
     val fpt3 = new FPT3File
     fpt3.fromStreamReader(getClass.getResourceAsStream("/no-tp-count.fpt3"),AncientConstants.GBK_ENCODING)
     Assert.assertEquals(1,fpt3.logic3Recs.size)
-    val fpt3_2= new FPT3File().fromByteArray(fpt3.toByteArray)
+    val fpt3_2= new FPT3File().fromByteArray(fpt3.toByteArray())
     Assert.assertEquals(fpt3.fileLength.toInt,fpt3.getDataSize)
   }
   @Test
@@ -90,7 +90,7 @@ class FPTFileTest {
     val fpt3 = new FPT3File
     fpt3.fromStreamReader(getClass.getResourceAsStream("/fpt3.fpt"),AncientConstants.GBK_ENCODING)
     Assert.assertEquals(1,fpt3.logic3Recs.size)
-    val fpt3_2= new FPT3File().fromByteArray(fpt3.toByteArray)
+    val fpt3_2= new FPT3File().fromByteArray(fpt3.toByteArray())
     Assert.assertEquals(fpt3.fileLength.toInt,fpt3.getDataSize)
   }
   @Test
@@ -99,7 +99,7 @@ class FPTFileTest {
     fpt4.fromStreamReader(getClass.getResourceAsStream("/fpt4.fpt")) //,AncientConstants.GBK_ENCODING)
     Assert.assertEquals(fpt4.logic02Recs.head.fingers.size ,fpt4.logic02Recs.head.sendFingerCount.toInt)
     Assert.assertEquals(fpt4.getDataSize,fpt4.fileLength.toInt)
-    val bytes = fpt4.toByteArray
+    val bytes = fpt4.toByteArray()
     Assert.assertEquals(fpt4.getDataSize,bytes.size)
 
     fpt4 = new FPT4File
