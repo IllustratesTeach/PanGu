@@ -81,8 +81,8 @@ object FPTLDataToMNTDISP {
   }
   def UTIL_Direction_FPT2MntDisp(direction:String):(Short,Short)=
   {
-    if(direction.length!=6)
-      return (0,0)
+    if(direction.length!=5)
+      return (UTIL_Angle_FPT2MntDisp(0),0)
 
     val fca = UTIL_Angle_FPT2MntDisp(direction.take(3).trim().toInt)
 
