@@ -155,7 +155,7 @@ object galoctpConverter {
             gafis7Head.fromByteArray(headData)
             val gafis6Head = convertHead7to6(gafis7Head)
             val data = new ByteArrayOutputStream()
-            data.write(gafis6Head.toByteArray)
+            data.write(gafis6Head.toByteArray())
             data.write(imageBytes, 128, imageBytes.length-128)
 
             mic.pstCpr_Data = data.toByteArray

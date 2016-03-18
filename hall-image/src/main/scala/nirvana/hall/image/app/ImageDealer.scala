@@ -36,7 +36,7 @@ object ImageDealer extends LoggerSupport{
         val originImg = firm.decode(img)
         info(i+"received")
 
-        val frameSent = new ZFrame(originImg.toByteArray)
+        val frameSent = new ZFrame(originImg.toByteArray())
         frameSent.sendAndDestroy(worker)
         info("sent")
       }

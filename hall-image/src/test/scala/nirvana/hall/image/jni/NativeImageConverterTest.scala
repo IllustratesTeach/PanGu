@@ -43,7 +43,7 @@ class NativeImageConverterTest extends BaseJniTest{
             */
 
             val destImgBytes = new Array[Byte](gafisImg.stHead.getDataSize + gafisImg.stHead.nWidth * gafisImg.stHead.nHeight)
-            NativeImageConverter.decodeByGFS(gafisImg.toByteArray,destImgBytes)
+            NativeImageConverter.decodeByGFS(gafisImg.toByteArray(),destImgBytes)
             val dest = new GAFISIMAGESTRUCT().fromByteArray(destImgBytes)
             dest.stHead
             seq +=1

@@ -34,7 +34,7 @@ class ImageDealerTest {
         req.connect("inproc://image_router")
         while(!Thread.currentThread().isInterrupted){
           try {
-            val zframe = new ZFrame(gafisImg.toByteArray)
+            val zframe = new ZFrame(gafisImg.toByteArray())
             zframe.sendAndDestroy(req)
             i += 1
             println(i + "sent")

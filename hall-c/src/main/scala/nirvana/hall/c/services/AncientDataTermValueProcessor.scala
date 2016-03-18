@@ -32,6 +32,8 @@ object AncientDataTermValueProcessor{
     //println(length)
     val bytesLength = if(bytes == null) 0 else bytes.length
     val zeroLength = length - bytesLength
+    if(zeroLength<0)
+      throw new IllegalStateException("length define is %s ,but data length is %s".format(length,bytesLength))
     if(bytes != null) {
       dataSink.writeBytes(bytes)
     }

@@ -1,7 +1,5 @@
 package nirvana.hall.c.services.kernel
 
-import java.nio.ByteBuffer
-
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData
 import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.kernel.mnt_checker_def._
@@ -69,9 +67,9 @@ object FPTLDataToMNTDISP {
 
     }
   }
-  def UTIL_LatPattern_FPT2MntDisp(pattern:String):Int=
+  def UTIL_LatPattern_FPT2MntDisp(pattern:String)=
   {
-    val bytes = pattern.map(ch=>(ch - '0').asInstanceOf[Byte]).toArray
+    pattern.trim.take(4).map(ch=>(ch - '0').asInstanceOf[Byte]).toArray
     /*
     val RpCode= Array[Byte](4)
     RpCode(0) = pattern.charAt(0) - '0';	//!< 弓型纹
@@ -79,7 +77,7 @@ object FPTLDataToMNTDISP {
     RpCode(2) = pszValue[2] - '0';	//!< 右箕纹
     RpCode(3) = pszValue[3] - '0';	//!< 斗型纹
     */
-    ByteBuffer.wrap(bytes).getInt
+    //ByteBuffer.wrap(bytes).getInt
   }
   def UTIL_Direction_FPT2MntDisp(direction:String):(Short,Short)=
   {

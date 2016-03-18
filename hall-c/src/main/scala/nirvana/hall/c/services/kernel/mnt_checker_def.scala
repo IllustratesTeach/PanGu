@@ -227,7 +227,8 @@ object mnt_checker_def {
     @Length(10)
     var FingerCode: String = _;
     //	现场候选指位
-    var RpCode: Int = _;
+    @Length(4)
+    var RpCode: Array[Byte] = _;
     //	现场候选纹型
     @Length(10 * 4)
     var fgrp: Array[Byte] = _;

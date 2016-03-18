@@ -80,7 +80,7 @@ class HttpDecompressServiceTest {
                         override def run(): Unit = {
                           print(method + " " + file.getAbsolutePath+" ")
                           val request = FirmImageDecompressRequest.newBuilder()
-                          request.setCprData(ByteString.copyFrom(gafisImg.toByteArray))
+                          request.setCprData(ByteString.copyFrom(gafisImg.toByteArray()))
 //                          service.decompress(request.build())
 //                          println("ok")
                         }
@@ -116,7 +116,7 @@ class HttpDecompressServiceTest {
                       override def run(): Unit = {
                         print(method + " " + file.getAbsolutePath+" ")
                         val request = FirmImageDecompressRequest.newBuilder()
-                        request.setCprData(ByteString.copyFrom(gafisImg.toByteArray))
+                        request.setCprData(ByteString.copyFrom(gafisImg.toByteArray()))
 //                        service.decompress(request.build())
                       }
                     })
@@ -201,7 +201,7 @@ class HttpDecompressServiceTest {
     gafisImg.bnData = bnData
     gafisImg.stHead.nImgSize = bnData.length
 
-    request.setCprData(ByteString.copyFrom(gafisImg.toByteArray))
+    request.setCprData(ByteString.copyFrom(gafisImg.toByteArray()))
     val result = service.decompress(request.build())
     Assert.assertTrue(result.isDefined)
     Assert.assertEquals(409600,result.get.bnData.length)
@@ -226,7 +226,7 @@ class HttpDecompressServiceTest {
     gafisImg.bnData = bnData
     gafisImg.stHead.nImgSize = bnData.length
 
-    request.setCprData(ByteString.copyFrom(gafisImg.toByteArray))
+    request.setCprData(ByteString.copyFrom(gafisImg.toByteArray()))
     val result = service.decompress(request.build())
     Assert.assertTrue(result.isDefined)
     Assert.assertEquals(409600,result.get.bnData.length)

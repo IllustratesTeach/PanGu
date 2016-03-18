@@ -360,7 +360,7 @@ object ProtobufConverter {
       mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
       mic.nItemData = 1
       mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
-      gafisQuery.mic = mic.toByteArray
+      gafisQuery.mic = mic.toByteArray()
     }else if(matchType == MatchType.FINGER_TT.getNumber || matchType == MatchType.FINGER_TL.getNumber){
       val micBuf = new ByteArrayOutputStream()
       matchTask.getTData.getMinutiaDataList.foreach{ md =>
@@ -371,7 +371,7 @@ object ProtobufConverter {
         mic.nItemData =  md.getPos.toByte
         mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
 
-        micBuf.write(mic.toByteArray)
+        micBuf.write(mic.toByteArray())
       }
       gafisQuery.mic = micBuf.toByteArray
     }

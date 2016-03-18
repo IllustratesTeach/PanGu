@@ -25,7 +25,9 @@ class FPTLatentConverterTest extends BaseJniTest{
     val latentFeature = FPTLatentConverter.convert(disp)
     latentFeature.nWidth
     val latent2 = new FINGERLATMNTSTRUCT()
-    latent2.fromStreamReader(new FileInputStream(new File("/Users/jcai/Downloads/650000000999210005000201.mnt")),AncientConstants.GBK_ENCODING  )
+    val fis = new FileInputStream(new File("/Users/jcai/Downloads/650000000999210005000201.mnt"))
+    fis.skip(64)
+    latent2.fromStreamReader(fis,AncientConstants.GBK_ENCODING )
 
     Assert.assertEquals(latentFeature.nWidth,latent2.nWidth)
   }
