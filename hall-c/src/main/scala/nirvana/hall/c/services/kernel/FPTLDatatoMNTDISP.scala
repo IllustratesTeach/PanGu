@@ -1,6 +1,5 @@
 package nirvana.hall.c.services.kernel
 
-import nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData
 import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.kernel.mnt_checker_def._
 import nirvana.hall.c.services.kernel.mnt_def._
@@ -11,7 +10,22 @@ import nirvana.hall.c.services.kernel.mnt_def._
   * @since 2016-03-17
   */
 object FPTLDataToMNTDISP {
-  def convertFPT03ToMNTDISP(fingerLData: FingerLData): MNTDISPSTRUCT ={
+  type FINGERLData ={
+    var pattern:String
+    var fingerDirection:String
+    var featureCount:String
+    var fgp:String
+    var centerPoint:String
+    var subCenterPoint:String
+    var leftTriangle:String
+    var rightTriangle:String
+    var feature:String
+
+    var imgHorizontalLength: String
+    var imgVerticalLength: String
+    var dpi: String
+  }
+  def convertFPT03ToMNTDISP(fingerLData: FINGERLData): MNTDISPSTRUCT ={
     val mntDisp = new MNTDISPSTRUCT
     mntDisp.bIsPalm = 0
     mntDisp.bIsLatent = 1
