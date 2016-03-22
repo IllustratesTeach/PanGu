@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stddef.h>
-#include <inttypes.h>
 
 #include "nirvana_hall_extractor_jni_NativeExtractor.h"
 
