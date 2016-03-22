@@ -68,11 +68,13 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
     */
     MNTDISPSTRUCT * disp_mnt_structure;
     disp_mnt_structure=(MNTDISPSTRUCT*)disp_mnt_bin;
+    /*
     uint2 width = disp_mnt_structure->nWidth;
     uint2 height = disp_mnt_structure->nHeight;
     printf("w:%"PRIu16 " h:%u \n",width,height);
     printf("size:%u  \n",disp_mnt_structure->nSize);
     fflush(stdout);
+    */
     GAFIS_MntDispToMntStd(disp_mnt_structure,mnt_data);
     jenv->ReleaseByteArrayElements(dispMnt,(jbyte*)disp_mnt_bin,JNI_ABORT);
     jenv->ReleaseByteArrayElements(stdMnt,(jbyte*)mnt_data,0);
