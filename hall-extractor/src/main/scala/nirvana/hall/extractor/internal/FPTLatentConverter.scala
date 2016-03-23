@@ -16,7 +16,7 @@ object FPTLatentConverter {
   def convert(mNTDISPSTRUCT: MNTDISPSTRUCT):FINGERLATMNTSTRUCT={
     val bytes = new FINGERLATMNTSTRUCT().toByteArray()
     //此处结构传入到JNI层需要采用低字节序
-    val dispBytes = mNTDISPSTRUCT.toByteArray(ByteOrder.LITTLE_ENDIAN)
+    val dispBytes = mNTDISPSTRUCT.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     NativeExtractor.ConvertFPTLatentMNT2Std(dispBytes,bytes)
     new FINGERLATMNTSTRUCT().fromByteArray(bytes)
   }

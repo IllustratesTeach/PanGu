@@ -103,7 +103,7 @@ object FPTFile {
      * @param stream netty channel buffer
      */
     override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
-      super.writeToStreamWriter(stream)
+      super.writeToStreamWriter(stream,encoding)
       if (getFingerDataCount == 0){
         val dataSink = converter(stream)
         dataSink.writeByte(logicEnd)
