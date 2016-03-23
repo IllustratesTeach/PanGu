@@ -256,7 +256,7 @@ object FPT3File {
     @Length(3)
     var featureCount: String = _
     @Length(1800)
-    var feature: Array[Byte] = _
+    var feature: String = _
     @Length(4)
     var customInfoLength: String = "0"
     @LengthRef("customInfoLength")
