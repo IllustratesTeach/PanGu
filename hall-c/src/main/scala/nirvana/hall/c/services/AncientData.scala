@@ -181,9 +181,9 @@ trait AncientData{
   def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
     fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
   }
-  def toByteArray(byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN):Array[Byte]={
+  def toByteArray(encoding:Charset=AncientConstants.UTF8_ENCODING,byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN):Array[Byte]={
     val data = ChannelBuffers.buffer(byteOrder,getDataSize)
-    writeToStreamWriter(data).array()
+    writeToStreamWriter(data,encoding).array()
   }
   /**
    * create term processor
