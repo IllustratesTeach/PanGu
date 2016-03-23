@@ -389,7 +389,7 @@ object FPT4File {
     var imgCompressMethod: String = _
     @Length(6)
     var imgDataLength: String = _
-    @Length(6)
+    @LengthRef("imgDataLength")
     var imgData: Array[Byte] = _
     var end: Byte = FPTFile.GS
   }
