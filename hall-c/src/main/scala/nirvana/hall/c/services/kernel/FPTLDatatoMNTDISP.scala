@@ -191,7 +191,8 @@ object FPTLDataToMNTDISP {
   {
     stmnt.x = pszFPTMnt.substring(0,3).toShort
     stmnt.y = pszFPTMnt.substring(3,6).toShort
-    stmnt.z = UTIL_Angle_FPT2MntDisp(pszFPTMnt.substring(6,9).toInt)
+    val zString = pszFPTMnt.substring(6,9)
+    stmnt.z = UTIL_Angle_FPT2MntDisp(zString.trim.toInt)
     stmnt.nReliability = 1
   }
 }
