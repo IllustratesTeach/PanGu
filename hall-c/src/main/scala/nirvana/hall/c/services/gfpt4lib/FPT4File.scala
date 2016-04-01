@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import nirvana.hall.c.annotations.{Length, LengthRef}
+import nirvana.hall.c.annotations.{NotTrim, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
 
@@ -19,6 +19,7 @@ object FPT4File {
 
     /**
      * calculate data size and return.
+ *
      * @return data size
      */
     override def getDataSize: Int = headSize
@@ -373,6 +374,7 @@ object FPT4File {
     var rightTriangle: String = _
     @Length(3)
     var featureCount: String = _
+    @NotTrim
     @Length(1800)
     var feature: String = _
     @Length(6)

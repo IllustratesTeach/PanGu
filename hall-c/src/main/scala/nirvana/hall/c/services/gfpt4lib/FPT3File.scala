@@ -2,7 +2,7 @@ package nirvana.hall.c.services.gfpt4lib
 
 import java.nio.charset.Charset
 
-import nirvana.hall.c.annotations.{Length, LengthRef}
+import nirvana.hall.c.annotations.{NotTrim, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData.StreamReader
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead, FPTParseException}
@@ -12,6 +12,7 @@ import scala.util.control.NonFatal
 
 /**
  * fpt3 file
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-01-27
  */
@@ -98,6 +99,7 @@ object FPT3File {
     }
     /**
      * convert channel buffer data as object
+ *
      * @param dataSource netty channel buffer
      */
     override def fromStreamReader(dataSource: StreamReader, encoding: Charset): FPT3File.this.type = {
@@ -255,6 +257,7 @@ object FPT3File {
     var rightTriangle: String = _
     @Length(3)
     var featureCount: String = _
+    @NotTrim
     @Length(1800)
     var feature: String = _
     @Length(4)
