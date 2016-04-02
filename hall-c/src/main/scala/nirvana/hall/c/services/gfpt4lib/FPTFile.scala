@@ -52,7 +52,7 @@ object FPTFile {
       streamReader.resetReaderIndex()
 
       if (head.flag != FPT_FLAG)
-        throw new IllegalArgumentException("FPT expected.")
+        throw new IllegalArgumentException("FPT expected.actual :[%s]".format(head.flag))
       head.majorVersion match {
         case FPT_V3 =>
           Left(new FPT3File().fromStreamReader(streamReader, encoding))
@@ -122,7 +122,7 @@ object FPTFile {
   def main(args:Array[String]): Unit ={
     val fis = new FileInputStream(new File(args(0)))
     try {
-      val fpt = FPTFile.parseFromInputStream(fis)
+      val fpt = FPTFile.parseFromInputStream(fis,AncientConstants.GBK_ENCODING)
       fpt match{
         case Left(ftp3)=>
           val head = ftp3.head
