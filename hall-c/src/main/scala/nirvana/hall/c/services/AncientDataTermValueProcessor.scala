@@ -14,8 +14,7 @@ import scala.reflect.runtime.universe._
 
 /**
  * Ancient data term value processor
-  *
-  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+ * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-03-01
  */
 object AncientDataTermValueProcessor{
@@ -53,8 +52,7 @@ object AncientDataTermValueProcessor{
 
 /**
  * value manipulation
-  *
-  * @param instanceMirror instance mirror
+ * @param instanceMirror instance mirror
  * @param term term symbol
  */
 case class ValueManipulation(instanceMirror: InstanceMirror,term:TermSymbol){
@@ -77,8 +75,7 @@ sealed trait AncientDataTermValueProcessor{
 
 /**
  * byte processor ancient data
-  *
-  * @param term field term
+ * @param term field term
  */
 class ByteProcessor(override val term:TermSymbol) extends AncientDataTermValueProcessor{
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= throwExceptionIfLengthGTZeroOrGet(term,length,1)
@@ -117,7 +114,7 @@ class LongProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
   }
 }
 class StringProcessor(val term:TermSymbol) extends AncientDataTermValueProcessor{
-  private val notTrim = term.annotations.exists(typeOf[NotTrim] =:= _.tree.tpe)
+  private lazy val notTrim = term.annotations.exists(typeOf[NotTrim] =:= _.tree.tpe)
   override def computeLength(value: ValueManipulation, length: Option[Int]): Int= returnLengthOrThrowException(term,length)
   override def writeToStreamWriter(stream: StreamWriter, valueManipulation: ValueManipulation, length: Option[Int],encoding:Charset): Unit = {
     val valueLength = computeLength(valueManipulation,length)
