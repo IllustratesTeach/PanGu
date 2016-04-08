@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   Copyright 2014,2015 Jun Tsai. All rights reserved.
+   site: http://www.ganshane.com
+-->
+<hall_matcher>
+  <log_file>${server.home}/log/nirvana.hall.matcher.log</log_file>
+  <local_store_dir>${server.home}/config/local</local_store_dir>
+  <web>
+    <bind>127.0.0.1:9003</bind>
+  </web>
+</hall_matcher>
+
