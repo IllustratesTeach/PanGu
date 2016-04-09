@@ -27,6 +27,7 @@ class SyncDataServiceImpl(dataSource: DataSource) extends SyncDataService{
       case SyncDataType.PERSON => new PersonFetcher()
       case SyncDataType.TEMPLATE_FINGER => new TemplateFingerFetcher()
       case SyncDataType.LATENT_FINGER => new LatentFingerFetcher()
+      case SyncDataType.CASE => new CaseFetcher()
       case other => null
     }
     if(fetcher != null)

@@ -20,16 +20,17 @@ class SyncData {
   @Inject
   private var syncDataService: SyncDataService = _
 
-  def onActivate:StreamResponse = {
+  def onActivate: StreamResponse = {
     val syncDataRequest = SyncDataRequest.parseFrom(request.getInputStream)
     val syncDataResponse = syncDataService.syncData(syncDataRequest)
     new StreamResponse {
       override def getStream: InputStream = new ByteArrayInputStream(syncDataResponse.toByteArray)
 
-      override def getContentType: String = "text/plain"
+      override def getContentType: String = "application/protobuf"
 
       override def prepareResponse(response: Response): Unit = {
-//        response.setHeader()
+        response.setHeader("Access-Control-Allow-Origin","*")
+        response.setHeader("Access-Control-Allow-Headers","X-Requested-With,Content-Type,X-Hall-Request")
       }
     }
   }

@@ -12,8 +12,8 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
   * Created by songpeng on 16/3/29.
   */
 class LatentFingerFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
-  override val MAX_SEQ_SQL: String = "select max(t.seq) as seq from gafis_case_finger t "
-  override val MIN_SEQ_SQL: String = "select min(t.seq) as seq from gafis_case_finger t where t.seq >"
+  override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_case_finger t "
+  override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_case_finger t where t.seq >"
   /** 同步现场指纹 */
   override val SYNC_SQL: String = "select t.sid, t.fgp, mnt.finger_mnt, mnt.finger_ridge, t.seq, t.deletag " +
     " from gafis_case_finger t " +

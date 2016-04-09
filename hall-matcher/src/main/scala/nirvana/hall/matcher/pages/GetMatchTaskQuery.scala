@@ -1,16 +1,18 @@
 package nirvana.hall.matcher.pages
 
+import java.io.{ByteArrayInputStream, InputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.protocol.MatchTaskQueryProto.MatchTaskQueryRequest
+import org.apache.tapestry5.StreamResponse
 import org.apache.tapestry5.ioc.annotations.Inject
+import org.apache.tapestry5.services.Response
 
 /**
  * Created by songpeng on 16/3/20.
  */
 class GetMatchTaskQuery {
-
   @Inject
   private var request: HttpServletRequest = _
   @Inject
@@ -18,9 +20,18 @@ class GetMatchTaskQuery {
   @Inject
   private var getMatchTaskService: GetMatchTaskService = _
 
-  def onActivate = {
+  def onActivate: StreamResponse = {
     val matchTaskQueryRequest = MatchTaskQueryRequest.parseFrom(request.getInputStream)
     val matchTaskQueryResponse = getMatchTaskService.getMatchTask(matchTaskQueryRequest)
-    matchTaskQueryResponse.writeTo(response.getOutputStream)
+    new StreamResponse {
+      override def getStream: InputStream = new ByteArrayInputStream(matchTaskQueryResponse.toByteArray)
+
+      override def getContentType: String = "application/protobuf"
+
+      override def prepareResponse(response: Response): Unit = {
+        response.setHeader("Access-Control-Allow-Origin","*")
+        response.setHeader("Access-Control-Allow-Headers","X-Requested-With,Content-Type,X-Hall-Request")
+      }
+    }
   }
 }
