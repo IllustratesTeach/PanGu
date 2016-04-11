@@ -119,17 +119,17 @@ object FPTLDataToMNTDISP {
     if(CoreDelta.length != 14)
       return
     val szCoreDelta = UTIL_FPT4LIB_StrTrimSpace(CoreDelta, UTIL_FPT4LIB_STRTRIM_STYLE_LEFT)
-    stCoreDelta.x = szCoreDelta.take(3).toShort
+    stCoreDelta.x = szCoreDelta.take(3).trim().toShort
 
-    stCoreDelta.y = szCoreDelta.substring(3,6).toShort
+    stCoreDelta.y = szCoreDelta.substring(3,6).trim().toShort
 
-    stCoreDelta.nRadius = szCoreDelta.substring(6,8).toInt.toByte
+    stCoreDelta.nRadius = szCoreDelta.substring(6,8).trim().toInt.toByte
 
     // 9-11位为方向
-    stCoreDelta.z = UTIL_Angle_FPT2MntDisp(szCoreDelta.substring(8,11).toInt)
+    stCoreDelta.z = UTIL_Angle_FPT2MntDisp(convertStringAsInt(szCoreDelta.substring(8,11)))
 
     // 12-13位为方向范围
-    stCoreDelta.nzVarRange = szCoreDelta.substring(11,13).toInt.toByte
+    stCoreDelta.nzVarRange = convertStringAsInt(szCoreDelta.substring(11,13)).toByte
 
     // 14位表示可靠度（1-3可靠度依次递减）
     stCoreDelta.nReliability = UTIL_Reliability_FPT2MntDisp(szCoreDelta.substring(13,14).toInt, nType).toByte
@@ -149,6 +149,9 @@ object FPTLDataToMNTDISP {
       case other=>
         stCoreDelta.nClass = mnt_checker_def.DELTACLASS_UNKNOWN;
     }
+  }
+  def convertStringAsInt(string:String): Int={
+    if(string == null || string.trim.isEmpty) 0 else string.trim.toInt
   }
   def UTIL_FPT4LIB_StrTrimSpace(pszString:String, nTrimStyle:Int):String=
   {
