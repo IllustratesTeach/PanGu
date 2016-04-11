@@ -4,7 +4,6 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
-import com.oracle.javafx.jmx.json.JSONException
 import net.sf.json.JSONObject
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.GetMatchTaskService
@@ -12,6 +11,7 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
 import nirvana.protocol.NirvanaTypeDefinition.MatchType
+import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, Occur}
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -41,7 +41,8 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    }
    def readMatchTask(rs: ResultSet): MatchTask = {
      val matchTaskBuilder = MatchTask.newBuilder()
-     matchTaskBuilder.setMatchId(rs.getString("ora_sid"))
+     val oraSid = rs.getString("ora_sid")
+     matchTaskBuilder.setMatchId(oraSid)
      val keyId = rs.getString("keyid")
      val queryType = rs.getInt("querytype")
      val flag = rs.getInt("flag")
@@ -80,18 +81,33 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          matchTaskBuilder.getTDataBuilder.getTextQuery
        }
      }
-     matchTaskBuilder.setConfig(getMatchConfig(textSql))
-     if(queryType == 0 || queryType == 2){
+     if(textSql != null){
+       //文本查询
+       val json = JSONObject.fromObject(textSql)
+       if(queryType == 0 || queryType == 2){
+         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
+         //布控和追逃不比1.2亿
+         if (json.has("controlPursuitStatus")) {
+           val value: String = json.getString("controlPursuitStatus")
+           val colQuery = KeywordQuery.newBuilder
+           colQuery.setValue(value)
+           queryBuilder.addQueryBuilder.setName("controlPursuitStatus").setExtension(KeywordQuery.query, colQuery.build)
+           val dataInQuery = GroupQuery.newBuilder
+           dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
+         }
+       }else if(queryType == 1 || queryType == 3){
 
-     }else if(queryType == 1 || queryType == 3){
-
+       }
+       //高级查询
+       matchTaskBuilder.setConfig(getMatchConfig(textSql))
      }
-
+     //更新status
+     updateStatusMatching(oraSid)
 
      matchTaskBuilder.build()
    }
 
-   def getObjectIdByCardId(cardId: String, queryType: Int, flag: Int): Long={
+   private def getObjectIdByCardId(cardId: String, queryType: Int, flag: Int): Long={
      var sql: String = ""
      if (queryType == 0 || queryType == 1) {
        sql = GET_SID_BY_PERSONID
@@ -105,7 +121,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      }.get
    }
 
-   def getMatchConfig(textSql:String): MatchConfig ={
+   private def getMatchConfig(textSql:String): MatchConfig ={
      val builder = MatchConfig.newBuilder
      if (textSql != null && textSql.length > 0) {
        try {
@@ -120,11 +136,16 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          if (json.has("scale1")) builder.setScale1(json.getDouble("scale1") / 100.0)
        }
        catch {
-         case e: JSONException => {
+         case e: Exception => {
            e.printStackTrace()
          }
        }
      }
      return builder.build
    }
+  private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
+    JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status=1 where t.ora_sid=?"){ps=>
+      ps.setString(1, oraSid)
+    }
+  }
  }

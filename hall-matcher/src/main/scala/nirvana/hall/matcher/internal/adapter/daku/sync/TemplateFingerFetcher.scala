@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
+import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 
 /**
  * Created by songpeng on 16/4/6.
@@ -17,14 +18,13 @@ class TemplateFingerFetcher(implicit dataSource: DataSource) extends SyncDataFet
   override val SYNC_SQL: String = "select p.sid, t.fgp, t.fgp_case, t.gather_data, t.seq " +
     " from gafis_gather_finger t " +
     " left join gafis_person p on t.person_id=p.personid " +
-    " where t.seq > ? and t.seq <= ? order by t.seq"
+    " where t.group_id=0 and t.seq >= ? and t.seq < ? order by t.seq"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
       val syncDataBuilder = syncDataResponse.addSyncDataBuilder()
+      syncDataBuilder.setMinutiaType(MinutiaType.FINGER)
       syncDataBuilder.setObjectId(rs.getInt("sid"));
-      val group_id = rs.getString("group_id")
-      val deletag = rs.getString("deletag")
       var fgp = rs.getInt("fgp")
       val fgp_case = rs.getString("fgp_case")
       val lastSeq = rs.getLong("seq")

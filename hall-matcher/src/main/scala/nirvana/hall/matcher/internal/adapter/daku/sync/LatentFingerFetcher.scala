@@ -18,7 +18,7 @@ class LatentFingerFetcher(implicit dataSource: DataSource) extends SyncDataFetch
   override val SYNC_SQL: String = "select t.sid, t.fgp, mnt.finger_mnt, mnt.finger_ridge, t.seq, t.deletag " +
     " from gafis_case_finger t " +
     " left join gafis_case_finger_mnt mnt on t.finger_id = mnt.finger_id and mnt.is_main_mnt=1 " +
-    " where mnt.finger_mnt is not null and t.seq > ? and t.seq <= ? order by t.seq"
+    " where mnt.finger_mnt is not null and t.seq >= ? and t.seq <= ? order by t.seq"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){

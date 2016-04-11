@@ -8,6 +8,7 @@
   <name>Nirvana Hall Application Platform</name>
   <description>Nirvana Hall Application Server</description>
   <modules>
+    <module>hall-matcher</module>
     <module>hall-api</module>
     <module>hall-c</module>
     <module>hall-extractor</module>
@@ -19,7 +20,6 @@
     <module>hall-sdk</module>
     <module>hall-stream</module>
     <module>hall-support</module>
-    <module>hall-matcher</module>
   </modules>
   <scm>
     <url>https://bitbucket.org/jcai/hall/src</url>
@@ -92,7 +92,8 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>nirvana-protocol</artifactId>
-        <version>1.0.11</version>
+        <!--<version>1.0.11</version>-->
+        <version>dev-SNAPSHOT</version>
       </dependency>
       <!-- javassist -->
       <dependency>
