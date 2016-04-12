@@ -23,6 +23,12 @@
                     <xs:documentation>配置Web服务器相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="databaseType" name="database" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="module" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>gz,daku</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

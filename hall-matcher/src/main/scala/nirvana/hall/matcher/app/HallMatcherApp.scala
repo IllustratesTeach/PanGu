@@ -3,7 +3,7 @@ package nirvana.hall.matcher.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
-import nirvana.hall.matcher.{HallMatcherConstants, HallMatcherModule}
+import nirvana.hall.matcher.{HallMatcherSymobls, HallMatcherConstants, HallMatcherModule}
 import org.slf4j.LoggerFactory
 
 /**
@@ -23,11 +23,15 @@ with BootstrapTextSupport{
     logger.info("starting hall matcher server ....")
     val classes = List[Class[_]](
       Class.forName("nirvana.hall.matcher.HallMatcherModule"),
-      Class.forName("nirvana.hall.matcher.HallMatcherDataSourceModule"),
-      Class.forName("nirvana.hall.matcher.HallMatcherServiceModule")
+      Class.forName("nirvana.hall.matcher.HallMatcherDataSourceModule")
     )
 
-    startServer(config.web, "nirvana.hall.matcher", classes: _*)
+    logger.info("module: "+ config.module)
+    val extraClasses = config.module match {
+      case "gz" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GZ)
+      case "daku" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_DAKU)
+    }
+    startServer(config.web, "nirvana.hall.matcher", classes :+ extraClasses : _*)
     val version = readVersionNumber("META-INF/maven/nirvana/hall-matcher/version.properties")
     printTextWithNative(logger, HallMatcherConstants.NIRVANA_TEXT_LOGO, "web@" + config.web.bind, version, 0)
     logger.info("hall matcher server started")

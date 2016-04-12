@@ -7,7 +7,7 @@ import org.apache.tapestry5.ioc.ServiceBinder
 /**
  * Created by songpeng on 16/3/25.
  */
-object HallMatcherServiceModule {
+object HallMatcherDakuServiceModule {
 
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[SyncDataService], classOf[SyncDataServiceImpl])
