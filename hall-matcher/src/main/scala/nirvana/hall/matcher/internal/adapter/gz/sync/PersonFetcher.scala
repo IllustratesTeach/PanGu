@@ -32,15 +32,9 @@ class PersonFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
          syncDataBuilder.setObjectId(rs.getInt("sid"))
          syncDataBuilder.setTimestamp(rs.getLong("seq"))
          val personId = rs.getString("personid")
-         val dataType = rs.getString("data_type")
-         val dataIn = rs.getString("data_in")
 
          val textData = TextData.newBuilder()
          textData.addColBuilder.setColName("personId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(personId.getBytes("UTF-8")))
-         if(dataType != null)
-            textData.addColBuilder.setColName("dataType").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(dataType.getBytes("UTF-8")))
-         if(dataIn != null)
-            textData.addColBuilder.setColName("dataIn").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(dataIn.getBytes("UTF-8")))
 
          syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
       }
