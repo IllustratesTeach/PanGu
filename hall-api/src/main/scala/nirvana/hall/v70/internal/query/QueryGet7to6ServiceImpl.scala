@@ -1,19 +1,17 @@
 package nirvana.hall.v70.internal.query
 
 import java.util.Date
-import javax.persistence.{EntityManager, EntityManagerFactory}
+import javax.persistence.EntityManager
 
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.internal.sync.ProtobufConverter
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import nirvana.hall.v70.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * Created by songpeng on 15/12/30.
@@ -148,26 +146,27 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
 
   }
 
+  /**
+   * 定时任务
+   * @param periodicExecutor
+   */
   @PostInjection
-  def startUp(periodicExecutor: PeriodicExecutor, entityManagerFactory: EntityManagerFactory): Unit = {
+  def startUp(periodicExecutor: PeriodicExecutor, queryGet7to6Service: QueryGet7to6Service): Unit = {
     periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-get-70to62", new Runnable {
       override def run(): Unit = {
-        val emHolder= new EntityManagerHolder(entityManagerFactory.createEntityManager())
-        TransactionSynchronizationManager.bindResource(entityManagerFactory,emHolder)
-        doWork
-        TransactionSynchronizationManager.unbindResource(entityManagerFactory)
-        EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager)
+        queryGet7to6Service.doWork
       }
     })
   }
-  def doWork: Unit ={
+  @Transactional
+  override def doWork: Unit ={
+    println("222222222222222")
     getGafisNormalqueryQueryqueMatching().foreach{ queryque =>
       getQueryAndSaveMatchResult(queryque)
-      doWork
     }
   }
 
   override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
-    GafisNormalqueryQueryque.where("status=?1 and syncTargetSid is not null", STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
+    GafisNormalqueryQueryque.where("status=?1 and deletag=1 and syncTargetSid is not null", STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
   }
 }

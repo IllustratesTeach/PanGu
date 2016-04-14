@@ -21,4 +21,10 @@ trait Query7to6Service {
    */
   @Transactional
   def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque]
+
+  /**
+   * 读取任务队列，处理发送查询任务
+   */
+  @Transactional
+  def doWork
 }

@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.query
 
 import java.util.Date
-import javax.persistence.{EntityManager, EntityManagerFactory}
+import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
@@ -16,9 +16,7 @@ import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.jboss.netty.buffer.ChannelBuffers
-import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * Created by songpeng on 15/12/9.
@@ -27,32 +25,23 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   extends Query7to6Service{
 
   private val STATUS_MATCHING =1.toShort//任务状态，正在比对
+  private val STATUS_FAIL=9.toShort//任务状态，失败
 
   @PostInjection
-  def startUp(periodicExecutor: PeriodicExecutor, entityManagerFactory: EntityManagerFactory): Unit = {
+  def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
     periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-70to62", new Runnable {
       override def run(): Unit = {
-        try {
-          val emHolder = new EntityManagerHolder(entityManagerFactory.createEntityManager())
-          TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
-          doWork
-          TransactionSynchronizationManager.unbindResource(entityManagerFactory)
-          EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager)
-        }
-        catch {
-          case e: Throwable =>
-            e.printStackTrace()
-        }
+        query7to6Service.doWork
       }
     })
   }
 
-  private def doWork: Unit ={
+  @Transactional
+  override def doWork: Unit ={
     getGafisNormalqueryQueryque.foreach{ gafisQuery =>
       sendQuery(gafisQuery)
       doWork
     }
-
   }
 
   /**
@@ -61,7 +50,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
    */
   @Transactional
   override def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque] ={
-    val gafisQuery = GafisNormalqueryQueryque.where("status=0 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
+    val gafisQuery = GafisNormalqueryQueryque.where("status=0 and deletag=1 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
     // 更新状态为正在比对
     gafisQuery.foreach{ query =>
       GafisNormalqueryQueryque.where("pkId=?1", query.pkId).update(status=STATUS_MATCHING, begintime=new Date())
@@ -98,15 +87,21 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
    */
   @Transactional
   override def sendQuery(gafisQuery: GafisNormalqueryQueryque): Unit = {
-    val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
+    try {
+      val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
+      val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
+      val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)
 
-    val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
-
-    val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)
-
-    val respnose = rpcHttpClient.call("http://"+syncTarget.targetIp+":"+syncTarget.targetPort, QuerySendRequest.cmd, request.build())
-    val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
-    new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
+      val respnose = rpcHttpClient.call("http://" + syncTarget.targetIp + ":" + syncTarget.targetPort, QuerySendRequest.cmd, request.build())
+      val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
+      //记录关联62的查询任务号
+      new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
+    }
+    catch {
+      case e: Exception =>
+        //发送比对异常，状态更新为失败
+        GafisNormalqueryQueryque.where("pkId=?1", gafisQuery.pkId).update(status=STATUS_FAIL)
+    }
   }
 
 }

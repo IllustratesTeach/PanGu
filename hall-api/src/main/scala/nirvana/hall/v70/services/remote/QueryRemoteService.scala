@@ -8,7 +8,7 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 trait QueryRemoteService {
 
   /**
-   * 获取查询结果
+   * 获取查询结果, 如果比对没有完成返回null
    * @param oraSid
    * @return
    */

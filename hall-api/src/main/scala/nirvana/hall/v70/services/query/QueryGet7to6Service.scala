@@ -21,4 +21,10 @@ trait QueryGet7to6Service {
    */
   @Transactional
   def getQueryAndSaveMatchResult(gafisNormalqueryQueryque: GafisNormalqueryQueryque)
+
+  /**
+   * 定时任务, 读取正在比对的任务，获取远程比对结果
+   */
+  @Transactional
+  def doWork()
 }

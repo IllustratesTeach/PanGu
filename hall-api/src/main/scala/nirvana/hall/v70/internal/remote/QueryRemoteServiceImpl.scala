@@ -11,7 +11,7 @@ import nirvana.hall.v70.services.remote.QueryRemoteService
  */
 class QueryRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends QueryRemoteService{
   /**
-   * 获取查询结果
+   * 获取查询结果,如果比对没有完成返回null
    * @param oraSid
    * @return
    */
@@ -20,8 +20,11 @@ class QueryRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends QueryRemoteSe
     val baseResponse = rpcHttpClient.call("http://"+ ip +":"+ port, QueryGetRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
       val queryGetResponse = baseResponse.getExtension(QueryGetResponse.cmd)
-
-      queryGetResponse.getMatchResult
+      if(queryGetResponse.getIsComplete){
+        queryGetResponse.getMatchResult
+      }else{
+        null
+      }
     }else{
       throw new RuntimeException(baseResponse.getMsg)
     }
