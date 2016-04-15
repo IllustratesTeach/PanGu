@@ -21,5 +21,7 @@ message BaseCommand {
     firm_image_decompress#FirmImageDecompressResponse 10002
     extract#ExtractRequest 10003
     extract#ExtractResponse 10004
+    image_compress#ImageCompressRequest 1005
+    image_compress#ImageCompressResponse 1006
    */
 }

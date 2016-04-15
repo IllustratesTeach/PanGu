@@ -3,9 +3,9 @@ package nirvana.hall.image
 import com.google.protobuf.ExtensionRegistry
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
-import nirvana.hall.image.internal.{FirmDecoderImpl, FirmImageDecompressRequestFilter}
-import nirvana.hall.image.services.FirmDecoder
-import nirvana.hall.protocol.image.FirmImageDecompressProto
+import nirvana.hall.image.internal.{ImageCompressRequestFilter, ImageEncoderImpl, FirmDecoderImpl, FirmImageDecompressRequestFilter}
+import nirvana.hall.image.services.{ImageEncoder, FirmDecoder}
+import nirvana.hall.protocol.image.{ImageCompressProto, FirmImageDecompressProto}
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId, Contribute}
 import org.apache.tapestry5.ioc.services.PipelineBuilder
 import org.apache.tapestry5.ioc.{Configuration, OrderedConfiguration, ServiceBinder}
@@ -19,6 +19,7 @@ import org.slf4j.Logger
 object LocalHallImageModule {
   def bind(binder:ServiceBinder): Unit ={
     binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+    binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
   }
   /*
   //增加EagerLoad,避免出现deadlock
@@ -64,12 +65,15 @@ object LocalHallImageModule {
   @Contribute(classOf[RpcServerMessageHandler])
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
     configuration.addInstance("FirmImageDecompressRequest", classOf[FirmImageDecompressRequestFilter])
+    configuration.addInstance("ImageCompressRequestFilter", classOf[ImageCompressRequestFilter])
+
   }
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {
     configuration.add(new ProtobufExtensionRegistryConfiger {
       override def config(registry: ExtensionRegistry): Unit = {
         FirmImageDecompressProto.registerAllExtensions(registry)
+        ImageCompressProto.registerAllExtensions(registry)
       }
     })
   }

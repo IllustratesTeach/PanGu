@@ -1,0 +1,30 @@
+/**
+ * 调用图像压缩
+ */
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+
+option java_package = "nirvana.hall.protocol.image";
+
+option java_outer_classname = "ImageCompressProto";
+/* send request to image server */
+message ImageCompressRequest {
+  extend monad.rpc.protocol.BaseCommand {
+    optional ImageCompressRequest cmd = 10005;
+  }
+  enum CompressMethod{
+    WSQ = 1;
+  }
+  required bytes original_data = 1;
+  required CompressMethod compress_method = 2;
+}
+
+/* response */
+message ImageCompressResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional ImageCompressResponse cmd = 10006;
+  }
+  optional bytes cpr_data = 1;
+}
