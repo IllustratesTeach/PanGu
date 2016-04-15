@@ -2,12 +2,13 @@ package nirvana.hall.image.internal
 
 import java.awt.image.{BufferedImage, DataBufferByte}
 import java.awt.{AlphaComposite, Color, Font, RenderingHints}
-import java.io.File
+import java.io.{FileInputStream, File}
 import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
 import nirvana.hall.c.services.AncientData._
+import nirvana.hall.c.services.gfpt4lib.{fpt4code, FPTFile}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
@@ -23,6 +24,22 @@ import scala.collection.JavaConversions._
  * @since 2015-12-10
  */
 class FirmDecoderImplTest extends BaseJniTest{
+  @Test
+  def test_parse_fpt: Unit ={
+    val filePath = "/Users/jcai/Downloads/B9300000000002016044415.FPT"
+    val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
+    fptEither match{
+      case Right(fpt4)=>
+        val tData = fpt4.logic02Recs.head.fingers.head
+        val gafisImg = fpt4code.FPTFingerDataToGafisImage(tData)
+        val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+        val dest = decoder.decode(gafisImg)
+        println(dest)
+      case Left(fpt3)=>
+        fpt3.head
+    }
+
+  }
   @Test
   def test_parse_xml: Unit ={
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test_config.xml")).mkString
