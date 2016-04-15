@@ -41,8 +41,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     if(gafisImg.stHead.bIsCompressed == 0)
       return gafisImg
 
-    val cprMethod =fpt4code.fptCprMethodToGafisCode(gafisImg.stHead.nCompressMethod)
-    val firmCode = fpt4code.gafisCprCodeToFPTCode(gafisImg.stHead.nCompressMethod)
+    val cprMethod =gafisImg.stHead.nCompressMethod
+    val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
 
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
