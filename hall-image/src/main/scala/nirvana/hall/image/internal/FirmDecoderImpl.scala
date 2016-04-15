@@ -71,6 +71,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
           destImg.stHead.nResolution = img.getPpi.toShort
         else
           destImg.stHead.nResolution = 500 //default ppi
+        /*
       case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE =>
 
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
@@ -87,6 +88,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         destImg.stHead.nResolution = gafisImg.stHead.nResolution
         if(destImg.stHead.nResolution == 0)
           destImg.stHead.nResolution = 500 //default ppi
+          */
 
       case other=>
 
