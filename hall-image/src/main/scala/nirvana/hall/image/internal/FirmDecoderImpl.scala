@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
 import org.apache.tapestry5.ioc.annotations.Symbol
 import org.jnbis.WsqDecoder
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions._
 import scala.util.control.NonFatal
@@ -25,6 +26,7 @@ import scala.util.control.NonFatal
  * @since 2015-12-10
  */
 class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,imageConfigSupport: ImageConfigSupport) extends FirmDecoder{
+  private val logger = LoggerFactory getLogger getClass
   private val dlls = new ConcurrentHashMap[String,Dll]()
   private case class Dll(Handle:Long,lockOpt:Option[ReentrantLock]){
     @volatile
@@ -198,6 +200,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         }
       }catch{
         case e:Throwable=>
+          logger.error(e.getMessage,e)
           throw new IllegalAccessException("cprMethod:"+cprMethod+" "+e.getMessage)
       }finally{
         lock.unlock()
@@ -217,7 +220,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         else
         "FPT_DC%s".format(prefix)
     }
-    val files = FileUtils.listFiles(new File(serverHome + "/dll"), new AbstractFileFilter {
+
+    val files = FileUtils.listFiles(new File(serverHome + File.separator+"dll"), new AbstractFileFilter {
       override def accept(dir: File, name: String): Boolean = name == dllName
     }, new AbstractFileFilter {
       override def accept(file: File): Boolean = true
