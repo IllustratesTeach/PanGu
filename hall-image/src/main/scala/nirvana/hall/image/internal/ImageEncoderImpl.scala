@@ -29,6 +29,7 @@ class ImageEncoderImpl extends ImageEncoder{
           image.stHead.nResolution,
           10)
         destImg.bnData = cpr
+        destImg.stHead.nImgSize = destImg.bnData.length
         destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ
         destImg
       case other=>
