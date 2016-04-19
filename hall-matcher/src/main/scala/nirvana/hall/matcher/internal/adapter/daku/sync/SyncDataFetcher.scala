@@ -26,7 +26,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    */
   def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     val from_ = getMinSeq(from)
-    if(from_ <= getMaxSeq()){
+    if(from_ > 0 && from_ <= getMaxSeq()){
       JdbcDatabase.queryWithPsSetter(SYNC_SQL){ps=>
         ps.setLong(1, from_)
         ps.setLong(2, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
