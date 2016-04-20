@@ -15,11 +15,11 @@ public class NativeExtractor{
      * @param ExtractMode extract mode. see afiskernel.EXETRACTMODE_XXX
      * @param belatent 0 -> latent,1->template
      */
-    public static native void ExtractMNT_All(byte[] img,byte[] mnt,
+    public static native void ExtractMNT_All(byte[] img,byte[] mnt,byte[] bin,
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
-    public static native void ExtractMNT_AllWithNewFeature(byte[] img,byte[] mnt,
+    public static native void ExtractMNT_AllWithNewFeature(byte[] img,byte[] mnt,byte[] bin,
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
