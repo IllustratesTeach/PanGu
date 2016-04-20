@@ -1,0 +1,37 @@
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+option java_package = "nirvana.hall.protocol.extract";
+
+option java_outer_classname = "LatentConverterExtractProto";
+
+message LatentConverterExtractRequest{
+  extend monad.rpc.protocol.BaseCommand {
+    optional LatentConverterExtractRequest cmd = 10007;
+  }
+  message FingerLData{
+    optional string	pattern = 1;
+    optional string	fingerDirection = 2;
+    optional string	featureCount = 3;
+    optional string	fgp = 4;
+    optional string	centerPoint = 5;
+    optional string	subCenterPoint = 6;
+    optional string	leftTriangle = 7;
+    optional string	rightTriangle = 8;
+    optional string	feature = 9;
+    optional string	imgHorizontalLength = 0;
+    optional string	imgVerticalLength = 11;
+    optional string	dpi = 12;
+  }
+  required FingerLData fingerLData = 1;
+}
+
+/* response */
+message LatentConverterExtractResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional LatentConverterExtractResponse cmd = 10008;
+  }
+  optional bytes mnt_data = 1;
+}
+
