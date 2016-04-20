@@ -11,6 +11,7 @@ public class NativeExtractor{
      * extract feature
      * @param img GAFISIMAGEHEADSTRUCT + image data
      * @param mnt GAFISIMAGEHEADSTRUCT + mnt output
+     * @param bin 纹线数据
      * @param finger_pos finger position
      * @param ExtractMode extract mode. see afiskernel.EXETRACTMODE_XXX
      * @param belatent 0 -> latent,1->template
