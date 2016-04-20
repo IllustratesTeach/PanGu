@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.TextQueryProto.TextData
@@ -12,7 +13,7 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 /**
   * Created by songpeng on 16/3/29.
   */
-class PersonFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
+class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
@@ -26,7 +27,7 @@ class PersonFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
     */
    override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit ={
       if(syncDataResponse.getSyncDataCount() < size){
-         val syncDataBuilder = syncDataResponse.addSyncDataBuilder()
+         val syncDataBuilder = SyncData.newBuilder()
          syncDataBuilder.setOperationType(SyncData.OperationType.PUT)
          syncDataBuilder.setMinutiaType(SyncData.MinutiaType.TEXT)
          syncDataBuilder.setObjectId(rs.getInt("sid"))
@@ -40,8 +41,11 @@ class PersonFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
          if(dataIn != null)
             textData.addColBuilder.setColName("dataIn").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(dataIn.getBytes("UTF-8")))
 
-         if(textData.getColCount > 0)
-            syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
+         syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
+         if (validSyncData(syncDataBuilder.build, false)) {
+            syncDataResponse.addSyncData(syncDataBuilder.build)
+         }
+
       }
    }
  }

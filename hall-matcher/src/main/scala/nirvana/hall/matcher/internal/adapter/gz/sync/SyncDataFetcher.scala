@@ -5,16 +5,17 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
-import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
+import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.{MinutiaType, OperationType}
 
 /**
  * Created by songpeng on 16/3/29.
  */
-abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSupport{
+abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit val dataSource: DataSource) extends LoggerSupport{
   val MAX_SEQ_SQL: String
   val MIN_SEQ_SQL: String
   val SYNC_SQL: String
@@ -26,7 +27,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    */
   def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     val from_ = getMinSeq(from)
-    if(from_ <= getMaxSeq()){
+    if(from_ > 0 && from_ <= getMaxSeq()){
       JdbcDatabase.queryWithPsSetter(SYNC_SQL){ps=>
         ps.setLong(1, from_)
         ps.setLong(2, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
@@ -70,26 +71,39 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    */
   protected def validSyncData(syncData: SyncData, isLatent: Boolean): Boolean ={
     /*数据长度校验*/
-    var dataSizeExpected:Int = 0
-    syncData.getMinutiaType match {
-      case MinutiaType.FINGER =>
-        dataSizeExpected = HallMatcherConstants.FINGER_MNT_LENGTH
-      case MinutiaType.PALM=>
-        if(isLatent){
-          dataSizeExpected = HallMatcherConstants.PALM_MNT_LENGTH_LATENT;
-        }else{
-          dataSizeExpected = HallMatcherConstants.PALM_MNT_LENGTH;
-        }
-      case MinutiaType.RIDGE=>
-        dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(syncData.getData)
-      case MinutiaType.FACE=>
-      case MinutiaType.TEXT=>
+    if(syncData.getMinutiaType == MinutiaType.TEXT){
+      return syncData.getData.size() > 0
+    }else{
+      if (syncData.getData.size() <=hallMatcherConfig.mnt.headerSize && syncData.getOperationType == OperationType.PUT) {
+        error("data size too small %s for sid:%s minutia_type:%s isLatent:%s".format(
+          syncData.getData.size(), syncData.getObjectId, syncData.getMinutiaType.toString, isLatent))
+        return false
+      }
+      var dataSizeExpected:Int = 0
+      syncData.getMinutiaType match {
+        case MinutiaType.FINGER =>
+          if(isLatent){
+            dataSizeExpected = hallMatcherConfig.mnt.fingerLatentSize
+          }else{
+            dataSizeExpected = hallMatcherConfig.mnt.fingerTemplateSize
+          }
+        case MinutiaType.PALM=>
+          if(isLatent){
+            dataSizeExpected = hallMatcherConfig.mnt.palmLatentSize
+          }else{
+            dataSizeExpected = hallMatcherConfig.mnt.palmTemplateSize
+          }
+        case MinutiaType.RIDGE=>
+          dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(syncData.getData)
+        case MinutiaType.FACE=>
+        case MinutiaType.TEXT=>
+      }
+      dataSizeExpected += hallMatcherConfig.mnt.headerSize
+      if (syncData.getData.size != dataSizeExpected || dataSizeExpected <= HallMatcherConstants.HEADER_LENGTH) {
+        error("MinutiaType:{} sid:{}  dataSize:{}", syncData.getMinutiaType, syncData.getObjectId,syncData.getData.size)
+        return false
+      }
+      true
     }
-    dataSizeExpected += HallMatcherConstants.HEADER_LENGTH
-    if (syncData.getData.size != dataSizeExpected || dataSizeExpected <= HallMatcherConstants.HEADER_LENGTH) {
-      error("MinutiaType:{} sid:{}  数据长度异常:{}", syncData.getMinutiaType, syncData.getObjectId,syncData.getData.size)
-      return false
-    }
-    true
   }
 }

@@ -9,5 +9,17 @@
   <web>
     <bind>127.0.0.1:9003</bind>
   </web>
+    <database>
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>gafis</user>
+      <password>gafis</password>
+      <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+    </database>
+    <module>gz</module>
+    <mnt>
+      <header_size>64</header_size>
+      <finger_template_size>640</finger_template_size>
+      <finger_latent_size>640</finger_latent_size>
+    </mnt>
 </hall_matcher>
 

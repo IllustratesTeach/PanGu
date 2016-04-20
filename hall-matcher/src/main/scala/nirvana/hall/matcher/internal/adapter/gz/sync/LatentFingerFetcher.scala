@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
@@ -11,7 +12,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
 /**
   * Created by songpeng on 16/3/29.
   */
-class LatentFingerFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
+class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_case_finger t "
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_case_finger t where t.seq >"
   /** 同步现场指纹 */
@@ -40,7 +41,7 @@ class LatentFingerFetcher(implicit dataSource: DataSource) extends SyncDataFetch
       val finger_ridge = rs.getBytes("finger_ridge")
       //如果有纹线数据，同步纹线数据
       if (finger_ridge != null) {
-        val ridgeBuilder = SyncData.newBuilder
+        val ridgeBuilder = SyncData.newBuilder()
         ridgeBuilder.setObjectId(rs.getInt("sid"))
         ridgeBuilder.setMinutiaType(SyncData.MinutiaType.RIDGE)
         ridgeBuilder.setOperationType(OperationType.PUT)

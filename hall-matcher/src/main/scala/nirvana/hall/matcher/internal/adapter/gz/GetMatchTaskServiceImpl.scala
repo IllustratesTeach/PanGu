@@ -114,11 +114,16 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      } else {
        sql = GET_SID_BY_CASE_FINGERID
      }
-     JdbcDatabase.queryFirst[Long](sql){ps =>
+     val oraSidOption = JdbcDatabase.queryFirst[Long](sql){ps =>
        ps.setString(1, cardId)
      }{ rs =>
        rs.getInt("ora_sid")
-     }.get
+     }
+     if(! oraSidOption.isEmpty){
+       oraSidOption.get
+     }else{
+       0
+     }
    }
 
    private def getMatchConfig(textSql:String): MatchConfig ={

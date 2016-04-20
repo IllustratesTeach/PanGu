@@ -2,6 +2,7 @@ package nirvana.hall.matcher.internal.adapter.gz
 
 import javax.sql.DataSource
 
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.service.SyncDataService
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
 import nirvana.protocol.SyncDataProto.{SyncDataRequest, SyncDataResponse}
@@ -9,8 +10,7 @@ import nirvana.protocol.SyncDataProto.{SyncDataRequest, SyncDataResponse}
 /**
  * Created by songpeng on 16/3/29.
  */
-class SyncDataServiceImpl(dataSource: DataSource) extends SyncDataService{
-  private implicit val ds = dataSource
+class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataService{
   /**
    * 同步数据
    * @param syncDataRequest
@@ -23,10 +23,10 @@ class SyncDataServiceImpl(dataSource: DataSource) extends SyncDataService{
     val timestamp = syncDataRequest.getTimestamp
     val syncDataType = syncDataRequest.getSyncDataType
     val fetcher = syncDataType match {
-//      case SyncDataType.PERSON => new sync.PersonFetcher()
-      case SyncDataType.TEMPLATE_FINGER => new sync.TemplateFingerFetcher()
-      case SyncDataType.LATENT_FINGER => new sync.LatentFingerFetcher()
-//      case SyncDataType.CASE => new sync.CaseFetcher()
+      case SyncDataType.PERSON => new sync.PersonFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.TEMPLATE_FINGER => new sync.TemplateFingerFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.LATENT_FINGER => new sync.LatentFingerFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.CASE => new sync.CaseFetcher(hallMatcherConfig, dataSource)
       case other => null
     }
     if(fetcher != null)

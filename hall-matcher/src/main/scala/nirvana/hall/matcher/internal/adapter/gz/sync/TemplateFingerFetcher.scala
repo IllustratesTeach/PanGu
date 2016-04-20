@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -11,7 +12,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 /**
  * Created by songpeng on 16/4/6.
  */
-class TemplateFingerFetcher(implicit dataSource: DataSource) extends SyncDataFetcher{
+class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_gather_finger t "
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_gather_finger t where t.seq >"
   override val SYNC_SQL: String = "select p.sid, t.fgp, t.fgp_case, t.group_id, t.gather_data, t.seq, p.deletag " +
