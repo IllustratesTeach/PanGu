@@ -208,12 +208,12 @@ trait gnetcsr {
   protected def GAFIS_NETSCR_RecvTPCardInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstCard:GTPCARDINFOSTRUCT) {
     val card = channel.receive[GTPCARDINFOSTRUCT]()
     pstCard.szCardID = card.szCardID
-    pstCard.bMicCanBeFreed = 0;
-    pstCard.bTextCanBeFreed = 0;
+    pstCard.bMicCanBeFreed = 0
+    pstCard.bTextCanBeFreed = 0
     pstCard.nMicItemCount = card.nMicItemCount
     pstCard.nTextItemCount = card.nTextItemCount
     pstCard.nInfoExLen = card.nInfoExLen
-
+    pstCard.stAdmData= card.stAdmData //操作信息
 
     pAns.nReturnValue = 1
     pAns.bnData = "$version=001$".getBytes
