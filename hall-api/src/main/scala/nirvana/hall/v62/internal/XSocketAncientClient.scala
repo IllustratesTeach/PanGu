@@ -19,7 +19,7 @@ import scala.reflect._
 class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTimeoutSecs:Int) extends AncientClient with LoggerSupport{
   def executeInChannel[T](action:ChannelOperator=>T): T={
     val connection = new BlockingConnection(InetAddress.getByName(host),port,connectionTimeoutSecs*1000)
-    connection.setReadTimeoutMillis(readTimeoutSecs * 1000)
+//    connection.setReadTimeoutMillis(readTimeoutSecs * 1000)
     val channelHolder = new XSocketChannelOperator(connection)
     try{
       action(channelHolder)
