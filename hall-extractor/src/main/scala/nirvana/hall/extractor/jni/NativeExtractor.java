@@ -11,15 +11,16 @@ public class NativeExtractor{
      * extract feature
      * @param img GAFISIMAGEHEADSTRUCT + image data
      * @param mnt GAFISIMAGEHEADSTRUCT + mnt output
+     * @param bin 纹线数据
      * @param finger_pos finger position
      * @param ExtractMode extract mode. see afiskernel.EXETRACTMODE_XXX
      * @param belatent 0 -> latent,1->template
      */
-    public static native void ExtractMNT_All(byte[] img,byte[] mnt,
+    public static native void ExtractMNT_All(byte[] img,byte[] mnt,byte[] bin,
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
-    public static native void ExtractMNT_AllWithNewFeature(byte[] img,byte[] mnt,
+    public static native void ExtractMNT_AllWithNewFeature(byte[] img,byte[] mnt,byte[] bin,
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);

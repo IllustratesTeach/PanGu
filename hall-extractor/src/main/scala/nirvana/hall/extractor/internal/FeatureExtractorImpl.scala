@@ -84,9 +84,9 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val mntData = mntBuffer.array()
 
     if(newFeature)
-      NativeExtractor.ExtractMNT_AllWithNewFeature(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+      NativeExtractor.ExtractMNT_AllWithNewFeature(originalImgData,mntData, null,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
     else
-      NativeExtractor.ExtractMNT_All(originalImgData,mntData, fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+      NativeExtractor.ExtractMNT_All(originalImgData,mntData, null,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
 
     mntData
   }

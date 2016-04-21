@@ -29,7 +29,7 @@ class NativeExtractorTest extends BaseJniTest{
     mntHead.szName="FingerRHMMnt"
     mntHead.writeToStreamWriter(mntBuffer)
     val mntBytes = mntBuffer.array()
-    NativeExtractor.ExtractMNT_All(img,mntBytes,FingerFgp.FINGER_R_THUMB.ordinal().toByte,afiskernel.EXTRACTMODE_NEW.toByte,0)
+    NativeExtractor.ExtractMNT_All(img,mntBytes,null,FingerFgp.FINGER_R_THUMB.ordinal().toByte,afiskernel.EXTRACTMODE_NEW.toByte,0)
     FileUtils.writeByteArrayToFile(new File("tp_1.mnt"),mntBytes)
     val mntHead2 = new GAFISIMAGEHEADSTRUCT().fromByteArray(mntBytes)
 

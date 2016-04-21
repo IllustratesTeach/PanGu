@@ -15,7 +15,7 @@ extern "C" void GAFIS_MntDispToMntStd(MNTDISPSTRUCT *pmnt, void *mnt);
  * Signature: ([BBB)[B
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
-  (JNIEnv * jenv, jclass, jbyteArray img_bytes,jbyteArray mnt_bytes,jbyte finger_pos,jbyte ExtractMode, jbyte belatent) {
+  (JNIEnv * jenv, jclass, jbyteArray img_bytes,jbyteArray mnt_bytes,jbyteArray bin_bytes,jbyte finger_pos,jbyte ExtractMode, jbyte belatent) {
   if (img_bytes == NULL) {
     SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, "image data is null");
     return;
@@ -29,6 +29,13 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
   GAFISIMAGESTRUCT *img = (GAFISIMAGESTRUCT *) img_data;
   img->stHead.nFingerIndex = (UCHAR) finger_pos;
 
+  GAFISIMAGESTRUCT *bin = NULL;
+  UCHAR* bin_data = NULL;
+  if(bin_bytes != NULL){
+    bin_data = (UCHAR *) jenv->GetByteArrayElements(bin_bytes, JNI_FALSE);
+    bin = (GAFISIMAGESTRUCT *) bin_data;
+  }
+
   UCHAR *mnt_data = (UCHAR *) jenv->GetByteArrayElements(mnt_bytes, JNI_FALSE);
   GAFISIMAGESTRUCT *mnt = (GAFISIMAGESTRUCT *) mnt_data;
   //mnt->stHead.nFingerIndex = (UCHAR) finger_pos;
@@ -37,11 +44,15 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
 
   mntExtStr.pImage = img;
   mntExtStr.pMnt = mnt->bnData;
+  mntExtStr.pBin = bin;
   mntExtStr.ExtractMode = (unsigned char) ExtractMode;
   mntExtStr.belatent = (unsigned char) belatent;
   int ret = GAFIS_ExtractMNT_All(&mntExtStr);
   jenv->ReleaseByteArrayElements(img_bytes, (jbyte *) img_data, JNI_ABORT);
   jenv->ReleaseByteArrayElements(mnt_bytes, (jbyte *) mnt_data, 0);
+  if(bin_bytes)
+    jenv->ReleaseByteArrayElements(bin_bytes, (jbyte *) bin_data, 0);
+
   if (ret != 1) {//success
     SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, ret);
   }
@@ -88,7 +99,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
  * Signature: ([B[BBBB)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1AllWithNewFeature
-    (JNIEnv * jenv, jclass, jbyteArray img_bytes,jbyteArray mnt_bytes,jbyte finger_pos,jbyte ExtractMode, jbyte belatent){
+    (JNIEnv * jenv, jclass, jbyteArray img_bytes,jbyteArray mnt_bytes,jbyteArray bin_bytes,jbyte finger_pos,jbyte ExtractMode, jbyte belatent){
   if(img_bytes == NULL){
     SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"image data is null");
     return;
@@ -101,6 +112,13 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
   UCHAR* img_data = (UCHAR*)jenv->GetByteArrayElements(img_bytes,JNI_FALSE);
   GAFISIMAGESTRUCT* img= (GAFISIMAGESTRUCT*)img_data;
   img->stHead.nFingerIndex = (UCHAR) finger_pos;
+
+  GAFISIMAGESTRUCT *bin = NULL;
+  UCHAR* bin_data = NULL;
+  if(bin_bytes != NULL){
+    bin_data = (UCHAR *) jenv->GetByteArrayElements(bin_bytes, JNI_FALSE);
+    bin = (GAFISIMAGESTRUCT *) bin_data;
+  }
 
   UCHAR* mnt_data = (UCHAR*)jenv->GetByteArrayElements(mnt_bytes,JNI_FALSE);
   GAFISIMAGESTRUCT* mnt = (GAFISIMAGESTRUCT*)mnt_data;
@@ -115,6 +133,8 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
   int ret = GAFIS_ExtractMNT_All_NewTTFea(&mntExtStr);
   jenv->ReleaseByteArrayElements(img_bytes,(jbyte*)img_data,JNI_ABORT);
   jenv->ReleaseByteArrayElements(mnt_bytes,(jbyte*)mnt_data,0);
+  if(bin_bytes)
+    jenv->ReleaseByteArrayElements(bin_bytes, (jbyte *) bin_data, 0);
   if(ret != 1){//success
     SWIG_JavaThrowExceptionByCode(jenv,SWIG_JavaArithmeticException,ret);
   }
