@@ -20,7 +20,7 @@ message LatentConverterExtractRequest{
     optional string	leftTriangle = 7;
     optional string	rightTriangle = 8;
     optional string	feature = 9;
-    optional string	imgHorizontalLength = 0;
+    optional string	imgHorizontalLength = 10;
     optional string	imgVerticalLength = 11;
     optional string	dpi = 12;
   }

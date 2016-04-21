@@ -26,7 +26,7 @@ import scala.collection.JavaConversions._
 class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "/Users/jcai/Downloads/B9300000000002016044415.FPT"
+    val filePath = "C:\\Users\\wangjue\\Desktop\\fpt_error\\B9300000000002016044415.FPT"
     val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
     fptEither match{
       case Right(fpt4)=>

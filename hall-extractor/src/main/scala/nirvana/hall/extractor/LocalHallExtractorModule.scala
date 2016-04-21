@@ -5,9 +5,9 @@ import monad.core.MonadCoreConstants
 import monad.core.config.ZkClientConfigSupport
 import monad.rpc.services.{ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
-import nirvana.hall.extractor.internal.{ExtractRequestFilter, FeatureExtractorImpl}
+import nirvana.hall.extractor.internal.{LatentConverterExtractRequestFilter, ExtractRequestFilter, FeatureExtractorImpl}
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.protocol.extract.ExtractProto
+import nirvana.hall.protocol.extract.{LatentConverterExtractProto, ExtractProto}
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
@@ -42,12 +42,14 @@ object LocalHallExtractorModule {
   @Contribute(classOf[RpcServerMessageHandler])
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
     configuration.addInstance("ExtractRequest", classOf[ExtractRequestFilter])
+    configuration.addInstance("LatentConverterExtractRequest", classOf[LatentConverterExtractRequestFilter])
   }
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {
     configuration.add(new ProtobufExtensionRegistryConfiger {
       override def config(registry: ExtensionRegistry): Unit = {
         ExtractProto.registerAllExtensions(registry)
+        LatentConverterExtractProto.registerAllExtensions(registry)
       }
     })
   }
