@@ -191,8 +191,8 @@ object galoctpConverter {
   def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT): TPCard = {
     val card = TPCard.newBuilder()
     card.setStrCardID(data.szCardID)
-    if(data.stAdmData.szPersonID != null)
-      card.setStrPersonID(data.stAdmData.szPersonID)
+    if(data.stAdmData.szMISPersonID!= null)
+      card.setStrPersonID(data.stAdmData.szMISPersonID)
 
     val text = card.getTextBuilder
     data.pstText_Data.foreach{ item =>
