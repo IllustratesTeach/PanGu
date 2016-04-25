@@ -91,7 +91,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
            val value: String = json.getString("controlPursuitStatus")
            val colQuery = KeywordQuery.newBuilder
            colQuery.setValue(value)
-           queryBuilder.addQueryBuilder.setName("controlPursuitStatus").setExtension(KeywordQuery.query, colQuery.build)
+           queryBuilder.addQueryBuilder.setName("dataType").setExtension(KeywordQuery.query, colQuery.build)
            val dataInQuery = GroupQuery.newBuilder
            dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
          }
