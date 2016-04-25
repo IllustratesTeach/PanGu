@@ -11,7 +11,7 @@ import nirvana.hall.c.services.AncientData
 object gitempkg {
   val GBASE_ITEMPKG_MAGICSTRING = "<GAFIS50NetPackage>"
   val GBASE_ITEMPKG_ITEMMAGIC = "Item"
-  val GBASE_ITEMPKG_MAXSIZE = (256*1024*1024)
+  val GBASE_ITEMPKG_MAXSIZE = 256 * 1024 * 1024
 
 
   class GBASE_ITEMPKG_PKGHEADSTRUCT extends AncientData
@@ -65,7 +65,7 @@ object gitempkg {
   var pbnPkg_Data:Array[Byte] = _ // for pbnPkg pointer ,struct:UCHAR;	// pointer to package, whole format of package
   @Length(4)
   var bnRes_Pointer:Array[Byte] = _ ;
-    var nPkgLen:Int = _;
-    var nPkgBufLen:Int = _;
+    var nPkgLen:Int = _; //记录当前数据的总长度
+    var nPkgBufLen:Int = _; //记录了当前buffer的长度
   } // GBASE_ITEMPKG_OPSTRUCT;	// size is 16 bytes
 }

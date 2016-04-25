@@ -213,9 +213,10 @@ object gbasedef {
 
   /*
   final val STRUCT_CLEAR(cs) = memset(cs, 0, sizeof(cs))
-
-  final val GBASE_UTIL_ALIGN(a, = at)	((((a)+(at)-1)/(at))*(at))
   */
+
+
+  def GBASE_UTIL_ALIGN(a:Int, at:Int)= ((a + at - 1) / at) * at
 
   class GAKEYSTRUCT extends AncientData {
     @Length(32)
