@@ -8,12 +8,6 @@
 #include "../../../hall-image/c/src/jni/jni_helper.h"
 
 extern "C" void GAFIS_MntDispToMntStd(MNTDISPSTRUCT *pmnt, void *mnt);
-#define MAXTTFEASIZE 3320
-typedef struct {
-   FINGERMNTSTRUCT MNT;
-   unsigned char pTTFea[MAXTTFEASIZE];
-}FINGERMNTSTRUCT_NEWTT;
-extern "C" int GAFIS_Generate_MntNewTTFea( FINGERMNTSTRUCT* pMnt, FINGERMNTSTRUCT_NEWTT* pMntTTFea );
 
 
 
@@ -99,7 +93,15 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
   }
 }
 #ifdef LINUX
+//Linux下支持新的算法
 
+#define MAXTTFEASIZE 3320
+typedef struct {
+   FINGERMNTSTRUCT MNT;
+   unsigned char pTTFea[MAXTTFEASIZE];
+}FINGERMNTSTRUCT_NEWTT;
+extern "C" int GAFIS_Generate_MntNewTTFea( FINGERMNTSTRUCT* pMnt, FINGERMNTSTRUCT_NEWTT* pMntTTFea );
+extern "C" int GAFIS_ExtractMNT_All_NewTTFea(XGWMNTEXTRACTSTR *MntExtStr);
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
