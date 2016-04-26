@@ -84,9 +84,9 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      if(textSql != null){
        //文本查询
        val json = JSONObject.fromObject(textSql)
-       if(queryType == 0 || queryType == 2){
-         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
+       if(queryType == 0){
          //布控和追逃不比1.2亿
+         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
          if (json.has("controlPursuitStatus")) {
            val value: String = json.getString("controlPursuitStatus")
            val colQuery = KeywordQuery.newBuilder
@@ -95,8 +95,10 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
            val dataInQuery = GroupQuery.newBuilder
            dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
          }
-       }else if(queryType == 1 || queryType == 3){
-
+       }else if(queryType == 1){
+         //只比参与比对的现场指纹
+         val queryBuilder = matchTaskBuilder.getLDataBuilder.getTextQueryBuilder
+         queryBuilder.addQueryBuilder().setName("dataMatcher").setExtension(KeywordQuery.query, KeywordQuery.newBuilder().setValue("1").build());
        }
        //高级查询
        matchTaskBuilder.setConfig(getMatchConfig(textSql))

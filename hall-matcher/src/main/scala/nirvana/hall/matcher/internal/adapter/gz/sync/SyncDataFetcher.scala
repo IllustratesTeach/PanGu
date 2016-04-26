@@ -27,7 +27,7 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
    */
   def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     val from_ = getMinSeq(from)
-    if(from_ > 0 && from_ <= getMaxSeq()){
+    if(from_ > 0 && from_ <= getMaxSeq){
       JdbcDatabase.queryWithPsSetter(SYNC_SQL){ps=>
         ps.setLong(1, from_)
         ps.setLong(2, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
@@ -46,7 +46,7 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
    * 获取最大的seq值
    * @return
    */
-  private def getMaxSeq()(implicit dataSource: DataSource): Long ={
+  private def getMaxSeq(implicit dataSource: DataSource): Long ={
     getSeqBySql(MAX_SEQ_SQL)
   }
 
@@ -100,7 +100,7 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
       }
       dataSizeExpected += hallMatcherConfig.mnt.headerSize
       if (syncData.getData.size != dataSizeExpected || dataSizeExpected <= HallMatcherConstants.HEADER_LENGTH) {
-        error("MinutiaType:{} sid:{}  dataSize:{}", syncData.getMinutiaType, syncData.getObjectId,syncData.getData.size)
+        error("MinutiaType:{} isLatent:{} sid:{}  dataSize:{}", syncData.getMinutiaType, isLatent, syncData.getObjectId,syncData.getData.size)
         return false
       }
       true
