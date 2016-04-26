@@ -205,7 +205,12 @@ trait AncientData{
   }
 
   private def findReferenceLength(termSymbol:TermSymbol): Int={
-    val value = instanceMirror.reflectField(termSymbol).get
+    val value = termSymbol match{
+        case m:MethodSymbol =>
+          instanceMirror.reflectMethod(m).apply()
+        case other =>
+          instanceMirror.reflectField(termSymbol).get
+      }
     if (value == null) {
       0
     } else {

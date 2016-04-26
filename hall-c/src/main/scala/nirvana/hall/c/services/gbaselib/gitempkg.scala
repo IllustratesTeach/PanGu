@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gbaselib
 
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
+import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
 
 /**
@@ -21,7 +21,7 @@ object gitempkg {
   var szMagic:String = GBASE_ITEMPKG_MAGICSTRING;	// magic, must be '<GAFIS50NetPackage>'
   var nDataLen:Int = _ ;	// length of the whole package
   var nMajorVer:Short = 5 ;	// must be 5
-  var nMinorVer:Short = _ ;	// must be 0
+  var nMinorVer:Short = 0 ;	// must be 0
   var nPkgType:Int = _ ;	// type of package, used to identify type of package
   @Length(16)
   var szPkgTypeStr:String = _ ;	// pkg type string, used to identify type package
@@ -54,10 +54,18 @@ object gitempkg {
   class GBASE_ITEMPKG_ITEMSTRUCT extends AncientData
   {
     var stHead = new GBASE_ITEMPKG_ITEMHEADSTRUCT;
-    @Length(16)
+    @IgnoreTransfer
+    def bnResLength:Int = {
+       //采取对其的方式
+      val nlen =stHead.getDataSize + stHead.nItemLen
+      val nitemlen = gbasedef.GBASE_UTIL_ALIGN(nlen, 4);
+      nitemlen - stHead.getDataSize
+    }
+    @LengthRef("bnResLength")
     var bnRes:Array[Byte] = _ ;
   } // GBASE_ITEMPKG_ITEMSTRUCT;	// size >=48, must be multiple of 4
 
+  /*
   class GBASE_ITEMPKG_OPSTRUCT extends AncientData
   {
     var pbnPkg_Ptr:Int = _ //using 4 byte as pointer
@@ -68,4 +76,20 @@ object gitempkg {
     var nPkgLen:Int = _; //记录当前数据的总长度
     var nPkgBufLen:Int = _; //记录了当前buffer的长度
   } // GBASE_ITEMPKG_OPSTRUCT;	// size is 16 bytes
+  */
+
+  class GBASE_ITEMPKG_OPSTRUCT{
+    var head = new GBASE_ITEMPKG_HEADSTRUCT()
+    //TODO 实现head中关于长度的更新问题
+    private var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
+    def findItemByName(name:String)={
+      items.find(_.stHead.szItemName == name)
+    }
+    def addItem(item:GBASE_ITEMPKG_ITEMSTRUCT): Unit ={
+      items = items :+ item
+    }
+    def deleteItemByName(name:String): Unit ={
+      items = items.dropWhile(_.stHead.szItemName==name)
+    }
+  }
 }
