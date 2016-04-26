@@ -18,7 +18,7 @@ class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
   override val SYNC_SQL: String = "select p.sid, t.fgp, t.group_id, t.gather_data, t.seq, p.deletag " +
     " from gafis_gather_palm t " +
     " left join gafis_person p on t.person_id=p.personid " +
-    " where p.sid is not null and t.group_id=0 and t.fgp in (11,12) and t.seq > ? and t.seq <= ? order by t.seq"
+    " where t.group_id=0 and t.fgp in (11,12) and t.seq >= ? and t.seq <= ? order by t.seq"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
