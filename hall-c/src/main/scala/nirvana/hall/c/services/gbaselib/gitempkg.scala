@@ -102,7 +102,7 @@ object gitempkg {
 
   class GBASE_ITEMPKG_OPSTRUCT extends AncientData{
     var head = new GBASE_ITEMPKG_HEADSTRUCT()
-    private var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
+    private[gbaselib] var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
 
     /**
       * calculate data size and return.
@@ -136,7 +136,7 @@ object gitempkg {
       head.fromStreamReader(dataSource,encoding)
       var remainLength = head.nDataLen - head.getDataSize
       val itemHeadSize = new GBASE_ITEMPKG_ITEMHEADSTRUCT().getDataSize
-      if(remainLength > itemHeadSize){
+      while(remainLength > itemHeadSize){
         val item = new GBASE_ITEMPKG_ITEMSTRUCT
         item.fromStreamReader(dataSource,encoding)
         addItem(item,updateDataLength = false)
