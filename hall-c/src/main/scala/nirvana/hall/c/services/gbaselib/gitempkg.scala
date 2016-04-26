@@ -45,6 +45,25 @@ object gitempkg {
     var szMagic:String = GBASE_ITEMPKG_ITEMMAGIC ;		// must 'Item'
   } // GBASE_ITEMPKG_ITEMHEADSTRUCT;	// size is 48 bytes
 
+  /**
+
+  包结构说明:
+
+         __                                            __
+       / /  [ GBASE_ITEMPKG_HEADSTRUCT ]               \ \
+      | |   [GBASE_ITEMPKG_ITEMHEADSTRUCT   0]         | |
+     < <    [ITEM具体数据 0]                             > >
+      | |   [GBASE_ITEMPKG_ITEMHEADSTRUCT   N]         | |
+       \_\  [ITEM具体数据 N]                            /_/
+
+    注意：
+    1.head中的nDataLen是整个包的大小
+    2.ITEM的头和数据部分采取4字节对齐模式(已经内置处理)
+    3.Item中头中nItemLen的大小是实际数据类型大小，有可能实际的字节大于这个值，因为上面字节对齐问题，需要补充字节
+
+
+ */
+
   // format of package item
   // [ GBASE_ITEMPKG_ITEMHEADSTRUCT]
   // [    ... item data ...        ]
