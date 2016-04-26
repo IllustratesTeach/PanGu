@@ -1,7 +1,10 @@
 package nirvana.hall.c.services.gbaselib
 
+import java.nio.charset.Charset
+
 import nirvana.hall.c.annotations.{LengthRef, IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
 
 /**
  *
@@ -78,17 +81,59 @@ object gitempkg {
   } // GBASE_ITEMPKG_OPSTRUCT;	// size is 16 bytes
   */
 
-  class GBASE_ITEMPKG_OPSTRUCT{
+  class GBASE_ITEMPKG_OPSTRUCT extends AncientData{
     var head = new GBASE_ITEMPKG_HEADSTRUCT()
-    //TODO 实现head中关于长度的更新问题
     private var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
+
+    /**
+      * calculate data size and return.
+      *
+      * @return data size
+      */
+    override def getDataSize: Int = {
+      head.nDataLen
+    }
+
+
+    /**
+      * serialize to channel buffer
+      *
+      * @param stream netty channel buffer
+      */
+    override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
+      head.writeToStreamWriter(stream,encoding)
+      items.foreach(_.writeToStreamWriter(stream,encoding))
+    }
+
+
+    /**
+      * convert channel buffer data as object
+      *
+      * @param dataSource netty channel buffer
+      */
+    override def fromStreamReader(dataSource: StreamReader, encoding: Charset): GBASE_ITEMPKG_OPSTRUCT.this.type = {
+      head.fromStreamReader(dataSource,encoding)
+      var remainLength = head.nDataLen - head.getDataSize
+      val itemHeadSize = new GBASE_ITEMPKG_ITEMHEADSTRUCT().getDataSize
+      if(remainLength > itemHeadSize){
+        val item = new GBASE_ITEMPKG_ITEMSTRUCT
+        item.fromStreamReader(dataSource,encoding)
+        addItem(item,updateDataLength = false)
+        remainLength -= item.getDataSize
+      }
+    }
+
     def findItemByName(name:String)={
       items.find(_.stHead.szItemName == name)
     }
-    def addItem(item:GBASE_ITEMPKG_ITEMSTRUCT): Unit ={
+    def addItem(item:GBASE_ITEMPKG_ITEMSTRUCT,updateDataLength:Boolean=true): Unit ={
       items = items :+ item
+      if(updateDataLength)
+        head.nDataLen += item.getDataSize
     }
     def deleteItemByName(name:String): Unit ={
+      //先更新头文件里面的数据长度
+      items.takeWhile(_.stHead.szItemName == name).foreach(head.nDataLen -= _.getDataSize)
       items = items.dropWhile(_.stHead.szItemName==name)
     }
   }
