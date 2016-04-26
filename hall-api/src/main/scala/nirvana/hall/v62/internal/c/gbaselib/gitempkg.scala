@@ -1,7 +1,6 @@
 package nirvana.hall.v62.internal.c.gbaselib
 
-import nirvana.hall.c.services.gbaselib.gitempkg
-import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_ITEMSTRUCT, GBASE_ITEMPKG_OPSTRUCT}
+import nirvana.hall.c.services.gbaselib.gitempkg._
 
 /**
   * gitem package
@@ -31,13 +30,13 @@ trait gitempkg {
   def GBASE_ITEMPKG_IsValidHead(pstPkg:GBASE_ITEMPKG_OPSTRUCT )
   {
     val ph = pstPkg.head
-    if ( ph.szMagic!=gitempkg.GBASE_ITEMPKG_MAGICSTRING ||
+    if ( ph.szMagic!=GBASE_ITEMPKG_MAGICSTRING ||
       ph.nMajorVer!=5 || ph.nMinorVer != 0)
       throw new IllegalArgumentException("Item package is invalid")
   }
   def GBASE_ITEMPKG_IsValidItem(pstItem:GBASE_ITEMPKG_ITEMHEADSTRUCT)
   {
-    if ( pstItem.szMagic!=gitempkg.GBASE_ITEMPKG_ITEMMAGIC )
+    if ( pstItem.szMagic!=GBASE_ITEMPKG_ITEMMAGIC )
       throw new IllegalArgumentException("Item package is invalid")
   }
   def GBASE_ITEMPKG_AddItemEx(pstPkg:GBASE_ITEMPKG_OPSTRUCT,
@@ -47,7 +46,6 @@ trait gitempkg {
   {
     val item = new GBASE_ITEMPKG_ITEMSTRUCT
     GBASE_ITEMHEAD_Init(item.stHead, pszName, nItemType);
-    val nDataLen = pData.length
     item.stHead.nItemLen = pData.length
     item.bnRes = pData
     pstPkg.addItem(item)
