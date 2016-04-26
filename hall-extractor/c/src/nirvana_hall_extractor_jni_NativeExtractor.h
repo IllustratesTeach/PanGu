@@ -10,18 +10,18 @@ extern "C" {
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ExtractMNT_All
- * Signature: ([B[BBBB)V
+ * Signature: ([B[B[BBBB)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1All
-  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyteArray,jbyte, jbyte, jbyte);
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ExtractMNT_AllWithNewFeature
- * Signature: ([B[BBBB)V
+ * Signature: ([B[B[BBBB)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMNT_1AllWithNewFeature
-  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyteArray,jbyte, jbyte, jbyte);
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jbyteArray, jbyte, jbyte, jbyte);
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
@@ -29,6 +29,14 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
  * Signature: ([B[B)V
  */
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFPTLatentMNT2Std
+  (JNIEnv *, jclass, jbyteArray, jbyteArray);
+
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    ConvertMntOldToNew
+ * Signature: ([B[B)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertMntOldToNew
   (JNIEnv *, jclass, jbyteArray, jbyteArray);
 
 #ifdef __cplusplus

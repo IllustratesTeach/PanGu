@@ -25,4 +25,11 @@ public class NativeExtractor{
                                              byte ExtractMode,
                                              byte belatent);
     public static native void ConvertFPTLatentMNT2Std(byte[] dispMnt, byte[] stdMnt);
+
+    /**
+     * 转换特征
+     * @param oldMnt 老的特征,不带头，结构为:FINGERMNTSTRUCT
+     * @param newMnt 新的特征，不带头，结构为:FINGERMNTSTRUCT_NEWTT
+     */
+    public static native void ConvertMntOldToNew(byte[] oldMnt,byte[] newMnt);
 }

@@ -8,6 +8,14 @@
 #include "../../../hall-image/c/src/jni/jni_helper.h"
 
 extern "C" void GAFIS_MntDispToMntStd(MNTDISPSTRUCT *pmnt, void *mnt);
+#define MAXTTFEASIZE 3320
+typedef struct {
+   FINGERMNTSTRUCT MNT;
+   unsigned char pTTFea[MAXTTFEASIZE];
+}FINGERMNTSTRUCT_NEWTT;
+extern "C" int GAFIS_Generate_MntNewTTFea( FINGERMNTSTRUCT* pMnt, FINGERMNTSTRUCT_NEWTT* pMntTTFea );
+
+
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
@@ -139,5 +147,29 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
     SWIG_JavaThrowExceptionByCode(jenv,SWIG_JavaArithmeticException,ret);
   }
 }
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertMntOldToNew
+  (JNIEnv *jenv, jclass, jbyteArray old_mnt_bytes, jbyteArray new_mnt_bytes){
+    if(old_img_bytes == NULL){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"old mn bytes is null");
+      return;
+    }
+    if(new_mnt_bytes == NULL){
+      SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"new mnt bytes is null");
+      return;
+    }
+     UCHAR* old_mnt_data = (UCHAR*)jenv->GetByteArrayElements(old_mnt_bytes,JNI_FALSE);
+     FINGERMNTSTRUCT* old_mnt = (FINGERMNTSTRUCT*)old_mnt_data;
+
+     UCHAR* new_mnt_data = (UCHAR*)jenv->GetByteArrayElements(new_mnt_bytes,JNI_FALSE);
+     FINGERMNTSTRUCT_NEWTT* new_mnt = (FINGERMNTSTRUCT_NEWTT*)new_mnt_data;
+
+     int ret = GAFIS_Generate_MntNewTTFea(old_mnt,new_mnt)
+    jenv->ReleaseByteArrayElements(old_mnt_bytes, (jbyte *) old_mnt_data, JNI_ABORT);
+    jenv->ReleaseByteArrayElements(new_mnt_bytes, (jbyte *) new_mnt_data, 0);
+  if(ret != 1){//success
+    SWIG_JavaThrowExceptionByCode(jenv,SWIG_JavaArithmeticException,ret);
+  }
+}
+
 #endif
 
