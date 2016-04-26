@@ -122,6 +122,8 @@ object gitempkg {
     override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
       head.writeToStreamWriter(stream,encoding)
       items.foreach(_.writeToStreamWriter(stream,encoding))
+
+      stream
     }
 
 
@@ -140,6 +142,8 @@ object gitempkg {
         addItem(item,updateDataLength = false)
         remainLength -= item.getDataSize
       }
+
+      this
     }
 
     def findItemByName(name:String)={

@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gbaselib
 
-import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_ITEMSTRUCT
+import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_OPSTRUCT, GBASE_ITEMPKG_ITEMSTRUCT}
 import org.junit.{Assert, Test}
 
 /**
@@ -13,7 +13,14 @@ class gitempkgTest {
   def test_length: Unit ={
     val item = new GBASE_ITEMPKG_ITEMSTRUCT
     item.stHead.nItemLen = 100
-    Assert.assertEquals(item.toByteArray().length,item.stHead.getDataSize+100)
+    val itemLength  = item.stHead.getDataSize+100
+    Assert.assertEquals(item.toByteArray().length,itemLength)
+
+    val pkg = new GBASE_ITEMPKG_OPSTRUCT
+    pkg.head.nDataLen = pkg.head.getDataSize
+    pkg.addItem(item)
+
+    Assert.assertEquals(itemLength+pkg.head.getDataSize,pkg.head.nDataLen)
   }
 
 }
