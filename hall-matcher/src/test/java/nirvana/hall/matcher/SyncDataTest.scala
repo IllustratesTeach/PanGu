@@ -16,14 +16,15 @@ import org.junit.{Assert, Test}
  */
 class SyncDataTest {
 
-  val url = "http://10.1.6.247:9003"
+//  val url = "http://10.1.6.247:9003"
+  val url = "http://127.0.0.1:9003"
   @Test
   def testSyncData(): Unit ={
      val syncUrl = url+"/syncData"
     val request = SyncDataRequest.newBuilder()
     val response = SyncDataResponse.newBuilder()
     request.setSize(100)
-    request.setSyncDataType(SyncDataType.TEMPLATE_FINGER)
+    request.setSyncDataType(SyncDataType.PERSON)
     var timestamp:Long = 0
     var total = 0
     (1 to 3).foreach{i=>

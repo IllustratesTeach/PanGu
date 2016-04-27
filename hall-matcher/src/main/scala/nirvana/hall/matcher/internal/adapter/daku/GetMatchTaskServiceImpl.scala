@@ -19,7 +19,7 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchTaskService{
    /** 获取比对任务  */
-   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0 and t.deletag=1 order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0 and t.deletag=1 and t.mic is not null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
    /** 获取sid根据卡号（人员编号） */
    private val GET_SID_BY_PERSONID: String = "select t.sid as ora_sid from gafis_person t where t.personid=?"
    /** 获取sid根据卡号（现场指纹） */
@@ -35,7 +35,14 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      JdbcDatabase.queryWithPsSetter(MATCH_TASK_QUERY) { ps =>
        ps.setInt(1, size)
      } { rs =>
-       matchTaskQueryResponse.addMatchTask(readMatchTask(rs))
+       val oraSid = rs.getString("ora_sid")
+       try {
+         matchTaskQueryResponse.addMatchTask(readMatchTask(rs))
+       }
+       catch {
+         case e: Exception =>
+           updateMatchStatusFail(oraSid, e.getMessage)
+       }
      }
      matchTaskQueryResponse.build()
    }
@@ -139,15 +146,22 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
        }
        catch {
          case e: Exception => {
-           e.printStackTrace()
+           throw new RuntimeException("getMatchConfig error")
          }
        }
      }
      return builder.build
    }
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
-    JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status=1 where t.ora_sid=?"){ps=>
+    JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status=1, t.begintime=sysdate where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
+    }
+  }
+  private def updateMatchStatusFail(match_id: String, message: String) {
+    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1, message)
+      ps.setString(2, match_id)
     }
   }
  }

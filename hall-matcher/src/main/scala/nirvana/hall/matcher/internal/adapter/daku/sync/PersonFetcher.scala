@@ -17,7 +17,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.data_type, t.data_in  from gafis_person t  where t.seq >= ? and t.seq <= ? order by t.seq"
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.data_type, t.data_in  from gafis_person t  where t.seq >= ? and t.seq <= ? order by t.seq"
 
    /**
     * 读取人员信息
@@ -45,7 +45,6 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
          if (validSyncData(syncDataBuilder.build, false)) {
             syncDataResponse.addSyncData(syncDataBuilder.build)
          }
-
       }
    }
  }
