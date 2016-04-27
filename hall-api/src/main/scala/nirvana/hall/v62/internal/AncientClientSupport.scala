@@ -5,9 +5,11 @@ import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.services.{ChannelOperator, GafisException, V62ServerAddress}
+import org.jboss.netty.buffer.ChannelBuffer
 
 /**
- * provide AncientClient instance
+  * provide AncientClient instance
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-02
  */
@@ -33,6 +35,7 @@ trait AncientClientSupport {
 
   /**
    * validate the response from server
+ *
    * @param response response object
    * @param channel server channel
    */
@@ -77,11 +80,17 @@ trait AncientClientSupport {
   protected def  NETOP_SENDDATA[R <: AncientData](channel:ChannelOperator,data:R): Unit ={
     channel.writeMessage[NoneResponse](data)
   }
+  protected def  NETOP_SENDDATA(channel:ChannelOperator,data:Array[Byte]): Unit ={
+    channel.writeByteArray[NoneResponse](data)
+  }
   protected def NETOP_RECVANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
     channel.receive(pAns)
   }
   protected def NETOP_RECVDATA[R <: AncientData](channel:ChannelOperator,target:R): R={
     channel.receive[R](target)
+  }
+  protected def NETOP_RECVDATA(channel:ChannelOperator,length:Int): ChannelBuffer ={
+    channel.receiveByteArray(length)
   }
   protected def NETOP_RETVAL_LT_FIN(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT):Unit={
     validateResponse(channel,pAns)
