@@ -5,6 +5,7 @@ import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal._
+import nirvana.hall.v62.internal.proxy.GbaseProxyServer
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.Startup
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub

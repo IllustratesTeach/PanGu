@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal
+package nirvana.hall.v62.internal.proxy
 
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT

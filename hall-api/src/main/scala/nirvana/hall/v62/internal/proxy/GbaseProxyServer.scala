@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal
+package nirvana.hall.v62.internal.proxy
 
 import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicInteger

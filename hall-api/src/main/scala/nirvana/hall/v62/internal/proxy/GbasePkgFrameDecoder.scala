@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal
+package nirvana.hall.v62.internal.proxy
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import org.jboss.netty.buffer.ChannelBuffer
