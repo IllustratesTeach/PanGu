@@ -80,7 +80,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
        if(micStruct.bIsLatent == 1){
          val ldata = matchTaskBuilder.getLDataBuilder
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-         if(micStruct.pstBin_Data != null)
+         if(micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
