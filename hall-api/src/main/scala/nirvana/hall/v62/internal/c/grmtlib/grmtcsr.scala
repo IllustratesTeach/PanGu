@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.v62.internal.c.gnetlib.gnetcsr
+import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
 
 /**
   * 远程通信服务器的客户端程序
@@ -12,7 +12,7 @@ import nirvana.hall.v62.internal.c.gnetlib.gnetcsr
   * @since 2016-04-27
   */
 trait grmtcsr {
-  this:AncientClientSupport with gnetcsr =>
+  this:AncientClientSupport with gnetcsr with reqansop =>
   def GAFIS_RMTLIB_SendPkg(pstPkg:GBASE_ITEMPKG_OPSTRUCT){
     executeInChannel{channelOperator=>
       val dataLen = pstPkg.head.nDataLen

@@ -21,6 +21,7 @@ class V62Facade(config:HallV62Config)
   with nettable
   with gnetfunc
   with AncientClientSupport
+  with reqansop
   with LoggerSupport{
   private val address = V62ServerAddress(config.host,config.port,
     config.connectionTimeoutSecs,config.readTimeoutSecs,config.user,Option(config.password))

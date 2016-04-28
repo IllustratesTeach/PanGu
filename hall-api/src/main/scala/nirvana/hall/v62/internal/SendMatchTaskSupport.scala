@@ -4,22 +4,24 @@ import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.GADB_RETVAL
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ghpcbase.gnopcode._
-import nirvana.hall.c.services.GADB_RETVAL
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
-import nirvana.hall.v62.services.{ChannelOperator, SelfMatchTask, V62ServerAddress}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
+import nirvana.hall.v62.services.{SelfMatchTask, V62ServerAddress}
 
 /**
  * send match task support
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-02
  */
 @deprecated(message = "use ganetqry method instead of")
 trait SendMatchTaskSupport {
-  this:AncientClientSupport with LoggerSupport =>
+  this:AncientClientSupport with LoggerSupport with reqansop with gnetcsr=>
 
   def queryMatchResult(address:V62ServerAddress,sid:Long):Unit ={
     executeInChannel{channel=>
@@ -188,49 +190,6 @@ trait SendMatchTaskSupport {
       channel.receive[GADB_RETVAL]()
     }.toArray
   }
-  private def GAFIS_NETSCR_SendQueryInfo(channel:ChannelOperator, pstQry:GAQUERYSTRUCT)
-  {
-
-
-    val ncandhead = pstQry.nCandHeadLen
-    val ncand = pstQry.nCandLen
-    val nqrycond = pstQry.nQryCondLen
-    val nMicCount = pstQry.nMICCount;
-    val nSvrListLen = pstQry.nSvrListLen;
-    val nMisCondLen = pstQry.nMISCondLen;
-    val nTxtSqlLen = pstQry.nTextSqlLen;
-    val nCommentLen = pstQry.nCommentLen;	// comment length.
-  val nqryinfolen = pstQry.nQryInfoLen;
-
-    if ( ncand<=0 && ncandhead<=0 && nqrycond<=0 && nMicCount<=0 && nSvrListLen<=0 &&
-      nMisCondLen<=0 && nTxtSqlLen<=0 && nCommentLen<=0 && nqryinfolen<=0 ) {
-      //throw new IllegalArgumentException("data is null");
-    }
-    val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstQry)
-    validateResponse(channel,response)
-
-    if( nMicCount > 0)
-    {
-      pstQry.pstMIC_Data.foreach(channel.writeMessage[NoneResponse](_))
-      pstQry.pstMIC_Data.foreach(GAFIS_NETSCR_SendMICStruct(channel,_))
-    }
-    if( nSvrListLen > 0 )
-      channel.writeByteArray(pstQry.pstSvrList_Data,0,nSvrListLen);
-
-    if ( ncandhead >0)
-      channel.writeMessage[NoneResponse](pstQry.pstCandHead_Data)
-    if ( ncand >0 )
-      pstQry.pstCand_Data.foreach(channel.writeMessage[NoneResponse](_))
-
-    if ( nqrycond>0 ) {
-      channel.writeByteArray[NoneResponse](pstQry.pstQryCond_Data,0,nqrycond)
-    }
-    if ( nMisCondLen>0 ) {
-      channel.writeByteArray[NoneResponse]( pstQry.pstMISCond_Data, 0,nMisCondLen)
-    }
-    if ( nTxtSqlLen>0 ) channel.writeByteArray[NoneResponse]( pstQry.pstTextSql_Data, 0,nTxtSqlLen);
-    if ( nCommentLen>0 ) channel.writeByteArray[NoneResponse]( pstQry.pszComment_Data, 0,nCommentLen);
-  }
 
   def sendMatchTask(address:V62ServerAddress,task:SelfMatchTask): Long ={
     executeInChannel{channel=>
@@ -290,7 +249,8 @@ trait SendMatchTaskSupport {
   }
   /**
    * 转换6个字节成long
-   * @param bytes 待转换的六个字节
+    *
+    * @param bytes 待转换的六个字节
    * @return 转换后的long数字
    */
   def convertSixByteArrayToLong(bytes: Array[Byte]): Long = {

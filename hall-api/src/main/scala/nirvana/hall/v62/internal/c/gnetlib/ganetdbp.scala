@@ -11,7 +11,7 @@ import nirvana.hall.v62.internal.AncientClientSupport
  * @since 2015-11-10
  */
 trait ganetdbp {
-  this:AncientClientSupport =>
+  this:AncientClientSupport with reqansop=>
 
   def NET_GAFIS_SYS_GetDBByID(nDBID:Short,nOption:Int=0):GADBPROPSTRUCT=executeInChannel {channel=>
     val pReq = new GNETREQUESTHEADOBJECT

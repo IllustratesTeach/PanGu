@@ -11,7 +11,7 @@ import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUE
  * @since 2015-11-24
  */
 trait nettable {
-    this:AncientClientSupport with gnetcsr =>
+    this:AncientClientSupport with gnetcsr with reqansop=>
 
   def NET_GAFIS_TABLE_Select(nDBID:Short,nTID:Short,pstRes:GADB_SELRESULT,pstStmt:GADB_SELSTATEMENT):Unit=  executeInChannel{channel=>
 

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{Case, FingerFgp, LPCard, TPCard}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.services.{DatabaseTable, V62ServerAddress}
 import org.junit.Test
 
@@ -143,7 +144,7 @@ class DataSyncSupportTest {
     sync.deleteLatentData(address,DatabaseTable(2,2),lpCard.getStrCardID)
   }
   private def createSender():DataSyncSupport={
-    new DataSyncSupport with AncientClientSupport with LoggerSupport{
+    new DataSyncSupport with AncientClientSupport with LoggerSupport with reqansop with gnetcsr{
 
       override def serverAddress: V62ServerAddress = address
     }

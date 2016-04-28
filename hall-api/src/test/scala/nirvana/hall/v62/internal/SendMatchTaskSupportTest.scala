@@ -8,6 +8,7 @@ import nirvana.hall.c.services.gloclib.{glocdef, gaqryque}
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.services.AncientEnum.MatchType
 import nirvana.hall.v62.services._
 import org.apache.commons.io.IOUtils
@@ -228,7 +229,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
     Assert.assertTrue(sid> 0)
   }
   private def createSender():SendMatchTaskSupport={
-    new SendMatchTaskSupport with AncientClientSupport with LoggerSupport{
+    new SendMatchTaskSupport with AncientClientSupport with LoggerSupport with reqansop with gnetcsr{
 
       override def serverAddress: V62ServerAddress = address
     }

@@ -6,16 +6,18 @@ import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
 import nirvana.hall.v62.services.{ChannelOperator, DatabaseTable, V62ServerAddress}
 
 /**
  * provide data sync function
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-03
  */
 @deprecated(message = "use gnetflib method instead of")
 trait DataSyncSupport {
-  this:LoggerSupport with AncientClientSupport =>
+  this:LoggerSupport with AncientClientSupport with gnetcsr with reqansop=>
 
   //change header data
   private type HeaderDataModifier = GNETREQUESTHEADOBJECT => Unit
@@ -33,7 +35,8 @@ trait DataSyncSupport {
   private case class V62OperateOptions(opClass:Int,opCode:Int,func:DataWriter)
   /**
    * send case data to v6.2 system
-   * @param databaseTable database define
+    *
+    * @param databaseTable database define
    * @param protoCase case data based on protobuf
    */
   def addCaseData(serverAddress:V62ServerAddress,databaseTable: DatabaseTable,protoCase:Case): Unit ={
@@ -46,7 +49,8 @@ trait DataSyncSupport {
 
   /**
    * update case data
-   * @param serverAddress v6.2 server address
+    *
+    * @param serverAddress v6.2 server address
    * @param databaseTable database table of case
    * @param protoCase case object
    */
@@ -60,7 +64,8 @@ trait DataSyncSupport {
 
   /**
    * delete case by caseId
-   * @param serverAddress server address of v6.2
+    *
+    * @param serverAddress server address of v6.2
    * @param databaseTable database table of case
    * @param caseId case id
    */
@@ -74,6 +79,7 @@ trait DataSyncSupport {
 
   /**
     * update template data
+    *
     * @param address server address
     * @param databaseTable database table
     * @param card template data
@@ -88,7 +94,8 @@ trait DataSyncSupport {
 
   /**
    * add template data to 6.2
-   * @param address server address
+    *
+    * @param address server address
    * @param databaseTable database table
    * @param card template data
    */
@@ -102,7 +109,8 @@ trait DataSyncSupport {
 
   /**
    * delete template data
-   * @param address server address
+    *
+    * @param address server address
    * @param databaseTable database table of template
    * @param key card id number
    */
@@ -117,7 +125,8 @@ trait DataSyncSupport {
 
   /**
    * update latenet data
-   * @param address server address
+    *
+    * @param address server address
    * @param databaseTable database table
    * @param card latent card 
    */
@@ -131,7 +140,8 @@ trait DataSyncSupport {
 
   /**
    * add latent data to 6.2
-   * @param address server address
+    *
+    * @param address server address
    * @param databaseTable database table
    * @param card latent card
    */
@@ -145,7 +155,8 @@ trait DataSyncSupport {
 
   /**
    * delete latent
-   * @param address server address
+    *
+    * @param address server address
    * @param databaseTable database table
    * @param key key of latent data
    */

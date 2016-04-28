@@ -21,7 +21,21 @@ import scala.collection.mutable
  * @since 2015-11-10
  */
 trait gnetcsr {
-  this: AncientClientSupport =>
+  this: AncientClientSupport with reqansop =>
+  protected def GAFIS_NETSCR_RecvMICStruct(channel:ChannelOperator,mic:GAFISMICSTRUCT):Unit={
+    // we assume we know the exact size and the memory has been allocated
+    if ( mic.nMntLen >0 ) mic.pstMnt_Data = channel.receiveByteArray(mic.nMntLen).array()
+    if ( mic.nImgLen >0 ) mic.pstImg_Data = channel.receiveByteArray(mic.nImgLen).array()
+    if ( mic.nCprLen >0 ) mic.pstCpr_Data = channel.receiveByteArray(mic.nCprLen).array()
+    if ( mic.nBinLen >0 ) mic.pstBin_Data = channel.receiveByteArray(mic.nBinLen).array()
+  }
+  protected def GAFIS_NETSCR_SendMICStruct(channel:ChannelOperator,mic:GAFISMICSTRUCT): Unit ={
+    if(mic.nMntLen > 0) channel.writeByteArray[NoneResponse](mic.pstMnt_Data)
+    if(mic.nImgLen > 0) channel.writeByteArray[NoneResponse](mic.pstImg_Data)
+    if(mic.nCprLen > 0) channel.writeByteArray[NoneResponse](mic.pstCpr_Data)
+    if(mic.nBinLen > 0) channel.writeByteArray[NoneResponse](mic.pstBin_Data)
+  }
+
   def GAFIS_NETSCR_RecvCaseInfo(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT):GCASEINFOSTRUCT={
     val pstCase = channel.receive[GCASEINFOSTRUCT]()
     val nfing = pstCase.nFingerCount;

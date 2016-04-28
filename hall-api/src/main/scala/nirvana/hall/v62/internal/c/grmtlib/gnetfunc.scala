@@ -4,7 +4,7 @@ import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.gserver.RMTSERVERSTRUCT
 import nirvana.hall.c.services.grmtlib.grmtcode._
-import nirvana.hall.v62.internal.c.gnetlib.gnetcsr
+import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
 
 /**
  *
@@ -12,7 +12,7 @@ import nirvana.hall.v62.internal.c.gnetlib.gnetcsr
  * @since 2015-11-24
  */
 trait gnetfunc {
-  this:AncientClientSupport with gnetcsr =>
+  this:AncientClientSupport with gnetcsr with reqansop =>
   def NET_GAFIS_RMTLIB_SERVER_Add(nDBID:Short, nTableID:Short, pServer:RMTSERVERSTRUCT, nOption:Int = 0):Unit=
     executeInChannel{pstCon=>
       val pReq = new GNETREQUESTHEADOBJECT

@@ -11,7 +11,7 @@ import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
  * @since 2015-11-10
  */
 trait ganetlp {
-  this:AncientClientSupport with gnetcsr =>
+  this:AncientClientSupport with gnetcsr with reqansop=>
   def NET_GAFIS_CASE_Del(nDBID:Short,nTableID:Short,pszKey:String,nOption:Int = 0):Unit=executeInChannel{channel=>
     val pReq = createRequestHeader
 

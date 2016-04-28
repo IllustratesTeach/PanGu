@@ -17,7 +17,7 @@ import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
  * @since 2015-11-10
  */
 trait gnetflib {
-  this:AncientClientSupport with gnetcsr with ganetdbp =>
+  this:AncientClientSupport with gnetcsr with ganetdbp with reqansop=>
 
   object Action extends Enumeration{
     type tpe = Value

@@ -15,7 +15,7 @@ import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
  * @since 2015-11-10
  */
 trait ganetqry {
-  this:AncientClientSupport with gnetcsr =>
+  this:AncientClientSupport with gnetcsr with reqansop=>
   def NET_GAFIS_QUERY_Get(
     nDBID:Short,
     nTableID:Short,
