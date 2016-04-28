@@ -19,7 +19,7 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchTaskService{
    /** 获取比对任务  */
-   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0 and t.deletag=1 and t.mic is not null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0 and t.deletag=1 order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
    /** 获取sid根据卡号（人员编号） */
    private val GET_SID_BY_PERSONID: String = "select t.sid as ora_sid from gafis_person t where t.personid=?"
    /** 获取sid根据卡号（现场指纹） */
@@ -158,7 +158,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
     }
   }
   private def updateMatchStatusFail(match_id: String, message: String) {
-    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, message)
       ps.setString(2, match_id)

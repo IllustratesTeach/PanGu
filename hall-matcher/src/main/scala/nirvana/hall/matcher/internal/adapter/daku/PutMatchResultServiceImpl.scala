@@ -71,7 +71,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
   }
 
   private def updateMatchStatusFail(match_id: String, status: MatcherStatus) {
-    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, status.getMsg)
       ps.setString(2, match_id)
