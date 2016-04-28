@@ -13,7 +13,7 @@ trait gitempkg {
 //  #define	GBASE_ITEMPKG_ITEMMAGIC		"Item"
   final val GBASE_ITEMPKG_MAXSIZE		= 256 * 1024 * 1024
 
-  def GBASE_ITEMPKG_New(nEstimateSize:Int):GBASE_ITEMPKG_OPSTRUCT=
+  def GBASE_ITEMPKG_New:GBASE_ITEMPKG_OPSTRUCT=
   {
     val result = new GBASE_ITEMPKG_OPSTRUCT
     result.head.nDataLen = result.head.getDataSize
