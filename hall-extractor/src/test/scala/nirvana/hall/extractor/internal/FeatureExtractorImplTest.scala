@@ -5,7 +5,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
@@ -20,8 +20,8 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val imgData = getClass.getResourceAsStream("/bmp.bmp")
 
     val extractor = new FeatureExtractorImpl
-    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
-    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData)
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V2)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
   }

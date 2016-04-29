@@ -5,6 +5,7 @@ import java.io.{File, FileInputStream}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
 import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
@@ -24,7 +25,12 @@ class FPTLatentConverterTest extends BaseJniTest{
     val headL = fpt4.logic03Recs.head.fingers.head
     val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(headL)
     val latentFeature = FPTLatentConverter.convert(disp)
+    val mnt = new GAFISIMAGESTRUCT()
+    mnt.bnData = latentFeature.toByteArray()
+    mnt.stHead.nImgSize = 640
+
     latentFeature.nWidth
+    print(mnt.getDataSize)
     val latent2 = new FINGERLATMNTSTRUCT()
     val fis = new FileInputStream(new File("/Users/jcai/Downloads/650000000999210005000201.mnt"))
     fis.skip(64)

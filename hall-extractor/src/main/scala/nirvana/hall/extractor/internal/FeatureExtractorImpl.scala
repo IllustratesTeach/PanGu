@@ -3,7 +3,7 @@ package nirvana.hall.extractor.internal
 import java.awt.Image
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{File, ByteArrayInputStream, InputStream}
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
@@ -17,6 +17,7 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
+import org.apache.commons.io.{IOUtils, FileUtils}
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -44,9 +45,9 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val imgData = img.toByteArray()
     val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType,newFeatureTry)
 
-    new GAFISIMAGESTRUCT().fromByteArray(mntData)
+    new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
   }
-  override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Array[Byte]= {
+  override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Option[(Array[Byte],Array[Byte])]= {
     val image = readByteArrayAsGAFISIMAGE(is)
     val originalImgData = image.toByteArray()
     val imgHead = image.stHead
@@ -83,12 +84,22 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val mntData = mntBuffer.array()
 
-    if(newFeature)
-      NativeExtractor.ExtractMNT_AllWithNewFeature(originalImgData,mntData, null,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
-    else
-      NativeExtractor.ExtractMNT_All(originalImgData,mntData, null,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+    val sbinHead = new GAFISIMAGEHEADSTRUCT
+    val binBuffer = ChannelBuffers.buffer(20480)
+    sbinHead.writeToStreamWriter(binBuffer)
+    val binData = binBuffer.array()
 
-    mntData
+    if(newFeature)
+      NativeExtractor.ExtractMNT_AllWithNewFeature(originalImgData,mntData, binData,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+    else
+      NativeExtractor.ExtractMNT_All(originalImgData,mntData, binData,fingerPos.getNumber.toByte, 0.toByte,isLatent.toByte)
+    sbinHead.fromByteArray(binData)
+    val bin = ChannelBuffers.buffer(sbinHead.nImgSize+64)
+    val sbinData = bin.array()
+    System.arraycopy(binData,0,sbinData,0,sbinHead.nImgSize+64)
+    //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\mnt.mnt"),mntData)
+    //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\bin.bin"),sbinData)
+    Some((mntData,binData))
   }
   private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
     val img = ImageIO.read(imgData)

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{RpcServerMessageFilter, CommandResponse, RpcServerMessageHandler}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
 import nirvana.hall.protocol.extract.LatentConverterExtractProto.{LatentConverterExtractResponse, LatentConverterExtractRequest}
 
@@ -31,9 +32,11 @@ class LatentConverterExtractRequestFilter extends RpcServerMessageFilter {
 
       val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(fingerLData)
       val latentFeature = FPTLatentConverter.convert(disp)
-
+      val mnt = new GAFISIMAGESTRUCT()
+      mnt.bnData = latentFeature.toByteArray()
+      mnt.stHead.nImgSize = 640
       val extractResponseBuilder = LatentConverterExtractResponse.newBuilder()
-      extractResponseBuilder.setMntData(ByteString.copyFrom(latentFeature.toByteArray()))
+      extractResponseBuilder.setMntData(ByteString.copyFrom(mnt.toByteArray()))
       response.writeMessage(commandRequest,LatentConverterExtractResponse.cmd,extractResponseBuilder.build())
 
       true

@@ -34,5 +34,5 @@ trait FeatureExtractor {
   def extractByGAFISIMGBinary(imgData:InputStream,
                         fingerPos:FingerPosition,
                         featureType:FeatureType,
-                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):Array[Byte]
+                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):Option[(Array[Byte],Array[Byte])]
 }

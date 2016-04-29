@@ -21,7 +21,8 @@ class ExtractRequestFilter(extractor:FeatureExtractor) extends RpcServerMessageF
         extractRequest.getFeatureTry)
 
       val extractResponseBuilder = ExtractResponse.newBuilder()
-      extractResponseBuilder.setMntData(ByteString.copyFrom(mntData))
+      extractResponseBuilder.setMntData(ByteString.copyFrom(mntData.get._1))
+      extractResponseBuilder.setBinData(ByteString.copyFrom(mntData.get._2))
       response.writeMessage(commandRequest,ExtractResponse.cmd,extractResponseBuilder.build())
 
       true
