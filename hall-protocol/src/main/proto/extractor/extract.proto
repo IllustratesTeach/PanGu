@@ -51,4 +51,5 @@ message ExtractResponse {
     optional ExtractResponse cmd = 10004;
   }
   optional bytes mnt_data = 1;
+  optional bytes bin_data = 2;
 }
