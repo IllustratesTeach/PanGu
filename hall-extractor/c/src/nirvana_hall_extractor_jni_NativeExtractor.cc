@@ -166,7 +166,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertMn
      UCHAR* new_mnt_data = (UCHAR*)jenv->GetByteArrayElements(new_mnt_bytes,JNI_FALSE);
      FINGERMNTSTRUCT_NEWTT* new_mnt = (FINGERMNTSTRUCT_NEWTT*)new_mnt_data;
 
-     int ret = GAFIS_Generate_MntNewTTFea(old_mnt,new_mnt)
+     int ret = GAFIS_Generate_MntNewTTFea(old_mnt,new_mnt);
     jenv->ReleaseByteArrayElements(old_mnt_bytes, (jbyte *) old_mnt_data, JNI_ABORT);
     jenv->ReleaseByteArrayElements(new_mnt_bytes, (jbyte *) new_mnt_data, 0);
   if(ret != 1){//success
