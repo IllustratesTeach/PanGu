@@ -1,12 +1,8 @@
 package nirvana.hall.c.services.gloclib
 
-import java.nio.charset.Charset
-
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
-import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
-import nirvana.hall.c.services.ghpcbase.ghpcdef.GAFIS_UUIDStruct
+import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.ghpcbase.ghpcdef.GAFIS_UUIDStruct
 
 /**
  *
@@ -199,8 +195,9 @@ object glocdef {
         class GAFISIMAGESTRUCT extends AncientData
         {
         var stHead = new GAFISIMAGEHEADSTRUCT;	// image head structure
-          @IgnoreTransfer
+          @LengthRef("getBnDataLength")
         var bnData:Array[Byte] = _ ;	// image followed
+          def getBnDataLength=stHead.nImgSize
 
           def transformForFPT():Unit={
             if (stHead.nCompressMethod >= 10) throw new IllegalStateException("invalid image compress method")
@@ -216,8 +213,10 @@ object glocdef {
               bnData(i) = n.toByte
             }
           }
+          /*
           /**
            * serialize to channel buffer
+ *
            * @param stream netty channel buffer
            */
           override def writeToStreamWriter[T](stream: T, encoding: Charset)(implicit converter: (T) => StreamWriter): T = {
@@ -234,6 +233,7 @@ object glocdef {
 
           /**
            * convert channel buffer data as object
+ *
            * @param dataSource netty channel buffer
            */
           override def fromStreamReader(dataSource: StreamReader,encoding:Charset=AncientConstants.UTF8_ENCODING): this.type = {
@@ -246,11 +246,13 @@ object glocdef {
 
           /**
            * calculate data size and return.
+ *
            * @return data size
            */
           override def getDataSize: Int = {
             stHead.getDataSize + bnData.length
           }
+          */
         } // GAFISIMAGESTRUCT;	// size of this structure depends on the image size(32-2GB)
 
         // the following structure represents a image which has four parts:
