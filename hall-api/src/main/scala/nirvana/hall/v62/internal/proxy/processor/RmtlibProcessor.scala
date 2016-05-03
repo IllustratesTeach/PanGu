@@ -28,7 +28,7 @@ class RmtlibProcessor extends BaseAncientProcessor {
         ans.nReturnValue = 1
 
         GAFIS_PKG_AddRmtAnswer(pkg,ans)
-        GAFIS_RMTLIB_SendPkg(pkg)
+        GAFIS_RMTLIB_SendPkgInServer(pkg)
       case other=>
         throw new UnsupportedOperationException("%s not supported,pls contact spy song!".format(other))
     }

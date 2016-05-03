@@ -33,7 +33,7 @@ class AncientUserProcessor
         ans.nReturnValue = 1
 
         GAFIS_PKG_AddRmtAnswer(pkg,ans)
-        GAFIS_RMTLIB_SendPkg(pkg)
+        GAFIS_RMTLIB_SendPkgInServer(pkg)
     }
   }
 }
