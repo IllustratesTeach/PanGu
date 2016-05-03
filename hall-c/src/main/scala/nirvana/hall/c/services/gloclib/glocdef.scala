@@ -201,6 +201,21 @@ object glocdef {
         var stHead = new GAFISIMAGEHEADSTRUCT;	// image head structure
           @IgnoreTransfer
         var bnData:Array[Byte] = _ ;	// image followed
+
+          def transformForFPT():Unit={
+            if (stHead.nCompressMethod >= 10) throw new IllegalStateException("invalid image compress method")
+            val imgSize = stHead.nImgSize
+
+            if (imgSize == 0) return
+
+            if (imgSize < 100 || bnData == null) new IllegalStateException("wrong image data")
+
+            0 until 100 foreach{case i=>
+              var n:Int = bnData(i)
+              n^= (i * i + 9 * i + 11) % 256
+              bnData(i) = n.toByte
+            }
+          }
           /**
            * serialize to channel buffer
            * @param stream netty channel buffer
