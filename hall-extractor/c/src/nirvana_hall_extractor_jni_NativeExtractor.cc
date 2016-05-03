@@ -138,6 +138,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
 
   mntExtStr.pImage      = img;
   mntExtStr.pMnt        = mnt->bnData;
+  mntExtStr.pBin = bin;
   mntExtStr.ExtractMode	= (unsigned char) ExtractMode;
   mntExtStr.belatent    = (unsigned char) belatent;
   int ret = GAFIS_ExtractMNT_All_NewTTFea(&mntExtStr);
