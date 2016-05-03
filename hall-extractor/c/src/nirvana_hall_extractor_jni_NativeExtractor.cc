@@ -152,7 +152,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ExtractMN
 }
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertMntOldToNew
   (JNIEnv *jenv, jclass, jbyteArray old_mnt_bytes, jbyteArray new_mnt_bytes){
-    if(old_img_bytes == NULL){
+    if(old_mnt_bytes == NULL){
       SWIG_JavaThrowException(jenv,SWIG_JavaIllegalArgumentException,"old mn bytes is null");
       return;
     }
