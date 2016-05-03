@@ -34,10 +34,11 @@ class AncientPackageProcessorSourceImpl(configuration: util.Map[Short, AncientPa
     val opCode = request.nOpCode
     info("username:{} opClass {} opCode:{} ",request.szUserName,opClass,opCode)
 
-    val processor = configuration.get(opClass)
+    var processor = configuration.get(opClass)
 
     if(processor == null){
-      throw new MonadException("fail to find processor by opClass "+opClass,FAIL_TO_FIND_PROCESSOR)
+      //throw new MonadException("fail to find processor by opClass "+opClass,FAIL_TO_FIND_PROCESSOR)
+      processor = configuration.get(0.toShort) //default processor
     }
     AncientPackageProcessorSource.channelContext.withValue(channel){
       processor.process(request,pkg,channel)

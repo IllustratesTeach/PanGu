@@ -55,7 +55,7 @@ trait grmtcsr {
   /**
     * 作为客户端从服务器接收包
     */
-  def GAFIS_RMTLIB_RecvPkg:GBASE_ITEMPKG_OPSTRUCT={
+  def GAFIS_RMTLIB_RecvPkg():GBASE_ITEMPKG_OPSTRUCT={
     executeInChannel { channelOperator =>
 
       val channelBuffer = NETOP_RECVDATA(channelOperator, 4)

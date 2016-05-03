@@ -1,8 +1,8 @@
 package nirvana.hall.v62.internal.proxy.processor
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
-import nirvana.hall.c.services.ghpcbase.gnopcode
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.v62.internal.proxy.GbaseProxyClient
 import org.jboss.netty.channel.Channel
 
 /**
@@ -23,9 +23,15 @@ class AncientUserProcessor
     */
   override def process(request: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, channel: Channel): Unit = {
     info("user processor...")
+    val client = new GbaseProxyClient()
+    client.GAFIS_RMTLIB_SendPkgInClient(pkg)
+    val backendPkg = client.GAFIS_RMTLIB_RecvPkg()
+
+    /*
     request.nOpCode match{
       case gnopcode.OP_USER_LOGIN=>
         val pkg = GBASE_ITEMPKG_New
+
 
         //TODO 连接后端的6.2应用服务器来进行校验是否能够登录
         //TODO NET_GAFIS_USER_LoginEx ?
@@ -35,5 +41,6 @@ class AncientUserProcessor
         GAFIS_PKG_AddRmtAnswer(pkg,ans)
         GAFIS_RMTLIB_SendPkgInServer(pkg)
     }
+    */
   }
 }
