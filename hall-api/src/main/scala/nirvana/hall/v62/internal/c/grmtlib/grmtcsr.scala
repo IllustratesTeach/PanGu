@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
+import nirvana.hall.v62.services.ChannelOperator
 
 /**
   * 远程通信服务器的客户端程序
@@ -39,8 +40,7 @@ trait grmtcsr {
     *
     * @param pstPkg 包
     */
-  def GAFIS_RMTLIB_SendPkgInClient(pstPkg:GBASE_ITEMPKG_OPSTRUCT){
-    executeInChannel{channelOperator=>
+  def GAFIS_RMTLIB_SendPkgInClient(channelOperator: ChannelOperator,pstPkg:GBASE_ITEMPKG_OPSTRUCT){
       val dataLen = pstPkg.head.nDataLen
       val bytes = ByteBuffer.allocate(4).putInt(dataLen).array()
       NETOP_SENDDATA(channelOperator,bytes)
@@ -49,22 +49,19 @@ trait grmtcsr {
         throw new IllegalStateException("server return data length less than zero")
       }
       NETOP_SENDDATA(channelOperator,pstPkg)
-    }
   }
 
   /**
     * 作为客户端从服务器接收包
     */
-  def GAFIS_RMTLIB_RecvPkg():GBASE_ITEMPKG_OPSTRUCT={
-    executeInChannel { channelOperator =>
+  def GAFIS_RMTLIB_RecvPkg(channelOperator: ChannelOperator):GBASE_ITEMPKG_OPSTRUCT= {
+    val channelBuffer = NETOP_RECVDATA(channelOperator, 4)
+    channelBuffer.markReaderIndex()
+    val bytes = channelBuffer.readBytes(4).array()
+    channelBuffer.resetReaderIndex()
+    val dataLength = channelBuffer.readInt()
 
-      val channelBuffer = NETOP_RECVDATA(channelOperator, 4)
-      channelBuffer.markReaderIndex()
-      val bytes = channelBuffer.readBytes(4).array()
-      channelBuffer.resetReaderIndex()
-      val dataLength = channelBuffer.readInt()
-
-      /*
+    /*
     //for normal net function, only for OP_CLASS_FILE and OP_CLASS_HOTUPDATE
     if(Char4To_uint4(nDataLen) == sizeof(GNETREQUESTHEADOBJECT))	//normal net function
     {
@@ -77,11 +74,10 @@ trait grmtcsr {
       goto Finish_Exit;
     }
     */
-      val pstPkg = new GBASE_ITEMPKG_OPSTRUCT
-      pstPkg.head.nDataLen = dataLength
+    val pstPkg = new GBASE_ITEMPKG_OPSTRUCT
+    pstPkg.head.nDataLen = dataLength
 
-      NETOP_SENDDATA(channelOperator, bytes)
-      NETOP_RECVDATA(channelOperator, pstPkg)
-    }
+    NETOP_SENDDATA(channelOperator, bytes)
+    NETOP_RECVDATA(channelOperator, pstPkg)
   }
 }

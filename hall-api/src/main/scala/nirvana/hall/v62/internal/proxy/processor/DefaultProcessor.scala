@@ -18,8 +18,7 @@ class DefaultProcessor extends BaseAncientProcessor{
    */
   override def process(request: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, channel: Channel): Unit = {
     val client = new GbaseProxyClient()
-    client.GAFIS_RMTLIB_SendPkgInClient(pkg)
-    val backendPkg = client.GAFIS_RMTLIB_RecvPkg()
+    val backendPkg = client.sendAndReceiveFromBackend(pkg)
     info("from backend received")
     GAFIS_RMTLIB_SendPkgInServer(backendPkg)
   }

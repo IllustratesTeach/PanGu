@@ -24,8 +24,6 @@ class AncientUserProcessor
   override def process(request: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, channel: Channel): Unit = {
     info("user processor...")
     val client = new GbaseProxyClient()
-    client.GAFIS_RMTLIB_SendPkgInClient(pkg)
-    val backendPkg = client.GAFIS_RMTLIB_RecvPkg()
 
     /*
     request.nOpCode match{
