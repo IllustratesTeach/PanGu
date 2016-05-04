@@ -6,7 +6,6 @@ import java.util.concurrent.{Executors, ThreadFactory}
 
 import monad.support.services.{LoggerSupport, MonadException, MonadUtils}
 import nirvana.hall.v62.config.V62ProxyBindSupport
-import nirvana.hall.v62.services.AncientPackageProcessorSource
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.jboss.netty.bootstrap.ServerBootstrap
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
@@ -20,7 +19,7 @@ import scala.util.control.NonFatal
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,source:AncientPackageProcessorSource) extends LoggerSupport {
+class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageHandler) extends LoggerSupport {
   //一个主IO，2个worker
   val ioThread = rpcBindSupport.rpc.ioThread
   val workerThread = rpcBindSupport.rpc.workerThread
@@ -62,7 +61,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,source:AncientPackageP
         pipeline.addLast("gbasePkgEncoder",new decoder.GbasePkgEncoder)
 
         //业务逻辑处理
-        pipeline.addLast("handler", new GbasePackageHandler(source))
+        pipeline.addLast("handler", handler)
         pipeline
       }
     })

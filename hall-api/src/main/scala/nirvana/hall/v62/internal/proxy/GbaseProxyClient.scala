@@ -17,4 +17,9 @@ class GbaseProxyClient extends AncientClientSupport with grmtcsr with gnetcsr wi
       GAFIS_RMTLIB_RecvPkg(channelOperator)
     }
   }
+  def sendFromBackend(pkg:GBASE_ITEMPKG_OPSTRUCT): Unit = {
+    executeInChannel{channelOperator=>
+      GAFIS_RMTLIB_SendPkgInClient(channelOperator,pkg)
+    }
+  }
 }
