@@ -92,8 +92,7 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>nirvana-protocol</artifactId>
-        <!--<version>1.0.11</version>-->
-        <version>dev-SNAPSHOT</version>
+        <version>1.0.8</version>
       </dependency>
       <!-- javassist -->
       <dependency>

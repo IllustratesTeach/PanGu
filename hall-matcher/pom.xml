@@ -38,7 +38,6 @@
         <dependency>
             <groupId>nirvana</groupId>
             <artifactId>nirvana-protocol</artifactId>
-            <version>dev-SNAPSHOT</version>
         </dependency>
         <!-- tapestry framework -->
         <dependency>

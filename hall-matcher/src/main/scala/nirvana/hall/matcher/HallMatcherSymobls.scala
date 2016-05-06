@@ -6,4 +6,5 @@ package nirvana.hall.matcher
 object HallMatcherSymobls {
   val SERVICE_MODULE_GZ = "nirvana.hall.matcher.HallMatcherGzServiceModule"
   val SERVICE_MODULE_DAKU = "nirvana.hall.matcher.HallMatcherDakuServiceModule"
+  val SERVICE_MODULE_SH = "nirvana.hall.matcher.HallMatcherShServiceModule"
 }

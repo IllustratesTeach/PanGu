@@ -1,4 +1,4 @@
-package nirvana.hall.matcher.internal.adapter.gz
+package nirvana.hall.matcher.internal.adapter.sh
 
 import javax.sql.DataSource
 
