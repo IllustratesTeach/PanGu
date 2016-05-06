@@ -22,7 +22,7 @@ trait FeatureExtractor {
   def extractByGAFISIMG(img:GAFISIMAGESTRUCT,
                         fingerPos:FingerPosition,
                         featureType:FeatureType,
-                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):GAFISIMAGESTRUCT
+                        newFeatureTry: NewFeatureTry=NewFeatureTry.V1):(GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)
 
   /**
    * extract feature from image data

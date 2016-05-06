@@ -42,7 +42,7 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val extractor = new FeatureExtractorImpl
     val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
     val feature = new FINGERMNTSTRUCT
-    feature.fromByteArray(mnt.bnData)
+    feature.fromByteArray(mnt._1.bnData)
 
     feature
 
@@ -55,7 +55,7 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val extractor = new FeatureExtractorImpl
     val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_R_THUMB,FeatureType.FingerTemplate)
     val feature = new FINGERMNTSTRUCT
-    feature.fromByteArray(mnt.bnData)
+    feature.fromByteArray(mnt._1.bnData)
 
     val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.mnt"))
     val destMntData = new GAFISIMAGESTRUCT().fromByteArray(bytes)
