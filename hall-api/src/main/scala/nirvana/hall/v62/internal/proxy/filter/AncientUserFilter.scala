@@ -10,11 +10,15 @@ import nirvana.hall.v62.internal.proxy.{GbaseProxyClient, GbaseItemPkgHandler}
  */
 class AncientUserFilter extends BaseAncientFilter{
   override def handle(request: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, handler: GbaseItemPkgHandler): Boolean = {
-    if(request.nOpCode == gnopcode.OP_USER_LOGOUT){
-      val client = new GbaseProxyClient()
-      client.sendFromBackend(pkg)
+    if(request.nOpClass == gnopcode.OP_CLASS_USER){
+      if(request.nOpCode == gnopcode.OP_USER_LOGOUT){
+        val client = new GbaseProxyClient()
+        client.sendFromBackend(pkg)
 
-      true
+        true
+      }else{
+        handler.handle(request, pkg)
+      }
     }else{
       handler.handle(request, pkg)
     }

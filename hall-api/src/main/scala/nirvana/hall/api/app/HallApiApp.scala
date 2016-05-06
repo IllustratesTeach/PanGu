@@ -35,6 +35,7 @@ object HallApiApp
       //v62
 //      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
 //      Class.forName("nirvana.hall.v62.LocalV62Module"),
+//      Class.forName("nirvana.hall.v62.LocalV62ProxyServiceModule"),
       //公共配置
       Class.forName("monad.core.LocalMonadCoreModule"),
       Class.forName("monad.rpc.LocalRpcModule"),

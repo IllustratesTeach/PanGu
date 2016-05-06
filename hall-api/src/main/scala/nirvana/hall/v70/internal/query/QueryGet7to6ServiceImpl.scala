@@ -160,7 +160,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   }
   @Transactional
   override def doWork: Unit ={
-    println("222222222222222")
     getGafisNormalqueryQueryqueMatching().foreach{ queryque =>
       getQueryAndSaveMatchResult(queryque)
     }
