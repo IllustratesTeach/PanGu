@@ -1,5 +1,7 @@
 package nirvana.hall.extractor.internal
 
+import java.io.InputStream
+
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
@@ -64,5 +66,15 @@ class FeatureExtractorImplTest extends BaseJniTest{
     Assert.assertArrayEquals(expectFeature.yy,feature.yy)
     Assert.assertArrayEquals(expectFeature.zz,feature.zz)
 
+  }
+  @Test
+  def test_nanjing: Unit ={
+    extract(getClass.getResourceAsStream("/test.img"),FingerPosition.FINGER_L_INDEX,FeatureType.FingerTemplate)
+  }
+  def extract(is:InputStream,pos:FingerPosition,featureType: FeatureType): Unit ={
+    val img = IOUtils.toByteArray(is)
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(img)
+    val extractor = new FeatureExtractorImpl
+    extractor.extractByGAFISIMG(gafisImg,pos,featureType)
   }
 }
