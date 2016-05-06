@@ -99,7 +99,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
     System.arraycopy(binData,0,sbinData,0,sbinHead.nImgSize+64)
     //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\mnt.mnt"),mntData)
     //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\bin.bin"),sbinData)
-    Some((mntData,binData))
+    Some((mntData,sbinData))
   }
   private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
     val img = ImageIO.read(imgData)
