@@ -30,6 +30,7 @@ with BootstrapTextSupport{
     val extraClasses = config.module match {
       case "gz" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GZ)
       case "daku" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_DAKU)
+      case "sh" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_SH)
     }
     startServer(config.web, "nirvana.hall.matcher", classes :+ extraClasses : _*)
     val version = readVersionNumber("META-INF/maven/nirvana/hall-matcher/version.properties")
