@@ -184,6 +184,9 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
     val lineLength = width // + padding;
 
     if (noTransform) {
+      if(height * width > bdata.length){
+        throw new IllegalStateException("height %s * width %s > bdata %s".format(height,width,bdata.length))
+      }
       var j = 0
 
       0 until height foreach{i=>
