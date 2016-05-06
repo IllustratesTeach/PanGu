@@ -8,6 +8,7 @@
   <name>Nirvana Hall Application Platform</name>
   <description>Nirvana Hall Application Server</description>
   <modules>
+    <module>hall-matcher</module>
     <module>hall-api</module>
     <module>hall-c</module>
     <module>hall-extractor</module>
@@ -87,6 +88,12 @@
             <artifactId>javassist</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
+        <artifactId>nirvana-protocol</artifactId>
+        <!--<version>1.0.11</version>-->
+        <version>dev-SNAPSHOT</version>
       </dependency>
       <!-- javassist -->
       <dependency>
@@ -558,11 +565,11 @@
           <version>10.2.0.3</version>
         </dependency>
         -->
-        <dependency>
+        <!--<dependency>
           <groupId>com.oracle</groupId>
           <artifactId>ojdbc6</artifactId>
           <version>11.2.0.3.0</version>
-        </dependency>
+        </dependency>-->
       </dependencies>
     </profile>
   </profiles>

@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
-import nirvana.hall.api.internal.{ScalaUtils, WebHttpClientUtils}
+import nirvana.hall.api.internal.ScalaUtils
+import nirvana.hall.support.services.WebHttpClientUtils
 import nirvana.hall.v70.services.sync.SyncDictService
 import nirvana.hall.protocol.sys.DictProto._
 import nirvana.hall.protocol.sys.SyncDictProto.{SyncDictRequest, SyncDictResponse}

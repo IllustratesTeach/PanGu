@@ -1,6 +1,6 @@
 // Copyright 2014,2015 Jun Tsai. All rights reserved.
 // site: http://www.ganshane.com
-package nirvana.hall.api.internal
+package nirvana.hall.support.services
 
 import java.io.{Closeable, IOException}
 
