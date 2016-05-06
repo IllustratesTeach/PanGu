@@ -184,9 +184,6 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
     val lineLength = width // + padding;
 
     if (noTransform) {
-      if(height * width > bdata.length){
-        throw new IllegalStateException("height %s * width %s > bdata %s".format(height,width,bdata.length))
-      }
       var j = 0
 
       0 until height foreach{i=>
@@ -264,6 +261,12 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
 
       width = head.nWidth
       height = head.nHeight
+      if(iis.length()>0){
+        val remainingLength = iis.length() - iis.getStreamPosition
+        if(height * width > (iis.length() - iis.getStreamPosition)){
+          throw new IllegalStateException("height %s * width %s > bdata %s".format(height,width,remainingLength))
+        }
+      }
 
       val numBands = 1
       val bandOffsets = Array(0)

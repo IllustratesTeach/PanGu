@@ -55,7 +55,10 @@ class ProtobufRpcServerMessageServletFilter(serverMessageHandler:RpcServerMessag
           case NonFatal(e) =>
             error(e.getMessage, e)
             responseBuilder.setStatus(CommandStatus.FAIL)
-            responseBuilder.setMsg(e.getMessage)
+            if(e.getMessage != null)
+              responseBuilder.setMsg(e.getMessage)
+            else
+              responseBuilder.setMsg(e.toString)
         }
         if (!responseBuilder.hasTaskId) {
 

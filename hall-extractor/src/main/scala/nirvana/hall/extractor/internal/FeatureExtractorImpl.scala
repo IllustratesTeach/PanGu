@@ -3,7 +3,7 @@ package nirvana.hall.extractor.internal
 import java.awt.Image
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.{File, ByteArrayInputStream, InputStream}
+import java.io.{ByteArrayInputStream, InputStream}
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
@@ -17,7 +17,6 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
-import org.apache.commons.io.{IOUtils, FileUtils}
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -39,13 +38,13 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @param featureType feature type
    * @return GAFISIMAGESTRUCT
    */
-  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): GAFISIMAGESTRUCT = {
+  override def extractByGAFISIMG(img: GAFISIMAGESTRUCT, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1)= {
     if(img.stHead.bIsCompressed == 1)
       throw new IllegalArgumentException("compressed image unspported!")
     val imgData = img.toByteArray()
     val mntData = extractByGAFISIMGBinary(new ByteArrayInputStream(imgData),fingerPos,featureType,newFeatureTry)
 
-    new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    (new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1),new GAFISIMAGESTRUCT().fromByteArray(mntData.get._2))
   }
   override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Option[(Array[Byte],Array[Byte])]= {
     val image = readByteArrayAsGAFISIMAGE(is)
