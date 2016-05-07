@@ -43,9 +43,11 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var maxScore = matchResultRequest.getMaxScore
     val queryQue = getQueryQue(oraSid.toInt)
 
-    val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
-    val candList = getCandList(matchResultRequest, queryQue.queryType, sidKeyidMap)
-
+    var candList:Array[Byte] = null
+    if(candNum > 0){
+      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
+      candList = getCandList(matchResultRequest, queryQue.queryType, sidKeyidMap)
+    }
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
     }
