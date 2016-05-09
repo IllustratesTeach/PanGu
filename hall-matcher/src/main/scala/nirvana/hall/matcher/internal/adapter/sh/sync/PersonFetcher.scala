@@ -64,13 +64,14 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
          try {
             if(personId.length == 23){
                val pId_pre: String = personId.substring(0, 1)
-               val pId_deptCode: String = personId.substring(1, 13)
-               val pId_date: String = personId.substring(13, 19)
-               val pId_serialNum: String = personId.substring(19)
+               val pId_deptCode = java.lang.Long.parseLong(personId.substring(1, 13), 36)
+               val pId_date = java.lang.Long.parseLong(personId.substring(13, 19), 36)
+               val pId_serialNum = Integer.parseInt(personId.substring(19), 36)
+
                textData.addColBuilder.setColName("pId_pre").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(pId_pre.getBytes))
-               textData.addColBuilder.setColName("pId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(pId_deptCode, 36))))
-               textData.addColBuilder.setColName("pId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(pId_date, 36))))
-               textData.addColBuilder.setColName("pId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(Integer.parseInt(pId_serialNum, 36))))
+               textData.addColBuilder.setColName("pId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_deptCode)))
+               textData.addColBuilder.setColName("pId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_date)))
+               textData.addColBuilder.setColName("pId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(pId_serialNum)))
             }
          }
          catch {
