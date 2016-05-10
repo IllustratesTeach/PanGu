@@ -86,7 +86,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       index += 1
       val cand = candIter.next()
       val keyId = sidKeyidMap.get(cand.getObjectId)
-      if (keyId != null) {
+      if (keyId.nonEmpty) {
         result.write(new Array[Byte](4))
         result.write(DataConverter.int2Bytes(cand.getScore))
         result.write(keyId.get.getBytes)
