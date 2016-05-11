@@ -24,13 +24,12 @@ class UserServiceImpl(authService: AuthService) extends UserService {
   }
 
   override def existsLoginName(loginName: String): Boolean = {
-    SysUser.find_by_loginName(loginName).exists()
-    //SysUser.countBy(sqls.eq(SysUser.column.loginName, loginName)) > 0
+    SysUser.where(SysUser.loginName === loginName).limit(1).nonEmpty
   }
   override def login(loginName: String, password: String): (Option[SysUser], Option[String]) = {
 
     val passwordEncrypted = DigestUtils.md5Hex(password)
-    val userOpt = SysUser.find_by_loginName_and_password(loginName,passwordEncrypted).firstOption
+    val userOpt = SysUser.find_by_loginName_and_password(loginName,passwordEncrypted).headOption
 
     var tokenOpt: Option[String] = None
     userOpt.foreach(x => tokenOpt = Some(authService.login(loginName)))
