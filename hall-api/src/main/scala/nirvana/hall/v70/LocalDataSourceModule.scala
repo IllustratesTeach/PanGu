@@ -5,12 +5,12 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import monad.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
+import stark.migration.{InstallAllMigrations, Migrator, DatabaseAdapter, Vendor}
 
 /**
  * 针对数据的操作

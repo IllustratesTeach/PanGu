@@ -59,6 +59,11 @@
         <version>${stark-release-version}</version>
       </dependency>
       <dependency>
+        <groupId>com.ganshane.stark</groupId>
+        <artifactId>stark-migration_2.11</artifactId>
+        <version>${stark-release-version}</version>
+      </dependency>
+      <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
@@ -68,11 +73,11 @@
         <artifactId>hall-support</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+<!--      <dependency>
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-migration</artifactId>
         <version>${monad-release-version}</version>
-      </dependency>
+      </dependency>-->
       <dependency>
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-support</artifactId>
