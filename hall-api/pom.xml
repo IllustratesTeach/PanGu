@@ -28,10 +28,6 @@
       <artifactId>hall-c</artifactId>
     </dependency>
     <dependency>
-      <groupId>nirvana</groupId>
-      <artifactId>hall-orm</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.ganshane.stark</groupId>
       <artifactId>stark-activerecord_2.11</artifactId>
     </dependency>
