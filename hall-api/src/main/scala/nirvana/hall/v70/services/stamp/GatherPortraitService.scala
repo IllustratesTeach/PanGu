@@ -1,6 +1,5 @@
 package nirvana.hall.v70.services.stamp
 
-import nirvana.hall.orm.services.Relation
 import nirvana.hall.v70.jpa.GafisGatherPortrait
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +14,7 @@ trait GatherPortraitService {
    * @param person
    * @return
    */
-  def queryGatherPortrait(person : String)  : Relation[GafisGatherPortrait]
+  def queryGatherPortrait(person : String)  : Seq[GafisGatherPortrait]
 
 
   /**

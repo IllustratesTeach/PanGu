@@ -25,7 +25,7 @@ class ProtobufRequestGlobalImpl(authService: AuthService) extends ProtobufReques
       _onlineUser = authService.refreshToken(token)
       _onlineUser match {
         case Some(ou) =>
-          _currentUser = SysUser.find_by_loginName(ou.login).takeOption
+          _currentUser = SysUser.find_by_loginName(ou.login).headOption
         case None =>
         //do nothing
       }

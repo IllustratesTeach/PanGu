@@ -63,8 +63,8 @@ trait Sync7to6TPCardService {
   //TODO 改用TPCardService
   private def getTPCard(personId: String, hasPalm: Boolean): TPCard = {
     val person = GafisPerson.find(personId)
-    val photos = GafisGatherPortrait.find_by_personid(personId)
-    val fingers = GafisGatherFinger.find_by_personId(personId)
+    val photos = GafisGatherPortrait.find_by_personid(personId).toSeq
+    val fingers = GafisGatherFinger.find_by_personId(personId).toSeq
 
     ProtobufConverter.convertGafisPerson2TPCard(person, photos, fingers, null)
   }

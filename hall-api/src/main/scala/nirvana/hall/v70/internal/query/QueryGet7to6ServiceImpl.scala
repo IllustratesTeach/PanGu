@@ -67,7 +67,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
               gafisPerson.gatherTypeId = "8a20fb2544baa8450144babc6a1e000d"
               gafisPerson.save()
               //保存逻辑库
-              val logicDb = GafisLogicDb.find_by_logicCategory_and_logicName("0", "默认库").take
+              val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicName === "默认库").headOption.get
               val logicDbFingerprint = new GafisLogicDbFingerprint()
               logicDbFingerprint.pkId = CommonUtils.getUUID()
               logicDbFingerprint.fingerprintPkid = gafisPerson.personid
@@ -110,7 +110,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                   gafisCase.caseSource = "4"
                   gafisCase.save()
                   //逻辑库
-                  val logicDb = GafisLogicDb.find_by_logicCategory_and_logicName("1", "默认库").take
+                  val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicName === "默认库").headOption.get
                   val logicDbCase = new GafisLogicDbCase()
                   logicDbCase.pkId = CommonUtils.getUUID()
                   logicDbCase.logicDbPkid = logicDb.pkId
@@ -163,6 +163,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   }
 
   override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
-    GafisNormalqueryQueryque.where("status=?1 and deletag=1 and syncTargetSid is not null", QueryConstants.STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
+    GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.status === QueryConstants.STATUS_MATCHING).and(GafisNormalqueryQueryque.deletag === "1").and(GafisNormalqueryQueryque.syncTargetSid[String].notNull).orderBy(GafisNormalqueryQueryque.priority[java.lang.Short].desc).headOption
   }
 }

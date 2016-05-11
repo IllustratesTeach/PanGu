@@ -54,6 +54,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.ganshane.stark</groupId>
+        <artifactId>stark-activerecord_2.11</artifactId>
+        <version>${stark-release-version}</version>
+      </dependency>
+      <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
@@ -601,6 +606,7 @@
     <proguard-release-version>5.1</proguard-release-version>
     <lichen-release-version>0.5.10.2</lichen-release-version>
     <monad-release-version>5.0.16</monad-release-version>
+    <stark-release-version>0.1.10</stark-release-version>
     <spring-release-version>4.2.4.RELEASE</spring-release-version>
     <rootPath>${basedir}</rootPath>
     <protoc>protoc</protoc>

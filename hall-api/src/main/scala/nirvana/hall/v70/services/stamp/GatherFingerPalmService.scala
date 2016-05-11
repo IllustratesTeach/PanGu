@@ -1,7 +1,6 @@
 package nirvana.hall.v70.services.stamp
 
-import nirvana.hall.orm.services.Relation
-import nirvana.hall.v70.jpa.{GafisGatherPalm, GafisGatherFinger}
+import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisGatherPalm}
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -15,14 +14,14 @@ trait GatherFingerPalmService {
    * @param personId
    * @return
    */
-  def queryFingerInfoByPersonId(personId : String) : Relation[GafisGatherFinger]
+  def queryFingerInfoByPersonId(personId : String) : Seq[GafisGatherFinger]
 
   /**
    * 查询指纹图像数据
    * @param personId
    * @return
    */
-  def queryFingerDataByPersonId(personId : String)  : Relation[GafisGatherFinger]
+  def queryFingerDataByPersonId(personId : String)  : Seq[GafisGatherFinger]
 
 
   /**
@@ -30,7 +29,7 @@ trait GatherFingerPalmService {
    * @param personId
    * @param groupId
    */
-  def queryFingerInfoBy(personId : String,groupId : Short)   : Relation[GafisGatherFinger]
+  def queryFingerInfoBy(personId : String,groupId : Short)   : Seq[GafisGatherFinger]
 
 
   /**
@@ -38,7 +37,7 @@ trait GatherFingerPalmService {
    * @param personId
    * @param groupId
    */
-  def queryPalmInfoBy(personId : String,groupId : Short)  : Relation[GafisGatherPalm]
+  def queryPalmInfoBy(personId : String,groupId : Short)  : Seq[GafisGatherPalm]
 
 
   /**

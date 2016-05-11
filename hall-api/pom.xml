@@ -32,6 +32,10 @@
       <artifactId>hall-orm</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.ganshane.stark</groupId>
+      <artifactId>stark-activerecord_2.11</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.ganshane.monad</groupId>
       <artifactId>monad-support</artifactId>
     </dependency>
