@@ -13,7 +13,7 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 import scala.io.Source
@@ -24,6 +24,15 @@ import scala.collection.JavaConversions._
  * @since 2015-12-10
  */
 class FirmDecoderImplTest extends BaseJniTest{
+  @Test
+  def test_decode_shanghai: Unit ={
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val gafisImg = new GAFISIMAGESTRUCT
+    val stream = getClass.getResourceAsStream("/shanghai/31011405020016040001_1_2.img")
+    gafisImg.fromByteArray(IOUtils.toByteArray(stream))
+    val originalImg = decoder.decode(gafisImg)
+//    FileUtils.writeByteArrayToFile(new File("31011405020016040001_1_2.img.orginal"),originalImg.toByteArray())
+  }
   @Test
   def test_parse_fpt: Unit ={
     val filePath = "C:\\Users\\wangjue\\Desktop\\fpt_error\\B9300000000002016044415.FPT"
