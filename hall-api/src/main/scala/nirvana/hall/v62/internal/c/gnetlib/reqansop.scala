@@ -131,6 +131,9 @@ trait reqansop {
   protected def  NETOP_SENDDATA(channel:ChannelOperator,data:Array[Byte]): Unit ={
     channel.writeByteArray[NoneResponse](data)
   }
+  protected def NETOP_SENDANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
+    NETANS_Send(channel,pAns)
+  }
   protected def NETOP_RECVANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
     channel.receive(pAns)
   }
