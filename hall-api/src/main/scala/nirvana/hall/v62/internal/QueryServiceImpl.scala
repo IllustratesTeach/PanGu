@@ -2,12 +2,12 @@ package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.c.services.ganumia.gadbrec._
-import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESITEM, GADB_SELRESULT}
+import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESITEM, GADB_SELRESULT, _}
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
+import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 
@@ -19,7 +19,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   def queryMatchResultByCardId(
                                        dbId:Short,
                                        tableId:Short,
-                                       cardId: String, limit: Int): Option[GAQUERYSIMPSTRUCT]= {
+                                       cardId: String, limit: Int): List[GAQUERYSIMPSTRUCT]= {
     
     val schema = facade.NET_GAFIS_SYS_GetTableSchema(dbId, tableId);
     val stSelRes = new GADB_SELRESULT
@@ -91,12 +91,13 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     if(nret >= 0) {
       val nCount = stSelRes.nRecGot
       if (nCount > 0) {
-        val qry = new GAQUERYSIMPSTRUCT().fromByteArray(stSelRes.pDataBuf_Data)
-        return Some(qry)
+        val buffer = ChannelBuffers.wrappedBuffer(stSelRes.pDataBuf_Data)
+        val result = Range(0,nCount).map(x=>new GAQUERYSIMPSTRUCT().fromStreamReader(buffer))
+        return result.toList
       }
     }
 
-    None
+    Nil
   }
 
   /**
