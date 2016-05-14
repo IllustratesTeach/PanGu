@@ -33,6 +33,7 @@ object AncientData extends AncientDataStreamWrapper{
   lazy val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   lazy val STRING_CLASS = typeOf[String]
   lazy val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]]()
+  type FieldDataType = (AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])
 
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
@@ -155,7 +156,7 @@ trait AncientData{
     */
   def findFieldOffsetAndLength(fieldName:String):(Int,Int)={
     @tailrec
-    def loopFields(list:List[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])],
+    def loopFields(list:List[FieldDataType],
                    offset:Int):(Int,Int)= list match {
       case Nil =>
         throw new AncientDataException("field [%s] not found".format(fieldName))
@@ -263,7 +264,7 @@ trait AncientData{
         throw new AncientDataException(term.toString + "," + e.toString, e)
     }
   }
-  private def internalProcessField:Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]={
+  private def internalProcessField:Seq[FieldDataType]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
       members = clazzType.members
