@@ -20,6 +20,7 @@ class V62Facade(config:HallV62Config)
   with gnetflib
   with nettable
   with gnetfunc
+  with netmisc
   with AncientClientSupport
   with reqansop
   with LoggerSupport{

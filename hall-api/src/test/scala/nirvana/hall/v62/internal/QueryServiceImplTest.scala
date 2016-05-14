@@ -13,6 +13,8 @@ class QueryServiceImplTest extends BaseV62TestCase{
   def testQuery: Unit ={
     val service  = new QueryServiceImpl(createFacade,null)
     service.queryMatchResultByCardId(20,2,Some("((KeyID REGLIKE '123'))"),10);
+
+    service.queryMatchInfo(None,10)
   }
 
 }
