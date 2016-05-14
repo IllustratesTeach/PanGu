@@ -149,6 +149,31 @@ trait AncientData{
   }
 
   /**
+    * 通过给定的field的名称来得到对应字段在类中数据的 偏移量 和 本字段的占用字节数
+    * @param fieldName 待查询的字段名称
+    * @return 偏移量和字节数
+    */
+  def findFieldOffsetAndLength(fieldName:String):(Int,Int)={
+    @tailrec
+    def loopFields(list:List[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])],
+                   offset:Int):(Int,Int)= list match {
+      case Nil =>
+        throw new AncientDataException("field [%s] not found".format(fieldName))
+      case (processor, lengthDef) :: tail =>
+        val termLength = tryIgnoreAncientDataException[Int](processor.term) {
+          processor.computeLength(ValueManipulation(instanceMirror, processor.term), findLength(lengthDef))
+        }
+        if (processor.term.name.decodedName.toString.trim == fieldName) {
+          (offset, termLength)
+        } else {
+          loopFields(tail, offset + termLength)
+        }
+    }
+    val fields = internalProcessField.toList
+    loopFields(fields,0)
+  }
+
+  /**
    * serialize to channel buffer
  *
    * @param stream netty channel buffer

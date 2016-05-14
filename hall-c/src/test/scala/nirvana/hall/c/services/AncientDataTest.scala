@@ -18,6 +18,15 @@ import scala.reflect.runtime.universe._
  * @since 2016-01-08
  */
 class AncientDataTest {
+  @Test
+  def test_getOffsetAndLength: Unit ={
+    val data = new AncientDataModel
+    Assert.assertEquals((0,2),data.findFieldOffsetAndLength("f1"))
+    Assert.assertEquals((2,1),data.findFieldOffsetAndLength("f2"))
+    Assert.assertEquals((3,2),data.findFieldOffsetAndLength("f3"))
+    Assert.assertEquals((5,100),data.findFieldOffsetAndLength("f4"))
+    Assert.assertEquals((105,20),data.findFieldOffsetAndLength("f5"))
+  }
 
   @Test
   def test_len_ref: Unit ={
