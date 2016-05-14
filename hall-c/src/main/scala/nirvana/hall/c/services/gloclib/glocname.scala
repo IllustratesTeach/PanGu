@@ -4583,16 +4583,16 @@ var stTcID = new COLGENNAMESTRUCT;			// tenprint card id, ( card id, barcode)
 var stTPnID = new COLGENNAMESTRUCT;		// person id
 var stTAdm = new TPADMINCOLNAME;
   @Length(10)
-  var stTFg:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](10);		// tenprint finger 10 tenfingers 10X5=50 names(rolled)
+  var stTFg:Array[COLMICBNAMESTRUCT] = Range(0,10).map(x=>new COLMICBNAMESTRUCT).toArray		// tenprint finger 10 tenfingers 10X5=50 names(rolled)
 @Length(10)
-var stTpf:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](10);		// tenprint plain fingers(unrolled), and extension
+var stTpf:Array[COLMICBNAMESTRUCT] = Range(0,10).map(x=>new COLMICBNAMESTRUCT).toArray		// tenprint plain fingers(unrolled), and extension
   // of the system.
 
   /**
     * 增加了左右侧掌
     */
   @Length(UTIL_PALMDATA_ITEMCOUNT)
-  var stTPm:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](UTIL_PALMDATA_ITEMCOUNT);
+  var stTPm:Array[COLMICBNAMESTRUCT] = Range(0,UTIL_PALMDATA_ITEMCOUNT).map(x=>new COLMICBNAMESTRUCT).toArray
   // tenprint 2 palms, 2*5 = 10 names(no feature
   // stTPm[0] right hand palm
   // stTPm[1] left hand palm
@@ -4606,22 +4606,22 @@ var stTpf:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](10);		// tenpr
   // stTPm[9] 左侧掌
 
   @Length(2)
-  var stTSign:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](2);		// signature names for criminal and printer.
+  var stTSign:Array[COLMICBNAMESTRUCT] = Range(0,2).map(x=>new COLMICBNAMESTRUCT).toArray		// signature names for criminal and printer.
 @Length(8)
-var stTCb:Array[COLGENNAMESTRUCT] = new Array[COLGENNAMESTRUCT](8);		// tenprint card binary data, 8 names
+var stTCb:Array[COLGENNAMESTRUCT] = Range(0,8).map(x=>new COLGENNAMESTRUCT).toArray		// tenprint card binary data, 8 names
 
   /**
     * 增加双拇指模式平面采集指纹
     */
   @Length(5)
-  var stTPl:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](5);		// plain fingers only four part 4*2=8 items(no mnt, bin, and feat),
+  var stTPl:Array[COLMICBNAMESTRUCT] = Range(0,5).map(x=>new COLMICBNAMESTRUCT).toArray		// plain fingers only four part 4*2=8 items(no mnt, bin, and feat),
   // 0--right thumb, 1-right four, 2 - left thumb 3 -left four
   //	COLMICBNAMESTRUCT	stTFsFr;		// face front
   //	COLMICBNAMESTRUCT	stTFsNl;		// face nose left
   //	COLMICBNAMESTRUCT	stTFsNr;		// face nose right
 
   @Length(6)
-  var stFace:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](6);		// 6 extra face data.
+  var stFace:Array[COLMICBNAMESTRUCT] = Range(0,6).map(x=>new COLMICBNAMESTRUCT).toArray		// 6 extra face data.
   // stFace[0] for face front.
   // stFace[1] for face nose left.
   // stFace[2] for face nose right.
@@ -4701,7 +4701,7 @@ var stLt = new LPLIBTABLENAMESTRUCT;	// lp table names
   var stAdmTable = new GAFIS_ADMINTABLENAME;
 
   @Length(4)
-  var stVoice:Array[COLMICBNAMESTRUCT] = new Array[COLMICBNAMESTRUCT](4);	// 4 voices. for tp.
+  var stVoice:Array[COLMICBNAMESTRUCT] = Range(0,4).map(x=>new COLMICBNAMESTRUCT).toArray	// 4 voices. for tp.
 
   var stLpVoice = new COLMICBNAMESTRUCT;
   var stLpFace = new COLMICBNAMESTRUCT;

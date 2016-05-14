@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.c.services.ganumia.gadbcol.GACOLUMNPROPSTRUCT
+import nirvana.hall.c.services.ganumia.gadbcol._
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gadbprop.GADBPROPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
@@ -39,14 +39,14 @@ trait ganetdbp {
 
     validateResponse(channel,pAns)
     val n = pAns.nReturnValue
-    val ret = new Array[GACOLUMNPROPSTRUCT](n)
     NETANS_SetRetVal(pAns, 1);
     NETOP_SENDANS(channel, pAns);
 
-    ret.foreach{col=>
+    val ret = Range(0,n).map{col=>
+      val col = new GACOLUMNPROPSTRUCT
       NETOP_RECVDATA(channel,col);
     }
 
-    return ret
+    return ret.toArray
   }
 }

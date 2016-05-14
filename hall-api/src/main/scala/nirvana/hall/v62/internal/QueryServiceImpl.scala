@@ -16,10 +16,10 @@ import scala.collection.mutable
  */
 class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryService{
 
-  def queryMatchResultByCardId(
-                                       dbId:Short,
-                                       tableId:Short,
-                                       cardId: String, limit: Int): List[GAQUERYSIMPSTRUCT]= {
+  def queryMatchResultByCardId( dbId:Short,
+                                tableId:Short,
+                                statement:Option[String], //查询条件
+                                limit: Int): List[GAQUERYSIMPSTRUCT]= {
     
     val schema = facade.NET_GAFIS_SYS_GetTableSchema(dbId, tableId);
     val stSelRes = new GADB_SELRESULT
@@ -75,8 +75,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     stSelRes.nResItemCount = stItems.size
 
     val stSelStatement = new 	GADB_SELSTATEMENT
-    stSelStatement.nMaxToGet = 100
-    stSelStatement.szStatement="keyid like '"+cardId+"'"
+    stSelStatement.nMaxToGet = limit
+    statement.foreach(x=>stSelStatement.szStatement=x)
 
 
     /*
