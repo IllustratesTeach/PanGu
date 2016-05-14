@@ -7,6 +7,7 @@ import nirvana.hall.c.services.ganumia.bmrfop.GADB_BMRFILEHEAD
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_SRID
 import nirvana.hall.c.services.ganumia.gadbrec.GADB_ROWHEADSCHEMA
 import nirvana.hall.c.services.ganumia.gaflobmg.GADB_LOBPT
+import nirvana.hall.c.services.ganumia.isafile.GADB_RESCOLNAME.GADB_RESCOLNAME
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.AncientData
 
@@ -190,4 +191,61 @@ object isafile {
     var bnRes:Array[Byte] = _
   } // GADB_ISAFILEINMEM;	// size is 2.5KB=2048 + 512 = 2560 bytes
 
+  object GADB_RESCOLNAME extends Enumeration
+  {
+    type GADB_RESCOLNAME = Value
+
+    val RESCOL_BADNAME,
+     RESCOL_UUID,
+     RESCOL_CREATETIME,
+     RESCOL_UPDATETIME,
+     RESCOL_PREVSID,
+     RESCOL_NEXTSID,
+     RESCOL_QUEFLAG,
+     RESCOL_USRACCMODE,
+     RESCOL_GRPACCMODE,
+     RESCOL_OTHERACCMODE,
+     RESCOL_CREATOR,
+     RESCOL_UPDATOR,
+     RESCOL_LOBPT,
+     RESCOL_RESERVED,
+     RESCOL_FILEID,
+     RESCOL_OID,
+     RESCOL_SID,
+     RESCOL_BKID,
+     RESCOL_ISROWUSED,
+     RESCOL_OWNERID,
+     RESCOL_GROUPID = Value
+  } //GADB_RESCOLNAME;  // reserved column name.
+
+
+
+  //from isafile.c
+  def GADB_RESCOL_GetName(eName:GADB_RESCOLNAME):String=
+  {
+    import GADB_RESCOLNAME._
+    eName match {
+      case	RESCOL_UUID =>			"$$UUID";
+      case	RESCOL_CREATETIME=>		"$$CreateTime";
+      case	RESCOL_UPDATETIME=>		"$$UpdateTime";
+      case	RESCOL_PREVSID=>			"$$PrevSID";
+      case	RESCOL_NEXTSID=>			"$$NextSID";
+      case	RESCOL_QUEFLAG=>			"$$QueFlag";
+      case	RESCOL_USRACCMODE=>		"$$UserAccMode";
+      case	RESCOL_GRPACCMODE=>		"$$GrpAccMode";
+      case	RESCOL_OTHERACCMODE=>		"$$OtherAccMode";
+      case	RESCOL_CREATOR=>			"$$Creator";
+      case	RESCOL_UPDATOR=>			"$$Updator";
+      case	RESCOL_LOBPT=>			"$$LobPt";
+      case	RESCOL_RESERVED=>		"$$Reserved";
+      case	RESCOL_FILEID=>			"$$FileID";
+      case	RESCOL_OID=>				"$$OID";
+      case	RESCOL_SID=>				"$$SID";
+      case	RESCOL_BKID=>			"$$BKID";
+      case	RESCOL_ISROWUSED=>		"$$IsRowUsed";
+      case	RESCOL_OWNERID=>			"$$OwnerID";
+      case	RESCOL_GROUPID=>			"$$GroupID";
+      case other =>		null;
+    }
+  }
 }

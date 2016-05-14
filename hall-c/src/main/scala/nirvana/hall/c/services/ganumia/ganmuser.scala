@@ -164,4 +164,17 @@ object ganmuser {
   } // NMUSER_VAR;
 
 
+
+
+  //form ganmuser.c
+  def NMUSER_COL_GetUserName():String=
+  {
+    "UserName";
+  }
+
+  def NMUSER_COL_GetPrivName():String=
+  {
+    "NMUserPriv";
+  }
+
 }

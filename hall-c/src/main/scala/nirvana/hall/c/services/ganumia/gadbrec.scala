@@ -2,6 +2,7 @@ package nirvana.hall.c.services.ganumia
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services._
+import nirvana.hall.c.services.ganumia.gadbcol.GADB_COLUMNSCHEMA
 import nirvana.hall.c.services.ganumia.gadbtbl.GADB_TABLEOBJECT
 import nirvana.hall.c.services.ganumia.gaitemop.{GADB_COLARRAYSTRUCT, GADB_COLPROPSTRUCT}
 import nirvana.hall.c.services.ganumia.isafile.GADB_ISAROWSCHEMA
@@ -938,6 +939,26 @@ object gadbrec {
   final val COLCOPY_OPT_NOCONTIGUOUS : Byte = 0x4	// does not need records that status is unused
 
   /////////////////////////////////////////////////////////////
+
+  def SETSELRESITEM_FIXED[T<:AncientData](p:GADB_SELRESITEM,data:T , szname:String, item:String): Unit = {
+    p.szItemName = szname
+    val (offset,len) = data.findFieldOffsetAndLength(item)
+    p.nDataOffset = offset
+    p.nDataLen = len
+  }
+  def GfPub_ItemExistInColumnSchema(szItemName:String, pstSchema:Array[GADB_COLUMNSCHEMA]):Boolean={
+    if(szItemName==null || szItemName.isEmpty)
+      return false
+
+    if(pstSchema == null)
+      return true
+    pstSchema.exists(_.szName == szItemName)
+  }
+  def SETSELRESITEM_FIXED_EXIST[T<:AncientData](p:GADB_SELRESITEM,data:T , szname:String, item:String,pstSchema:Array[GADB_COLUMNSCHEMA]): Unit = {
+    if(GfPub_ItemExistInColumnSchema(szname,pstSchema)){
+      SETSELRESITEM_FIXED(p,data,szname,item)
+    }
+  }
 
 
   final val TABLE_ADDOPT_APPEND : Byte = 0x1	// append mode
