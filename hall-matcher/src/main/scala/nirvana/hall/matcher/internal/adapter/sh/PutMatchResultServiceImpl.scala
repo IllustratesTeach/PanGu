@@ -46,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
-      candList = getCandList(matchResultRequest, queryQue.queryType, sidKeyidMap)
+      candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
     }
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
@@ -77,7 +77,8 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     }
   }
 
-  private def getCandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String]): Array[Byte] = {
+  private def getCandList(matchResultRequest: MatchResultRequest, queryQue: QueryQue,sidKeyidMap: Map[Long, String]): Array[Byte] = {
+    val queryType = queryQue.queryType
     val result = new ByteArrayOutputStream()
     val candIter = matchResultRequest.getCandidateResultList.iterator()
     var index = 0 //比对排名
@@ -86,6 +87,13 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       val cand = candIter.next()
       val keyId = sidKeyidMap.get(cand.getObjectId)
       if (keyId.nonEmpty){
+        //指位转换
+        var fgp = 0
+        if(queryQue.isPalm){
+          fgp = DataConverter.palmPos8to6(cand.getPos)
+        }else{
+          fgp = DataConverter.fingerPos8to6(cand.getPos)
+        }
         result.write(new Array[Byte](4))
         result.write(DataConverter.int2Bytes(cand.getScore))
         result.write(keyId.get.getBytes)
@@ -94,7 +102,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
         result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
         result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
-        result.write(cand.getPos.toByte)
+        result.write(fgp.toByte)
         result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
         result.write(DataConverter.getAFISDateTime(new Date()))
         result.write(new Array[Byte](2 + 2 + 2 + 2))
@@ -134,10 +142,10 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
-      //      val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType)
+      val flag = rs.getInt("flag")
+      new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
     }.get
   }
 }
 
-class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int)
+class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)

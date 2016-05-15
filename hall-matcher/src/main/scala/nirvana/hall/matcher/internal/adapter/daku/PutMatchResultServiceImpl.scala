@@ -87,6 +87,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       val cand = candIter.next()
       val keyId = sidKeyidMap.get(cand.getObjectId)
       if (keyId.nonEmpty) {
+        val fgp = DataConverter.fingerPos8to6(cand.getPos)
         result.write(new Array[Byte](4))
         result.write(DataConverter.int2Bytes(cand.getScore))
         result.write(keyId.get.getBytes)
@@ -95,7 +96,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
         result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
         result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
-        result.write(cand.getPos.toByte)
+        result.write(fgp.toByte)
         result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
         result.write(DataConverter.getAFISDateTime(new Date()))
         result.write(new Array[Byte](2 + 2 + 2 + 2))
