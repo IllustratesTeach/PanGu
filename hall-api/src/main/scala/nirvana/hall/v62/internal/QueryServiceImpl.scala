@@ -67,7 +67,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     stSelRes.nResItemCount = stItems.size
 
     stSelStatement.nMaxToGet = limit
-    statementOpt.foreach(x=>stSelStatement.szStatement=x)
+    statementOpt.foreach(stSelStatement.szStatement = _)
 
     val dbDef = facade.NET_GAFIS_MISC_GetDefDBID()
     val nret = facade.NET_GAFIS_TABLE_Select(dbDef.nAdminDefDBID,g_stCN.stSysAdm.nTIDBreakCaseTable, stSelRes, stSelStatement);
