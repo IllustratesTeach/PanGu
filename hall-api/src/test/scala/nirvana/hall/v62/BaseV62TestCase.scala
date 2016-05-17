@@ -39,7 +39,7 @@ class BaseV62TestCase {
     config.user = "afisadmin"
     config.password=""
 
-    new V62Facade(config)
+    new V62Facade
   }
 }
 
