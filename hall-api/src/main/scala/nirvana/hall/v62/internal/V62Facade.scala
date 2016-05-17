@@ -32,6 +32,8 @@ class V62Facade
     val address = V62Facade.serverContext.value
     if(address == null)
       throw new IllegalStateException("can't find v62 server address from context")
+
+    address
   }
 }
 object V62Facade{

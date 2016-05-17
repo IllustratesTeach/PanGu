@@ -21,7 +21,7 @@ class nettableTest {
     config.user = "afisadmin"
     config.password=""
 
-    val facade = new V62Facade(config)
+    val facade = new V62Facade
 
     val result = new GADB_SELRESULT
     val field1 = new GADB_SELRESITEM
