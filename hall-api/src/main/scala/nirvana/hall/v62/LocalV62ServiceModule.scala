@@ -22,8 +22,5 @@ object LocalV62ServiceModule {
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
   }
-  @Contribute(classOf[HttpServletRequestHandler])
-  def provideAutoSetupServerContextFilter(configuration: OrderedConfiguration[HttpServletRequestFilter]): Unit = {
-    configuration.addInstance("AutoSetupServerContext", classOf[AutoSetupServerContextFilter], "before:protobuf")
-  }
+
 }
