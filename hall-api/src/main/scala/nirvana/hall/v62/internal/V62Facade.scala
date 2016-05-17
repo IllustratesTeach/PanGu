@@ -24,6 +24,7 @@ class V62Facade
   with gnetflib
   with nettable
   with gnetfunc
+  with netpmadm
   with netmisc
   with AncientClientSupport
   with reqansop
