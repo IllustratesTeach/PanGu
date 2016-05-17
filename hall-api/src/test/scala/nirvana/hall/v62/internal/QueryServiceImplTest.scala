@@ -11,12 +11,15 @@ import org.junit.Test
 class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def testQuery: Unit ={
-    val service  = new QueryServiceImpl(createFacade,null)
-    val queryResult = service.queryMatchResultByCardId(20,2,Some("((KeyID LIKE '123'))"),10);
-    println(queryResult.size)
+    executeInContext{
 
-    var list = service.queryMatchInfo(None,10)
-    list = service.queryMatchInfo(Some("((SrcKey LIKE '010%')) "),10)
+      val service  = new QueryServiceImpl(createFacade,null)
+      val queryResult = service.queryMatchResultByCardId(20,2,Some("((KeyID LIKE '123'))"),10);
+      println(queryResult.size)
+
+      var list = service.queryMatchInfo(None,10)
+      list = service.queryMatchInfo(Some("((SrcKey LIKE '010%')) "),10)
+    }
   }
 
 }

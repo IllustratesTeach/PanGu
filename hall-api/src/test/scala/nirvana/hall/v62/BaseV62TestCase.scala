@@ -3,6 +3,7 @@ package nirvana.hall.v62
 import monad.support.services.XmlLoader
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.services.V62ServerAddress
 import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{After, Before}
 
@@ -32,14 +33,25 @@ class BaseV62TestCase {
     registry.shutdown()
   }
 
-  def createFacade:V62Facade ={
+  def createFacade:V62Facade = new V62Facade
+  def executeInContext[T](function: => T): Unit ={
     val config = new HallV62Config
-    config.host = "10.1.6.119"
+    config.host = "10.1.6.182"
     config.port = 6798
     config.user = "afisadmin"
     config.password=""
 
-    new V62Facade
+    val passwordOpt = if(config.password.isEmpty) None else Some(config.password)
+
+    val address = V62ServerAddress(
+      config.host,
+      config.port,
+      config.connectionTimeoutSecs,
+      config.readTimeoutSecs,config.user,
+      passwordOpt)
+    V62Facade.serverContext.withValue(address){
+     function
+    }
   }
 }
 
