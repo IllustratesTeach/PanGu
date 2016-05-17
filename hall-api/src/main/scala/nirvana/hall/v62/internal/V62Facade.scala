@@ -48,6 +48,17 @@ object V62Facade{
     * 动态获取服务器的地址，通过动态变量的上下文进行获取
     */
   private[v62] val serverContext = new scala.util.DynamicVariable[V62ServerAddress](null)
+  def withConfigurationServer[T](config:HallV62Config)(function: =>T)={
+    val address = V62ServerAddress(config.host,
+      config.port,
+      config.connectionTimeoutSecs,
+      config.readTimeoutSecs,
+      config.user,
+      Option(config.password))
+    serverContext.withValue(address){
+      function
+    }
+  }
   /**
     * 针对v62的服务器端请求，自动添加请求的上下文
     * NOTICE: 此filter的位置需要放置在protobuf的前端
