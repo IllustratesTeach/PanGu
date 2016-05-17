@@ -74,7 +74,7 @@ object V62Facade{
         }else{
           val port = getHeader(request,X_V62_PORT_HEAD,config.port.toString).toInt
           val user = getHeader(request,X_V62_USER_HEAD,config.user)
-          val passOpt = Option(getHeader(request,X_V62_USER_HEAD,config.password))
+          val passOpt = Option(getHeader(request,X_V62_PASSWORD_HEAD,config.password))
           V62ServerAddress(host,port,config.connectionTimeoutSecs,config.readTimeoutSecs,user,passOpt)
         }
       serverContext.withValue(v62Address){
