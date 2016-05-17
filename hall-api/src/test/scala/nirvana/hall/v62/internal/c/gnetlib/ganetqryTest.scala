@@ -28,7 +28,7 @@ class ganetqryTest {
     config.port = 6898
     config.user = "afisadmin"
 
-    val facade = new V62Facade(config)
+    val facade = new V62Facade
 
     val srcDb = DatabaseTable(1,2)
     val destDb = DatabaseTable(1,2)
