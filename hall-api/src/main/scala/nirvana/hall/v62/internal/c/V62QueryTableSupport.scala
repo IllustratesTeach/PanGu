@@ -9,14 +9,16 @@ import org.jboss.netty.buffer.ChannelBuffers
 import scala.reflect._
 
 /**
-  *
+  * 实现通用查询接口，能够根据数据库的id和表的id进行查询
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-05-18
   */
 trait V62QueryTableSupport {
   this:nettable=>
   /**
-    * 通用查询接口
+    * 通用查询接口,能够直接查询6.2的任何表.
+    *
+    * //TODO 对给的SQL根据给定的数据库类型来进行自适应
     *
     * @param dbId          数据库ID
     * @param tableId       表ID
