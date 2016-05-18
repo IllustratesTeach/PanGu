@@ -4,6 +4,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.c.V62QueryTableSupport
 import nirvana.hall.v62.internal.c.gnetlib._
 import nirvana.hall.v62.internal.c.grmtlib.gnetfunc
 import nirvana.hall.v62.services.V62ServerAddress
@@ -17,6 +18,7 @@ import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletReque
  */
 class V62Facade
   extends gnetcsr
+  with V62QueryTableSupport
   with DataSyncSupport
   with ganetqry
   with ganetdbp
@@ -64,6 +66,7 @@ object V62Facade{
     * NOTICE: 此filter的位置需要放置在protobuf的前端
     *
     * 如果前端的请求指定了服务器相关信息，则采用指定的信息进行连接
+ *
     * @see ProtobufServletFilter
     * @see LocalV62ServiceModule
     * @see LocalApiWebModule

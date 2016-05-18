@@ -60,18 +60,9 @@ trait galocpkg {
         case PKG_ITEMTYPE_THIS=>
           pstCard.fromByteArray(pstItem.bnRes)
         case PKG_ITEMTYPE_MIC =>
-        nCount = GAFIS_MIC_GetMicArrayFromStream(pstItem->bnRes,Char4To_uint4(pstItem->stHead.nItemLen),&pstMic);
-        if(nCount < 0)	ERRFAILFINISHEXIT();
-        for( j = 0; j <	nCount; ++j)
-        {
-          if(pstMic[j].pstBin)	pstMic[j].bBinCanBeFreed = 1;
-          if(pstMic[j].pstCpr)	pstMic[j].bCprCanBeFreed = 1;
-          if(pstMic[j].pstImg)	pstMic[j].bImgCanBeFreed = 1;
-          if(pstMic[j].pstMnt)	pstMic[j].bMntCanBeFreed = 1;
-        }
-        pstCard->pstMIC = pstMic;
-        pstCard->nMicItemCount	= (UCHAR)(uint4)nCount;
-        pstCard->bMicCanBeFreed	= 1;
+        val pstMics = GAFIS_MIC_GetMicArrayFromStream(pstItem.bnRes)
+        pstCard.pstMIC_Data = pstMics.toArray
+        pstCard.nMicItemCount	= pstMics.length
 
         if( GAFIS_PKG_UnZipMicArray(pstCard->pstMIC, nCount, 0) < 0 ) ERRFAILFINISHEXIT();
 

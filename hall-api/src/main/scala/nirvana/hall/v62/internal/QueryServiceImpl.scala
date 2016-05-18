@@ -8,7 +8,7 @@ import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
-import nirvana.hall.v62.internal.c.gloclib.gcolnames.g_stCN
+import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
@@ -26,59 +26,45 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @return 查询结构
     */
   def queryMatchInfo(statementOpt:Option[String],limit:Int): List[GAFIS_VERIFYLOGSTRUCT]={
-    val stSelStatement = new GADB_SELSTATEMENT    
-    val stItems = new mutable.ListBuffer[GADB_SELRESITEM]();
-    val stSelRes = new GADB_SELRESULT
-
-    val destStruct = new GAFIS_VERIFYLOGSTRUCT
-    stSelRes.nSegSize = destStruct.getDataSize
-
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszBreakID,"szBreakID")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSrcKey,"szSrcKey")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszDestKey,"szDestKey")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszScore,"nScore")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszFirstRankScore,"nFirstRankScore")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszRank,"nRank")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszFg,"nFg")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszHitPoss,"nHitPoss")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszIsRemoteSearched,"bIsRmtSearched")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszIsCrimeCaptured,"bIsCrimeCaptured")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszTotoalMatchedCnt,"nTotalMatchedCnt")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszQueryType,"nQueryType")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSrcDBID,"nSrcDBID")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszDestDBID,"nDestDBID")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSrcPersonCaseID,"szSrcPersonCaseID")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszDestPersonCaseID,"szDestPersonCaseID")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszCaseClassCode1,"szCaseClassCode1")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszCaseClassCode2,"szCaseClassCode2")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszCaseClassCode3,"szCaseClassCode3")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSubmitUserName,"szSubmitUserName")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSubmitUserUnitCode,"szSubmitUserUnitCode")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszSubmitDateTime,"tSubmitDateTime")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszBreakUserName,"szBreakUserName")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszBreakUserUnitCode,"szBreakUserUnitCode")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszBreakDateTime,"tBreakDateTime")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszReCheckUserName,"szReCheckUserName")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszReCheckerUnitCode,"szReCheckerUnitCode")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stBc.pszReCheckDate,"tReCheckDateTime")
-      SETSELRESITEM_FIXED(stItems, destStruct, g_stCN.stNuminaCol.pszSID,"nSID")
-
-   stSelRes.pstItem_Data = stItems.toArray
-    stSelRes.nResItemCount = stItems.size
-
-    stSelStatement.nMaxToGet = limit
-    statementOpt.foreach(stSelStatement.szStatement = _)
+    val mapper = Map(
+         g_stCN.stBc.pszBreakID->"szBreakID",
+         g_stCN.stBc.pszSrcKey->"szSrcKey",
+         g_stCN.stBc.pszDestKey->"szDestKey",
+         g_stCN.stBc.pszScore->"nScore",
+         g_stCN.stBc.pszFirstRankScore->"nFirstRankScore",
+         g_stCN.stBc.pszRank->"nRank",
+         g_stCN.stBc.pszFg->"nFg",
+         g_stCN.stBc.pszHitPoss->"nHitPoss",
+         g_stCN.stBc.pszIsRemoteSearched->"bIsRmtSearched",
+         g_stCN.stBc.pszIsCrimeCaptured->"bIsCrimeCaptured",
+         g_stCN.stBc.pszTotoalMatchedCnt->"nTotalMatchedCnt",
+         g_stCN.stBc.pszQueryType->"nQueryType",
+         g_stCN.stBc.pszSrcDBID->"nSrcDBID",
+         g_stCN.stBc.pszDestDBID->"nDestDBID",
+         g_stCN.stBc.pszSrcPersonCaseID->"szSrcPersonCaseID",
+         g_stCN.stBc.pszDestPersonCaseID->"szDestPersonCaseID",
+         g_stCN.stBc.pszCaseClassCode1->"szCaseClassCode1",
+         g_stCN.stBc.pszCaseClassCode2->"szCaseClassCode2",
+         g_stCN.stBc.pszCaseClassCode3->"szCaseClassCode3",
+         g_stCN.stBc.pszSubmitUserName->"szSubmitUserName",
+         g_stCN.stBc.pszSubmitUserUnitCode->"szSubmitUserUnitCode",
+         g_stCN.stBc.pszSubmitDateTime->"tSubmitDateTime",
+         g_stCN.stBc.pszBreakUserName->"szBreakUserName",
+         g_stCN.stBc.pszBreakUserUnitCode->"szBreakUserUnitCode",
+         g_stCN.stBc.pszBreakDateTime->"tBreakDateTime",
+         g_stCN.stBc.pszReCheckUserName->"szReCheckUserName",
+         g_stCN.stBc.pszReCheckerUnitCode->"szReCheckerUnitCode",
+         g_stCN.stBc.pszReCheckDate->"tReCheckDateTime",
+         g_stCN.stNuminaCol.pszSID->"nSID"
+    )
 
     val dbDef = facade.NET_GAFIS_MISC_GetDefDBID()
-    val nret = facade.NET_GAFIS_TABLE_Select(dbDef.nAdminDefDBID,g_stCN.stSysAdm.nTIDBreakCaseTable, stSelRes, stSelStatement);
-    if(nret >= 0){
-      val count = stSelRes.nRecGot
-      if(count > 0) {
-        val buffer = ChannelBuffers.wrappedBuffer(stSelRes.pDataBuf_Data)
-        return Range(0, count).map(x => new GAFIS_VERIFYLOGSTRUCT().fromStreamReader(buffer)).toList
-      }
-    }
-    Nil
+    facade.queryV62Table[GAFIS_VERIFYLOGSTRUCT](
+      dbDef.nAdminDefDBID,
+      g_stCN.stSysAdm.nTIDBreakCaseTable,
+      mapper,
+      statementOpt,
+      limit)
   }
   def queryMatchResultByCardId( dbId:Short,
                                 tableId:Short,

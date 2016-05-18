@@ -939,6 +939,15 @@ object gadbrec {
 
   /////////////////////////////////////////////////////////////
 
+  def SETSELRESITEM_FIXED[T<:AncientData](data:T , szname:String, item:String): GADB_SELRESITEM= {
+    val p = new GADB_SELRESITEM()
+    p.szItemName = szname
+    val (offset,len) = data.findFieldOffsetAndLength(item)
+    p.nDataOffset = offset
+    p.nDataLen = len
+
+    p
+  }
   def SETSELRESITEM_FIXED[T<:AncientData](buffer:scala.collection.mutable.ListBuffer[GADB_SELRESITEM],
                                           data:T , szname:String, item:String): Unit = {
     val p = new GADB_SELRESITEM()
