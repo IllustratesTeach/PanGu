@@ -7,7 +7,7 @@ option java_outer_classname = "MatchRelationProto";
 //查中登记系统信息
 message MatchSysInfo{
     required string match_unit_code = 1; //比对单位代码
-    required string match_name = 2; //比对单位名称
+    required string match_unit_name = 2; //比对单位名称
     required string matcher = 3; //比对人姓名
     required string match_date = 4; //比对日期
     optional string remark = 5; //备注
