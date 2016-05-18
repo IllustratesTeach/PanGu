@@ -13,6 +13,26 @@ import nirvana.hall.v62.internal.AncientClientSupport
  */
 trait ganetdbp {
   this:AncientClientSupport with reqansop=>
+  def NET_GAFIS_SYS_GetAllDB(nOption:Int=0):Array[GADBPROPSTRUCT]=
+    executeInChannel{pstCon=>
+
+      val pReq = new GNETREQUESTHEADOBJECT
+      val stAns = new GNETANSWERHEADOBJECT
+      NETREQ_SetOpClass(pReq, OP_CLASS_SYS);	// set op class
+      NETREQ_SetOpCode(pReq, OP_SYS_GETALLDB);	// set op code
+      NETOP_SENDREQ(pstCon, pReq);
+      NETOP_RECVANS(pstCon, stAns);
+      validateResponse(pstCon,stAns)
+      val retval = NETANS_GetRetVal(stAns)
+      if ( retval>0 ) {
+
+        NETANS_SetRetVal(stAns, 1);
+        NETOP_SENDANS(pstCon, stAns);
+        Range(0,retval).map(x=>new GADBPROPSTRUCT()).map(NETOP_RECVDATA(pstCon,_)).toArray
+      }else{
+        Array[GADBPROPSTRUCT]()
+      }
+  }
 
   def NET_GAFIS_SYS_GetDBByID(nDBID:Short,nOption:Int=0):GADBPROPSTRUCT=executeInChannel {channel=>
     val pReq = new GNETREQUESTHEADOBJECT

@@ -1,10 +1,12 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
-import nirvana.hall.v62.internal.AncientClientSupport
+import nirvana.hall.c.services.gbaselib.paramadm
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
-import nirvana.hall.c.services.grmtlib.gserver.RMTSERVERSTRUCT
 import nirvana.hall.c.services.grmtlib.grmtcode._
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.c.services.grmtlib.grmtpara
+import nirvana.hall.c.services.grmtlib.gserver.RMTSERVERSTRUCT
+import nirvana.hall.v62.internal.AncientClientSupport
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, netpmadm, reqansop}
 
 /**
  *
@@ -12,7 +14,7 @@ import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
  * @since 2015-11-24
  */
 trait gnetfunc {
-  this:AncientClientSupport with gnetcsr with reqansop =>
+  this:AncientClientSupport with gnetcsr with reqansop with netpmadm =>
   def NET_GAFIS_RMTLIB_SERVER_Add(nDBID:Short, nTableID:Short, pServer:RMTSERVERSTRUCT, nOption:Int = 0):Unit=
     executeInChannel{pstCon=>
       val pReq = new GNETREQUESTHEADOBJECT
@@ -48,5 +50,15 @@ trait gnetfunc {
       NETOP_RETVAL_LT_FIN(pstCon,pAns);
       NETOP_RECVDATA(pstCon, pServer);
     }
+  //get local unit code
+  def NET_GAFIS_RMTLIB_GetLocUnitCode:String= {
 
+    val pszName =
+      if (grmtpara.g_stRmtParamName.pszLocUnitCode != null)
+        grmtpara.g_stRmtParamName.pszLocUnitCode;
+      else
+        paramadm.g_stParamName.pszUnitCode;
+
+    NET_GAFIS_PMADM_GetStr(pszName)
+  }
 }
