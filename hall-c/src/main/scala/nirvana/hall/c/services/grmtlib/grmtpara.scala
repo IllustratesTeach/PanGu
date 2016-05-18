@@ -4,6 +4,7 @@ import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services._
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
+import nirvana.hall.c.services.grmtlib.grmtdb.RMTLOCALDBIDSTRUCT
 
 /**
   *
@@ -495,19 +496,17 @@ object grmtpara {
   final val RMTSVRPARAM_FLAGEX_CLIENT_LASTGETCMDTIME = 0x10
   final val RMTSVRPARAM_FLAGEX_CLIENT_LASTQUALCHKTIME = 0x20
 
-  /*
-  class RMTSVRPARAMSTRUCT extends AncientData
+  class RMTSVRPARAMSTRUCT //extends AncientData
   {
     var stClient = new RMTCLIENTPARAMSTRUCT;		//size is 1024
   @Length(4)
-  var stAutoQry:Array[RMTCLIENTAUTOQRYSTRUCT] = _;	//size is 512 * 4, TT TL LT LL
+//  var stAutoQry:Array[RMTCLIENTAUTOQRYSTRUCT] = _;	//size is 512 * 4, TT TL LT LL
   var stDBID = new RMTLOCALDBIDSTRUCT;			//size is 128
   var nFlag:Byte = _ ;
     var nFlagEx:Byte = _ ;
     @Length(5*1024 - 128 - 2)
     var bnRes:Byte = _
   } //RMTSVRPARAMSTRUCT;	//size is 10 * 1024
-  */
 
   // add for database map between shengting and shiju [10/9/2004]
   final val RMTDBMAP_FLAG_DEFAULTREPORTDB = 0x01

@@ -64,9 +64,12 @@ trait gitempkg {
   {
     pstPkg.deleteItemByName(pszItemName)
   }
-  def GBASE_ITEMPKG_UpdateItem(pstPkg:GBASE_ITEMPKG_OPSTRUCT, pstItem:GBASE_ITEMPKG_ITEMSTRUCT)
-  {
+  def GBASE_ITEMPKG_UpdateItem(pstPkg:GBASE_ITEMPKG_OPSTRUCT, pstItem:GBASE_ITEMPKG_ITEMSTRUCT) {
     GBASE_ITEMPKG_DelItem(pstPkg, pstItem.stHead.szItemName)
     GBASE_ITEMPKG_AddItem(pstPkg, pstItem)
+  }
+  //﻿// get all items head from package
+  def GBASE_ITEMPKG_GetItemDir(pstPkg:GBASE_ITEMPKG_OPSTRUCT):Array[GBASE_ITEMPKG_ITEMHEADSTRUCT]= {
+    pstPkg.items.map(_.stHead).toArray
   }
 }
