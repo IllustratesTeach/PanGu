@@ -4,7 +4,8 @@ import nirvana.hall.c.services.gbaselib.gbasedef
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
-import nirvana.hall.c.services.gloclib.{galoclp, galoctp}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.{glocdef, galoclp, galoctp}
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
@@ -60,7 +61,7 @@ trait galocpkg {
         case PKG_ITEMTYPE_THIS =>
           pstCard.fromByteArray(pstItem.bnRes)
         case PKG_ITEMTYPE_MIC =>
-          val pstMics = GAFIS_MIC_GetMicArrayFromStream(pstItem.bnRes)
+          val pstMics = GAFIS_MIC_GetMicArrayFromStream(buffer)
           pstCard.pstMIC_Data = pstMics.toArray
           pstCard.nMicItemCount = pstMics.length.toByte
 
@@ -115,7 +116,7 @@ trait galocpkg {
           pstCard.fromStreamReader(buffer)
 
         case PKG_ITEMTYPE_MIC =>
-        val pstMic = GAFIS_MIC_GetMicArrayFromStream(pstItem.bnRes)
+        val pstMic = GAFIS_MIC_GetMicArrayFromStream(buffer)
         pstCard.pstMIC_Data = pstMic
         pstCard.nMicItemCount	= pstMic.length.toByte
         pstCard.bMicCanBeFreed	= 1
@@ -204,80 +205,49 @@ trait galocpkg {
     }.toList
 
   }
-  /*
 
-  int	GAFIS_PKG_GetQuery(GBASE_ITEMPKG_OPSTRUCT* pstPkg,GAQUERYSTRUCT* pstQuery)
+  def GAFIS_PKG_GetQuery(pstPkg:GBASE_ITEMPKG_OPSTRUCT):Array[GAQUERYSTRUCT]=
   {
-    GBASE_ITEMPKG_ITEMHEADSTRUCT*	pstItemHead	= NULL;
-    GBASE_ITEMPKG_ITEMSTRUCT*		pstItem		= NULL;
 
-    int	retval,nItemCount,i;
+    val pstItemHeads = GBASE_ITEMPKG_GetItemDir(pstPkg)
+    pstItemHeads.map{pstItemHead=>
 
-    retval = -1;
-
-    nItemCount = GBASE_ITEMPKG_GetItemDir(pstPkg,&pstItemHead);
-    if(nItemCount < 1)	ERRFAILFINISHEXIT();
-
-    for( i = 0; i < nItemCount; ++i)
-    {
-      if( GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead[i].szItemName,&pstItem) < 0 ) ERRFAILFINISHEXIT();
-      switch(Char4To_uint4(pstItemHead[i].nItemType))
-      {
-        case PKG_ITEMTYPE_THIS:
-        if( GAFIS_QUERY_Stream2Struct((UCHAR*)pstItem.bnRes,Char4To_uint4(pstItem.stHead.nItemLen),pstQuery) < 0 ) ERRFAILFINISHEXIT();
-        break;
-        default:	break;
+      val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead.szItemName).getOrElse(throw new IllegalStateException("item not found"))
+      val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
+      pstItemHead.nItemType match {
+        case PKG_ITEMTYPE_THIS=>
+         GAFIS_QUERY_Stream2Struct(buffer)
       }
     }
-
-    GAFIS_Err_ClearError();
-    retval = 1;
-    Finish_Exit:
-    if(pstItemHead)	free(pstItemHead);
-    if(retval < 0)	GAFIS_QUERY_Free(pstQuery);
-    return retval;
   }
 
-  int	GAFIS_PKG_GetPkgType(GBASE_ITEMPKG_OPSTRUCT* pstPkg,void** ppData)
+  /*
+  def GAFIS_PKG_GetPkgType(pstPkg:GBASE_ITEMPKG_OPSTRUCT)
   {
-    GBASE_ITEMPKG_HEADSTRUCT*	pstHead = NULL;
-    GTPCARDINFOSTRUCT*			pstTpCard	= NULL;
-    GLPCARDINFOSTRUCT*			pstLpCard	= NULL;
-    GCASEINFOSTRUCT*			pstCase		= NULL;
-    GAQUERYSTRUCT*				pstQuery	= NULL;
-    int	retval,nPkgType;
-
-    if( !pstPkg || !ppData || !GBASE_ITEMPKG_IsValidHead(pstPkg) )
+    val pstHead = pstPkg.head
+    val nPkgType = pstHead.nPkgType
+    nPkgType match
     {
-      GAFIS_GAFISERR_SET(GAFISERR_PARAMETER_INVALID,0,0);
-      return -1;
-    }
+      case PKG_TYPE_TPCARD=>
 
-    retval = -1;
-
-    pstHead = (GBASE_ITEMPKG_HEADSTRUCT*)pstPkg.pbnPkg;
-    nPkgType = Char4To_uint4(pstHead.nPkgType);
-    switch(nPkgType)
-    {
-      case PKG_TYPE_TPCARD:
       ZMALLOC_GOTOFIN(pstTpCard,GTPCARDINFOSTRUCT*,sizeof(*pstTpCard));
       if( GAFIS_PKG_GetTpCard(pstPkg,pstTpCard) < 0)	ERRFAILFINISHEXIT();
       *ppData = pstTpCard;
       retval = nPkgType;
       break;
-      case PKG_TYPE_LPCARD:
+      case PKG_TYPE_LPCARD=>
       ZMALLOC_GOTOFIN(pstLpCard,GLPCARDINFOSTRUCT*,sizeof(*pstLpCard));
       if( GAFIS_PKG_GetLpCard(pstPkg,pstLpCard) < 0)	ERRFAILFINISHEXIT();
       *ppData = pstLpCard;
       retval = nPkgType;
       break;
-      case PKG_TYPE_CASE:
+      case PKG_TYPE_CASE=>
       ZMALLOC_GOTOFIN(pstCase,GCASEINFOSTRUCT*,sizeof(*pstCase));
       if( GAFIS_PKG_GetCase(pstPkg,pstCase) < 0)	ERRFAILFINISHEXIT();
       *ppData = pstCase;
       retval = nPkgType;
       break;
-      case PKG_TYPE_QUERY:
+      case PKG_TYPE_QUERY=>
       ZMALLOC_GOTOFIN(pstQuery,GAQUERYSTRUCT*,sizeof(*pstQuery));
       if( GAFIS_PKG_GetQuery(pstPkg,pstQuery) < 0)	ERRFAILFINISHEXIT();
       *ppData = pstQuery;
@@ -286,7 +256,7 @@ trait galocpkg {
 
       case PKG_TYPE_FPTFILE:
       default:
-      *ppData = NULL;
+      *ppData = null;
       retval = 0;	break;
     }
 
@@ -334,5 +304,105 @@ trait galocpkg {
       }.toArray
   }
   def GAFIS_PKG_UnZipMicArray(pstMIC:Array[GAFISMICSTRUCT]){
+  }
+  def GAFIS_QUERY_Stream2Struct(pszStream:ChannelBuffer):GAQUERYSTRUCT=
+  {
+    val pstQuery = new GAQUERYSTRUCT
+    pstQuery.fromStreamReader(pszStream)
+
+    var nSize = pstQuery.nCandHeadLen
+    if(nSize>0) {
+      pstQuery.pstCandHead_Data = new GAQUERYCANDHEADSTRUCT().fromStreamReader(pszStream)
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nCandLen
+    if(nSize > 0 ) {
+      val num = nSize / new GAQUERYCANDSTRUCT().getDataSize
+      pstQuery.pstCand_Data = Range(0,num).map(x=>new GAQUERYCANDSTRUCT().fromStreamReader(pszStream)).toArray
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nQryCondLen
+    if( nSize >0 ) {
+      pstQuery.pstQryCond_Data = pszStream.readBytes(nSize).array()
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nMISCondLen
+    if( nSize > 0 )
+    {
+      pstQuery.pstMISCond_Data = pszStream.readBytes(nSize).array()
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nSvrListLen
+    if( nSize >0)
+    {
+      pstQuery.pstSvrList_Data = pszStream.readBytes(nSize).array()
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nTextSqlLen
+    if( nSize > 0 )
+    {
+      pstQuery.pstTextSql_Data = pszStream.readBytes(nSize).array()
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pszStream.readableBytes()
+    if(nSize > 0 )
+    {
+      val readerIndex = pszStream.readerIndex()
+      pstQuery.pstMIC_Data = GAFIS_MIC_GetMicArrayFromStream(pszStream)
+      pstQuery.nMICCount = pstQuery.pstMIC_Data.length
+      val bIsLat =
+      if( pstQuery.stSimpQry.nQueryType == glocdef.LTMATCH || pstQuery.stSimpQry.nQueryType== glocdef.LLMATCH )
+        1
+      else
+        0
+
+
+      pstQuery.pstMIC_Data.foreach(_.bIsLatent = bIsLat.toByte)
+       pszStream.skipBytes(GAFIS_MIC_MicStreamLen(pstQuery.pstMIC_Data) - readerIndex)
+    }
+
+    nSize = pstQuery.nCommentLen
+    if( nSize > 0 )
+    {
+      pstQuery.pszComment_Data = pszStream.readBytes(nSize).array()
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = pstQuery.nQryInfoLen
+    if( nSize > 0 )
+    {
+      pstQuery.pstInfo_Data  = new GAFIS_QUERYINFO
+      pstQuery.pstInfo_Data.fromStreamReader(pszStream)
+      pszStream.skipBytes(gbasedef.GBASE_UTIL_ALIGN(nSize,4) - nSize)
+      /*
+      ZMALLOC_GOTOFIN(pstQuery.pstInfo, GAFIS_QUERYINFO*, nSize);
+      memcpy(pstQuery.pstInfo, pos, nSize);
+      pstQuery.bQryInfoCanBeFree = 1;
+      pos += GBASE_UTIL_ALIGN(nSize,4);
+      */
+    }
+
+    pstQuery
+  }
+  def GAFIS_MIC_MicStreamLen(mics:Array[GAFISMICSTRUCT]):Int={
+    var n = 0;
+    mics.foreach { pmic =>
+      n += 160 + 36; // 4 items  and one  mic name.
+      if (pmic.nIndex > 0) {
+        n += 40; // has index items
+      }
+      n += 36 + gbasedef.GBASE_UTIL_ALIGN(pmic.nMntLen, 4)
+      n += 36 + gbasedef.GBASE_UTIL_ALIGN(pmic.nImgLen, 4)
+      n += 36 + gbasedef.GBASE_UTIL_ALIGN(pmic.nCprLen, 4)
+      n += 36 + gbasedef.GBASE_UTIL_ALIGN(pmic.nBinLen, 4)
+    }
+
+    n
   }
 }

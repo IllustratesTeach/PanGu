@@ -2,7 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.c.services.gloclib.galoctp.GADB_MICSTREAMNAMESTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
+import org.jboss.netty.buffer.ChannelBuffer
 
 import scala.collection.mutable
 
@@ -90,8 +90,7 @@ trait galoctp {
     buffer.resetReaderIndex()
   }
   // return the # of mic got
-  def GAFIS_MIC_GetMicArrayFromStream(pstream: Array[Byte]): Array[GAFISMICSTRUCT] = {
-    val buffer = ChannelBuffers.wrappedBuffer(pstream)
+  def GAFIS_MIC_GetMicArrayFromStream(buffer: ChannelBuffer): Array[GAFISMICSTRUCT] = {
     val result = mutable.Buffer[GAFISMICSTRUCT]()
     while (buffer.readableBytes() > 360) {
       // even has many larger buffer, these may not be mic stream(other application used).
