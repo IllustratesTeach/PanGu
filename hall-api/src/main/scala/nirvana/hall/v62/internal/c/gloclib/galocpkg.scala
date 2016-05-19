@@ -1,8 +1,9 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.c.services.gbaselib.gbasedef
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
-import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.{galoclp, galoctp}
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
@@ -144,26 +145,19 @@ trait galocpkg {
     }.toList
   }
 
-  /*
-  int	GAFIS_PKG_GetCase(GBASE_ITEMPKG_OPSTRUCT* pstPkg,GCASEINFOSTRUCT*	pstCase)
+  def GAFIS_PKG_GetCase(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GCASEINFOSTRUCT]=
   {
-    GBASE_ITEMPKG_ITEMHEADSTRUCT*	pstItemHead	= NULL;
-    GBASE_ITEMPKG_ITEMSTRUCT*		pstItem		= NULL;
-    GATEXTITEMSTRUCT*				pstTextItem	= NULL;
-    GAKEYSTRUCT*					pstKey		= NULL;
-    int	retval,nItemCount,i,nCount;
+    val headers = GBASE_ITEMPKG_GetItemDir(pstPkg)
 
-    retval = -1;
+    var nCount = 0
 
-    nItemCount = GBASE_ITEMPKG_GetItemDir(pstPkg,&pstItemHead);
-    if(nItemCount < 1)	ERRFAILFINISHEXIT();
-
-    for( i = 0; i < nItemCount; ++i)
-    {
-      if( GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead[i].szItemName,&pstItem) < 0 ) ERRFAILFINISHEXIT();
-      switch(Char4To_uint4(pstItemHead[i].nItemType))
-      {
-        case PKG_ITEMTYPE_THIS:
+    headers.map {pstItemHead=>
+      val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead.szItemName).getOrElse(throw new IllegalStateException("item not found"))
+      val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
+      val pstCase = new GCASEINFOSTRUCT
+      nCount = pstItem.stHead.nItemLen
+      pstItemHead.nItemType match{
+        case PKG_ITEMTYPE_THIS=>
         //			pstCaseInfo = (GCASEINFOSTRUCT*)pstItem.bnRes;
         //			memcpy(pstCase.nGroupID,pstCaseInfo.nGroupID,sizeof(pstCase.nGroupID));
         //			memcpy(pstCase.szCaseID,pstCaseInfo.szCaseID,sizeof(pstCase.szCaseID));
@@ -172,70 +166,45 @@ trait galocpkg {
         //			memcpy(pstCase.szMISCaseID,pstCaseInfo.szMISCaseID,sizeof(pstCase.szMISCaseID));
         //			pstCase.nItemFlag = pstCaseInfo.nItemFlag;
         //			pstCase.nItemFlagEx = pstCaseInfo.nItemFlagEx;
-        memcpy(pstCase, pstItem.bnRes, sizeof(*pstCase));
-        GAFIS_CASE_ClearPointer(pstCase);
-        break;
 
-        case PKG_ITEMTYPE_FINGERID:
-        nCount = Char4To_uint4(pstItem.stHead.nItemLen);
-        ZMALLOC_GOTOFIN(pstKey,GAKEYSTRUCT*,nCount);
-        memcpy(pstKey,pstItem.bnRes,nCount);
-        pstCase.pstFingerID = pstKey;
-        pstCase.bFingerIDCanBeFreed = 1;
-        uint2ToChar2((int2)(nCount/sizeof(GAKEYSTRUCT)),pstCase.nFingerCount);
-        uint4ToChar4(nCount,pstCase.nFingerIDLen);
-        pstCase.nItemFlag	|= (GCIS_ITEMFLAG_FINGERCOUNT|GCIS_ITEMFLAG_FINGERID);
-        pstKey	= NULL;
-        break;
-        case PKG_ITEMTYPE_PALMID:
-        nCount = Char4To_uint4(pstItem.stHead.nItemLen);
-        ZMALLOC_GOTOFIN(pstKey,GAKEYSTRUCT*,nCount);
-        memcpy(pstKey,pstItem.bnRes,nCount);
-        pstCase.pstPalmID = pstKey;
-        pstCase.bPalmIDCanBeFreed = 1;
-        uint2ToChar2((int2)(nCount/sizeof(GAKEYSTRUCT)),pstCase.nPalmCount);
-        uint4ToChar4(nCount,pstCase.nPalmIDLen);
-        pstCase.nItemFlag	|= (GCIS_ITEMFLAG_PALMCOUNT|GCIS_ITEMFLAG_PALMID);
-        pstKey	= NULL;
-        break;
+          pstCase.fromStreamReader(buffer)
 
-        case PKG_ITEMTYPE_TEXT:
-        nCount = GAFIS_TEXT_GetTextArrayFromStream(pstItem.bnRes,Char4To_uint4(pstItem.stHead.nItemLen),&pstTextItem);
-        if(nCount < 0)	ERRFAILFINISHEXIT();
-        pstCase.pstText = pstTextItem;
-        uint2ToChar2((int2)nCount,pstCase.nTextItemCount);
-        pstCase.bTextCanBeFreed	= 1;
-        pstCase.nItemFlag |= GCIS_ITEMFLAG_TEXT;
-        break;
+        case PKG_ITEMTYPE_FINGERID=>
+          pstCase.pstFingerID_Data = Range(0,nCount).map(x=>new GAKEYSTRUCT().fromStreamReader(buffer)).toArray
+          pstCase.nFingerCount = pstCase.pstFingerID_Data.length.toShort
+          pstCase.nFingerIDLen = nCount.toShort
 
+          pstCase.nItemFlag	 = (pstCase.nItemFlag | galoclp.GCIS_ITEMFLAG_FINGERCOUNT| galoclp.GCIS_ITEMFLAG_FINGERID).toByte
+        case PKG_ITEMTYPE_PALMID=>
+          pstCase.pstPalmID_Data = Range(0,nCount).map(x=>new GAKEYSTRUCT().fromStreamReader(buffer)).toArray
+          pstCase.nPalmCount = pstCase.pstPalmID_Data.length.toShort
+          pstCase.nPalmIDLen = nCount.toShort
+          pstCase.nItemFlag	 = (pstCase.nItemFlag | galoclp.GCIS_ITEMFLAG_FINGERCOUNT|galoclp.GCIS_ITEMFLAG_FINGERID).toByte
+
+        case PKG_ITEMTYPE_TEXT=>
+          val pstTextItems = GAFIS_TEXT_GetTextArrayFromStream(buffer)
+          pstCase.pstText_Data = pstTextItems
+          pstCase.nTextItemCount = pstCase.pstText_Data.length.toShort
+          pstCase.nItemFlag = (pstCase.nItemFlag | galoclp.GCIS_ITEMFLAG_TEXT).toByte
         //  [12/8/2006]
-        case PKG_ITEMTYPE_EXTRAINFO:
-        nCount = Char4To_uint4(pstItem.stHead.nItemLen);
-        if( nCount > 0 )
-        {
-          ZMALLOC_GOTOFIN(pstCase.pstExtraInfo, GAFIS_CASE_EXTRAINFO*, nCount);
-          memcpy(pstCase.pstExtraInfo, pstItem.bnRes, nCount);
-          pstCase.bExtraInfoCanBeFreed = 1;
-          uint2ToChar2((uint2)(uint4)nCount, pstCase.nExtraInfoLen);
-          //set itemflag for add or update  [12/18/2006]
-          pstCase.nItemFlagEx |= GCIS_ITEMFLAGEX_EXTRAINFO;
-          if(pstCase.pstExtraInfo.nItemFlag == 0)	pstCase.pstExtraInfo.nItemFlag = 0xFF;
-          if(pstCase.pstExtraInfo.stFpx.nItemFlag == 0)	pstCase.pstExtraInfo.stFpx.nItemFlag = 0xFF;
-        }
-        break;
+        case PKG_ITEMTYPE_EXTRAINFO=>
+          if (nCount > 0) {
 
-        default:	break;
+            pstCase.pstExtraInfo_Data = new GAFIS_CASE_EXTRAINFO().fromStreamReader(buffer)
+            pstCase.nExtraInfoLen = nCount.toShort
+
+            //set itemflag for add or update  [12/18/2006]
+            pstCase.nItemFlagEx = (pstCase.nItemFlagEx | galoclp.GCIS_ITEMFLAGEX_EXTRAINFO).toByte
+            if(pstCase.pstExtraInfo_Data.nItemFlag == 0)	pstCase.pstExtraInfo_Data.nItemFlag = 0xFF.toByte
+            if(pstCase.pstExtraInfo_Data.stFpx.nItemFlag == 0)	pstCase.pstExtraInfo_Data.stFpx.nItemFlag = 0xFF.toByte
+          }
       }
-    }
 
-    GAFIS_Err_ClearError();
-    GAFIS_PKG_UTIL_CheckCase(pstCase);
-    retval = 1;
-    Finish_Exit:
-    if(pstItemHead)	GAFIS_free(pstItemHead);
-    if(retval < 0)	GAFIS_CASE_Free(pstCase);
-    return retval;
+      pstCase
+    }.toList
+
   }
+  /*
 
   int	GAFIS_PKG_GetQuery(GBASE_ITEMPKG_OPSTRUCT* pstPkg,GAQUERYSTRUCT* pstQuery)
   {
@@ -348,7 +317,8 @@ trait galocpkg {
     }
     return	retval;
   }
-  */def GAFIS_TEXT_GetTextArrayFromStream(pszStream:ChannelBuffer):Array[GATEXTITEMSTRUCT]={
+  */
+  def GAFIS_TEXT_GetTextArrayFromStream(pszStream:ChannelBuffer):Array[GATEXTITEMSTRUCT]={
     val nTextItemCount =  pszStream.readInt()
 
     Range(0,nTextItemCount).map(x=>new GATEXTITEMSTRUCT())
