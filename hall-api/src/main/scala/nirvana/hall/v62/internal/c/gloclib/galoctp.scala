@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.services.gloclib.galoctp.GADB_MICSTREAMNAMESTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import org.jboss.netty.buffer.ChannelBuffer
@@ -13,6 +15,7 @@ import scala.collection.mutable
  */
 trait galoctp {
   val streamParameter = new GADB_MICSTREAMNAMESTRUCT
+  val pn = streamParameter
 
   def GAFIS_MIC_GetDataFromStream(buffer: ChannelBuffer): Seq[GAFISMICSTRUCT] = {
 
@@ -99,6 +102,41 @@ trait galoctp {
     }
 
     result.toArray
+  }
+  def GAFIS_MIC_AddDataToStream(pstream:ChannelBuffer,pszName:String,pData:Array[Byte]) //, int nLen, void *pData)
+  {
+    val pos = pstream.writerIndex()
+    pstream.writeBytes(pszName.getBytes())
+
+    pstream.writeZero(32-pos)
+
+    val nLen = if(pData == null) 0 else pData.length
+    pstream.writeInt(nLen)
+    if(pData != null){
+      pstream.writeBytes(pData)
+      pstream.writeZero(UTIL_TO4ALIGN(nLen) - nLen)
+    }
+  }
+  // return 1 on success else return -1
+  def GAFIS_MIC_Mic2Stream(pmic:GAFISMICSTRUCT, pstream:ChannelBuffer)
+  {
+    GAFIS_MIC_AddDataToStream(pstream, pn.pszMICName_Data,null);
+    if ( pmic.nIndex >0 ) {
+      GAFIS_MIC_AddDataToStream(pstream,  pn.pszItemIndex_Data, ByteBuffer.allocate(4).put(pmic.nIndex).array())
+    }
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszItemFlag_Data , Array(pmic.nItemFlag))
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszItemType_Data, Array(pmic.nItemType))
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszItemData_Data, Array(pmic.nItemData))
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszIsLatent_Data, Array(pmic.bIsLatent))
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszMntName_Data, pmic.pstMnt_Data);
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszImgName_Data,  pmic.pstImg_Data);
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszCprName_Data,  pmic.pstCpr_Data);
+    GAFIS_MIC_AddDataToStream(pstream,  pn.pszBinName_Data,  pmic.pstBin_Data);
+  }
+  // return length of stream
+  def GAFIS_MIC_MicArray2Stream(pmic:Array[GAFISMICSTRUCT], buffer:ChannelBuffer)
+  {
+    pmic.foreach(GAFIS_MIC_Mic2Stream(_,buffer))
   }
 }
 

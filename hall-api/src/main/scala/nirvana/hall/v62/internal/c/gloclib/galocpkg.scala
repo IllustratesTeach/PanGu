@@ -1,11 +1,11 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.c.services.gbaselib.gbasedef
-import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
-import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.c.services.gbaselib.gbasedef.{GAKEYSTRUCT,GBASE_UTIL_ALIGN}
+import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMSTRUCT, GBASE_ITEMPKG_OPSTRUCT}
 import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
-import nirvana.hall.c.services.gloclib.{glocdef, galoclp, galoctp}
+import nirvana.hall.c.services.gloclib.{galocpkg, glocdef, galoclp, galoctp}
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
@@ -43,6 +43,27 @@ trait galocpkg {
   val pszPalmID	= "PalmID";
   val pszExtraInfo= "ExtraInfo";
   //val pszOther	= "Other";
+
+
+
+  def GAFIS_PKG_Query2Pkg(pstQuery:GAQUERYSTRUCT,pstPkg:GBASE_ITEMPKG_OPSTRUCT)
+  {
+
+    val bytes = GAFIS_QUERY_Struct2Stream(pstQuery);
+
+    val pstItem = new GBASE_ITEMPKG_ITEMSTRUCT
+    pstItem.stHead.nItemLen = bytes.size
+    pstItem.stHead.nItemType = PKG_ITEMTYPE_THIS
+    pstItem.stHead.szItemName = pszThis
+    pstItem.bnRes = bytes
+
+    pstPkg.addItem(pstItem)
+
+    pstPkg.head.nPkgType = galocpkg.PKG_TYPE_QUERY
+    pstPkg.head.szPkgTypeStr = pszQuery
+
+  }
+
 
   def GAFIS_PKG_GetTpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GTPCARDINFOSTRUCT]= //,GTPCARDINFOSTRUCT* pstCard)
   {
@@ -305,6 +326,124 @@ trait galocpkg {
   }
   def GAFIS_PKG_UnZipMicArray(pstMIC:Array[GAFISMICSTRUCT]){
   }
+  def GAFIS_QUERY_GetStreamLen(pstQuery:GAQUERYSTRUCT):Int=
+  {
+
+    var nStreamSize = pstQuery.getDataSize
+
+    var nSize = pstQuery.nCandHeadLen;
+    if(nSize>0 && pstQuery.pstCandHead_Data!=null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nCandLen);
+    if(nSize > 0 && pstQuery.pstCand_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nQryCondLen);
+    if(nSize>0 && pstQuery.pstQryCond_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nMISCondLen);
+    if(nSize > 0 && pstQuery.pstMISCond_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nSvrListLen);
+    if(nSize > 0 && pstQuery.pstSvrList_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nTextSqlLen);
+    if(nSize > 0 && pstQuery.pstTextSql_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize,4);
+
+    nSize = (pstQuery.nMICCount);
+    if(nSize > 0 && pstQuery.pstMIC_Data != null)
+      nStreamSize += GAFIS_MIC_MicStreamLen(pstQuery.pstMIC_Data);
+
+    nSize = (pstQuery.nCommentLen);
+    if( nSize > 0 && pstQuery.pszComment_Data != null)
+      nStreamSize += GBASE_UTIL_ALIGN(nSize, 4);
+
+    nSize = (pstQuery.nQryInfoLen);
+    if( nSize > 0 && pstQuery.pstInfo_Data != null )
+      nStreamSize += GBASE_UTIL_ALIGN(nSize, 4);
+
+    nStreamSize;
+  }
+
+  def GAFIS_QUERY_Struct2Stream(pstQuery:GAQUERYSTRUCT):Array[Byte]=
+  {
+    val nStreamSize = GAFIS_QUERY_GetStreamLen(pstQuery);
+
+    val buffer = ChannelBuffers.buffer(nStreamSize)
+
+    pstQuery.writeToStreamWriter(buffer)
+
+
+    var nSize = (pstQuery.nCandHeadLen);
+    if(nSize> 0  && pstQuery.pstCandHead_Data != null)
+    {
+      pstQuery.pstCandHead_Data.writeToStreamWriter(buffer)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nCandLen);
+    if(nSize >0  && pstQuery.pstCand_Data != null)
+    {
+      pstQuery.pstCand_Data.foreach(_.writeToStreamWriter(buffer))
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nQryCondLen);
+    if(nSize > 0 && pstQuery.pstQryCond_Data != null)
+    {
+      buffer.writeBytes(pstQuery.pstQryCond_Data)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nMISCondLen);
+    if(nSize > 0 && pstQuery.pstMISCond_Data != null)
+    {
+      buffer.writeBytes(pstQuery.pstMISCond_Data)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nSvrListLen);
+    if(nSize > 0 && pstQuery.pstSvrList_Data != null)
+    {
+      buffer.writeBytes(pstQuery.pstSvrList_Data)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nTextSqlLen);
+    if(nSize >0  && pstQuery.pstTextSql_Data != null)
+    {
+      buffer.writeBytes(pstQuery.pstTextSql_Data)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nMICCount);
+    if(nSize > 0 && pstQuery.pstMIC_Data != null)
+    {
+      GAFIS_MIC_MicArray2Stream(pstQuery.pstMIC_Data,buffer)
+    }
+
+    nSize = (pstQuery.nCommentLen);
+    if( nSize > 0 && pstQuery.pszComment_Data != null )
+    {
+      buffer.writeBytes(pstQuery.pszComment_Data)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    nSize = (pstQuery.nQryInfoLen);
+    if( nSize > 0 && pstQuery.pstInfo_Data != null )
+    {
+      pstQuery.pstInfo_Data.writeToStreamWriter(buffer)
+      buffer.writeZero(GBASE_UTIL_ALIGN(nSize,4) - nSize)
+    }
+
+    buffer.array()
+  }
+
   def GAFIS_QUERY_Stream2Struct(pszStream:ChannelBuffer):GAQUERYSTRUCT=
   {
     val pstQuery = new GAQUERYSTRUCT
