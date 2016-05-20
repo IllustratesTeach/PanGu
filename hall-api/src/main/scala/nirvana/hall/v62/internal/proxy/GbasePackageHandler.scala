@@ -2,6 +2,8 @@ package nirvana.hall.v62.internal.proxy
 
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import nirvana.hall.v62.services.HallV62ExceptionCode.FAIL_TO_FIND_PROCESSOR
@@ -13,7 +15,7 @@ import org.jboss.netty.channel._
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbasePackageHandler(handler: GbaseItemPkgHandler) extends SimpleChannelUpstreamHandler with grmtpkg with gitempkg with LoggerSupport{
+class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler with grmtpkg with gitempkg with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
     val pkg = e.getMessage.asInstanceOf[GBASE_ITEMPKG_OPSTRUCT]
     if(pkg.head.nDataLen != pkg.getDataSize){
@@ -24,8 +26,13 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler) extends SimpleChannelUps
     val opClass = request.nOpClass
     val opCode = request.nOpCode
     info("username:{} opClass {} opCode:{} ",request.szUserName,opClass,opCode)
+
+    //绑定当前线程使用的channel
     ChannelThreadContext.channelContext.withValue(ctx.getChannel){
-      handler.handle(request, pkg)
+      //绑定当前线程使用的v62配置
+      V62Facade.withConfigurationServer(config){
+        handler.handle(request, pkg)
+      }
     }
   }
   override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {

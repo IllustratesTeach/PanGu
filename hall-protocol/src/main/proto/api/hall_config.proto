@@ -1,0 +1,23 @@
+package api;
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "HallConfigProto";
+
+//6.2链接配置
+message V62Config {
+    required string host = 1; //ip
+    required int32 port = 2; //端口
+    optional int32 connection_timeout_secs = 3; //链接超时
+    optional int32 read_timeout_secs = 4; //读取超时
+    required string user = 5; //用户名
+    required string password = 6; //密码
+    required DatabaseTable template_finger_table = 7; //捺印指纹表
+    required DatabaseTable latent_finger_table = 8; //现场指纹表
+    required DatabaseTable case_table = 9; //案件表
+    required DatabaseTable query_table = 10; //查询表
+}
+//6.2表配置
+message DatabaseTable {
+    required string db_id = 1; //数据库id
+    required string table_id = 2; //表id
+}

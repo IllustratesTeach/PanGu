@@ -13,7 +13,7 @@ import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUE
 trait nettable {
     this:AncientClientSupport with gnetcsr with reqansop=>
 
-  def NET_GAFIS_TABLE_Select(nDBID:Short,nTID:Short,pstRes:GADB_SELRESULT,pstStmt:GADB_SELSTATEMENT):Unit=  executeInChannel{channel=>
+  def NET_GAFIS_TABLE_Select(nDBID:Short,nTID:Short,pstRes:GADB_SELRESULT,pstStmt:GADB_SELSTATEMENT):Int =  executeInChannel{channel=>
 
     val pReq = new GNETREQUESTHEADOBJECT
     pReq.nDBID = nDBID
@@ -35,5 +35,6 @@ trait nettable {
     if ( n>0 ) {
       GAFIS_NETSCR_RecvSelResult(channel, pstRes)
     }
+    return n;
   }
 }

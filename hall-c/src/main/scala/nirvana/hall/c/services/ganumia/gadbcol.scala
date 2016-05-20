@@ -59,6 +59,8 @@ object gadbcol {
     var bnRes2:Array[Byte] = _ ;		// reserved.
   } // GADB_COLUMNSCHEMA;	// size of this structure is 256 bytes
 
+  type GACOLUMNPROPSTRUCT = GADB_COLUMNSCHEMA
+
   // After the creation of the table, user can modify the following column properties
   // added on Apr.30, 2004.
   final val GADBCS_ITEM_MODMASK = 0x1		// GADB_COLUMNSCHEMA::nModMask will take effect

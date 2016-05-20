@@ -4,6 +4,7 @@ import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services._
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
+import nirvana.hall.c.services.grmtlib.grmtdb.RMTLOCALDBIDSTRUCT
 
 /**
   *
@@ -11,6 +12,112 @@ import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
   * @since 2016-04-26
   */
 object grmtpara {
+ lazy val g_stRmtParamName =  GAFIS_RMTLIB_InitRmtParamName()
+  private def GAFIS_RMTLIB_InitRmtParamName():RMTPARAMNAMESTRUCT={
+    val g_stRmtParamName = new RMTPARAMNAMESTRUCT()
+
+    g_stRmtParamName.pszLocUnitCode	= RMTPARAMNAME_LOCUNITCODE;	// "UnitCode";
+    g_stRmtParamName.pszRmtSvrParam	= RMTPARAMNAME_RMTSVRPARAM;	// "RMT_SvrParam";
+    g_stRmtParamName.pszLocDBMap	= RMTPARAMNAME_LOCDBMAP;	// "RMT_LocDBMap";
+    g_stRmtParamName.pszSvrDBMap	= RMTPARAMNAME_SVRDBMAP;	// "RMT_SvrDBMap";
+    g_stRmtParamName.pszIPFilters	= RMTPARAMNAME_IPFILTERS;	// "RMT_IPFilters";
+    g_stRmtParamName.pszTxSvrInfo	= RMTPARAMNAME_TXSVRINFO;	// "RMT_TxSvrInfo";
+    g_stRmtParamName.pszReportDatFilters = RMTPARAMNAME_REPORTDATFILTERS;	// "RMT_ReportDatFilters";
+
+    // [11/26/2005]
+    g_stRmtParamName.pszRequiredTPCardTextItem	= RMTPARAMNAME_REQUIREDTPCARDTEXT;	// "RMT_RequiredTPCardTextItem";
+    g_stRmtParamName.pszRequiredLPCardTextItem	= RMTPARAMNAME_REQUIREDLPCARDTEXT;	// "RMT_RequiredLPCardTextItem";
+    g_stRmtParamName.pszRequiredLPCaseTextItem	= RMTPARAMNAME_REQUIREDLPCASETEXT;	// "RMT_RequiredLPCaseTextItem";
+    g_stRmtParamName.pszLiveScan_EnableReplace	= "RMT_LiveScan_EnableReplace";
+    g_stRmtParamName.pszLiveScan_MaxTPCardID	= "RMT_LiveScan_MaxTPCardID";
+
+    //  [12/1/2005]
+    g_stRmtParamName.pszIPMapTable	= RMTPARAMNAME_IPMAPTABLE;	// "RMT_IPMapTable";
+
+    g_stRmtParamName.pszUseSetMode		= "TxUseSetMode";
+    g_stRmtParamName.pszUseDebugMode	= "TxUseDebugMode";
+    g_stRmtParamName.pszLiveUpdateSvr	= "TxLiveUpdateServer";
+    g_stRmtParamName.pszUseDataCtrl		= "TxUseDataCtrl";
+    g_stRmtParamName.pszWaitTimeWhenSysErrOccur	= "TxWaitTimeWhenSysErrOccur";
+
+    /*
+    pszUseThread = g_stRmtParamName.pszUseThread;
+    pszUseThread[RMTTDSEQ_SCHEDULE] = "TxUseScheduleThread";
+    pszUseThread[RMTTDSEQ_ACCEPT]	= "TxUseTcpThread";
+    pszUseThread[RMTTDSEQ_COMMAND]	= "TxUseUdpThread";
+    pszUseThread[RMTTDSEQ_TRANSCFG] = "TxUseAutoTransCfgThread";
+    pszUseThread[RMTTDSEQ_REPORT]	= "TxUseReportThread";
+    pszUseThread[RMTTDSEQ_DOWNLOAD]	= "TxUseDownloadThread";
+    pszUseThread[RMTTDSEQ_RMTQRY]	= "TxUseRmtQryThread";
+    pszUseThread[RMTTDSEQ_AUTODLQRY]	= "TxUseAutoDownloadQryThread";
+    pszUseThread[RMTTDSEQ_LIVEUPDATE]	= "TxUseLiveUpdateThread";
+    pszUseThread[RMTTDSEQ_QRYECHO]	= "TxUseAutoQryEchoThread";
+    pszUseThread[RMTTDSEQ_GETMSG]	= "TxUseGetMsgThread";
+    pszUseThread[RMTTDSEQ_CHECKDB]	= "TxUseCheckDBThread";
+    pszUseThread[RMTTDSEQ_GETASYNCMD]	= "TxUseGetAsynCmdThread";
+    pszUseThread[RMTTDSEQ_GETDBMAP]		= "TxUseGetDBMapThread";
+    pszUseThread[RMTTDSEQ_SENDASYNCMD]	= "TxUseSendAsynCmdThread";
+    pszUseThread[RMTTDSEQ_LIVESCANUSED]	= "TxUseLiveScanUsedThread";
+    pszUseThread[RMTTDSEQ_FPX_RPTTPLP]	= "TxUseFpxReportTPLPThread";
+    pszUseThread[RMTTDSEQ_FPX_RPTQUERY]	= "TxUseFpxReportQueryThread";
+    pszUseThread[RMTTDSEQ_INFOSYNC]		= "TxUseInfoSyncThread";
+    pszUseThread[RMTTDSEQ_DLQRYRESULT]  = "TxUseQryResultDownload";
+
+    pszUseThread[RMTTDSEQ_LIVESCANRMTQRY] = "TxUseLiveScanRmtQryThread";
+    */
+
+    g_stRmtParamName.pszTxSvrType		= "TxServerType";
+    /*
+    g_stRmtParamName.pszDBSvrName		= NAME_SERVERNAME;
+    g_stRmtParamName.pszDBSvrPort		= NAME_SERVERPORT;
+    g_stRmtParamName.pszTxSvrName		= NAME_TXSERVERNAME;
+    g_stRmtParamName.pszTxSvrPort		= NAME_TXSERVERPORT;
+    */
+    g_stRmtParamName.pszMainTxSvrName	= "MainTxServerName";
+    g_stRmtParamName.pszMainTxSvrPort	= "MainTxServerPort";
+    g_stRmtParamName.pszIsMainTxSvr		= "IsMainTxServer";
+    g_stRmtParamName.pszUseMutltiTxSvr	= "UseMutltiTxSvr";
+    g_stRmtParamName.pszTxSvrRunAsServe	= "TxServerRunAsService";
+    g_stRmtParamName.pszMaxThreadCount	= "TxMaxThreadCount";
+    g_stRmtParamName.pszDirectThreadCount		= "TxDirectThreadCount";
+    g_stRmtParamName.pszCreateThreadInternal	= "TxCreateThreadInterval";
+    g_stRmtParamName.pszMaxWaitTime		= "TxMaxWaitTime";
+    g_stRmtParamName.pszTxSendTimeOut	= "TxSendTimeOut";
+    g_stRmtParamName.pszTxRecvTimeOut	= "TxRecvTimeOut";
+    g_stRmtParamName.pszMaxTTL			= "TxMaxTTL";
+
+    g_stRmtParamName.pszRmtQryQueRefreshInternal	= "TxRmtQryQueInterval";
+    g_stRmtParamName.pszRmtQryQueMaxErrTimes		= "TxRmtQryQueMaxErrTimes";
+    g_stRmtParamName.pszRmtQryQueShowIdleInfo		= "TxRmtQryQueShowIdleInfo";
+    g_stRmtParamName.pszRmtQryQuePrefetchCount		= "TxRmtQryQuePrefetchCount";
+    g_stRmtParamName.pszRmtQryQueRetrLatestDays		= "TxRmtQryQueRetrLatestDays";
+
+    g_stRmtParamName.pszReportQueRefreshInternal	= "TxReportQueInterval";
+    g_stRmtParamName.pszReportQueMaxErrTimes		= "TxReportQueMaxErrTimes";
+    g_stRmtParamName.pszReportQueShowIdleInfo		= "TxReportQueShowIdleInfo";
+    g_stRmtParamName.pszReportQuePrefetchCount		= "TxReportQuePrefetchCount";
+
+    g_stRmtParamName.pszDownloadQueRefreshInternal	= "TxDownloadQueInterval";
+    g_stRmtParamName.pszDownloadQueMaxErrTimes		= "TxDownloadQueMaxErrTimes";
+    g_stRmtParamName.pszDownloadQueShowIdleInfo		= "TxDownloadQueShowIdleInfo";
+    g_stRmtParamName.pszDownloadQuePrefetchCount	= "TxDownloadQuePrefetchCount";
+
+    g_stRmtParamName.pszRmtKeyQueRefreshInternal	= "TxRmtKeyQueInterval";
+    g_stRmtParamName.pszRmtKeyQueMaxErrTimes		= "TxRmtKeyQueMaxErrTimes";
+    g_stRmtParamName.pszRmtKeyQueShowIdleInfo		= "TxRmtKeyQueShowIdleInfo";
+    g_stRmtParamName.pszRmtKeyQuePrefetchCount		= "TxRmtKeyQuePrefetchCount";
+
+    g_stRmtParamName.pszUseLogUserRequest	= "LogRmtUserRequest";
+    g_stRmtParamName.pszSvrInfoRefreshInterval	= "SvrInfoRefreshInterval";
+    g_stRmtParamName.pszOutSideIpHead	= "outside_ip_head";
+
+    g_stRmtParamName.pszBackSvrDBMap = RMTPARAMNAME_BACKSVRDBMAP;
+
+    g_stRmtParamName.bInited = 1
+
+    g_stRmtParamName
+  }
+
 
   //paramter's name used on tx server
   class RMTPARAMNAMESTRUCT extends AncientData
@@ -20,192 +127,190 @@ object grmtpara {
     var bnRes:Array[Int] = _;
 
     //used by param table by dbsvr
-    var pszLocUnitCode_Ptr:Int = _ //using 4 byte as pointer
-  @IgnoreTransfer
-  var pszLocUnitCode_Data:Array[Byte] = _ // for pszLocUnitCode pointer ,struct:char;
-  var pszRmtSvrParam_Ptr:Int = _ //using 4 byte as pointer
+    var pszLocUnitCode:String = _ //using 4 byte as pointer
+  var pszRmtSvrParam:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtSvrParam_Data:Array[Byte] = _ // for pszRmtSvrParam pointer ,struct:char;
-  var pszLocDBMap_Ptr:Int = _ //using 4 byte as pointer
+  var pszLocDBMap:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszLocDBMap_Data:Array[Byte] = _ // for pszLocDBMap pointer ,struct:char;
-  var pszSvrDBMap_Ptr:Int = _ //using 4 byte as pointer
+  var pszSvrDBMap:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszSvrDBMap_Data:Array[Byte] = _ // for pszSvrDBMap pointer ,struct:char;
-  var pszIPFilters_Ptr:Int = _ //using 4 byte as pointer
+  var pszIPFilters:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszIPFilters_Data:Array[Byte] = _ // for pszIPFilters pointer ,struct:char;
-  var pszReportDatFilters_Ptr:Int = _ //using 4 byte as pointer
+  var pszReportDatFilters:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszReportDatFilters_Data:Array[Byte] = _ // for pszReportDatFilters pointer ,struct:char;
-  var pszTxSvrInfo_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxSvrInfo:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSvrInfo_Data:Array[Byte] = _ // for pszTxSvrInfo pointer ,struct:char;
   // required text item [11/26/2005]
-  var pszRequiredTPCardTextItem_Ptr:Int = _ //using 4 byte as pointer
+  var pszRequiredTPCardTextItem:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRequiredTPCardTextItem_Data:Array[Byte] = _ // for pszRequiredTPCardTextItem pointer ,struct:char;	//tpcard text
-  var pszRequiredLPCardTextItem_Ptr:Int = _ //using 4 byte as pointer
+  var pszRequiredLPCardTextItem:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRequiredLPCardTextItem_Data:Array[Byte] = _ // for pszRequiredLPCardTextItem pointer ,struct:char;	//lpcard text
-  var pszRequiredLPCaseTextItem_Ptr:Int = _ //using 4 byte as pointer
+  var pszRequiredLPCaseTextItem:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRequiredLPCaseTextItem_Data:Array[Byte] = _ // for pszRequiredLPCaseTextItem pointer ,struct:char;	//lpcase text
-  var pszLiveScan_EnableReplace_Ptr:Int = _ //using 4 byte as pointer
+  var pszLiveScan_EnableReplace:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszLiveScan_EnableReplace_Data:Array[Byte] = _ // for pszLiveScan_EnableReplace pointer ,struct:char;	//enable replace exist finger
-  var pszLiveScan_MaxTPCardID_Ptr:Int = _ //using 4 byte as pointer
+  var pszLiveScan_MaxTPCardID:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszLiveScan_MaxTPCardID_Data:Array[Byte] = _ // for pszLiveScan_MaxTPCardID pointer ,struct:char;	//max tpcardid on rmt server
 
     // Inner and Outre IP Map Table [12/1/2005]
-    var pszIPMapTable_Ptr:Int = _ //using 4 byte as pointer
+    var pszIPMapTable:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszIPMapTable_Data:Array[Byte] = _ // for pszIPMapTable pointer ,struct:char;
 
-    var pszResName_Ptr:Int = _ //using 4 byte as pointer
+    var pszResName:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszResName_Data:Array[Byte] = _ // for pszResName pointer ,struct:char;	//reserved
 
     //used by txserver.ini
-    var pszUseSetMode_Ptr:Int = _ //using 4 byte as pointer
+    var pszUseSetMode:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseSetMode_Data:Array[Byte] = _ // for pszUseSetMode pointer ,struct:char;
-  var pszUseDebugMode_Ptr:Int = _ //using 4 byte as pointer
+  var pszUseDebugMode:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseDebugMode_Data:Array[Byte] = _ // for pszUseDebugMode pointer ,struct:char;
-  var pszLiveUpdateSvr_Ptr:Int = _ //using 4 byte as pointer
+  var pszLiveUpdateSvr:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszLiveUpdateSvr_Data:Array[Byte] = _ // for pszLiveUpdateSvr pointer ,struct:char;
-  var pszUseDataCtrl_Ptr:Int = _ //using 4 byte as pointer
+  var pszUseDataCtrl:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseDataCtrl_Data:Array[Byte] = _ // for pszUseDataCtrl pointer ,struct:char;
-  var pszWaitTimeWhenSysErrOccur_Ptr:Int = _ //using 4 byte as pointer
+  var pszWaitTimeWhenSysErrOccur:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszWaitTimeWhenSysErrOccur_Data:Array[Byte] = _ // for pszWaitTimeWhenSysErrOccur pointer ,struct:char;
 
-    var pszUseThread_Ptr:Int = _ //using 4 byte as pointer
+    var pszUseThread:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseThread_Data:Array[Byte] = _ // for pszUseThread pointer ,struct:char;
 
-    var pszTxSvrType_Ptr:Int = _ //using 4 byte as pointer
+    var pszTxSvrType:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSvrType_Data:Array[Byte] = _ // for pszTxSvrType pointer ,struct:char;
-  var pszDBSvrName_Ptr:Int = _ //using 4 byte as pointer
+  var pszDBSvrName:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDBSvrName_Data:Array[Byte] = _ // for pszDBSvrName pointer ,struct:char;
-  var pszDBSvrPort_Ptr:Int = _ //using 4 byte as pointer
+  var pszDBSvrPort:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDBSvrPort_Data:Array[Byte] = _ // for pszDBSvrPort pointer ,struct:char;
-  var pszTxSvrName_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxSvrName:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSvrName_Data:Array[Byte] = _ // for pszTxSvrName pointer ,struct:char;
-  var pszTxSvrPort_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxSvrPort:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSvrPort_Data:Array[Byte] = _ // for pszTxSvrPort pointer ,struct:char;
-  var pszMainTxSvrName_Ptr:Int = _ //using 4 byte as pointer
+  var pszMainTxSvrName:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszMainTxSvrName_Data:Array[Byte] = _ // for pszMainTxSvrName pointer ,struct:char;
-  var pszMainTxSvrPort_Ptr:Int = _ //using 4 byte as pointer
+  var pszMainTxSvrPort:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszMainTxSvrPort_Data:Array[Byte] = _ // for pszMainTxSvrPort pointer ,struct:char;
-  var pszIsMainTxSvr_Ptr:Int = _ //using 4 byte as pointer
+  var pszIsMainTxSvr:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszIsMainTxSvr_Data:Array[Byte] = _ // for pszIsMainTxSvr pointer ,struct:char;
-  var pszUseMutltiTxSvr_Ptr:Int = _ //using 4 byte as pointer
+  var pszUseMutltiTxSvr:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseMutltiTxSvr_Data:Array[Byte] = _ // for pszUseMutltiTxSvr pointer ,struct:char;
-  var pszTxSvrRunAsServe_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxSvrRunAsServe:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSvrRunAsServe_Data:Array[Byte] = _ // for pszTxSvrRunAsServe pointer ,struct:char;
-  var pszMaxThreadCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszMaxThreadCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszMaxThreadCount_Data:Array[Byte] = _ // for pszMaxThreadCount pointer ,struct:char;
-  var pszDirectThreadCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszDirectThreadCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDirectThreadCount_Data:Array[Byte] = _ // for pszDirectThreadCount pointer ,struct:char;
-  var pszCreateThreadInternal_Ptr:Int = _ //using 4 byte as pointer
+  var pszCreateThreadInternal:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszCreateThreadInternal_Data:Array[Byte] = _ // for pszCreateThreadInternal pointer ,struct:char;
-  var pszMaxWaitTime_Ptr:Int = _ //using 4 byte as pointer
+  var pszMaxWaitTime:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszMaxWaitTime_Data:Array[Byte] = _ // for pszMaxWaitTime pointer ,struct:char;
-  var pszTxSendTimeOut_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxSendTimeOut:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxSendTimeOut_Data:Array[Byte] = _ // for pszTxSendTimeOut pointer ,struct:char;
-  var pszTxRecvTimeOut_Ptr:Int = _ //using 4 byte as pointer
+  var pszTxRecvTimeOut:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszTxRecvTimeOut_Data:Array[Byte] = _ // for pszTxRecvTimeOut pointer ,struct:char;
-  var pszMaxTTL_Ptr:Int = _ //using 4 byte as pointer
+  var pszMaxTTL:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszMaxTTL_Data:Array[Byte] = _ // for pszMaxTTL pointer ,struct:char;
 
-    var pszRmtQryQueRefreshInternal_Ptr:Int = _ //using 4 byte as pointer
+    var pszRmtQryQueRefreshInternal:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtQryQueRefreshInternal_Data:Array[Byte] = _ // for pszRmtQryQueRefreshInternal pointer ,struct:char;
-  var pszRmtQryQueMaxErrTimes_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtQryQueMaxErrTimes:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtQryQueMaxErrTimes_Data:Array[Byte] = _ // for pszRmtQryQueMaxErrTimes pointer ,struct:char;
-  var pszRmtQryQueShowIdleInfo_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtQryQueShowIdleInfo:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtQryQueShowIdleInfo_Data:Array[Byte] = _ // for pszRmtQryQueShowIdleInfo pointer ,struct:char;
-  var pszRmtQryQuePrefetchCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtQryQuePrefetchCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtQryQuePrefetchCount_Data:Array[Byte] = _ // for pszRmtQryQuePrefetchCount pointer ,struct:char;
-  var pszRmtQryQueRetrLatestDays_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtQryQueRetrLatestDays:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtQryQueRetrLatestDays_Data:Array[Byte] = _ // for pszRmtQryQueRetrLatestDays pointer ,struct:char;
 
-    var pszReportQueRefreshInternal_Ptr:Int = _ //using 4 byte as pointer
+    var pszReportQueRefreshInternal:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszReportQueRefreshInternal_Data:Array[Byte] = _ // for pszReportQueRefreshInternal pointer ,struct:char;
-  var pszReportQueMaxErrTimes_Ptr:Int = _ //using 4 byte as pointer
+  var pszReportQueMaxErrTimes:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszReportQueMaxErrTimes_Data:Array[Byte] = _ // for pszReportQueMaxErrTimes pointer ,struct:char;
-  var pszReportQueShowIdleInfo_Ptr:Int = _ //using 4 byte as pointer
+  var pszReportQueShowIdleInfo:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszReportQueShowIdleInfo_Data:Array[Byte] = _ // for pszReportQueShowIdleInfo pointer ,struct:char;
-  var pszReportQuePrefetchCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszReportQuePrefetchCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszReportQuePrefetchCount_Data:Array[Byte] = _ // for pszReportQuePrefetchCount pointer ,struct:char;
 
-    var pszDownloadQueRefreshInternal_Ptr:Int = _ //using 4 byte as pointer
+    var pszDownloadQueRefreshInternal:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDownloadQueRefreshInternal_Data:Array[Byte] = _ // for pszDownloadQueRefreshInternal pointer ,struct:char;
-  var pszDownloadQueMaxErrTimes_Ptr:Int = _ //using 4 byte as pointer
+  var pszDownloadQueMaxErrTimes:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDownloadQueMaxErrTimes_Data:Array[Byte] = _ // for pszDownloadQueMaxErrTimes pointer ,struct:char;
-  var pszDownloadQueShowIdleInfo_Ptr:Int = _ //using 4 byte as pointer
+  var pszDownloadQueShowIdleInfo:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDownloadQueShowIdleInfo_Data:Array[Byte] = _ // for pszDownloadQueShowIdleInfo pointer ,struct:char;
-  var pszDownloadQuePrefetchCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszDownloadQuePrefetchCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszDownloadQuePrefetchCount_Data:Array[Byte] = _ // for pszDownloadQuePrefetchCount pointer ,struct:char;
 
-    var pszRmtKeyQueRefreshInternal_Ptr:Int = _ //using 4 byte as pointer
+    var pszRmtKeyQueRefreshInternal:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtKeyQueRefreshInternal_Data:Array[Byte] = _ // for pszRmtKeyQueRefreshInternal pointer ,struct:char;
-  var pszRmtKeyQueMaxErrTimes_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtKeyQueMaxErrTimes:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtKeyQueMaxErrTimes_Data:Array[Byte] = _ // for pszRmtKeyQueMaxErrTimes pointer ,struct:char;
-  var pszRmtKeyQueShowIdleInfo_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtKeyQueShowIdleInfo:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtKeyQueShowIdleInfo_Data:Array[Byte] = _ // for pszRmtKeyQueShowIdleInfo pointer ,struct:char;
-  var pszRmtKeyQuePrefetchCount_Ptr:Int = _ //using 4 byte as pointer
+  var pszRmtKeyQuePrefetchCount:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszRmtKeyQuePrefetchCount_Data:Array[Byte] = _ // for pszRmtKeyQuePrefetchCount pointer ,struct:char;
 
-    var pszSvrInfoRefreshInterval_Ptr:Int = _ //using 4 byte as pointer
+    var pszSvrInfoRefreshInterval:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszSvrInfoRefreshInterval_Data:Array[Byte] = _ // for pszSvrInfoRefreshInterval pointer ,struct:char;
-  var pszUseLogUserRequest_Ptr:Int = _ //using 4 byte as pointer
+  var pszUseLogUserRequest:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszUseLogUserRequest_Data:Array[Byte] = _ // for pszUseLogUserRequest pointer ,struct:char;
-  var pszOutSideIpHead_Ptr:Int = _ //using 4 byte as pointer
+  var pszOutSideIpHead:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszOutSideIpHead_Data:Array[Byte] = _ // for pszOutSideIpHead pointer ,struct:char;
 
-    var pszBackSvrDBMap_Ptr:Int = _ //using 4 byte as pointer
+    var pszBackSvrDBMap:String = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pszBackSvrDBMap_Data:Array[Byte] = _ // for pszBackSvrDBMap pointer ,struct:char;	// 在清空映射表时保留以前的映射库ID
   } //RMTPARAMNAMESTRUCT;
@@ -391,19 +496,17 @@ object grmtpara {
   final val RMTSVRPARAM_FLAGEX_CLIENT_LASTGETCMDTIME = 0x10
   final val RMTSVRPARAM_FLAGEX_CLIENT_LASTQUALCHKTIME = 0x20
 
-  /*
-  class RMTSVRPARAMSTRUCT extends AncientData
+  class RMTSVRPARAMSTRUCT //extends AncientData
   {
     var stClient = new RMTCLIENTPARAMSTRUCT;		//size is 1024
   @Length(4)
-  var stAutoQry:Array[RMTCLIENTAUTOQRYSTRUCT] = _;	//size is 512 * 4, TT TL LT LL
+//  var stAutoQry:Array[RMTCLIENTAUTOQRYSTRUCT] = _;	//size is 512 * 4, TT TL LT LL
   var stDBID = new RMTLOCALDBIDSTRUCT;			//size is 128
   var nFlag:Byte = _ ;
     var nFlagEx:Byte = _ ;
     @Length(5*1024 - 128 - 2)
     var bnRes:Byte = _
   } //RMTSVRPARAMSTRUCT;	//size is 10 * 1024
-  */
 
   // add for database map between shengting and shiju [10/9/2004]
   final val RMTDBMAP_FLAG_DEFAULTREPORTDB = 0x01

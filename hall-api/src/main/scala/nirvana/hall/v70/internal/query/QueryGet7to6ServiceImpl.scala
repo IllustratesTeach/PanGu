@@ -24,9 +24,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                               caseInfoRemoteService: CaseInfoRemoteService)
   extends QueryGet7to6Service{
 
-  private val STATUS_MATCHING:Short = 1//任务状态，正在比对
-  private val STATUS_FINISH:Short = 2
-
   @Transactional
   override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque): Unit = {
     val gafisQuery7to6 = GafisQuery7to6.findOption(queryque.oraSid)
@@ -41,7 +38,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
         ProtobufConverter.convertMatchResult2GafisNormalqueryQueryque(matchResult, queryque)
 
         queryque.finishtime = new Date()
-        queryque.status = STATUS_FINISH
+        queryque.status = QueryConstants.STATUS_SUCCESS
         queryque.save()
         //如果候选列表里的编号在本地没有数据，远程获取数据
         val candList = matchResult.getCandidateResultList
@@ -166,6 +163,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   }
 
   override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
-    GafisNormalqueryQueryque.where("status=?1 and deletag=1 and syncTargetSid is not null", STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
+    GafisNormalqueryQueryque.where("status=?1 and deletag=1 and syncTargetSid is not null", QueryConstants.STATUS_MATCHING).desc("priority").asc("oraSid").takeOption
   }
 }

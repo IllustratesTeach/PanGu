@@ -2,10 +2,11 @@ package nirvana.hall.v62
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.proxy.filter.{AncientDefaultFilter, AncientUserFilter}
-import nirvana.hall.v62.internal.proxy.{GbaseItemPkgFilter, GbaseItemPkgHandler, GbasePackageHandler}
-import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId}
-import org.apache.tapestry5.ioc.services.PipelineBuilder
+import nirvana.hall.v62.internal.proxy.{GbaseProxyServer, GbaseItemPkgFilter, GbaseItemPkgHandler, GbasePackageHandler}
+import org.apache.tapestry5.ioc.annotations.{Startup, Contribute, ServiceId}
+import org.apache.tapestry5.ioc.services.{RegistryShutdownHub, PipelineBuilder}
 import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.slf4j.Logger
 
@@ -16,6 +17,13 @@ object LocalV62ProxyServiceModule {
   def bind(binder:ServiceBinder): Unit ={
 
     binder.bind(classOf[GbasePackageHandler], classOf[GbasePackageHandler])
+  }
+  @Startup
+  def startProxyServer(rpcBindSupport: HallV62Config,hub:RegistryShutdownHub,handler: GbasePackageHandler): Unit ={
+    if(rpcBindSupport.rpc!=null && rpcBindSupport.rpc.bind.length >0){
+      val server = new GbaseProxyServer(rpcBindSupport,handler)
+      server.start(hub)
+    }
   }
   @ServiceId("GbaseItemPkgHandler")
   def buildGbaseItemPkgHandler(pipelineBuilder: PipelineBuilder, logger: Logger,

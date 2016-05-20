@@ -18,6 +18,16 @@ import org.junit.{Assert, Test}
  */
 class FeatureExtractorImplTest extends BaseJniTest{
   @Test
+  def test_extract_shanghai: Unit ={
+
+    val imgData = getClass.getResourceAsStream("/shanghai/31011405020016040001_1_2.img.orginal")
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+  @Test
   def test_extract_bmp: Unit ={
     val imgData = getClass.getResourceAsStream("/bmp.bmp")
 

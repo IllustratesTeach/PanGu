@@ -2,13 +2,13 @@ package nirvana.hall.image.internal
 
 import java.awt.image.{BufferedImage, DataBufferByte}
 import java.awt.{AlphaComposite, Color, Font, RenderingHints}
-import java.io.{FileInputStream, File}
+import java.io.{File, FileInputStream}
 import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
 import nirvana.hall.c.services.AncientData._
-import nirvana.hall.c.services.gfpt4lib.{fpt4code, FPTFile}
+import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
@@ -16,14 +16,23 @@ import nirvana.hall.image.jni.BaseJniTest
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
-import scala.io.Source
 import scala.collection.JavaConversions._
+import scala.io.Source
 /**
  *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
 class FirmDecoderImplTest extends BaseJniTest{
+  @Test
+  def test_decode_shanghai: Unit ={
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val gafisImg = new GAFISIMAGESTRUCT
+    val stream = getClass.getResourceAsStream("/shanghai/31011405020016040001_1_2.img")
+    gafisImg.fromByteArray(IOUtils.toByteArray(stream))
+    val originalImg = decoder.decode(gafisImg)
+//    FileUtils.writeByteArrayToFile(new File("31011405020016040001_1_2.img.orginal"),originalImg.toByteArray())
+  }
   @Test
   def test_parse_fpt: Unit ={
     val filePath = "C:\\Users\\wangjue\\Desktop\\fpt_error\\B9300000000002016044415.FPT"

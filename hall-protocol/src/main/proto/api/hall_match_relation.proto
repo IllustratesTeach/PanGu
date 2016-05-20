@@ -1,0 +1,25 @@
+package api;
+import "fpt/type_definition.proto";
+import "fpt/match_relation.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "HallMatchRelationProto";
+
+//获取比对关系请求
+message MatchRelationGetRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional MatchRelationGetRequest cmd = 11001;
+    }
+    required fpt.MatchType match_type = 1; //比对类型
+    required string card_id = 2; //卡号
+}
+
+//获取比对关系响应
+message MatchRelationGetResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional MatchRelationGetResponse cmd = 11002;
+    }
+    required fpt.MatchType match_type = 1; //比对类型
+    repeated fpt.MatchRelation match_relation = 2; //比对关系
+}

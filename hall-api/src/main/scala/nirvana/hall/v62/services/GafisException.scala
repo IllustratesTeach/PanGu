@@ -4,6 +4,7 @@ import java.util
 import javax.xml.bind.annotation._
 
 import monad.support.services.XmlLoader
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 
 import scala.collection.JavaConversions._
@@ -12,6 +13,7 @@ import GafisException._
 
 /**
  * exception from v62 system
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-07
  */
@@ -44,6 +46,7 @@ object GafisException{
 class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
   /**
    * get error code
+ *
    * @return error code
    */
   def code:Int =  gafisError.nAFISErrno
@@ -51,13 +54,19 @@ class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
   def getSimpleMessage: String = findMessageByCode(code).getOrElse(UNKNOW_ERROR) +"(%s)".format(code)
   /**
    * retrieve message
+ *
    * @return error message
    */
   override def getMessage: String = {
     val message = getSimpleMessage
+    val sb = new StringBuilder
+    sb.append(message)
+    if(gafisError.bnAFISErrData != null)
+      sb.append("\n \t ErrorData: ").append(new String(gafisError.bnAFISErrData, AncientConstants.GBK_ENCODING))
+
 //    if(gafisError.szFileName != null)
 //      message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)
 //    else
-      message
+    sb.toString()
   }
 }

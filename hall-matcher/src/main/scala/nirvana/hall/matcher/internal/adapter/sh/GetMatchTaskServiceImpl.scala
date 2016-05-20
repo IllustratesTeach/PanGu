@@ -35,7 +35,14 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      JdbcDatabase.queryWithPsSetter(MATCH_TASK_QUERY) { ps =>
        ps.setInt(1, size)
      } { rs =>
-       matchTaskQueryResponse.addMatchTask(readMatchTask(rs))
+       val oraSid = rs.getString("ora_sid")
+       try {
+         matchTaskQueryResponse.addMatchTask(readMatchTask(rs))
+       }
+       catch {
+         case e: Exception =>
+           updateMatchStatusFail(oraSid, e.getMessage)
+       }
      }
      matchTaskQueryResponse.build()
    }
@@ -151,6 +158,13 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
     JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status=1 where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
+    }
+  }
+  private def updateMatchStatusFail(match_id: String, message: String) {
+    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1, message)
+      ps.setString(2, match_id)
     }
   }
  }

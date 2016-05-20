@@ -128,14 +128,24 @@ trait reqansop {
   protected def  NETOP_SENDDATA[R <: AncientData](channel:ChannelOperator,data:R): Unit ={
     channel.writeMessage[NoneResponse](data)
   }
+  protected def  NETOP_SENDDATA[R <: AncientData](channel:ChannelOperator,data:Array[R]): Unit ={
+    data.foreach(channel.writeMessage[NoneResponse](_))
+  }
   protected def  NETOP_SENDDATA(channel:ChannelOperator,data:Array[Byte]): Unit ={
     channel.writeByteArray[NoneResponse](data)
+  }
+  protected def NETOP_SENDANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
+    NETANS_Send(channel,pAns)
   }
   protected def NETOP_RECVANS(channel:ChannelOperator, pAns:GNETANSWERHEADOBJECT): Unit ={
     channel.receive(pAns)
   }
   protected def NETOP_RECVDATA[R <: AncientData](channel:ChannelOperator,target:R): R={
     channel.receive[R](target)
+  }
+  protected def NETOP_RECVDATA[R <: AncientData](channel:ChannelOperator,target:Array[R]): Array[R]={
+    target.foreach(channel.receive[R])
+    target
   }
   protected def NETOP_RECVDATA(channel:ChannelOperator,length:Int): ChannelBuffer ={
     channel.receiveByteArray(length)
@@ -156,4 +166,6 @@ trait reqansop {
       throw new GafisException(gafisError)
     }
   }
+
+
 }

@@ -33,6 +33,7 @@ object AncientData extends AncientDataStreamWrapper{
   lazy val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   lazy val STRING_CLASS = typeOf[String]
   lazy val reflectCaches = new ConcurrentHashMap[Class[_],Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]]()
+  type FieldDataType = (AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])
 
 
   /** stream reader type ,it can suit netty's ChannelBuffer and xSocket's IDataSource **/
@@ -149,6 +150,31 @@ trait AncientData{
   }
 
   /**
+    * 通过给定的field的名称来得到对应字段在类中数据的 偏移量 和 本字段的占用字节数
+    * @param fieldName 待查询的字段名称
+    * @return 偏移量和字节数
+    */
+  def findFieldOffsetAndLength(fieldName:String):(Int,Int)={
+    @tailrec
+    def loopFields(list:List[FieldDataType],
+                   offset:Int):(Int,Int)= list match {
+      case Nil =>
+        throw new AncientDataException("field [%s] not found".format(fieldName))
+      case (processor, lengthDef) :: tail =>
+        val termLength = tryIgnoreAncientDataException[Int](processor.term) {
+          processor.computeLength(ValueManipulation(instanceMirror, processor.term), findLength(lengthDef))
+        }
+        if (processor.term.name.decodedName.toString.trim == fieldName) {
+          (offset, termLength)
+        } else {
+          loopFields(tail, offset + termLength)
+        }
+    }
+    val fields = internalProcessField.toList
+    loopFields(fields,0)
+  }
+
+  /**
    * serialize to channel buffer
  *
    * @param stream netty channel buffer
@@ -238,7 +264,7 @@ trait AncientData{
         throw new AncientDataException(term.toString + "," + e.toString, e)
     }
   }
-  private def internalProcessField:Seq[(AncientDataTermValueProcessor,Option[Either[Int,TermSymbol]])]={
+  private def internalProcessField:Seq[FieldDataType]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
       members = clazzType.members

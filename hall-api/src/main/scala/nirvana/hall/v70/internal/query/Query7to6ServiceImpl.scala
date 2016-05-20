@@ -24,9 +24,6 @@ import org.springframework.transaction.annotation.Transactional
 class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient, entityManager: EntityManager)
   extends Query7to6Service{
 
-  private val STATUS_MATCHING =1.toShort//任务状态，正在比对
-  private val STATUS_FAIL=9.toShort//任务状态，失败
-
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
     periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-70to62", new Runnable {
@@ -50,10 +47,10 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
    */
   @Transactional
   override def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque] ={
-    val gafisQuery = GafisNormalqueryQueryque.where("status=0 and deletag=1 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
+    val gafisQuery = GafisNormalqueryQueryque.where("status="+QueryConstants.STATUS_WAIT+" and deletag=1 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
     // 更新状态为正在比对
     gafisQuery.foreach{ query =>
-      GafisNormalqueryQueryque.where("pkId=?1", query.pkId).update(status=STATUS_MATCHING, begintime=new Date())
+      GafisNormalqueryQueryque.where("pkId=?1", query.pkId).update(status=QueryConstants.STATUS_MATCHING, begintime=new Date())
     }
 
     gafisQuery
@@ -100,7 +97,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     catch {
       case e: Exception =>
         //发送比对异常，状态更新为失败
-        GafisNormalqueryQueryque.where("pkId=?1", gafisQuery.pkId).update(status=STATUS_FAIL)
+        GafisNormalqueryQueryque.where("pkId=?1", gafisQuery.pkId).update(status=QueryConstants.STATUS_FAIL)
     }
   }
 

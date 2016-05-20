@@ -102,7 +102,7 @@ object gitempkg {
 
   class GBASE_ITEMPKG_OPSTRUCT extends AncientData{
     var head = new GBASE_ITEMPKG_HEADSTRUCT()
-    private[gbaselib] var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
+    private[hall] var items:List[GBASE_ITEMPKG_ITEMSTRUCT] = Nil
 
     /**
       * calculate data size and return.
@@ -159,5 +159,6 @@ object gitempkg {
       items.takeWhile(_.stHead.szItemName == name).foreach(head.nDataLen -= _.getDataSize)
       items = items.dropWhile(_.stHead.szItemName==name)
     }
+
   }
 }
