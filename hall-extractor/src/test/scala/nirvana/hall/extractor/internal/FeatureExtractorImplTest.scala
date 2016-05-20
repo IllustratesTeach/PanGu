@@ -2,6 +2,7 @@ package nirvana.hall.extractor.internal
 
 import java.io.InputStream
 
+import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
@@ -39,22 +40,36 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_wsq: Unit ={
-    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data.uncompressed"))
+    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/test.img"))
     val gafisImg = new GAFISIMAGESTRUCT
-    //gafisImg.fromByteArray(img1)
-    gafisImg.stHead.nHeight = 640
+    gafisImg.fromByteArray(img)
+    /*gafisImg.stHead.nHeight = 640
     gafisImg.stHead.nWidth= 640
     gafisImg.stHead.nResolution = 500
     gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
     gafisImg.stHead.nImgSize = img.length
-    gafisImg.bnData = img
-
+    gafisImg.bnData = img*/
     val extractor = new FeatureExtractorImpl
-    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
-    val feature = new FINGERMNTSTRUCT
-    feature.fromByteArray(mnt._1.bnData)
+    if (gafisImg.stHead.nCompressMethod.toInt>=10) {
+      val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+      println(data.get._1.length)
+    } else {
+      gafisImg.transformForFPT()
+      val gafisImg1 = new GAFISIMAGESTRUCT
+      gafisImg1.bnData = gafisImg.toByteArray()
+      gafisImg1.stHead = gafisImg.stHead
+      gafisImg1.stHead.nImgSize = gafisImg1.bnData.size
+      val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg1.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+      println(data.get._1.length)
+    }
 
-    feature
+
+    //val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+
+
+    /*val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt._1.bnData)*/
+
 
   }
   @Test
