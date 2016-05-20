@@ -1,6 +1,6 @@
 package nirvana.hall.extractor.internal
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -17,6 +17,19 @@ import org.junit.{Assert, Test}
  * @since 2015-12-11
  */
 class FeatureExtractorImplTest extends BaseJniTest{
+  @Test
+  def test_crash_shanghai: Unit ={
+
+    val imgData = getClass.getResourceAsStream("/crash.img")
+    val bytes = IOUtils.toByteArray(imgData)
+    val extractor = new FeatureExtractorImpl
+//    Range(0,100).foreach{i=>
+    val mntData = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(bytes),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+//    }
+  }
   @Test
   def test_extract_shanghai: Unit ={
 
