@@ -84,7 +84,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val mntData = mntBuffer.array()
 
     val sbinHead = new GAFISIMAGEHEADSTRUCT
-    val binBuffer = ChannelBuffers.buffer(20480)
+    val binBuffer = ChannelBuffers.buffer(20480 *  imgHead.nWidth/640 * imgHead.nHeight /640)
+//    println(binBuffer.capacity())
     sbinHead.writeToStreamWriter(binBuffer)
     val binData = binBuffer.array()
 
