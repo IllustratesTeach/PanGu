@@ -68,7 +68,7 @@ trait grmtsvr {
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
         val stQuery = GAFIS_PKG_GetTpCard(pstRecvPkg)
-        // 通过得到的stQuery来进行发送查询
+        //TODO 通过得到的stQuery来进行发送查询
 
 
         //nAddRet为成功发送查询ID
