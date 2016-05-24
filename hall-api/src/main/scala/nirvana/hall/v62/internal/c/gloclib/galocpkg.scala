@@ -248,7 +248,7 @@ trait galocpkg {
         case PKG_ITEMTYPE_THIS=>
          Some(GAFIS_QUERY_Stream2Struct(buffer))
         case other=>
-          println(pstItemHead.szItemName+" type "+other+" not found ")
+//          println(pstItemHead.szItemName+" type "+other+" not found ")
           None
       }
     }
