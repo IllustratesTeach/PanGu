@@ -8,7 +8,8 @@ import monad.support.services.{LoggerSupport, MonadException, MonadUtils}
 import nirvana.hall.v62.config.V62ProxyBindSupport
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.jboss.netty.bootstrap.ServerBootstrap
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
+import org.jboss.netty.channel.socket.ServerSocketChannelFactory
+import org.jboss.netty.channel.socket.oio.OioServerSocketChannelFactory
 import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory, Channels}
 
 import scala.util.control.NonFatal
@@ -35,7 +36,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
     }
   })
 
-  private var channelFactory: NioServerSocketChannelFactory = _
+  private var channelFactory: ServerSocketChannelFactory = _
   private var bootstrap: ServerBootstrap = _
   private var serverChannel: Option[Channel] = None
 
@@ -45,7 +46,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 //  @PostConstruct
   def start(hub: RegistryShutdownHub) {
 
-    channelFactory = new NioServerSocketChannelFactory(executor, executor, workerThread)
+    channelFactory = new OioServerSocketChannelFactory(executor, executor)//, workerThread)
     bootstrap = new ServerBootstrap(channelFactory)
     bootstrap.setOption("child.tcpNoDelay", true)
     bootstrap.setOption("child.keepAlive", true)

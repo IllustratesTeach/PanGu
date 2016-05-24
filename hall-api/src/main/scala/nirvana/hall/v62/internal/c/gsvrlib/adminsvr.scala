@@ -4,12 +4,12 @@ import java.nio.ByteBuffer
 
 import nirvana.hall.c.services.gbaselib.paramadm.GBASE_PARAM_NETITEM
 import nirvana.hall.c.services.ghpcbase.gnopcode
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
-import nirvana.hall.v62.internal.c.grmtlib.{grmtpkg, grmtcsr}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
+import nirvana.hall.v62.internal.c.grmtlib.{grmtcsr, grmtpkg}
 import nirvana.hall.v62.internal.proxy.GbaseProxyClient
 import nirvana.hall.v62.services.ChannelOperator
 
@@ -28,8 +28,8 @@ trait adminsvr {
     with reqansop =>
   // DBLOG operations
   def GAFIS_PARAMADM_Server(channelOperator:ChannelOperator,pReq: GNETREQUESTHEADOBJECT): Boolean = {
-    nOption = NETREQ_GetOption(pReq);
-    nopcode = NETREQ_GetOpCode(pReq);
+    val nOption = NETREQ_GetOption(pReq);
+    val nopcode = NETREQ_GetOpCode(pReq);
     nopcode match{
       case gnopcode.OP_PARAMADM_GET =>
         val n = ByteBuffer.wrap(pReq.bnData).getInt
@@ -41,9 +41,9 @@ trait adminsvr {
         val ans = client.executeInChannel{channel=>
           NETOP_SENDDATA(channel,pReq)
           NETOP_SENDDATA(channel,params)
-          NETOP_RECVDATA[GNETANSWERHEADOBJECT](channel)
+//          NETOP_RECVDATA[GNETANSWERHEADOBJECT](channel)
         }
-        NETOP_SENDANS(channelOperator,ans)
+//        NETOP_SENDANS(channelOperator,ans)
 
         true
       case other=>
