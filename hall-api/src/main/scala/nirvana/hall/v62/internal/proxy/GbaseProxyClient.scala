@@ -1,17 +1,18 @@
 package nirvana.hall.v62.internal.proxy
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.internal.c.grmtlib.grmtcsr
 import nirvana.hall.v62.services.V62ServerAddress
 
 /**
  * Created by songpeng on 16/5/3.
  */
-class GbaseProxyClient extends AncientClientSupport with grmtcsr with gnetcsr with reqansop {
+class GbaseProxyClient extends AncientClientSupport with grmtcsr with gnetcsr with reqansop with LoggerSupport{
   //TODO 可配置
-  override def serverAddress: V62ServerAddress = V62ServerAddress("0.0.0.0",6811,10,30,"afisadmin",Some("helloafis"))
+  override def serverAddress: V62ServerAddress = V62ServerAddress("10.1.6.182",6811,10,30,"afisadmin",Some("helloafis"))
   def sendAndReceiveFromBackend(pkg:GBASE_ITEMPKG_OPSTRUCT): GBASE_ITEMPKG_OPSTRUCT={
     executeInChannel{channelOperator=>
       GAFIS_RMTLIB_SendPkgInClient(channelOperator,pkg)

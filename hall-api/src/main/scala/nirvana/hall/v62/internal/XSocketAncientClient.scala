@@ -28,8 +28,17 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
   }
   class XSocketChannelOperator(connection:IBlockingConnection) extends ChannelOperator{
+
+    /**
+      * 得到服务器信息
+      *
+      * @return
+      */
+    override def getServerInfo: String = connection.getRemoteAddress.toString
+
     /**
      * write message to channel
+ *
      * @param data data written
      * @param manifest class reflection
      * @tparam R return type
@@ -65,6 +74,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
 
     /**
      * write byte array to channel
+ *
      * @param data data be sent
      * @param offset byte array offset
      * @param length data length

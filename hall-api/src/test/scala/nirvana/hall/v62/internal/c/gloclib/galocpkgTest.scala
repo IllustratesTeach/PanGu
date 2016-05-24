@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
+import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import org.junit.{Assert, Test}
 
 /**
@@ -15,8 +16,10 @@ class galocpkgTest {
   def test_OP_TPLIB_ADD: Unit ={
     val itemPkg = new GBASE_ITEMPKG_OPSTRUCT
     itemPkg.fromStreamReader(getClass.getResourceAsStream("/OP_TPLIB_ADD.dat"))
-    val galocpkg = new galocpkg with gitempkg with galoctp
+
+    val galocpkg = new galocpkg with gitempkg with galoctp with grmtpkg
     val items = galocpkg.GAFIS_PKG_GetTpCard(itemPkg)
+    val request = galocpkg.GAFIS_PKG_GetRmtRequest(itemPkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
     Assert.assertEquals(4,items.length)
   }
   @Test

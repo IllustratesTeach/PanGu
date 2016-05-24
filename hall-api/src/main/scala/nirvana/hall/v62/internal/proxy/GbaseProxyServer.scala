@@ -21,8 +21,8 @@ import scala.util.control.NonFatal
   */
 class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageHandler) extends LoggerSupport {
   //一个主IO，2个worker
-  val ioThread = rpcBindSupport.rpc.ioThread
-  val workerThread = rpcBindSupport.rpc.workerThread
+  val ioThread = rpcBindSupport.proxy.ioThread
+  val workerThread = rpcBindSupport.proxy.workerThread
   val executor = Executors.newFixedThreadPool(ioThread + workerThread + 2, new ThreadFactory {
     private val seq = new AtomicInteger(0)
 
@@ -70,7 +70,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 
   private def openOnce(): Channel = {
     try {
-      val bindTuple = MonadUtils.parseBind(rpcBindSupport.rpc.bind)
+      val bindTuple = MonadUtils.parseBind(rpcBindSupport.proxy.bind)
       val address = new InetSocketAddress("0.0.0.0", bindTuple._2)
       bootstrap.bind(address)
     } catch {

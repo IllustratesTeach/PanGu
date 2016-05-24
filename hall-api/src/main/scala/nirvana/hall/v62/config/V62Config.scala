@@ -51,6 +51,6 @@ class DatabaseTable{
 @XmlType(name = "RpcBindSupport")
 trait V62ProxyBindSupport {
   @XmlElement(name = "proxy")
-  var rpc: RpcBind = _
+  var proxy: RpcBind = _
 }
 

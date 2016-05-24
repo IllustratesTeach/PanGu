@@ -2,7 +2,11 @@ package nirvana.hall.v62.internal.proxy
 
 import java.util.concurrent.atomic.AtomicBoolean
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.v62.internal.c.gbaselib.gitempkg
+import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.channel.{Channel, ChannelHandlerContext}
 import org.jboss.netty.handler.codec.frame.FrameDecoder
@@ -14,7 +18,7 @@ import org.jboss.netty.handler.codec.oneone.{OneToOneEncoder, OneToOneDecoder}
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbasePkgFrameDecoder extends FrameDecoder{
+class GbasePkgFrameDecoder extends FrameDecoder with LoggerSupport with gitempkg with grmtpkg{
   private var lengthOpt:Option[Int] = None
   private val sendingFlag = new AtomicBoolean(false)
   private var waitingPkg:GBASE_ITEMPKG_OPSTRUCT = null
@@ -40,15 +44,19 @@ class GbasePkgFrameDecoder extends FrameDecoder{
           return buffer.readBytes(dataLength)
         }
       case None if buffer.readableBytes() >= 4=>
+        buffer.markReaderIndex()
         val dataLength = buffer.readInt()
-        lengthOpt = Some(dataLength)
         if(dataLength <= 0)
           throw new IllegalArgumentException("data length is zero!")
-
-        //向通讯服务器发送数据
-        val dataLengthBuffer = buffer.factory().getBuffer(4)
-        dataLengthBuffer.writeInt(dataLength)
-        channel.write(dataLengthBuffer)
+        lengthOpt = Some(dataLength)
+        if(dataLength == 192) //TODO 使用常量，刚好等于 GNETREQUESTHEADOBJECT的长度
+          buffer.resetReaderIndex()
+        else {
+          //向通讯服务器发送数据
+          val dataLengthBuffer = buffer.factory().getBuffer(4)
+          dataLengthBuffer.writeInt(1)
+          channel.write(dataLengthBuffer)
+        }
 
         if(buffer.readableBytes() >= dataLength){
           lengthOpt = None //清空之前的操作数据
@@ -63,7 +71,14 @@ class GbasePkgFrameDecoder extends FrameDecoder{
     override def decode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
       msg match{
         case buffer:ChannelBuffer =>
-          new GBASE_ITEMPKG_OPSTRUCT().fromStreamReader(buffer)
+          //TODO 使用常量
+          if(buffer.readableBytes() == 192) {
+            val pstPkg = GBASE_ITEMPKG_New
+            GAFIS_PKG_AddRmtRequest(pstPkg,new GNETREQUESTHEADOBJECT().fromStreamReader(buffer))
+            pstPkg
+          }else{
+            new GBASE_ITEMPKG_OPSTRUCT().fromStreamReader(buffer)
+          }
         case other=>
           other.asInstanceOf[AnyRef]
       }

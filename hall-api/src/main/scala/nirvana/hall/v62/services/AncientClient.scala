@@ -20,6 +20,11 @@ trait AncientClient {
  */
 trait ChannelOperator{
   /**
+    * 得到服务器信息
+    * @return
+    */
+  def getServerInfo:String
+  /**
    * write message to channel
    * @param data data written
    * @param manifest class reflection
