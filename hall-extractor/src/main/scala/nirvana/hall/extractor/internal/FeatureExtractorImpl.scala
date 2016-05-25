@@ -17,6 +17,7 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.GAFISImageReaderSpi
+import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -30,6 +31,20 @@ class FeatureExtractorImpl extends FeatureExtractor{
   iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
   private val COLOR_GRAY_SPACE=  ColorSpace.getInstance(ColorSpace.CS_GRAY);
+
+  /**
+   * old feature converter to new feature
+   * @param oldMnt
+   * @return
+   */
+  override def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]] = {
+    val omnt = IOUtils.toByteArray(oldMnt)
+    val nmnt = ChannelBuffers.buffer(3960)
+    val newMntBuffer = nmnt.array()
+    NativeExtractor.ConvertMntOldToNew(omnt,newMntBuffer)
+
+    Some(newMntBuffer)
+  }
   /**
    * extract feature from image data
     *

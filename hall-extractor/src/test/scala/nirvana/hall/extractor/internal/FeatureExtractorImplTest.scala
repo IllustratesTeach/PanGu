@@ -53,7 +53,7 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_wsq: Unit ={
-    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/test.img"))
+    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/testt.img"))
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.fromByteArray(img)
     /*gafisImg.stHead.nHeight = 640
@@ -115,4 +115,14 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val extractor = new FeatureExtractorImpl
     extractor.extractByGAFISIMG(gafisImg,pos,featureType)
   }
+
+
+  @Test
+  def test_converterNewFeature: Unit ={
+    val bytes = getClass.getResourceAsStream("/tp_1.mnt")
+    val extractor = new FeatureExtractorImpl
+    val newFeature = extractor.ConvertMntOldToNew(bytes)
+    Assert.assertEquals(4024,newFeature.size)
+  }
+
 }

@@ -35,4 +35,10 @@ trait FeatureExtractor {
                         fingerPos:FingerPosition,
                         featureType:FeatureType,
                         newFeatureTry: NewFeatureTry=NewFeatureTry.V1):Option[(Array[Byte],Array[Byte])]
+
+  /**
+   * old feature converter to new feature
+   * @param oldMnt
+   */
+  def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]]
 }
