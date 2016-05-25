@@ -8,7 +8,7 @@ import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 
 /**
   *

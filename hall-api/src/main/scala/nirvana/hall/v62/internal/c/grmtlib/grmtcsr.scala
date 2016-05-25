@@ -47,16 +47,16 @@ trait grmtcsr {
   def GAFIS_RMTLIB_SendPkgInClient(channelOperator: ChannelOperator,pstPkg:GBASE_ITEMPKG_OPSTRUCT){
       val dataLen = pstPkg.head.nDataLen
       val bytes = ByteBuffer.allocate(4).putInt(dataLen).array()
-    debug("{} sending backend package length ...",channelOperator.getServerInfo)
+//    debug("{} sending backend package length ...",channelOperator.getServerInfo)
     NETOP_SENDDATA(channelOperator,bytes)
-    debug("{} receiving backend package length ...",channelOperator.getServerInfo)
+//    debug("{} receiving backend package length ...",channelOperator.getServerInfo)
     val bufferReceived = NETOP_RECVDATA(channelOperator,4)
     if(bufferReceived.readInt() <0){
       throw new IllegalStateException("server return data length less than zero")
     }
-    debug("{} sending package to backend ",channelOperator.getServerInfo)
+//    debug("{} sending package to backend ",channelOperator.getServerInfo)
     NETOP_SENDDATA(channelOperator,pstPkg)
-    debug("{} finish send to backend ",channelOperator.getServerInfo)
+//    debug("{} finish send to backend ",channelOperator.getServerInfo)
   }
 
   /**

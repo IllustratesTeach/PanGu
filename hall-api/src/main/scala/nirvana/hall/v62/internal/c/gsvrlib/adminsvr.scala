@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal.c.gsvrlib
 
 import java.nio.ByteBuffer
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.paramadm.GBASE_PARAM_NETITEM
 import nirvana.hall.c.services.ghpcbase.gnopcode
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
@@ -26,6 +27,7 @@ trait adminsvr {
     with gitempkg
     with grmtcsr
     with grmtpkg
+    with LoggerSupport
     with gnetcsr
     with reqansop =>
   implicit val executeContext= ExecutionContext.global
@@ -52,6 +54,7 @@ trait adminsvr {
             }
             NETOP_SENDANS(channelOperator,ans)
             NETOP_SENDDATA(channelOperator,params)
+            error("<=========== direct data for opClass:"+pReq.nOpClass+" opCode:"+pReq.nOpCode+" finished!")
           }
           channelOperator.writePromise(len,promise)
         }
