@@ -19,7 +19,7 @@ class GbaseProxyClient extends AncientClientSupport
   with reqansop
   with LoggerSupport{
   //TODO 可配置
-  override def serverAddress: V62ServerAddress = V62ServerAddress("10.1.6.182",6811,10,30,"afisadmin",Some("helloafis"))
+  override def serverAddress: V62ServerAddress = V62ServerAddress("10.1.6.181",6811,10,30,"afisadmin",Some("helloafis"))
   def sendAndReceiveFromBackend(pkg:GBASE_ITEMPKG_OPSTRUCT): GBASE_ITEMPKG_OPSTRUCT={
     executeInChannel{channelOperator=>
       GAFIS_RMTLIB_SendPkgInClient(channelOperator,pkg)

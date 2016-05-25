@@ -18,6 +18,12 @@ import org.jboss.netty.channel._
 class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler
   with grmtpkg with gitempkg with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+    if(!e.getMessage.isInstanceOf[GBASE_ITEMPKG_OPSTRUCT]){
+      ctx.getChannel.write(RequestNotHandled)
+      val outbound = ctx.getChannel.getAttachment.asInstanceOf[Channel]
+      outbound.write(e.getMessage)
+      return
+    }
     val pkg = e.getMessage.asInstanceOf[GBASE_ITEMPKG_OPSTRUCT]
     if(pkg.head.nDataLen != pkg.getDataSize){
       throw new MonadException("invalidate package len(r):%s!=len(h)%s".format(pkg.getDataSize,pkg.head.nDataLen),FAIL_TO_FIND_PROCESSOR)
@@ -36,7 +42,16 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) ext
     ChannelThreadContext.channelContext.withValue(ctx.getChannel){
       //绑定当前线程使用的v62配置
       V62Facade.withConfigurationServer(config){
-        handler.handle(request, pkg)
+        if(handler.handle(request, pkg)) {
+          ctx.getChannel.write(RequestHandled)
+        }else{
+          ctx.getChannel.write(RequestNotHandled)
+          //没有抓获，则向OutbundleChannel回写
+          val outbound = ctx.getChannel.getAttachment.asInstanceOf[Channel]
+          val pkgBuffer = outbound.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
+          pkg.writeToStreamWriter(pkgBuffer)
+          outbound.write(pkgBuffer)
+        }
       }
     }
   }

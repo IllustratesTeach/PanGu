@@ -1,15 +1,14 @@
 package nirvana.hall.v62.internal.proxy
 
 import java.net.InetSocketAddress
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{Executors, ThreadFactory}
+import java.util.concurrent.Executors
 
 import monad.support.services.{LoggerSupport, MonadException, MonadUtils}
 import nirvana.hall.v62.config.V62ProxyBindSupport
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.jboss.netty.bootstrap.ServerBootstrap
 import org.jboss.netty.channel.socket.ServerSocketChannelFactory
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
+import org.jboss.netty.channel.socket.nio.{NioClientSocketChannelFactory, NioServerSocketChannelFactory}
 import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory, Channels}
 
 import scala.util.control.NonFatal
@@ -24,7 +23,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
   //一个主IO，2个worker
   val ioThread = rpcBindSupport.proxy.ioThread
   val workerThread = rpcBindSupport.proxy.workerThread
-  val executor = Executors.newFixedThreadPool(ioThread + workerThread + 2, new ThreadFactory {
+  val executor = Executors.newCachedThreadPool() /*.newFixedThreadPool(ioThread + workerThread + 2, new ThreadFactory {
     private val seq = new AtomicInteger(0)
 
     override def newThread(r: Runnable): Thread = {
@@ -35,6 +34,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
       thread
     }
   })
+  */
 
   private var channelFactory: ServerSocketChannelFactory = _
   private var bootstrap: ServerBootstrap = _
@@ -45,6 +45,8 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
     */
 //  @PostConstruct
   def start(hub: RegistryShutdownHub) {
+    val cf = new NioClientSocketChannelFactory(executor, executor);
+
 
     channelFactory = new NioServerSocketChannelFactory(executor, executor, workerThread)
     bootstrap = new ServerBootstrap(channelFactory)
@@ -54,7 +56,9 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
       def getPipeline: ChannelPipeline = {
         val pipeline = Channels.pipeline()
         //解码
-        val decoder = new GbasePkgFrameDecoder
+        val txHandler = new TxProxyInboundHandler(cf)
+        val decoder = new txHandler.GbasePkgFrameDecoder
+        pipeline.addLast("proxy", txHandler)
         pipeline.addLast("frameDecoder", decoder)
         pipeline.addLast("gbasePkgDecoder", new decoder.GbasePkgDecoder)
 

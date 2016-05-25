@@ -273,7 +273,7 @@ object gadbprop {
   @Length(32)
   var szFirstFIFOQueName:String = _ ;	// first fifo queue name
   @Length(16)
-  var guidUUID:String = _ ;		// uuid of this database, we internally use this value to distinguish different database
+  var guidUUID:Array[Byte]= _ ;		// uuid of this database, we internally use this value to distinguish different database
   @Length(128)
   var szMainPath:String = _ ;	// main path
   var stSpecProp = new DBSPECPROPUNION;
