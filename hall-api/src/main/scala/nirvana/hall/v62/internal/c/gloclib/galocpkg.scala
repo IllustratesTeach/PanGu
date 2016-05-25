@@ -74,8 +74,9 @@ trait galocpkg {
       throw new IllegalStateException("item dir is empty")
     }
 
-    val pstCard = new GTPCARDINFOSTRUCT
-    headers.map {header=>
+    headers.flatMap{header=>
+      val pstCard = new GTPCARDINFOSTRUCT
+      var pstCardOpt:Option[GTPCARDINFOSTRUCT] = Some(pstCard)
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
       header.nItemType match {
@@ -107,8 +108,10 @@ trait galocpkg {
             if (pstCard.pstInfoEx_Data.nItemFlag == 0) pstCard.pstInfoEx_Data.nItemFlag = 0xFF.toByte
             if (pstCard.pstInfoEx_Data.stFpx.nItemFlag == 0) pstCard.pstInfoEx_Data.stFpx.nItemFlag = 0xFF.toByte
           }
+        case other=>
+          pstCardOpt = None
       }
-      pstCard
+      pstCardOpt
     }.toList
 
     //TODO 实现对pstCard的校验
@@ -122,11 +125,12 @@ trait galocpkg {
     val headers = GBASE_ITEMPKG_GetItemDir(pstPkg)
 
 
-    headers.map {header=>
+    headers.flatMap {header=>
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
 
       val pstCard = new GLPCARDINFOSTRUCT()
+      var pstCardOpt:Option[GLPCARDINFOSTRUCT] = Some(pstCard)
       header.nItemType match{
         case PKG_ITEMTYPE_THIS=>
         //			pstLpCard = (GLPCARDINFOSTRUCT*)pstItem.bnRes;
@@ -161,9 +165,11 @@ trait galocpkg {
             if(pstCard.pstExtraInfo_Data.nItemFlag == 0)	pstCard.pstExtraInfo_Data.nItemFlag = 0xFF.toByte
             if(pstCard.pstExtraInfo_Data.stFpx.nItemFlag == 0)	pstCard.pstExtraInfo_Data.stFpx.nItemFlag = 0xFF.toByte
           }
+        case other=>
+          pstCardOpt = None
       }
 
-      pstCard
+      pstCardOpt
     }.toList
   }
 
@@ -173,10 +179,11 @@ trait galocpkg {
 
     var nCount = 0
 
-    headers.map {pstItemHead=>
+    headers.flatMap {pstItemHead=>
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
       val pstCase = new GCASEINFOSTRUCT
+      var pstCaseOpt:Option[GCASEINFOSTRUCT] = Some(pstCase)
       nCount = pstItem.stHead.nItemLen
       pstItemHead.nItemType match{
         case PKG_ITEMTYPE_THIS=>
@@ -220,9 +227,11 @@ trait galocpkg {
             if(pstCase.pstExtraInfo_Data.nItemFlag == 0)	pstCase.pstExtraInfo_Data.nItemFlag = 0xFF.toByte
             if(pstCase.pstExtraInfo_Data.stFpx.nItemFlag == 0)	pstCase.pstExtraInfo_Data.stFpx.nItemFlag = 0xFF.toByte
           }
+        case other=>
+          pstCaseOpt = None
       }
 
-      pstCase
+      pstCaseOpt
     }.toList
 
   }
@@ -231,13 +240,16 @@ trait galocpkg {
   {
 
     val pstItemHeads = GBASE_ITEMPKG_GetItemDir(pstPkg)
-    pstItemHeads.map{pstItemHead=>
+    pstItemHeads.flatMap{pstItemHead=>
 
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,pstItemHead.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
       pstItemHead.nItemType match {
         case PKG_ITEMTYPE_THIS=>
-         GAFIS_QUERY_Stream2Struct(buffer)
+         Some(GAFIS_QUERY_Stream2Struct(buffer))
+        case other=>
+//          println(pstItemHead.szItemName+" type "+other+" not found ")
+          None
       }
     }
   }
@@ -492,7 +504,7 @@ trait galocpkg {
     nSize = pszStream.readableBytes()
     if(nSize > 0 )
     {
-      val readerIndex = pszStream.readerIndex()
+//      val beginReaderIndex = pszStream.readerIndex()
       pstQuery.pstMIC_Data = GAFIS_MIC_GetMicArrayFromStream(pszStream)
       pstQuery.nMICCount = pstQuery.pstMIC_Data.length
       val bIsLat =
@@ -503,7 +515,11 @@ trait galocpkg {
 
 
       pstQuery.pstMIC_Data.foreach(_.bIsLatent = bIsLat.toByte)
-       pszStream.skipBytes(GAFIS_MIC_MicStreamLen(pstQuery.pstMIC_Data) - readerIndex)
+      /*
+      val readerIndex = pszStream.readerIndex()
+      val micsLength = GAFIS_MIC_MicStreamLen(pstQuery.pstMIC_Data)
+       pszStream.skipBytes(micsLength - (readerIndex - beginReaderIndex))
+       */
     }
 
     nSize = pstQuery.nCommentLen

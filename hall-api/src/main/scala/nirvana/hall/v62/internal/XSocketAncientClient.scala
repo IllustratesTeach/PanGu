@@ -28,32 +28,13 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
   }
   class XSocketChannelOperator(connection:IBlockingConnection) extends ChannelOperator{
+
     /**
-     * write message to channel
-     * @param data data written
-     * @param manifest class reflection
-     * @tparam R return type
-     * @return server return message object
-     */
-    override def writeMessage[R <: AncientData](data: Any*)(implicit manifest: Manifest[R]): R = {
-      data.foreach{
-        case el:AncientData =>
-          /*
-          val buffer = ChannelBuffers.buffer(el.getDataSize)
-          val bytes = el.writeToChannelBuffer(buffer).array()
-          val count = connection.write(bytes,0,bytes.length)
-          if(count != bytes.length){
-            throw new IllegalAccessException("fail to write byte array")
-          }
-          */
-          el.writeToStreamWriter(connection)
-        case el:Array[Byte] =>
-          connection.write(el,0,el.length)
-        case other=>
-          throw new IllegalArgumentException("data unsupported "+other)
-      }
-      receive[R]()
-    }
+      * 得到服务器信息
+      *
+      * @return
+      */
+    override def getServerInfo: String = connection.getRemoteAddress.toString
 
     override def receiveByteArray(len: Int): ChannelBuffer = {
 //      val destByteBuffer = ByteBuffer.allocate(len)
@@ -63,22 +44,15 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
       ChannelBuffers.wrappedBuffer(connection.readBytesByLength(len))
     }
 
-    /**
-     * write byte array to channel
-     * @param data data be sent
-     * @param offset byte array offset
-     * @param length data length
-     * @param manifest class reflection
-     * @tparam R return type
-     * @return data from server
-     */
-    override def writeByteArray[R <: AncientData](data: Array[Byte], offset: Int, length: Int)(implicit manifest: Manifest[R]): R = {
+    override def writeByteArray[R <: AncientData:ClassTag](data: Array[Byte], offset: Int, length: Int): R = {
       connection.write(data,offset,length)
       receive[R]()
     }
 
-    override def writeByteArray[R <: AncientData](data: Array[Byte])(implicit manifest: Manifest[R]): R = {
-      writeByteArray(data,0,data.length)
+
+    override def writeAncientData[T <: AncientData, R <: AncientData : ClassManifest](target: T): R = {
+      target.writeToStreamWriter(connection)
+      receive[R]()
     }
 
     override def receive[R <: AncientData](target:R): R = {

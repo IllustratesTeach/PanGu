@@ -8,6 +8,7 @@ import monad.support.services.{LoggerSupport, MonadException, MonadUtils}
 import nirvana.hall.v62.config.V62ProxyBindSupport
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.jboss.netty.bootstrap.ServerBootstrap
+import org.jboss.netty.channel.socket.ServerSocketChannelFactory
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
 import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory, Channels}
 
@@ -21,8 +22,8 @@ import scala.util.control.NonFatal
   */
 class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageHandler) extends LoggerSupport {
   //一个主IO，2个worker
-  val ioThread = rpcBindSupport.rpc.ioThread
-  val workerThread = rpcBindSupport.rpc.workerThread
+  val ioThread = rpcBindSupport.proxy.ioThread
+  val workerThread = rpcBindSupport.proxy.workerThread
   val executor = Executors.newFixedThreadPool(ioThread + workerThread + 2, new ThreadFactory {
     private val seq = new AtomicInteger(0)
 
@@ -35,7 +36,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
     }
   })
 
-  private var channelFactory: NioServerSocketChannelFactory = _
+  private var channelFactory: ServerSocketChannelFactory = _
   private var bootstrap: ServerBootstrap = _
   private var serverChannel: Option[Channel] = None
 
@@ -70,7 +71,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 
   private def openOnce(): Channel = {
     try {
-      val bindTuple = MonadUtils.parseBind(rpcBindSupport.rpc.bind)
+      val bindTuple = MonadUtils.parseBind(rpcBindSupport.proxy.bind)
       val address = new InetSocketAddress("0.0.0.0", bindTuple._2)
       bootstrap.bind(address)
     } catch {

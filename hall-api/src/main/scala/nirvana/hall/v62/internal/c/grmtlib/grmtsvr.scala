@@ -2,12 +2,13 @@ package nirvana.hall.v62.internal.c.grmtlib
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 
 /**
   *
@@ -22,11 +23,10 @@ trait grmtsvr {
     with grmtpkg
     with gnetcsr
     with reqansop =>
-  def GAFIS_RMTLIB_TPSVR_Server(nClientNo:Int,
-                                pReq:GNETREQUESTHEADOBJECT,
-                                pAns:GNETANSWERHEADOBJECT,
+  def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
-                                bIsReq50:Int){
+                                bIsReq50:Int=0):Boolean={
+    val pAns = new GNETANSWERHEADOBJECT
     val nOpClass = NETREQ_GetOpClass(pReq);
     val nOpCode = NETREQ_GetOpCode(pReq);
     val nDBID	 = NETREQ_GetDBID(pReq);
@@ -55,9 +55,24 @@ trait grmtsvr {
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+      case OP_TPLIB_EXIST=>
+        //TODO 判断卡片是否存在
+
+        NETANS_SetRetVal(pAns,0);
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+
+      case other=>
+        false
     }
   }
-  def GAFIS_RMTLIB_QUERY_Server(pReq:GNETREQUESTHEADOBJECT, pAns:GNETANSWERHEADOBJECT,pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT): Unit ={
+  def GAFIS_RMTLIB_QUERY_Server(pReq:GNETREQUESTHEADOBJECT, pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT): Boolean ={
+    val pAns = new GNETANSWERHEADOBJECT
     val nOpClass = NETREQ_GetOpClass(pReq);
     val nOpCode = NETREQ_GetOpCode(pReq);
     val nDBID	 = NETREQ_GetDBID(pReq);
@@ -67,8 +82,8 @@ trait grmtsvr {
 
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
-        val stQuery = GAFIS_PKG_GetTpCard(pstRecvPkg)
-        // 通过得到的stQuery来进行发送查询
+        val stQuery = GAFIS_PKG_GetQuery(pstRecvPkg)
+        //TODO 通过得到的stQuery来进行发送查询
 
 
         //nAddRet为成功发送查询ID
@@ -79,6 +94,26 @@ trait grmtsvr {
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
+        true
+      case 	grmtcode.OP_RMTLIB_QUERY_GETRESULT=>
+        val stQuery = new GAQUERYSTRUCT
+        stQuery.stSimpQry.nQueryID = pReq.bnData
+
+        //TODO 利用得到的SID进行查询候选队列
+        val nRet = 1 //如果有候选队列
+
+
+        val stSendPkg = GBASE_ITEMPKG_New
+        NETANS_SetRetVal(pAns,nRet);
+
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        if(nRet > 0 )
+          GAFIS_PKG_Query2Pkg(stQuery,stSendPkg)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+      case other =>
+        false
     }
   }
 }

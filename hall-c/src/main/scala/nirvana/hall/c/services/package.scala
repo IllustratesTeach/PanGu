@@ -1,5 +1,7 @@
 package nirvana.hall.c
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.annotations.Length
 
 /**
@@ -22,4 +24,15 @@ package object services {
   } //GADB_RETVAL;  // size is 8 bytes long.
   final val GADB_RETVALFLAG_HASOP = 0x1 //·
   final val GADB_RETVALFLAG_FAILED= 0x2
+  def SIDArrayToLong(sid:Array[Byte],offset:Int=0): Long ={
+    val buffer = ByteBuffer.allocate(8);
+    buffer.mark()
+    buffer.position(2)
+    buffer.put(sid,offset,SID_SIZE)
+    buffer.reset()
+    buffer.getLong
+  }
+  def longToSidArray(sid:Long):Array[Byte]={
+    ByteBuffer.allocate(8).putLong(sid).array().drop(2)
+  }
 }

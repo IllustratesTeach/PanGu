@@ -3,10 +3,10 @@ package nirvana.hall.v62
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.proxy.filter.{AncientDefaultFilter, AncientUserFilter}
-import nirvana.hall.v62.internal.proxy.{GbaseProxyServer, GbaseItemPkgFilter, GbaseItemPkgHandler, GbasePackageHandler}
-import org.apache.tapestry5.ioc.annotations.{Startup, Contribute, ServiceId}
-import org.apache.tapestry5.ioc.services.{RegistryShutdownHub, PipelineBuilder}
+import nirvana.hall.v62.internal.proxy.filter.{GAFIS_PARAMADM_ServerFilter, AncientUserFilter, GAFIS_RMTLIB_TPSVR_ServerFilter, AncientDefaultFilter}
+import nirvana.hall.v62.internal.proxy.{GbaseItemPkgFilter, GbaseItemPkgHandler, GbasePackageHandler, GbaseProxyServer}
+import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId, Startup}
+import org.apache.tapestry5.ioc.services.{PipelineBuilder, RegistryShutdownHub}
 import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.slf4j.Logger
 
@@ -20,7 +20,7 @@ object LocalV62ProxyServiceModule {
   }
   @Startup
   def startProxyServer(rpcBindSupport: HallV62Config,hub:RegistryShutdownHub,handler: GbasePackageHandler): Unit ={
-    if(rpcBindSupport.rpc!=null && rpcBindSupport.rpc.bind.length >0){
+    if(rpcBindSupport.proxy!=null && rpcBindSupport.proxy.bind.length >0){
       val server = new GbaseProxyServer(rpcBindSupport,handler)
       server.start(hub)
     }
@@ -37,6 +37,10 @@ object LocalV62ProxyServiceModule {
   @Contribute(classOf[GbaseItemPkgHandler])
   def provideSegGbaseItemPkgMessageHandler(configuration: OrderedConfiguration[GbaseItemPkgFilter]) {
     configuration.addInstance("AncientUserFilter", classOf[AncientUserFilter])
+    configuration.addInstance("GAFIS_RMTLIB_TPSVR_ServerFilter", classOf[GAFIS_RMTLIB_TPSVR_ServerFilter])
+    configuration.addInstance("GAFIS_PARAMADM_ServerFilter", classOf[GAFIS_PARAMADM_ServerFilter])
+
+
 
     //默认Filter，放在最后
     configuration.addInstance("AncientDefaultFilter", classOf[AncientDefaultFilter], "after:*")

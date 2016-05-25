@@ -15,17 +15,22 @@ import org.jboss.netty.channel._
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler with grmtpkg with gitempkg with LoggerSupport{
+class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler
+  with grmtpkg with gitempkg with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
     val pkg = e.getMessage.asInstanceOf[GBASE_ITEMPKG_OPSTRUCT]
     if(pkg.head.nDataLen != pkg.getDataSize){
       throw new MonadException("invalidate package len(r):%s!=len(h)%s".format(pkg.getDataSize,pkg.head.nDataLen),FAIL_TO_FIND_PROCESSOR)
     }
 
-    val request = GAFIS_PKG_GetRmtRequest(pkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
+    val requestOpt = GAFIS_PKG_GetRmtRequest(pkg)
+    if(requestOpt.isEmpty) {
+      throw new IllegalStateException("Missing Request Item")
+    }
+    val request = requestOpt.get
     val opClass = request.nOpClass
     val opCode = request.nOpCode
-    info("username:{} opClass {} opCode:{} ",request.szUserName,opClass,opCode)
+    info("[{}] username:{} opClass {} opCode:{} ",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode)
 
     //绑定当前线程使用的channel
     ChannelThreadContext.channelContext.withValue(ctx.getChannel){
