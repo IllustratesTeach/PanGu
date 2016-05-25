@@ -46,11 +46,18 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) ext
           ctx.getChannel.write(RequestHandled)
         }else{
           ctx.getChannel.write(RequestNotHandled)
-          //没有抓获，则向OutbundleChannel回写
+          val isPkg = ctx.getAttachment.asInstanceOf[Boolean]
           val outbound = ctx.getChannel.getAttachment.asInstanceOf[Channel]
-          val pkgBuffer = outbound.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
-          pkg.writeToStreamWriter(pkgBuffer)
-          outbound.write(pkgBuffer)
+          if(isPkg) {
+            //没有抓获，则向OutbundleChannel回写
+            val pkgBuffer = outbound.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
+            pkg.writeToStreamWriter(pkgBuffer)
+            outbound.write(pkgBuffer)
+          }else{
+            val reqBuffer = outbound.getConfig.getBufferFactory.getBuffer(request.getDataSize)
+            request.writeToStreamWriter(reqBuffer)
+            outbound.write(reqBuffer)
+          }
         }
       }
     }

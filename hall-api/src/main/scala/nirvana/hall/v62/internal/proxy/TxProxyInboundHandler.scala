@@ -69,7 +69,7 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     inboundChannel.setReadable(false)
     val cb: ClientBootstrap = new ClientBootstrap(cf)
     cb.getPipeline.addLast("handler", new OutboundHandler(e.getChannel))
-    val f: ChannelFuture = cb.connect(new InetSocketAddress("10.1.6.182", 6811))
+    val f: ChannelFuture = cb.connect(new InetSocketAddress("127.0.0.1", 6811))
     outboundChannel = f.getChannel
     f.addListener(new ChannelFutureListener() {
       def operationComplete(future: ChannelFuture) {
@@ -190,9 +190,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           lengthOpt = Some(dataLength)
           if(dataLength == DIRECT_REQUEST_LENGTH) {
             buffer.resetReaderIndex()
+            ctx.setAttachment(false)
           }
           else {
             //向通讯服务器发送数据
+            ctx.setAttachment(true)
             val dataLengthBuffer = buffer.factory().getBuffer(4)
             dataLengthBuffer.writeInt(dataLength)
             outboundChannel.write(dataLengthBuffer)
