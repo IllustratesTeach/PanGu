@@ -458,8 +458,6 @@ object paramadm {
   // to here is 40 bytes long.
   @Length(8)
   var bnRes2:Array[Byte] = _ ;	// reserved 8 bytes
-    @Length(80)
-    var bnRes3:Array[Byte] = _
 
     @Length(80)
     var stVal:Array[Byte] = _

@@ -3,7 +3,7 @@ package nirvana.hall.v62
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.proxy.filter.{AncientUserFilter, GAFIS_RMTLIB_TPSVR_ServerFilter, AncientDefaultFilter}
+import nirvana.hall.v62.internal.proxy.filter.{GAFIS_PARAMADM_ServerFilter, AncientUserFilter, GAFIS_RMTLIB_TPSVR_ServerFilter, AncientDefaultFilter}
 import nirvana.hall.v62.internal.proxy.{GbaseItemPkgFilter, GbaseItemPkgHandler, GbasePackageHandler, GbaseProxyServer}
 import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId, Startup}
 import org.apache.tapestry5.ioc.services.{PipelineBuilder, RegistryShutdownHub}
@@ -38,6 +38,8 @@ object LocalV62ProxyServiceModule {
   def provideSegGbaseItemPkgMessageHandler(configuration: OrderedConfiguration[GbaseItemPkgFilter]) {
     configuration.addInstance("AncientUserFilter", classOf[AncientUserFilter])
     configuration.addInstance("GAFIS_RMTLIB_TPSVR_ServerFilter", classOf[GAFIS_RMTLIB_TPSVR_ServerFilter])
+    configuration.addInstance("GAFIS_PARAMADM_ServerFilter", classOf[GAFIS_PARAMADM_ServerFilter])
+
 
 
     //默认Filter，放在最后
