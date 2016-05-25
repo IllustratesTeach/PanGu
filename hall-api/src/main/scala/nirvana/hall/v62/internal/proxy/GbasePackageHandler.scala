@@ -3,7 +3,6 @@ package nirvana.hall.v62.internal.proxy
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import nirvana.hall.v62.services.HallV62ExceptionCode.FAIL_TO_FIND_PROCESSOR
@@ -18,48 +17,36 @@ import org.jboss.netty.channel._
 class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler
   with grmtpkg with gitempkg with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
-    if(!e.getMessage.isInstanceOf[GBASE_ITEMPKG_OPSTRUCT]){
-      ctx.getChannel.write(RequestNotHandled)
-      val outbound = ctx.getChannel.getAttachment.asInstanceOf[Channel]
-      outbound.write(e.getMessage)
-      return
-    }
-    val pkg = e.getMessage.asInstanceOf[GBASE_ITEMPKG_OPSTRUCT]
-    if(pkg.head.nDataLen != pkg.getDataSize){
-      throw new MonadException("invalidate package len(r):%s!=len(h)%s".format(pkg.getDataSize,pkg.head.nDataLen),FAIL_TO_FIND_PROCESSOR)
-    }
+    val msg = e.getMessage
+    val channel = ctx.getChannel
+    val attachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
+    msg match{
+      case pkg:GBASE_ITEMPKG_OPSTRUCT =>
+        if(pkg.head.nDataLen != pkg.getDataSize){
+          throw new MonadException("invalidate package len(r):%s!=len(h)%s".format(pkg.getDataSize,pkg.head.nDataLen),FAIL_TO_FIND_PROCESSOR)
+        }
+        val request = GAFIS_PKG_GetRmtRequest(pkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
+        val opClass = request.nOpClass
+        val opCode = request.nOpCode
+        info("[{}] username:{} opClass {} opCode:{} ",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode)
 
-    val requestOpt = GAFIS_PKG_GetRmtRequest(pkg)
-    if(requestOpt.isEmpty) {
-      throw new IllegalStateException("Missing Request Item")
-    }
-    val request = requestOpt.get
-    val opClass = request.nOpClass
-    val opCode = request.nOpCode
-    info("[{}] username:{} opClass {} opCode:{} ",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode)
-
-    //绑定当前线程使用的channel
-    ChannelThreadContext.channelContext.withValue(ctx.getChannel){
-      //绑定当前线程使用的v62配置
-      V62Facade.withConfigurationServer(config){
-        if(handler.handle(request, pkg)) {
-          ctx.getChannel.write(RequestHandled)
-        }else{
-          ctx.getChannel.write(RequestNotHandled)
-          val isPkg = ctx.getAttachment.asInstanceOf[Boolean]
-          val outbound = ctx.getChannel.getAttachment.asInstanceOf[Channel]
-          if(isPkg) {
-            //没有抓获，则向OutbundleChannel回写
-            val pkgBuffer = outbound.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
-            pkg.writeToStreamWriter(pkgBuffer)
-            outbound.write(pkgBuffer)
-          }else{
-            val reqBuffer = outbound.getConfig.getBufferFactory.getBuffer(request.getDataSize)
-            request.writeToStreamWriter(reqBuffer)
-            outbound.write(reqBuffer)
+        //绑定当前线程使用的channel
+        ChannelThreadContext.channelContext.withValue(channel) {
+          if (handler.handle(request, pkg)) {
+            attachment.status = RequestHandled
+          } else {
+            attachment.status = RequestNotHandled
+            val outbound = attachment.outboundChannel
+            if (attachment.directRequest) {
+              outbound.write(request)
+            } else {
+              outbound.write(pkg)
+            }
           }
         }
-      }
+      case other =>
+        attachment.status = RequestNotHandled
+        attachment.outboundChannel.write(e.getMessage)
     }
   }
   override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
@@ -69,7 +56,6 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) ext
       case other =>
         error("server exception,client:" + e.getChannel.getRemoteAddress, other)
     }
-
     //服务器上发生异常，则关闭此channel
     e.getChannel.close()
   }

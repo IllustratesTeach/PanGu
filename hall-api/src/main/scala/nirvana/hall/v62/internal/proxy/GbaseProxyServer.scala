@@ -63,7 +63,8 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
         pipeline.addLast("gbasePkgDecoder", new decoder.GbasePkgDecoder)
 
         //编码
-        pipeline.addLast("gbasePkgEncoder",new decoder.GbasePkgEncoder)
+        pipeline.addLast("AncientDataEncoder", new txHandler.AncientDataEncoder())
+        pipeline.addLast("GbasePkgEncoder",new decoder.GbasePkgEncoder)
 
         //业务逻辑处理
         pipeline.addLast("handler", handler)

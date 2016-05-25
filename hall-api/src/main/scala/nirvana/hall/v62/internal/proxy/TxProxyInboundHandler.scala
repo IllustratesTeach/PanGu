@@ -43,6 +43,7 @@ import org.jboss.netty.handler.codec.oneone.{OneToOneEncoder, OneToOneDecoder}
 import scala.concurrent.{Promise, ExecutionContext}
 
 object TxProxyInboundHandler {
+  val DIRECT_REQUEST_LENGTH=192
   /**
     * Closes the specified channel after all queued write requests are flushed.
     */
@@ -52,24 +53,24 @@ object TxProxyInboundHandler {
     }
   }
 }
-case object RequestHandled
-case object RequestNotHandled
+sealed abstract class RequestHandleStatus()
+case object RequestNotHandled extends RequestHandleStatus
+case object RequestHandled extends RequestHandleStatus
+case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Channel,var directRequest:Boolean=false)
 
 class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChannelUpstreamHandler {
   private[proxy] final val trafficLock: AnyRef = new AnyRef
   @volatile
   private var outboundChannel: Channel = null
-  @volatile
-  private var working = false
-  @volatile
-  private var firstCall = true
 
   override def channelOpen(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     val inboundChannel: Channel = e.getChannel
     inboundChannel.setReadable(false)
     val cb: ClientBootstrap = new ClientBootstrap(cf)
     cb.getPipeline.addLast("handler", new OutboundHandler(e.getChannel))
-    val f: ChannelFuture = cb.connect(new InetSocketAddress("127.0.0.1", 6811))
+    cb.getPipeline.addLast("encoder", new AncientDataEncoder())
+
+    val f: ChannelFuture = cb.connect(new InetSocketAddress("10.1.6.182", 6811))
     outboundChannel = f.getChannel
     f.addListener(new ChannelFutureListener() {
       def operationComplete(future: ChannelFuture) {
@@ -81,16 +82,17 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
         }
       }
     })
-    inboundChannel.setAttachment(outboundChannel)
+    inboundChannel.setAttachment(ChannelAttachment(RequestHandled,outboundChannel))
   }
 
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
     val msg: ChannelBuffer = e.getMessage.asInstanceOf[ChannelBuffer]
     trafficLock synchronized {
-      if(working || firstCall)
-        ctx.sendUpstream(e) //向上发送数据
-      else {
-        outboundChannel.write(msg)
+      ctx.getChannel.getAttachment match{
+        case ChannelAttachment(RequestHandled,channel:Channel,_)=>
+          ctx.sendUpstream(e)
+        case ChannelAttachment(RequestNotHandled,outboundChannel:Channel,_)=>
+          outboundChannel.write(msg)
       }
       if (!outboundChannel.isWritable) {
         e.getChannel.setReadable(false)
@@ -119,11 +121,18 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     TxProxyInboundHandler.closeOnFlush(e.getChannel)
   }
 
+  /**
+    * 转向所代理的服务器
+    * @param inboundChannel 请求的通道
+    */
   private class OutboundHandler(inboundChannel: Channel) extends SimpleChannelUpstreamHandler {
     override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
-      val msg: ChannelBuffer = e.getMessage.asInstanceOf[ChannelBuffer]
+      val msg = e.getMessage
       trafficLock synchronized {
-          inboundChannel.write(msg)
+        msg match{
+          case buffer:ChannelBuffer =>
+            inboundChannel.write(msg)
+        }
         if (!inboundChannel.isWritable) {
           e.getChannel.setReadable(false)
         }
@@ -137,11 +146,9 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
         }
       }
     }
-
     override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
       TxProxyInboundHandler.closeOnFlush(inboundChannel)
     }
-
     override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
       outputException(e)
       TxProxyInboundHandler.closeOnFlush(e.getChannel)
@@ -160,9 +167,21 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     }
   }
 
+  class AncientDataEncoder extends OneToOneEncoder{
+    override def encode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
+      msg match{
+        case data:AncientData =>
+          val buffer = ctx.getChannel.getConfig.getBufferFactory.getBuffer(data.getDataSize)
+          data.writeToStreamWriter(buffer)
+          buffer
+        case other =>
+          other.asInstanceOf[AnyRef]
+      }
+    }
+  }
+
 
   class GbasePkgFrameDecoder extends FrameDecoder with LoggerSupport with gitempkg with grmtpkg{
-    private val DIRECT_REQUEST_LENGTH=192
     private implicit val executionContext = ExecutionContext.global
     private var lengthOpt:Option[Int] = None
     private var nextPromiseOpt:Option[Promise[ChannelBuffer]] = None
@@ -170,7 +189,6 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     protected def decode(ctx: ChannelHandlerContext, channel: Channel, buffer: ChannelBuffer): AnyRef = {
       lengthOpt match{
         case Some(dataLength)=>
-          //        debug("readable length:{} dataLength:{}",buffer.readableBytes(),dataLength)
           if(buffer.readableBytes() >= dataLength){
             val tmpBuffer = buffer.readBytes(dataLength)
             nextPromiseOpt match{
@@ -188,13 +206,14 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           if(dataLength <= 0)
             throw new IllegalArgumentException("data length is zero!")
           lengthOpt = Some(dataLength)
-          if(dataLength == DIRECT_REQUEST_LENGTH) {
+          val oldAttachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
+          if(dataLength == TxProxyInboundHandler.DIRECT_REQUEST_LENGTH) {
             buffer.resetReaderIndex()
-            ctx.setAttachment(false)
+            channel.setAttachment(ChannelAttachment(oldAttachment.status,oldAttachment.outboundChannel,directRequest = true))
           }
           else {
-            //向通讯服务器发送数据
-            ctx.setAttachment(true)
+            channel.setAttachment(ChannelAttachment(oldAttachment.status,oldAttachment.outboundChannel,directRequest = false))
+            //向代理的后端通讯服务器发送数据
             val dataLengthBuffer = buffer.factory().getBuffer(4)
             dataLengthBuffer.writeInt(dataLength)
             outboundChannel.write(dataLengthBuffer)
@@ -211,19 +230,14 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     }
     class GbasePkgDecoder extends OneToOneDecoder{
       override def decode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
-        firstCall = false
         msg match{
           case buffer:ChannelBuffer =>
-            working = false
-            if(buffer.readableBytes() == DIRECT_REQUEST_LENGTH) {
+            if(buffer.readableBytes() == TxProxyInboundHandler.DIRECT_REQUEST_LENGTH) {
               val pstPkg = GBASE_ITEMPKG_New
               val pReq = new GNETREQUESTHEADOBJECT().fromStreamReader(buffer)
               GAFIS_PKG_AddRmtRequest(pstPkg,pReq)
-              //192的忽略
-              error("===========> direct data for opClass:"+pReq.nOpClass+" opCode:"+pReq.nOpCode)
               pstPkg
             }else{
-              working = false
               new GBASE_ITEMPKG_OPSTRUCT().fromStreamReader(buffer)
             }
           case other=>
@@ -250,21 +264,9 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
             nextPromiseOpt = Some(promise)
 
             buffer
-          case ancientData:AncientData =>
-            val buffer = channel.getConfig.getBufferFactory.getBuffer(ancientData.getDataSize)
-            ancientData.writeToStreamWriter(buffer)
-
-            buffer
-
           case (len:Int,promise:Promise[ChannelBuffer])=>
             lengthOpt = Some(len)
             nextPromiseOpt = Some(promise)
-            null
-          case RequestHandled=>
-            working = true
-            null
-          case RequestNotHandled =>
-            working = false
             null
           case other=>
             other.asInstanceOf[AnyRef]
