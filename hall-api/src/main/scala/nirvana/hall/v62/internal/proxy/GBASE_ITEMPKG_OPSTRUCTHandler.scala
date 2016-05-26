@@ -14,7 +14,7 @@ import org.jboss.netty.channel._
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) extends SimpleChannelUpstreamHandler
+class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62Config) extends SimpleChannelUpstreamHandler
   with grmtpkg with gitempkg with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
     val msg = e.getMessage

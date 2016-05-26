@@ -17,18 +17,8 @@ import org.apache.tapestry5.services.Core
 @XmlRootElement(name = "hall_v62")
 @Marker(Array(classOf[Core]))
 class HallV62Config extends V62ProxyBindSupport{
-  @XmlElement(name="host")
-  var host:String = _
-  @XmlElement(name="port")
-  var port:Int = _
-  @XmlElement(name="connection_timeout_secs")
-  var connectionTimeoutSecs:Int = 30
-  @XmlElement(name="read_timeout_secs")
-  var readTimeoutSecs:Int = 30
-  @XmlElement(name="user")
-  var user:String= _
-  @XmlElement(name="password")
-  var password:String= _
+  @XmlElement(name="app_server")
+  var appServer:V62ServerConfig = new V62ServerConfig()
 
   @XmlElement(name="template_finger_table")
   var templateTable:DatabaseTable = _
@@ -48,9 +38,33 @@ class DatabaseTable{
   var tableId:Int = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RpcBindSupport")
+@XmlType(name = "V62ProxyBindSupport")
 trait V62ProxyBindSupport {
   @XmlElement(name = "proxy")
-  var proxy: RpcBind = _
+  var proxy:ProxyServerConfig = _
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "V62Server")
+class ProxyServerConfig{
+  @XmlElement(name = "server")
+  var server: RpcBind = _
+  @XmlElement(name="tx_server")
+  var backend:V62ServerConfig = _
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "V62ServerConfig")
+class V62ServerConfig{
+  @XmlElement(name="host")
+  var host:String = _
+  @XmlElement(name="port")
+  var port:Int = _
+  @XmlElement(name="connection_timeout_secs")
+  var connectionTimeoutSecs:Int = 30
+  @XmlElement(name="read_timeout_secs")
+  var readTimeoutSecs:Int = 30
+  @XmlElement(name="user")
+  var user:String= _
+  @XmlElement(name="password")
+  var password:String= _
 }
 

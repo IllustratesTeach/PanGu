@@ -15,11 +15,11 @@ class netpmadmTest {
   def test_select: Unit ={
 
     val config = new HallV62Config
-    config.host = "127.0.0.1"
-    config.port = 7777
-    config.user = "afisadmin"
-    config.password=""
-    V62Facade.withConfigurationServer(config) {
+    config.appServer.host = "127.0.0.1"
+    config.appServer.port = 7777
+    config.appServer.user = "afisadmin"
+    config.appServer.password=""
+    V62Facade.withConfigurationServer(config.appServer) {
 
       val facade = new V62Facade
 

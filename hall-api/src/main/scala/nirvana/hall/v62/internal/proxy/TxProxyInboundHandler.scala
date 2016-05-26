@@ -1,33 +1,25 @@
 package nirvana.hall.v62.internal.proxy
 
+import java.net.InetSocketAddress
 import java.nio.channels.ClosedChannelException
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.v62.config.ProxyServerConfig
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import org.jboss.netty.bootstrap.ClientBootstrap
-import org.jboss.netty.buffer.ChannelBuffer
-import org.jboss.netty.buffer.ChannelBuffers
-import org.jboss.netty.channel.Channel
-import org.jboss.netty.channel.ChannelFuture
-import org.jboss.netty.channel.ChannelFutureListener
-import org.jboss.netty.channel.ChannelHandlerContext
-import org.jboss.netty.channel.ChannelStateEvent
-import org.jboss.netty.channel.ExceptionEvent
-import org.jboss.netty.channel.MessageEvent
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler
+import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
+import org.jboss.netty.channel.{Channel, ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelStateEvent, ExceptionEvent, MessageEvent, SimpleChannelUpstreamHandler}
 import org.jboss.netty.channel.socket.ClientSocketChannelFactory
-import java.net.InetSocketAddress
-
 import org.jboss.netty.handler.codec.frame.FrameDecoder
-import org.jboss.netty.handler.codec.oneone.{OneToOneEncoder, OneToOneDecoder}
+import org.jboss.netty.handler.codec.oneone.{OneToOneDecoder, OneToOneEncoder}
 import org.jboss.netty.handler.timeout.ReadTimeoutException
 import org.jboss.netty.util.HashedWheelTimer
 
-import scala.concurrent.{Promise, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Promise}
 
 /**
   * 整个代理服务器的核心部分,整个系统采取完全异步模式(比较难理解)
@@ -41,12 +33,12 @@ import scala.concurrent.{Promise, ExecutionContext}
   * 2. 整个核心程序的思想把一端收到的消息毫无保留的转发给另外一端的通信服务器
   *  处理左端网络消息的核心程序
   *     TxProxyInboundHandler  针对收到的消息进行统一处理，根据状态是否要转发给右端服务器，还是本身自己消化
-  *     GbasePkgFrameDecoder   针对收到的网络字节序进行处理,需要注意的是：
+  *     GBASE_ITEMPKG_OPSTRUCTFrameDecoder   针对收到的网络字节序进行处理,需要注意的是：
   *                               开始消息有两种，1.GBASE_ITEMPKG_OPSTRUCT 2.GNETREQUESTHEADOBJECT
-  *     GbasePkgDecoder        针对收到的网络字节变为为  GBASE_ITEMPKG_OPSTRUCT对象
+  *     GBASE_ITEMPKG_OPSTRUCTDecoder        针对收到的网络字节变为为  GBASE_ITEMPKG_OPSTRUCT对象
   *     AncientDataEncoder    针对所有发送的数据，把对象变换为字节码
-  *     GbasePkgEncoder       构造GBASE_ITEMPKG_OPSTRUCT的发送方法
-  *     GbasePackageHandler   针对接受到的消息执行业务逻辑，如果整个包没有处理，则直接转发给右端服务器
+  *     GBASE_ITEMPKG_OPSTRUCTEncoder       构造GBASE_ITEMPKG_OPSTRUCT的发送方法
+  *     GBASE_ITEMPKG_OPSTRUCTHandler   针对接受到的消息执行业务逻辑，如果整个包没有处理，则直接转发给右端服务器
   *                                                                      ^^^^^^^^^^^^^^
   *  处理右端网络消息的核心程序
   *     OutboundHandler       接收到右端网络的消息，直接发送给左端网络服务器
@@ -86,7 +78,7 @@ case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Chan
   }
 }
 
-class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChannelUpstreamHandler with LoggerSupport{
+class TxProxyInboundHandler(cf: ClientSocketChannelFactory,proxyConfig: ProxyServerConfig) extends SimpleChannelUpstreamHandler with LoggerSupport{
   private[proxy] final val trafficLock: AnyRef = new AnyRef
   @volatile
   private var outboundChannel: Channel = null
@@ -95,10 +87,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     val inboundChannel: Channel = e.getChannel
     inboundChannel.setReadable(false)
     val cb: ClientBootstrap = new ClientBootstrap(cf)
+    cb.setOption("connectTimeoutMillis", proxyConfig.backend.connectionTimeoutSecs * 1000);
     cb.getPipeline.addLast("handler", new OutboundHandler(e.getChannel))
     cb.getPipeline.addLast("encoder", new AncientDataEncoder())
 
-    val f: ChannelFuture = cb.connect(new InetSocketAddress("10.1.6.182", 6811))
+    val f: ChannelFuture = cb.connect(new InetSocketAddress(proxyConfig.backend.host, proxyConfig.backend.port))
     outboundChannel = f.getChannel
     f.addListener(new ChannelFutureListener() {
       def operationComplete(future: ChannelFuture) {

@@ -4,7 +4,7 @@ import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 
 import monad.support.services.{LoggerSupport, MonadException, MonadUtils}
-import nirvana.hall.v62.config.V62ProxyBindSupport
+import nirvana.hall.v62.config.ProxyServerConfig
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.jboss.netty.bootstrap.ServerBootstrap
 import org.jboss.netty.channel.socket.ServerSocketChannelFactory
@@ -20,10 +20,10 @@ import scala.util.control.NonFatal
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageHandler) extends LoggerSupport {
+class TxProxyServer(proxyConfig:ProxyServerConfig, handler: GBASE_ITEMPKG_OPSTRUCTHandler) extends LoggerSupport {
   //一个主IO，2个worker
-  val ioThread = rpcBindSupport.proxy.ioThread
-  val workerThread = rpcBindSupport.proxy.workerThread
+  val ioThread = proxyConfig.server.ioThread
+  val workerThread = proxyConfig.server.workerThread
   val executor = Executors.newCachedThreadPool() /*.newFixedThreadPool(ioThread + workerThread + 2, new ThreadFactory {
     private val seq = new AtomicInteger(0)
 
@@ -51,7 +51,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 
     channelFactory = new NioServerSocketChannelFactory(executor, executor, workerThread)
     bootstrap = new ServerBootstrap(channelFactory)
-    bootstrap.setOption("connectTimeoutMillis", 10000);
+    bootstrap.setOption("connectTimeoutMillis", proxyConfig.backend.connectionTimeoutSecs * 1000);
 
     bootstrap.setOption("child.tcpNoDelay", true)
     bootstrap.setOption("child.keepAlive", true)
@@ -59,9 +59,9 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
       def getPipeline: ChannelPipeline = {
         val pipeline = Channels.pipeline()
         //解码
-        val txHandler = new TxProxyInboundHandler(cf)
+        val txHandler = new TxProxyInboundHandler(cf,proxyConfig)
         val decoder = new txHandler.GBASE_ITEMPKG_OPSTRUCTFrameDecoder
-        pipeline.addLast("timer",new ReadTimeoutHandler(TxProxyInboundHandler.timer,30))
+        pipeline.addLast("timer",new ReadTimeoutHandler(TxProxyInboundHandler.timer,proxyConfig.backend.connectionTimeoutSecs))
         pipeline.addLast("proxy", txHandler)
         pipeline.addLast("frameDecoder", decoder)
         pipeline.addLast("gbasePkgDecoder", new decoder.GBASE_ITEMPKG_OPSTRUCTDecoder)
@@ -80,7 +80,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 
   private def openOnce(): Channel = {
     try {
-      val bindTuple = MonadUtils.parseBind(rpcBindSupport.proxy.bind)
+      val bindTuple = MonadUtils.parseBind(proxyConfig.server.bind)
       val address = new InetSocketAddress("0.0.0.0", bindTuple._2)
       bootstrap.bind(address)
     } catch {
