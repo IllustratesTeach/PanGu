@@ -16,37 +16,39 @@ class nettableTest {
   def test_select: Unit ={
 
     val config = new HallV62Config
-    config.host = "10.1.6.119"
-    config.port = 6798
+    config.host = "127.0.0.1"
+    config.port = 7777
     config.user = "afisadmin"
     config.password=""
+    V62Facade.withConfigurationServer(config) {
 
-    val facade = new V62Facade
+      val facade = new V62Facade
 
-    val result = new GADB_SELRESULT
-    val field1 = new GADB_SELRESITEM
-    field1.szItemName = "CardId"
-    val field3 = new GADB_SELRESITEM
-    field3.szItemName = "FINGERRHMCPR"
-    field3.nFormFlag = gadbrec.SELRESITEM_FFLAG_ISMEMBLOB
+      val result = new GADB_SELRESULT
+      val field1 = new GADB_SELRESITEM
+      field1.szItemName = "CardId"
+      val field3 = new GADB_SELRESITEM
+      field3.szItemName = "FINGERRHMCPR"
+      field3.nFormFlag = gadbrec.SELRESITEM_FFLAG_ISMEMBLOB
 
-    //result.pstItem_Data = Array(field1,field3)
-    result.nResItemCount = 0 //result.pstItem_Data.length
-    result.nItemFlag = gadbrec.SELRES_ITEM_RESITEM
-    result.nFreeOption = gadbrec.SELRES_CANBEFREE_RESITEM
+      //result.pstItem_Data = Array(field1,field3)
+      result.nResItemCount = 0 //result.pstItem_Data.length
+      result.nItemFlag = gadbrec.SELRES_ITEM_RESITEM
+      result.nFreeOption = gadbrec.SELRES_CANBEFREE_RESITEM
 
-    result.nSegSize = 0
-    result.nFlag =  gadbrec.SELRES_FLAG_BLOBHASDATA
+      result.nSegSize = 0
+      result.nFlag = gadbrec.SELRES_FLAG_BLOBHASDATA
 
-    val stmt: GADB_SELSTATEMENT = new GADB_SELSTATEMENT
-    //stmt.szStatement="cardid = 12"
-    stmt.stReadOpt.nFlag = gadbrec.READROW_FLAG_GETBLOBINFOONLY
-    stmt.stReadOpt.nResColFmt = gadbrec.RESCOLFMT_GETALL //.RESCOLFMT_NAMEGIVEN
-    stmt.stReadOpt.nPosBy = gadbrec.READROW_POSBY_SELECT
+      val stmt: GADB_SELSTATEMENT = new GADB_SELSTATEMENT
+      //stmt.szStatement="cardid = 12"
+      stmt.stReadOpt.nFlag = gadbrec.READROW_FLAG_GETBLOBINFOONLY
+      stmt.stReadOpt.nResColFmt = gadbrec.RESCOLFMT_GETALL //.RESCOLFMT_NAMEGIVEN
+      stmt.stReadOpt.nPosBy = gadbrec.READROW_POSBY_SELECT
 
-    facade.NET_GAFIS_TABLE_Select(1,2,result,stmt)
+      facade.NET_GAFIS_TABLE_Select(1, 2, result, stmt)
 
-    val bufResult = result.pDataBuf_Result
-    val memblob = bufResult.head
+      val bufResult = result.pDataBuf_Result
+//      val memblob = bufResult.head
+    }
   }
 }

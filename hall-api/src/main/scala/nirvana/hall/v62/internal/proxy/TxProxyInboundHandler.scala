@@ -1,18 +1,3 @@
-/*
- * Copyright 2012 The Netty Project
- *
- * The Netty Project licenses this file to you under the Apache License,
- * version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at:
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package nirvana.hall.v62.internal.proxy
 
 import java.nio.channels.ClosedChannelException
@@ -39,11 +24,38 @@ import java.net.InetSocketAddress
 
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 import org.jboss.netty.handler.codec.oneone.{OneToOneEncoder, OneToOneDecoder}
+import org.jboss.netty.handler.timeout.ReadTimeoutException
+import org.jboss.netty.util.HashedWheelTimer
 
 import scala.concurrent.{Promise, ExecutionContext}
 
+/**
+  * 整个代理服务器的核心部分,整个系统采取完全异步模式(比较难理解)
+  *
+  * 1.总体架构：
+  *  活采 <-> 活采通讯服务器    <--- HALL PROXY -->   上级通讯服务器 <->应用服务器
+  *                                   \
+  *                                    \------>   HALL(支持6.2/7.0)
+  *
+  *  hall proxy起到代理功能，大部分的功能还是通过通信服务器来实现的，只是把我们需要的业务放在7.0服务器中实现.
+  * 2. 整个核心程序的思想把一端收到的消息毫无保留的转发给另外一端的通信服务器
+  *  处理左端网络消息的核心程序
+  *     TxProxyInboundHandler  针对收到的消息进行统一处理，根据状态是否要转发给右端服务器，还是本身自己消化
+  *     GbasePkgFrameDecoder   针对收到的网络字节序进行处理,需要注意的是：
+  *                               开始消息有两种，1.GBASE_ITEMPKG_OPSTRUCT 2.GNETREQUESTHEADOBJECT
+  *     GbasePkgDecoder        针对收到的网络字节变为为  GBASE_ITEMPKG_OPSTRUCT对象
+  *     AncientDataEncoder    针对所有发送的数据，把对象变换为字节码
+  *     GbasePkgEncoder       构造GBASE_ITEMPKG_OPSTRUCT的发送方法
+  *     GbasePackageHandler   针对接受到的消息执行业务逻辑，如果整个包没有处理，则直接转发给右端服务器
+  *                                                                      ^^^^^^^^^^^^^^
+  *  处理右端网络消息的核心程序
+  *     OutboundHandler       接收到右端网络的消息，直接发送给左端网络服务器
+  *     AncientDataEncoder    针对所有发送的对象数据，变换为字节码
+  *
+  */
 object TxProxyInboundHandler {
   val DIRECT_REQUEST_LENGTH=192
+  val timer = new HashedWheelTimer
   /**
     * Closes the specified channel after all queued write requests are flushed.
     */
@@ -58,7 +70,7 @@ case object RequestNotHandled extends RequestHandleStatus
 case object RequestHandled extends RequestHandleStatus
 case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Channel,var directRequest:Boolean=false)
 
-class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChannelUpstreamHandler {
+class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChannelUpstreamHandler with LoggerSupport{
   private[proxy] final val trafficLock: AnyRef = new AnyRef
   @volatile
   private var outboundChannel: Channel = null
@@ -111,18 +123,21 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
   }
 
   override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+    val isDirect=ctx.getChannel.getAttachment.asInstanceOf[ChannelAttachment].directRequest
+//    debug("[{}](closed) <-- HALL(direct:{}) --> [{}]",e.getChannel.getRemoteAddress,isDirect,outboundChannel.getRemoteAddress)
     if (outboundChannel != null) {
       TxProxyInboundHandler.closeOnFlush(outboundChannel)
     }
   }
 
   override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
-    outputException(e)
+    outputException(e,ctx.getChannel,outboundChannel)
     TxProxyInboundHandler.closeOnFlush(e.getChannel)
   }
 
   /**
     * 转向所代理的服务器
+    *
     * @param inboundChannel 请求的通道
     */
   private class OutboundHandler(inboundChannel: Channel) extends SimpleChannelUpstreamHandler {
@@ -147,20 +162,25 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
       }
     }
     override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      val isDirect=inboundChannel.getAttachment.asInstanceOf[ChannelAttachment].directRequest
+//      debug("[{}] <-- HALL(direct:{}) --> [{}](closed)",inboundChannel.getRemoteAddress,isDirect,outboundChannel.getRemoteAddress)
       TxProxyInboundHandler.closeOnFlush(inboundChannel)
     }
     override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
-      outputException(e)
+      outputException(e,inboundChannel,ctx.getChannel)
       TxProxyInboundHandler.closeOnFlush(e.getChannel)
     }
   }
-  private def outputException(e:ExceptionEvent): Unit ={
+  private def outputException(e:ExceptionEvent,inbound:Channel,outbound:Channel): Unit ={
     e.getCause match {
       case cce:ClosedChannelException=>
 //        System.err.println("channel closed!")
       case ioe:java.io.IOException =>
         if(ioe.getMessage== null || ioe.getMessage != "Connection reset by peer")
           ioe.printStackTrace(System.err)
+      case rte:ReadTimeoutException=>
+        val isDirect=inbound.getAttachment.asInstanceOf[ChannelAttachment].directRequest
+        debug("[{}] <-- HALL(direct:{}) --> [{}] .... read timeout",inbound.getRemoteAddress,isDirect,outbound.getRemoteAddress)
 
       case other=>
         other.printStackTrace(System.err)
@@ -187,6 +207,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
     private var nextPromiseOpt:Option[Promise[ChannelBuffer]] = None
     @throws(classOf[Exception])
     protected def decode(ctx: ChannelHandlerContext, channel: Channel, buffer: ChannelBuffer): AnyRef = {
+      val attachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
+      if(attachment.status == RequestNotHandled){
+        val bytesNum = buffer.readableBytes()
+        return buffer.readBytes(bytesNum)
+      }
       lengthOpt match{
         case Some(dataLength)=>
           if(buffer.readableBytes() >= dataLength){
@@ -206,13 +231,13 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           if(dataLength <= 0)
             throw new IllegalArgumentException("data length is zero!")
           lengthOpt = Some(dataLength)
-          val oldAttachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
+          val attachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
           if(dataLength == TxProxyInboundHandler.DIRECT_REQUEST_LENGTH) {
             buffer.resetReaderIndex()
-            channel.setAttachment(ChannelAttachment(oldAttachment.status,oldAttachment.outboundChannel,directRequest = true))
+            attachment.directRequest = true
           }
           else {
-            channel.setAttachment(ChannelAttachment(oldAttachment.status,oldAttachment.outboundChannel,directRequest = false))
+            attachment.directRequest = false
             //向代理的后端通讯服务器发送数据
             val dataLengthBuffer = buffer.factory().getBuffer(4)
             dataLengthBuffer.writeInt(dataLength)
@@ -220,18 +245,22 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           }
 
           if(buffer.readableBytes() >= dataLength){
-            lengthOpt = None //清空之前的操作数据
+//            lengthOpt = None //清空之前的操作数据
             return buffer.readBytes(dataLength)
           }
-        case other=>
       }
 
       null
     }
     class GbasePkgDecoder extends OneToOneDecoder{
       override def decode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
+        val attachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
+
         msg match{
-          case buffer:ChannelBuffer =>
+          case buffer:ChannelBuffer if attachment.status == RequestNotHandled =>
+            val len = buffer.readableBytes()
+            buffer.readBytes(len)
+          case buffer:ChannelBuffer if attachment.status == RequestHandled =>
             if(buffer.readableBytes() == TxProxyInboundHandler.DIRECT_REQUEST_LENGTH) {
               val pstPkg = GBASE_ITEMPKG_New
               val pReq = new GNETREQUESTHEADOBJECT().fromStreamReader(buffer)

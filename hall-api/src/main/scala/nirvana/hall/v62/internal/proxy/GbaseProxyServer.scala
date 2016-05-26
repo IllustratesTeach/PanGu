@@ -10,6 +10,7 @@ import org.jboss.netty.bootstrap.ServerBootstrap
 import org.jboss.netty.channel.socket.ServerSocketChannelFactory
 import org.jboss.netty.channel.socket.nio.{NioClientSocketChannelFactory, NioServerSocketChannelFactory}
 import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory, Channels}
+import org.jboss.netty.handler.timeout.ReadTimeoutHandler
 
 import scala.util.control.NonFatal
 
@@ -50,6 +51,8 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
 
     channelFactory = new NioServerSocketChannelFactory(executor, executor, workerThread)
     bootstrap = new ServerBootstrap(channelFactory)
+    bootstrap.setOption("connectTimeoutMillis", 10000);
+
     bootstrap.setOption("child.tcpNoDelay", true)
     bootstrap.setOption("child.keepAlive", true)
     bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
@@ -58,6 +61,7 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
         //解码
         val txHandler = new TxProxyInboundHandler(cf)
         val decoder = new txHandler.GbasePkgFrameDecoder
+        pipeline.addLast("timer",new ReadTimeoutHandler(TxProxyInboundHandler.timer,30))
         pipeline.addLast("proxy", txHandler)
         pipeline.addLast("frameDecoder", decoder)
         pipeline.addLast("gbasePkgDecoder", new decoder.GbasePkgDecoder)

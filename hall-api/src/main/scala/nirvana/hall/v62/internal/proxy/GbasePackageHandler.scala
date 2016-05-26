@@ -28,7 +28,7 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) ext
         val request = GAFIS_PKG_GetRmtRequest(pkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
         val opClass = request.nOpClass
         val opCode = request.nOpCode
-        info("[{}] username:{} opClass {} opCode:{} ",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode)
+        info("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] ",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
 
         //绑定当前线程使用的channel
         ChannelThreadContext.channelContext.withValue(channel) {

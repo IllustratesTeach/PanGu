@@ -19,6 +19,7 @@ import scala.concurrent.{ExecutionContext, Promise}
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
+@deprecated
 class GbasePkgFrameDecoder extends FrameDecoder with LoggerSupport with gitempkg with grmtpkg{
   private val DIRECT_REQUEST_LENGTH=192
   private implicit val executionContext = ExecutionContext.global

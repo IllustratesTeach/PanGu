@@ -11,6 +11,7 @@ import nirvana.hall.v62.services.V62ServerAddress
 /**
  * Created by songpeng on 16/5/3.
  */
+@deprecated
 class GbaseProxyClient extends AncientClientSupport
   with grmtcsr
   with gnetcsr
