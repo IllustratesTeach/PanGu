@@ -14,10 +14,6 @@ class GAFIS_RMTLIB_TPSVR_ServerFilter extends BaseAncientFilter{
   override def handle(pReq: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, handler: GbaseItemPkgHandler): Boolean = {
     val nOpClass = NETREQ_GetOpClass(pReq)
     val executed = nOpClass == gnopcode.OP_CLASS_TPLIB && GAFIS_RMTLIB_TPSVR_Server(pReq,pkg)
-    if(executed){
-      return true
-    }else{
-      handler.handle(pReq,pkg)
-    }
+    executed || handler.handle(pReq,pkg)
   }
 }

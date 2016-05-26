@@ -54,7 +54,12 @@ import scala.concurrent.{Promise, ExecutionContext}
   *
   */
 object TxProxyInboundHandler {
+  /**
+    * 通过收到的头大小来进行判断是否为代理模式
+    * 见：grmtcsr#GAFIS_RMTLIB_RecvPkg
+    */
   val DIRECT_REQUEST_LENGTH=192
+  /** 用来做超时处理的定时器  **/
   val timer = new HashedWheelTimer
   /**
     * Closes the specified channel after all queued write requests are flushed.
@@ -65,9 +70,13 @@ object TxProxyInboundHandler {
     }
   }
 }
+/** 请求处理的状态  **/
 sealed abstract class RequestHandleStatus()
+/** 未被Hall处理 **/
 case object RequestNotHandled extends RequestHandleStatus
+/** 被Hall处理 **/
 case object RequestHandled extends RequestHandleStatus
+/** 当前channel中的参数，用来做判断处理 **/
 case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Channel,var directRequest:Boolean=false){
   var opClass:Int = 0
   var opCode:Int = 0
@@ -107,6 +116,12 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
     val msg: ChannelBuffer = e.getMessage.asInstanceOf[ChannelBuffer]
     trafficLock synchronized {
+
+      /**
+        * 此处针对收到的数据进行处理
+        * 如果是被系统处理的数据，则向上传送进行处理
+        * 如果是未被处理的数据，则直接转发给右端服务器
+        */
       ctx.getChannel.getAttachment match{
         case ChannelAttachment(RequestHandled,channel:Channel,_)=>
           ctx.sendUpstream(e)
@@ -184,17 +199,19 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
 //        System.err.println("channel closed!")
       case ioe:java.io.IOException =>
         if(ioe.getMessage== null || ioe.getMessage != "Connection reset by peer")
-          ioe.printStackTrace(System.err)
+          error(ioe.getMessage,ioe)
       case rte:ReadTimeoutException=>
         val isDirect=inbound.getAttachment.asInstanceOf[ChannelAttachment].directRequest
-        debug("[{}] <-- HALL(opClass:{} opCode:{} direct:{}) --> [{}] .... read timeout",
+        warn("[{}] <-- HALL(opClass:{} opCode:{} direct:{}) --> [{}] .... read timeout",
           inbound.getRemoteAddress,attachment.opClass,attachment.opCode,isDirect,outbound.getRemoteAddress)
-
       case other=>
-        other.printStackTrace(System.err)
+        error(other.getMessage,other)
     }
   }
 
+  /**
+    * 针对结构性数据进行输出操作
+    */
   class AncientDataEncoder extends OneToOneEncoder{
     override def encode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
       msg match{
@@ -209,7 +226,10 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
   }
 
 
-  class GbasePkgFrameDecoder extends FrameDecoder with LoggerSupport with gitempkg with grmtpkg{
+  /**
+    * 得到符合GBASE_ITEMPKG_OPSTRUCT结构的数据帧
+    */
+  class GBASE_ITEMPKG_OPSTRUCTFrameDecoder extends FrameDecoder with LoggerSupport with gitempkg with grmtpkg{
     private implicit val executionContext = ExecutionContext.global
     private var lengthOpt:Option[Int] = None
     private var nextPromiseOpt:Option[Promise[ChannelBuffer]] = None
@@ -247,14 +267,19 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           }
           else {
             attachment.directRequest = false
-            //向代理的后端通讯服务器发送数据
+            /**
+              * 此处向右端服务器发送4个的字节，
+              * 然后右端服务器回应4个字节给左端服务器
+              * 如果后面的业务能处理此包，则右端收到的4个字节丢弃了
+              * 如果后面的业务不能处理此包，则刚好模拟了正常的数据代理
+              */
             val dataLengthBuffer = buffer.factory().getBuffer(4)
             dataLengthBuffer.writeInt(dataLength)
             outboundChannel.write(dataLengthBuffer)
           }
 
           if(buffer.readableBytes() >= dataLength){
-//            lengthOpt = None //清空之前的操作数据
+            lengthOpt = None //清空之前的操作数据
             return buffer.readBytes(dataLength)
           }
         case other=>
@@ -263,7 +288,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
 
       null
     }
-    class GbasePkgDecoder extends OneToOneDecoder{
+
+    /**
+      * 把收到的数据帧转换为 GBASE_ITEMPKG_OPSTRUCT结构
+      */
+    class GBASE_ITEMPKG_OPSTRUCTDecoder extends OneToOneDecoder{
       override def decode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
         val attachment = channel.getAttachment.asInstanceOf[ChannelAttachment]
 
@@ -285,7 +314,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
         }
       }
     }
-    class GbasePkgEncoder extends OneToOneEncoder{
+
+    /**
+      * 把收到的GBASE_ITEMPKG_OPSTRUCT结构转换为buffer
+      */
+    class GBASE_ITEMPKG_OPSTRUCTEncoder extends OneToOneEncoder{
       override def encode(ctx: ChannelHandlerContext, channel: Channel, msg: scala.Any): AnyRef = {
         msg match{
           case pkg:GBASE_ITEMPKG_OPSTRUCT =>
@@ -299,8 +332,8 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
               val pkgBuffer = channel.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
               pkg.writeToStreamWriter(pkgBuffer)
               channel.write(pkgBuffer)
-              //如果发送完了报级别的数据，则关闭
-//              TxProxyInboundHandler.closeOnFlush(channel)
+              //如果发送完了报文级别的数据，则关闭连接
+              TxProxyInboundHandler.closeOnFlush(channel)
             }
             lengthOpt = Some(4)
             nextPromiseOpt = Some(promise)

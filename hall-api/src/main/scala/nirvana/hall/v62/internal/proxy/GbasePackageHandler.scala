@@ -36,12 +36,13 @@ class GbasePackageHandler(handler: GbaseItemPkgHandler,config:HallV62Config) ext
         ChannelThreadContext.channelContext.withValue(channel) {
           /**
             * 非direct的模式，且被捕获
+            * 在6.2中direct模式就是代理模式，所以直接进行转发
             */
           if (!attachment.directRequest && handler.handle(request, pkg)) {
-            info("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
+            debug("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
             attachment.status = RequestHandled
           } else {
-            info("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] not handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
+            debug("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] not handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
             attachment.status = RequestNotHandled
             val outbound = attachment.outboundChannel
             if (attachment.directRequest) {

@@ -60,15 +60,15 @@ class GbaseProxyServer(rpcBindSupport:V62ProxyBindSupport,handler: GbasePackageH
         val pipeline = Channels.pipeline()
         //解码
         val txHandler = new TxProxyInboundHandler(cf)
-        val decoder = new txHandler.GbasePkgFrameDecoder
+        val decoder = new txHandler.GBASE_ITEMPKG_OPSTRUCTFrameDecoder
         pipeline.addLast("timer",new ReadTimeoutHandler(TxProxyInboundHandler.timer,30))
         pipeline.addLast("proxy", txHandler)
         pipeline.addLast("frameDecoder", decoder)
-        pipeline.addLast("gbasePkgDecoder", new decoder.GbasePkgDecoder)
+        pipeline.addLast("gbasePkgDecoder", new decoder.GBASE_ITEMPKG_OPSTRUCTDecoder)
 
         //编码
         pipeline.addLast("AncientDataEncoder", new txHandler.AncientDataEncoder())
-        pipeline.addLast("GbasePkgEncoder",new decoder.GbasePkgEncoder)
+        pipeline.addLast("GbasePkgEncoder",new decoder.GBASE_ITEMPKG_OPSTRUCTEncoder)
 
         //业务逻辑处理
         pipeline.addLast("handler", handler)

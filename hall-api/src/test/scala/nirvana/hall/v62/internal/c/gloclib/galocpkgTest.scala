@@ -16,7 +16,10 @@ class galocpkgTest {
   @Test
   def test_OP_TPLIB_ADD2: Unit ={
     val itemPkg = new GBASE_ITEMPKG_OPSTRUCT
-    itemPkg.fromStreamReader(getClass.getResourceAsStream("/OP_TPLIB_ADD_2.dat"))
+    val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/OP_TPLIB_ADD_2.dat"))
+    itemPkg.fromByteArray(bytes)
+    Assert.assertEquals(bytes.length,itemPkg.getDataSize)
+    Assert.assertEquals(bytes.length,itemPkg.head.nDataLen)
 
     val galocpkg = new galocpkg with gitempkg with galoctp with grmtpkg
     val items = galocpkg.GAFIS_PKG_GetTpCard(itemPkg)

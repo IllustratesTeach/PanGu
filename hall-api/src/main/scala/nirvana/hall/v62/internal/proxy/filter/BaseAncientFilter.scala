@@ -6,7 +6,6 @@ import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.internal.c.grmtlib.{grmtcsr, grmtpkg, grmtsvr}
-import nirvana.hall.v62.internal.c.gsvrlib.adminsvr
 import nirvana.hall.v62.internal.proxy.{ChannelThreadContext, GbaseItemPkgFilter}
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.{ChannelOperator, V62ServerAddress}
@@ -24,7 +23,6 @@ trait BaseAncientFilter extends GbaseItemPkgFilter with LoggerSupport
   with gitempkg
   with galoctp
   with grmtcsr
-  with adminsvr
   with grmtsvr
   with grmtpkg
   with gnetcsr
@@ -92,7 +90,7 @@ class NettyChannelOperator(channel:Channel) extends ChannelOperator {
     new NoneResponse().asInstanceOf[R]
   }
 
-  override def receive[R <: AncientData : ClassManifest](): R = {
+  override def receive[R <: AncientData : ClassTag](): R = {
     throw new UnsupportedOperationException
   }
 
