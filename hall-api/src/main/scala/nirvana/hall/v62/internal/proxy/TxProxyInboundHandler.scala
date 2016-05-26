@@ -68,7 +68,14 @@ object TxProxyInboundHandler {
 sealed abstract class RequestHandleStatus()
 case object RequestNotHandled extends RequestHandleStatus
 case object RequestHandled extends RequestHandleStatus
-case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Channel,var directRequest:Boolean=false)
+case class ChannelAttachment(var status:RequestHandleStatus,outboundChannel:Channel,var directRequest:Boolean=false){
+  var opClass:Int = 0
+  var opCode:Int = 0
+
+  override def toString: String = {
+    "opClass:%s opCode:%s direct:%s".format(opClass,opCode,directRequest)
+  }
+}
 
 class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChannelUpstreamHandler with LoggerSupport{
   private[proxy] final val trafficLock: AnyRef = new AnyRef
@@ -131,7 +138,7 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
   }
 
   override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
-    outputException(e,ctx.getChannel,outboundChannel)
+    outputException(e,ctx.getChannel.getAttachment.asInstanceOf[ChannelAttachment],ctx.getChannel,outboundChannel)
     TxProxyInboundHandler.closeOnFlush(e.getChannel)
   }
 
@@ -167,11 +174,11 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
       TxProxyInboundHandler.closeOnFlush(inboundChannel)
     }
     override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
-      outputException(e,inboundChannel,ctx.getChannel)
+      outputException(e,inboundChannel.getAttachment.asInstanceOf[ChannelAttachment],inboundChannel,ctx.getChannel)
       TxProxyInboundHandler.closeOnFlush(e.getChannel)
     }
   }
-  private def outputException(e:ExceptionEvent,inbound:Channel,outbound:Channel): Unit ={
+  private def outputException(e:ExceptionEvent,attachment: ChannelAttachment,inbound:Channel,outbound:Channel): Unit ={
     e.getCause match {
       case cce:ClosedChannelException=>
 //        System.err.println("channel closed!")
@@ -180,7 +187,8 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
           ioe.printStackTrace(System.err)
       case rte:ReadTimeoutException=>
         val isDirect=inbound.getAttachment.asInstanceOf[ChannelAttachment].directRequest
-        debug("[{}] <-- HALL(direct:{}) --> [{}] .... read timeout",inbound.getRemoteAddress,isDirect,outbound.getRemoteAddress)
+        debug("[{}] <-- HALL(opClass:{} opCode:{} direct:{}) --> [{}] .... read timeout",
+          inbound.getRemoteAddress,attachment.opClass,attachment.opCode,isDirect,outbound.getRemoteAddress)
 
       case other=>
         other.printStackTrace(System.err)
@@ -215,6 +223,7 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
       lengthOpt match{
         case Some(dataLength)=>
           if(buffer.readableBytes() >= dataLength){
+            lengthOpt = None
             val tmpBuffer = buffer.readBytes(dataLength)
             nextPromiseOpt match{
               case Some(promise)=>
@@ -248,6 +257,8 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
 //            lengthOpt = None //清空之前的操作数据
             return buffer.readBytes(dataLength)
           }
+        case other=>
+          //continue read buffer ...
       }
 
       null
@@ -288,6 +299,8 @@ class TxProxyInboundHandler(cf: ClientSocketChannelFactory) extends SimpleChanne
               val pkgBuffer = channel.getConfig.getBufferFactory.getBuffer(pkg.getDataSize)
               pkg.writeToStreamWriter(pkgBuffer)
               channel.write(pkgBuffer)
+              //如果发送完了报级别的数据，则关闭
+//              TxProxyInboundHandler.closeOnFlush(channel)
             }
             lengthOpt = Some(4)
             nextPromiseOpt = Some(promise)

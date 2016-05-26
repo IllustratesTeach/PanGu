@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef
 import nirvana.hall.c.services.gbaselib.gbasedef.{GAKEYSTRUCT,GBASE_UTIL_ALIGN}
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMSTRUCT, GBASE_ITEMPKG_OPSTRUCT}
@@ -324,11 +325,14 @@ trait galocpkg {
   def GAFIS_TEXT_GetTextArrayFromStream(pszStream:ChannelBuffer):Array[GATEXTITEMSTRUCT]={
     val nTextItemCount =  pszStream.readInt()
 
-    Range(0,nTextItemCount).map(x=>new GATEXTITEMSTRUCT())
+    Range(0,nTextItemCount).map(x=>new GATEXTITEMSTRUCT().fromStreamReader(pszStream,AncientConstants.GBK_ENCODING))
       .map { pstItem =>
-        pstItem.fromStreamReader(pszStream)
         if (pstItem.bIsPointer > 0) {
+          val readableSize = pszStream.readableBytes()
           val nSize = pstItem.nItemLen
+          if(readableSize < nSize){
+            println("^_^")
+          }
           pstItem.stData.textContent = pszStream.readBytes(nSize).array()
           val blankSize = gbasedef.GBASE_UTIL_ALIGN(nSize, 4)
           pszStream.skipBytes(blankSize)

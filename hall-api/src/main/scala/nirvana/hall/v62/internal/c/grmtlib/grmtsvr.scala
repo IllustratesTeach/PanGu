@@ -1,5 +1,8 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
+import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.ganumia.gadbcol.GACOLUMNPROPSTRUCT
@@ -14,6 +17,7 @@ import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.internal.proxy.GbaseProxyClient
+import org.apache.commons.io.FileUtils
 import org.jboss.netty.buffer.ChannelBuffer
 
 import scala.concurrent.{ExecutionContext, Promise}
@@ -34,6 +38,7 @@ trait grmtsvr {
     with gnetcsr
     with reqansop =>
   private implicit val executionContext = ExecutionContext.global
+  private val seq = new AtomicInteger(0)
   def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
                                 bIsReq50:Int=0):Boolean={
@@ -55,6 +60,9 @@ trait grmtsvr {
          * 2. 保存档案数据
          * 3. 返回结果
          */
+        val seqNum = seq.incrementAndGet()
+        debug("process ..... {}",seqNum)
+        FileUtils.writeByteArrayToFile(new File("target"+seqNum),pstRecvPkg.toByteArray())
 
         val stTPCard = GAFIS_PKG_GetTpCard(pstRecvPkg)
         //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
@@ -71,7 +79,7 @@ trait grmtsvr {
       case OP_TPLIB_EXIST=>
         //TODO 判断卡片是否存在
 
-        NETANS_SetRetVal(pAns,0);
+        NETANS_SetRetVal(pAns,0)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
