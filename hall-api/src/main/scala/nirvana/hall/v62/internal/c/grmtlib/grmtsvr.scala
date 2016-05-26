@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
+import java.io.ByteArrayOutputStream
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
@@ -10,6 +12,7 @@ import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
+import nirvana.hall.v70.jpa.GafisPerson
 
 import scala.concurrent.ExecutionContext
 
@@ -52,6 +55,15 @@ trait grmtsvr {
         val stTPCard = GAFIS_PKG_GetTpCard(pstRecvPkg)
         //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
         //saveStTPCardToV70.....
+        /*stTPCard.foreach{gtpCard =>
+          val tpCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(gtpCard)
+          val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+          val portraits = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+          val fingers = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+          person.save()
+          portraits.foreach(_.save())
+          fingers.foreach(_.save())
+        }*/
         //n 为保存成功的个数
         val n = stTPCard.length
 
@@ -62,9 +74,17 @@ trait grmtsvr {
 
         true
       case OP_TPLIB_EXIST=>
-        //TODO 判断卡片是否存在
+        //获取编号,去除后边的空字符
+        val cardIdBuf = new ByteArrayOutputStream()
+        pReq.bnData.foreach(c => if(c != 0) cardIdBuf.write(c))
+        val cardId = cardIdBuf.toString("GB2312")
+        //根据人员编号查询7.0数据库
+        val person = GafisPerson.findOption(cardId)
+        println(person)
+        //如果人员编号存在返回1，不存在0
+        val n = if(person != None) 1 else 0
 
-        NETANS_SetRetVal(pAns,0)
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
