@@ -40,11 +40,14 @@ object fpt4code {
   def gafisCprCodeToFPTCode(code:Int): String = {
     code match {
       case glocdef.GAIMG_CPRMETHOD_DEFAULT => // by xgw supplied method
-        throw new UnsupportedOperationException("%s compress not supported".format(code))
+        //throw new UnsupportedOperationException("%s compress not supported".format(code))
+        fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
       case glocdef.GAIMG_CPRMETHOD_XGW => // by xgw supplied method.
-        throw new UnsupportedOperationException("%s compress not supported".format(code))
+        //throw new UnsupportedOperationException("%s compress not supported".format(code))
+        fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
       case glocdef.GAIMG_CPRMETHOD_XGW_EZW => // 许公望的EZW压缩方法：适合低倍率高保真的压缩.
-        throw new UnsupportedOperationException("%s compress not supported".format(code))
+        //throw new UnsupportedOperationException("%s compress not supported".format(code))
+        fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
       case glocdef.GAIMG_CPRMETHOD_GA10 => // 公安部10倍压缩方法
         fpt4code.GAIMG_CPRMETHOD_GA10_CODE
       case glocdef.GAIMG_CPRMETHOD_GFS => // golden
