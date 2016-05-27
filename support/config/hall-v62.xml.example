@@ -27,15 +27,6 @@
     <database_id>20</database_id>
     <table_id>2</table_id>
   </query_table>
-  <proxy>
-    <server>
-      <bind>0.0.0.0:7777</bind>
-    </server>
-    <tx_server>
-      <host>10.1.6.182</host>
-      <port>6811</port>
-    </tx_server>
-  </proxy>
 </hall_v62>
 
 
