@@ -3,8 +3,11 @@ package nirvana.hall.v62.internal.c.grmtlib
 import java.nio.ByteBuffer
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gbaselib.gafiserr
+import nirvana.hall.c.services.gbaselib.gafiserr.{FILENLSTRUCT, GAFISERRDATSTRUCT}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
-import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
@@ -91,5 +94,35 @@ trait grmtcsr {
       NETOP_SENDDATA(channelOperator, bytes)
       NETOP_RECVDATA(channelOperator, pstPkg)
     }
+  }
+  def GAFIS_NETCSR_SendRemoteErrStruct(e:Throwable)
+  {
+    var stacks = e.getStackTrace
+    val errdata = new GAFISERRDATSTRUCT
+    errdata.bnAFISErrData = e.getMessage.getBytes(AncientConstants.GBK_ENCODING)
+    errdata.nErrDataLen = errdata.bnAFISErrData.length.toByte
+
+    errdata.szFileName = stacks.head.getFileName
+    errdata.nAFISErrno = gafiserr.GAFISERR_SYS_UNKNOWN
+    errdata.nLineNum = stacks.head.getLineNumber.toShort
+    if(stacks.length > 14)
+      stacks = stacks.take(14)
+
+    errdata.stFileList = stacks.map{s=>
+      val f = new FILENLSTRUCT()
+      f.nLineNum = s.getLineNumber.toShort
+      f.sFileName = s.getFileName
+      if(f.sFileName != null && f.sFileName.length>18)
+        f.sFileName = f.sFileName.take(18)
+      f
+    }
+    errdata.nFileCount = errdata.stFileList.length.toByte
+
+    val stAns = new GNETANSWERHEADOBJECT
+    NETANS_SetRetVal(stAns,-1)
+    val stSendPkg = GBASE_ITEMPKG_New
+    GAFIS_PKG_AddRmtAnswer(stSendPkg,stAns)
+    GAFIS_PKG_AddOtherData(stSendPkg,errdata.toByteArray(AncientConstants.GBK_ENCODING))
+    GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
   }
 }

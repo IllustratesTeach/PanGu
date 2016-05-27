@@ -3,11 +3,13 @@ package nirvana.hall.v62.internal.c.gloclib
 import java.io.ByteArrayOutputStream
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
@@ -19,10 +21,11 @@ import scala.collection.mutable
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-14
  */
-object galoctpConverter {
+object galoctpConverter extends LoggerSupport{
   /**
    * convert protobuf object to gafis' TPCard
-   * @param card protobuf object
+    *
+    * @param card protobuf object
    * @return gafis TPCard
    * @see FPTBatchUpdater.cpp #812
    */
@@ -98,7 +101,9 @@ object galoctpConverter {
         flag |= glocdef.GAMIC_ITEMFLAG_MNT
       }
       if(blob.hasStImage){
-        val imgType = blob.getStImageBytes.byteAt(9) //see GAFISIMAGEHEADSTRUCT.bIsCompressed
+        val img = new GAFISIMAGESTRUCT().fromStreamReader(blob.getStImageBytes.newInput())
+//        val imgType = blob.getStImageBytes.byteAt(9) //see GAFISIMAGEHEADSTRUCT.bIsCompressed
+        val imgType = img.stHead.bIsCompressed
         if(imgType == 1){ //image compressed
           mic.pstCpr_Data = blob.getStImageBytes.toByteArray
           mic.nCprLen = mic.pstCpr_Data.length
@@ -170,7 +175,8 @@ object galoctpConverter {
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case other =>
-          new UnsupportedOperationException("item type "+other+" not supported ")
+          error("mic type {} not supported for {}",other,data.szCardID)
+//          new UnsupportedOperationException("item type "+other+" not supported ")
       }
       mic.bIsLatent = 0 //是否位现场数据
 
@@ -185,7 +191,8 @@ object galoctpConverter {
 
   /**
    * convert gafis' tpcard object to protobuf
-   * @param data
+    *
+    * @param data
    * @return
    */
   def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT): TPCard = {
@@ -256,44 +263,48 @@ object galoctpConverter {
     }
 
     data.pstMIC_Data.foreach{ mic =>
-      val data = card.addBlobBuilder()
-      if(mic.pstMnt_Data != null)
-        data.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
-      if(mic.pstCpr_Data != null)
-        data.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
+      val micDataBuilder = TPCardBlob.newBuilder() //card.addBlobBuilder()
+      if(mic.pstMnt_Data != null && mic.pstMnt_Data.length > 64)
+        micDataBuilder.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
+      if(mic.pstCpr_Data != null && mic.pstCpr_Data.length > 64)
+        micDataBuilder.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
       mic.nItemType match {
         case glocdef.GAIMG_IMAGETYPE_FINGER =>
-          data.setType(ImageType.IMAGETYPE_FINGER)
-          data.setFgp(FingerFgp.valueOf(mic.nItemData))
+          micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
+          micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
         case glocdef.GAMIC_ITEMTYPE_PLAINFINGER =>
           //四联指,不确定
-          data.setType(ImageType.IMAGETYPE_UNKNOWN)
+          micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
         case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
-          data.setType(ImageType.IMAGETYPE_FINGER)
-          data.setBPlain(true)
-          data.setFgp(FingerFgp.valueOf(mic.nItemData))
+          micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
+          micDataBuilder.setBPlain(true)
+          micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
         case glocdef.GAMIC_ITEMTYPE_FACE =>
-          data.setType(ImageType.IMAGETYPE_FACE)
+          micDataBuilder.setType(ImageType.IMAGETYPE_FACE)
           mic.nItemData match {
-            case 1 => data.setFacefgp(FaceFgp.FACE_FRONT)
-            case 2 => data.setFacefgp(FaceFgp.FACE_LEFT)
-            case 3 => data.setFacefgp(FaceFgp.FACE_RIGHT)
-            case other => data.setFacefgp(FaceFgp.FACE_UNKNOWN)
+            case 1 => micDataBuilder.setFacefgp(FaceFgp.FACE_FRONT)
+            case 2 => micDataBuilder.setFacefgp(FaceFgp.FACE_LEFT)
+            case 3 => micDataBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
+            case other => micDataBuilder.setFacefgp(FaceFgp.FACE_UNKNOWN)
           }
         case glocdef.GAMIC_ITEMTYPE_DATA =>
-          data.setType(ImageType.IMAGETYPE_CARDIMG)
+          micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
         case glocdef.GAMIC_ITEMTYPE_PALM =>
-          data.setType(ImageType.IMAGETYPE_PALM)
+          micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
           mic.nItemData match {
-            case 1 => data.setPalmfgp(PalmFgp.PALM_RIGHT)
-            case 2 => data.setPalmfgp(PalmFgp.PALM_LEFT)
-            case other => data.setPalmfgp(PalmFgp.PALM_UNKNOWN)
+            case 1 => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
+            case 2 => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
+            case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
           }
         case glocdef.GAMIC_ITEMTYPE_VOICE =>
-          data.setType(ImageType.IMAGETYPE_VOICE)
+          micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
         case other =>
-          data.setType(ImageType.IMAGETYPE_UNKNOWN)
+          logger.error("mic type {} not supported for {}",other,data.szCardID)
+          micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
       }
+      //过滤掉image type为0的数据
+      if(micDataBuilder.getType !=  ImageType.IMAGETYPE_UNKNOWN)
+        card.addBlob(micDataBuilder)
     }
 
     card.build()

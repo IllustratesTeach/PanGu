@@ -908,7 +908,7 @@ object gafiserr {
 
   class GAFISERRDATSTRUCT extends AncientData
   {
-  var cbSize:Int = _ ;			// size of this structure
+  var cbSize:Int = 640 ;			// size of this structure
   var nAFISErrno:Int = _ ;		// AFIS internal errno
   var nSYSErrno:Int = _ ;		// operation system errno
   var nLineNum:Short = _ ;		// file line no, 2 bytes int

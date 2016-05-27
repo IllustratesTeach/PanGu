@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
@@ -30,6 +32,7 @@ trait grmtsvr {
     with grmtpkg
     with reqansop =>
   private implicit val executionContext = ExecutionContext.global
+  private val testSeq = new AtomicInteger(0)
   def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
                                 bIsReq50:Int=0):Boolean={
@@ -67,18 +70,14 @@ trait grmtsvr {
         var n = 0
         stTPCardOpt.map{tpCard=>
           //测试使用，本机上报本机
-//          tpCard.szCardID=System.currentTimeMillis().toString
+//          println("================>>>>>>> "+tpCard.szCardID)
+//          tpCard.szCardID=testSeq.incrementAndGet()+"-"+tpCard.szCardID
           galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
         }.foreach{ card =>
-          try {
             val request = TPCardAddRequest.newBuilder()
             request.setCard(card)
             findTPCardService.addTPCard(request.build())
             n += 1
-          }catch{
-            case e:Throwable=>
-              error("fail to save tpcard "+card.getStrCardID+" ---> "+e.getMessage,e)
-          }
         }
 
         NETANS_SetRetVal(pAns,n)

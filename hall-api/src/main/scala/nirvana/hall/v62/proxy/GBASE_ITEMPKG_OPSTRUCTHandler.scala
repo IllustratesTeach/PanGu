@@ -2,10 +2,15 @@ package nirvana.hall.v62.proxy
 
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
+import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.v62.internal.c.grmtlib.{grmtcsr, grmtpkg}
+import nirvana.hall.v62.proxy.filter.NettyChannelOperator
 import nirvana.hall.v62.services.HallV62ExceptionCode.FAIL_TO_FIND_PROCESSOR
+import nirvana.hall.v62.services.{ChannelOperator, V62ServerAddress}
 import org.jboss.netty.channel._
 
 /**
@@ -15,7 +20,7 @@ import org.jboss.netty.channel._
   * @since 2016-04-27
   */
 class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62Config) extends SimpleChannelUpstreamHandler
-  with grmtpkg with gitempkg with LoggerSupport{
+  with grmtpkg with gitempkg with grmtcsr with gnetcsr with reqansop with AncientClientSupport with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
     val msg = e.getMessage
     val channel = ctx.getChannel
@@ -38,7 +43,7 @@ class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62
             * 非direct的模式，且被捕获
             * 在6.2中direct模式就是代理模式，所以直接进行转发
             */
-          if (!attachment.directRequest && handler.handle(request, pkg)) {
+          if (!attachment.directRequest && hanleInExceptionCaught(request, pkg)) {
             debug("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
             attachment.status = RequestHandled
           } else {
@@ -57,6 +62,17 @@ class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62
         attachment.outboundChannel.write(e.getMessage)
     }
   }
+  private def hanleInExceptionCaught(request:GNETREQUESTHEADOBJECT,pkg:GBASE_ITEMPKG_OPSTRUCT): Boolean ={
+    try{
+      handler.handle(request,pkg)
+    }catch{
+      case e:Throwable =>
+        error(e.getMessage,e)
+        //服务器上发生异常，则关闭此channel
+        GAFIS_NETCSR_SendRemoteErrStruct(e)
+        true
+    }
+  }
   override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
     e.getCause match {
       case me: MonadException =>
@@ -64,8 +80,15 @@ class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62
       case other =>
         error("server exception,client:" + e.getChannel.getRemoteAddress, other)
     }
-    //服务器上发生异常，则关闭此channel
-    e.getChannel.close()
+    //e.getChannel.close()
+  }
+  override def serverAddress: V62ServerAddress = {throw new UnsupportedOperationException}
+  /**
+    * execute in channel
+    */
+  override def executeInChannel[T](channelOperator: (ChannelOperator) => T): T = {
+    val channel = ChannelThreadContext.channelContext.value
+    channelOperator(new NettyChannelOperator(channel))
   }
 }
 object ChannelThreadContext{
