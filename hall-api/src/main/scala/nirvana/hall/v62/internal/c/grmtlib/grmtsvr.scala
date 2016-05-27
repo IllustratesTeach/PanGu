@@ -1,7 +1,5 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
-import java.io.ByteArrayOutputStream
-
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
@@ -11,9 +9,8 @@ import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.protocol.api.TPCardProto.TPCardAddRequest
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.gloclib.{galoctpConverter, galocpkg}
+import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctpConverter}
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
-import nirvana.hall.v70.jpa.GafisPerson
 import nirvana.hall.v62.proxy.LocalServiceFinder
 
 import scala.concurrent.ExecutionContext
@@ -91,6 +88,7 @@ trait grmtsvr {
 
         true
       case OP_TPLIB_EXIST=>
+        /*
         //获取编号,去除后边的空字符
         val cardIdBuf = new ByteArrayOutputStream()
         pReq.bnData.foreach(c => if(c != 0) cardIdBuf.write(c))
@@ -100,7 +98,9 @@ trait grmtsvr {
         println(person)
         //如果人员编号存在返回1，不存在0
         val n = if(person != None) 1 else 0
+        */
 
+        val n = 0
         NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
