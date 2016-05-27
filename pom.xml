@@ -8,16 +8,18 @@
   <name>Nirvana Hall Application Platform</name>
   <description>Nirvana Hall Application Server</description>
   <modules>
-    <module>hall-matcher</module>
     <module>hall-api</module>
     <module>hall-c</module>
     <module>hall-extractor</module>
     <module>hall-image</module>
+    <module>hall-matcher</module>
+    <!--
     <module>hall-orm</module>
     <module>hall-orm-generator</module>
     <module>hall-orm-macro</module>
+    -->
     <module>hall-protocol</module>
-    <module>hall-sdk</module>
+    <!-- <module>hall-sdk</module> -->
     <module>hall-stream</module>
     <module>hall-support</module>
   </modules>
