@@ -22,9 +22,8 @@ class galocpkgTest {
     Assert.assertEquals(bytes.length,itemPkg.head.nDataLen)
 
     val galocpkg = new galocpkg with gitempkg with galoctp with grmtpkg
-    val items = galocpkg.GAFIS_PKG_GetTpCard(itemPkg)
+    val card = galocpkg.GAFIS_PKG_GetTpCard(itemPkg).get
     val request = galocpkg.GAFIS_PKG_GetRmtRequest(itemPkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
-    Assert.assertEquals(4,items.length)
   }
   @Test
   def test_OP_TPLIB_ADD: Unit ={
@@ -34,9 +33,8 @@ class galocpkgTest {
     Assert.assertEquals(bytes.length,itemPkg.getDataSize)
 
     val galocpkg = new galocpkg with gitempkg with galoctp with grmtpkg
-    val items = galocpkg.GAFIS_PKG_GetTpCard(itemPkg)
+    val card = galocpkg.GAFIS_PKG_GetTpCard(itemPkg).get
     val request = galocpkg.GAFIS_PKG_GetRmtRequest(itemPkg).getOrElse(throw new IllegalStateException("Missing Request Item"))
-    Assert.assertEquals(4,items.length)
   }
   @Test
   def test_OP_RMTLIB_QUERY_ADD: Unit ={

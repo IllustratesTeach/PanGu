@@ -66,7 +66,7 @@ trait galocpkg {
   }
 
 
-  def GAFIS_PKG_GetTpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GTPCARDINFOSTRUCT]= //,GTPCARDINFOSTRUCT* pstCard)
+  def GAFIS_PKG_GetTpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):Option[GTPCARDINFOSTRUCT]= //,GTPCARDINFOSTRUCT* pstCard)
   {
 
 
@@ -75,9 +75,9 @@ trait galocpkg {
       throw new IllegalStateException("item dir is empty")
     }
 
-    headers.flatMap{header=>
-      val pstCard = new GTPCARDINFOSTRUCT
-      var pstCardOpt:Option[GTPCARDINFOSTRUCT] = Some(pstCard)
+    val pstCard = new GTPCARDINFOSTRUCT
+    val pstCardOpt:Option[GTPCARDINFOSTRUCT] = Some(pstCard)
+    headers.foreach{header=>
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
 //      println("bnResLength "+ pstItem.bnRes.length +" dataLength " + pstItem.stHead.nItemLen)
@@ -111,13 +111,14 @@ trait galocpkg {
             if (pstCard.pstInfoEx_Data.stFpx.nItemFlag == 0) pstCard.pstInfoEx_Data.stFpx.nItemFlag = 0xFF.toByte
           }
         case other=>
-          pstCardOpt = None
+          //do nothing
       }
-      pstCardOpt
-    }.toList
+    }
 
     //TODO 实现对pstCard的校验
 //    GAFIS_PKG_UTIL_CheckTPCard(pstCard);
+
+    pstCardOpt
 
   }
 

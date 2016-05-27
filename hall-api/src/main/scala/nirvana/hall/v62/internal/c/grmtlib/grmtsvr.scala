@@ -8,11 +8,13 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
+import nirvana.hall.protocol.api.TPCardProto.TPCardAddRequest
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.gloclib.galocpkg
+import nirvana.hall.v62.internal.c.gloclib.{galoctpConverter, galocpkg}
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
 import nirvana.hall.v70.jpa.GafisPerson
+import nirvana.hall.v62.proxy.LocalServiceFinder
 
 import scala.concurrent.ExecutionContext
 
@@ -26,6 +28,7 @@ trait grmtsvr {
     with LoggerSupport
     with galocpkg
     with gitempkg
+    with LocalServiceFinder
     with grmtcsr
     with grmtpkg
     with reqansop =>
@@ -51,7 +54,7 @@ trait grmtsvr {
          * 2. 保存档案数据
          * 3. 返回结果
          */
-        val stTPCard = GAFIS_PKG_GetTpCard(pstRecvPkg)
+        val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
         //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
         //saveStTPCardToV70.....
         /*stTPCard.foreach{gtpCard =>
@@ -64,9 +67,24 @@ trait grmtsvr {
           fingers.foreach(_.save())
         }*/
         //n 为保存成功的个数
-        val n = stTPCard.length
+        var n = 0
+        stTPCardOpt.map{tpCard=>
+          //测试使用，本机上报本机
+//          tpCard.szCardID=System.currentTimeMillis().toString
+          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
+        }.foreach{ card =>
+          try {
+            val request = TPCardAddRequest.newBuilder()
+            request.setCard(card)
+            findTPCardService.addTPCard(request.build())
+            n += 1
+          }catch{
+            case e:Throwable=>
+              error("fail to save tpcard "+card.getStrCardID+" ---> "+e.getMessage,e)
+          }
+        }
 
-        NETANS_SetRetVal(pAns,n);
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)

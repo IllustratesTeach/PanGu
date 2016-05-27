@@ -16,7 +16,7 @@ import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletReque
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-11-04
  */
-class V62Facade
+class V62Facade(defaultConfig:HallV62Config)
   extends gnetcsr
   with V62QueryTableSupport
   with DataSyncSupport
@@ -32,10 +32,19 @@ class V62Facade
   with reqansop
   with LoggerSupport{
   override def serverAddress: V62ServerAddress = {
-    val address = V62Facade.serverContext.value
-    if(address == null)
-      throw new IllegalStateException("can't find v62 server address from context")
-
+    var address = V62Facade.serverContext.value
+    if(address == null) {
+      address = V62ServerAddress(
+        defaultConfig.appServer.host,
+        defaultConfig.appServer.port,
+        defaultConfig.appServer.connectionTimeoutSecs,
+        defaultConfig.appServer.readTimeoutSecs,
+        defaultConfig.appServer.user,
+        Option(defaultConfig.appServer.password))
+      info("using default config server to request [{}:{}]",address.host,address.port)
+    }else{
+      info("using context server to request [{}:{}]",address.host,address.port)
+    }
     address
   }
 }
@@ -72,28 +81,20 @@ object V62Facade{
     * @see LocalApiWebModule
     */
   class AutoSetupServerContextFilter(config:HallV62Config) extends HttpServletRequestFilter {
-    //服务器的地址配置
-    private val address = V62ServerAddress(config.appServer.host,
-      config.appServer.port,
-      config.appServer.connectionTimeoutSecs,
-      config.appServer.readTimeoutSecs,
-      config.appServer.user,
-      Option(config.appServer.password))
 
     override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
       val host = request.getHeader(X_V62_HOST_HEAD)
-      val v62Address =
         if(host == null){
-          address
+          handler.service(request,response)
         }else{
           val port = getHeader(request,X_V62_PORT_HEAD,config.appServer.port.toString).toInt
           val user = getHeader(request,X_V62_USER_HEAD,config.appServer.user)
           val passOpt = Option(getHeader(request,X_V62_PASSWORD_HEAD,config.appServer.password))
-          V62ServerAddress(host,port,config.appServer.connectionTimeoutSecs,config.appServer.readTimeoutSecs,user,passOpt)
+          val address = V62ServerAddress(host,port,config.appServer.connectionTimeoutSecs,config.appServer.readTimeoutSecs,user,passOpt)
+          serverContext.withValue(address){
+            handler.service(request,response)
+          }
         }
-      serverContext.withValue(v62Address){
-        handler.service(request,response)
-      }
     }
     private def getHeader(request:HttpServletRequest,name:String,defaultValue:String):String={
       val value = request.getHeader(name)

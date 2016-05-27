@@ -21,7 +21,7 @@ class netpmadmTest {
     config.appServer.password=""
     V62Facade.withConfigurationServer(config.appServer) {
 
-      val facade = new V62Facade
+      val facade = new V62Facade(config)
 
 
       println(facade.NET_GAFIS_PMADM_GetStr(paramadm.g_stParamName.pszUnitCode))

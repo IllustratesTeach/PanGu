@@ -20,9 +20,8 @@ class nettableTest {
     config.appServer.port = 7777
     config.appServer.user = "afisadmin"
     config.appServer.password=""
-    V62Facade.withConfigurationServer(config.appServer) {
 
-      val facade = new V62Facade
+      val facade = new V62Facade(config)
 
       val result = new GADB_SELRESULT
       val field1 = new GADB_SELRESITEM
@@ -49,6 +48,5 @@ class nettableTest {
 
       val bufResult = result.pDataBuf_Result
 //      val memblob = bufResult.head
-    }
   }
 }

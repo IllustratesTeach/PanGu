@@ -170,7 +170,7 @@ object galoctpConverter {
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case other =>
-          throw new UnsupportedOperationException
+          new UnsupportedOperationException("item type "+other+" not supported ")
       }
       mic.bIsLatent = 0 //是否位现场数据
 
