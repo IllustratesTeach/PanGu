@@ -50,7 +50,7 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
 
   //TODO 允许3次失败
   def findSyncQueue: Option[SyncQueue] ={
-    SyncQueue.find_by_uploadStatus(UPLOAD_STATUS_WAIT).asc("createdate").takeOption
+    SyncQueue.where(SyncQueue.uploadStatus === UPLOAD_STATUS_WAIT).orderBy(SyncQueue.createdate).headOption
   }
   def doWork: Unit ={
     findSyncQueue.foreach{ syncQueue =>

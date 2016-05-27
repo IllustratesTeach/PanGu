@@ -45,7 +45,7 @@ class LPCardServiceImpl extends LPCardService{
   override def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse = {
     val fingerId = lPCardGetRequest.getCardId
     val caseFinger = GafisCaseFinger.find(fingerId)
-    val caseFingerMnt = GafisCaseFingerMnt.find_by_fingerId(fingerId).firstOption.get
+    val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
     val lpCard = ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
 
     LPCardGetResponse.newBuilder().setCard(lpCard).build()
@@ -68,7 +68,7 @@ class LPCardServiceImpl extends LPCardService{
     caseFinger.save()
 
     //先删除，后插入
-    GafisCaseFingerMnt.where("fingerId=?1", caseFinger.fingerId).delete
+    GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
     caseFingerMnt.inputtime = new Date()
@@ -85,8 +85,8 @@ class LPCardServiceImpl extends LPCardService{
   @Transactional
   override def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse = {
     val cardId = lPCardDelRequest.getCardId
-    GafisCaseFingerMnt.where("fingerId=?1", cardId).delete
-    GafisCaseFinger.where("fingerId=?1",cardId).delete
+    GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === cardId).execute
+    GafisCaseFinger.find(cardId).delete
 
     LPCardDelResponse.newBuilder().build()
   }

@@ -7,7 +7,6 @@ import java.util.Date
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.orm.services.Relation
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -158,7 +157,7 @@ object ProtobufConverter {
     lpCard.build()
   }
 
-  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Relation[GafisGatherPortrait], fingerList: Relation[GafisGatherFinger], palmList: Relation[GafisGatherPalm]): TPCard={
+  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)

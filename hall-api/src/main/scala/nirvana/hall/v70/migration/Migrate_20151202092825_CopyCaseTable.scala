@@ -1,6 +1,6 @@
 package nirvana.hall.v70.migration
 
-import monad.migration._
+import stark.migration._
 
 /**
  * 添加现场案件相关的表

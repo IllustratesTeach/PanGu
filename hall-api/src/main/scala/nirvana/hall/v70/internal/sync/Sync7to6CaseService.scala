@@ -56,7 +56,7 @@ trait Sync7to6CaseService {
 
   private def getCase(caseId: String): Case = {
     val gafisCase = GafisCase.find(caseId)
-    val fingerIds = GafisCaseFinger.find_by_caseId(caseId).map(f => f.fingerId)
+    val fingerIds = GafisCaseFinger.find_by_caseId(caseId).map(f => f.fingerId).toSeq
 
     ProtobufConverter.convertGafisCase2Case(gafisCase, fingerIds)
   }

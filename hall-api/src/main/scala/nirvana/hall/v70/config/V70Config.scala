@@ -3,7 +3,7 @@ package nirvana.hall.v70.config
 import javax.xml.bind.annotation._
 
 import monad.core.config.DatabaseConfigSupport
-import nirvana.hall.orm.config.HallOrmConfigSupport
+import stark.activerecord.config.ActiveRecordConfigSupport
 
 /**
  * Created by songpeng on 16/1/25.
@@ -11,7 +11,7 @@ import nirvana.hall.orm.config.HallOrmConfigSupport
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HallV70Config")
 @XmlRootElement(name = "hall_v70")
-class HallV70Config extends HallOrmConfigSupport {
+class HallV70Config extends ActiveRecordConfigSupport {
 
   @XmlElement(name = "api")
   var api: ApiServerConfig = new ApiServerConfig

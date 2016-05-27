@@ -1,6 +1,6 @@
 package nirvana.hall.v70.migration
 
-import monad.migration._
+import stark.migration._
 
 /**
  * migration

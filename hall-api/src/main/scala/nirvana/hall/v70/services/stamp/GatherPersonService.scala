@@ -1,6 +1,5 @@
 package nirvana.hall.v70.services.stamp
 
-import nirvana.hall.orm.services.Relation
 import nirvana.hall.v70.jpa.{GafisPerson, GafisGatherTypeNodeField, GafisGatherType}
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +15,7 @@ trait GatherPersonService {
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  def queryGatherPersonList(start : Integer,limit : Integer)  : Relation[GafisPerson]
+  def queryGatherPersonList(start : Integer,limit : Integer)  : Seq[GafisPerson]
 
 
   /**
@@ -26,12 +25,12 @@ trait GatherPersonService {
    * @param name  姓名
    * @param idCard  身份证号
    */
-  def queryGatherPersonBy(gatherDateStart: String,gatherDateEnd:String,name:String,idCard:String,start: Integer, limit: Integer)  : Relation[GafisPerson]
+  def queryGatherPersonBy(gatherDateStart: String,gatherDateEnd:String,name:String,idCard:String,start: Integer, limit: Integer)  : Seq[GafisPerson]
 
   /**
    * 捺印人员高级查询
    */
-  def queryGatherPersonSeniorBy()  : Relation[GafisPerson]
+  def queryGatherPersonSeniorBy()  : Seq[GafisPerson]
 
 
   /**
@@ -40,14 +39,14 @@ trait GatherPersonService {
    * @param uplaodStatus(0:等待上报;1:正在上报;2:完成上报)
    */
   @Transactional
-  def uploadGatherPerson(personid : String,uplaodStatus : Integer)  : Boolean
+  def uploadGatherPerson(personid : String,uplaodStatus : String)  : Boolean
 
 
   /**
    * 人员采集类型查询
    * @return
    */
-  def queryGatherType()  : Relation[GafisGatherType]
+  def queryGatherType()  : Seq[GafisGatherType]
 
 
   /**
@@ -55,7 +54,7 @@ trait GatherPersonService {
    * @param gatherTypeId
    * @return
    */
-  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Relation[GafisGatherTypeNodeField]
+  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Seq[GafisGatherTypeNodeField]
 
 
   /**

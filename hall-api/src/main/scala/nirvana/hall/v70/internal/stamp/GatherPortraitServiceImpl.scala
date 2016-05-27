@@ -5,7 +5,6 @@ import java.util
 import java.util.{Date, UUID}
 
 import nirvana.hall.api.internal.AnalysisData
-import nirvana.hall.orm.services.Relation
 import nirvana.hall.v70.jpa.GafisGatherPortrait
 import nirvana.hall.v70.services.stamp.GatherPortraitService
 
@@ -19,8 +18,8 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @param person
    * @return
    */
-  override def queryGatherPortrait(person: String)  : Relation[GafisGatherPortrait] = {
-    GafisGatherPortrait.find_by_personid(person)
+  override def queryGatherPortrait(person: String)  : Seq[GafisGatherPortrait] = {
+    GafisGatherPortrait.find_by_personid(person).toSeq
   }
 
 
@@ -55,18 +54,8 @@ class GatherPortraitServiceImpl extends GatherPortraitService{
    * @return
    */
   override def deleteGatherPortrait(personid: String): Boolean = {
-    GafisGatherPortrait.find_by_personid(personid).delete
+    GafisGatherPortrait.delete.where(GafisGatherPortrait.personid === personid).execute
     true
-    /*
-    try {
-      withSQL {
-        delete.from(GafisGatherPortrait).where.eq(GafisGatherPortrait.column.personid,personid)
-      }
-      true
-    } catch {
-      case exception: Exception => false
-    }
-    */
   }
 
   /**
