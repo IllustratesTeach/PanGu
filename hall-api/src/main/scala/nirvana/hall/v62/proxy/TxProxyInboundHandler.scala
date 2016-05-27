@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.proxy
+package nirvana.hall.v62.proxy
 
 import java.net.InetSocketAddress
 import java.nio.channels.ClosedChannelException

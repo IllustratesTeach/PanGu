@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.proxy.filter
+package nirvana.hall.v62.proxy.filter
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.AncientData
@@ -6,7 +6,7 @@ import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.internal.c.grmtlib.{grmtcsr, grmtpkg, grmtsvr}
-import nirvana.hall.v62.internal.proxy.{ChannelThreadContext, GbaseItemPkgFilter}
+import nirvana.hall.v62.proxy.{ChannelThreadContext, GbaseItemPkgFilter}
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.{ChannelOperator, V62ServerAddress}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}

@@ -1,11 +1,13 @@
-package nirvana.hall.v62
+package nirvana.hall.v62.proxy
 
+import monad.core.MonadCoreSymbols
+import monad.core.internal.MonadConfigFileUtils
+import monad.support.services.XmlLoader
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.proxy.filter.GAFIS_RMTLIB_TPSVR_ServerFilter
-import nirvana.hall.v62.internal.proxy.{GbaseItemPkgFilter, GbaseItemPkgHandler, GBASE_ITEMPKG_OPSTRUCTHandler, TxProxyServer}
-import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId, Startup}
+import nirvana.hall.v62.config.ProxyServerConfig
+import nirvana.hall.v62.proxy.filter.GAFIS_RMTLIB_TPSVR_ServerFilter
+import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId, Startup, Symbol}
 import org.apache.tapestry5.ioc.services.{PipelineBuilder, RegistryShutdownHub}
 import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
 import org.slf4j.Logger
@@ -18,12 +20,14 @@ object LocalV62ProxyServiceModule {
 
     binder.bind(classOf[GBASE_ITEMPKG_OPSTRUCTHandler], classOf[GBASE_ITEMPKG_OPSTRUCTHandler])
   }
+  def buildProxyServerConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String) = {
+    val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-v62-proxy.xml")
+    XmlLoader.parseXML[ProxyServerConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v62/proxy/proxy.xsd")))
+  }
   @Startup
-  def startProxyServer(rpcBindSupport: HallV62Config,hub:RegistryShutdownHub,handler: GBASE_ITEMPKG_OPSTRUCTHandler): Unit ={
-    if(rpcBindSupport.proxy!=null){
-      val server = new TxProxyServer(rpcBindSupport.proxy,handler)
+  def startProxyServer(config: ProxyServerConfig, hub:RegistryShutdownHub, handler: GBASE_ITEMPKG_OPSTRUCTHandler): Unit ={
+      val server = new TxProxyServer(config,handler)
       server.start(hub)
-    }
   }
   @ServiceId("GbaseItemPkgHandler")
   def buildGbaseItemPkgHandler(pipelineBuilder: PipelineBuilder, logger: Logger,

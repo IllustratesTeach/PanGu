@@ -16,7 +16,7 @@ import org.apache.tapestry5.services.Core
 @XmlType(name = "HallV62Config")
 @XmlRootElement(name = "hall_v62")
 @Marker(Array(classOf[Core]))
-class HallV62Config extends V62ProxyBindSupport{
+class HallV62Config {
   @XmlElement(name="app_server")
   var appServer:V62ServerConfig = new V62ServerConfig()
 
@@ -38,13 +38,8 @@ class DatabaseTable{
   var tableId:Int = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "V62ProxyBindSupport")
-trait V62ProxyBindSupport {
-  @XmlElement(name = "proxy")
-  var proxy:ProxyServerConfig = _
-}
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "V62Server")
+@XmlType(name = "ProxyServerConfig")
+@XmlRootElement(name="hall_v62_proxy")
 class ProxyServerConfig{
   @XmlElement(name = "server")
   var server: RpcBind = _

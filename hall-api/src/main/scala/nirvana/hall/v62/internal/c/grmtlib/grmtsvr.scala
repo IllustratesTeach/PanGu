@@ -11,7 +11,7 @@ import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.galocpkg
-import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
+import nirvana.hall.v62.internal.c.gnetlib.reqansop
 import nirvana.hall.v70.jpa.GafisPerson
 
 import scala.concurrent.ExecutionContext
@@ -28,7 +28,6 @@ trait grmtsvr {
     with gitempkg
     with grmtcsr
     with grmtpkg
-    with gnetcsr
     with reqansop =>
   private implicit val executionContext = ExecutionContext.global
   def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
