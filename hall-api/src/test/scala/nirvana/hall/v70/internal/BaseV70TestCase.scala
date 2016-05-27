@@ -26,7 +26,7 @@ class BaseV70TestCase {
   @Before
   def setup: Unit ={
     val modules = Seq[String](
-      "nirvana.hall.orm.HallOrmModule",
+      "stark.activerecord.StarkActiveRecordModule",
       "nirvana.hall.v70.LocalV70ServiceModule",
       "nirvana.hall.v70.LocalDataSourceModule",
       "nirvana.hall.api.LocalProtobufModule",
