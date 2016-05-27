@@ -5,13 +5,15 @@
 -->
 
 <hall_v70>
-    <api>
-      <database>
-          <driver>oracle.jdbc.driver.OracleDriver</driver>
-          <user>gafis_qd</user>
-          <password>gafis</password>
-          <url>jdbc:oracle:thin:@10.1.7.151:1521:GAFISNEW7</url>
-      </database>
-    </api>
-    <sync62_cron>0 * * * * ? *</sync62_cron>
+    <database>
+        <driver>oracle.jdbc.driver.OracleDriver</driver>
+        <user>gafis</user>
+        <password>gafis</password>
+        <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+    </database>
+    <cron>
+        <sync_dict_cron>0 0 * * * ? *</sync_dict_cron>
+        <sync_7to6_cron>0 0 * * * ? *</sync_7to6_cron>
+        <query_7to6_cron>0 0 * * * ? *</query_7to6_cron>
+    </cron>
 </hall_v70>

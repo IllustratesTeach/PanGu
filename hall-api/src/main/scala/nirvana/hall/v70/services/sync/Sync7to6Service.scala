@@ -16,4 +16,10 @@ trait Sync7to6Service {
    */
   @Transactional
   def doTaskOfSyncQueue(syncQueue: SyncQueue)
+
+  /**
+   * 读取上报任务队列, 处理上报任务
+   */
+  @Transactional
+  def doWork
 }

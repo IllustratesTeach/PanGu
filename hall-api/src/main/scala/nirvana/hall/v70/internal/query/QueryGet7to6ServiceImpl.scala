@@ -24,6 +24,11 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                               caseInfoRemoteService: CaseInfoRemoteService)
   extends QueryGet7to6Service{
 
+  /**
+   * 从6.2获取查询结果，保存候选列表信息
+   * @param queryque
+   * @return
+   */
   @Transactional
   override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque): Unit = {
     val gafisQuery7to6 = GafisQuery7to6.findOption(queryque.oraSid)
@@ -33,6 +38,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
       val syncTagert = SyncTarget.find(queryque.syncTargetSid)
       val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, syncTagert.targetIp, syncTagert.targetPort)
 
+      //TODO 单位代码不能写死
       if (matchResult != null){
         //写入比对结果
         ProtobufConverter.convertMatchResult2GafisNormalqueryQueryque(matchResult, queryque)
@@ -149,11 +155,13 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
    */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, queryGet7to6Service: QueryGet7to6Service): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-get-70to62", new Runnable {
-      override def run(): Unit = {
-        queryGet7to6Service.doWork
-      }
-    })
+    if(v70Config.cron.query7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-get-70to62", new Runnable {
+        override def run(): Unit = {
+          queryGet7to6Service.doWork
+        }
+      })
+    }
   }
   @Transactional
   override def doWork: Unit ={
@@ -161,7 +169,10 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
       getQueryAndSaveMatchResult(queryque)
     }
   }
-
+  /**
+   * 获取正在比对的6.2查询任务
+   * @return
+   */
   override def getGafisNormalqueryQueryqueMatching(): Option[GafisNormalqueryQueryque] = {
     GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.status === QueryConstants.STATUS_MATCHING).and(GafisNormalqueryQueryque.deletag === "1").and(GafisNormalqueryQueryque.syncTargetSid[String].notNull).orderBy(GafisNormalqueryQueryque.priority[java.lang.Short].desc).headOption
   }

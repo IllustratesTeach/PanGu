@@ -22,14 +22,15 @@ class SyncDictServiceImpl(config: HallV70Config) extends SyncDictService{
    */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    if(config.syncDict != null){
-      periodicExecutor.addJob(new CronSchedule(config.syncDict.cron), "sync-remote-dict", new Runnable {
+    if(config.cron.syncDictCron != null){
+      periodicExecutor.addJob(new CronSchedule(config.cron.syncDictCron), "sync-remote-dict", new Runnable {
         override def run(): Unit = {
           val request = SyncDictRequest.newBuilder()
           val response = SyncDictResponse.newBuilder()
           DictType.values().foreach{ f =>
             request.setDictType(f)
-            WebHttpClientUtils.call(config.syncDict.url, request.build(), response)
+            //TODO url配置
+            WebHttpClientUtils.call("", request.build(), response)
             syncDict(f, response.getDictDataList.toSeq)
           }
         }

@@ -26,11 +26,13 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-70to62", new Runnable {
-      override def run(): Unit = {
-        query7to6Service.doWork
-      }
-    })
+    if(v70Config.cron.query7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-70to62", new Runnable {
+        override def run(): Unit = {
+          query7to6Service.doWork
+        }
+      })
+    }
   }
 
   @Transactional
