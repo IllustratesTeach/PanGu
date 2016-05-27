@@ -64,7 +64,7 @@
           <xs:documentation>6.2应用服务器读取数据超时设置</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="xs:string" name="user" minOccurs="0" maxOccurs="1">
+      <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>6.2应用服务器的用户名</xs:documentation>
         </xs:annotation>
