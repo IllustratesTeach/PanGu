@@ -1,6 +1,5 @@
 package nirvana.hall.spark.services
 
-import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
 import com.google.protobuf.ByteString
@@ -8,24 +7,24 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.internal.FirmDecoderImpl
-import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
 import nirvana.hall.spark.config.NirvanaSparkConfig
-import SparkFunctions.{StreamError, StreamEvent}
-import org.apache.commons.io.FileUtils
+import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 
 import scala.util.control.NonFatal
 
 /**
  * decompress image service
- *
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-02-09
  */
 object DecompressImageService {
   private lazy val serverRandom = randomImageServer()
   private lazy val seq = new AtomicLong(0)
   private var imageServers:String = _
+  private lazy val gfsDirect = SysProperties.getBoolean("decompress.gfs.direct",defaultValue = false)
+  private lazy val wsqDirect = SysProperties.getBoolean("decompress.wsq.direct",defaultValue = false)
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
@@ -53,22 +52,14 @@ object DecompressImageService {
       if (compressedImg.stHead.bIsCompressed == 1) {
         //using direct decompress method for WSQ and GFS
         if (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_WSQ.toByte
-          || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS.toByte
+        && wsqDirect){
+          directDecode(parameter, event, compressedImg)
+        }else if( gfsDirect && (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW_EZW.toByte
-          || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_DEFAULT.toByte) {
-          try {
-            //load jni
-            //          println("jni decompress code:"+compressedImg.stHead.nCompressMethod)
-            SparkFunctions.loadImageJNI()
-            //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".data"),decoder.decode(compressedImg).toByteArray())
-            val result = decoder.decode(compressedImg)
-            Some((event, result))
-          } catch {
-            case NonFatal(e) =>
-              doReportException(parameter, event,
-                new RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + " " + e.toString, e))
-          }
+          || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_DEFAULT.toByte)){
+
+          directDecode(parameter, event, compressedImg)
         }
         else
           decompressWithHttpService(parameter, event, compressedImg)
@@ -78,14 +69,27 @@ object DecompressImageService {
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
       Some((event, compressedImg))
     } else {
-      doReportException(parameter, event,
-        new RuntimeException("personId and caseId are null!"))
+      doReportException(parameter, event,new RuntimeException("personId and caseId are null!"))
       None
     }
-
   }
 
-  def doReportException(parameter:NirvanaSparkConfig,event:StreamEvent,e: Throwable) = {
+  private def directDecode(parameter: NirvanaSparkConfig, event: StreamEvent, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT)] = {
+    try {
+      //load jni
+      //          println("jni decompress code:"+compressedImg.stHead.nCompressMethod)
+      SparkFunctions.loadImageJNI()
+      //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".data"),decoder.decode(compressedImg).toByteArray())
+      val result = decoder.decode(compressedImg)
+      Some((event, result))
+    } catch {
+      case NonFatal(e) =>
+        doReportException(parameter, event,
+          new scala.RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + " " + e.toString, e))
+    }
+  }
+
+  def doReportException(parameter:NirvanaSparkConfig, event:StreamEvent, e: Throwable) = {
     e.printStackTrace()
     SparkFunctions.reportError(parameter, DecompressError(event, e.toString))
     None

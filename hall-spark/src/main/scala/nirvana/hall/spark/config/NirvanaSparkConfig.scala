@@ -22,8 +22,8 @@ class NirvanaSparkConfig extends Serializable{
   var kafkaServer:String = _
   @XmlElement(name="kafka_topic_name")
   var kafkaTopicName:String = _
-  @XmlElement(name="image_file_server")
-  var imageFileServer:String = _
+  @XmlElement(name="image_provider_class")
+  var imageProviderClass:String = _
   @XmlElement(name="decompress_image_server")
   var decompressImageServer:String = _
   @XmlElement(name="extractor_server")
@@ -38,10 +38,9 @@ class NirvanaSparkConfig extends Serializable{
   var partitionsNum:Int = 4
   @XmlElement(name = "database")
   var db: DatabaseConfig = new DatabaseConfig()
-  /** JPA相关配置 **/
-  @XmlElementWrapper(name = "spark")
+  @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
-  var sparkProperties  = new util.ArrayList[SparkConfigProperty]
+  var properties = new util.ArrayList[SparkConfigProperty]
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DatabaseConfig")

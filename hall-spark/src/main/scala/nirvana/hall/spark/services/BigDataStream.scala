@@ -35,13 +35,15 @@ object BigDataStream {
 
     val kafkaTopicName = parameter.kafkaTopicName
 
+    //设置系统属性
+    SysProperties.setProperties(parameter.properties)
+
     KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc, kafkaParams,Set(kafkaTopicName))
       .repartition(parameter.partitionsNum) //reset partition
       .map(_._2) //only use message content
       .flatMap(
-        if ("FPT".equals(kafkaTopicName)) ImageProviderService.requestRemoteFile(parameter,_)
-        else ImageProviderService.requestDataBaseData(parameter,_)
+        ImageProviderService.requestRemoteFile(parameter,_)
       ) //fetch files
       .flatMap(x=>DecompressImageService.requestDecompress(parameter,x._1,x._2)) // decompress image
       .flatMap(x=>ExtractFeatureService.requestExtract(parameter,x._1,x._2)) //extract feature

@@ -13,7 +13,7 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions.{StreamEvent, _}
-import nirvana.hall.spark.services.{CallRpcException, ImageProvider, PartitionRecordsSaver, SparkFunctions}
+import nirvana.hall.spark.services._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
@@ -24,12 +24,13 @@ import scala.util.control.NonFatal
   * @since 2016-05-30
   */
 class FPTImageProvider extends ImageProvider{
+  private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
   def requestImage(parameter:NirvanaSparkConfig,filePath:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     //PartitionRecordsSaver.databaseConfig=Some(parameter.db)
     //    @tailrec
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       try {
-        val data = SparkFunctions.httpClient.download(parameter.imageFileServer + filePath)
+        val data = SparkFunctions.httpClient.download(imageFileServer + filePath)
         val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
 
         //FileUtils.writeByteArrayToFile(new File("/tmp/"+filePath.substring(filePath.lastIndexOf("/"))),data)
