@@ -61,6 +61,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     (new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1),new GAFISIMAGESTRUCT().fromByteArray(mntData.get._2))
   }
+  //TODO 支持是否提取纹线的问题
   override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Option[(Array[Byte],Array[Byte])]= {
     val image = readByteArrayAsGAFISIMAGE(is)
     val originalImgData = image.toByteArray()
