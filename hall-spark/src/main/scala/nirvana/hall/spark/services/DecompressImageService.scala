@@ -22,9 +22,9 @@ import scala.util.control.NonFatal
 object DecompressImageService {
   private lazy val serverRandom = randomImageServer()
   private lazy val seq = new AtomicLong(0)
-  private var imageServers:String = _
   private lazy val gfsDirect = SysProperties.getBoolean("decompress.gfs.direct",defaultValue = false)
   private lazy val wsqDirect = SysProperties.getBoolean("decompress.wsq.direct",defaultValue = false)
+  private lazy val imageServers = SysProperties.getPropertyOption("decompress.server").get
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
@@ -96,7 +96,6 @@ object DecompressImageService {
   }
 
   private def decompressWithHttpService(parameter: NirvanaSparkConfig, event: StreamEvent, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT)] = {
-    this.imageServers = parameter.decompressImageServer
     val rpcHttpClient = SparkFunctions.httpClient
     val request = FirmImageDecompressRequest.newBuilder()
     request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))

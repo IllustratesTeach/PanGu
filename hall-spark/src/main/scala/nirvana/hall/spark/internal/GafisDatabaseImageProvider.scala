@@ -4,7 +4,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions._
-import nirvana.hall.spark.services.{ImageProvider, PartitionRecordsSaver}
+import nirvana.hall.spark.services.ImageProvider
 import nirvana.hall.support.services.JdbcDatabase
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
@@ -19,7 +19,7 @@ import scala.util.control.NonFatal
   * @since 2016-05-30
   */
 class GafisDatabaseImageProvider extends ImageProvider{
-  private lazy implicit val dataSource = PartitionRecordsSaver.dataSource
+  private lazy implicit val dataSource = GafisPartitionRecordsSaver.dataSource
   val querySqlByPersonId = "select t.gather_data,t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ?"
   val querySql = "select t.gather_data,t.fgp,t.fgp_case,t.person_id from gafis_gather_finger t where t.pk_id = ?"
 

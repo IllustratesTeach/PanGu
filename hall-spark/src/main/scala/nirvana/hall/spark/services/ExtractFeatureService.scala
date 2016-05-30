@@ -20,6 +20,7 @@ import scala.util.control.NonFatal
 object ExtractFeatureService {
   private lazy val extractor = new FeatureExtractorImpl
   private lazy val directExtract = SysProperties.getBoolean("extractor.direct",defaultValue = false)
+  private lazy val extractorServer = SysProperties.getPropertyOption("extractor.server").get
   private lazy val extractBinSupport = SysProperties.getBoolean("extractor.bin.support",defaultValue = false)
   case class ExtractError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "E|"+message
@@ -40,7 +41,7 @@ object ExtractFeatureService {
           request.setFeatureTry(featureTryVersion)
           request.setMntType(event.featureType)
           request.setPosition(event.position)
-          val baseResponse = rpcHttpClient.call(parameter.extractorServer, ExtractRequest.cmd, request.build())
+          val baseResponse = rpcHttpClient.call(extractorServer, ExtractRequest.cmd, request.build())
           baseResponse.getStatus match {
             case CommandStatus.OK =>
               if (baseResponse.hasExtension(ExtractResponse.cmd)) {

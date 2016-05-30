@@ -58,7 +58,7 @@ class FPTImageProvider extends ImageProvider{
                 assert(fingerCount == tp.fingers.length)
                 personId = tp.personId
                 assert(personId != null, "person id is null")
-                val person = PartitionRecordsSaver.queryPersonById(personId)
+                val person = GafisPartitionRecordsSaver.queryPersonById(personId)
                 if(person.isEmpty) {
                   tp.fingers.foreach { tData =>
                     if (tData.imgData != null && tData.imgData.length > 0)
@@ -111,7 +111,7 @@ class FPTImageProvider extends ImageProvider{
                 personId = tp.personId
                 assert(personId != null, "person id is null")
 
-                val person = PartitionRecordsSaver.queryPersonById(personId)
+                val person = GafisPartitionRecordsSaver.queryPersonById(personId)
                 if(person.isEmpty) {
                   tp.fingers.foreach { tData =>
                     if (tData.imgData != null && tData.imgData.length > 0)

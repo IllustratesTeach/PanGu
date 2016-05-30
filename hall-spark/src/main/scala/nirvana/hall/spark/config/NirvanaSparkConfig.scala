@@ -22,12 +22,12 @@ class NirvanaSparkConfig extends Serializable{
   var kafkaServer:String = _
   @XmlElement(name="kafka_topic_name")
   var kafkaTopicName:String = _
+
   @XmlElement(name="image_provider_class")
   var imageProviderClass:String = _
-  @XmlElement(name="decompress_image_server")
-  var decompressImageServer:String = _
-  @XmlElement(name="extractor_server")
-  var extractorServer:String = _
+  @XmlElement(name="data_saver_class")
+  var dataSaverClass:String = _
+
   @XmlElement(name="hdfs_server")
   var hdfsServer:String = "None"
   @XmlElement(name="is_new_feature")

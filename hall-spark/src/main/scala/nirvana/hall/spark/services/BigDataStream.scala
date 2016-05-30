@@ -6,6 +6,7 @@ import kafka.serializer.StringDecoder
 import monad.support.MonadSupportConstants
 import monad.support.services.XmlLoader
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.internal.GafisPartitionRecordsSaver
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Minutes, StreamingContext}
@@ -14,8 +15,8 @@ import scala.io.Source
 
 /**
  * bing data stream process
- *
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-01-30
  */
 object BigDataStream {
@@ -49,7 +50,7 @@ object BigDataStream {
       .flatMap(x=>ExtractFeatureService.requestExtract(parameter,x._1,x._2)) //extract feature
       .foreachRDD{rdd=>
         //save records for partition
-        rdd.foreachPartition(PartitionRecordsSaver.savePartitionRecords(parameter))
+        rdd.foreachPartition(GafisPartitionRecordsSaver.savePartitionRecords(parameter))
       }
 
     ssc
