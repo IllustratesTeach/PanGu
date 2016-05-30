@@ -21,6 +21,7 @@
     <module>hall-protocol</module>
     <!-- <module>hall-sdk</module> -->
     <module>hall-stream</module>
+    <module>hall-spark</module>
     <module>hall-support</module>
   </modules>
   <scm>
