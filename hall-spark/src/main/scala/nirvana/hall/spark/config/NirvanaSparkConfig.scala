@@ -3,10 +3,13 @@ package nirvana.hall.spark.config
 import java.util
 import javax.xml.bind.annotation._
 
+import nirvana.hall.spark.internal.{GafisPartitionRecordsSaver, GafisDatabaseImageProvider}
+
 
 /**
  * nirvana spark configuration
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-02-17
  */
 @XmlType(name = "NirvanaSparkConfig")
@@ -24,9 +27,9 @@ class NirvanaSparkConfig extends Serializable{
   var kafkaTopicName:String = _
 
   @XmlElement(name="image_provider_class")
-  var imageProviderClass:String = _
+  var imageProviderClass:String = classOf[GafisDatabaseImageProvider].getName
   @XmlElement(name="data_saver_class")
-  var dataSaverClass:String = _
+  var dataSaverClass:String = classOf[GafisPartitionRecordsSaver].getName
 
   @XmlElement(name="hdfs_server")
   var hdfsServer:String = "None"

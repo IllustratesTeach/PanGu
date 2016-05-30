@@ -34,14 +34,9 @@
           <xs:documentation>提供图像源数据的类</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="xs:string" name="decompress_image_server" minOccurs="1" maxOccurs="1">
+      <xs:element type="xs:string" name="data_saver_class" minOccurs="1" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>decompress image http server</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="xs:string" name="extractor_server" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>extractor http server</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element type="xs:string" name="hdfs_server" minOccurs="0" maxOccurs="1">

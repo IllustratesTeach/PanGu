@@ -17,73 +17,76 @@ import scala.util.control.NonFatal
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-02-09
  */
+class GafisPartitionRecordsSaver {
+  import GafisPartitionRecordsSaver._
+  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
+    databaseConfig = Some(parameter.db)
+    val flag= parameter.kafkaTopicName
+    records.foreach { case (event, mnt ,bin) =>
+      try {
+        if (event.personId != null && event.personId.length > 0) { //save template
+        var fagCase = 0
+          /*val personIdOpt = queryPersonById(event.personId)
+          if (personIdOpt.isEmpty) {
+            try savePersonInfo(event.personId, event.path,flag)
+            catch {
+              case e: Throwable =>
+                if (e.toString.indexOf("PK_GAFIS_PERSON_PERSONID") == -1)
+                  throw e
+            }
+          }*/
+
+          if (mnt.stHead.bIsPlain == 1) //is plain finger
+            fagCase = 1
+          //save mnt
+          savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, mnt.toByteArray(), event.path, 0,flag)
+          //save bin
+          if (parameter.isExtractorBin)
+            savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, bin.toByteArray(), event.path ,4,flag)
+        }
+
+        if (event.caseId != null && event.caseId.length > 0) { //save latent
+        val caseIdOpt = queryCaseInfoById(event.caseId)
+          if(caseIdOpt.isEmpty){
+            try saveCaseInfo(event.caseId)
+            catch {
+              case e: Throwable =>
+                if (e.toString.indexOf("PK_PK_GAFIS_CASE") == -1)
+                  throw e
+            }
+          }
+          //save card info
+          val cardIdOpt = queryCaseFingerInfoById(event.cardId)
+          if(cardIdOpt.isEmpty){
+            var seqNo = ""
+            if (event.sendNo != null) {
+              seqNo = event.sendNo
+            }
+            try saveCaseFingerInfo(seqNo,event.cardId,event.caseId,event.path)
+            catch {
+              case e: Throwable =>
+                if (e.toString.indexOf("PK_GAFIS_CASE_FINGER") == -1)
+                  throw e
+            }
+          }
+          //save mnt
+          val hasMnt = updateCaseFingerMntInfo(event.cardId)
+          if (hasMnt == 0)
+            saveCaseFingerMntInfo(event.cardId,event.caseId,mnt.toByteArray())
+        }
+      } catch {
+        case NonFatal(e) =>
+          e.printStackTrace(System.err)
+          SparkFunctions.reportError(parameter, DbError(event, e.toString))
+      }
+    }
+  }
+}
 object GafisPartitionRecordsSaver {
   var databaseConfig:Option[DatabaseConfig] = None
   lazy implicit val dataSource = buildMntDataSource()
   case class DbError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "S|"+message
-  }
-  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
-      databaseConfig = Some(parameter.db)
-      val flag= parameter.kafkaTopicName
-      records.foreach { case (event, mnt ,bin) =>
-        try {
-          if (event.personId != null && event.personId.length > 0) { //save template
-            var fagCase = 0
-            /*val personIdOpt = queryPersonById(event.personId)
-            if (personIdOpt.isEmpty) {
-              try savePersonInfo(event.personId, event.path,flag)
-              catch {
-                case e: Throwable =>
-                  if (e.toString.indexOf("PK_GAFIS_PERSON_PERSONID") == -1)
-                    throw e
-              }
-            }*/
-
-            if (mnt.stHead.bIsPlain == 1) //is plain finger
-              fagCase = 1
-            //save mnt
-            savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, mnt.toByteArray(), event.path, 0,flag)
-            //save bin
-            if (parameter.isExtractorBin)
-              savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, bin.toByteArray(), event.path ,4,flag)
-          }
-
-          if (event.caseId != null && event.caseId.length > 0) { //save latent
-              val caseIdOpt = queryCaseInfoById(event.caseId)
-              if(caseIdOpt.isEmpty){
-                try saveCaseInfo(event.caseId)
-                catch {
-                  case e: Throwable =>
-                    if (e.toString.indexOf("PK_PK_GAFIS_CASE") == -1)
-                      throw e
-                }
-              }
-              //save card info
-              val cardIdOpt = queryCaseFingerInfoById(event.cardId)
-              if(cardIdOpt.isEmpty){
-                var seqNo = ""
-                if (event.sendNo != null) {
-                  seqNo = event.sendNo
-                }
-                try saveCaseFingerInfo(seqNo,event.cardId,event.caseId,event.path)
-                catch {
-                  case e: Throwable =>
-                    if (e.toString.indexOf("PK_GAFIS_CASE_FINGER") == -1)
-                      throw e
-                }
-              }
-              //save mnt
-              val hasMnt = updateCaseFingerMntInfo(event.cardId)
-              if (hasMnt == 0)
-                saveCaseFingerMntInfo(event.cardId,event.caseId,mnt.toByteArray())
-          }
-        } catch {
-          case NonFatal(e) =>
-            e.printStackTrace(System.err)
-            SparkFunctions.reportError(parameter, DbError(event, e.toString))
-        }
-      }
   }
 
   //查询人员主表信息
