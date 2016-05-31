@@ -68,8 +68,8 @@ class DatabaseConfig extends Serializable{
  * JPA属性配置
  */
 @XmlRootElement(name = "property")
-class SparkConfigProperty {
-  @XmlAttribute(name = "name")
+class SparkConfigProperty extends Serializable{
+  @XmlAttribute(name = "key")
   var name: String = null
   @XmlAttribute(name = "value")
   var value: String = null
