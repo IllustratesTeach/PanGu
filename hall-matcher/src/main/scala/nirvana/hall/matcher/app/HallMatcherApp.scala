@@ -31,6 +31,9 @@ with BootstrapTextSupport{
       case "gz" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GZ)
       case "daku" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_DAKU)
       case "sh" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_SH)
+      case "gafis6" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GAFIS6)
+      case other =>
+        throw new UnsupportedOperationException(" module "+other.toString+" unsupported")
     }
     startServer(config.web, "nirvana.hall.matcher", classes :+ extraClasses : _*)
     val version = readVersionNumber("META-INF/maven/nirvana/hall-matcher/version.properties")

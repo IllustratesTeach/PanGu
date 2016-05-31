@@ -1,4 +1,4 @@
-package nirvana.hall.matcher.internal.adapter.sh
+package nirvana.hall.matcher.internal.adapter.gafis6
 
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -11,7 +11,6 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
 import nirvana.protocol.NirvanaTypeDefinition.MatchType
-import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, Occur}
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -19,11 +18,11 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchTaskService{
    /** 获取比对任务  */
-   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0 and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+   private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=0  order by t.priority desc, t.ora_sid ) tt where rownum <=?"
    /** 获取sid根据卡号（人员编号） */
-   private val GET_SID_BY_PERSONID: String = "select t.sid as ora_sid from gafis_person t where t.personid=?"
+   private val GET_SID_BY_PERSONID: String = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid=?"
    /** 获取sid根据卡号（现场指纹） */
-   private val GET_SID_BY_CASE_FINGERID: String = "select t.sid as ora_sid from gafis_case_finger t where t.finger_id=?"
+   private val GET_SID_BY_CASE_FINGERID: String = "select t.ora_sid from normallp_latfinger t where t.fingerid=?"
    /**
     * 获取比对任务
     * @param matchTaskQueryRequest
@@ -87,26 +86,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
        }
      }
-     if(textSql != null){
-       //文本查询
-       val json = JSONObject.fromObject(textSql)
-       if(queryType == 0 || queryType == 2){
-         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
-         //布控和追逃不比1.2亿
-         if (json.has("controlPursuitStatus")) {
-           val value: String = json.getString("controlPursuitStatus")
-           val colQuery = KeywordQuery.newBuilder
-           colQuery.setValue(value)
-           queryBuilder.addQueryBuilder.setName("controlPursuitStatus").setExtension(KeywordQuery.query, colQuery.build)
-           val dataInQuery = GroupQuery.newBuilder
-           dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
-         }
-       }else if(queryType == 1 || queryType == 3){
-
-       }
-       //高级查询
-       matchTaskBuilder.setConfig(getMatchConfig(textSql))
-     }
+     //TODO 高级查询
      //更新status
      updateStatusMatching(oraSid)
 
@@ -132,6 +112,11 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      }
    }
 
+  /**
+   * 高级查询配置
+   * @param textSql
+   * @return
+   */
    private def getMatchConfig(textSql:String): MatchConfig ={
      val builder = MatchConfig.newBuilder
      if (textSql != null && textSql.length > 0) {
@@ -154,11 +139,23 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      }
      return builder.build
    }
+
+  /**
+   * 更新比对状态正在比对
+   * @param oraSid
+   * @param dataSource
+   * @return
+   */
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
     JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status=1 where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
     }
   }
+  /**
+   * 更新比对状态比对失败
+   * @param match_id
+   * @param message 异常信息
+   */
   private def updateMatchStatusFail(match_id: String, message: String) {
     val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>

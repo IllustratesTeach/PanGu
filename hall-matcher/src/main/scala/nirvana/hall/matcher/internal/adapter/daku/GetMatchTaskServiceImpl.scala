@@ -85,7 +85,6 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
        }else{
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
          matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
-         matchTaskBuilder.getTDataBuilder.getTextQuery
        }
      }
      if(textSql != null){
