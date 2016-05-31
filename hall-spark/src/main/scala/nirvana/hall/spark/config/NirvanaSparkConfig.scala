@@ -39,8 +39,11 @@ class NirvanaSparkConfig extends Serializable{
   var isExtractorBin:Boolean = false
   @XmlElement(name="partitions_num")
   var partitionsNum:Int = 4
+
+  @XmlElementWrapper(name = "database_list")
   @XmlElement(name = "database")
-  var db: DatabaseConfig = new DatabaseConfig()
+  var database = new util.ArrayList[DatabaseConfig]()
+
   @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
   var properties = new util.ArrayList[SparkConfigProperty]
@@ -48,6 +51,8 @@ class NirvanaSparkConfig extends Serializable{
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DatabaseConfig")
 class DatabaseConfig extends Serializable{
+  @XmlAttribute(name = "name")
+  var poolName: String = _
   @XmlElement(name = "driver")
   var driver: String = _
   @XmlElement(name = "user")
@@ -56,6 +61,8 @@ class DatabaseConfig extends Serializable{
   var password: String = _
   @XmlElement(name = "url")
   var url: String = _
+  @XmlElement(name = "url")
+  var max: Int= 20
 }
 /**
  * JPA属性配置

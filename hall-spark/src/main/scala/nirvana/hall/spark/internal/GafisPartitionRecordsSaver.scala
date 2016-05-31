@@ -1,11 +1,8 @@
 package nirvana.hall.spark.internal
 
-import javax.sql.DataSource
-
-import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.spark.config.{DatabaseConfig, NirvanaSparkConfig}
-import nirvana.hall.spark.services.SparkFunctions
+import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.{SysProperties, SparkFunctions}
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 import nirvana.hall.support.services.JdbcDatabase
 
@@ -20,7 +17,6 @@ import scala.util.control.NonFatal
 class GafisPartitionRecordsSaver {
   import GafisPartitionRecordsSaver._
   def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
-    databaseConfig = Some(parameter.db)
     val flag= parameter.kafkaTopicName
     records.foreach { case (event, mnt ,bin) =>
       try {
@@ -83,8 +79,7 @@ class GafisPartitionRecordsSaver {
   }
 }
 object GafisPartitionRecordsSaver {
-  var databaseConfig:Option[DatabaseConfig] = None
-  lazy implicit val dataSource = buildMntDataSource()
+  lazy implicit val dataSource = SysProperties.getDataSource("gafis")
   case class DbError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "S|"+message
   }
@@ -201,35 +196,4 @@ object GafisPartitionRecordsSaver {
       ps.setBytes(2,mnt)
     }
   }
-
-  def buildMntDataSource(): DataSource = {
-    databaseConfig match{
-      case Some(config) =>
-        val hikariConfig = new HikariConfig()
-        //针对oracle特别处理
-        hikariConfig.setConnectionTestQuery("select 1 from dual")
-        hikariConfig.setDriverClassName(config.driver)
-
-        /*hikariConfig.setJdbcUrl(System.getProperty("daku.mnt.jdbc.url"))
-      hikariConfig.setUsername(System.getProperty("daku.mnt.jdbc.user"))
-      hikariConfig.setPassword(System.getProperty("daku.mnt.jdbc.pass"))*/
-
-        hikariConfig.setJdbcUrl(config.url)
-        hikariConfig.setUsername(config.user)
-        hikariConfig.setPassword(config.password)
-        //设置自动提交事务
-        hikariConfig.setAutoCommit(false)
-
-        hikariConfig.addDataSourceProperty("cachePrepStmts", "true")
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250")
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
-        hikariConfig.setMaximumPoolSize(20)
-        //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
-
-        new HikariDataSource(hikariConfig)
-      case None=>
-      throw new IllegalStateException("database configuration not set")
-    }
-  }
-
 }

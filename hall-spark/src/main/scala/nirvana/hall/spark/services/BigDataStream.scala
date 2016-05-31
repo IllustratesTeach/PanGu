@@ -36,7 +36,7 @@ object BigDataStream {
     val kafkaTopicName = parameter.kafkaTopicName
 
     //设置系统属性
-    SysProperties.setProperties(parameter.properties)
+    SysProperties.setConfig(parameter)
 
     KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc, kafkaParams,Set(kafkaTopicName))

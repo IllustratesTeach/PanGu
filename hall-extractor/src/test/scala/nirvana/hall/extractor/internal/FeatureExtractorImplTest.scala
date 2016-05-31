@@ -3,12 +3,11 @@ package nirvana.hall.extractor.internal
 import java.io.{ByteArrayInputStream, InputStream}
 
 import com.google.protobuf.ByteString
-import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
+import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
@@ -18,6 +17,21 @@ import org.junit.{Assert, Test}
  * @since 2015-12-11
  */
 class FeatureExtractorImplTest extends BaseJniTest{
+  @Test
+  def test_plain: Unit ={
+
+    val imgData = getClass.getResourceAsStream("/plain.img")
+    val bytes = IOUtils.toByteArray(imgData)
+    val extractor = new FeatureExtractorImpl
+    //    Range(0,100).foreach{i=>
+    val mntData = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(bytes),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+    Assert.assertEquals(496,feature.nWidth)
+    Assert.assertEquals(616,feature.nHeight)
+    //    }
+  }
   @Test
   def test_crash_shanghai: Unit ={
 

@@ -59,11 +59,17 @@
           <xs:documentation>is extractor bin</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="databaseType" name="database" minOccurs="0" maxOccurs="1">
+      <xs:element type="databaseListType" name="database_list" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>mnt store database configruation</xs:documentation>
         </xs:annotation>
       </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="databaseListType">
+    <xs:sequence>
+      <xs:element name="database" type="databaseType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="databaseType">
@@ -73,5 +79,10 @@
       <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1"/>
     </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required">
+      <xs:annotation>
+        <xs:documentation>pooll的名称</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 </xs:schema>

@@ -5,18 +5,24 @@
   <master_server>local[1]</master_server>
   <kafka_server>10.1.7.140:9092</kafka_server>
   <kafka_topic_name>DBDATA</kafka_topic_name>
-  <image_file_server>http://10.1.7.144/fpt</image_file_server>
-  <decompress_image_server>http://10.1.7.98:9001/image</decompress_image_server>
-  <!--<extractor_server>http://10.1.7.144:9002/extractor</extractor_server>-->
-  <extractor_server>http://10.1.7.141:9001/extractor</extractor_server>
+  <image_provider_class>nirvana.hall.spark.internal.FPTImageProvider</image_provider_class>
+  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsSaver</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>true</is_new_feature>
   <is_extractor_bin>true</is_extractor_bin>
-  <database>
-    <driver>oracle.jdbc.driver.OracleDriver</driver>
-    <user>nanjing</user>
-    <password>nanjing</password>
-    <url>jdbc:oracle:thin:@10.1.7.143:1521:gafisdb</url>
-  </database>
+  <database_list>
+    <database name="gafis-image">
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>nanjing</user>
+      <password>nanjing</password>
+      <url>jdbc:oracle:thin:@10.1.7.143:1521:gafisdb</url>
+    </database>
+    <database name="gafis-mnt">
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>nanjing</user>
+      <password>nanjing</password>
+      <url>jdbc:oracle:thin:@10.1.7.143:1521:gafisdb</url>
+    </database>
+  </database_list>
 </nirvana_spark>

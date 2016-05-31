@@ -1,9 +1,7 @@
 package nirvana.hall.spark.services.bianjian
 
-import javax.sql.DataSource
-
-import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import nirvana.hall.spark.config.{DatabaseConfig, NirvanaSparkConfig}
+import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.SysProperties
 import nirvana.hall.support.services.JdbcDatabase
 
 /**
@@ -11,11 +9,9 @@ import nirvana.hall.support.services.JdbcDatabase
  */
 object BianjianPartitionErrorSaver {
 
-  private var databaseConfig:Option[DatabaseConfig] = None
-  private lazy implicit val dataSource = buildErrorDataSource()
+  private lazy implicit val dataSource = SysProperties.getDataSource("bianjian")
 
   def savePartitionErrors(parameter: NirvanaSparkConfig)(errors:Iterator[(String)]):Unit = {
-    databaseConfig = Some(parameter.db)
     errors.foreach(item=> {
       val error = item
       println("-----------------------------------"+error)
@@ -49,35 +45,6 @@ object BianjianPartitionErrorSaver {
       ps.setString(1,keyId)
       ps.setString(2,errorType)
       ps.setString(3,errorDetail)
-    }
-  }
-
-  def buildErrorDataSource(): DataSource = {
-    databaseConfig match{
-      case Some(config) =>
-        val hikariConfig = new HikariConfig()
-
-        hikariConfig.setConnectionTestQuery("select 1 from dual")
-        hikariConfig.setDriverClassName(config.driver)
-
-        /*hikariConfig.setJdbcUrl(System.getProperty("daku.mnt.jdbc.url"))
-        hikariConfig.setUsername(System.getProperty("daku.mnt.jdbc.user"))
-        hikariConfig.setPassword(System.getProperty("daku.mnt.jdbc.pass"))*/
-
-        hikariConfig.setJdbcUrl(config.url)
-        hikariConfig.setUsername(config.user)
-        hikariConfig.setPassword(config.password)
-        hikariConfig.setAutoCommit(false)
-
-        hikariConfig.addDataSourceProperty("cachePrepStmts", "true")
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250")
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
-        hikariConfig.setMaximumPoolSize(5)
-        //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
-
-        new HikariDataSource(hikariConfig)
-      case None=>
-        throw new IllegalStateException("database configuration not set")
     }
   }
 
