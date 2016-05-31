@@ -84,6 +84,8 @@
       <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1"/>
       <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1"/>
       <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1"/>
+      <xs:element type="xs:int" name="max_pool_size" minOccurs="0" maxOccurs="1"/>
+
     </xs:sequence>
     <xs:attribute type="xs:string" name="name" use="required">
       <xs:annotation>
