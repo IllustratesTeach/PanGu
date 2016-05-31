@@ -3,9 +3,46 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     attributeFormDefault="unqualified"
     elementFormDefault="qualified"
-    id="sync">
+    id="v62">
   <xs:element name="hall_v62" type="hallV62Type"/>
   <xs:complexType name="hallV62Type">
+    <xs:sequence>
+      <xs:element type="V62ServerType" name="app_server" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>6.2应用服务器的主机地址</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element type="databaseTableType" name="template_finger_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>档案指纹录入数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="databaseTableType" name="latent_finger_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>现场指纹录入数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="databaseTableType" name="case_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>案件录入的数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="databaseTableType" name="query_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>查询的数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="databaseTableType">
+    <xs:sequence>
+      <xs:element type="xs:integer" name="database_id" minOccurs="1" maxOccurs="1"/>
+      <xs:element type="xs:integer" name="table_id" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="V62ServerType">
     <xs:sequence>
       <xs:element type="xs:string" name="host" minOccurs="1" maxOccurs="1">
         <xs:annotation>
@@ -37,49 +74,6 @@
           <xs:documentation>6.2应用服务器的密码</xs:documentation>
         </xs:annotation>
       </xs:element>
-
-      <xs:element type="databaseTableType" name="template_finger_table" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>档案指纹录入数据库表</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="databaseTableType" name="latent_finger_table" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>现场指纹录入数据库表</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="databaseTableType" name="case_table" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>案件录入的数据库表</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="databaseTableType" name="query_table" minOccurs="1" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>查询的数据库表</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-
-      <xs:element type="rpcType" name="proxy" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>提供代理服务器的能力</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="databaseTableType">
-    <xs:sequence>
-      <xs:element type="xs:integer" name="database_id" minOccurs="1" maxOccurs="1"/>
-      <xs:element type="xs:integer" name="table_id" minOccurs="1" maxOccurs="1"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="rpcType">
-    <xs:sequence>
-      <xs:element name="bind" type="xs:string" minOccurs="1" maxOccurs="1"/>
-      <xs:element name="expose" type="xs:string" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="io_thread" type="xs:string" minOccurs="0" maxOccurs="1" default="1"/>
-      <xs:element name="worker_thread" type="xs:string" minOccurs="0" maxOccurs="1" default="8"/>
-      <xs:element name="max_frame_length" type="xs:int" minOccurs="0" maxOccurs="1" default="10485760"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

@@ -33,21 +33,29 @@ class BaseV62TestCase {
     registry.shutdown()
   }
 
-  def createFacade:V62Facade = new V62Facade
+  def createFacade:V62Facade = {
+    val config = new HallV62Config
+    config.appServer.host = "10.1.6.182"
+    config.appServer.port = 6798
+    config.appServer.user = "afisadmin"
+    config.appServer.password=""
+    new V62Facade(config)
+  }
   def executeInContext[T](function: => T): Unit ={
     val config = new HallV62Config
-    config.host = "10.1.6.182"
-    config.port = 6798
-    config.user = "afisadmin"
-    config.password=""
+    config.appServer.host = "10.1.6.182"
+    config.appServer.port = 6798
+    config.appServer.user = "afisadmin"
+    config.appServer.password=""
 
-    val passwordOpt = if(config.password.isEmpty) None else Some(config.password)
+    val passwordOpt = if(config.appServer.password.isEmpty) None else Some(config.appServer.password)
 
     val address = V62ServerAddress(
-      config.host,
-      config.port,
-      config.connectionTimeoutSecs,
-      config.readTimeoutSecs,config.user,
+      config.appServer.host,
+      config.appServer.port,
+      config.appServer.connectionTimeoutSecs,
+      config.appServer.readTimeoutSecs,
+      config.appServer.user,
       passwordOpt)
     V62Facade.serverContext.withValue(address){
      function

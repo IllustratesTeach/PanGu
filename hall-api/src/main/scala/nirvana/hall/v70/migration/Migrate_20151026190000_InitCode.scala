@@ -1,6 +1,6 @@
 package nirvana.hall.v70.migration
 
-import monad.migration.Migration
+import stark.migration.Migration
 
 import scala.io.Source
 

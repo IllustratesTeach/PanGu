@@ -1,0 +1,40 @@
+deployment setup:
+
+1）hadoop's docker image --- hadoop-2.7.x
+  docker run -d --name="hadoop" -h "hadoop" -p 8042:8042 -p 8088:8088 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 9000:9000 hadoop-2.7.x
+2) nirvana-cloud's docker image --- nirvana-cloud
+3) kafka software
+  3.1 modify config/server.properties
+      host.name
+      log.dir
+      log.retention.hours
+      zookeeper.connect
+  3.2 run  bin/kafka-server-start.sh config/server.properties
+  3.3 bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic FPT
+  3.4 bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic ERROR
+4) spark standalone cluster
+  4.1 make all node passwordless login
+  4.2 install JDK to same location on all machine
+  4.3 install libnirvana-kernel.so on all machine
+    copy so file to /usr/local/lib and run ldconfig
+  4.4 distribute spark-1.6.0-bin-jcai-spark.tgz to all cluster node and extract to same directory
+  4.5 in spark master machine
+      4.5.1 cp conf/spark-env.sh.template conf/spark-env.sh
+      4.5.2 modify conf/spark-env.sh,
+        add JAVA_HOME=/path/to/jdk
+        modify SPARK_MASTER_IP=xxx.xxx.xxx.xxx
+      4.5.4 cp conf/slaves.template conf/slaves
+      4.5.5 add all machine's ip into conf/slaves
+  4.6 sbin/start-all.sh
+  4.7 open browser to visit  SparkUI at http://master_ip:8080
+  4.8 ensure all worker node successfully started
+
+5) deploy nirvana-spark application
+  5.1 copy nirvana-spark-dev-SNAPSHOT.jar to spark master machine.
+  5.2 create nirvana-spark.xml,refer test_spark.xml
+      NOTICE:
+        * must modify host as internal ip
+        * must modify partitions as num of all cpu core multiplied 2
+        * must modify other corresponding parameter
+  5.3 bin/spark-submit  --master spark://MASTER_IP:7077  /path/to/nirvana-spark-dev-SNAPSHOT.jar /path/to/nirvana-spark.xml
+

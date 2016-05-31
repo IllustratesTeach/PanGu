@@ -8,17 +8,14 @@
   <name>Nirvana Hall Application Platform</name>
   <description>Nirvana Hall Application Server</description>
   <modules>
-    <module>hall-matcher</module>
     <module>hall-api</module>
     <module>hall-c</module>
     <module>hall-extractor</module>
     <module>hall-image</module>
-    <module>hall-orm</module>
-    <module>hall-orm-generator</module>
-    <module>hall-orm-macro</module>
+    <module>hall-matcher</module>
     <module>hall-protocol</module>
-    <module>hall-sdk</module>
-    <module>hall-stream</module>
+    <!-- <module>hall-sdk</module> -->
+    <module>hall-spark</module>
     <module>hall-support</module>
   </modules>
   <scm>
@@ -54,6 +51,16 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.ganshane.stark</groupId>
+        <artifactId>stark-activerecord_2.11</artifactId>
+        <version>${stark-release-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ganshane.stark</groupId>
+        <artifactId>stark-migration_2.11</artifactId>
+        <version>${stark-release-version}</version>
+      </dependency>
+      <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
@@ -63,11 +70,11 @@
         <artifactId>hall-support</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+<!--      <dependency>
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-migration</artifactId>
         <version>${monad-release-version}</version>
-      </dependency>
+      </dependency>-->
       <dependency>
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-support</artifactId>
@@ -594,6 +601,7 @@
     <proguard-release-version>5.1</proguard-release-version>
     <lichen-release-version>0.5.10.2</lichen-release-version>
     <monad-release-version>5.0.16</monad-release-version>
+    <stark-release-version>0.1.10</stark-release-version>
     <spring-release-version>4.2.4.RELEASE</spring-release-version>
     <rootPath>${basedir}</rootPath>
     <protoc>protoc</protoc>

@@ -26,11 +26,13 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "query-70to62", new Runnable {
-      override def run(): Unit = {
-        query7to6Service.doWork
-      }
-    })
+    if(v70Config.cron.query7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-70to62", new Runnable {
+        override def run(): Unit = {
+          query7to6Service.doWork
+        }
+      })
+    }
   }
 
   @Transactional
@@ -47,10 +49,10 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
    */
   @Transactional
   override def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque] ={
-    val gafisQuery = GafisNormalqueryQueryque.where("status="+QueryConstants.STATUS_WAIT+" and deletag=1 and syncTargetSid is not null").desc("priority").asc("oraSid").takeOption
+    val gafisQuery = GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.status === QueryConstants.STATUS_WAIT).and(GafisNormalqueryQueryque.deletag === "1").and(GafisNormalqueryQueryque.syncTargetSid[String].notNull).orderBy(GafisNormalqueryQueryque.priority[java.lang.Short].desc).orderBy(GafisNormalqueryQueryque.oraSid).headOption
     // 更新状态为正在比对
     gafisQuery.foreach{ query =>
-      GafisNormalqueryQueryque.where("pkId=?1", query.pkId).update(status=QueryConstants.STATUS_MATCHING, begintime=new Date())
+      GafisNormalqueryQueryque.update.set(status = QueryConstants.STATUS_MATCHING, begintime = new Date()).where(GafisNormalqueryQueryque.pkId === query.pkId).execute
     }
 
     gafisQuery
@@ -97,7 +99,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     catch {
       case e: Exception =>
         //发送比对异常，状态更新为失败
-        GafisNormalqueryQueryque.where("pkId=?1", gafisQuery.pkId).update(status=QueryConstants.STATUS_FAIL)
+        GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
     }
   }
 

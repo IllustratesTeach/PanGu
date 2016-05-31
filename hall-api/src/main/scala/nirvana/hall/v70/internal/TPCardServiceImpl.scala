@@ -58,8 +58,8 @@ class TPCardServiceImpl extends TPCardService{
   override def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse = {
     val personId = tPCardGetRequest.getCardId
     val person = GafisPerson.find(personId)
-    val photoList = GafisGatherPortrait.find_by_personid(personId)
-    val fingerList = GafisGatherFinger.find_by_personId(personId)
+    val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
+    val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
 
     val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
 

@@ -65,14 +65,14 @@ trait JpaBaseServiceTestSupport {
 object JpaTestModule {
   def buildHallV70Config() = {
     val config = new HallV70Config
-//    config.api.db.driver = "org.h2.Driver"
-//    config.api.db.user = "sa"
-//    config.api.db.url = "jdbc:h2:mem:db"
+//    config.db.driver = "org.h2.Driver"
+//    config.db.user = "sa"
+//    config.db.url = "jdbc:h2:mem:db"
 
-    config.api.db.driver = "oracle.jdbc.driver.OracleDriver"
-    config.api.db.url = "jdbc:oracle:thin:gafis_qd/gafis@10.1.7.151:1521:GAFISNEW7"
-    config.api.db.user = "gafis_qd"
-    config.api.db.password = "gafis"
+    config.db.driver = "oracle.jdbc.driver.OracleDriver"
+    config.db.url = "jdbc:oracle:thin:gafis_qd/gafis@10.1.7.151:1521:GAFISNEW7"
+    config.db.user = "gafis_qd"
+    config.db.password = "gafis"
     config
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={

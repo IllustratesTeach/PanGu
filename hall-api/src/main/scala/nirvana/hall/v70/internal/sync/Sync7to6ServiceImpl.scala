@@ -1,7 +1,6 @@
 package nirvana.hall.v70.internal.sync
 
 import java.util.Date
-import javax.persistence.EntityManagerFactory
 
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.services.GafisException
@@ -10,9 +9,7 @@ import nirvana.hall.v70.jpa.SyncQueue
 import nirvana.hall.v70.services.sync.Sync7to6Service
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, PostInjection}
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * Created by songpeng on 15/12/1.
@@ -34,25 +31,30 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
   val UPLOAD_STATUS_SUCCESS = "1"
   val UPLOAD_STATUS_FAIL = "2"
 
-
+  /**
+   * 上报任务定时器，向6.2上报数据
+   * @param periodicExecutor
+   * @param sync7to6Service
+   */
   @PostInjection
-  def startUp(periodicExecutor: PeriodicExecutor, entityManagerFactory: EntityManagerFactory): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.sync62Cron), "sync-70to62", new Runnable {
+  def startUp(periodicExecutor: PeriodicExecutor, sync7to6Service: Sync7to6Service): Unit = {
+    periodicExecutor.addJob(new CronSchedule(v70Config.cron.sync7to6Cron), "sync-70to62", new Runnable {
       override def run(): Unit = {
-        val emHolder= new EntityManagerHolder(entityManagerFactory.createEntityManager())
-        TransactionSynchronizationManager.bindResource(entityManagerFactory,emHolder)
-        doWork
-        TransactionSynchronizationManager.unbindResource(entityManagerFactory)
-        EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager)
+        sync7to6Service.doWork
       }
     })
   }
 
   //TODO 允许3次失败
+  /**
+   * 查询一条上报任务
+   */
   def findSyncQueue: Option[SyncQueue] ={
-    SyncQueue.find_by_uploadStatus(UPLOAD_STATUS_WAIT).asc("createdate").takeOption
+    SyncQueue.where(SyncQueue.uploadStatus === UPLOAD_STATUS_WAIT).orderBy(SyncQueue.createdate).headOption
   }
-  def doWork: Unit ={
+
+  @Transactional
+  override def doWork: Unit ={
     findSyncQueue.foreach{ syncQueue =>
       doTaskOfSyncQueue(syncQueue)
       doWork
@@ -78,7 +80,7 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
         case other =>
           throw new UnsupportedOperationException("unknown uploadFlag " + other)
       }
-      updateSyncQueueSucess(syncQueue)
+      updateSyncQueueSuccess(syncQueue)
     }
     catch {
       case e: Exception =>
@@ -91,7 +93,7 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
    * 更新队列任务状态
    * @param syncQueue
    */
-  private def updateSyncQueueSucess(syncQueue: SyncQueue): Unit ={
+  private def updateSyncQueueSuccess(syncQueue: SyncQueue): Unit ={
     syncQueue.uploadStatus = UPLOAD_STATUS_SUCCESS
     syncQueue.remark="success"
     syncQueue.finishdate=new Date()

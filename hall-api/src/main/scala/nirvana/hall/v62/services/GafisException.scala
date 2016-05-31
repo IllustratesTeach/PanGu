@@ -62,7 +62,7 @@ class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
     val sb = new StringBuilder
     sb.append(message)
     if(gafisError.bnAFISErrData != null)
-      sb.append("\n \t ErrorData: ").append(new String(gafisError.bnAFISErrData, AncientConstants.GBK_ENCODING))
+      sb.append("\n \t ErrorData: ").append(new String(gafisError.bnAFISErrData, AncientConstants.GBK_ENCODING).trim)
 
 //    if(gafisError.szFileName != null)
 //      message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)

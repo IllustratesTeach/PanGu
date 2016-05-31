@@ -1,23 +1,21 @@
 package nirvana.hall.v62.internal.c.grmtlib
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import monad.support.services.LoggerSupport
-import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.ganumia.gadbcol.GACOLUMNPROPSTRUCT
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
-import nirvana.hall.c.services.gloclib.gadbprop.GADBPROPSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
+import nirvana.hall.protocol.api.TPCardProto.TPCardAddRequest
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.gloclib.galocpkg
-import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
-import nirvana.hall.v62.internal.proxy.GbaseProxyClient
-import org.jboss.netty.buffer.ChannelBuffer
+import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctpConverter}
+import nirvana.hall.v62.internal.c.gnetlib.reqansop
+import nirvana.hall.v62.proxy.LocalServiceFinder
 
-import scala.concurrent.{ExecutionContext, Promise}
-import scala.reflect.{ClassTag, classTag}
+import scala.concurrent.ExecutionContext
 
 /**
   *
@@ -29,11 +27,12 @@ trait grmtsvr {
     with LoggerSupport
     with galocpkg
     with gitempkg
+    with LocalServiceFinder
     with grmtcsr
     with grmtpkg
-    with gnetcsr
     with reqansop =>
   private implicit val executionContext = ExecutionContext.global
+  private val testSeq = new AtomicInteger(0)
   def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
                                 bIsReq50:Int=0):Boolean={
@@ -55,23 +54,53 @@ trait grmtsvr {
          * 2. 保存档案数据
          * 3. 返回结果
          */
-
-        val stTPCard = GAFIS_PKG_GetTpCard(pstRecvPkg)
+        val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
         //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
         //saveStTPCardToV70.....
+        /*stTPCard.foreach{gtpCard =>
+          val tpCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(gtpCard)
+          val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+          val portraits = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+          val fingers = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+          person.save()
+          portraits.foreach(_.save())
+          fingers.foreach(_.save())
+        }*/
         //n 为保存成功的个数
-        val n = stTPCard.length
+        var n = 0
+        stTPCardOpt.map{tpCard=>
+          //测试使用，本机上报本机
+//          println("================>>>>>>> "+tpCard.szCardID)
+//          tpCard.szCardID=testSeq.incrementAndGet()+"-"+tpCard.szCardID
+          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
+        }.foreach{ card =>
+            val request = TPCardAddRequest.newBuilder()
+            request.setCard(card)
+            findTPCardService.addTPCard(request.build())
+            n += 1
+        }
 
-        NETANS_SetRetVal(pAns,n);
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
         true
       case OP_TPLIB_EXIST=>
-        //TODO 判断卡片是否存在
+        /*
+        //获取编号,去除后边的空字符
+        val cardIdBuf = new ByteArrayOutputStream()
+        pReq.bnData.foreach(c => if(c != 0) cardIdBuf.write(c))
+        val cardId = cardIdBuf.toString("GB2312")
+        //根据人员编号查询7.0数据库
+        val person = GafisPerson.findOption(cardId)
+        println(person)
+        //如果人员编号存在返回1，不存在0
+        val n = if(person != None) 1 else 0
+        */
 
-        NETANS_SetRetVal(pAns,0);
+        val n = 0
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
@@ -124,66 +153,6 @@ trait grmtsvr {
 
         true
       case other =>
-        false
-    }
-  }
-  def GAFIS_RMTLIB_DBSYS_Server(pReq:GNETREQUESTHEADOBJECT): Boolean ={
-    val pAns = new GNETANSWERHEADOBJECT
-    val nOpClass = NETREQ_GetOpClass(pReq);
-    val nOpCode = NETREQ_GetOpCode(pReq);
-    val nDBID	 = NETREQ_GetDBID(pReq);
-    val nTableID = NETREQ_GetTableID(pReq);
-    val nOption	 = NETREQ_GetOption(pReq);
-
-    def multiDataLogic[T<:AncientData:ClassTag]():Unit={
-      val client =  new GbaseProxyClient
-      var ret:Array[T] = null
-      var n = 0
-      client.executeInChannel{channel=>
-        NETOP_SENDDATA(channel,pReq)
-        NETOP_RECVDATA[GNETANSWERHEADOBJECT](channel,pAns)
-        n=NETANS_GetRetVal(pAns)
-        validateResponse(channel,pAns)
-        NETANS_SetRetVal(pAns, 1);
-        NETOP_SENDANS(channel, pAns);
-        ret = Range(0,n).map(x=>classTag[T].runtimeClass.newInstance().asInstanceOf[T]).toArray
-        NETOP_RECVDATA(channel,ret);
-      }
-
-      val promise = Promise[ChannelBuffer]()
-      executeInChannel{channelOperator=>
-        NETOP_SENDDATA(channelOperator,pAns)
-        promise.future.foreach{ buffer=>
-          NETOP_SENDDATA(channelOperator,ret)
-          error("<=========== direct data for opClass:"+pReq.nOpClass+" opCode:"+pReq.nOpCode+" finished!")
-        }
-        channelOperator.writePromise(pAns.getDataSize,promise)
-      }
-    }
-    def simpleLogic[T<:AncientData](target:T): Unit ={
-      val client =  new GbaseProxyClient
-      client.executeInChannel{channel=>
-        NETOP_SENDDATA(channel,pReq)
-        NETOP_RECVDATA[GNETANSWERHEADOBJECT](channel,pAns)
-        validateResponse(channel,pAns)
-
-        NETOP_RECVDATA(channel,target);
-      }
-      executeInChannel{channelOperator=>
-        NETOP_SENDDATA(channelOperator,pAns)
-        NETOP_SENDDATA(channelOperator,target)
-        error("<=========== direct data for opClass:"+pReq.nOpClass+" opCode:"+pReq.nOpCode+" finished!")
-      }
-    }
-    nOpCode match{
-      case OP_SYS_GETDBBYID=>
-        simpleLogic(new GADBPROPSTRUCT)
-
-        true
-      case OP_SYS_GETTABLESCHEMA=>
-        multiDataLogic[GACOLUMNPROPSTRUCT]()
-        true
-      case other=>
         false
     }
   }

@@ -24,11 +24,11 @@ class ganetqryTest {
   @Test
   def test_add: Unit ={
     val config = new HallV62Config
-    config.host = "10.1.6.119"
-    config.port = 6898
-    config.user = "afisadmin"
+    config.appServer.host = "10.1.6.119"
+    config.appServer.port = 6898
+    config.appServer.user = "afisadmin"
 
-    val facade = new V62Facade
+    val facade = new V62Facade(config)
 
     val srcDb = DatabaseTable(1,2)
     val destDb = DatabaseTable(1,2)

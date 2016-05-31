@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+  <xs:element name="nirvana_spark" type="nirvanaSparkType"/>
+  <xs:complexType name="nirvanaSparkType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="host" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>driver host</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="app_name" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>application name</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="master_server" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>spark master server</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="kafka_server" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>kafka message queue server</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="kafka_topic_name" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>kafka topic name</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="image_provider_class" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>提供图像源数据的类</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="data_saver_class" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>decompress image http server</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="hdfs_server" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>hdfs_server</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:int" name="partitions_num" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>data partitions</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:boolean" name="is_new_feature" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>whether is new feature</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:boolean" name="is_extractor_bin" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>is extractor bin</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="databaseListType" name="database_list" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>mnt store database configruation</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="propertiesType" name="properties" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>系统相关的属性定义</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="databaseListType">
+    <xs:sequence>
+      <xs:element name="database" type="databaseType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="databaseType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="driver" minOccurs="1" maxOccurs="1"/>
+      <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1"/>
+      <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required">
+      <xs:annotation>
+        <xs:documentation>pool的名称</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="propertiesType">
+    <xs:sequence>
+      <xs:element name="property" type="propertyType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="propertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="key" use="required">
+          <xs:annotation>
+            <xs:documentation>属性的key</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" name="value" use="required">
+          <xs:annotation>
+            <xs:documentation>属性的值</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

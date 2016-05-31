@@ -1,7 +1,6 @@
 package nirvana.hall.v70.internal.stamp
 
 import nirvana.hall.v70.services.stamp.GatherPersonService
-import nirvana.hall.orm.services.Relation
 import nirvana.hall.v70.jpa.{GafisPerson, GafisGatherTypeNodeField, GafisGatherType}
 
 import scala.reflect.runtime.universe._
@@ -15,13 +14,9 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  override def queryGatherPersonList(start: Integer, limit: Integer)  : Relation[GafisPerson] = {
-    GafisPerson.all.limit(limit).offset(start)
-    /*
-    withSQL {
-      select.from(GafisPerson as gp).limit(limit).offset(start)
-    }.map(GafisPerson(gp)).list.apply()
-    */
+  override def queryGatherPersonList(start: Integer, limit: Integer)  : Seq[GafisPerson] = {
+//    GafisPerson.all.limit(limit).offset(start).map(_).toSeq
+    null
   }
 
   /**
@@ -29,19 +24,9 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param personid
    * @param uplaodStatus(0:等待上报;1:正在上报;2:完成上报)
    */
-  override def uploadGatherPerson(personid: String, uplaodStatus: Integer) : Boolean = {
-    GafisPerson.find_by_personid(personid).update(status=uplaodStatus)
+  override def uploadGatherPerson(personid: String, uplaodStatus: String) : Boolean = {
+    GafisPerson.update.set(status=uplaodStatus).where(GafisPerson.personid === personid).execute
     true
-    /*
-    try {
-      withSQL {update(GafisPerson).set(GafisPerson.column.status -> uplaodStatus).
-        where.eq(GafisPerson.column.personid,personid)}.
-        update.apply()
-      true
-    } catch {
-      case exception: Exception => false
-    }
-    */
   }
 
   /**
@@ -53,32 +38,23 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param start:查询开始条数
    * @param limit:查询条数
    */
-  override def queryGatherPersonBy(gatherDateStart: String, gatherDateEnd: String, name: String, idCard: String,start: Integer, limit: Integer) : Relation[GafisPerson] = {
-    GafisPerson.where("name=?1 and idcardno=?2 and gatherDate between ? ?").desc("gatheDate").limit(limit).offset(start)
-    /*
-    withSQL {
-      select.from(GafisPerson as gp).where.eq(GafisPerson.column.name,name).and.
-        eq(GafisPerson.column.idcardno,idCard).and.between(GafisPerson.column.gatherDate,gatherDateStart,gatherDateEnd).
-        orderBy(GafisPerson.column.gatherDate).desc.
-        limit(limit).
-        offset(start)
-    }.map(GafisPerson(gp.resultName)).list.apply()
-    */
-
+  override def queryGatherPersonBy(gatherDateStart: String, gatherDateEnd: String, name: String, idCard: String,start: Integer, limit: Integer) : Seq[GafisPerson] = {
+    null
   }
 
   /**
    * 捺印人员高级查询
    */
-  override def queryGatherPersonSeniorBy() : Relation[GafisPerson] = ???
+  override def queryGatherPersonSeniorBy() : Seq[GafisPerson] = ???
 
 
   /**
    * 人员采集类型查询
    * @return
    */
-  def queryGatherType() : Relation[GafisGatherType] = {
-    GafisGatherType.all
+  def queryGatherType() : Seq[GafisGatherType] = {
+//    GafisGatherType.all.toList.toSeq
+    null
   }
 
 
@@ -88,9 +64,8 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @param gatherTypeId
    * @return
    */
-  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Relation[GafisGatherTypeNodeField] = {
-    GafisGatherTypeNodeField.find_by_typeId(gatherTypeId)
-    //GafisGatherTypeNodeField.findAllBy(sqls.eq(GafisGatherTypeNodeField.column.typeId,gatherTypeId))
+  def queryGatherTypeNodeFieldBy(gatherTypeId : String)  : Seq[GafisGatherTypeNodeField] = {
+    GafisGatherTypeNodeField.find_by_typeId(gatherTypeId).toSeq
   }
 
 
@@ -100,8 +75,7 @@ class GatherPersonServiceImpl extends GatherPersonService{
    * @return
    */
   def queryBasePersonInfo(personId : String) : Option[GafisPerson] = {
-    GafisPerson.find_by_personid(personId).takeOption
-    //Option(GafisPerson.find(personId))
+    GafisPerson.find_by_personid(personId).headOption
   }
 
   /**

@@ -66,7 +66,7 @@ class CaseInfoServiceImpl extends CaseInfoService{
    */
   @Transactional
   override def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse = {
-    GafisCase.where("caseId=?1", caseDelRequest.getCaseId).delete
+    GafisCase.find(caseDelRequest.getCaseId).delete
     CaseDelResponse.newBuilder().build()
   }
 }

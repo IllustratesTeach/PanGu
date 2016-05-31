@@ -5,12 +5,12 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import monad.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
+import stark.migration.{InstallAllMigrations, Migrator, DatabaseAdapter, Vendor}
 
 /**
  * 针对数据的操作
@@ -44,13 +44,13 @@ object LocalDataSourceModule {
   def buildDataSource(config: HallV70Config, hub: RegistryShutdownHub, logger: Logger): DataSource = {
     val hikariConfig = new HikariConfig();
     //针对heroku的mysql特别处理
-    if (config.api.db.url.startsWith("mysql")) {
-      val dbUri = new URI(config.api.db.url)
+    if (config.db.url.startsWith("mysql")) {
+      val dbUri = new URI(config.db.url)
       val username = dbUri.getUserInfo.split(":")(0)
       val password = dbUri.getUserInfo.split(":")(1)
       val dbUrl = "jdbc:mysql://" + dbUri.getHost + dbUri.getPath + "?useUnicode=true&characterEncoding=utf-8"
       //hikariConfig.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource")
-      hikariConfig.setDriverClassName(config.api.db.driver)
+      hikariConfig.setDriverClassName(config.db.driver)
       hikariConfig.setJdbcUrl(dbUrl)
       hikariConfig.setUsername(username)
       hikariConfig.setPassword(password)
@@ -59,15 +59,15 @@ object LocalDataSourceModule {
     }
     else {
       //针对oracle特别处理
-      if(config.api.db.driver.startsWith("oracle")){
+      if(config.db.driver.startsWith("oracle")){
         hikariConfig.setConnectionTestQuery("select 1 from dual")
       }
-      hikariConfig.setDriverClassName(config.api.db.driver)
-      hikariConfig.setJdbcUrl(config.api.db.url)
-      if (config.api.db.user != null)
-        hikariConfig.setUsername(config.api.db.user);
-      if (config.api.db.password != null)
-        hikariConfig.setPassword(config.api.db.password);
+      hikariConfig.setDriverClassName(config.db.driver)
+      hikariConfig.setJdbcUrl(config.db.url)
+      if (config.db.user != null)
+        hikariConfig.setUsername(config.db.user);
+      if (config.db.password != null)
+        hikariConfig.setPassword(config.db.password);
     }
     //设置自动提交事务
     hikariConfig.setAutoCommit(false)
@@ -89,9 +89,9 @@ object LocalDataSourceModule {
       }
     })
     //用之前先升级数据库
-    val driverClassName: String = config.api.db.driver
+    val driverClassName: String = config.db.driver
     val vendor = Vendor.forDriver(driverClassName)
-    val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.api.db.user))
+    val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
     //migrator.migrate(RemoveAllMigrations, "nirvana.hall.v70.migration", false)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.v70.migration", searchSubPackages = false)

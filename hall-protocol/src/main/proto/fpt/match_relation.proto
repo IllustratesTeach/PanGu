@@ -32,7 +32,6 @@ message MatchRelationTT{
     }
     required string person_id1 = 1; //人员编号1
     required string person_id2 = 2; //人员编号2
-    required MatchSysInfo match_sys_info = 3; //比中系统信息
 }
 message MatchRelationLL{
     extend MatchRelation {
@@ -42,7 +41,6 @@ message MatchRelationLL{
     required string seq_no1 = 2; //现场指纹序号1
     required string case_id2 = 3; //人员编号2
     required string seq_no2 = 4; //现场指纹序号2
-    required MatchSysInfo match_sys_info = 5; //比中系统信息
 }
 message MatchRelationTLAndLT{
     extend MatchRelation {

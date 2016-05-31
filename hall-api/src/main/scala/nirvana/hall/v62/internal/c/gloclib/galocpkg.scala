@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal.c.gloclib
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef
 import nirvana.hall.c.services.gbaselib.gbasedef.{GAKEYSTRUCT,GBASE_UTIL_ALIGN}
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMSTRUCT, GBASE_ITEMPKG_OPSTRUCT}
@@ -7,7 +8,7 @@ import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOS
 import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.{galocpkg, glocdef, galoclp, galoctp}
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef.{GATEXTITEMSTRUCT, GAFISMICSTRUCT}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
 
@@ -65,7 +66,7 @@ trait galocpkg {
   }
 
 
-  def GAFIS_PKG_GetTpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GTPCARDINFOSTRUCT]= //,GTPCARDINFOSTRUCT* pstCard)
+  def GAFIS_PKG_GetTpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):Option[GTPCARDINFOSTRUCT]= //,GTPCARDINFOSTRUCT* pstCard)
   {
 
 
@@ -74,11 +75,12 @@ trait galocpkg {
       throw new IllegalStateException("item dir is empty")
     }
 
-    headers.flatMap{header=>
-      val pstCard = new GTPCARDINFOSTRUCT
-      var pstCardOpt:Option[GTPCARDINFOSTRUCT] = Some(pstCard)
+    val pstCard = new GTPCARDINFOSTRUCT
+    val pstCardOpt:Option[GTPCARDINFOSTRUCT] = Some(pstCard)
+    headers.foreach{header=>
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
+//      println("bnResLength "+ pstItem.bnRes.length +" dataLength " + pstItem.stHead.nItemLen)
       header.nItemType match {
         case PKG_ITEMTYPE_THIS =>
           pstCard.fromByteArray(pstItem.bnRes)
@@ -109,13 +111,14 @@ trait galocpkg {
             if (pstCard.pstInfoEx_Data.stFpx.nItemFlag == 0) pstCard.pstInfoEx_Data.stFpx.nItemFlag = 0xFF.toByte
           }
         case other=>
-          pstCardOpt = None
+          //do nothing
       }
-      pstCardOpt
-    }.toList
+    }
 
     //TODO 实现对pstCard的校验
 //    GAFIS_PKG_UTIL_CheckTPCard(pstCard);
+
+    pstCardOpt
 
   }
 
@@ -324,14 +327,13 @@ trait galocpkg {
   def GAFIS_TEXT_GetTextArrayFromStream(pszStream:ChannelBuffer):Array[GATEXTITEMSTRUCT]={
     val nTextItemCount =  pszStream.readInt()
 
-    Range(0,nTextItemCount).map(x=>new GATEXTITEMSTRUCT())
-      .map { pstItem =>
-        pstItem.fromStreamReader(pszStream)
+    val list = Range(0,nTextItemCount).map(x=>new GATEXTITEMSTRUCT().fromStreamReader(pszStream,AncientConstants.GBK_ENCODING))
+    list.map { pstItem =>
         if (pstItem.bIsPointer > 0) {
           val nSize = pstItem.nItemLen
           pstItem.stData.textContent = pszStream.readBytes(nSize).array()
           val blankSize = gbasedef.GBASE_UTIL_ALIGN(nSize, 4)
-          pszStream.skipBytes(blankSize)
+          pszStream.skipBytes(blankSize-nSize)
         }
         pstItem
       }.toArray

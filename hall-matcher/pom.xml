@@ -26,10 +26,6 @@
         </dependency>
         <dependency>
             <groupId>com.ganshane.monad</groupId>
-            <artifactId>monad-migration</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ganshane.monad</groupId>
             <artifactId>monad-core</artifactId>
         </dependency>
         <dependency>

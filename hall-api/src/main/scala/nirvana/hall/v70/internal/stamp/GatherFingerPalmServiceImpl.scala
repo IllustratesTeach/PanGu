@@ -5,9 +5,8 @@ import java.util.Date
 import javax.sql.rowset.serial.SerialBlob
 
 import nirvana.hall.api.internal.AnalysisData
+import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisGatherPalm}
 import nirvana.hall.v70.services.stamp.GatherFingerPalmService
-import nirvana.hall.orm.services.Relation
-import nirvana.hall.v70.jpa.{GafisGatherPalm, GafisGatherFinger}
 
 /**
  * Created by wangjue on 2015/10/27.
@@ -19,8 +18,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @return
    */
-  override def queryFingerInfoByPersonId(personId : String): Relation[GafisGatherFinger] = {
-    GafisGatherFinger.find_by_personId(personId)
+  override def queryFingerInfoByPersonId(personId : String): Seq[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId(personId).toSeq
   }
 
   /**
@@ -28,8 +27,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @return
    */
-  override def queryFingerDataByPersonId(personId: String): Relation[GafisGatherFinger] = {
-    GafisGatherFinger.find_by_personId_and_lobtype(personId,1).asc("fgp")
+  override def queryFingerDataByPersonId(personId: String): Seq[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId_and_lobtype(personId,1).orderBy(GafisGatherFinger.fgp).toSeq
   }
 
   /**
@@ -37,9 +36,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @param groupId
    */
-  override def queryFingerInfoBy(personId: String, groupId: Short)  : Relation[GafisGatherFinger] = {
-    GafisGatherFinger.find_by_personId_and_groupId(personId,groupId)
-    //GafisGatherFinger.findAllBy(sqls.eq(GafisGatherFinger.column.personId,personId).and.eq(GafisGatherFinger.column.groupId,groupId))
+  override def queryFingerInfoBy(personId: String, groupId: Short)  : Seq[GafisGatherFinger] = {
+    GafisGatherFinger.find_by_personId_and_groupId(personId,groupId).toSeq
   }
 
   /**
@@ -47,9 +45,8 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
    * @param personId
    * @param groupId
    */
-  override def queryPalmInfoBy(personId: String, groupId: Short)  : Relation[GafisGatherPalm] = {
-    GafisGatherPalm.find_by_personId_and_groupId(personId,groupId)
-    //GafisGatherPalm.findAllBy(sqls.eq(GafisGatherPalm.column.personId,personId).and.eq(GafisGatherPalm.column.groupId,groupId))
+  override def queryPalmInfoBy(personId: String, groupId: Short)  : Seq[GafisGatherPalm] = {
+    GafisGatherPalm.find_by_personId_and_groupId(personId,groupId).toSeq
   }
 
   /**
@@ -108,13 +105,11 @@ class GatherFingerPalmServiceImpl extends GatherFingerPalmService{
   }
 
   def deleteFingerData(personId: String)  = {
-    GafisGatherFinger.find_by_personId(personId).delete
-    //withSQL { delete.from(GafisGatherFinger).where.eq(GafisGatherFinger.column.personId, personId) }.update.apply()
+    GafisGatherFinger.delete.where(GafisGatherFinger.personId === personId).execute
   }
 
   def deletePalmData(personId: String)  = {
-    GafisGatherPalm.find_by_personId(personId).delete
-    //withSQL { delete.from(GafisGatherPalm).where.eq(GafisGatherPalm.column.personId, personId) }.update.apply()
+    GafisGatherPalm.delete.where(GafisGatherPalm.personId === personId).execute
   }
 
 

@@ -2,8 +2,8 @@ package nirvana.hall.v70.config
 
 import javax.xml.bind.annotation._
 
-import monad.core.config.DatabaseConfigSupport
-import nirvana.hall.orm.config.HallOrmConfigSupport
+import monad.core.config.DatabaseConfig
+import stark.activerecord.config.ActiveRecordConfigSupport
 
 /**
  * Created by songpeng on 16/1/25.
@@ -11,24 +11,19 @@ import nirvana.hall.orm.config.HallOrmConfigSupport
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HallV70Config")
 @XmlRootElement(name = "hall_v70")
-class HallV70Config extends HallOrmConfigSupport {
-
-  @XmlElement(name = "api")
-  var api: ApiServerConfig = new ApiServerConfig
-  @XmlElement(name = "sync_dict")
-  var syncDict: SyncDictConfig = null
-  @XmlElement(name = "sync62_cron")
-  var sync62Cron: String = "0 0 * * * ? *"
-}
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ApiServerConfig")
-class ApiServerConfig extends DatabaseConfigSupport {
-}
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SyncDictConfig")
-class SyncDictConfig {
-  @XmlElement(name = "url")
-  var url: String = _
+class HallV70Config extends ActiveRecordConfigSupport {
+  @XmlElement(name = "database")
+  var db: DatabaseConfig = new DatabaseConfig()
   @XmlElement(name = "cron")
-  var cron: String = "0 0 * * * ? *"
+  var cron: CronConfig = new CronConfig
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "CronConfig")
+class CronConfig {
+  @XmlElement(name = "sync_dict_cron")
+  var syncDictCron: String = null
+  @XmlElement(name = "sync_7to6_cron")
+  var sync7to6Cron: String = null
+  @XmlElement(name = "query_7to6_cron")
+  val query7to6Cron: String = null
 }
