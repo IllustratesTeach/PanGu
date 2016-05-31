@@ -1,6 +1,6 @@
 package nirvana.hall.extractor.internal
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{File, ByteArrayInputStream, InputStream}
 
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef
@@ -9,7 +9,8 @@ import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
+import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 
 /**
@@ -123,6 +124,52 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val extractor = new FeatureExtractorImpl
     val newFeature = extractor.ConvertMntOldToNew(bytes)
     Assert.assertEquals(4024,newFeature.size)
+  }
+
+  @Test
+  def test_viewHead(): Unit ={
+    val bytesIMG = IOUtils.toByteArray(getClass.getResourceAsStream("/3100002000689048F_1_1.img"))
+    val destIMGData = new GAFISIMAGESTRUCT().fromByteArray(bytesIMG)
+    val IMGnWidth = destIMGData.stHead.nWidth
+    val IMGnHeight = destIMGData.stHead.nHeight
+    println(IMGnWidth)
+    println(IMGnHeight)
+
+    val bytes = IOUtils.toByteArray(getClass.getResourceAsStream("/3100002000689048F_1_1.mnt"))
+    val destMntData = new GAFISIMAGESTRUCT().fromByteArray(bytes)
+    val MNTnWidth = destMntData.stHead.nWidth
+    val MNTnHeight = destMntData.stHead.nHeight
+    println(MNTnWidth)
+    println(MNTnHeight)
+
+    if (IMGnWidth*IMGnHeight != MNTnWidth*MNTnHeight) {
+      destMntData.stHead.nWidth = IMGnWidth
+      destMntData.stHead.nHeight = IMGnHeight
+      val feature = new FINGERMNTSTRUCT
+      val data = feature.fromByteArray(destMntData.bnData)
+      data.nWidth = IMGnWidth
+      data.nHeight = IMGnHeight
+      destMntData.bnData = data.toByteArray()
+      FileUtils.writeByteArrayToFile(new File("/new.mnt"),destMntData.toByteArray())
+    }
+
+
+
+
+  }
+
+  @Test
+  def test_newMnt(): Unit ={
+    val bytesNEW = IOUtils.toByteArray(getClass.getResourceAsStream("/new.mnt"))
+    val destMntDataNEW = new GAFISIMAGESTRUCT().fromByteArray(bytesNEW)
+    val MNTnWidthNEW = destMntDataNEW.stHead.nWidth
+    val MNTnHeightNEW = destMntDataNEW.stHead.nHeight
+
+    val feature = new FINGERMNTSTRUCT
+    val data = feature.fromByteArray(destMntDataNEW.bnData)
+
+    println("new:"+MNTnWidthNEW)
+    println("new:"+MNTnHeightNEW)
   }
 
 }

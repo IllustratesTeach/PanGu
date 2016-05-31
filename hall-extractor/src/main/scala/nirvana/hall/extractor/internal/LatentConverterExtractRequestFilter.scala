@@ -34,7 +34,7 @@ class LatentConverterExtractRequestFilter extends RpcServerMessageFilter {
       val latentFeature = FPTLatentConverter.convert(disp)
       val mnt = new GAFISIMAGESTRUCT()
       mnt.bnData = latentFeature.toByteArray()
-      mnt.stHead.nImgSize = 640
+      mnt.stHead.nImgSize = mnt.bnData.length
       val extractResponseBuilder = LatentConverterExtractResponse.newBuilder()
       extractResponseBuilder.setMntData(ByteString.copyFrom(mnt.toByteArray()))
       response.writeMessage(commandRequest,LatentConverterExtractResponse.cmd,extractResponseBuilder.build())
