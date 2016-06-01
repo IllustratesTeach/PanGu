@@ -1,10 +1,10 @@
 package nirvana.hall.matcher.internal.adapter.gafis6
 
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
-import java.util.Date
 import javax.sql.DataSource
 
+import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT}
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
@@ -91,68 +91,17 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param queryQue
    */
   private def getCandHead(matchResultRequest: MatchResultRequest, queryQue: QueryQue): Array[Byte] ={
-    val keyId: String = queryQue.keyId
-    val queryType: Int = queryQue.queryType
-    val sid: Int = queryQue.oraSid
-    val result: Array[Byte] = new Array[Byte](128)
-    //		byte[] cbSize = new byte[4];
-    var szKey: Array[Byte] = new Array[Byte](32)
-    //		byte[] szUserName = new byte[16];
-    var nQueryType: Array[Byte] = new Array[Byte](1)
-    //		byte[] CPUCoef = new byte[1];
-    var nSrcDBID: Array[Byte] = new Array[Byte](2)
-    var nTableID: Array[Byte] = new Array[Byte](2)
-    //		byte[] bIsPalm = new byte[1];
-    //		byte[] bnRes = new byte[3];
-    var nQueryID: Array[Byte] = new Array[Byte](6)
-    var nCandidateNum: Array[Byte] = new Array[Byte](4)
-    //		byte[] tSubmitTime = new byte[8];
-    var tFinishTime: Array[Byte] = new Array[Byte](8)
-    //		byte[] nRecSearched = new byte[8];
-    //		byte[] bnRes2 = new byte[32];
-    var pos: Int = 0
-    pos += 4
-    szKey = keyId.getBytes
-    System.arraycopy(szKey, 0, result, pos, szKey.length)
-    pos += 32 + 16
-    nQueryType = DataConverter.int2Bytes(queryQue.queryType, 1)
-    System.arraycopy(nQueryType, 0, result, pos, 1)
-    pos += 1 + 1
-    /*
-     * nQueryType
-     *	TTMATCH				0
-      TLMATCH				1
-      LTMATCH				2
-      LLMATCH				3
-     * 捺印  dbid: 1, tableid:2
-     * 现场  dbid: 2, tableid:2
-     * 现场掌纹：dbid:2, tableid:3
-     * */
-    nSrcDBID = DataConverter.int2Bytes(if (queryType == 0 || queryType == 1) 1 else 2, 2)
-    System.arraycopy(nSrcDBID, 0, result, pos, 2)
-    pos += 2
-    nTableID = DataConverter.int2Bytes(2, 2)
-    System.arraycopy(nTableID, 0, result, pos, 2)
-    pos += 2
-    //		System.arraycopy(bIsPalm, 0, result, pos, bIsPalm.length);
-    pos += 1 + 3
-    nQueryID = DataConverter.int2Bytes(sid, 6)
-    System.arraycopy(nQueryID, 0, result, pos, 6)
-    pos += 6
-    nCandidateNum = DataConverter.int2Bytes(matchResultRequest.getCandidateNum, 4)
-    System.arraycopy(nCandidateNum, 0, result, pos, nCandidateNum.length)
-    pos += 4 + 8
-    tFinishTime = DataConverter.getAFISDateTime(new Date)
-    System.arraycopy(tFinishTime, 0, result, pos, tFinishTime.length)
-    pos += 8 + 32
-    /*
-     * szKey 卡号
-     * nQueryType 查询类型
-     * bIsPalm 是否是掌纹 1是，0否
-     * nCandidateNum 候选个数
-     * tFinishTime 完成时间
-     * */
-    return result
+    val queryType = queryQue.queryType
+    val candHead = new GAQUERYCANDHEADSTRUCT
+    candHead.szKey = queryQue.keyId
+    candHead.bIsPalm = if (queryQue.isPalm) 1 else 0
+    candHead.nQueryType = queryType.toByte
+    candHead.nSrcDBID = if (queryType == 0 || queryType == 1) 1 else 2
+    candHead.nTableID = 2
+    candHead.nQueryID = queryQue.oraSid.toString
+    candHead.nCandidateNum = matchResultRequest.getCandidateNum
+    candHead.tFinishTime = new AFISDateTime
+    return candHead.toByteArray()
   }
   /**
    * 获取候选列表
@@ -178,7 +127,16 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         }else{
           fgp = DataConverter.fingerPos8to6(cand.getPos)
         }
-        result.write(new Array[Byte](4))
+        val gCand = new GAQUERYCANDSTRUCT
+        gCand.nScore = cand.getScore
+        gCand.szKey = keyId.get
+        gCand.nDBID = if (queryType == 0 || queryType == 2) 1 else 2
+        gCand.nTableID = 2
+        gCand.nIndex = fgp.toByte
+        gCand.tFinishTime = new AFISDateTime
+        gCand.nStepOneRank = index
+        result.write(gCand.toByteArray())
+/*        result.write(new Array[Byte](4))
         result.write(DataConverter.int2Bytes(cand.getScore))
         result.write(keyId.get.getBytes)
         result.write(new Array[Byte](32 - keyId.get.getBytes().length + 2))
@@ -192,7 +150,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         result.write(new Array[Byte](2 + 2 + 2 + 2))
         result.write(new Array[Byte](8 + 2))
         result.write(DataConverter.int2Bytes(index))
-        result.write(new Array[Byte](2))
+        result.write(new Array[Byte](2))*/
       }
     }
     result.toByteArray

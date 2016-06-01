@@ -1,10 +1,10 @@
 package nirvana.hall.matcher.internal.adapter.gz
 
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
-import java.util.Date
 import javax.sql.DataSource
 
+import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
@@ -95,21 +95,15 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         }else{
           fgp = DataConverter.fingerPos8to6(cand.getPos)
         }
-        result.write(new Array[Byte](4))
-        result.write(DataConverter.int2Bytes(cand.getScore))
-        result.write(keyId.get.getBytes)
-        result.write(new Array[Byte](32 - keyId.get.getBytes().length + 2))
-        val dbId = if (queryType == 0 || queryType == 2) 1 else 2
-        result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
-        result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
-        result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
-        result.write(fgp.toByte)
-        result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
-        result.write(DataConverter.getAFISDateTime(new Date()))
-        result.write(new Array[Byte](2 + 2 + 2 + 2))
-        result.write(new Array[Byte](8 + 2))
-        result.write(DataConverter.int2Bytes(index))
-        result.write(new Array[Byte](2))
+        val gCand = new GAQUERYCANDSTRUCT
+        gCand.nScore = cand.getScore
+        gCand.szKey = keyId.get
+        gCand.nDBID = if (queryType == 0 || queryType == 2) 1 else 2
+        gCand.nTableID = 2
+        gCand.nIndex = fgp.toByte
+        gCand.tFinishTime = new AFISDateTime
+        gCand.nStepOneRank = index
+        result.write(gCand.toByteArray())
       }
     }
     result.toByteArray
