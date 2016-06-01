@@ -18,7 +18,7 @@ import scala.collection.JavaConversions._
  * 保存比对结果service
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
-  val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.FINISHTIME=sysdate where t.ora_sid=?"
+  val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
   val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
@@ -58,6 +58,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       ps.setBytes(2, candHead)
       ps.setBytes(3, candList)
       ps.setInt(4, maxScore)
+      /*
       if (candNum > 0) {
         //如果有候选队列，处理状态为待处理0,比中状态0;否则已处理1,没有比中1
         ps.setInt(5, 0)
@@ -66,7 +67,8 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         ps.setInt(5, 99)
         ps.setInt(6, 1)
       }
-      ps.setLong(7, oraSid.toLong)
+      */
+      ps.setLong(5, oraSid.toLong)
     }
   }
 
