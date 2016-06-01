@@ -25,7 +25,7 @@ class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
       val leftPalmMnt = rs.getBytes("palmlmnt")
       if(leftPalmMnt != null){
         val sid = rs.getInt("sid")
-        val pos = 2
+        val pos = 1
         val seq = rs.getLong("seq")
         val syncDataBuilder = SyncData.newBuilder
         syncDataBuilder.setObjectId(sid)

@@ -18,8 +18,8 @@ import scala.collection.JavaConversions._
  * 保存比对结果service
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
-  val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.FINISHTIME=sysdate where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
    * 推送比对结果
@@ -48,23 +48,25 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
       candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
     }
+    val candHead = getCandHead(matchResultRequest, queryQue)
 
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
     }
     JdbcDatabase.update(UPDATE_MATCH_RESULT_SQL) { ps =>
       ps.setInt(1, candNum)
-      ps.setBytes(2, candList)
-      ps.setInt(3, maxScore)
+      ps.setBytes(2, candHead)
+      ps.setBytes(3, candList)
+      ps.setInt(4, maxScore)
       if (candNum > 0) {
         //如果有候选队列，处理状态为待处理0,比中状态0;否则已处理1,没有比中1
-        ps.setInt(4, 0)
         ps.setInt(5, 0)
+        ps.setInt(6, 0)
       } else {
-        ps.setInt(4, 99)
-        ps.setInt(5, 1)
+        ps.setInt(5, 99)
+        ps.setInt(6, 1)
       }
-      ps.setLong(6, oraSid.toLong)
+      ps.setLong(7, oraSid.toLong)
     }
   }
 
@@ -74,13 +76,22 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param status
    */
   private def updateMatchStatusFail(match_id: String, status: MatcherStatus) {
-    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, status.getMsg)
       ps.setString(2, match_id)
     }
   }
 
+  /**
+   * 获取候选头结构信息
+   * @param matchResultRequest
+   * @param queryQue
+   */
+  private def getCandHead(matchResultRequest: MatchResultRequest, queryQue: QueryQue): Array[Byte] ={
+    //TODO
+    null
+  }
   /**
    * 获取候选列表
    * @param matchResultRequest
@@ -142,18 +153,25 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     if (sids.lastIndexOf(",") > 0) {
       sids = sids.substring(0, sids.length - 1)
     }
-    if (queryType == 0 || queryType == 2) {
-      sql = "select p.ora_sid as sid, p.personid as cardid from normaltp_tpcardinfo t where t.ora_sid in (" + sids + ")"
-    } else {
-      sql = "select t.ora_sid as sid, t.fingerid as cardid from normallp_latfinger t where t.ora_sid in (" + sids + ")"
+    if (queryType == 0 || queryType == 1) {
+      sql = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid in ("+sids+")"
+    }
+    else {
+      sql = "select t.ora_sid from normallp_latfinger t where t.fingerid in ("+sids+")"
     }
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
     } { rs =>
-      map +=(rs.getLong("sid") -> rs.getString("cardid"))
+      map +=(rs.getLong("ora_sid") -> rs.getString("cardid"))
     }
     map
   }
 
+  /**
+   * 获取查询信息
+   * @param oraSid
+   * @param dataSource
+   * @return
+   */
   private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {
     JdbcDatabase.queryFirst(GET_QUERY_QUE_SQL) { ps =>
       ps.setInt(1, oraSid)
