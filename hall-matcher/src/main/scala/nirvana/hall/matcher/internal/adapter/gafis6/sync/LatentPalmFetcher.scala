@@ -13,9 +13,9 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
  * gafis6.2现场掌纹分库
  */
 class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = "select max(t.updatetime) from normallp_latpalm t "
-  override val MIN_SEQ_SQL: String = "select min(t.updatetime) from normallp_latpalm t where t.updatetime >"
-  override val SYNC_SQL: String = "select * from (select t.ora_sid as sid, t.palmmnt, t.updatetime as seq from normallp_latpalm t  where t.updatetime >=? order by t.updatetime) tt where rownum <=?"
+  override val MAX_SEQ_SQL: String = "select (max(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY')) from normallp_latpalm t "
+  override val MIN_SEQ_SQL: String = "select (min(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normallp_latpalm t where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY')) >"
+  override val SYNC_SQL: String = "select * from (select t.ora_sid as sid, t.palmmnt, ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  as seq from normallp_latpalm t  where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  >=? order by t.updatetime) tt where rownum <=?"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
@@ -25,7 +25,10 @@ class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSo
       val lastSeq = rs.getLong("seq")
       syncDataBuilder.setOperationType(OperationType.PUT)
       syncDataBuilder.setPos(1)
-      syncDataBuilder.setData(ByteString.copyFrom(rs.getBytes("palmmnt")))
+      val bytes = rs.getBytes("palmmnt")
+      if(bytes == null)
+        return
+      syncDataBuilder.setData(ByteString.copyFrom(bytes))
       syncDataBuilder.setTimestamp(lastSeq)
       if (validSyncData(syncDataBuilder.build, true)) {
         syncDataResponse.addSyncData(syncDataBuilder.build)

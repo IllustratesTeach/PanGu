@@ -13,10 +13,10 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
  * gafis6.2现场指纹分库
   */
 class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = "select max(t.updatetime) from normallp_latfinger t "
-  override val MIN_SEQ_SQL: String = "select min(t.updatetime) from normallp_latfinger t where t.updatetime >"
+  override val MAX_SEQ_SQL: String = "select (max(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normallp_latfinger t "
+  override val MIN_SEQ_SQL: String = "select (min(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normallp_latfinger t where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  >"
   /** 同步现场指纹 */
-  override val SYNC_SQL: String = "select * from (select t.ora_sid as sid, t.fingermnt, t.fingerbin, t.updatetime as seq from normallp_latfinger t  where t.updatetime >=? order by t.updatetime) tt where rownum <=?"
+  override val SYNC_SQL: String = "select * from (select t.ora_sid as sid, t.fingermnt, t.fingerbin, ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  as seq from normallp_latfinger t  where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  >=? order by t.updatetime) tt where rownum <=?"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
@@ -27,7 +27,11 @@ class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
       syncDataBuilder.setOperationType(OperationType.PUT)
       //现场指位同一设置为1
       syncDataBuilder.setPos(1)
-      val mnt: ByteString = ByteString.copyFrom(rs.getBytes("fingermnt"))
+      val bytes = rs.getBytes("fingermnt")
+      if(bytes == null) //特征值为空，则不进行同步
+        return
+
+      val mnt: ByteString = ByteString.copyFrom(bytes)
       syncDataBuilder.setData(mnt)
       syncDataBuilder.setTimestamp(lastSeq)
       val finger_ridge = rs.getBytes("fingerbin")

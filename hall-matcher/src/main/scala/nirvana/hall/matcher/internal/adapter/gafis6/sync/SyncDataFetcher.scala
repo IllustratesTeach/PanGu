@@ -100,7 +100,12 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
       }
       dataSizeExpected += hallMatcherConfig.mnt.headerSize
       if (syncData.getData.size != dataSizeExpected || dataSizeExpected <= HallMatcherConstants.HEADER_LENGTH) {
-        error("MinutiaType:{} isLatent:{} sid:{}  dataSize:{}", syncData.getMinutiaType, isLatent, syncData.getObjectId,syncData.getData.size)
+        error("MinutiaType:{} isLatent:{} sid:{}  dataSize:{} expected:{}",
+          syncData.getMinutiaType,
+          isLatent,
+          syncData.getObjectId,
+          syncData.getData.size,
+          dataSizeExpected)
         return false
       }
       true

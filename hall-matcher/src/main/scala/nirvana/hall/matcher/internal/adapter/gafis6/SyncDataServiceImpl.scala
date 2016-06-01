@@ -5,7 +5,7 @@ import javax.sql.DataSource
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.service.SyncDataService
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
-import nirvana.protocol.SyncDataProto.{SyncDataResponse, SyncDataRequest}
+import nirvana.protocol.SyncDataProto.{SyncDataRequest, SyncDataResponse}
 
 /**
  * gafis6.2分库service
@@ -13,7 +13,8 @@ import nirvana.protocol.SyncDataProto.{SyncDataResponse, SyncDataRequest}
 class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataService{
   /**
    * 同步数据
-   * @param syncDataRequest
+    *
+    * @param syncDataRequest
    * @return
    */
   override def syncData(syncDataRequest: SyncDataRequest): SyncDataResponse = {
@@ -35,4 +36,5 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
       fetcher.doFetch(responseBuilder, size, timestamp)
     responseBuilder.build()
   }
+
 }
