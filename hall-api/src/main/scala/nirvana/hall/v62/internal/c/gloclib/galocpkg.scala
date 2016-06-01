@@ -122,34 +122,33 @@ trait galocpkg {
 
   }
 
-  def GAFIS_PKG_GetLpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GLPCARDINFOSTRUCT]=
+  def GAFIS_PKG_GetLpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):GLPCARDINFOSTRUCT=
   {
 
     val headers = GBASE_ITEMPKG_GetItemDir(pstPkg)
 
 
-    headers.flatMap {header=>
-      val pstItem = GBASE_ITEMPKG_GetItem(pstPkg,header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
+    val pstCard = new GLPCARDINFOSTRUCT()
+    headers.foreach { header =>
+      val pstItem = GBASE_ITEMPKG_GetItem(pstPkg, header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
 
-      val pstCard = new GLPCARDINFOSTRUCT()
-      var pstCardOpt:Option[GLPCARDINFOSTRUCT] = Some(pstCard)
-      header.nItemType match{
-        case PKG_ITEMTYPE_THIS=>
-        //			pstLpCard = (GLPCARDINFOSTRUCT*)pstItem.bnRes;
-        //			memcpy(pstCard.szCardID,pstLpCard.szCardID,sizeof(pstCard.szCardID));
-        //			memcpy(&pstCard.stAdmData,&pstLpCard.stAdmData,sizeof(pstCard.stAdmData));
-        //			pstCard.nItemFlag |= pstLpCard.nItemFlag;
+      header.nItemType match {
+        case PKG_ITEMTYPE_THIS =>
+          //			pstLpCard = (GLPCARDINFOSTRUCT*)pstItem.bnRes;
+          //			memcpy(pstCard.szCardID,pstLpCard.szCardID,sizeof(pstCard.szCardID));
+          //			memcpy(&pstCard.stAdmData,&pstLpCard.stAdmData,sizeof(pstCard.stAdmData));
+          //			pstCard.nItemFlag |= pstLpCard.nItemFlag;
 
           pstCard.fromStreamReader(buffer)
 
         case PKG_ITEMTYPE_MIC =>
-        val pstMic = GAFIS_MIC_GetMicArrayFromStream(buffer)
-        pstCard.pstMIC_Data = pstMic
-        pstCard.nMicItemCount	= pstMic.length.toByte
-        pstCard.bMicCanBeFreed	= 1
+          val pstMic = GAFIS_MIC_GetMicArrayFromStream(buffer)
+          pstCard.pstMIC_Data = pstMic
+          pstCard.nMicItemCount = pstMic.length.toByte
+          pstCard.bMicCanBeFreed = 1
 
-        GAFIS_PKG_UnZipMicArray(pstCard.pstMIC_Data)
+          GAFIS_PKG_UnZipMicArray(pstCard.pstMIC_Data)
 
         case PKG_ITEMTYPE_TEXT =>
           val pstTextItems = GAFIS_TEXT_GetTextArrayFromStream(buffer)
@@ -165,15 +164,15 @@ trait galocpkg {
 
             //set itemflag for add or update  [12/18/2006]
             pstCard.nItemFlag = (pstCard.nItemFlag | galoclp.LPCARDINFO_ITEMFLAG_EXTRAINFO).toByte
-            if(pstCard.pstExtraInfo_Data.nItemFlag == 0)	pstCard.pstExtraInfo_Data.nItemFlag = 0xFF.toByte
-            if(pstCard.pstExtraInfo_Data.stFpx.nItemFlag == 0)	pstCard.pstExtraInfo_Data.stFpx.nItemFlag = 0xFF.toByte
+            if (pstCard.pstExtraInfo_Data.nItemFlag == 0) pstCard.pstExtraInfo_Data.nItemFlag = 0xFF.toByte
+            if (pstCard.pstExtraInfo_Data.stFpx.nItemFlag == 0) pstCard.pstExtraInfo_Data.stFpx.nItemFlag = 0xFF.toByte
           }
-        case other=>
-          pstCardOpt = None
+        case other =>
+        //do nothing
       }
 
-      pstCardOpt
-    }.toList
+    }
+    pstCard
   }
 
   def GAFIS_PKG_GetCase(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GCASEINFOSTRUCT]=
