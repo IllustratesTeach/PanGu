@@ -14,8 +14,8 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
  * gafis6.2捺印指纹分库
  */
 class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = "select (max(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normaltp_tpcardinfo t "
-  override val MIN_SEQ_SQL: String = "select (min(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normaltp_tpcardinfo t where (t.updatetime - to_date('01-JAN-1970','DD-MON-YYYY'))  >"
+  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normaltp_tpcardinfo t "
+  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t where ${wrapUpdateTimeAsLong()}  >"
 //  override val SYNC_SQL: String = "select t.ora_sid, " +
 //    " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
 //    " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
@@ -29,7 +29,8 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
       " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin ," +
 //    " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
 //    " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
-    " (t.updatetime - to_date('01-JAN-1970','DD-MON-YYYY')) as seq from normaltp_tpcardinfo t where (t.updatetime - to_date('01-JAN-1970','DD-MON-YYYY')) >=? order by t.updatetime) tt where rownum <=?";
+    s" ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t " +
+    s"where ${wrapUpdateTimeAsLong()} >=? order by t.updatetime) tt where rownum <=?";
   //特征字段，根据指位1..20排序
   val mntColums: Array[String] = Array[String](
     "fingerrhmmnt", "fingerrhsmnt", "fingerrhzmnt", "fingerrhhmnt", "fingerrhxmnt", "fingerlhmmnt", "fingerlhsmnt", "fingerlhzmnt", "fingerlhhmnt", "fingerlhxmnt",

@@ -12,9 +12,12 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
  * gafis6.2捺印掌纹分库
  */
 class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = "select (max(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normaltp_tpcardinfo t "
-  override val MIN_SEQ_SQL: String = "select (min(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  from normaltp_tpcardinfo t where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY')) >"
-  override val SYNC_SQL: String = "select * from (select t.ora_sid as sid, t.palmlmnt, t.palmrmnt, ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  as seq from normaltp_tpcardinfo t  where ((t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY'))  >=? order by t.updatetime) tt where rownum <=? "
+  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normaltp_tpcardinfo t "
+  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t " +
+    s"where ${wrapUpdateTimeAsLong()} >"
+  override val SYNC_SQL: String = "select * from " +
+    s"(select t.ora_sid as sid, t.palmlmnt, t.palmrmnt, ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t  " +
+    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=? "
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
