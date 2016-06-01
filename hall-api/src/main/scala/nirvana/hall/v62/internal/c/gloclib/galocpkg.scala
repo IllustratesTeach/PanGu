@@ -122,13 +122,15 @@ trait galocpkg {
 
   }
 
-  def GAFIS_PKG_GetLpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):GLPCARDINFOSTRUCT=
+  def GAFIS_PKG_GetLpCard(pstPkg:GBASE_ITEMPKG_OPSTRUCT):Option[GLPCARDINFOSTRUCT]=
   {
 
     val headers = GBASE_ITEMPKG_GetItemDir(pstPkg)
 
 
     val pstCard = new GLPCARDINFOSTRUCT()
+    //TODO 尝试对pstCard进行校验
+    val pstCardOpt = Some(pstCard)
     headers.foreach { header =>
       val pstItem = GBASE_ITEMPKG_GetItem(pstPkg, header.szItemName).getOrElse(throw new IllegalStateException("item not found"))
       val buffer = ChannelBuffers.wrappedBuffer(pstItem.bnRes)
@@ -172,7 +174,7 @@ trait galocpkg {
       }
 
     }
-    pstCard
+    pstCardOpt
   }
 
   def GAFIS_PKG_GetCase(pstPkg:GBASE_ITEMPKG_OPSTRUCT):List[GCASEINFOSTRUCT]=
