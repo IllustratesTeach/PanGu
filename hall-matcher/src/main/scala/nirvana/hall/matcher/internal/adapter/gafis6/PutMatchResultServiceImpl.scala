@@ -156,10 +156,10 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       sids = sids.substring(0, sids.length - 1)
     }
     if (queryType == 0 || queryType == 1) {
-      sql = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid in ("+sids+")"
+      sql = "select t.ora_sid,t.cardid from normaltp_tpcardinfo t where t.ora_sid in ("+sids+")"
     }
     else {
-      sql = "select t.ora_sid from normallp_latfinger t where t.fingerid in ("+sids+")"
+      sql = "select t.ora_sid,t.fingerid as cardid from normallp_latfinger t where t.ora_sid in ("+sids+")"
     }
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
     } { rs =>
