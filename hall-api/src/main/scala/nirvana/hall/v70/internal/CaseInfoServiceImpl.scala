@@ -69,4 +69,13 @@ class CaseInfoServiceImpl extends CaseInfoService{
     GafisCase.find(caseDelRequest.getCaseId).delete
     CaseDelResponse.newBuilder().build()
   }
+
+  /**
+   * 验证案件编号是否已存在
+   * @param caseId
+   * @return
+   */
+  override def isExist(caseId: String): Boolean = {
+    GafisCase.findOption(caseId).nonEmpty
+  }
 }

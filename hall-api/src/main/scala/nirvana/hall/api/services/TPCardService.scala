@@ -38,4 +38,11 @@ trait TPCardService {
    * @return
    */
   def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse
+
+  /**
+   * 验证卡号是否已存在
+   * @param cardId
+   * @return
+   */
+  def isExist(cardId: String): Boolean
 }

@@ -3,12 +3,17 @@ package nirvana.hall.v62.internal
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESITEM, GADB_SELRESULT, _}
+import nirvana.hall.c.services.gfpmanager.GfpManagerConst.Gf_AssociateGroupInfo
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
+import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
+import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT}
+import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
+import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
@@ -198,5 +203,61 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
 
     response.build()
+  }
+
+  def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
+    val reponse = MatchRelationGetResponse.newBuilder()
+    val baseRelation = MatchRelation.newBuilder()
+    //TODO 查询相关信息
+    /*val matchSysInfo = baseRelation.getMatchSysInfoBuilder()
+    matchSysInfo.setMatchUnitCode("100000000000")
+    matchSysInfo.setMatchUnitName("上海市公安局")
+    matchSysInfo.setMatcher("match")
+    matchSysInfo.setMatchDate("20160501")
+    matchSysInfo.setRemark("remark")
+    matchSysInfo.setInputUnitCode("123456789012")
+    matchSysInfo.setInputUnitName("东方金指")
+    matchSysInfo.setInputer("sp")
+    matchSysInfo.setInputDate("20160501")
+    matchSysInfo.setApprover("jcai")
+    matchSysInfo.setApproveDate("20160501")
+    matchSysInfo.setRecheckUnitCode("20000000000")
+    matchSysInfo.setRechecker("复核")
+    matchSysInfo.setRecheckDate("20160501")*/
+    val cardId = request.getCardId
+    request.getMatchType match {
+      case MatchType.FINGER_TL =>
+        //倒查直接查询比中关系表
+        //TODO 如何根据现场指纹获取案件编号和指纹序号
+        val matchInfo = queryMatchInfo(Some("((SrcKey = '"+cardId+"')) "), 1)
+        matchInfo.foreach{ verifyLog: GAFIS_VERIFYLOGSTRUCT=>
+          val matchRelationTL = MatchRelationTLAndLT.newBuilder()
+          matchRelationTL.setPersonId(verifyLog.szSrcKey)
+          matchRelationTL.setCaseId(verifyLog.szDestKey)
+          matchRelationTL.setFpg(FingerFgp.valueOf(verifyLog.nFg))
+          matchRelationTL.setSeqNo("01")
+          matchRelationTL.setCapture(verifyLog.bIsCrimeCaptured > 0)
+          baseRelation.setExtension(MatchRelationTLAndLT.data, matchRelationTL.build())
+        }
+      case MatchType.FINGER_TT =>
+        //重卡信息先从捺印表查到重卡组号，然后根据重卡组号查询重卡信息
+        //TODO 人员编号对应的Key
+        val tp = new GTPCARDINFOSTRUCT
+        facade.NET_GAFIS_FLIB_Get(config.templateTable.dbId.toShort, config.templateTable.tableId.toShort,
+          cardId, tp, null, 3)
+        if(tp.stAdmData.szPersonID.nonEmpty){
+          val mapper = Map(
+            g_stCN.stTPnID.pszName -> "szGroupID",
+            g_stCN.stTCardCount.pszName -> "nTprCardCnt"
+          )
+          val gfGroupInfo = facade.queryV62Table[Gf_AssociateGroupInfo](
+            1,3,
+            mapper,None,1)
+
+        }
+    }
+    reponse.addMatchRelation(baseRelation.build())
+    reponse.setMatchType(request.getMatchType)
+    null
   }
 }

@@ -90,4 +90,8 @@ class LPCardServiceImpl extends LPCardService{
 
     LPCardDelResponse.newBuilder().build()
   }
+
+  override def isExist(cardId: String): Boolean = {
+    GafisCaseFinger.findOption(cardId).nonEmpty
+  }
 }

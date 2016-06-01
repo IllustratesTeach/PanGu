@@ -38,11 +38,13 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
    */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, sync7to6Service: Sync7to6Service): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.cron.sync7to6Cron), "sync-70to62", new Runnable {
-      override def run(): Unit = {
-        sync7to6Service.doWork
-      }
-    })
+    if(v70Config.cron.sync7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.sync7to6Cron), "sync-70to62", new Runnable {
+        override def run(): Unit = {
+          sync7to6Service.doWork
+        }
+      })
+    }
   }
 
   //TODO 允许3次失败
