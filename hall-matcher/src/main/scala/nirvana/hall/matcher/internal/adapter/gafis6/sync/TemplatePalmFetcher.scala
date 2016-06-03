@@ -20,7 +20,6 @@ class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=? "
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
-    if(syncDataResponse.getSyncDataCount < size){
       //左掌特征
       val leftPalmMnt = rs.getBytes("palmlmnt")
       if(leftPalmMnt != null){
@@ -55,7 +54,6 @@ class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
           syncDataResponse.addSyncData(syncDataBuilder.build)
         }
       }
-    }
   }
 
 }
