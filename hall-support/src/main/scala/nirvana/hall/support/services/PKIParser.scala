@@ -5,7 +5,49 @@ import java.security.cert.{CertificateFactory, X509Certificate}
 import java.util.regex.Pattern
 
 /**
-  * pki信息解析类
+  * pki信息解析类,本解析主要是解析NGINX配置好的SSL
+  *
+  *一、制作负载均衡使用的证书文件
+  *	从相关部门获取对应的证书文件(my.jks)、证书的密码(mypass)、证书对应的名称，通常为IP或者域名(myalias)，
+  *	通常jks文件包含了服务器的私钥(server.key)，服务器证书(server.crt)、公安根证书(ca.crt)
+  *二、通过java的keytool工具导出成 PKCS12 格式文件(my.p12)
+  *
+  *	keytool -importkeystore -srckeystore my.jks -destkeystore my.p12 -srcstoretype JKS -deststoretype PKCS12  \
+  *		-srcstorepass mypass -deststorepass mypass -srcalias myalias -destalias myalias -srckeypass mypass -destkeypass mypass -noprompt
+  *
+  *	上述命令在一行执行
+  *
+  *三、使用openssl把PKCS12文件(my.p12)转换成我们需要的pem文件(my.pem)
+  *
+  *	openssl pkcs12 -in my.p12 -out my.pem -passin pass:mypass -passout pass:mypass
+  *
+  *四、分离my.pem文件,导出服务器配置所需文件
+  *	my.pem一个文件里面实际上包含了服务器做双向SSL证书认证的所有文件,打开my.pem能查看所有的key和证书
+  *
+  *	得到配置服务器使用的 server.crt,server.key,ca.crt 文件,上述访问的命令分别为：
+  *	openssl pkcs12 -in my.p12  -nodes -nocerts -out server.key
+  *	openssl pkcs12 -in my.p12  -nodes -nokeys -clcerts -out server.crt
+  *	openssl pkcs12 -in my.p12  -nodes -nokeys -cacerts -out ca.crt
+  *
+  *
+  *
+  * 五、配置NGINX
+  *		ssl  on;
+  *		ssl_certificate  /path/to/server.crt;
+  *		ssl_certificate_key  /path/to/server.key;
+  *		ssl_client_certificate /path/to/ca.crt;
+  *		ssl_verify_client on;
+  *
+  *		# 此行方便在java中能够得到证书信息
+  *		proxy_set_header    X-Forwarded-Proto https;
+  *	  proxy_set_header X-Client-Cert $ssl_client_cert;
+  *	  proxy_set_header X-Client-DN $ssl_client_s_dn;
+  *
+  * 六、上述配置后，在重新启动服务器的时候，老是让你输入私有key的密码，为此
+  *
+  * openssl rsa -in server.key -out server.key.unsecure
+  *    修改NGINX配置：
+  *    ssl_certificate_key  /path/to/server.key.unsecure;
   *
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-06-03
@@ -56,7 +98,7 @@ object PKIParser {
     //CN=张三 510722199541012021, OU=00, OU=00, O=60, L=00, L=00, ST=51, C=CN
     subjectContent match {
       case valueMatcher(cnName, zjhm, d1, d2, d3, d4, d5, d6) =>
-        PKIInfoWithName(cnName,zjhm,d1 + d2 + d3 + d4 + d5 + d6)
+        PKIInfoWithName(cnName,zjhm,d6+d1 + d2 + d3 + d4 + d5)
       case other =>
         throw new IllegalStateException("invalid subject %s".format(other))
     }
