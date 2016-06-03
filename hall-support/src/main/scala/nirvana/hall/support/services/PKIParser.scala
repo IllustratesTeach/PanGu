@@ -2,7 +2,7 @@ package nirvana.hall.support.services
 
 import java.io.{BufferedInputStream, ByteArrayInputStream}
 import java.security.cert.{CertificateFactory, X509Certificate}
-import java.util.regex.{Matcher, Pattern}
+import java.util.regex.Pattern
 
 /**
   * pki信息解析类
@@ -33,9 +33,9 @@ object PKIParser {
     val idCode = dnContent.substring(dnContent.lastIndexOf(' ')).replaceAll("\\\\x00", "").split("/")(0).trim
     val pre1: String = dnContent.substring(0, dnContent.indexOf("/CN="))
     val regex: String = "[^0-9]"
-    val pattren: Pattern = Pattern.compile(regex)
-    val `match`: Matcher = pattren.matcher(pre1)
-    val unitCode = `match`.replaceAll("").trim
+    val pattern = Pattern.compile(regex)
+    val matcher = pattern.matcher(pre1)
+    val unitCode = matcher.replaceAll("").trim
     PKIInfo(idCode,unitCode)
   }
 
