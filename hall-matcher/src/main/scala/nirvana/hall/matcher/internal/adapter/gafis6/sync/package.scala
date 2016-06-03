@@ -10,9 +10,9 @@ package object sync {
   def wrapUpdateTimeAsLong(func:Option[String]=None): String ={
     func match{
       case Some(f)=>
-        s"($f(t.updatetime) - to_date('01-JAN-1970','DD-MON-YYYY')) * 86400"
+        s"$f(to_number(to_char(t.updatetime,'YYYYMMDDHH24MISS')))"
       case None =>
-        "(t.updatetime - to_date('01-JAN-1970','DD-MON-YYYY')) * 86400"
+        "(to_number(to_char(t.updatetime,'YYYYMMDDHH24MISS')))"
     }
   }
 
