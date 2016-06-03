@@ -35,7 +35,7 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
         val count = syncDataResponse.getSyncDataCount
         val seq = rs.getLong("seq")
         if(count >= size){
-          //如果
+          //如果下一条数据的seq与当前最大的不一致，退出
           val preSeq = syncDataResponse.getSyncDataList.get(count - 1).getTimestamp
           if(preSeq < seq){
             return
