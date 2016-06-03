@@ -41,50 +41,54 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
     "tplainrmbin", "tplainrsbin", "tplainrzbin", "tplainrhbin", "tplainrxbin", "tplainlmbin", "tplainlsbin", "tplainlzbin", "tplainlhbin", "tplainlxbin")
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
-    if(syncDataResponse.getSyncDataCount < size){
-      val sid = rs.getInt("sid")
-      var pos = 1 //代表指位
-      //循环读取特征
-      mntColums.foreach{col =>
-        val mnt = rs.getBytes(col)
-        if(mnt != null){
-          val syncData = SyncData.newBuilder()
-          syncData.setObjectId(sid)
-          val seq = rs.getLong("seq")
-          syncData.setData(ByteString.copyFrom(mnt))
-          syncData.setObjectId(sid)
-          syncData.setPos(DataConverter.fingerPos6to8(pos))
-          syncData.setOperationType(SyncData.OperationType.PUT)
-          syncData.setMinutiaType(MinutiaType.FINGER)
-          syncData.setTimestamp(seq)
-          if (validSyncData(syncData.build, false)) {
-            syncDataResponse.addSyncData(syncData.build)
-          }
-        }
-        pos += 1
+    val count = syncDataResponse.getSyncDataCount
+    val seq = rs.getLong("seq")
+    if(count >= size){
+      //如果
+      val preSeq = syncDataResponse.getSyncDataList.get(count - 1).getTimestamp
+      if(preSeq < seq){
+        return
       }
-      pos = 1 //获取纹线指位从1开始
-      binColums.foreach{col =>
-        val bin = rs.getBytes(col)
-        if(bin != null){
-          val syncData = SyncData.newBuilder()
-          syncData.setObjectId(sid)
-          val seq = rs.getLong("seq")
-          syncData.setData(ByteString.copyFrom(bin))
-          syncData.setObjectId(sid)
-          syncData.setPos(DataConverter.fingerPos6to8(pos))
-          syncData.setOperationType(SyncData.OperationType.PUT)
-          syncData.setMinutiaType(MinutiaType.RIDGE)
-          syncData.setTimestamp(seq)
-          if (validSyncData(syncData.build, false)) {
-            syncDataResponse.addSyncData(syncData.build)
-          }
-        }
-        pos += 1
-      }
-
-
     }
+    val sid = rs.getInt("sid")
+    var pos = 1 //代表指位
+    //循环读取特征
+    mntColums.foreach{col =>
+      val mnt = rs.getBytes(col)
+      if(mnt != null){
+        val syncData = SyncData.newBuilder()
+        syncData.setObjectId(sid)
+        syncData.setData(ByteString.copyFrom(mnt))
+        syncData.setObjectId(sid)
+        syncData.setPos(DataConverter.fingerPos6to8(pos))
+        syncData.setOperationType(SyncData.OperationType.PUT)
+        syncData.setMinutiaType(MinutiaType.FINGER)
+        syncData.setTimestamp(seq)
+        if (validSyncData(syncData.build, false)) {
+          syncDataResponse.addSyncData(syncData.build)
+        }
+      }
+      pos += 1
+    }
+    pos = 1 //获取纹线指位从1开始
+    binColums.foreach{col =>
+      val bin = rs.getBytes(col)
+      if(bin != null){
+        val syncData = SyncData.newBuilder()
+        syncData.setObjectId(sid)
+        syncData.setData(ByteString.copyFrom(bin))
+        syncData.setObjectId(sid)
+        syncData.setPos(DataConverter.fingerPos6to8(pos))
+        syncData.setOperationType(SyncData.OperationType.PUT)
+        syncData.setMinutiaType(MinutiaType.RIDGE)
+        syncData.setTimestamp(seq)
+        if (validSyncData(syncData.build, false)) {
+          syncDataResponse.addSyncData(syncData.build)
+        }
+      }
+      pos += 1
+    }
+
   }
 
 }
