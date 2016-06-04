@@ -59,6 +59,11 @@
           <xs:documentation>is extractor bin</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="xs:int" name="streaming_context_startTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>streamingContextStartTime</xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element type="databaseListType" name="database_list" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>mnt store database configruation</xs:documentation>

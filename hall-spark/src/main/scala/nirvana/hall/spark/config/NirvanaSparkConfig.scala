@@ -40,6 +40,9 @@ class NirvanaSparkConfig extends Serializable{
   @XmlElement(name="partitions_num")
   var partitionsNum:Int = 4
 
+  @XmlElement(name="streaming_context_startTime")
+  var streamingContextStartTime:Int = 1
+
   @XmlElementWrapper(name = "database_list")
   @XmlElement(name = "database")
   var database = new util.ArrayList[DatabaseConfig]()

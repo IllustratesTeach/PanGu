@@ -27,7 +27,7 @@ object BigDataStream {
     //spark parell
 //    conf.set("spark.default.parallelism","1000")
     conf.set("spark.driver.host",parameter.host)
-    val ssc =  new StreamingContext(conf, Minutes(1))
+    val ssc =  new StreamingContext(conf, Minutes(parameter.streamingContextStartTime))
     checkpointDirectory.foreach(ssc.checkpoint)
 
 
