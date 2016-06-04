@@ -1,6 +1,6 @@
 package nirvana.hall.v62.proxy
 
-import nirvana.hall.api.services.TPCardService
+import nirvana.hall.api.services.{QueryService, CaseInfoService, LPCardService, TPCardService}
 
 /**
   * 封装本地的服务
@@ -9,5 +9,8 @@ import nirvana.hall.api.services.TPCardService
   * @since 2016-05-27
   */
 trait LocalServiceFinder {
-  def findTPCardService: TPCardService
+  def findTPCardService: TPCardService = null
+  def findLPCardService: LPCardService = null
+  def findCaseInfoService: CaseInfoService = null
+  def findQueryService: QueryService = null
 }

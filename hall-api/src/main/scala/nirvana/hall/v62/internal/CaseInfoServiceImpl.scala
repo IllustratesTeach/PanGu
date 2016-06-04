@@ -60,4 +60,13 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
 
     CaseDelResponse.newBuilder().build()
   }
+
+  /**
+   * 验证案件编号是否已存在
+   * @param caseId
+   * @return
+   */
+  override def isExist(caseId: String): Boolean = {
+    throw new UnsupportedOperationException
+  }
 }

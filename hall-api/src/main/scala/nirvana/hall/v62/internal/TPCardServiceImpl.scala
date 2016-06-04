@@ -62,4 +62,13 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
 
     TPCardUpdateResponse.newBuilder().build()
   }
+
+  /**
+   * 验证卡号是否已存在
+   * @param cardId
+   * @return
+   */
+  override def isExist(cardId: String): Boolean = {
+    throw new UnsupportedOperationException
+  }
 }

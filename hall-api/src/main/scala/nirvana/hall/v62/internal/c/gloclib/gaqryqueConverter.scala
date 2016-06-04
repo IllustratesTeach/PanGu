@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import java.nio.ByteBuffer
 
+import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
@@ -131,6 +132,11 @@ object gaqryqueConverter {
     pstQry
   }
 
+  /**
+   * 将6的查询候选结果转为protobuf
+   * @param gaQueryStruct
+   * @return
+   */
   def convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct: GAQUERYSTRUCT): MatchResult={
     val matchResult = MatchResult.newBuilder()
 
@@ -157,6 +163,40 @@ object gaqryqueConverter {
     matchResult.setStatus(MatcherStatus.newBuilder().setMsg("success").setCode(0))
 
     matchResult.build()
+  }
+
+  /**
+   * 将6的查询任务转为protobuf
+   * @param gaQueryStruct
+   * @return
+   */
+  def convertGAQUERYSTRUCT2MatchTask(gaQueryStruct: GAQUERYSTRUCT): MatchTask ={
+    val matchTask = MatchTask.newBuilder()
+    //ora_sid
+    matchTask.setMatchId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID).toString)
+    //优先级
+    matchTask.setPriority(gaQueryStruct.stSimpQry.nPriority)
+    //查询类型
+    matchTask.setMatchType(MatchType.valueOf(gaQueryStruct.stSimpQry.nQueryType))
+    //任务本身的sid
+    matchTask.setObjectId(1)
+    matchTask.setScoreThreshold(gaQueryStruct.stSimpQry.nMinScore)
+    matchTask.setTopN(gaQueryStruct.stSimpQry.nMaxCandidateNum)
+    gaQueryStruct.pstMIC_Data.foreach{micStruct =>
+      if(micStruct.bIsLatent == 1){
+        val ldata = matchTask.getLDataBuilder
+        ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
+        if(micStruct.pstBin_Data.length > 0)
+          ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+      }else{
+        //这里指位不做转换
+        val pos = micStruct.nItemData
+        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
+      }
+    }
+    //TODO 文本查询,高级查询参数
+
+    matchTask.build()
   }
 
   /**

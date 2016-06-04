@@ -93,4 +93,13 @@ class TPCardServiceImpl extends TPCardService{
 
     TPCardUpdateResponse.newBuilder().build()
   }
+
+  /**
+   * 验证卡号是否已存在
+   * @param cardId
+   * @return
+   */
+  override def isExist(cardId: String): Boolean = {
+    GafisPerson.findOption(cardId).nonEmpty
+  }
 }

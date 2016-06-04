@@ -66,4 +66,8 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
 
     LPCardDelResponse.newBuilder().build()
   }
+
+  override def isExist(cardId: String): Boolean = {
+    throw new UnsupportedOperationException
+  }
 }

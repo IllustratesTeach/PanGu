@@ -61,7 +61,7 @@ class DatabaseConfig extends Serializable{
   var password: String = _
   @XmlElement(name = "url")
   var url: String = _
-  @XmlElement(name = "url")
+  @XmlElement(name = "max_pool_size")
   var max: Int= 20
 }
 /**

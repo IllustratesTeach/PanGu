@@ -38,4 +38,11 @@ trait LPCardService {
    * @return
    */
   def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse
+
+  /**
+   * 验证现场卡片是否存在
+   * @param cardId
+   * @return
+   */
+  def isExist(cardId: String): Boolean
 }

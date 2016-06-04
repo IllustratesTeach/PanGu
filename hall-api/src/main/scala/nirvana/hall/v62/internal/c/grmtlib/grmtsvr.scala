@@ -8,10 +8,13 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.protocol.api.TPCardProto.TPCardAddRequest
+import nirvana.hall.protocol.api.CaseProto.{CaseAddRequest, CaseUpdateRequest}
+import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardDelRequest, LPCardUpdateRequest}
+import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
+import nirvana.hall.protocol.api.TPCardProto.{TPCardAddRequest, TPCardDelRequest, TPCardUpdateRequest}
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctpConverter}
+import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpConverter, gaqryqueConverter}
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
 import nirvana.hall.v62.proxy.LocalServiceFinder
 
@@ -33,6 +36,14 @@ trait grmtsvr {
     with reqansop =>
   private implicit val executionContext = ExecutionContext.global
   private val testSeq = new AtomicInteger(0)
+
+  /**
+   * 处理对TP的请求操作
+   * @param pReq
+   * @param pstRecvPkg
+   * @param bIsReq50
+   * @return
+   */
   def GAFIS_RMTLIB_TPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
                                 bIsReq50:Int=0):Boolean={
@@ -46,7 +57,9 @@ trait grmtsvr {
     val nZipMethod = pReq.bnData(48);
     val nZipRatio  = pReq.bnData(49);
 
+
     nOpCode match{
+        //增加捺印卡信息
       case OP_TPLIB_ADD=>
         /*
          * 主干程序，
@@ -57,15 +70,6 @@ trait grmtsvr {
         val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
         //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
         //saveStTPCardToV70.....
-        /*stTPCard.foreach{gtpCard =>
-          val tpCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(gtpCard)
-          val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-          val portraits = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-          val fingers = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-          person.save()
-          portraits.foreach(_.save())
-          fingers.foreach(_.save())
-        }*/
         //n 为保存成功的个数
         var n = 0
         stTPCardOpt.map{tpCard=>
@@ -86,31 +90,61 @@ trait grmtsvr {
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
         true
-      case OP_TPLIB_EXIST=>
-        /*
-        //获取编号,去除后边的空字符
-        val cardIdBuf = new ByteArrayOutputStream()
-        pReq.bnData.foreach(c => if(c != 0) cardIdBuf.write(c))
-        val cardId = cardIdBuf.toString("GB2312")
-        //根据人员编号查询7.0数据库
-        val person = GafisPerson.findOption(cardId)
-        println(person)
-        //如果人员编号存在返回1，不存在0
-        val n = if(person != None) 1 else 0
-        */
+        //更新捺印卡数据
+      case OP_TPLIB_UPDATE=>
+        var n = 0
+        val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
+        stTPCardOpt.map{ tpCard=>
+          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
+        }.foreach{ card=>
+          val request = TPCardUpdateRequest.newBuilder()
+          request.setCard(card)
+          findTPCardService.updateTPCard(request.build())
+          n += 1
+        }
 
-        val n = 0
+        NETANS_SetRetVal(pAns,0)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+        //判断捺印编号是否存在
+      case OP_TPLIB_EXIST=>
+        //获取编号,去除后边的空字符
+        val cardId = new String(pReq.bnData, "GB2312").trim
+        println(cardId)
+
+        val n = if(findTPCardService.isExist(cardId)) 1 else 0
         NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
         true
+      case OP_TPLIB_DEL=>
+        val cardId = new String(pReq.bnData, "GB2312").trim
+        val request = TPCardDelRequest.newBuilder()
+        request.setCardId(cardId)
 
+        findTPCardService.delTPCard(request.build())
+        NETANS_SetRetVal(pAns,1)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
       case other=>
         false
     }
   }
+
+  /**
+   * 处理Query查询请求
+   * @param pReq
+   * @param pstRecvPkg
+   * @return
+   */
   def GAFIS_RMTLIB_QUERY_Server(pReq:GNETREQUESTHEADOBJECT, pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT): Boolean ={
     val pAns = new GNETANSWERHEADOBJECT
     val nOpClass = NETREQ_GetOpClass(pReq);
@@ -123,11 +157,16 @@ trait grmtsvr {
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
         val stQuery = GAFIS_PKG_GetQuery(pstRecvPkg)
-        //TODO 通过得到的stQuery来进行发送查询
-
-
         //nAddRet为成功发送查询ID
-        val nAddRet = 1;
+        var nAddRet = 0
+        stQuery.map{query =>
+          gaqryqueConverter.convertGAQUERYSTRUCT2MatchTask(query)
+        }.foreach{matchTask =>
+          val request = QuerySendRequest.newBuilder()
+          request.setMatchTask(matchTask)
+          val response = findQueryService.sendQuery(request.build())
+          nAddRet = response.getOraSid.toInt
+        }
 
         NETANS_SetRetVal(pAns,nAddRet);
         val stSendPkg = GBASE_ITEMPKG_New
@@ -138,6 +177,13 @@ trait grmtsvr {
       case 	grmtcode.OP_RMTLIB_QUERY_GETRESULT=>
         val stQuery = new GAQUERYSTRUCT
         stQuery.stSimpQry.nQueryID = pReq.bnData
+//        val oraSid = new String(pReq.bnData, "GB2312").trim
+//        val request = QueryGetRequest.newBuilder()
+//        request.setOraSid(oraSid.toLong)
+//        val response = findQueryService.getQuery(request.build())
+//        if(response.getIsComplete){
+//          val candList = response.getMatchResult.getCandidateResultList
+//        }
 
         //TODO 利用得到的SID进行查询候选队列
         val nRet = 1 //如果有候选队列
@@ -151,6 +197,156 @@ trait grmtsvr {
           GAFIS_PKG_Query2Pkg(stQuery,stSendPkg)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
+        true
+      case other =>
+        false
+    }
+  }
+
+  /**
+   * 处理对LP的请求操作
+   * @param pReq
+   * @param pstRecvPkg
+   * @param bIsReq50
+   * @return
+   */
+  def GAFIS_RMTLIB_LPSVR_Server(pReq:GNETREQUESTHEADOBJECT,
+                                pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
+                                bIsReq50:Int=0): Boolean ={
+
+    val pAns = new GNETANSWERHEADOBJECT
+    val nOpClass = NETREQ_GetOpClass(pReq);
+    val nOpCode = NETREQ_GetOpCode(pReq);
+    val nDBID	 = NETREQ_GetDBID(pReq);
+    val nTableID = NETREQ_GetTableID(pReq);
+    val nOption	 = NETREQ_GetOption(pReq);
+    val nRmtOpt	 = NETREQ_GetRetVal(pReq);
+    val nZipMethod = pReq.bnData(48);
+    val nZipRatio  = pReq.bnData(49);
+
+    nOpCode match {
+      case OP_LPLIB_ADD =>
+        val stLPCard = GAFIS_PKG_GetLpCard(pstRecvPkg)
+        var n = 0
+        stLPCard.map{ lpCard=>
+          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
+        }.foreach{ card =>
+          val request = LPCardAddRequest.newBuilder()
+          request.setCard(card)
+          findLPCardService.addLPCard(request.build())
+          n += 1
+        }
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+        true
+      case OP_LPLIB_DEL =>
+        val cardId = new String(pReq.bnData, "GB2312").trim
+        val request = LPCardDelRequest.newBuilder()
+        request.setCardId(cardId)
+        findLPCardService.delLPCard(request.build())
+
+        NETANS_SetRetVal(pAns,1)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+      case OP_LPLIB_UPDATE =>
+        val stLPCard = GAFIS_PKG_GetLpCard(pstRecvPkg)
+        var n = 0
+        stLPCard.map{ lpCard=>
+          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
+        }.foreach{ card =>
+          val request = LPCardUpdateRequest.newBuilder()
+          request.setCard(card)
+          findLPCardService.updateLPCard(request.build())
+          n += 1
+        }
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+        true
+      case OP_LPLIB_EXIST =>
+        val cardId = new String(pReq.bnData,"GB2312").trim
+        val n = if (findLPCardService.isExist(cardId)) 1 else 0
+
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        true
+      case other =>
+        false
+    }
+  }
+
+  /**
+   * 处理Case案件信息请求
+   * @param pReq
+   * @param pstRecvPkg
+   * @param bIsReq50
+   * @return
+   */
+  def GAFIS_RMTLIB_CASE_Server(pReq:GNETREQUESTHEADOBJECT,
+                                pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT,
+                                bIsReq50:Int=0): Boolean ={
+    val pAns = new GNETANSWERHEADOBJECT
+    val nOpClass = NETREQ_GetOpClass(pReq);
+    val nOpCode = NETREQ_GetOpCode(pReq);
+    val nDBID	 = NETREQ_GetDBID(pReq);
+    val nTableID = NETREQ_GetTableID(pReq);
+    val nOption	 = NETREQ_GetOption(pReq);
+    val nRmtOpt	 = NETREQ_GetRetVal(pReq);
+    val nZipMethod = pReq.bnData(48);
+    val nZipRatio  = pReq.bnData(49);
+
+    nOpCode match {
+      case OP_CASE_ADD =>
+        val stCase = GAFIS_PKG_GetCase(pstRecvPkg)
+        var n = 0
+        stCase.map{caseInfo =>
+          galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(caseInfo)
+        }.foreach{caseInfo =>
+          val request = CaseAddRequest.newBuilder()
+          request.setCase(caseInfo)
+          findCaseInfoService.addCaseInfo(request.build())
+          n += 1
+        }
+
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+        true
+      case OP_CASE_UPDATE =>
+        val stCase = GAFIS_PKG_GetCase(pstRecvPkg)
+        var n = 0
+        stCase.map{caseInfo =>
+          galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(caseInfo)
+        }.foreach{caseInfo =>
+          val request = CaseUpdateRequest.newBuilder()
+          request.setCase(caseInfo)
+          findCaseInfoService.updateCaseInfo(request.build())
+          n += 1
+        }
+
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+        true
+      case OP_CASE_EXIST =>
+        val cardId = new String(pReq.bnData,"GB2312").trim
+        val n = if (findCaseInfoService.isExist(cardId)) 1 else 0
+
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
         true
       case other =>
         false

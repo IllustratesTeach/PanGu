@@ -99,7 +99,7 @@ trait grmtcsr {
   {
     var stacks = e.getStackTrace
     val errdata = new GAFISERRDATSTRUCT
-    errdata.bnAFISErrData = e.getMessage.getBytes(AncientConstants.GBK_ENCODING)
+    errdata.bnAFISErrData = e.getMessage.getBytes(AncientConstants.GBK_ENCODING).take(96)
     errdata.nErrDataLen = errdata.bnAFISErrData.length.toByte
 
     errdata.szFileName = stacks.head.getFileName

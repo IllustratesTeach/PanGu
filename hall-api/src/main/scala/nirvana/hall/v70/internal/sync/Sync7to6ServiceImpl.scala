@@ -2,6 +2,7 @@ package nirvana.hall.v70.internal.sync
 
 import java.util.Date
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.services.GafisException
 import nirvana.hall.v70.config.HallV70Config
@@ -19,7 +20,8 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
   extends Sync7to6Service
   with Sync7to6CaseService
   with Sync7to6LPCardService
-  with Sync7to6TPCardService{
+  with Sync7to6TPCardService
+  with LoggerSupport{
 
   //上报标记(1:捺印;2:案件;3:现场)
   val UPLOAD_FLAG_TPCARD = "1"
@@ -38,11 +40,13 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
    */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, sync7to6Service: Sync7to6Service): Unit = {
-    periodicExecutor.addJob(new CronSchedule(v70Config.cron.sync7to6Cron), "sync-70to62", new Runnable {
-      override def run(): Unit = {
-        sync7to6Service.doWork
-      }
-    })
+    if(v70Config.cron.sync7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.sync7to6Cron), "sync-70to62", new Runnable {
+        override def run(): Unit = {
+          sync7to6Service.doWork
+        }
+      })
+    }
   }
 
   //TODO 允许3次失败
@@ -56,6 +60,8 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
   @Transactional
   override def doWork: Unit ={
     findSyncQueue.foreach{ syncQueue =>
+      info("sync-70to62 sync_queue info[keyid:{} type:{} targetIp:{} port:{} userName:{}]", syncQueue.uploadKeyid, syncQueue.uploadType,
+        syncQueue.targetIp, syncQueue.targetPort, syncQueue.targetUsername)
       doTaskOfSyncQueue(syncQueue)
       doWork
     }

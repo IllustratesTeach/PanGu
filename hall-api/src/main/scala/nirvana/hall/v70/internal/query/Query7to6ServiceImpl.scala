@@ -4,6 +4,7 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
@@ -22,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional
  * Created by songpeng on 15/12/9.
  */
 class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient, entityManager: EntityManager)
-  extends Query7to6Service{
+  extends Query7to6Service with LoggerSupport{
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
@@ -38,6 +39,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   @Transactional
   override def doWork: Unit ={
     getGafisNormalqueryQueryque.foreach{ gafisQuery =>
+      info("sync-70to62 sync_queue info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
       sendQuery(gafisQuery)
       doWork
     }

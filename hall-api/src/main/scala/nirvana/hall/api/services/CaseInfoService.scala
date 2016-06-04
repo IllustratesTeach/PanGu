@@ -38,4 +38,11 @@ trait CaseInfoService {
    * @return
    */
   def getCaseInfo(caseGetRequest: CaseGetRequest): CaseGetResponse
+
+  /**
+   * 验证案件编号是否已存在
+   * @param caseId
+   * @return
+   */
+  def isExist(caseId: String): Boolean
 }
