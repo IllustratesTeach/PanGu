@@ -27,7 +27,7 @@ class GafisPartitionRecordsUpdate extends PartitionRecordsSaver {
 
 }
 object GafisPartitionRecordsUpdate{
-  lazy implicit val dataSource = SysProperties.getDataSource("gafis_sh")
+  lazy implicit val dataSource = SysProperties.getDataSource("gafis")
   case class DbError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "S|"+message
   }

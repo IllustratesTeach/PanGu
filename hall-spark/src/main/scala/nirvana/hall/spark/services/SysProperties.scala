@@ -16,13 +16,15 @@ object SysProperties{
   private var sysProperties:Map[String,String] = _
   private var dataSources :Map[String,DataSource] = _
   private def initProperties(properties: util.List[SparkConfigProperty]): Unit ={
-    val data = new util.HashMap[String,String](properties.size())
-    val it = properties.iterator()
-    if(it.hasNext) {
-      val property = it.next()
-      data.put(property.name,property.value)
+    if(sysProperties == null) {
+      val data = new util.HashMap[String, String](properties.size())
+      val it = properties.iterator()
+      while (it.hasNext) {
+        val property = it.next()
+        data.put(property.name, property.value)
+      }
+      sysProperties = data.asScala.toMap
     }
-    sysProperties = data.asScala.toMap
   }
   def setConfig(config:NirvanaSparkConfig){
     initProperties(config.properties)
@@ -35,7 +37,7 @@ object SysProperties{
     if(dataSources == null) {
       val data = new util.HashMap[String, DataSource](databaseConfigList.size())
       val it = databaseConfigList.iterator()
-      if (it.hasNext) {
+      while(it.hasNext) {
         val databaseConfig = it.next()
         data.put(databaseConfig.poolName, buildDataSource(databaseConfig))
       }

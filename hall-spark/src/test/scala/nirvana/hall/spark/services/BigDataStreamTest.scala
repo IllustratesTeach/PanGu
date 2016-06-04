@@ -10,7 +10,7 @@ class BigDataStreamTest {
 
   @Test
   def streamTest (){
-    val array = Array("src/test/resources/test_spark.xml")
+    val array = Array("hall-spark/src/test/resources/test_spark.xml")
     BigDataStream.main(array)
     //SaveErrorStream.main(array)
   }
