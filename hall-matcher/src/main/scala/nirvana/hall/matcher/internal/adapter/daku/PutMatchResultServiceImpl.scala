@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
+import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
@@ -71,7 +72,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
   }
 
   private def updateMatchStatusFail(match_id: String, status: MatcherStatus) {
-    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE GAFIS_NORMALQUERY_QUERYQUE t SET t.status="+HallMatcherConstants.QUERY_STATUS_FAIL +", t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, status.getMsg)
       ps.setString(2, match_id)
@@ -91,7 +92,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         val gCand = new GAQUERYCANDSTRUCT
         gCand.nScore = cand.getScore
         gCand.szKey = keyId.get
-        gCand.nDBID = if (queryType == 0 || queryType == 2) 1 else 2
+        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
         gCand.nTableID = 2
         gCand.nIndex = fgp.toByte
         gCand.tFinishTime = new AFISDateTime
@@ -112,7 +113,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     if (sids.lastIndexOf(",") > 0) {
       sids = sids.substring(0, sids.length - 1)
     }
-    if (queryType == 0 || queryType == 2) {
+    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
       sql = "select p.sid as sid, p.personid as cardid from gafis_person p where p.sid in (" + sids + ")"
     } else {
       sql = "select t.sid as sid, t.finger_id as cardid from gafis_case_finger t where t.sid in (" + sids + ")"

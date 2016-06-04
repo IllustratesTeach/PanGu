@@ -33,4 +33,17 @@ object HallMatcherConstants {
  / _  / __ |/ /__/ /__ module : |@@|red %s|@#
 /_//_/_/ |_/____/____/ version: |@@|yellow %s|@
                                """.replaceAll("#", "@|green ")
+
+
+  //查询类型
+  val QUERY_TYPE_TT = 0
+  val QUERY_TYPE_TL = 1
+  val QUERY_TYPE_LT = 2
+  val QUERY_TYPE_LL = 3
+
+  //比对状态
+  val QUERY_STATUS_WAIT = 0
+  val QUERY_STATUS_MATCHING = 1
+  val QUERY_STATUS_SUCCESS = 2
+  val QUERY_STATUS_FAIL = 3
 }
