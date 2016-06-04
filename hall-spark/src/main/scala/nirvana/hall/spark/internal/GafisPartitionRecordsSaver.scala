@@ -2,7 +2,7 @@ package nirvana.hall.spark.internal
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.spark.config.NirvanaSparkConfig
-import nirvana.hall.spark.services.{SysProperties, SparkFunctions}
+import nirvana.hall.spark.services.{PartitionRecordsSaver, SysProperties, SparkFunctions}
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 import nirvana.hall.support.services.JdbcDatabase
 
@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-02-09
  */
-class GafisPartitionRecordsSaver {
+class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
   import GafisPartitionRecordsSaver._
   def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
     val flag= parameter.kafkaTopicName
@@ -127,7 +127,7 @@ object GafisPartitionRecordsSaver {
         ps.setString(6, path)
       }
     } else {
-      val saveFingerSql: String = "insert into gafis_gather_finger_temp(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data)" +
+      val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data)" +
         "values(sys_guid(),?,?,?,?,2,sysdate,gafis_gather_finger_seq.nextval,?)"
       //保存指纹特征信息
       JdbcDatabase.update(saveFingerSql) { ps =>
