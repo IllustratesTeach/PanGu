@@ -41,15 +41,7 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
     "tplainrmbin", "tplainrsbin", "tplainrzbin", "tplainrhbin", "tplainrxbin", "tplainlmbin", "tplainlsbin", "tplainlzbin", "tplainlhbin", "tplainlxbin")
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
-    val count = syncDataResponse.getSyncDataCount
     val seq = rs.getLong("seq")
-    if(count >= size){
-      //如果
-      val preSeq = syncDataResponse.getSyncDataList.get(count - 1).getTimestamp
-      if(preSeq < seq){
-        return
-      }
-    }
     val sid = rs.getInt("sid")
     var pos = 1 //代表指位
     //循环读取特征

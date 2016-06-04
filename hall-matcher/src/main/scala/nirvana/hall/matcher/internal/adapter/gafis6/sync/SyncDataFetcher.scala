@@ -32,6 +32,15 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
         ps.setLong(1, from_)
         ps.setLong(2, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
       }{rs=>
+        val count = syncDataResponse.getSyncDataCount
+        val seq = rs.getLong("seq")
+        if(count >= size){
+          //如果下一条数据的seq与当前最大的不一致，退出
+          val preSeq = syncDataResponse.getSyncDataList.get(count - 1).getTimestamp
+          if(preSeq < seq){
+            return
+          }
+        }
         readResultSet(syncDataResponse, rs, size)
       }
       if(syncDataResponse.getSyncDataCount < size){

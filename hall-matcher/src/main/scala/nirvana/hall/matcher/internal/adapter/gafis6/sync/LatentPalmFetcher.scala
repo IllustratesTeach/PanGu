@@ -21,7 +21,6 @@ class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSo
     s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=?"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
-    if(syncDataResponse.getSyncDataCount < size){
       val syncDataBuilder = SyncData.newBuilder
       syncDataBuilder.setObjectId(rs.getInt("sid"))
       syncDataBuilder.setMinutiaType(SyncData.MinutiaType.PALM)
@@ -36,7 +35,6 @@ class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSo
       if (validSyncData(syncDataBuilder.build, true)) {
         syncDataResponse.addSyncData(syncDataBuilder.build)
       }
-    }
   }
 
 }
