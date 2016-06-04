@@ -3,7 +3,6 @@ package nirvana.hall.v62.internal
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESITEM, GADB_SELRESULT, _}
-import nirvana.hall.c.services.gfpmanager.GfpManagerConst.Gf_AssociateGroupInfo
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
@@ -250,9 +249,11 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
             g_stCN.stTPnID.pszName -> "szGroupID",
             g_stCN.stTCardCount.pszName -> "nTprCardCnt"
           )
+          /*
           val gfGroupInfo = facade.queryV62Table[Gf_AssociateGroupInfo](
             1,3,
             mapper,None,1)
+            */
 
         }
     }
