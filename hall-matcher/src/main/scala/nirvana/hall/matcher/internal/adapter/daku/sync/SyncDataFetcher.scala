@@ -6,11 +6,10 @@ import javax.sql.DataSource
 import monad.support.services.LoggerSupport
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.DataConverter
+import nirvana.hall.matcher.internal.DataChecker
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
-import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.{OperationType, MinutiaType}
 
 /**
  * Created by songpeng on 16/3/29.
@@ -70,40 +69,6 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
    * @return
    */
   protected def validSyncData(syncData: SyncData, isLatent: Boolean): Boolean ={
-    /*数据长度校验*/
-    if(syncData.getMinutiaType == MinutiaType.TEXT){
-      return syncData.getData.size() > 0
-    }else{
-      if (syncData.getData.size() <=hallMatcherConfig.mnt.headerSize && syncData.getOperationType == OperationType.PUT) {
-        error("data size too small %s for sid:%s minutia_type:%s isLatent:%s".format(
-          syncData.getData.size(), syncData.getObjectId, syncData.getMinutiaType.toString, isLatent))
-        return false
-      }
-      var dataSizeExpected:Int = 0
-      syncData.getMinutiaType match {
-        case MinutiaType.FINGER =>
-          if(isLatent){
-            dataSizeExpected = hallMatcherConfig.mnt.fingerLatentSize
-          }else{
-            dataSizeExpected = hallMatcherConfig.mnt.fingerTemplateSize
-          }
-        case MinutiaType.PALM=>
-          if(isLatent){
-            dataSizeExpected = hallMatcherConfig.mnt.palmLatentSize
-          }else{
-            dataSizeExpected = hallMatcherConfig.mnt.palmTemplateSize
-          }
-        case MinutiaType.RIDGE=>
-          dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(syncData.getData)
-        case MinutiaType.FACE=>
-        case MinutiaType.TEXT=>
-      }
-      dataSizeExpected += hallMatcherConfig.mnt.headerSize
-      if (syncData.getData.size != dataSizeExpected || dataSizeExpected <= HallMatcherConstants.HEADER_LENGTH) {
-        error("MinutiaType:{} isLatent:{} sid:{}  dataSize:{}", syncData.getMinutiaType, isLatent, syncData.getObjectId,syncData.getData.size)
-        return false
-      }
-      true
-    }
+    DataChecker.checkSyncData(hallMatcherConfig, syncData, isLatent)
   }
 }
