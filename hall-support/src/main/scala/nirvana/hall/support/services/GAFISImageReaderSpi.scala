@@ -105,7 +105,7 @@ class GAFISImageReader(originator:ImageReaderSpi) extends ImageReader(originator
 
     //校验数据长度
     val bits= if(head.nBits < 1) 8 else head.nBits
-    val imgSize = head.nWidth * (bits +7)/8 * head.nHeight
+    val imgSize = (head.nWidth * bits +7)/8 * head.nHeight
     if(imgSize != head.nImgSize){
       throw new IOException("image size (%s) != head.nImgSize(%s)".format(imgSize,head.nImgSize))
     }
