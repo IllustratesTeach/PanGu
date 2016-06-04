@@ -46,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
 
     var candList:Array[Byte] = null
     if(candNum > 0){
-      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
+      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
       candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
     }
 

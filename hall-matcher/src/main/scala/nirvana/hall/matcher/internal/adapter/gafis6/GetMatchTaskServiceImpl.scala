@@ -27,6 +27,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    private val GET_SID_BY_PERSONID: String = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid=?"
    /** 获取sid根据卡号（现场指纹） */
    private val GET_SID_BY_CASE_FINGERID: String = "select t.ora_sid from normallp_latfinger t where t.fingerid=?"
+   private val GET_SID_BY_CASE_PALMID: String = "select t.ora_sid from normallp_latpalm t where t.palmid=?"
    /**
     * 获取比对任务
     * @param matchTaskQueryRequest
@@ -56,13 +57,14 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      val keyId = rs.getString("keyid")
      val queryType = rs.getInt("querytype")
      val flag = rs.getInt("flag")
+     val isPalm = flag == 2 || flag == 22
 //     val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
-     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, flag))
+     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
      matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
      matchTaskBuilder.setPriority(rs.getInt("priority"))
-     if(flag == 2 || flag == 22){
+     if(isPalm){
        queryType match {
          case HallMatcherConstants.QUERY_TYPE_TT =>
            matchTaskBuilder.setMatchType(MatchType.PALM_TT)
@@ -106,12 +108,16 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      matchTaskBuilder.build()
    }
 
-   private def getObjectIdByCardId(cardId: String, queryType: Int, flag: Int): Long={
+   private def getObjectIdByCardId(cardId: String, queryType: Int, isPalm: Boolean): Long={
      var sql: String = ""
      if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
        sql = GET_SID_BY_PERSONID
      } else {
-       sql = GET_SID_BY_CASE_FINGERID
+       if(isPalm){
+         sql = GET_SID_BY_CASE_PALMID
+       }else{
+         sql = GET_SID_BY_CASE_FINGERID
+       }
      }
      val oraSidOption = JdbcDatabase.queryFirst[Long](sql){ps =>
        ps.setString(1, cardId)
