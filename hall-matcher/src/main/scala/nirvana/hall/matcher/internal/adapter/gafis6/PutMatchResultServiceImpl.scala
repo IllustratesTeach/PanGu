@@ -159,11 +159,12 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
   /**
    * 根据候选列表的sid获取编号, 生成对应关系map
    * @param matchResultRequest
-   * @param queryType
+   * @param queryQue
    * @param dataSource
    * @return
    */
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryType: Int)(implicit dataSource: DataSource): Map[Long, String] = {
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+    val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
     var map: Map[Long, String] = Map()
@@ -177,7 +178,11 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       sql = "select t.ora_sid,t.cardid from normaltp_tpcardinfo t where t.ora_sid in ("+sids+")"
     }
     else {
-      sql = "select t.ora_sid,t.fingerid as cardid from normallp_latfinger t where t.ora_sid in ("+sids+")"
+      if(queryQue.isPalm){
+        sql = "select t.ora_sid, t.palmid as cardid from normallp_latpalm t where t.ora_sid in (" + sids + ")"
+      }else{
+        sql = "select t.ora_sid,t.fingerid as cardid from normallp_latfinger t where t.ora_sid in ("+sids+")"
+      }
     }
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
     } { rs =>
