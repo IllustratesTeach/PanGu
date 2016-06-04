@@ -1,5 +1,7 @@
 package nirvana.hall.spark.services
 
+import java.io.ByteArrayInputStream
+
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -8,7 +10,6 @@ import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractResponse, ExtractRequest}
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
-
 import scala.util.control.NonFatal
 
 /**
@@ -20,6 +21,7 @@ import scala.util.control.NonFatal
 object ExtractFeatureService {
   private lazy val extractor = new FeatureExtractorImpl
   private lazy val directExtract = SysProperties.getBoolean("extractor.direct",defaultValue = false)
+  private lazy val converterExtract = SysProperties.getBoolean("extractor.converter",defaultValue = false)
   private lazy val extractorServer = SysProperties.getPropertyOption("extractor.server").get
   private lazy val extractBinSupport = SysProperties.getBoolean("extractor.bin.support",defaultValue = false)
   case class ExtractError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
@@ -31,9 +33,17 @@ object ExtractFeatureService {
         val featureTryVersion = if (parameter.isNewFeature) ExtractProto.NewFeatureTry.V2 else ExtractProto.NewFeatureTry.V1
         if(directExtract) {
           SparkFunctions.loadExtractorJNI()
-          //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".img"),originalImg.toByteArray())
-          val (mnt,bin) = extractor.extractByGAFISIMG(originalImg, event.position, event.featureType, featureTryVersion)
-          Some(event, mnt,bin)
+          var m = null
+          var b = null
+          if (converterExtract) {
+            val is = new ByteArrayInputStream(originalImg.toByteArray())
+            val newFeature = extractor.ConvertMntOldToNew(is)
+            Some(event, new GAFISIMAGESTRUCT().fromByteArray(newFeature.get),null)
+          } else {
+            //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".img"),originalImg.toByteArray())
+            val (mnt, bin) = extractor.extractByGAFISIMG(originalImg, event.position, event.featureType, featureTryVersion)
+            Some(event, mnt, bin)
+          }
         }else {
           val rpcHttpClient = SparkFunctions.httpClient
           val request = ExtractRequest.newBuilder()

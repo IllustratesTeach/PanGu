@@ -8,7 +8,7 @@ import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGESTRUCT, GAFISIMAGEHEADSTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def._
 import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.NativeExtractor
@@ -38,12 +38,13 @@ class FeatureExtractorImpl extends FeatureExtractor{
    * @return
    */
   override def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]] = {
-    val omnt = IOUtils.toByteArray(oldMnt)
+    val feature  = new GAFISIMAGESTRUCT().fromByteArray(IOUtils.toByteArray(oldMnt))
     val nmnt = ChannelBuffers.buffer(3960)
     val newMntBuffer = nmnt.array()
-    NativeExtractor.ConvertMntOldToNew(omnt,newMntBuffer)
-
-    Some(newMntBuffer)
+    NativeExtractor.ConvertMntOldToNew(feature.bnData,newMntBuffer)
+    feature.bnData = newMntBuffer
+    feature.stHead.nImgSize = newMntBuffer.size
+    Some(feature.toByteArray())
   }
   /**
    * extract feature from image data

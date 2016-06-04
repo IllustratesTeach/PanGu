@@ -27,7 +27,7 @@ object BigDataStream {
     //spark parell
 //    conf.set("spark.default.parallelism","1000")
     conf.set("spark.driver.host",parameter.host)
-    val ssc =  new StreamingContext(conf, Minutes(10))
+    val ssc =  new StreamingContext(conf, Minutes(1))
     checkpointDirectory.foreach(ssc.checkpoint)
 
 
@@ -42,9 +42,7 @@ object BigDataStream {
       ssc, kafkaParams,Set(kafkaTopicName))
       .repartition(parameter.partitionsNum) //reset partition
       .map(_._2) //only use message content
-      .flatMap(
-        ImageProviderService.requestRemoteFile(parameter,_)
-      ) //fetch files
+      .flatMap(ImageProviderService.requestRemoteFile(parameter,_)) //fetch files
       .flatMap(x=>DecompressImageService.requestDecompress(parameter,x._1,x._2)) // decompress image
       .flatMap(x=>ExtractFeatureService.requestExtract(parameter,x._1,x._2)) //extract feature
       .foreachRDD{rdd=>

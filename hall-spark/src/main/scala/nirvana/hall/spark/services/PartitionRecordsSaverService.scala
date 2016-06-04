@@ -10,10 +10,12 @@ import nirvana.hall.spark.services.SparkFunctions.StreamEvent
   * @since 2016-05-30
   */
 object PartitionRecordsSaverService {
-  private val saver:PartitionRecordsSaver = createSaver
+  private lazy val saver:PartitionRecordsSaver = createSaver
   private var saverClassName:String = _
   def createSaver: PartitionRecordsSaver ={
-    Class.forName(saverClassName).newInstance().asInstanceOf[PartitionRecordsSaver]
+    Thread.currentThread().getContextClassLoader
+      .loadClass(saverClassName).newInstance()
+      .asInstanceOf[PartitionRecordsSaver]
   }
   def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit={
     saverClassName = parameter.dataSaverClass

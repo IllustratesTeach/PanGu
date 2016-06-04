@@ -11,13 +11,15 @@ import nirvana.hall.spark.services.SparkFunctions._
  * @since 2016-02-09
  */
 object ImageProviderService {
-  private val provider:ImageProvider = createProvider
+  private lazy val provider:ImageProvider = createProvider
   private var providerClassName:String = _
+  def createProvider:ImageProvider={
+    Thread.currentThread().getContextClassLoader
+      .loadClass(providerClassName).newInstance().asInstanceOf[ImageProvider]
+  }
   def requestRemoteFile(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
     providerClassName = parameter.imageProviderClass
     provider.requestImage(parameter,message)
   }
-  private def createProvider:ImageProvider={
-    Class.forName(providerClassName).newInstance().asInstanceOf[ImageProvider]
-  }
+
 }

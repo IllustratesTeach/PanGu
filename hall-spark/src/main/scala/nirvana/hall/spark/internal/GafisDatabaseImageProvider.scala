@@ -4,7 +4,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions._
-import nirvana.hall.spark.services.ImageProvider
+import nirvana.hall.spark.services.{SysProperties, ImageProvider}
 import nirvana.hall.support.services.JdbcDatabase
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
@@ -19,8 +19,9 @@ import scala.util.control.NonFatal
   * @since 2016-05-30
   */
 class GafisDatabaseImageProvider extends ImageProvider{
+  private lazy val converterExtract = SysProperties.getBoolean("extractor.converter",defaultValue = false)
   private lazy implicit val dataSource = GafisPartitionRecordsSaver.dataSource
-  val querySqlByPersonId = "select t.gather_data,t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ?"
+  val querySqlByPersonId = "select t.gather_data,t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ? and t.group_id = 1"
   val querySql = "select t.gather_data,t.fgp,t.fgp_case,t.person_id from gafis_gather_finger t where t.pk_id = ?"
 
   def requestImage(parameter:NirvanaSparkConfig,pkId:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] = {
@@ -47,13 +48,6 @@ class GafisDatabaseImageProvider extends ImageProvider{
           gafisImg.stHead.bIsPlain = fgpCase.toByte
           val gafisbuffer = ChannelBuffers.wrappedBuffer(IOUtils.toByteArray(data))
           gafisImg.fromStreamReader(gafisbuffer)
-
-          /*gafisImg.stHead.bIsCompressed = 1
-          gafisImg.stHead.bIsPlain = fgpCase.toByte
-          gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
-          gafisImg.bnData = IOUtils.toByteArray(data)
-          gafisImg.stHead.nImgSize = gafisImg.bnData.length*/
-
           IOUtils.closeQuietly(data)
           if (gafisImg.stHead.nImgSize <= 0)
             throw new IllegalArgumentException("nImage is "+ gafisImg.stHead.nImgSize)
@@ -80,15 +74,19 @@ class GafisDatabaseImageProvider extends ImageProvider{
   }
   private def createDataImageEvent(pkId : String ,personId: String, fgp : Integer ,gafisImg: GAFISIMAGESTRUCT): (StreamEvent,GAFISIMAGESTRUCT) = {
     val event = new StreamEvent(pkId,personId, FeatureType.FingerTemplate, getFingerPosition(fgp.toInt),"","","")
-    if (gafisImg.stHead.nCompressMethod.toInt>=10)
+    if (converterExtract) //converter new feature
       (event,gafisImg)
     else {
-      gafisImg.transformForFPT()
-      val gafisImg1 = new GAFISIMAGESTRUCT
-      gafisImg1.bnData = gafisImg.toByteArray()
-      gafisImg1.stHead = gafisImg.stHead
-      gafisImg1.stHead.nImgSize = gafisImg1.bnData.length
-      (event, gafisImg1)
+      if (gafisImg.stHead.nCompressMethod.toInt >= 10)
+        (event, gafisImg)
+      else {
+        gafisImg.transformForFPT()
+        val gafisImg1 = new GAFISIMAGESTRUCT
+        gafisImg1.bnData = gafisImg.toByteArray()
+        gafisImg1.stHead = gafisImg.stHead
+        gafisImg1.stHead.nImgSize = gafisImg1.bnData.length
+        (event, gafisImg1)
+      }
     }
   }
 

@@ -32,7 +32,7 @@ object SysProperties{
     sysProperties.get(name)
   }
   def initDataSource(databaseConfigList:util.List[DatabaseConfig]): Unit ={
-    if(dataSources != null) {
+    if(dataSources == null) {
       val data = new util.HashMap[String, DataSource](databaseConfigList.size())
       val it = databaseConfigList.iterator()
       if (it.hasNext) {
