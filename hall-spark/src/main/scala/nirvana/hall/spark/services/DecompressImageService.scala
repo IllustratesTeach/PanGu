@@ -25,7 +25,6 @@ object DecompressImageService {
   private lazy val gfsDirect = SysProperties.getBoolean("decompress.gfs.direct",defaultValue = false)
   private lazy val wsqDirect = SysProperties.getBoolean("decompress.wsq.direct",defaultValue = false)
   private lazy val imageServers = SysProperties.getPropertyOption("decompress.server").get
-  private lazy val converterExtract = SysProperties.getBoolean("extractor.converter",defaultValue = false)
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
@@ -50,7 +49,7 @@ object DecompressImageService {
     if (event.personId != null && event.personId.length > 0) {
     //if (true) {
 
-      if (compressedImg.stHead.bIsCompressed == 1 || converterExtract) {
+      if (compressedImg.stHead.bIsCompressed == 1) {
         //using direct decompress method for WSQ and GFS
         if (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_WSQ.toByte
         && wsqDirect){
