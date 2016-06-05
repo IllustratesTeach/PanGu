@@ -56,26 +56,35 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      val flag = rs.getInt("flag")
      val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
-     //TODO 没有掌纹
-     if(flag == 2 || flag == 22){
-
-     }
      matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, flag))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
      matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
      matchTaskBuilder.setPriority(rs.getInt("priority"))
-     val mic = rs.getBytes("mic")
-     queryType match {
-       case HallMatcherConstants.QUERY_TYPE_TT =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
-       case HallMatcherConstants.QUERY_TYPE_TL =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
-       case HallMatcherConstants.QUERY_TYPE_LT =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
-       case HallMatcherConstants.QUERY_TYPE_LL =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+     if(flag == 2 || flag == 22){
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LL)
+       }
+     }else{
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+       }
      }
 
+     val mic = rs.getBytes("mic")
      val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
      mics.foreach{ micStruct =>
        if(micStruct.bIsLatent == 1){

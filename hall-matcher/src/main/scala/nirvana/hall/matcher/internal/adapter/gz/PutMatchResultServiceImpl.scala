@@ -46,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
 
     var candList:Array[Byte] = null
     if(candNum > 0){
-      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
+      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
       candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
     }
 
@@ -78,7 +78,13 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       ps.setString(2, match_id)
     }
   }
-
+  /**
+   * 获取候选列表
+   * @param matchResultRequest
+   * @param queryQue
+   * @param sidKeyidMap
+   * @return
+   */
   private def getCandList(matchResultRequest: MatchResultRequest, queryQue: QueryQue, sidKeyidMap: Map[Long, String]): Array[Byte] = {
     val queryType = queryQue.queryType
     val result = new ByteArrayOutputStream()
@@ -110,7 +116,15 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     result.toByteArray
   }
 
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryType: Int)(implicit dataSource: DataSource): Map[Long, String] = {
+  /**
+   * 根据候选列表的sid获取编号, 生成对应关系map
+   * @param matchResultRequest
+   * @param queryQue
+   * @param dataSource
+   * @return
+   */
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+    val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
     var map: Map[Long, String] = Map()
@@ -123,7 +137,11 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
       sql = "select p.sid as sid, p.personid as cardid from gafis_person p where p.sid in (" + sids + ")"
     } else {
-      sql = "select t.sid as sid, t.finger_id as cardid from gafis_case_finger t where t.sid in (" + sids + ")"
+      if(queryQue.isPalm){
+        sql = "select t.sid as sid, t.palm_id as cardid from gafis_case_palm t where t.sid in (" + sids + ")"
+      }else{
+        sql = "select t.sid as sid, t.finger_id as cardid from gafis_case_finger t where t.sid in (" + sids + ")"
+      }
     }
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
     } { rs =>

@@ -78,7 +78,13 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       ps.setString(2, match_id)
     }
   }
-
+  /**
+   * 获取候选列表
+   * @param matchResultRequest
+   * @param queryType
+   * @param sidKeyidMap
+   * @return
+   */
   private def getCandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String]): Array[Byte] = {
     val result = new ByteArrayOutputStream()
     val candIter = matchResultRequest.getCandidateResultList.iterator()
@@ -103,6 +109,13 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     result.toByteArray
   }
 
+  /**
+   * 根据候选列表的sid获取编号, 生成对应关系map
+   * @param matchResultRequest
+   * @param queryType
+   * @param dataSource
+   * @return
+   */
   private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryType: Int)(implicit dataSource: DataSource): Map[Long, String] = {
     var sids = ""
     var sql = ""

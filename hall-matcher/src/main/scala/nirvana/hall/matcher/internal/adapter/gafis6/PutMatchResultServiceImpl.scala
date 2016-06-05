@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT}
+import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
@@ -18,7 +19,7 @@ import scala.collection.JavaConversions._
  * 保存比对结果service
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
-  val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
+  val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
   val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
@@ -45,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
 
     var candList:Array[Byte] = null
     if(candNum > 0){
-      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
+      val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
       candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
@@ -78,7 +79,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param status
    */
   private def updateMatchStatusFail(match_id: String, status: MatcherStatus) {
-    val sql: String = "UPDATE NORMALQUERY_QUERYQUE t SET t.status=2, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE NORMALQUERY_QUERYQUE t SET t.status="+HallMatcherConstants.QUERY_STATUS_FAIL+", t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, status.getMsg)
       ps.setString(2, match_id)
@@ -96,7 +97,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     candHead.szKey = queryQue.keyId
     candHead.bIsPalm = if (queryQue.isPalm) 1 else 0
     candHead.nQueryType = queryType.toByte
-    candHead.nSrcDBID = if (queryType == 0 || queryType == 1) 1 else 2
+    candHead.nSrcDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) 1 else 2
     candHead.nTableID = 2
     candHead.nQueryID = queryQue.oraSid.toString
     candHead.nCandidateNum = matchResultRequest.getCandidateNum
@@ -130,7 +131,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         val gCand = new GAQUERYCANDSTRUCT
         gCand.nScore = cand.getScore
         gCand.szKey = keyId.get
-        gCand.nDBID = if (queryType == 0 || queryType == 2) 1 else 2
+        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
         gCand.nTableID = 2
         gCand.nIndex = fgp.toByte
         gCand.tFinishTime = new AFISDateTime
@@ -159,11 +160,12 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
   /**
    * 根据候选列表的sid获取编号, 生成对应关系map
    * @param matchResultRequest
-   * @param queryType
+   * @param queryQue
    * @param dataSource
    * @return
    */
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryType: Int)(implicit dataSource: DataSource): Map[Long, String] = {
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+    val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
     var map: Map[Long, String] = Map()
@@ -173,11 +175,15 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     if (sids.lastIndexOf(",") > 0) {
       sids = sids.substring(0, sids.length - 1)
     }
-    if (queryType == 0 || queryType == 1) {
+    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
       sql = "select t.ora_sid,t.cardid from normaltp_tpcardinfo t where t.ora_sid in ("+sids+")"
     }
     else {
-      sql = "select t.ora_sid,t.fingerid as cardid from normallp_latfinger t where t.ora_sid in ("+sids+")"
+      if(queryQue.isPalm){
+        sql = "select t.ora_sid, t.palmid as cardid from normallp_latpalm t where t.ora_sid in (" + sids + ")"
+      }else{
+        sql = "select t.ora_sid,t.fingerid as cardid from normallp_latfinger t where t.ora_sid in ("+sids+")"
+      }
     }
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
     } { rs =>

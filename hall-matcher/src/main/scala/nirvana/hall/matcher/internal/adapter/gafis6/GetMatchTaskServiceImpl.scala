@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import net.sf.json.JSONObject
+import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
@@ -26,6 +27,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    private val GET_SID_BY_PERSONID: String = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid=?"
    /** 获取sid根据卡号（现场指纹） */
    private val GET_SID_BY_CASE_FINGERID: String = "select t.ora_sid from normallp_latfinger t where t.fingerid=?"
+   private val GET_SID_BY_CASE_PALMID: String = "select t.ora_sid from normallp_latpalm t where t.palmid=?"
    /**
     * 获取比对任务
     * @param matchTaskQueryRequest
@@ -55,28 +57,38 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      val keyId = rs.getString("keyid")
      val queryType = rs.getInt("querytype")
      val flag = rs.getInt("flag")
+     val isPalm = flag == 2 || flag == 22
 //     val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
-     //TODO 没有掌纹
-     if(flag == 2 || flag == 22){
-
-     }
-     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, flag))
+     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
      matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
      matchTaskBuilder.setPriority(rs.getInt("priority"))
-     val mic = rs.getBytes("mic")
-     queryType match {
-       case 0 =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
-       case 1 =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
-       case 2 =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
-       case 3 =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+     if(isPalm){
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LL)
+       }
+     }else{
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+       }
      }
 
+     val mic = rs.getBytes("mic")
      val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
      mics.foreach{ micStruct =>
        if(micStruct.bIsLatent == 1){
@@ -96,12 +108,16 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      matchTaskBuilder.build()
    }
 
-   private def getObjectIdByCardId(cardId: String, queryType: Int, flag: Int): Long={
+   private def getObjectIdByCardId(cardId: String, queryType: Int, isPalm: Boolean): Long={
      var sql: String = ""
-     if (queryType == 0 || queryType == 1) {
+     if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
        sql = GET_SID_BY_PERSONID
      } else {
-       sql = GET_SID_BY_CASE_FINGERID
+       if(isPalm){
+         sql = GET_SID_BY_CASE_PALMID
+       }else{
+         sql = GET_SID_BY_CASE_FINGERID
+       }
      }
      val oraSidOption = JdbcDatabase.queryFirst[Long](sql){ps =>
        ps.setString(1, cardId)
@@ -150,7 +166,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    * @return
    */
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
-    JdbcDatabase.update("update NORMALQUERY_QUERYQUE t set t.status=1 where t.ora_sid=?"){ps=>
+    JdbcDatabase.update("update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+" where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
     }
   }
@@ -160,7 +176,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    * @param message 异常信息
    */
   private def updateMatchStatusFail(match_id: String, message: String) {
-    val sql: String = "UPDATE NORMALQUERY_QUERYQUE t SET t.status=3, t.ORACOMMENT=? WHERE t.ora_sid=?"
+    val sql: String = "UPDATE NORMALQUERY_QUERYQUE t SET t.status="+HallMatcherConstants.QUERY_STATUS_FAIL+", t.ORACOMMENT=? WHERE t.ora_sid=?"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, message)
       ps.setString(2, match_id)
