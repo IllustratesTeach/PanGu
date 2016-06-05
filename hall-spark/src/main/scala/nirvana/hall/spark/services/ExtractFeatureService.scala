@@ -1,6 +1,6 @@
 package nirvana.hall.spark.services
 
-import java.io.ByteArrayInputStream
+import java.io.{File, ByteArrayInputStream}
 
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
@@ -10,6 +10,7 @@ import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractResponse, ExtractRequest}
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
+import org.apache.commons.io.FileUtils
 import scala.util.control.NonFatal
 
 /**
@@ -31,16 +32,15 @@ object ExtractFeatureService {
     if (event.personId != null && event.personId.length > 0) {
       try {
         val featureTryVersion = if (parameter.isNewFeature) ExtractProto.NewFeatureTry.V2 else ExtractProto.NewFeatureTry.V1
+        //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\dd\\"+event.path+".data"),originalImg.toByteArray())
         if(directExtract) {
           SparkFunctions.loadExtractorJNI()
-          var m = null
-          var b = null
           if (converterExtract) {
             val is = new ByteArrayInputStream(originalImg.toByteArray())
             val newFeature = extractor.ConvertMntOldToNew(is)
             Some(event, new GAFISIMAGESTRUCT().fromByteArray(newFeature.get),null)
           } else {
-            //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".img"),originalImg.toByteArray())
+            //FileUtils.writeStringToFile(new File("C:\\Users\\wangjue\\Desktop\\dd\\1.txt"),event.path+"\r\n",true)
             val (mnt, bin) = extractor.extractByGAFISIMG(originalImg, event.position, event.featureType, featureTryVersion)
             Some(event, mnt, bin)
           }

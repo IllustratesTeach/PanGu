@@ -42,11 +42,21 @@ object BigDataStream {
       ssc, kafkaParams,Set(kafkaTopicName))
       .repartition(parameter.partitionsNum) //reset partition
       .map(_._2) //only use message content
-      .flatMap(ImageProviderService.requestRemoteFile(parameter,_)) //fetch files
-      .flatMap(x=>DecompressImageService.requestDecompress(parameter,x._1,x._2)) // decompress image
-      .flatMap(x=>ExtractFeatureService.requestExtract(parameter,x._1,x._2)) //extract feature
+      .flatMap{x=>
+          SysProperties.setConfig(parameter)
+          ImageProviderService.requestRemoteFile(parameter,x)
+      } //fetch files
+      .flatMap{x=>
+          SysProperties.setConfig(parameter)
+          DecompressImageService.requestDecompress(parameter,x._1,x._2)
+      } // decompress image
+      .flatMap{x=>
+        SysProperties.setConfig(parameter)
+        ExtractFeatureService.requestExtract(parameter,x._1,x._2)
+        } //extract feature
       .foreachRDD{rdd=>
         //save records for partition
+        SysProperties.setConfig(parameter)
         rdd.foreachPartition(PartitionRecordsSaverService.savePartitionRecords(parameter))
       }
 
