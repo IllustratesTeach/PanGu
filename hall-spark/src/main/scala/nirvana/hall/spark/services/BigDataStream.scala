@@ -56,8 +56,10 @@ object BigDataStream {
         } //extract feature
       .foreachRDD{rdd=>
         //save records for partition
-        SysProperties.setConfig(parameter)
-        rdd.foreachPartition(PartitionRecordsSaverService.savePartitionRecords(parameter))
+        rdd.foreachPartition{x=>
+            SysProperties.setConfig(parameter)
+            PartitionRecordsSaverService.savePartitionRecords(parameter)
+          }
       }
 
     ssc
