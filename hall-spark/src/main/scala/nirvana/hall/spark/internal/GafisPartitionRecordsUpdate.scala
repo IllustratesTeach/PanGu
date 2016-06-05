@@ -34,7 +34,7 @@ object GafisPartitionRecordsUpdate{
 
 
   private def savePersonFingerMntInfo(pkId : String,newFeature : Array[Byte]): Unit = {
-    val updateFeatureSql: String = "update gafis_gather_finger t set t.gather_data = ? where t.pk_id = ?"
+    val updateFeatureSql: String = "update gafis_gather_finger t set t.gather_data = ? , t.modifiedtime = sysdate where t.pk_id = ?"
     JdbcDatabase.update(updateFeatureSql) { ps =>
       ps.setBytes(1, newFeature)
       ps.setString(2, pkId)
