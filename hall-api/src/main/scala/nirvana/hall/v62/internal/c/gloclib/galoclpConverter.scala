@@ -145,11 +145,11 @@ object galoclpConverter extends LoggerSupport{
     val mic = card.getBlobBuilder
     gCard.pstMIC_Data.foreach{ item =>
 
-      if(item.pstMnt_Data != null)
+      if(item.nImgLen > 0)
         mic.setStMntBytes(ByteString.copyFrom(item.pstMnt_Data))
-      if(item.pstCpr_Data != null) {
+      if(item.nCprLen > 0) {
         mic.setStImageBytes(ByteString.copyFrom(item.pstCpr_Data))
-      }else if(item.pstImg_Data != null) {
+      }else if(item.nImgLen > 0) {
         mic.setStImageBytes(ByteString.copyFrom(item.pstImg_Data))
       }
       item.nItemType match {
@@ -323,12 +323,12 @@ object galoclpConverter extends LoggerSupport{
         }
       }
     }
-    if(gCase.pstFingerID_Data != null){
+    if(gCase.nFingerIDLen > 0){
       gCase.pstFingerID_Data.foreach{ f=>
         caseInfo.addStrFingerID(f.szKey)
       }
     }
-    if(gCase.pstPalmID_Data != null){
+    if(gCase.nPalmIDLen > 0){
       gCase.pstPalmID_Data.foreach{ f=>
         caseInfo.addStrPalmID(f.szKey)
       }
