@@ -46,7 +46,11 @@ object ghpcdef {
     // day, [1, 31]
     var tMonth: Byte = calendar.get(Calendar.MONTH).toByte;
     // month, [0, 11]
-    var tYear: Short = calendar.get(Calendar.YEAR).toShort; // short int year.
+    var tYear: Short = converAsGafisYear()
+    def converAsGafisYear(): Short ={
+      val year = calendar.get(Calendar.YEAR)
+      (((year & 0xff) << 8) | (year >>> 8)).toShort
+    }
   }
 
   // GAFIS_DATE;	// size is 4 bytes long.
