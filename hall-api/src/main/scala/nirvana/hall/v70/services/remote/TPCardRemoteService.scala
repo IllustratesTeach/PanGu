@@ -11,5 +11,5 @@ trait TPCardRemoteService {
    * 获取捺印卡片
    * @return
    */
-  def getTPCard(personId: String, ip: String, port: String): TPCard
+  def getTPCard(personId: String, ip: String, port: String): Option[TPCard]
 }
