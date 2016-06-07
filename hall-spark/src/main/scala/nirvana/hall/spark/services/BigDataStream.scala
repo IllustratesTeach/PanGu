@@ -51,14 +51,14 @@ object BigDataStream {
           DecompressImageService.requestDecompress(parameter,x._1,x._2)
       } // decompress image
       .flatMap{x=>
-        SysProperties.setConfig(parameter)
-        ExtractFeatureService.requestExtract(parameter,x._1,x._2)
+          SysProperties.setConfig(parameter)
+          ExtractFeatureService.requestExtract(parameter,x._1,x._2)
         } //extract feature
       .foreachRDD{rdd=>
         //save records for partition
         rdd.foreachPartition{x=>
             SysProperties.setConfig(parameter)
-            PartitionRecordsSaverService.savePartitionRecords(parameter)
+            PartitionRecordsSaverService.savePartitionRecords(parameter)(x)
           }
       }
 

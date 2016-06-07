@@ -22,7 +22,7 @@ class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
       try {
         if (event.personId != null && event.personId.length > 0) { //save template
         var fagCase = 0
-          /*val personIdOpt = queryPersonById(event.personId)
+          val personIdOpt = queryPersonById(event.personId)
           if (personIdOpt.isEmpty) {
             try savePersonInfo(event.personId, event.path,flag)
             catch {
@@ -30,7 +30,7 @@ class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
                 if (e.toString.indexOf("PK_GAFIS_PERSON_PERSONID") == -1)
                   throw e
             }
-          }*/
+          }
 
           if (mnt.stHead.bIsPlain == 1) //is plain finger
             fagCase = 1
