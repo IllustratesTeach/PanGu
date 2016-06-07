@@ -20,5 +20,10 @@ class BigDataStreamTest {
     BigDataStream.main(array)
     //SaveErrorStream.main(array)
   }
+  @Test
+  def streamTestFTP (){
+    val array = Array("src/test/resources/test_spark_ftp.xml")
+    BigDataStream.main(array)
+  }
 
 }
