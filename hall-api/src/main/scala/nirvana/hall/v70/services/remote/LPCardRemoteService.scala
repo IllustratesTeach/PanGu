@@ -14,5 +14,5 @@ trait LPCardRemoteService {
    * @param port
    * @return
    */
-  def getLPCard(cardId: String, ip: String, port: String): LPCard
+  def getLPCard(cardId: String, ip: String, port: String): Option[LPCard]
 }

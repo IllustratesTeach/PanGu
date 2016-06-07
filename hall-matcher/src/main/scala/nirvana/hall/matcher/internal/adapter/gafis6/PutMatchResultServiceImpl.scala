@@ -175,7 +175,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     if (sids.lastIndexOf(",") > 0) {
       sids = sids.substring(0, sids.length - 1)
     }
-    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
+    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
       sql = "select t.ora_sid,t.cardid from normaltp_tpcardinfo t where t.ora_sid in ("+sids+")"
     }
     else {

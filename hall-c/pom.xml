@@ -20,10 +20,6 @@
       <artifactId>hall-protocol</artifactId>
     </dependency>
     <dependency>
-      <groupId>nirvana</groupId>
-      <artifactId>hall-orm-macro</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
