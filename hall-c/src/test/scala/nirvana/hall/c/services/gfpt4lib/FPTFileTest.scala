@@ -16,6 +16,26 @@ import org.junit.{Assert, Test}
  */
 class FPTFileTest {
   @Test
+  def test_convert: Unit = {
+    val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/fpt_failed"), Array[String]("fpt", "FPT", "fptt"), true)
+    val it = files.iterator()
+    while(it.hasNext){
+      val file = it.next()
+      println("processing "+file.getAbsolutePath)
+      val is = new FileInputStream(file)
+      val result = FPTFile.parseFromInputStream(is,AncientConstants.GBK_ENCODING)
+      IOUtils.closeQuietly(is)
+      val bytes = result match{
+        case Left(fpt3)=>
+          fpt3.fs = FPTFile.FS
+          fpt3.toByteArray(AncientConstants.GBK_ENCODING)
+        case Right(fpt4)=>
+          fpt4.toByteArray(AncientConstants.GBK_ENCODING)
+      }
+      FileUtils.writeByteArrayToFile(new File(file.getAbsolutePath+".converted"),bytes)
+    }
+  }
+  @Test
   def test_performance: Unit ={
     val files = FileUtils.listFiles(new File("/Users/jcai/Downloads/fpt-files"),Array[String]("fpt","FPT","fptt"),true)
     val it = files.iterator()
