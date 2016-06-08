@@ -13,8 +13,8 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
  * Created by songpeng on 16/4/6.
  */
 class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_gather_finger t where t.group_id in(0,4) "
-  override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_gather_finger t where t.group_id in(0,4) and t.seq >"
+  override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_gather_finger t "
+  override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_gather_finger t where t.seq >"
   override val SYNC_SQL: String = "select p.sid, t.fgp, t.fgp_case, t.group_id, t.gather_data, t.seq, p.deletag " +
     " from gafis_gather_finger t " +
     " left join gafis_person p on t.person_id=p.personid " +
