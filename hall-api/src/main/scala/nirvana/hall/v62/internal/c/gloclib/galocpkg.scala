@@ -6,7 +6,8 @@ import nirvana.hall.c.services.gbaselib.gbasedef.{GAKEYSTRUCT,GBASE_UTIL_ALIGN}
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMSTRUCT, GBASE_ITEMPKG_OPSTRUCT}
 import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GAFIS_LP_EXTRAINFO, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAQUERYSTRUCT}
-import nirvana.hall.c.services.gloclib.{galocpkg, glocdef, galoclp, galoctp}
+import nirvana.hall.c.services.gloclib
+import nirvana.hall.c.services.gloclib.{glocdef, galoclp}
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GATEXTITEMSTRUCT, GAFISMICSTRUCT}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
@@ -60,7 +61,7 @@ trait galocpkg {
 
     pstPkg.addItem(pstItem)
 
-    pstPkg.head.nPkgType = galocpkg.PKG_TYPE_QUERY
+    pstPkg.head.nPkgType = gloclib.galocpkg.PKG_TYPE_QUERY
     pstPkg.head.szPkgTypeStr = pszQuery
 
   }
@@ -106,7 +107,7 @@ trait galocpkg {
             pstCard.nInfoExLen = nCount.toShort
 
             //set itemflag for add or update  [12/18/2006]
-            pstCard.nItemFlag = (pstCard.nItemFlag | galoctp.TPCARDINFO_ITEMFLAG_INFOEX).toByte
+            pstCard.nItemFlag = (pstCard.nItemFlag | gloclib.galoctp.TPCARDINFO_ITEMFLAG_INFOEX).toByte
             if (pstCard.pstInfoEx_Data.nItemFlag == 0) pstCard.pstInfoEx_Data.nItemFlag = 0xFF.toByte
             if (pstCard.pstInfoEx_Data.stFpx.nItemFlag == 0) pstCard.pstInfoEx_Data.stFpx.nItemFlag = 0xFF.toByte
           }

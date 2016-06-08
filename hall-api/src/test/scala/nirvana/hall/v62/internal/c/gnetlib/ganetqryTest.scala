@@ -78,7 +78,7 @@ class ganetqryTest {
     itemHead.szItemName = facade.GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
-    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\0".getBytes
+    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\u0000".getBytes
     val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
     itemHead2.szItemName = facade.GAFIS_TEXTSQL_GetName
     itemHead2.nItemLen = xmlData.length

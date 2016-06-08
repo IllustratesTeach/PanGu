@@ -50,7 +50,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
 
 
-    override def writeAncientData[T <: AncientData, R <: AncientData : ClassManifest](target: T): R = {
+    override def writeAncientData[T <: AncientData, R <: AncientData : ClassTag](target: T): R = {
       target.writeToStreamWriter(connection)
       receive[R]()
     }

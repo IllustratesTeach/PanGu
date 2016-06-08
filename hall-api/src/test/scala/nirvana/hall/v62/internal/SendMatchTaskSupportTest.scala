@@ -81,7 +81,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
     itemHead.szItemName = sender.GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
-    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\0".getBytes
+    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\u0000".getBytes
     val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
     itemHead2.szItemName = sender.GAFIS_TEXTSQL_GetName
     itemHead2.nItemLen = xmlData.length
@@ -138,7 +138,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
 
     val idx= 1 to 10 map(x=>x.asInstanceOf[Byte]) toArray
 
-    val key = "3702022014000002\0".getBytes
+    val key = "3702022014000002\u0000".getBytes
     val pstKey = new GADB_KEYARRAY
     pstKey.nKeyCount = 1
     pstKey.nKeySize = key.size.asInstanceOf[Short]
@@ -170,7 +170,7 @@ class SendMatchTaskSupportTest extends LoggerSupport{
     itemHead.szItemName = sender.GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
-    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\0".getBytes
+    val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\u0000".getBytes
     val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
     itemHead2.szItemName = sender.GAFIS_TEXTSQL_GetName
     itemHead2.nItemLen = xmlData.length

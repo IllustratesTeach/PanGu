@@ -29,8 +29,6 @@ class FPTLatentConverterTest extends BaseJniTest{
     mnt.bnData = latentFeature.toByteArray()
     mnt.stHead.nImgSize = 640
 
-    latentFeature.nWidth
-    print(mnt.getDataSize)
     val latent2 = new FINGERLATMNTSTRUCT()
     val fis = new FileInputStream(new File("/Users/jcai/Downloads/650000000999210005000201.mnt"))
     fis.skip(64)
