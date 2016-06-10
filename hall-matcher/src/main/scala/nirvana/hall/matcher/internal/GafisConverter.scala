@@ -1,7 +1,13 @@
 package nirvana.hall.matcher.internal
 
+import java.io.ByteArrayOutputStream
+
+import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.galoctp.GADB_MICSTREAMNAMESTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
+import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.protocol.MatchResult.MatchResultRequest
 import org.jboss.netty.buffer.ChannelBuffer
 
 import scala.collection.mutable
@@ -11,6 +17,12 @@ import scala.collection.mutable
  */
 object GafisConverter {
   val streamParameter = new GADB_MICSTREAMNAMESTRUCT
+
+  /**
+   * gafis查询mic字段解析
+   * @param buffer
+   * @return
+   */
   def GAFIS_MIC_GetDataFromStream(buffer:ChannelBuffer): Seq[GAFISMICSTRUCT]={
     val result= mutable.Buffer[GAFISMICSTRUCT]()
     var dataLength = 0
@@ -72,5 +84,57 @@ object GafisConverter {
     val currentName= new String(bytes.array()).trim
     if(!currentName.startsWith(expectedName))
       throw new IllegalAccessException("expectName=%s actual =%s".format(expectedName,currentName))
+  }
+
+  /**
+   * 比对结果MatchResult转换为gafis候选列表
+   * @param matchResultRequest
+   * @param queryType
+   * @param sidKeyidMap
+   * @return
+   */
+  def convertMatchResult2CandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String], isPalm: Boolean = false): Array[Byte] ={
+    val result = new ByteArrayOutputStream()
+    val candIter = matchResultRequest.getCandidateResultList.iterator()
+    var index = 0 //比对排名
+    while (candIter.hasNext) {
+      index += 1
+      val cand = candIter.next()
+      val keyId = sidKeyidMap.get(cand.getObjectId)
+      if (keyId.nonEmpty) {
+        //指位转换
+        var fgp = 0
+        if(isPalm){
+          fgp = DataConverter.palmPos8to6(cand.getPos)
+        }else{
+          fgp = DataConverter.fingerPos8to6(cand.getPos)
+        }
+        val gCand = new GAQUERYCANDSTRUCT
+        gCand.nScore = cand.getScore
+        gCand.szKey = keyId.get
+        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
+        gCand.nTableID = 2
+        gCand.nIndex = fgp.toByte
+        gCand.tFinishTime = new AFISDateTime
+        gCand.nStepOneRank = index
+        result.write(gCand.toByteArray())
+      }
+      /*  result.write(new Array[Byte](4))
+          result.write(DataConverter.int2Bytes(cand.getScore))
+          result.write(keyId.get.getBytes)
+          result.write(new Array[Byte](32 - keyId.get.getBytes().length + 2))
+          val dbId = if (queryType == 0 || queryType == 2) 1 else 2
+          result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
+          result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
+          result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
+          result.write(fgp.toByte)
+          result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
+          result.write(DataConverter.getAFISDateTime(new Date()))
+          result.write(new Array[Byte](2 + 2 + 2 + 2))
+          result.write(new Array[Byte](8 + 2))
+          result.write(DataConverter.int2Bytes(index))
+          result.write(new Array[Byte](2))*/
+    }
+    result.toByteArray
   }
 }

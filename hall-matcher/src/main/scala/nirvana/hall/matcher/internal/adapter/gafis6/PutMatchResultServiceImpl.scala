@@ -1,12 +1,11 @@
 package nirvana.hall.matcher.internal.adapter.gafis6
 
-import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDHEADSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.internal.DataConverter
+import nirvana.hall.matcher.internal.GafisConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
@@ -47,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      candList = getCandList(matchResultRequest, queryQue, sidKeyidMap)
+      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
 
@@ -103,58 +102,6 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     candHead.nCandidateNum = matchResultRequest.getCandidateNum
     candHead.tFinishTime = new AFISDateTime
     return candHead.toByteArray()
-  }
-  /**
-   * 获取候选列表
-   * @param matchResultRequest
-   * @param queryQue
-   * @param sidKeyidMap
-   * @return
-   */
-  private def getCandList(matchResultRequest: MatchResultRequest, queryQue: QueryQue, sidKeyidMap: Map[Long, String]): Array[Byte] = {
-    val queryType = queryQue.queryType
-    val result = new ByteArrayOutputStream()
-    val candIter = matchResultRequest.getCandidateResultList.iterator()
-    var index = 0 //比对排名
-    while (candIter.hasNext) {
-      index += 1
-      val cand = candIter.next()
-      val keyId = sidKeyidMap.get(cand.getObjectId)
-      if (keyId.nonEmpty) {
-        //指位转换
-        var fgp = 0
-        if(queryQue.isPalm){
-          fgp = DataConverter.palmPos8to6(cand.getPos)
-        }else{
-          fgp = DataConverter.fingerPos8to6(cand.getPos)
-        }
-        val gCand = new GAQUERYCANDSTRUCT
-        gCand.nScore = cand.getScore
-        gCand.szKey = keyId.get
-        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
-        gCand.nTableID = 2
-        gCand.nIndex = fgp.toByte
-        gCand.tFinishTime = new AFISDateTime
-        gCand.nStepOneRank = index
-        result.write(gCand.toByteArray())
-/*        result.write(new Array[Byte](4))
-        result.write(DataConverter.int2Bytes(cand.getScore))
-        result.write(keyId.get.getBytes)
-        result.write(new Array[Byte](32 - keyId.get.getBytes().length + 2))
-        val dbId = if (queryType == 0 || queryType == 2) 1 else 2
-        result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
-        result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
-        result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
-        result.write(fgp.toByte)
-        result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
-        result.write(DataConverter.getAFISDateTime(new Date()))
-        result.write(new Array[Byte](2 + 2 + 2 + 2))
-        result.write(new Array[Byte](8 + 2))
-        result.write(DataConverter.int2Bytes(index))
-        result.write(new Array[Byte](2))*/
-      }
-    }
-    result.toByteArray
   }
 
   /**
