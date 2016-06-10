@@ -32,14 +32,20 @@ import scala.concurrent.{ExecutionContext, Promise}
   *  hall proxy起到代理功能，大部分的功能还是通过通信服务器来实现的，只是把我们需要的业务放在7.0服务器中实现.
   * 2. 整个核心程序的思想把一端收到的消息毫无保留的转发给另外一端的通信服务器
   *  处理左端网络消息的核心程序
-  *     TxProxyInboundHandler  针对收到的消息进行统一处理，根据状态是否要转发给右端服务器，还是本身自己消化
-  *     GBASE_ITEMPKG_OPSTRUCTFrameDecoder   针对收到的网络字节序进行处理,需要注意的是：
+  *     TxProxyInboundHandler
+  *         针对收到的消息进行统一处理，根据状态是否要转发给右端服务器，还是本身自己消化
+  *     GBASE_ITEMPKG_OPSTRUCTFrameDecoder
+  *         针对收到的网络字节序进行处理,需要注意的是：
   *                               开始消息有两种，1.GBASE_ITEMPKG_OPSTRUCT 2.GNETREQUESTHEADOBJECT
-  *     GBASE_ITEMPKG_OPSTRUCTDecoder        针对收到的网络字节变为为  GBASE_ITEMPKG_OPSTRUCT对象
-  *     AncientDataEncoder    针对所有发送的数据，把对象变换为字节码
-  *     GBASE_ITEMPKG_OPSTRUCTEncoder       构造GBASE_ITEMPKG_OPSTRUCT的发送方法
-  *     GBASE_ITEMPKG_OPSTRUCTHandler   针对接受到的消息执行业务逻辑，如果整个包没有处理，则直接转发给右端服务器
-  *                                                                      ^^^^^^^^^^^^^^
+  *     GBASE_ITEMPKG_OPSTRUCTDecoder
+  *         针对收到的网络字节变为为 GBASE_ITEMPKG_OPSTRUCT对象
+  *     AncientDataEncoder
+  *         针对所有发送的数据，把对象变换为字节码
+  *     GBASE_ITEMPKG_OPSTRUCTEncoder
+  *         构造GBASE_ITEMPKG_OPSTRUCT的发送方法
+  *     GBASE_ITEMPKG_OPSTRUCTHandler
+  *         针对接受到的消息执行业务逻辑，如果整个包没有处理，则直接转发给右端服务器
+  *                                                      ^^^^^^^^^^^^^^
   *  处理右端网络消息的核心程序
   *     OutboundHandler       接收到右端网络的消息，直接发送给左端网络服务器
   *     AncientDataEncoder    针对所有发送的对象数据，变换为字节码
