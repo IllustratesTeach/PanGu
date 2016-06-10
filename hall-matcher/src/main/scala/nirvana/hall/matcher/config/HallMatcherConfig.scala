@@ -15,6 +15,8 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
 
   @XmlElement(name = "database")
   var db: DatabaseConfig = new DatabaseConfig
+  @XmlElement(name = "fetch_batch_size")
+  var fetchBatchSize: Int = 100
   @XmlElement(name = "module")
   var module: String = "gz"
   @XmlElement(name = "mnt")

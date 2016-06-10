@@ -1,10 +1,9 @@
-package nirvana.hall.matcher.internal.adapter.gz.sync
+package nirvana.hall.matcher.internal.adapter
 
 import java.sql.ResultSet
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataChecker
 import nirvana.hall.support.services.JdbcDatabase
@@ -18,6 +17,7 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
   val MAX_SEQ_SQL: String
   val MIN_SEQ_SQL: String
   val SYNC_SQL: String
+  final val FETCH_BATCH_SIZE = hallMatcherConfig.fetchBatchSize
   /**
    * 抓取同步数据
    * @param syncDataResponse
@@ -29,12 +29,12 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
     if(from_ > 0 && from_ <= getMaxSeq){
       JdbcDatabase.queryWithPsSetter(SYNC_SQL){ps=>
         ps.setLong(1, from_)
-        ps.setLong(2, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
+        ps.setLong(2, from_ + FETCH_BATCH_SIZE)
       }{rs=>
         readResultSet(syncDataResponse, rs, size)
       }
       if(syncDataResponse.getSyncDataCount < size){
-        doFetch(syncDataResponse, size, from_ + HallMatcherConstants.FETCH_BATCH_SIZE)
+        doFetch(syncDataResponse, size, from_ + FETCH_BATCH_SIZE)
       }
     }
   }

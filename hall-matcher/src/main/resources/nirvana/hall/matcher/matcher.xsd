@@ -29,6 +29,7 @@
                     <xs:documentation>gz,daku,sh</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:int" name="fetch_batch_size" minOccurs="0" maxOccurs="1"/>
             <xs:element type="mntType" name="mnt" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>特征的相关配置</xs:documentation>
