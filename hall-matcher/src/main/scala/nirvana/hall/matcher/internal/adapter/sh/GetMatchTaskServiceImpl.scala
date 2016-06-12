@@ -14,7 +14,6 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
 import nirvana.protocol.NirvanaTypeDefinition.MatchType
-import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, Occur}
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -109,16 +108,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig,featureExtrac
        //文本查询
        val json = JSONObject.fromObject(textSql)
        if(queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT){
-         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
-         //布控和追逃不比1.2亿
-         if (json.has("controlPursuitStatus")) {
-           val value: String = json.getString("controlPursuitStatus")
-           val colQuery = KeywordQuery.newBuilder
-           colQuery.setValue(value)
-           queryBuilder.addQueryBuilder.setName("controlPursuitStatus").setExtension(KeywordQuery.query, colQuery.build)
-           val dataInQuery = GroupQuery.newBuilder
-           dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
-         }
+
        }else if(queryType == HallMatcherConstants.QUERY_TYPE_TL || queryType == HallMatcherConstants.QUERY_TYPE_LL){
 
        }
@@ -181,7 +171,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig,featureExtrac
      return builder.build
    }
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
-    JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+" where t.ora_sid=?"){ps=>
+    JdbcDatabase.update("update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+", t.begintime=sysdate where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
     }
   }
