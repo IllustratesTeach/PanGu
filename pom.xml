@@ -61,6 +61,11 @@
         <version>${stark-release-version}</version>
       </dependency>
       <dependency>
+          <groupId>nirvana</groupId>
+          <artifactId>hall-extractor</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
