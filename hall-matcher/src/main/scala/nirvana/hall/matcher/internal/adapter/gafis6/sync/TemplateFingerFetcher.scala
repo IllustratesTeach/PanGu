@@ -6,7 +6,6 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
@@ -31,7 +30,7 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
 //    " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
 //    " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
     s" ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t " +
-    s"where ${wrapUpdateTimeAsLong()} >=? order by t.updatetime) tt where rownum <=?";
+    s"where ${wrapUpdateTimeAsLong()} >=? order by t.updatetime) tt "
   //特征字段，根据指位1..20排序
   val mntColums: Array[String] = Array[String](
     "fingerrhmmnt", "fingerrhsmnt", "fingerrhzmnt", "fingerrhhmnt", "fingerrhxmnt", "fingerlhmmnt", "fingerlhsmnt", "fingerlhzmnt", "fingerlhhmnt", "fingerlhxmnt",

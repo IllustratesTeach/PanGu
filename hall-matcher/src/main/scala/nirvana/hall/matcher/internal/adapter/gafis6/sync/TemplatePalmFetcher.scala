@@ -5,7 +5,6 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 
@@ -18,7 +17,7 @@ class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     s"where ${wrapUpdateTimeAsLong()} >"
   override val SYNC_SQL: String = "select * from " +
     s"(select t.ora_sid as sid, t.palmlmnt, t.palmrmnt, ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t  " +
-    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=? "
+    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt "
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
       //左掌特征

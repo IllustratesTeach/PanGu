@@ -5,7 +5,6 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
@@ -20,7 +19,7 @@ class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Data
   /** 同步现场指纹 */
   override val SYNC_SQL: String = s"select * from " +
     s"(select t.ora_sid as sid, t.fingermnt, t.fingerbin, ${wrapUpdateTimeAsLong()} as seq from normallp_latfinger t  " +
-    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=?"
+    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt "
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
       val syncDataBuilder = SyncData.newBuilder()

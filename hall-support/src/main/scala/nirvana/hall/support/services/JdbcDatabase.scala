@@ -77,6 +77,40 @@ object JdbcDatabase {
       }
     }
   }
+
+  /**
+   * 查询自己控制是否遍历，通过手动执行rs.next遍历结果
+   * @param sql
+   * @param psSetter
+   * @param mapper
+   * @param ds
+   * @return
+   */
+  def queryWithPsSetter2(sql: String)(psSetter: PreparedStatement => Unit)(mapper: ResultSet => Unit)(implicit ds: DataSource) {
+    use(autoCommit = false) { conn =>
+      val st = conn.prepareStatement(sql)
+      try {
+        psSetter.apply(st)
+        val rs = st.executeQuery
+        try {
+          mapper(rs)
+        } finally {
+          closeJdbc(rs)
+        }
+      } finally {
+        closeJdbc(st)
+      }
+    }
+  }
+
+  /**
+   * 查询遍历所有的结果集,不用执行rs.next
+   * @param sql
+   * @param psSetter
+   * @param mapper
+   * @param ds
+   * @return
+   */
   def queryWithPsSetter(sql: String)(psSetter: PreparedStatement => Unit)(mapper: ResultSet => Unit)(implicit ds: DataSource) {
     use(autoCommit = false) { conn =>
       val st = conn.prepareStatement(sql)

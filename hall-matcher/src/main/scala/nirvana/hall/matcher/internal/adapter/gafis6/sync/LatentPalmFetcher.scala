@@ -5,7 +5,6 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
@@ -17,9 +16,8 @@ class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSo
   override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normallp_latpalm t "
   override val MIN_SEQ_SQL: String = s"select  ${wrapUpdateTimeAsLong(Some("min"))}  from normallp_latpalm t " +
     s"where ${wrapUpdateTimeAsLong()} >"
-  override val SYNC_SQL: String = "select * from " +
-    s"(select t.ora_sid as sid, t.palmmnt, ${wrapUpdateTimeAsLong()}  as seq from normallp_latpalm t  " +
-    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime) tt where rownum <=?"
+  override val SYNC_SQL: String = s"select t.ora_sid as sid, t.palmmnt, ${wrapUpdateTimeAsLong()}  as seq from normallp_latpalm t  " +
+    s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
       val syncDataBuilder = SyncData.newBuilder
