@@ -12,6 +12,9 @@ import java.util.regex.Pattern
   *	通常jks文件包含了服务器的私钥(server.key)，服务器证书(server.crt)、公安根证书(ca.crt)
   *二、通过java的keytool工具导出成 PKCS12 格式文件(my.p12)
   *
+  * 查看证书中对应的名称
+  * keytool -list -v -keystore my.jks
+  *
   *	keytool -importkeystore -srckeystore my.jks -destkeystore my.p12 -srcstoretype JKS -deststoretype PKCS12  \
   *		-srcstorepass mypass -deststorepass mypass -srcalias myalias -destalias myalias -srckeypass mypass -destkeypass mypass -noprompt
   *
