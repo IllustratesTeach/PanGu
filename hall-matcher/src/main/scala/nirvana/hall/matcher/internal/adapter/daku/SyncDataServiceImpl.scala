@@ -24,7 +24,7 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     val size = syncDataRequest.getSize
     val timestamp = syncDataRequest.getTimestamp
     val syncDataType = syncDataRequest.getSyncDataType
-    info("fetching data timestamp:{} size:{}",timestamp,size)
+    info("fetching data {} timestamp:{} size:{}", syncDataType,timestamp,size)
     val fetcher = syncDataType match {
       case SyncDataType.PERSON => new PersonFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.TEMPLATE_FINGER => new TemplateFingerFetcher(hallMatcherConfig, dataSource)
@@ -34,7 +34,7 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     }
     if(fetcher != null)
       fetcher.doFetch(responseBuilder, size, timestamp)
-    info("{} data fetched with timestamp:{} size:{}",responseBuilder.getSyncDataCount,timestamp,size)
+    info("{} data fetched with timestamp:{}",responseBuilder.getSyncDataCount,timestamp)
     responseBuilder.build()
   }
 }

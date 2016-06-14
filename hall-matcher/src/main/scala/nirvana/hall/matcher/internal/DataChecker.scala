@@ -19,6 +19,10 @@ object DataChecker extends LoggerSupport{
    * @return
    */
   def checkSyncData(hallMatcherConfig: HallMatcherConfig, syncData: SyncData, isLatent: Boolean): Boolean ={
+    if(syncData.getObjectId <= 0){
+      error("syncData objectId is 0")
+      return false
+    }
     /*数据长度校验*/
     if(syncData.getMinutiaType == MinutiaType.TEXT){
       return syncData.getData.size() > 0

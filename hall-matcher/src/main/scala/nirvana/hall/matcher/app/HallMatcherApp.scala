@@ -3,6 +3,7 @@ package nirvana.hall.matcher.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
+import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.matcher.{HallMatcherSymobls, HallMatcherConstants, HallMatcherModule}
 import org.slf4j.LoggerFactory
 
@@ -18,6 +19,7 @@ with BootstrapTextSupport{
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
     val config = HallMatcherModule.buildHallMatcherConfig(serverHome)
     configLogger(config.logFile, "WEB", "egf", "hall.matcher")
+    JniLoader.loadJniLibrary(serverHome,config.logFile)
 
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall matcher server ....")

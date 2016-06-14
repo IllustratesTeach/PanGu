@@ -4,7 +4,10 @@ import java.nio.ByteBuffer
 import java.util.{Calendar, Date}
 
 import com.google.protobuf.ByteString
+import net.sf.json.JSONObject
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
+import nirvana.protocol.TextQueryProto.TextQueryData.{LongRangeQuery, LongQuery, KeywordQuery, GroupQuery}
 
 /**
  * Created by songpeng on 16/3/21.
@@ -122,5 +125,168 @@ object DataConverter {
     result(6) = yy(1)
     result(7) = yy(0)
     return result
+  }
+
+  /**
+   * 高级查询条件
+   * @param textSql
+   * @return
+   */
+  def getMatchConfig(textSql:String): MatchConfig ={
+    val builder = MatchConfig.newBuilder
+    if (textSql != null && textSql.length > 0) {
+      try {
+        val json: JSONObject = JSONObject.fromObject(textSql)
+        if (json.has("minutia")) builder.setMinutia(json.getInt("minutia"))
+        if (json.has("distore")) builder.setDistore(json.getInt("distore"))
+        if (json.has("loc_structure")) builder.setLocStructure(json.getInt("loc_structure"))
+        if (json.has("full_match_on")) builder.setFullMatchOn(json.getInt("full_match_on"))
+        if (json.has("mask_enh_feat")) builder.setMaskEnhFeat(json.getInt("mask_enh_feat"))
+        if (json.has("morph_accu_use")) builder.setMorphAccuUse(json.getInt("morph_accu_use"))
+        if (json.has("scale0")) builder.setScale0(json.getDouble("scale0") / 100.0)
+        if (json.has("scale1")) builder.setScale1(json.getDouble("scale1") / 100.0)
+      }
+      catch {
+        case e: Exception => {
+          println("getMatchConfig error msg:" + e.getMessage)
+        }
+      }
+    }
+    return builder.build
+  }
+  /**
+   * 人员编号区间查询,用于多个区间的模糊查询
+   * @param personId_
+   * @return
+   */
+  def getPersonIdGroupQuery(personId_ : String): GroupQuery={
+    val groupQuery = GroupQuery.newBuilder()
+    if(personId_ != null && personId_.nonEmpty){
+      //正则表达式校验
+      var personId = personId_.replace("*", "")//替换*
+      if (!personId.matches("^[a-zA-Z0-9]*$")) {
+        return groupQuery.build
+      }
+      //如果人员编号是完整的精确查询
+      if (personId.length >= 23) {
+        groupQuery.addClauseQueryBuilder.setName("personId").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personId).build)
+      }
+      if (personId.matches("^[a-zA-Z]\\w*")) {
+        val pId_pre: String = personId.substring(0, 1)
+        groupQuery.addClauseQueryBuilder.setName("pId_pre").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(pId_pre).build)
+        personId = personId.substring(1)
+      }
+      val len = personId.length
+
+      if (len >= 12) {
+        val pId_deptCode: String = personId.substring(0, 12)
+        groupQuery.addClauseQueryBuilder.setName("pId_deptCode").setExtension(LongQuery.query,
+          LongQuery.newBuilder.setValue(java.lang.Long.parseLong(pId_deptCode, 36)).build)
+        if (len >= 18) {
+          val pId_date: String = personId.substring(12, 18)
+          groupQuery.addClauseQueryBuilder.setName("pId_date").setExtension(LongQuery.query,
+            LongQuery.newBuilder.setValue(java.lang.Long.parseLong(pId_date, 36)).build)
+          if (len > 18) {
+            var pid_serialnum_beg: String = personId.substring(18)
+            var pid_serialnum_end: String = pid_serialnum_beg
+            for(i <- len until 22){
+              pid_serialnum_beg += "0"
+              pid_serialnum_end += "z"
+            }
+            groupQuery.addClauseQueryBuilder.setName("pId_serialNum").setExtension(LongRangeQuery.query,
+              LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pid_serialnum_beg, 36)).setMinInclusive(true)
+                .setMax(java.lang.Long.parseLong(pid_serialnum_end, 36)).setMaxInclusive(true).build)
+          }
+        }
+        else {
+          var pid_date_beg: String = personId.substring(12)
+          var pid_date_end: String = pid_date_beg
+          for(i <- len until 18){
+            pid_date_beg += "0"
+            pid_date_end += "z"
+          }
+          groupQuery.addClauseQueryBuilder.setName("pId_date").setExtension(LongRangeQuery.query,
+            LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pid_date_beg, 36)).setMinInclusive(true)
+              .setMax(java.lang.Long.parseLong(pid_date_end, 36)).setMaxInclusive(true).build)
+        }
+      }
+      else {
+        var pid_deptcode_beg: String = personId
+        var pid_deptcode_end: String = personId
+        for(i <- len until 12){
+          pid_deptcode_beg += "0"
+          pid_deptcode_end += "z"
+        }
+        groupQuery.addClauseQueryBuilder.setName("pId_deptCode").setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pid_deptcode_beg, 36)).setMinInclusive(true)
+            .setMax(java.lang.Long.parseLong(pid_deptcode_end, 36)).setMaxInclusive(true).build)
+      }
+    }
+
+    groupQuery.build()
+  }
+  /**
+   * 案件编号区间模糊查询
+   * @param caseId_
+   * @return
+   */
+  def getCaseIdGroupQuery(caseId_ : String): GroupQuery = {
+    val groupQuery = GroupQuery.newBuilder()
+    if (caseId_ != null && caseId_.nonEmpty) {
+      var caseId = caseId_.replace("*", "")
+      if (!caseId.matches("^[a-zA-Z0-9]*$")) {
+        return groupQuery.build
+      }
+      if (caseId.length >= 25) {
+        groupQuery.addClauseQueryBuilder.setName("caseId").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(caseId).build)
+      }
+      if (caseId.matches("^[a-zA-Z]\\w*")) {
+        caseId = caseId.substring(1)
+      }
+      val len: Int = caseId.length
+      if (len >= 12) {
+        val cId_deptCode: String = caseId.substring(0, 12)
+        groupQuery.addClauseQueryBuilder.setName("cId_deptCode").setExtension(LongQuery.query, LongQuery.newBuilder.setValue(java.lang.Long.parseLong(cId_deptCode, 36)).build)
+        if (len >= 18) {
+          val cId_date: String = caseId.substring(12, 18)
+          groupQuery.addClauseQueryBuilder.setName("cId_date").setExtension(LongQuery.query, LongQuery.newBuilder.setValue(java.lang.Long.parseLong(cId_date, 36)).build)
+          if (len > 18) {
+            var cid_serialnum_beg: String = caseId.substring(18)
+            var cid_serialnum_end: String = cid_serialnum_beg
+            for (i <- len until 18) {
+              cid_serialnum_beg += "0"
+              cid_serialnum_end += "z"
+            }
+            groupQuery.addClauseQueryBuilder.setName("cId_serialNum").setExtension(LongRangeQuery.query,
+              LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(cid_serialnum_beg, 36)).setMinInclusive(true)
+                .setMax(java.lang.Long.parseLong(cid_serialnum_end, 36)).setMaxInclusive(true).build)
+          }
+        }
+        else {
+          var cid_date_beg: String = caseId.substring(12)
+          var cid_date_end: String = cid_date_beg
+          for (i <- len until 18) {
+            cid_date_beg += "0"
+            cid_date_end += "z"
+          }
+          groupQuery.addClauseQueryBuilder.setName("cId_date").setExtension(LongRangeQuery.query,
+            LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(cid_date_beg, 36)).setMinInclusive(true)
+              .setMax(java.lang.Long.parseLong(cid_date_end, 36)).setMaxInclusive(true).build)
+        }
+      }
+      else {
+        var cid_deptcode_beg: String = caseId
+        var cid_deptcode_end: String = caseId
+        for (i <- len until 18) {
+          cid_deptcode_beg += "0"
+          cid_deptcode_end += "z"
+        }
+        groupQuery.addClauseQueryBuilder.setName("cId_deptCode").setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(cid_deptcode_beg, 36)).setMinInclusive(true)
+            .setMax(java.lang.Long.parseLong(cid_deptcode_end, 36)).setMaxInclusive(true).build)
+      }
+    }
+
+    groupQuery.build()
   }
 }
