@@ -1,4 +1,4 @@
-package nirvana.hall.v70.services.remote
+package nirvana.hall.api.services.remote
 
 import nirvana.hall.protocol.api.FPTProto.LPCard
 

@@ -1,10 +1,10 @@
-package nirvana.hall.v70.internal.remote
+package nirvana.hall.api.internal.remote
 
 import monad.rpc.protocol.CommandProto.CommandStatus
-import nirvana.hall.protocol.api.QueryProto.{QueryGetResponse, QueryGetRequest}
+import nirvana.hall.api.services.remote.QueryRemoteService
+import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.services.remote.QueryRemoteService
 
 /**
  * Created by songpeng on 16/3/4.

@@ -1,16 +1,16 @@
 package nirvana.hall.v70
 
+import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, QueryRemoteServiceImpl, TPCardRemoteServiceImpl}
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6ServiceImpl}
-import nirvana.hall.v70.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, QueryRemoteServiceImpl, TPCardRemoteServiceImpl}
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync.Sync7to6ServiceImpl
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.internal.{CaseInfoServiceImpl, LPCardServiceImpl, QueryServiceImpl, TPCardServiceImpl}
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
-import nirvana.hall.v70.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sync.Sync7to6Service
 import nirvana.hall.v70.services.sys.{DictService, UserService}

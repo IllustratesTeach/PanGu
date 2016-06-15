@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
@@ -70,5 +71,18 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    */
   override def isExist(cardId: String): Boolean = {
     throw new UnsupportedOperationException
+  }
+
+  /**
+   * 获取捺印卡信息
+   * @param cardId
+   * @return
+   */
+  override def getTPCard(cardId: String): TPCard = {
+    val tp = new GTPCARDINFOSTRUCT
+    facade.NET_GAFIS_FLIB_Get(config.templateTable.dbId.toShort, config.templateTable.tableId.toShort,
+      cardId, tp, null, 3)
+
+    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
   }
 }

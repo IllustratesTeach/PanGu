@@ -2,6 +2,7 @@ package nirvana.hall.v62.config
 
 import javax.xml.bind.annotation._
 
+import monad.core.config.DatabaseConfig
 import monad.rpc.config.RpcBind
 import org.apache.tapestry5.ioc.annotations.Marker
 import org.apache.tapestry5.services.Core
@@ -19,7 +20,6 @@ import org.apache.tapestry5.services.Core
 class HallV62Config {
   @XmlElement(name="app_server")
   var appServer:V62ServerConfig = new V62ServerConfig()
-
   @XmlElement(name="template_finger_table")
   var templateTable:DatabaseTable = _
   @XmlElement(name="latent_finger_table")
@@ -28,6 +28,13 @@ class HallV62Config {
   var caseTable:DatabaseTable = _
   @XmlElement(name="query_table")
   var queryTable:DatabaseTable = _
+
+  @XmlElement(name = "database")
+  var db: DatabaseConfig = _
+  @XmlElement(name = "cron")
+  var cron:CronConfig = _
+  @XmlElement(name = "v70_url")
+  var v70Url:String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HallV62DatabaseTable")
@@ -62,4 +69,9 @@ class V62ServerConfig{
   @XmlElement(name="password")
   var password:String= _
 }
-
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "CronConfig")
+class CronConfig {
+  @XmlElement(name = "sync_6to7_cron")
+  var sync6to7Cron: String = _
+}

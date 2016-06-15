@@ -1,10 +1,10 @@
-package nirvana.hall.v70.internal.remote
+package nirvana.hall.api.internal.remote
 
 import monad.rpc.protocol.CommandProto.CommandStatus
-import nirvana.hall.protocol.api.CaseProto.{CaseGetResponse, CaseGetRequest}
+import nirvana.hall.api.services.remote.CaseInfoRemoteService
+import nirvana.hall.protocol.api.CaseProto.{CaseGetRequest, CaseGetResponse}
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.services.remote.CaseInfoRemoteService
 
 /**
  * Created by songpeng on 16/3/7.

@@ -4,12 +4,12 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService, QueryRemoteService}
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
-import nirvana.hall.v70.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.springframework.transaction.annotation.Transactional
@@ -57,7 +57,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             //获取捺印信息
             val person = GafisPerson.findOption(cand.getObjectId)
             if(person.isEmpty){
-              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, syncTagert.targetIp, syncTagert.targetPort)
+              val url = "http://"+syncTagert.targetIp+":"+syncTagert.targetPort
+              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url)
               tPCard.foreach{tpCard =>
                 val gafisPerson = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
                 val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)

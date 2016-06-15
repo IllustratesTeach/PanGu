@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.TPCardProto._
 import org.springframework.transaction.annotation.Transactional
 
@@ -45,4 +46,11 @@ trait TPCardService {
    * @return
    */
   def isExist(cardId: String): Boolean
+
+  /**
+   * 获取捺印卡信息
+   * @param cardId
+   * @return
+   */
+  def getTPCard(cardId: String): TPCard
 }

@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.TPCardService
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisGatherPortrait, GafisGatherFinger, GafisPerson}
@@ -12,6 +13,19 @@ import org.springframework.transaction.annotation.Transactional
  * Created by songpeng on 16/1/26.
  */
 class TPCardServiceImpl extends TPCardService{
+  /**
+   * 获取捺印卡信息
+   * @param personId
+   * @return
+   */
+  override def getTPCard(personId: String): TPCard = {
+    val person = GafisPerson.find(personId)
+    val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
+    val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
+
+    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
+  }
+
   /**
    * 新增捺印卡片
    * @param tPCardAddRequest
@@ -57,11 +71,7 @@ class TPCardServiceImpl extends TPCardService{
    */
   override def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse = {
     val personId = tPCardGetRequest.getCardId
-    val person = GafisPerson.find(personId)
-    val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
-    val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
-
-    val tpCard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
+    val tpCard = getTPCard(personId)
 
     TPCardGetResponse.newBuilder().setCard(tpCard).build()
   }
