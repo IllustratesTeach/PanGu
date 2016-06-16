@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.api.CaseProto._
+import nirvana.hall.protocol.api.FPTProto.Case
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -10,34 +10,34 @@ trait CaseInfoService {
 
   /**
    * 新增案件信息
-   * @param caseAddRequest
+   * @param caseInfo
    * @return
    */
   @Transactional
-  def addCaseInfo(caseAddRequest: CaseAddRequest): CaseAddResponse
+  def addCaseInfo(caseInfo: Case): Unit
 
   /**
    * 删除案件信息
-   * @param caseDelRequest
+   * @param caseId
    * @return
    */
   @Transactional
-  def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse
+  def delCaseInfo(caseId: String): Unit
 
   /**
    * 更新案件信息
-   * @param caseUpdateRequest
+   * @param caseInfo
    * @return
    */
   @Transactional
-  def updateCaseInfo(caseUpdateRequest: CaseUpdateRequest): CaseUpdateResponse
+  def updateCaseInfo(caseInfo: Case): Unit
 
   /**
    * 获取案件信息
-   * @param caseGetRequest
+   * @param caseId
    * @return
    */
-  def getCaseInfo(caseGetRequest: CaseGetRequest): CaseGetResponse
+  def getCaseInfo(caseId: String): Case
 
   /**
    * 验证案件编号是否已存在

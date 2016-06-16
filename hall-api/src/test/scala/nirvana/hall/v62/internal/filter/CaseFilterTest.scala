@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.protocol.api.CaseProto._
+import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 
@@ -11,8 +11,7 @@ import org.junit.{Assert, Test}
 class CaseFilterTest extends BaseV62TestCase{
    @Test
    def test_add(): Unit ={
-     val requestBuilder = CaseAddRequest.newBuilder()
-     val caseInfo = requestBuilder.getCaseBuilder
+     val caseInfo = Case.newBuilder()
      caseInfo.setStrCaseID("123456")
      caseInfo.setNCaseFingerCount(0)
      caseInfo.setNSendFingerCount(0)
@@ -35,23 +34,16 @@ class CaseFilterTest extends BaseV62TestCase{
      textBuilder.setStrSuspArea1Code("520100")
 
      val caseInfoService = getService[CaseInfoService]
-     val response = caseInfoService.addCaseInfo(requestBuilder.build())
-
-     Assert.assertNotNull(response)
+     caseInfoService.addCaseInfo(caseInfo.build())
    }
   @Test
   def test_del(): Unit ={
-    val requestBuilder = CaseDelRequest.newBuilder()
-    requestBuilder.setCaseId("123456")
     val caseInfoService = getService[CaseInfoService]
-    val response = caseInfoService.delCaseInfo(requestBuilder.build())
-
-    Assert.assertNotNull(response)
+    caseInfoService.delCaseInfo("123456")
   }
   @Test
   def test_update(): Unit ={
-    val requestBuilder = CaseUpdateRequest.newBuilder()
-    val caseInfo = requestBuilder.getCaseBuilder
+    val caseInfo = Case.newBuilder()
     caseInfo.setStrCaseID("123456")
     caseInfo.setNCaseFingerCount(0)
     caseInfo.setNSendFingerCount(0)
@@ -74,18 +66,14 @@ class CaseFilterTest extends BaseV62TestCase{
     textBuilder.setStrSuspArea1Code("520300")
 
     val caseInfoService = getService[CaseInfoService]
-    val response = caseInfoService.updateCaseInfo(requestBuilder.build())
-
-    Assert.assertNotNull(response)
+    caseInfoService.updateCaseInfo(caseInfo.build())
   }
   @Test
   def test_get(): Unit ={
-    val requestBuilder = CaseGetRequest.newBuilder()
-    requestBuilder.setCaseId("123456")
     val caseInfoService = getService[CaseInfoService]
-    val response = caseInfoService.getCaseInfo(requestBuilder.build())
+    val caseInfo = caseInfoService.getCaseInfo("123456")
 
-    Assert.assertNotNull(response.getCase)
+    Assert.assertNotNull(caseInfo)
   }
 
  }

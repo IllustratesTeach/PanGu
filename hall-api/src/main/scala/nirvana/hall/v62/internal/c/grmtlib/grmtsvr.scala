@@ -8,7 +8,6 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.protocol.api.CaseProto.{CaseAddRequest, CaseUpdateRequest}
 import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardDelRequest, LPCardUpdateRequest}
 import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
 import nirvana.hall.v62.internal.AncientClientSupport
@@ -303,9 +302,7 @@ trait grmtsvr {
         stCase.map{caseInfo =>
           galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(caseInfo)
         }.foreach{caseInfo =>
-          val request = CaseAddRequest.newBuilder()
-          request.setCase(caseInfo)
-          findCaseInfoService.addCaseInfo(request.build())
+          findCaseInfoService.addCaseInfo(caseInfo)
           n += 1
         }
 
@@ -320,9 +317,7 @@ trait grmtsvr {
         stCase.map{caseInfo =>
           galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(caseInfo)
         }.foreach{caseInfo =>
-          val request = CaseUpdateRequest.newBuilder()
-          request.setCase(caseInfo)
-          findCaseInfoService.updateCaseInfo(request.build())
+          findCaseInfoService.updateCaseInfo(caseInfo)
           n += 1
         }
 

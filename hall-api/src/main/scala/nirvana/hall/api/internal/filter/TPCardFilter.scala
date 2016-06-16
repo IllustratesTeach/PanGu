@@ -40,6 +40,14 @@ class TPCardFilter(tpCardService: TPCardService) extends RpcServerMessageFilter{
       val response = TPCardGetResponse.newBuilder().setCard(tpCard).build()
       commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response)
       true
+    }//是否已存在
+    else if(commandRequest.hasExtension(TPCardIsExistRequest.cmd)){
+      val request = commandRequest.getExtension(TPCardIsExistRequest.cmd)
+      val cardId = request.getCardId
+      val response = TPCardIsExistResponse.newBuilder()
+      response.setIsExist(tpCardService.isExist(cardId))
+      commandResponse.writeMessage(commandRequest, TPCardIsExistResponse.cmd, response.build())
+      true
     }else{
       handler.handle(commandRequest, commandResponse)
     }

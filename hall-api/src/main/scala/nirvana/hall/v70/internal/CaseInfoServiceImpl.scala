@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.protocol.api.CaseProto._
+import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisCase
 import org.springframework.transaction.annotation.Transactional
@@ -14,60 +14,53 @@ import org.springframework.transaction.annotation.Transactional
 class CaseInfoServiceImpl extends CaseInfoService{
   /**
    * 新增案件信息
-   * @param caseAddRequest
+   * @param caseInfo
    * @return
    */
   @Transactional
-  override def addCaseInfo(caseAddRequest: CaseAddRequest): CaseAddResponse = {
-    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseAddRequest.getCase)
+  override def addCaseInfo(caseInfo: Case): Unit = {
+    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
     gafisCase.inputpsn = Gafis70Constants.INPUTPSN
     gafisCase.inputtime = new Date()
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.save()
-
-    CaseAddResponse.newBuilder().build()
   }
 
   /**
    * 更新案件信息
-   * @param caseUpdateRequest
+   * @param caseInfo
    * @return
    */
   @Transactional
-  override def updateCaseInfo(caseUpdateRequest: CaseUpdateRequest): CaseUpdateResponse = {
-    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseUpdateRequest.getCase)
+  override def updateCaseInfo(caseInfo: Case): Unit = {
+    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
     gafisCase.modifiedpsn = Gafis70Constants.INPUTPSN
     gafisCase.modifiedtime = new Date()
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.save()
-
-    CaseUpdateResponse.newBuilder().build()
   }
 
   /**
    * 获取案件信息
-   * @param caseGetRequest
+   * @param caseId
    * @return
    */
-  override def getCaseInfo(caseGetRequest: CaseGetRequest): CaseGetResponse = {
-    val gafisCase = GafisCase.findOption(caseGetRequest.getCaseId)
+  override def getCaseInfo(caseId: String): Case= {
+    val gafisCase = GafisCase.findOption(caseId)
     if(gafisCase.isEmpty){
       throw new RuntimeException("记录不存在!");
     }
-    val caseInfo = ProtobufConverter.convertGafisCase2Case(gafisCase.get)
-
-    CaseGetResponse.newBuilder().setCase(caseInfo).build()
+    ProtobufConverter.convertGafisCase2Case(gafisCase.get)
   }
 
   /**
    * 删除案件信息
-   * @param caseDelRequest
+   * @param caseId
    * @return
    */
   @Transactional
-  override def delCaseInfo(caseDelRequest: CaseDelRequest): CaseDelResponse = {
-    GafisCase.find(caseDelRequest.getCaseId).delete
-    CaseDelResponse.newBuilder().build()
+  override def delCaseInfo(caseId: String): Unit = {
+    GafisCase.find(caseId).delete
   }
 
   /**

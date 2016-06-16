@@ -12,25 +12,29 @@ class CaseInfoFilter(caseInfoService: CaseInfoService) extends RpcServerMessageF
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
      if(commandRequest.hasExtension(CaseAddRequest.cmd)){//增加案件
        val request = commandRequest.getExtension(CaseAddRequest.cmd)
-       val response = caseInfoService.addCaseInfo(request)
+       caseInfoService.addCaseInfo(request.getCase)
+       val response = CaseAddResponse.newBuilder().build()
        commandResponse.writeMessage(commandRequest, CaseAddResponse.cmd, response)
        true
      }//删除案件
      else if(commandRequest.hasExtension(CaseDelRequest.cmd)) {
        val request = commandRequest.getExtension(CaseDelRequest.cmd)
-       val response = caseInfoService.delCaseInfo(request)
+       caseInfoService.delCaseInfo(request.getCaseId)
+       val response = CaseDelResponse.newBuilder().build()
        commandResponse.writeMessage(commandRequest, CaseDelResponse.cmd, response)
        true
      }//修改案件信息
      else if(commandRequest.hasExtension(CaseUpdateRequest.cmd)) {
        val request = commandRequest.getExtension(CaseUpdateRequest.cmd)
-       val response = caseInfoService.updateCaseInfo(request)
+       caseInfoService.updateCaseInfo(request.getCase)
+       val response = CaseUpdateResponse.newBuilder().build()
        commandResponse.writeMessage(commandRequest, CaseUpdateResponse.cmd, response)
        true
      }//查询案件
      else if(commandRequest.hasExtension(CaseGetRequest.cmd)){
        val request = commandRequest.getExtension(CaseGetRequest.cmd)
-       val response = caseInfoService.getCaseInfo(request)
+       caseInfoService.getCaseInfo(request.getCaseId)
+       val response = CaseGetResponse.newBuilder().build()
        commandResponse.writeMessage(commandRequest, CaseGetResponse.cmd, response)
        true
      }else{
