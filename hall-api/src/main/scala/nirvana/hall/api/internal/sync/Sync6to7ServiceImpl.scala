@@ -36,23 +36,19 @@ class Sync6to7ServiceImpl(v62Config: HallV62Config,@InjectService("V62DataSource
    * 定时任务调用方法
    */
   override def doWork(): Unit = {
-    findSyncQueue(dataSource)
-  }
-
-  def findSyncQueue(implicit dataSource: DataSource): Unit ={
-    JdbcDatabase.queryWithPsSetter("select t.ora_sid, tp.cardid from NORMALTP_TPCARDINFO_MOD t LEFT JOIN NORMALTP_TPCARDINFO tp ON t.ORA_SID= tp.ORA_SID where rownum=1 order by t.MODTIME"){ps=>
+    implicit val ds = dataSource
+    JdbcDatabase.queryWithPsSetter("select t.ora_sid, tp.cardid from NORMALTP_TPCARDINFO_MOD_7 t LEFT JOIN NORMALTP_TPCARDINFO tp ON t.ORA_SID= tp.ORA_SID order by t.MODTIME"){ps=>
     }{rs=>
       val oraSid = rs.getInt("ora_sid")
       val cardId = rs.getString("cardid")
       val tpCard = tpCardService.getTPCard(cardId)
       if(tpCardRemoteService.addTPCard(tpCard, v62Config.v70Url)){
         //删除mod
-        JdbcDatabase.update("delete from NORMALTP_TPCARDINFO_MOD t where t.ora_sid=?"){ps=>
+        JdbcDatabase.update("delete from NORMALTP_TPCARDINFO_MOD_7 t where t.ora_sid=?"){ps=>
           ps.setInt(1, oraSid)
         }
       }
-
     }
-
   }
+
 }

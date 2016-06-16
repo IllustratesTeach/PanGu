@@ -11,7 +11,6 @@ import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.protocol.api.CaseProto.{CaseAddRequest, CaseUpdateRequest}
 import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardDelRequest, LPCardUpdateRequest}
 import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
-import nirvana.hall.protocol.api.TPCardProto.{TPCardAddRequest, TPCardDelRequest, TPCardUpdateRequest}
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpConverter, gaqryqueConverter}
@@ -78,9 +77,7 @@ trait grmtsvr {
 //          tpCard.szCardID=testSeq.incrementAndGet()+"-"+tpCard.szCardID
           galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
         }.foreach{ card =>
-            val request = TPCardAddRequest.newBuilder()
-            request.setCard(card)
-            findTPCardService.addTPCard(request.build())
+            findTPCardService.addTPCard(card)
             n += 1
         }
 
@@ -97,9 +94,7 @@ trait grmtsvr {
         stTPCardOpt.map{ tpCard=>
           galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
         }.foreach{ card=>
-          val request = TPCardUpdateRequest.newBuilder()
-          request.setCard(card)
-          findTPCardService.updateTPCard(request.build())
+          findTPCardService.updateTPCard(card)
           n += 1
         }
 
@@ -124,10 +119,7 @@ trait grmtsvr {
         true
       case OP_TPLIB_DEL=>
         val cardId = new String(pReq.bnData, "GB2312").trim
-        val request = TPCardDelRequest.newBuilder()
-        request.setCardId(cardId)
-
-        findTPCardService.delTPCard(request.build())
+        findTPCardService.delTPCard(cardId)
         NETANS_SetRetVal(pAns,1)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)

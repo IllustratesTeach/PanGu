@@ -4,9 +4,8 @@ import java.util.Date
 
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
-import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisGatherPortrait, GafisGatherFinger, GafisPerson}
+import nirvana.hall.v70.jpa.{GafisGatherFinger, GafisGatherPortrait, GafisPerson}
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -28,62 +27,49 @@ class TPCardServiceImpl extends TPCardService{
 
   /**
    * 新增捺印卡片
-   * @param tPCardAddRequest
+   * @param tpCard
    * @return
    */
   @Transactional
-  override def addTPCard(tPCardAddRequest: TPCardAddRequest): TPCardAddResponse = {
-    val tpCard = tPCardAddRequest.getCard
-    val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-    val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-    person.inputtime = new Date()
-    person.inputpsn = Gafis70Constants.INPUTPSN
-    person.save()
-    fingerList.foreach{finger =>
-      finger.pkId = CommonUtils.getUUID()
-      finger.inputtime = new Date()
-      finger.inputpsn = Gafis70Constants.INPUTPSN
-      finger.save()
+  override def addTPCard(tpCard: TPCard): Unit = {
+    //验证卡号是否已经存在
+    if(isExist(tpCard.getStrCardID)){
+      throw new RuntimeException("记录已存在")
+    }else{
+      val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+      val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+      person.inputtime = new Date()
+      person.inputpsn = Gafis70Constants.INPUTPSN
+      person.save()
+      fingerList.foreach{finger =>
+        finger.pkId = CommonUtils.getUUID()
+        finger.inputtime = new Date()
+        finger.inputpsn = Gafis70Constants.INPUTPSN
+        finger.save()
+      }
     }
-
-    TPCardAddResponse.newBuilder().build()
   }
 
   /**
    * 删除捺印卡片
-   * @param tPCardDelRequest
+   * @param cardId
    * @return
    */
   @Transactional
-  override def delTPCard(tPCardDelRequest: TPCardDelRequest): TPCardDelResponse = {
-    val personId = tPCardDelRequest.getCardId
+  override def delTPCard(cardId: String): Unit = {
     //删除指纹
-    GafisGatherFinger.find_by_personId(personId).foreach(f=> f.delete())
+    GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除人员信息
-    GafisPerson.find(personId).delete()
-    TPCardDelResponse.newBuilder().build()
-  }
-
-  /**
-   * 获取捺印卡片
-   * @param tPCardGetRequest
-   * @return
-   */
-  override def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse = {
-    val personId = tPCardGetRequest.getCardId
-    val tpCard = getTPCard(personId)
-
-    TPCardGetResponse.newBuilder().setCard(tpCard).build()
+    GafisPerson.find(cardId).delete()
   }
 
   /**
    * 更新捺印卡片
-   * @param tPCardUpdateRequest
+   * @param tpCard
    * @return
    */
   @Transactional
-  override def updateTPCard(tPCardUpdateRequest: TPCardUpdateRequest): TPCardUpdateResponse = {
-    val tpCard = tPCardUpdateRequest.getCard
+  override def updateTPCard(tpCard: TPCard): Unit = {
     val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
 
@@ -101,7 +87,6 @@ class TPCardServiceImpl extends TPCardService{
       finger.save()
     }
 
-    TPCardUpdateResponse.newBuilder().build()
   }
 
   /**

@@ -1,7 +1,6 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.protocol.api.FPTProto.TPCard
-import nirvana.hall.protocol.api.TPCardProto._
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -11,34 +10,27 @@ trait TPCardService {
 
   /**
    * 新增捺印卡片
-   * @param tPCardAddRequest
+   * @param tPCard
    * @return
    */
   @Transactional
-  def addTPCard(tPCardAddRequest: TPCardAddRequest): TPCardAddResponse
+  def addTPCard(tPCard: TPCard): Unit
 
   /**
    * 删除捺印卡片
-   * @param tPCardDelRequest
+   * @param cardId
    * @return
    */
   @Transactional
-  def delTPCard(tPCardDelRequest: TPCardDelRequest): TPCardDelResponse
+  def delTPCard(cardId: String): Unit
 
   /**
    * 更新捺印卡片
-   * @param tPCardUpdateRequest
+   * @param tpCard
    * @return
    */
   @Transactional
-  def updateTPCard(tPCardUpdateRequest: TPCardUpdateRequest): TPCardUpdateResponse
-
-  /**
-   * 获取捺印卡片
-   * @param tPCardGetRequest
-   * @return
-   */
-  def getTPCard(tPCardGetRequest: TPCardGetRequest): TPCardGetResponse
+  def updateTPCard(tpCard: TPCard): Unit
 
   /**
    * 验证卡号是否已存在

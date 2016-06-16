@@ -15,25 +15,29 @@ class TPCardFilter(tpCardService: TPCardService) extends RpcServerMessageFilter{
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(TPCardAddRequest.cmd)){
       val request = commandRequest.getExtension(TPCardAddRequest.cmd)
-      val response = tpCardService.addTPCard(request)
+      tpCardService.addTPCard(request.getCard)
+      val response = TPCardAddResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardAddResponse.cmd, response)
       true
     }//删除
     else if(commandRequest.hasExtension(TPCardDelRequest.cmd)){
       val request = commandRequest.getExtension(TPCardDelRequest.cmd)
-      val response = tpCardService.delTPCard(request)
+      tpCardService.delTPCard(request.getCardId)
+      val response = TPCardDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardDelResponse.cmd, response)
       true
     }//修改
     else if(commandRequest.hasExtension(TPCardUpdateRequest.cmd)){
       val request = commandRequest.getExtension(TPCardUpdateRequest.cmd)
-      val response = tpCardService.updateTPCard(request)
+      tpCardService.updateTPCard(request.getCard)
+      val response = TPCardUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardUpdateResponse.cmd, response)
       true
     }//查询
-    else if(commandRequest.hasExtension(TPCardGetRequest.cmd)){
+    else if(commandRequest.hasExtension(TPCardGetRequest.cmd)) {
       val request = commandRequest.getExtension(TPCardGetRequest.cmd)
-      val response = tpCardService.getTPCard(request)
+      val tpCard = tpCardService.getTPCard(request.getCardId)
+      val response = TPCardGetResponse.newBuilder().setCard(tpCard).build()
       commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response)
       true
     }else{

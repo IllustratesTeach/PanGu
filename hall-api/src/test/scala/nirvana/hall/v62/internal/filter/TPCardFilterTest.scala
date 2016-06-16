@@ -4,7 +4,6 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, TPCard}
-import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 
@@ -65,25 +64,16 @@ class TPCardFilterTest extends BaseV62TestCase{
     textBuilder.setStrXieChaTelNo ("")
     textBuilder.setStrShenPiBy ("")
 
-    val tpCardAdd = TPCardAddRequest.newBuilder()
-    tpCardAdd.setCard(tpCard.build())
-
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.addTPCard(tpCardAdd.build())
-    Assert.assertNotNull(response)
+    tpCardService.addTPCard(tpCard.build())
   }
   @Test
   def test_del: Unit ={
-    val requestBuilder = TPCardDelRequest.newBuilder()
-    requestBuilder.setCardId("1234567890")
-
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.delTPCard(requestBuilder.build())
-    Assert.assertNotNull(response)
+    tpCardService.delTPCard("1234567890")
   }
   @Test
   def test_update: Unit ={
-    val requestBuilder = TPCardUpdateRequest.newBuilder()
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID("1234567890")
     val blobBuilder = tpCard.addBlobBuilder()
@@ -131,20 +121,16 @@ class TPCardFilterTest extends BaseV62TestCase{
     textBuilder.setStrXieChaContacter ("")
     textBuilder.setStrXieChaTelNo ("")
     textBuilder.setStrShenPiBy ("")
-    requestBuilder.setCard(tpCard)
 
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.updateTPCard(requestBuilder.build())
+    val response = tpCardService.updateTPCard(tpCard.build())
     Assert.assertNotNull(response)
   }
   @Test
   def test_get: Unit ={
-    val requestBuilder = TPCardGetRequest.newBuilder()
-    requestBuilder.setCardId("1234567890")
-
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.getTPCard(requestBuilder.build())
-    Assert.assertNotNull(response)
+    val tpCard = tpCardService.getTPCard("1234567890")
+    Assert.assertNotNull(tpCard)
   }
 
 }

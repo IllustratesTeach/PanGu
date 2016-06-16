@@ -65,12 +65,8 @@ class TPCardFilterTest extends BaseV70TestCase{
     textBuilder.setStrXieChaTelNo ("")
     textBuilder.setStrShenPiBy ("")
 
-    val tpCardAdd = TPCardAddRequest.newBuilder()
-    tpCardAdd.setCard(tpCard.build())
-
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.addTPCard(tpCardAdd.build())
-    Assert.assertNotNull(response)
+    tpCardService.addTPCard(tpCard.build())
   }
   @Test
   def test_del: Unit ={
@@ -79,7 +75,6 @@ class TPCardFilterTest extends BaseV70TestCase{
   }
   @Test
   def test_update: Unit ={
-    val requestBuilder = TPCardUpdateRequest.newBuilder()
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID("1234567890")
     val blobBuilder = tpCard.addBlobBuilder()
@@ -127,20 +122,16 @@ class TPCardFilterTest extends BaseV70TestCase{
     textBuilder.setStrXieChaContacter ("")
     textBuilder.setStrXieChaTelNo ("")
     textBuilder.setStrShenPiBy ("")
-    requestBuilder.setCard(tpCard)
 
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.updateTPCard(requestBuilder.build())
+    val response = tpCardService.updateTPCard(tpCard.build())
     Assert.assertNotNull(response)
   }
   @Test
   def test_get: Unit ={
-    val requestBuilder = TPCardGetRequest.newBuilder()
-    requestBuilder.setCardId("1234567890")
-
     val tpCardService = getService[TPCardService]
-    val response = tpCardService.getTPCard(requestBuilder.build())
-    Assert.assertNotNull(response.getCard)
+    val tpCard = tpCardService.getTPCard("1234567890")
+    Assert.assertNotNull(tpCard)
   }
 
 }
