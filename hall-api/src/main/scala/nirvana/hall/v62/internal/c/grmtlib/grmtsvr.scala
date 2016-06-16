@@ -8,7 +8,6 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardDelRequest, LPCardUpdateRequest}
 import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
@@ -222,9 +221,7 @@ trait grmtsvr {
         stLPCard.map{ lpCard=>
           galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
         }.foreach{ card =>
-          val request = LPCardAddRequest.newBuilder()
-          request.setCard(card)
-          findLPCardService.addLPCard(request.build())
+          findLPCardService.addLPCard(card)
           n += 1
         }
         NETANS_SetRetVal(pAns,n)
@@ -234,9 +231,7 @@ trait grmtsvr {
         true
       case OP_LPLIB_DEL =>
         val cardId = new String(pReq.bnData, "GB2312").trim
-        val request = LPCardDelRequest.newBuilder()
-        request.setCardId(cardId)
-        findLPCardService.delLPCard(request.build())
+        findLPCardService.delLPCard(cardId)
 
         NETANS_SetRetVal(pAns,1)
         val stSendPkg = GBASE_ITEMPKG_New
@@ -250,9 +245,7 @@ trait grmtsvr {
         stLPCard.map{ lpCard=>
           galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
         }.foreach{ card =>
-          val request = LPCardUpdateRequest.newBuilder()
-          request.setCard(card)
-          findLPCardService.updateLPCard(request.build())
+          findLPCardService.updateLPCard(card)
           n += 1
         }
         NETANS_SetRetVal(pAns,n)

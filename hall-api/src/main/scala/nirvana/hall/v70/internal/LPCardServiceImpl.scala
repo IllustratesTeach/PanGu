@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 
 import nirvana.hall.api.services.LPCardService
-import nirvana.hall.protocol.api.LPCardProto._
+import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
 import org.springframework.transaction.annotation.Transactional
@@ -14,12 +14,11 @@ import org.springframework.transaction.annotation.Transactional
 class LPCardServiceImpl extends LPCardService{
   /**
    * 新增现场卡片
-   * @param lPCardAddRequest
+   * @param lpCard
    * @return
    */
   @Transactional
-  override def addLPCard(lPCardAddRequest: LPCardAddRequest): LPCardAddResponse = {
-    val lpCard = lPCardAddRequest.getCard
+  override def addLPCard(lpCard: LPCard): Unit = {
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
@@ -33,32 +32,26 @@ class LPCardServiceImpl extends LPCardService{
     caseFingerMnt.inputtime = new Date()
     caseFingerMnt.isMainMnt = "1"
     caseFingerMnt.save()
-
-    LPCardAddResponse.newBuilder().build()
   }
 
   /**
    * 获取现场卡片
-   * @param lPCardGetRequest
+   * @param fingerId
    * @return
    */
-  override def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse = {
-    val fingerId = lPCardGetRequest.getCardId
+  override def getLPCard(fingerId: String): LPCard = {
     val caseFinger = GafisCaseFinger.find(fingerId)
     val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
-    val lpCard = ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
-
-    LPCardGetResponse.newBuilder().setCard(lpCard).build()
+    ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
   }
 
   /**
    * 更新现场卡片
-   * @param lPCardUpdateRequest
+   * @param lpCard
    * @return
    */
   @Transactional
-  override def updateLPCard(lPCardUpdateRequest: LPCardUpdateRequest): LPCardUpdateResponse = {
-    val lpCard = lPCardUpdateRequest.getCard
+  override def updateLPCard(lpCard: LPCard): Unit = {
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
@@ -73,22 +66,17 @@ class LPCardServiceImpl extends LPCardService{
     caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
     caseFingerMnt.inputtime = new Date()
     caseFingerMnt.save()
-
-    LPCardUpdateResponse.newBuilder().build()
   }
 
   /**
    * 删除现场卡片
-   * @param lPCardDelRequest
+   * @param cardId
    * @return
    */
   @Transactional
-  override def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse = {
-    val cardId = lPCardDelRequest.getCardId
+  override def delLPCard(cardId: String): Unit = {
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === cardId).execute
     GafisCaseFinger.find(cardId).delete
-
-    LPCardDelResponse.newBuilder().build()
   }
 
   override def isExist(cardId: String): Boolean = {

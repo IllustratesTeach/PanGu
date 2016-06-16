@@ -10,9 +10,16 @@ trait CaseInfoRemoteService {
   /**
    * 获取案件信息
    * @param caseId
-   * @param ip
-   * @param port
+   * @param url
    * @return
    */
-  def getCaseInfo(caseId: String, ip: String, port: String): Case
+  def getCaseInfo(caseId: String, url: String): Case
+
+  /**
+   * 添加案件信息
+   * @param caseInfo
+   * @param url
+   * @return
+   */
+  def addCaseInfo(caseInfo: Case, url: String):Boolean
 }

@@ -33,7 +33,7 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
    * @param url
    */
   override def addTPCard(tpCard: TPCard, url: String): Boolean= {
-    info("remote add tpcard [personId:{},ip:{},port:{}]", tpCard.getStrCardID, url)
+    info("remote add tpcard [personId:{},url:{}]", tpCard.getStrCardID, url)
     val request = TPCardAddRequest.newBuilder().setCard(tpCard).build()
     val baseResponse = rpcHttpClient.call(url, TPCardAddRequest.cmd, request)
     if(baseResponse.getStatus == CommandStatus.OK){

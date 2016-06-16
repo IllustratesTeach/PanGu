@@ -12,25 +12,29 @@ class LPCardFilter(lPCardService: LPCardService) extends RpcServerMessageFilter{
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(LPCardAddRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardAddRequest.cmd)
-      val response = lPCardService.addLPCard(request)
+      lPCardService.addLPCard(request.getCard)
+      val response = LPCardAddResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardAddResponse.cmd, response)
       true
     }//删除现场
     else if(commandRequest.hasExtension(LPCardDelRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardDelRequest.cmd)
-      val response = lPCardService.delLPCard(request)
+      lPCardService.delLPCard(request.getCardId)
+      val response = LPCardDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardDelResponse.cmd, response)
       true
     }//更新现场
     else if(commandRequest.hasExtension(LPCardUpdateRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardUpdateRequest.cmd)
-      val response = lPCardService.updateLPCard(request)
+      lPCardService.updateLPCard(request.getCard)
+      val response = LPCardUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardUpdateResponse.cmd, response)
       true
     }//查询现场
     else if(commandRequest.hasExtension(LPCardGetRequest.cmd)){
       val request = commandRequest.getExtension(LPCardGetRequest.cmd)
-      val response = lPCardService.getLPCard(request)
+      lPCardService.getLPCard(request.getCardId)
+      val response = LPCardGetResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardGetResponse.cmd, response)
       true
     }else{

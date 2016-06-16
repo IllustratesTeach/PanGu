@@ -2,8 +2,7 @@ package nirvana.hall.v62.internal.filter
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.LPCardService
-import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, PatternType}
-import nirvana.hall.protocol.api.LPCardProto._
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 
@@ -13,8 +12,7 @@ import org.junit.{Assert, Test}
 class LPCardFilterTest extends BaseV62TestCase{
   @Test
   def test_add(): Unit ={
-    val requestBuilder = LPCardAddRequest.newBuilder()
-    val lpCard = requestBuilder.getCardBuilder
+    val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID("12345601")
     val textBuilder = lpCard.getTextBuilder
     textBuilder.setStrSeq("01")
@@ -33,24 +31,16 @@ class LPCardFilterTest extends BaseV62TestCase{
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
 
     val lpCardService = getService[LPCardService]
-    val response = lpCardService.addLPCard(requestBuilder.build())
-
-    Assert.assertNotNull(response)
+    lpCardService.addLPCard(lpCard.build())
   }
   @Test
   def test_del(): Unit ={
-    val requestBuilder = LPCardDelRequest.newBuilder()
-    requestBuilder.setCardId("12345601")
-
     val lpCardService = getService[LPCardService]
-    val response = lpCardService.delLPCard(requestBuilder.build())
-
-    Assert.assertNotNull(response)
+    lpCardService.delLPCard("12345601")
   }
   @Test
   def test_update(): Unit ={
-    val requestBuilder = LPCardUpdateRequest.newBuilder()
-    val lpCard = requestBuilder.getCardBuilder
+    val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID("12345601")
     val textBuilder = lpCard.getTextBuilder
     textBuilder.setStrSeq("01")
@@ -69,19 +59,14 @@ class LPCardFilterTest extends BaseV62TestCase{
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
 
     val lpCardService = getService[LPCardService]
-    val response = lpCardService.updateLPCard(requestBuilder.build())
-
-    Assert.assertNotNull(response)
+    lpCardService.updateLPCard(lpCard.build())
   }
   @Test
   def test_get(): Unit ={
-    val requestBuilder = LPCardGetRequest.newBuilder()
-    requestBuilder.setCardId("12345601")
-
     val lpCardService = getService[LPCardService]
-    val response = lpCardService.getLPCard(requestBuilder.build())
+    val card = lpCardService.getLPCard("12345601")
 
-    Assert.assertNotNull(response.getCard)
+    Assert.assertNotNull(card)
   }
 
 }

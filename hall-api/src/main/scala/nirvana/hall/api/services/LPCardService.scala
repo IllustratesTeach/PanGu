@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.protocol.api.LPCardProto._
+import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -10,34 +10,34 @@ trait LPCardService {
 
   /**
    * 新增现场卡片
-   * @param lPCardAddRequest
+   * @param lpCard
    * @return
    */
   @Transactional
-  def addLPCard(lPCardAddRequest: LPCardAddRequest): LPCardAddResponse
+  def addLPCard(lpCard: LPCard): Unit
 
   /**
    * 删除现场卡片
-   * @param lPCardDelRequest
+   * @param cardId
    * @return
    */
   @Transactional
-  def delLPCard(lPCardDelRequest: LPCardDelRequest): LPCardDelResponse
+  def delLPCard(cardId: String): Unit
 
   /**
    * 更新现场卡片
-   * @param lPCardUpdateRequest
+   * @param lpCard
    * @return
    */
   @Transactional
-  def updateLPCard(lPCardUpdateRequest: LPCardUpdateRequest): LPCardUpdateResponse
+  def updateLPCard(lpCard: LPCard): Unit
 
   /**
    * 获取现场卡片
-   * @param lPCardGetRequest
+   * @param cardId
    * @return
    */
-  def getLPCard(lPCardGetRequest: LPCardGetRequest): LPCardGetResponse
+  def getLPCard(cardId: String): LPCard
 
   /**
    * 验证现场卡片是否存在

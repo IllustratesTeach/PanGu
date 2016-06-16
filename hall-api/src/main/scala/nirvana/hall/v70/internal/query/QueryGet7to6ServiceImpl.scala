@@ -113,7 +113,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                 if(caseId != null && caseId.length >0){
                   val caseInfo = GafisCase.findOption(caseId)
                   if(caseInfo.isEmpty){
-                    val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, syncTagert.targetIp, syncTagert.targetPort)
+                    val url = "http://"+syncTagert.targetIp + ":" + syncTagert.targetPort
+                    val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url)
                     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
                     gafisCase.deletag = Gafis70Constants.DELETAG_USE
                     gafisCase.inputtime = new Date()
