@@ -10,9 +10,16 @@ trait LPCardRemoteService {
   /**
    * 获取现场卡片信息
    * @param cardId
-   * @param ip
-   * @param port
+   * @param url
    * @return
    */
-  def getLPCard(cardId: String, ip: String, port: String): Option[LPCard]
+  def getLPCard(cardId: String, url: String): Option[LPCard]
+
+  /**
+   * 添加现场卡
+   * @param lPCard
+   * @param url
+   * @return
+   */
+  def addLPCard(lPCard: LPCard, url: String): Boolean
 }

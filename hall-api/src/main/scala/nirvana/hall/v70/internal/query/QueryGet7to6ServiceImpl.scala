@@ -107,7 +107,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             val cardId = cand.getObjectId
             val caseFinger = GafisCaseFinger.findOption(cardId)
             if(caseFinger.isEmpty){
-              val lPCard = lPCardRemoteService.getLPCard(cardId, syncTagert.targetIp, syncTagert.targetPort)
+              val url = "http://" + syncTagert.targetIp+":"+syncTagert.targetPort
+              val lPCard = lPCardRemoteService.getLPCard(cardId, url)
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){

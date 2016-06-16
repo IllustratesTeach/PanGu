@@ -4,7 +4,7 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.LPCardRemoteService
 import nirvana.hall.protocol.api.FPTProto.LPCard
-import nirvana.hall.protocol.api.LPCardProto.{LPCardGetRequest, LPCardGetResponse}
+import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardGetRequest, LPCardGetResponse}
 import nirvana.hall.support.services.RpcHttpClient
 
 /**
@@ -14,19 +14,36 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
   /**
    * 获取现场卡片信息
    * @param cardId
-   * @param ip
-   * @param port
+   * @param url
    * @return
    */
-  override def getLPCard(cardId: String, ip: String, port: String): Option[LPCard] = {
-    info("remote get lpcard [cardId:{},ip:{},port:{}]", cardId, ip, port)
+  override def getLPCard(cardId: String, url: String): Option[LPCard] = {
+    info("remote get lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardGetRequest.newBuilder().setCardId(cardId)
-    val response = rpcHttpClient.call("http://"+ip+":"+port, LPCardGetRequest.cmd, request.build())
+    val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build())
     if(response.getStatus == CommandStatus.OK){
       Option(response.getExtension(LPCardGetResponse.cmd).getCard)
     }else{
       error("remote get lpcard message:{}", response.getMsg)
       None
+    }
+  }
+
+  /**
+   * 添加现场卡
+   * @param lPCard
+   * @param url
+   * @return
+   */
+  override def addLPCard(lPCard: LPCard, url: String): Boolean = {
+    info("remote add lpcard [cardId:{},url:{}]", lPCard.getStrCardID, url)
+    val request = LPCardAddRequest.newBuilder().setCard(lPCard)
+    val response = rpcHttpClient.call(url, LPCardAddRequest.cmd, request.build())
+    if(response.getStatus == CommandStatus.OK){
+      true
+    }else{
+      error("remote add lpcard message:{}", response.getMsg)
+      false
     }
   }
 }
