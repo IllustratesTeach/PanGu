@@ -123,7 +123,7 @@ object FPTLDataToMNTDISP {
 
     stCoreDelta.y = szCoreDelta.substring(3,6).trim().toShort
 
-    stCoreDelta.nRadius = szCoreDelta.substring(6,8).trim().toInt.toByte
+    stCoreDelta.nRadius = convertStringAsInt(szCoreDelta.substring(6,8)).toByte
 
     // 9-11位为方向
     stCoreDelta.z = UTIL_Angle_FPT2MntDisp(convertStringAsInt(szCoreDelta.substring(8,11)))
