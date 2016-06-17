@@ -133,5 +133,11 @@ class TPCardFilterTest extends BaseV70TestCase{
     val tpCard = tpCardService.getTPCard("1234567890")
     Assert.assertNotNull(tpCard)
   }
+  @Test
+  def test_isExist: Unit ={
+    val tPCardService = getService[TPCardService]
+    val isExist = tPCardService.isExist("1234567890")
+    Assert.assertTrue(isExist)
+  }
 
 }

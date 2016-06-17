@@ -37,6 +37,14 @@ class LPCardFilter(lPCardService: LPCardService) extends RpcServerMessageFilter{
       val response = LPCardGetResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardGetResponse.cmd, response)
       true
+    }//是否已存在
+    else if(commandRequest.hasExtension(LPCardIsExistRequest.cmd)){
+      val request = commandRequest.getExtension(LPCardIsExistRequest.cmd)
+      val cardId = request.getCardId
+      val response = LPCardIsExistResponse.newBuilder()
+      response.setIsExist(lPCardService.isExist(cardId))
+      commandResponse.writeMessage(commandRequest, LPCardIsExistResponse.cmd, response.build())
+      true
     }else{
       handler.handle(commandRequest, commandResponse);
     }

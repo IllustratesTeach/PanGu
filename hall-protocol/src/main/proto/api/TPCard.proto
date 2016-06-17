@@ -54,7 +54,7 @@ message TPCardGetResponse{
     }
     required TPCard card = 1;
 }
-//验证是否已存在
+//验证卡号是否已存在
 message TPCardIsExistRequest{
     extend monad.rpc.protocol.BaseCommand{
         optional TPCardIsExistRequest cmd = 10049;

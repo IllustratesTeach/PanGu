@@ -37,6 +37,14 @@ class CaseInfoFilter(caseInfoService: CaseInfoService) extends RpcServerMessageF
        val response = CaseGetResponse.newBuilder().build()
        commandResponse.writeMessage(commandRequest, CaseGetResponse.cmd, response)
        true
+     }//是否已存在
+     else if(commandRequest.hasExtension(CaseIsExistRequest.cmd)){
+       val request = commandRequest.getExtension(CaseIsExistRequest.cmd)
+       val cardId = request.getCardId
+       val response = CaseIsExistResponse.newBuilder()
+       response.setIsExist(caseInfoService.isExist(cardId))
+       commandResponse.writeMessage(commandRequest, CaseIsExistResponse.cmd, response.build())
+       true
      }else{
        handler.handle(commandRequest, commandResponse);
      }

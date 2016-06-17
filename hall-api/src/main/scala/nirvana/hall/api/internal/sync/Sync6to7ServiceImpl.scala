@@ -2,6 +2,7 @@ package nirvana.hall.api.internal.sync
 
 import javax.sql.DataSource
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.services.remote.{LPCardRemoteService, CaseInfoRemoteService, TPCardRemoteService}
 import nirvana.hall.support.services.JdbcDatabase
@@ -19,7 +20,7 @@ class Sync6to7ServiceImpl(v62Config: HallV62Config,@InjectService("V62DataSource
                           lPCardService: LPCardService,
                           tpCardRemoteService: TPCardRemoteService,
                           caseInfoRemoteService: CaseInfoRemoteService,
-                          lPCardRemoteService: LPCardRemoteService) extends Sync6to7Service{
+                          lPCardRemoteService: LPCardRemoteService) extends Sync6to7Service with LoggerSupport{
 
   private final val TPCARD_MOD_SQL = "select t.ora_sid, tp.cardid from NORMALTP_TPCARDINFO_MOD_7 t LEFT JOIN NORMALTP_TPCARDINFO tp ON t.ORA_SID= tp.ORA_SID order by t.MODTIME"
   private final val CASEINFO_MOD_SQL = "select t.ORA_SID, c.CASEID from NORMALLP_CASE_MOD_7 t left join NORMALLP_CASE c on t.ORA_SID=c.ORA_SID order by t.MODTIME"
@@ -58,11 +59,19 @@ class Sync6to7ServiceImpl(v62Config: HallV62Config,@InjectService("V62DataSource
     }{rs=>
       val oraSid = rs.getInt("ora_sid")
       val cardId = rs.getString("cardid")
-      val tpCard = tpCardService.getTPCard(cardId)
-      if(tpCardRemoteService.addTPCard(tpCard, v62Config.v70Url)){
+      if(tpCardRemoteService.isExist(cardId, v62Config.v70Url)){
+        info("personId:{} isExist", cardId)
         //删除mod
         JdbcDatabase.update("delete from NORMALTP_TPCARDINFO_MOD_7 t where t.ora_sid=?"){ps=>
           ps.setInt(1, oraSid)
+        }
+      }else{
+        val tpCard = tpCardService.getTPCard(cardId)
+        if(tpCardRemoteService.addTPCard(tpCard, v62Config.v70Url)){
+          //删除mod
+          JdbcDatabase.update("delete from NORMALTP_TPCARDINFO_MOD_7 t where t.ora_sid=?"){ps=>
+            ps.setInt(1, oraSid)
+          }
         }
       }
     }

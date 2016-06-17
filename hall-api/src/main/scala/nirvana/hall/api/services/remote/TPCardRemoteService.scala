@@ -20,4 +20,12 @@ trait TPCardRemoteService {
    * @param url
    */
   def addTPCard(tpCard: TPCard, url: String): Boolean
+
+  /**
+   * 验证编号是否已存在
+   * @param personId
+   * @param url
+   * @return
+   */
+  def isExist(personId: String, url: String): Boolean
 }

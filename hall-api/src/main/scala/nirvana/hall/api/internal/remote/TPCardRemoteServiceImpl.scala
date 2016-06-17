@@ -4,7 +4,7 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.TPCardRemoteService
 import nirvana.hall.protocol.api.FPTProto.TPCard
-import nirvana.hall.protocol.api.TPCardProto.{TPCardAddRequest, TPCardGetRequest, TPCardGetResponse}
+import nirvana.hall.protocol.api.TPCardProto._
 import nirvana.hall.support.services.RpcHttpClient
 
 /**
@@ -40,6 +40,24 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
       true
     }else{
       error("remote get tpcard message:{}", baseResponse.getMsg)
+      false
+    }
+  }
+
+  /**
+   * 验证编号是否已存在
+   * @param personId
+   * @param url
+   * @return
+   */
+  override def isExist(personId: String, url: String): Boolean = {
+    info("remote isExist tpcard [personId:{},url:{}]", personId, url)
+    val request = TPCardIsExistRequest.newBuilder().setCardId(personId).build()
+    val baseResponse = rpcHttpClient.call(url, TPCardIsExistRequest.cmd, request)
+    if(baseResponse.getStatus == CommandStatus.OK){
+      baseResponse.getExtension(TPCardIsExistResponse.cmd).getIsExist
+    }else{
+      error("remote isExist tpcard message:{}", baseResponse.getMsg)
       false
     }
   }

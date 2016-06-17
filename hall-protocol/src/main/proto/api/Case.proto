@@ -55,3 +55,16 @@ message CaseGetResponse{
     }
     optional Case case = 1;
 }
+//验证卡号是否已存在
+message CaseIsExistRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseIsExistRequest cmd = 10019;
+    }
+    required string card_id = 1;
+}
+message CaseIsExistResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional CaseIsExistResponse cmd = 10020;
+    }
+    required bool isExist = 1;
+}

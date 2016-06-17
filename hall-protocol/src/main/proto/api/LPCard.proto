@@ -54,3 +54,16 @@ message LPCardGetResponse{
     }
     optional LPCard card = 1;
 }
+//验证卡号是否已存在
+message LPCardIsExistRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardIsExistRequest cmd = 10029;
+    }
+    required string card_id = 1;
+}
+message LPCardIsExistResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPCardIsExistResponse cmd = 10030;
+    }
+    required bool isExist = 1;
+}
