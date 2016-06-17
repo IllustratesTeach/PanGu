@@ -14,21 +14,16 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
  * gafis6.2捺印指纹分库
  */
 class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normaltp_tpcardinfo t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t where ${wrapUpdateTimeAsLong()}  >"
-//  override val SYNC_SQL: String = "select t.ora_sid, " +
-//    " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
-//    " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
-//    " t.tplainrmmnt, t.tplainrsmnt, t.tplainrzmnt, t.tplainrhmnt, t.tplainrxmnt, t.tplainlmmnt, t.tplainlsmnt, t.tplainlzmnt, t.tplainlhmnt, t.tplainlxmnt," +
-//    " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin" +
-//    " from normaltp_tpcardinfo t where t.ora_sid=? "
+//  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normaltp_tpcardinfo t "
+//  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t where ${wrapUpdateTimeAsLong()}  >"
+  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normaltp_tpcardinfo_mod t "
+  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()}  >"
+
   override val SYNC_SQL = "select * from (select t.ora_sid as sid," +
       " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
       " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
       " t.tplainrmmnt, t.tplainrsmnt, t.tplainrzmnt, t.tplainrhmnt, t.tplainrxmnt, t.tplainlmmnt, t.tplainlsmnt, t.tplainlzmnt, t.tplainlhmnt, t.tplainlxmnt," +
       " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin ," +
-//    " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
-//    " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
     s" ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t " +
     s"where ${wrapUpdateTimeAsLong()} >=? order by t.updatetime) tt "
   //特征字段，根据指位1..20排序

@@ -15,5 +15,12 @@ package object sync {
         "(to_number(to_char(t.updatetime,'YYYYMMDDHH24MISS')))"
     }
   }
-
+  def wrapModTimeAsLong(func:Option[String]=None): String ={
+    func match{
+      case Some(f)=>
+        s"$f(to_number(to_char(t.modtime,'YYYYMMDDHH24MISS')))"
+      case None =>
+        "(to_number(to_char(t.modtime,'YYYYMMDDHH24MISS')))"
+    }
+  }
 }

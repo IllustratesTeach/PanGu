@@ -13,9 +13,12 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
  * gafis6.2现场指纹分库
   */
 class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normallp_latfinger t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))}  from normallp_latfinger t " +
-    s"where ${wrapUpdateTimeAsLong()}  >"
+//  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normallp_latfinger t "
+//  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))}  from normallp_latfinger t " +
+//  s"where ${wrapUpdateTimeAsLong()}  >"
+  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
+  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t " +
+    s"where ${wrapModTimeAsLong()}  >"
   /** 同步现场指纹 */
   override val SYNC_SQL: String = s"select * from " +
     s"(select t.ora_sid as sid, t.fingermnt, t.fingerbin, ${wrapUpdateTimeAsLong()} as seq from normallp_latfinger t  " +

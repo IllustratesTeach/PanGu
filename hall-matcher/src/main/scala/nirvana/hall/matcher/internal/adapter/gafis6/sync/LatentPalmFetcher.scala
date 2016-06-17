@@ -13,9 +13,12 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
  * gafis6.2现场掌纹分库
  */
 class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
-  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normallp_latpalm t "
-  override val MIN_SEQ_SQL: String = s"select  ${wrapUpdateTimeAsLong(Some("min"))}  from normallp_latpalm t " +
-    s"where ${wrapUpdateTimeAsLong()} >"
+//  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normallp_latpalm t "
+//  override val MIN_SEQ_SQL: String = s"select  ${wrapUpdateTimeAsLong(Some("min"))}  from normallp_latpalm t " +
+//    s"where ${wrapUpdateTimeAsLong()} >"
+  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normallp_latpalm_mod t "
+  override val MIN_SEQ_SQL: String = s"select  ${wrapModTimeAsLong(Some("min"))}  from normallp_latpalm_mod t " +
+    s"where ${wrapModTimeAsLong()} >"
   override val SYNC_SQL: String = s"select t.ora_sid as sid, t.palmmnt, ${wrapUpdateTimeAsLong()}  as seq from normallp_latpalm t  " +
     s"where ${wrapUpdateTimeAsLong()}  >=? order by t.updatetime"
 
