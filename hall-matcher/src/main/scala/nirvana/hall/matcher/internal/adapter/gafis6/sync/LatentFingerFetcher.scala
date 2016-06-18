@@ -20,7 +20,7 @@ class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, override implici
   override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
   override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t " +
     s"where ${wrapModTimeAsLong()}  >"
-  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >? and ${wrapModTimeAsLong()} <=? order by t.modtime"
+  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by t.modtime"
   /** 同步现场指纹 */
   val SELECT_LPCARD_SQL: String = s"select t.ora_sid as sid, t.fingermnt, t.fingerbin from normallp_latfinger t where t.ora_sid =?"
 
