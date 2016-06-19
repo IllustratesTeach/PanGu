@@ -39,16 +39,6 @@
           <xs:documentation>gafis6.2 oracle的数据库配置</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="cronConfigType" name="cron" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>定时计划配置</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element type="xs:string" name="v70_url" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>v70 hall url 配置</xs:documentation>
-        </xs:annotation>
-      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="databaseTableType">
@@ -87,15 +77,6 @@
       <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>6.2应用服务器的密码</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="cronConfigType">
-    <xs:sequence>
-      <xs:element type="cronType" name="sync_6to7_cron" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>6.2向7.0同步数据定时计划</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>

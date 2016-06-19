@@ -24,6 +24,7 @@ class BaseV62TestCase {
   def setup: Unit ={
     val modules = Seq[String](
        "nirvana.hall.v62.LocalV62ServiceModule",
+      "nirvana.hall.v62.LocalV62DataSourceModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)

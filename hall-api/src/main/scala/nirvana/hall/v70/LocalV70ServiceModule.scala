@@ -7,12 +7,12 @@ import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6ServiceImpl}
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
-import nirvana.hall.v70.internal.sync.Sync7to6ServiceImpl
+import nirvana.hall.v70.internal.sync.{Sync6to7ServiceImpl, Sync7to6ServiceImpl}
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.internal.{CaseInfoServiceImpl, LPCardServiceImpl, QueryServiceImpl, TPCardServiceImpl}
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
-import nirvana.hall.v70.services.sync.Sync7to6Service
+import nirvana.hall.v70.services.sync.{Sync6to7Service, Sync7to6Service}
 import nirvana.hall.v70.services.sys.{DictService, UserService}
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -45,6 +45,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
 
+    binder.bind(classOf[Sync6to7Service], classOf[Sync6to7ServiceImpl]).eagerLoad()
   }
 
 //  @Contribute(classOf[ProtobufRequestHandler])

@@ -1,4 +1,4 @@
-package nirvana.hall.v62.services
+package nirvana.hall.v70.services.sync
 
 import org.springframework.transaction.annotation.Transactional
 

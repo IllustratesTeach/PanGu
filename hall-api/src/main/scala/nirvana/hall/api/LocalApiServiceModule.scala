@@ -5,7 +5,7 @@ import monad.core.config.ZkClientConfigSupport
 import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
 import nirvana.hall.api.internal._
-import nirvana.hall.api.internal.filter.{CaseInfoFilter, LPCardFilter, QueryFilter, TPCardFilter}
+import nirvana.hall.api.internal.filter._
 import nirvana.hall.api.services._
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, Contribute}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
@@ -32,6 +32,7 @@ object LocalApiServiceModule {
     configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
     configuration.addInstance("CaseFilter", classOf[CaseInfoFilter])
     configuration.addInstance("QueryFilter", classOf[QueryFilter])
+    configuration.addInstance("SyncDataFilter", classOf[SyncDataFilter])
   }
 
   //增加EagerLoad,避免出现deadlock
