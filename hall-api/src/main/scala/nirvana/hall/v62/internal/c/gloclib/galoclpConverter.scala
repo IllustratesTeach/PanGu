@@ -145,7 +145,7 @@ object galoclpConverter extends LoggerSupport{
     val mic = card.getBlobBuilder
     gCard.pstMIC_Data.foreach{ item =>
 
-      if(item.nImgLen > 0)
+      if(item.nMntLen > 0)
         mic.setStMntBytes(ByteString.copyFrom(item.pstMnt_Data))
       if(item.nCprLen > 0) {
         mic.setStImageBytes(ByteString.copyFrom(item.pstCpr_Data))
