@@ -102,8 +102,8 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig,featureExtrac
        }else{
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
          var mnt = micStruct.pstMnt_Data
-         //TT查询老特征转新特征
-         if(hallMatcherConfig.mnt.isNewFeature && !isPalm && queryType == HallMatcherConstants.QUERY_TYPE_TT){
+         //TT，TL查询老特征转新特征
+         if(hallMatcherConfig.mnt.isNewFeature && !isPalm && (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL)){
            mnt = featureExtractor.ConvertMntOldToNew(ByteString.copyFrom(mnt).newInput()).get
          }
          matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
