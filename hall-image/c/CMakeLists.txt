@@ -53,7 +53,7 @@ IF(WIN32)
     TARGET_LINK_LIBRARIES(hall-image4j ${TCPRDLL} ${GAFISTOOLS})
 
     ELSE()
-        ADD_DEFINITIONS(-DDISABLE_GFS)
+        #ADD_DEFINITIONS(-DDISABLE_GFS)
         FIND_LIBRARY(GAFISTOOLS
                 NAME gafistools
                 PATHS "${KERNEL_DIR}\\build-w32\\src"
