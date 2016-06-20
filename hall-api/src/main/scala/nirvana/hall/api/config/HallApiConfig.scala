@@ -20,4 +20,15 @@ class HallApiConfig
     with WebServerConfigSupport
     with LocalStoreConfigSupport
     with ZkClientConfigSupport
-    with HeartbeatConfigSupport
+    with HeartbeatConfigSupport{
+
+    @XmlElement(name = "sync")
+    var sync: SyncConfig = new SyncConfig
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SyncConfig")
+class SyncConfig {
+    @XmlElement(name = "sync_cron")
+    var syncCron: String = _
+}

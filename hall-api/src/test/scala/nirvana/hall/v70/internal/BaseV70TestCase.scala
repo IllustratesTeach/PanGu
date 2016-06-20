@@ -5,6 +5,7 @@ import javax.persistence.EntityManagerFactory
 import com.google.protobuf.ExtensionRegistry
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import monad.support.services.XmlLoader
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
@@ -52,6 +53,9 @@ object TestV70Module{
   def buildHallV70Config={
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test-v70.xml"),"utf8").mkString
     XmlLoader.parseXML[HallV70Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v70/v70.xsd")))
+  }
+  def buildHallApiConfig={
+    new HallApiConfig
   }
 
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={

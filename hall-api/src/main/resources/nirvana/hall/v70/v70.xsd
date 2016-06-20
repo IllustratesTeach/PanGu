@@ -33,11 +33,6 @@
           <xs:documentation>发送6.2查询任务定时计划</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="cronType" name="sync_6to7_cron" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>同步6.2任务定时计划</xs:documentation>
-        </xs:annotation>
-      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

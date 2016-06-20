@@ -26,6 +26,4 @@ class CronConfig {
   var sync7to6Cron: String = _
   @XmlElement(name = "query_7to6_cron")
   val query7to6Cron: String = null
-  @XmlElement(name = "sync_6to7_cron")
-  var sync6to7Cron: String = _
 }

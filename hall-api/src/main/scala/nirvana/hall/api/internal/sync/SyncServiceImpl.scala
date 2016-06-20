@@ -1,0 +1,130 @@
+package nirvana.hall.api.internal.sync
+
+import javax.persistence.EntityManager
+
+import monad.rpc.protocol.CommandProto.CommandStatus
+import monad.support.services.LoggerSupport
+import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.protocol.api.SyncDataProto._
+import nirvana.hall.support.services.RpcHttpClient
+import org.apache.tapestry5.ioc.annotations.PostInjection
+import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+
+/**
+ * Created by songpeng on 16/6/18.
+ */
+class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService, tpCardService: TPCardService, lpCardService: LPCardService, caseInfoService: CaseInfoService) extends SyncService with LoggerSupport{
+  val SYNC_BATCH_SIZE = 1
+  /**
+   * 上报任务定时器，向6.2上报数据
+   * @param periodicExecutor
+   * @param syncService
+   */
+  @PostInjection
+  def startUp(periodicExecutor: PeriodicExecutor, syncService: SyncService): Unit = {
+    if(apiConfig.sync.syncCron != null){
+      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron), "sync-cron", new Runnable {
+        override def run(): Unit = {
+          syncService.doWork
+        }
+      })
+    }
+  }
+  /**
+   * 定时任务调用方法
+   */
+  override def doWork(): Unit = {
+    //同步捺印
+    syncTPCard()
+    //同步案件
+    syncCaseInfo()
+    //同步现场
+    syncLPCard()
+  }
+
+  override def syncTPCard(): Unit ={
+    val syncConfig = syncConfigService.getSyncConfig()
+    val request = SyncTPCardRequest.newBuilder()
+    request.setSize(SYNC_BATCH_SIZE)
+    request.setTimestamp(syncConfig.tpcardTimestamp)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build())
+    if(baseResponse.getStatus == CommandStatus.OK){
+      var timestamp = syncConfig.tpcardTimestamp
+      val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
+      val iter = response.getSyncTPCardList.iterator()
+      while (iter.hasNext){
+        val syncTPCard = iter.next()
+        val tpCard = syncTPCard.getTpCard
+        val cardId = tpCard.getStrCardID
+        if(!tpCardService.isExist(cardId)){
+          tpCardService.addTPCard(tpCard)
+        }
+        timestamp = syncTPCard.getTimestamp
+      }
+      if(response.getSyncTPCardCount > 0){
+        syncConfig.tpcardTimestamp = timestamp
+        syncConfigService.updateSyncConfig(syncConfig)
+        info("success syncTPCard count {} timestamp {}", response.getSyncTPCardCount, timestamp)
+        syncTPCard()
+      }
+    }
+  }
+
+  override def syncLPCard(): Unit ={
+    val syncConfig = syncConfigService.getSyncConfig()
+    val request = SyncLPCardRequest.newBuilder()
+    request.setSize(SYNC_BATCH_SIZE)
+    request.setTimestamp(syncConfig.lpcardTimestamp)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPCardRequest.cmd, request.build())
+    if(baseResponse.getStatus == CommandStatus.OK){
+      var timestamp = syncConfig.lpcardTimestamp
+      val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
+      val iter = response.getSyncLPCardList.iterator()
+      while (iter.hasNext){
+        val syncLPCard = iter.next()
+        val lpCard = syncLPCard.getLpCard
+        val cardId = lpCard.getStrCardID
+        if(!lpCardService.isExist(cardId)){
+          lpCardService.addLPCard(lpCard)
+        }
+        timestamp = syncLPCard.getTimestamp
+      }
+      if(response.getSyncLPCardCount > 0){
+        syncConfig.lpcardTimestamp = timestamp
+        syncConfigService.updateSyncConfig(syncConfig)
+        info("success syncLPCard count {} timestamp {}", response.getSyncLPCardCount, timestamp)
+        syncLPCard()
+      }
+    }
+  }
+
+  override def syncCaseInfo(): Unit ={
+    val syncConfig = syncConfigService.getSyncConfig()
+    val request = SyncCaseRequest.newBuilder()
+    request.setSize(SYNC_BATCH_SIZE)
+    request.setTimestamp(syncConfig.caseTimestamp)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncCaseRequest.cmd, request.build())
+    if(baseResponse.getStatus == CommandStatus.OK){
+      var timestamp = syncConfig.caseTimestamp
+      val response = baseResponse.getExtension(SyncCaseResponse.cmd)
+      val iter = response.getSyncCaseList.iterator()
+      while (iter.hasNext){
+        val syncCaseInfo = iter.next()
+        val caseInfo = syncCaseInfo.getCaseInfo
+        val cardId = caseInfo.getStrCaseID
+        if(!caseInfoService.isExist(cardId)){
+          caseInfoService.addCaseInfo(caseInfo)
+        }
+        timestamp = syncCaseInfo.getTimestamp
+      }
+      if(response.getSyncCaseCount > 0){
+        syncConfig.caseTimestamp = timestamp
+        syncConfigService.updateSyncConfig(syncConfig)
+        info("success syncCaseInfo count {} timestamp {}", response.getSyncCaseCount, timestamp)
+        syncCaseInfo()
+      }
+    }
+  }
+}
