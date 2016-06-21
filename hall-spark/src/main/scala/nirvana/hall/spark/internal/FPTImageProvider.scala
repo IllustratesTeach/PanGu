@@ -30,7 +30,7 @@ class FPTImageProvider extends ImageProvider{
     //    @tailrec
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       try {
-        val data = SparkFunctions.httpClient.download(imageFileServer + filePath)
+        val data = SparkFunctions.httpClient.download(imageFileServer.get + filePath)
         val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
 
         //FileUtils.writeByteArrayToFile(new File("/tmp/"+filePath.substring(filePath.lastIndexOf("/"))),data)

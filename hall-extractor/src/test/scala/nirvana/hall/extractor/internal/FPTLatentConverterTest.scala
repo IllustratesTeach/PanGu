@@ -20,7 +20,7 @@ class FPTLatentConverterTest extends BaseJniTest{
   @Test
   def test_convert: Unit ={
     val fpt4 = new FPT4File
-    fpt4.fromStreamReader(new FileInputStream(new File("C:\\Users\\wangjue\\Desktop\\错误日志\\zipPath\\LT120160519005347\\B0120160518164331699591.FPT")),AncientConstants.GBK_ENCODING  )
+    fpt4.fromStreamReader(new FileInputStream(new File("C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\fpt_lt\\B0120160617142019608855.FPT")),AncientConstants.GBK_ENCODING  )
 
     val headL = fpt4.logic03Recs.head.fingers.head
     val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(headL)
@@ -30,7 +30,7 @@ class FPTLatentConverterTest extends BaseJniTest{
     mnt.stHead.nImgSize = 640
 
     val latent2 = new FINGERLATMNTSTRUCT()
-    val fis = new FileInputStream(new File("/Users/jcai/Downloads/650000000999210005000201.mnt"))
+    val fis = new FileInputStream(new File("C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\fpt_lt\\B0120160617142019608855.FPT"))
     fis.skip(64)
     latent2.fromStreamReader(fis,AncientConstants.GBK_ENCODING )
 
@@ -40,7 +40,7 @@ class FPTLatentConverterTest extends BaseJniTest{
   @Test
   def test_convert3: Unit ={
     val fpt3 = new FPT3File
-    fpt3.fromStreamReader(new FileInputStream(new File("C:\\Users\\wangjue\\Desktop\\错误日志\\zipPath\\LT120160519005347\\B0120160518164331699591.FPT")),AncientConstants.GBK_ENCODING  )
+    fpt3.fromStreamReader(new FileInputStream(new File("C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\fpt_lt\\B0120160617142019608855.FPT")),AncientConstants.GBK_ENCODING  )
     val flag = fpt3.head.flag
     val headL = fpt3.logic2Recs.head.fingers.head
     val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(headL)

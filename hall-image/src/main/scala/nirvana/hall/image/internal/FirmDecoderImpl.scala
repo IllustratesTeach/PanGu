@@ -26,6 +26,7 @@ import scala.util.control.NonFatal
  * @since 2015-12-10
  */
 class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,imageConfigSupport: ImageConfigSupport) extends FirmDecoder{
+  private val os = System.getProperties.getProperty("os.name")
   private val logger = LoggerFactory getLogger getClass
   private val dlls = new ConcurrentHashMap[String,Dll]()
   private case class Dll(Handle:Long,lockOpt:Option[ReentrantLock]){
@@ -44,14 +45,15 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       return gafisImg
 
     val cprMethod =gafisImg.stHead.nCompressMethod
-    val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
+    var firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
 
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
     destImg.stHead.bIsCompressed = 0
     destImg.stHead.nCompressMethod = 0
     destImg.stHead.nBits = 8
-
+    if (firmCode.equals(fpt4code.GAIMG_CPRMETHOD_EGFS_CODE) && os.toLowerCase().startsWith("win"))
+      firmCode = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE.toInt+1+""
     firmCode match{
       case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
 
@@ -237,7 +239,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         true
     }
     System.err.println("prepare loading %s,isConcurrent:%s".format(dllName,isConcurrent))
-    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0)
+    val handle = NativeImageConverter.loadLibrary(files.head.getAbsolutePath,functionName,cprMethod,0x00000100)
     System.err.println("%s loaded,isConcurrent:%s".format(dllName,isConcurrent))
     dlls.put(code, Dll(handle,if(isConcurrent) None else Some(new ReentrantLock())))
   }

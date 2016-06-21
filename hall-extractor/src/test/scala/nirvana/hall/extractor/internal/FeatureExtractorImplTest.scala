@@ -1,6 +1,6 @@
 package nirvana.hall.extractor.internal
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{File, ByteArrayInputStream, InputStream}
 
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -8,7 +8,7 @@ import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 /**
@@ -101,7 +101,8 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract: Unit ={
-    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.img"))
+    //val img = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.img"))
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\dd\\t1.data"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(img)
 
     val extractor = new FeatureExtractorImpl

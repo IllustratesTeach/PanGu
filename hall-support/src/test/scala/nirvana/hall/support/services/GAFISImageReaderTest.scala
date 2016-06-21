@@ -17,7 +17,7 @@ class GAFISImageReaderTest {
     val iioRegistry = IIORegistry.getDefaultInstance
     iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
-    val img = ImageIO.read(getClass.getResourceAsStream("/testimg.img"))
-    ImageIO.write(img, "bmp", new File("test_t_t.bmp"));
+    val img = ImageIO.read(getClass.getResourceAsStream("/te.data"))
+    ImageIO.write(img, "bmp", new File("te.bmp"));
   }
 }

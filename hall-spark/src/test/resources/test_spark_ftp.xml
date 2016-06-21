@@ -3,12 +3,12 @@
   <host>127.0.0.1</host>
   <app_name>spark</app_name>
   <master_server>local[1]</master_server>
-  <kafka_server>192.168.127.128:9092</kafka_server>
+  <kafka_server>192.168.1.106:9092</kafka_server>
   <kafka_topic_name>DBDATA</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
   <image_provider_class>nirvana.hall.spark.internal.FPTImageFromFTPServerProvide</image_provider_class>
   <!-- 特征数据保存的服务类 -->
-  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsSaver</data_saver_class>
+  <data_saver_class>nirvana.hall.spark.internal.DumpSaver</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>

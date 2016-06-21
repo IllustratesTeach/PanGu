@@ -15,13 +15,13 @@ import org.apache.commons.io.FileUtils
 object TestCreateFilePath {
   def main(args:Array[String]): Unit ={
     val props = new Properties()
-    props.put("metadata.broker.list", "192.168.127.128:9092")
+    props.put("metadata.broker.list", "192.168.1.106:9092")
     props.put("serializer.class", "kafka.serializer.StringEncoder")
     val config = new ProducerConfig(props)
     val producer = new Producer[String, String](config)
 
     //
-    val files  = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\DBDATA\\pkids"),Array[String]("txt"),true)
+    val files  = FileUtils.listFiles(new File("D:\\fpt_path"),Array[String]("txt"),true)
     val itt = files.iterator()
     while (itt.hasNext) {
       val fptFile = itt.next()

@@ -11,9 +11,10 @@ import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 import scala.collection.JavaConversions._
@@ -25,17 +26,47 @@ import scala.io.Source
  */
 class FirmDecoderImplTest extends BaseJniTest{
   @Test
+  def test_decode_dir: Unit ={
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val files = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\fpt_miss_candidate\\img"),Array[String]("img"),true)
+    val itt = files.iterator()
+    while (itt.hasNext) {
+      val imgFile = itt.next()
+      val gafisImg = new GAFISIMAGESTRUCT
+      val cprData = FileUtils.readFileToByteArray(imgFile)
+      gafisImg.fromByteArray(cprData)
+      val expectFeature = new FINGERMNTSTRUCT
+      expectFeature.fromByteArray(gafisImg.bnData)
+      val originalImg = decoder.decode(gafisImg)
+      println("----"+originalImg.toByteArray().length)
+    }
+  }
+
+  @Test
   def test_decode_shanghai: Unit ={
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
     val gafisImg = new GAFISIMAGESTRUCT
-    val stream = getClass.getResourceAsStream("/shanghai/31011405020016040001_1_2.img")
-    gafisImg.fromByteArray(IOUtils.toByteArray(stream))
+    //val stream = getClass.getResourceAsStream("/shanghai/31011405020016040001_1_2.img")
+    //gafisImg.fromByteArray(IOUtils.toByteArray(stream))
+    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\1900_fail\\R9000000000000000013440_20.img"))
+    gafisImg.fromByteArray(cprData)
+    /*if (gafisImg.stHead.nCompressMethod.toInt < 10) {
+      gafisImg.transformForFPT()
+      val gafisImg1 = new GAFISIMAGESTRUCT
+      gafisImg1.bnData = gafisImg.toByteArray()
+      gafisImg1.stHead = gafisImg.stHead
+      gafisImg1.stHead.nImgSize = gafisImg1.bnData.length
+      gafisImg = gafisImg1
+    }*/
+    val expectFeature = new FINGERMNTSTRUCT
+    expectFeature.fromByteArray(gafisImg.bnData)
     val originalImg = decoder.decode(gafisImg)
+    println(originalImg.toByteArray().length)
 //    FileUtils.writeByteArrayToFile(new File("31011405020016040001_1_2.img.orginal"),originalImg.toByteArray())
   }
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "C:\\Users\\wangjue\\Desktop\\fpt_error\\B9300000000002016044415.FPT"
+    val filePath = "C:\\Users\\wangjue\\Desktop\\大库FPT\\比对丢失分析\\12undecompress\\temp\\1801\\R1863224224111222403365.fpt"
     val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
     fptEither match{
       case Right(fpt4)=>
@@ -83,7 +114,8 @@ class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_decode_gafisimg{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
-    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
+    //val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
+    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\dd\\31010342000007070037_1_0.data"))
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.bIsCompressed = 1.toByte
     gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
