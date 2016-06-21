@@ -25,12 +25,11 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
    * @param from
    */
   def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
-    println(MIN_SEQ_SQL)
     val from_ = getMinSeq(from)
     if(from_ > 0 && from_ <= getMaxSeq){
-      println(from_ +":"+getMaxSeq)
       JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
         ps.setLong(1, from_)
+        ps.setLong(2, from_ + FETCH_BATCH_SIZE)
       }{rs=>
         while (rs.next()){
           //如果下一条数据的seq与当前的最大值不一样，退出
@@ -43,6 +42,9 @@ abstract class SyncDataFetcher(hallMatcherConfig: HallMatcherConfig , implicit v
           }
           readResultSet(syncDataResponse, rs, size)
         }
+      }
+      if(syncDataResponse.getSyncDataCount < size){
+        doFetch(syncDataResponse, size, from_ + FETCH_BATCH_SIZE)
       }
     }
   }

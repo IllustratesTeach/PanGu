@@ -21,9 +21,9 @@ class HallV70Config extends ActiveRecordConfigSupport {
 @XmlType(name = "CronConfig")
 class CronConfig {
   @XmlElement(name = "sync_dict_cron")
-  var syncDictCron: String = null
+  var syncDictCron: String = _
   @XmlElement(name = "sync_7to6_cron")
-  var sync7to6Cron: String = null
+  var sync7to6Cron: String = _
   @XmlElement(name = "query_7to6_cron")
   val query7to6Cron: String = null
 }

@@ -21,6 +21,8 @@
       <header_size>64</header_size>
       <finger_template_size>640</finger_template_size>
       <finger_latent_size>640</finger_latent_size>
+      <!-- 是否转换新特征 -->
+      <is_new_feature>false</is_new_feature>
     </mnt>
 </hall_matcher>
 

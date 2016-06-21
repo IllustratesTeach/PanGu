@@ -32,8 +32,7 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
       val deletag = rs.getString("deletag")
       val mnt = ByteString.copyFrom(rs.getBytes("gather_data"))
       //是否是纹线数据
-      val isRidge = if (("4" == group_id)) true else false
-      if (isRidge) {
+      if ("4" == group_id) {
         syncDataBuilder.setMinutiaType(SyncData.MinutiaType.RIDGE)
       } else {
         syncDataBuilder.setMinutiaType(SyncData.MinutiaType.FINGER)

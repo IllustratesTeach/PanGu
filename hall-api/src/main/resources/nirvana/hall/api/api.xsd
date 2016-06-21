@@ -38,6 +38,20 @@
           <xs:documentation>配置Web服务器相关参数</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="syncConfigType" name="sync" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置Web服务器相关参数</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="syncConfigType">
+    <xs:sequence>
+      <xs:element type="cronType" name="sync_cron" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>同步数据定时计划</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

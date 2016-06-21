@@ -1,6 +1,7 @@
 package nirvana.hall.spark.services
 
 import java.util
+import java.util.concurrent.locks.ReentrantLock
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
@@ -14,7 +15,9 @@ import scala.collection.convert.decorateAsScala._
   */
 object SysProperties{
   private var sysProperties:Map[String,String] = _
-  private var dataSources :Map[String,DataSource] = _
+  private var dataSources :Map[String,DataSource] = Map()
+  private var databaseConfigs:List[DatabaseConfig] = _
+  private val locker = new ReentrantLock()
   private def initProperties(properties: util.List[SparkConfigProperty]): Unit ={
     if(sysProperties == null) {
       val data = new util.HashMap[String, String](properties.size())
@@ -34,21 +37,37 @@ object SysProperties{
     sysProperties.get(name)
   }
   def initDataSource(databaseConfigList:util.List[DatabaseConfig]): Unit ={
-    if(dataSources == null) {
-      val data = new util.HashMap[String, DataSource](databaseConfigList.size())
-      val it = databaseConfigList.iterator()
-      while(it.hasNext) {
-        val databaseConfig = it.next()
-        data.put(databaseConfig.poolName, buildDataSource(databaseConfig))
-      }
-      dataSources = data.asScala.toMap
-    }else{
-      println("data source has been initialized!")
-    }
+      databaseConfigs = databaseConfigList.asScala.toList
   }
 
   def getDataSource(name:String):DataSource = {
-    dataSources.getOrElse(name, throw new IllegalArgumentException("database config %s not found".format(name)))
+    var dsOpt = dataSources.get(name)
+    dsOpt match{
+      case Some(ds)=>
+        ds
+      case None=>
+        try {
+          locker.lock()
+          dsOpt = dataSources.get(name)
+          dsOpt match{
+            case Some(ds)=>
+              ds
+            case None=>
+              val configOpt = databaseConfigs.find(_.poolName == name)
+              configOpt match{
+                case Some(config)=>
+                  val ds  = buildDataSource(config)
+                  dataSources = dataSources+ (name->ds)
+                  ds
+                case None=>
+                  throw new IllegalArgumentException("database config %s not found".format(name))
+              }
+          }
+
+        }finally{
+          locker.unlock()
+        }
+    }
   }
   def getBoolean(name:String,defaultValue:Boolean):Boolean={
     getPropertyOption(name) match{
