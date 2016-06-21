@@ -1,0 +1,72 @@
+package api;
+import "api/FPTData.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "SyncDataProto";
+
+//同步捺印数据，添加timestamp时间
+message SyncTPCard{
+    required TPCard tpCard = 1;
+    required int64 timestamp = 2;
+}
+//同步TPCard
+message SyncTPCardRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncTPCardRequest cmd = 11501;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 timestamp = 1;
+    //数据大小，一次传送的数据大小,默认为100
+    optional int32 size = 2 [default = 100];
+}
+message SyncTPCardResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncTPCardResponse cmd = 11502;
+    }
+    repeated SyncTPCard syncTPCard = 1;
+}
+
+//同步捺印数据，添加timestamp时间
+message SyncLPCard{
+    required LPCard lpCard = 1;
+    required int64 timestamp = 2;
+}
+//同步LPCard
+message SyncLPCardRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPCardRequest cmd = 11503;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 timestamp = 1;
+    //数据大小，一次传送的数据大小,默认为100
+    optional int32 size = 2 [default = 100];
+}
+message SyncLPCardResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPCardResponse cmd = 11504;
+    }
+    repeated SyncLPCard syncLPCard = 1;
+}
+
+//同步捺印数据，添加timestamp时间
+message SyncCase{
+    required Case caseInfo = 1;
+    required int64 timestamp = 2;
+}
+//同步Case
+message SyncCaseRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncCaseRequest cmd = 11505;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 timestamp = 1;
+    //数据大小，一次传送的数据大小,默认为100
+    optional int32 size = 2 [default = 100];
+}
+message SyncCaseResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncCaseResponse cmd = 11506;
+    }
+    repeated SyncCase syncCase = 1;
+}
