@@ -5,6 +5,7 @@ import javax.persistence.EntityManager
 
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 
 /**
@@ -13,6 +14,7 @@ import nirvana.hall.v70.internal.sync.ProtobufConverter
 class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
    * 发送查询任务
+ *
    * @param querySendRequest
    * @return
    */
@@ -34,11 +36,21 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
    * 获取查询信息
+ *
    * @param queryGetRequest
    * @return
    */
   override def getQuery(queryGetRequest: QueryGetRequest): QueryGetResponse = {
+    throw new UnsupportedOperationException
+  }
 
+  /**
+    * 通过卡号查找第一个的比中结果
+    *
+    * @param cardId 卡号
+    * @return 比对结果
+    */
+  override def findFirstQueryResultByCardId(dbId: Short, tableId: Short, cardId: String): Option[MatchResult] = {
     throw new UnsupportedOperationException
   }
 }

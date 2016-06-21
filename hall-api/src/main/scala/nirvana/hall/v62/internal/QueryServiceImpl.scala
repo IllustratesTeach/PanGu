@@ -10,6 +10,7 @@ import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT}
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
@@ -21,6 +22,19 @@ import scala.collection.mutable
  * Created by songpeng on 16/1/26.
  */
 class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryService{
+
+
+  /**
+    * 通过卡号查找第一个的比中结果
+    *
+    * @param cardId 卡号
+    * @return 比对结果
+    */
+  override def findFirstQueryResultByCardId(dbId:Short,tableId:Short,cardId: String): Option[MatchResult] = {
+    val queryResult = queryMatchResultByCardId(dbId,tableId,Some("((KeyID = '"+cardId+"'))"),1);
+//    queryResult.headOption.map(_.nQueryID).map(getQuery()).map(gaqryqueConverter.convertGAQUERYSTRUCT2ProtoBuf)
+    None
+  }
 
   /**
     * 查询比中关系
