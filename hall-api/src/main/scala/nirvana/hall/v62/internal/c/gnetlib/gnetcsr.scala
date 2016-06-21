@@ -247,7 +247,9 @@ trait gnetcsr {
     pAns.nReturnValue = 1
     channel.writeMessage[NoneResponse](pAns)
 
-    pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_RecvMICStruct(channel,_))
+    //判断是否有图像数据
+    if(pstCard.nMicItemCount > 0)
+      pstCard.pstMIC_Data.foreach(GAFIS_NETSCR_RecvMICStruct(channel,_))
     pstCard.pstText_Data.filter(_.bIsPointer == 1).foreach(x=>x.stData.textContent = channel.receiveByteArray(x.nItemLen).array())
 
     if ( pstCard.nInfoExLen > 0 ) {

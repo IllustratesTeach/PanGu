@@ -262,50 +262,54 @@ object galoctpConverter extends LoggerSupport{
       }
     }
 
-    data.pstMIC_Data.foreach{ mic =>
-      val micDataBuilder = TPCardBlob.newBuilder() //card.addBlobBuilder()
-      if(mic.pstMnt_Data != null && mic.pstMnt_Data.length > 64)
-        micDataBuilder.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
-      if(mic.pstCpr_Data != null && mic.pstCpr_Data.length > 64)
-        micDataBuilder.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
-      mic.nItemType match {
-        case glocdef.GAIMG_IMAGETYPE_FINGER =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
-          micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
-        case glocdef.GAMIC_ITEMTYPE_PLAINFINGER =>
-          //四联指,不确定
-          micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
-        case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
-          micDataBuilder.setBPlain(true)
-          micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
-        case glocdef.GAMIC_ITEMTYPE_FACE =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_FACE)
-          mic.nItemData match {
-            case 1 => micDataBuilder.setFacefgp(FaceFgp.FACE_FRONT)
-            case 2 => micDataBuilder.setFacefgp(FaceFgp.FACE_LEFT)
-            case 3 => micDataBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
-            case other => micDataBuilder.setFacefgp(FaceFgp.FACE_UNKNOWN)
-          }
-        case glocdef.GAMIC_ITEMTYPE_DATA =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
-        case glocdef.GAMIC_ITEMTYPE_PALM =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
-          mic.nItemData match {
-            case 1 => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
-            case 2 => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
-            case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
-          }
-        case glocdef.GAMIC_ITEMTYPE_VOICE =>
-          micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
-        case other =>
-          logger.error("mic type {} not supported for {}",other,data.szCardID)
-          micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
+    //判断是否有图像数据
+    if(data.nMicItemCount > 0){
+      data.pstMIC_Data.foreach{ mic =>
+        val micDataBuilder = TPCardBlob.newBuilder() //card.addBlobBuilder()
+        if(mic.pstMnt_Data != null && mic.pstMnt_Data.length > 64)
+          micDataBuilder.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
+        if(mic.pstCpr_Data != null && mic.pstCpr_Data.length > 64)
+          micDataBuilder.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
+        mic.nItemType match {
+          case glocdef.GAIMG_IMAGETYPE_FINGER =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
+            micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
+          case glocdef.GAMIC_ITEMTYPE_PLAINFINGER =>
+            //四联指,不确定
+            micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
+          case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)
+            micDataBuilder.setBPlain(true)
+            micDataBuilder.setFgp(FingerFgp.valueOf(mic.nItemData))
+          case glocdef.GAMIC_ITEMTYPE_FACE =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_FACE)
+            mic.nItemData match {
+              case 1 => micDataBuilder.setFacefgp(FaceFgp.FACE_FRONT)
+              case 2 => micDataBuilder.setFacefgp(FaceFgp.FACE_LEFT)
+              case 3 => micDataBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
+              case other => micDataBuilder.setFacefgp(FaceFgp.FACE_UNKNOWN)
+            }
+          case glocdef.GAMIC_ITEMTYPE_DATA =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
+          case glocdef.GAMIC_ITEMTYPE_PALM =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
+            mic.nItemData match {
+              case 1 => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
+              case 2 => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
+              case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
+            }
+          case glocdef.GAMIC_ITEMTYPE_VOICE =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
+          case other =>
+            logger.error("mic type {} not supported for {}",other,data.szCardID)
+            micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
+        }
+        //过滤掉image type为0的数据
+        if(micDataBuilder.getType !=  ImageType.IMAGETYPE_UNKNOWN)
+          card.addBlob(micDataBuilder)
       }
-      //过滤掉image type为0的数据
-      if(micDataBuilder.getType !=  ImageType.IMAGETYPE_UNKNOWN)
-        card.addBlob(micDataBuilder)
     }
+
 
     card.build()
   }
