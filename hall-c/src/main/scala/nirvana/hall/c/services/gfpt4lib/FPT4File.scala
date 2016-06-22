@@ -2,6 +2,7 @@ package nirvana.hall.c.services.gfpt4lib
 
 import nirvana.hall.c.annotations.{NotTrim, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.AncientData.AncientDataException
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
 
 /**
@@ -210,7 +211,10 @@ object FPT4File {
 
     // GS
     override protected def getFingerDataCount: Int = {
-      if (sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
+      if (sendFingerCount != null && sendFingerCount.nonEmpty)
+        sendFingerCount.toInt
+      else
+        throw new AncientDataException("sendFingerCount field is "+sendFingerCount)
     }
   }
 
