@@ -38,6 +38,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
       return false
     }else{
       val syncTagert = SyncTarget.find(queryque.syncTargetSid)
+      val url = "http://%s:%s".format(syncTagert.targetIp, syncTagert.targetPort)
       val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, syncTagert.targetIp, syncTagert.targetPort)
 
       if (matchResult != null){
@@ -57,7 +58,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             //获取捺印信息
             val person = GafisPerson.findOption(cand.getObjectId)
             if(person.isEmpty){
-              val url = "http://"+syncTagert.targetIp+":"+syncTagert.targetPort
               val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url)
               tPCard.foreach{tpCard =>
                 tpCardService.addTPCard(tpCard)
@@ -68,14 +68,12 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             val cardId = cand.getObjectId
             val caseFinger = GafisCaseFinger.findOption(cardId)
             if(caseFinger.isEmpty){
-              val url = "http://" + syncTagert.targetIp+":"+syncTagert.targetPort
               val lPCard = lPCardRemoteService.getLPCard(cardId, url)
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){
                   val caseInfo = GafisCase.findOption(caseId)
                   if(caseInfo.isEmpty){
-                    val url = "http://"+syncTagert.targetIp + ":" + syncTagert.targetPort
                     val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url)
                     caseInfoService.addCaseInfo(caseInfo)
                   }
