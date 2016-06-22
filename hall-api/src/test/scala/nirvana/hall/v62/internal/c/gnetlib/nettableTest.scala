@@ -17,7 +17,7 @@ class nettableTest {
 
     val config = new HallV62Config
     config.appServer.host = "127.0.0.1"
-    config.appServer.port = 7777
+    config.appServer.port = 6798
     config.appServer.user = "afisadmin"
     config.appServer.password=""
 
