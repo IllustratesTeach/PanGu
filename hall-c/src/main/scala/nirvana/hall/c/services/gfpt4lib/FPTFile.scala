@@ -89,7 +89,14 @@ object FPTFile {
   trait DynamicFingerData extends AncientData{
     @IgnoreTransfer
     private var logicEnd: Byte = FPTFile.FS // GS
-    protected def getFingerDataCount:Int
+    protected def getFingerDataCountString:String
+    protected def getFingerDataCount:Int={
+      val sendFingerCount = getFingerDataCountString
+      if (sendFingerCount != null && sendFingerCount.nonEmpty)
+        sendFingerCount.toInt
+      else
+        throw new AncientDataException("sendFingerCount field is "+sendFingerCount)
+    }
     override def getDataSize: Int = {
       var count = super.getDataSize
       if (getFingerDataCount == 0)

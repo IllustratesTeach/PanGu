@@ -2,7 +2,7 @@ package nirvana.hall.c.services.gfpt4lib
 
 import java.nio.charset.Charset
 
-import nirvana.hall.c.annotations.{NotTrim, Length, LengthRef}
+import nirvana.hall.c.annotations.{Length, LengthRef, NotTrim}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.AncientData.StreamReader
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead, FPTParseException}
@@ -169,9 +169,7 @@ object FPT3File {
     var fingers: Array[FingerLData] = _
 
     // GS
-    override protected def getFingerDataCount: Int = {
-      if(sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
-    }
+    override protected def getFingerDataCountString: String = sendFingerCount
   }
 
   class FingerTData extends AncientData {
@@ -331,9 +329,6 @@ object FPT3File {
     @LengthRef("sendFingerCount")
     var fingers: Array[FingerTData] = _
 
-    // GS
-    override protected def getFingerDataCount: Int = {
-      if(sendFingerCount != null && sendFingerCount.nonEmpty) sendFingerCount.toInt else 0
-    }
+    override protected def getFingerDataCountString: String = sendFingerCount
   }
 }
