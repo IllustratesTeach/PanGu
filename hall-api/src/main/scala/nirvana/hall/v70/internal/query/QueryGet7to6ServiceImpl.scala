@@ -1,7 +1,6 @@
 package nirvana.hall.v70.internal.query
 
 import java.util.Date
-import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional
  * Created by songpeng on 15/12/30.
  */
 class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
-                              entityManager: EntityManager,
                               queryRemoteService: QueryRemoteService,
                               tPCardRemoteService: TPCardRemoteService,
                               lPCardRemoteService: LPCardRemoteService,
