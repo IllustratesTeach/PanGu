@@ -4,7 +4,6 @@ import java.net.InetAddress
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.AncientData._
 import nirvana.hall.v62.services.{AncientClient, ChannelOperator}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.xsocket.connection.{BlockingConnection, IBlockingConnection}
@@ -50,6 +49,7 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
     }
 
 
+    /*
     override def writeAncientData[T <: AncientData, R <: AncientData : ClassTag](target: T): R = {
       target.writeToStreamWriter(connection)
       receive[R]()
@@ -73,5 +73,6 @@ class XSocketAncientClient(host:String,port:Int,connectionTimeoutSecs:Int,readTi
           */
       }
     }
+    */
   }
 }

@@ -331,6 +331,7 @@ class Migrate_20151007124532_CopyTable
       t.column("LOGIC_CATEGORY",VarcharType,Limit(1),Nullable,Comment("分库类型，0:捺印分库,  1:案件分库"))
       t.column("LOGIC_DELTAG",VarcharType,Limit(1),Nullable,Comment("禁启用标识，0: 禁用，1:启用"))
       t.column("LOGIC_REMARK",VarcharType,Limit(60),Nullable,Comment("备注"))
+      t.column("LOGIC_ISDEFAULTTAG",VarcharType,Limit(1),Nullable,Comment("1:默认库"))
     }
     createTable("GAFIS_LOGIC_DB_CASE",Comment("案件逻辑分库中间表")){ t=>
       t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)

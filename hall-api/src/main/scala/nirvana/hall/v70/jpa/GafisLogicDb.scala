@@ -32,14 +32,15 @@ class GafisLogicDb extends ActiveRecord {
   var logicDeltag: java.lang.String = _
   @Column(name = "LOGIC_REMARK", length = 60)
   var logicRemark: java.lang.String = _
-
+  @Column(name = "LOGIC_ISDEFAULTTAG", length = 1)
+  var logicIsdefaulttag: java.lang.String = _
 
   def this(pkId: java.lang.String) {
     this()
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, logicCode: java.lang.String, logicName: java.lang.String, logicCategory: java.lang.String, logicDeltag: java.lang.String, logicRemark: java.lang.String) {
+  def this(pkId: java.lang.String, logicCode: java.lang.String, logicName: java.lang.String, logicCategory: java.lang.String, logicDeltag: java.lang.String, logicRemark: java.lang.String, logicIsdefaulttag: java.lang.String) {
     this()
     this.pkId = pkId
     this.logicCode = logicCode
@@ -47,6 +48,7 @@ class GafisLogicDb extends ActiveRecord {
     this.logicCategory = logicCategory
     this.logicDeltag = logicDeltag
     this.logicRemark = logicRemark
+    this.logicIsdefaulttag = logicIsdefaulttag
   }
 
 

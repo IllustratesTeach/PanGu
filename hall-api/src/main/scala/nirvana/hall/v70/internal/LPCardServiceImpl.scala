@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal
 
 import java.util.Date
+import javax.persistence.EntityManager
 
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.LPCard
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Created by songpeng on 16/1/26.
  */
-class LPCardServiceImpl extends LPCardService{
+class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
   /**
    * 新增现场卡片
    * @param lpCard
@@ -21,7 +22,9 @@ class LPCardServiceImpl extends LPCardService{
   override def addLPCard(lpCard: LPCard): Unit = {
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
-
+    val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
+    val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
+    caseFinger.sid = sid
     caseFinger.inputpsn = Gafis70Constants.INPUTPSN
     caseFinger.inputtime = new Date()
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
@@ -30,7 +33,7 @@ class LPCardServiceImpl extends LPCardService{
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
     caseFingerMnt.inputtime = new Date()
-    caseFingerMnt.isMainMnt = "1"
+    caseFingerMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     caseFingerMnt.save()
   }
 

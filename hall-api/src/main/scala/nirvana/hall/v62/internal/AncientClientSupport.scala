@@ -15,7 +15,9 @@ trait AncientClientSupport {
    * execute in channel
    */
   def executeInChannel[T](channelOperator: ChannelOperator=>T):T={
-    new XSocketAncientClient(serverAddress.host,serverAddress.port,serverAddress.connectionTimeoutSecs,serverAddress.readTimeoutSecs).executeInChannel(channelOperator)
+    val address = serverAddress
+//    new XSocketAncientClient(address.host,address.port,address.connectionTimeoutSecs,address.readTimeoutSecs).executeInChannel(channelOperator)
+    new NettyAncientClient(address.host,address.port,address.connectionTimeoutSecs,address.readTimeoutSecs).executeInChannel(channelOperator)
   }
   def serverAddress:V62ServerAddress
   def createRequestHeader:GNETREQUESTHEADOBJECT={
