@@ -42,7 +42,7 @@ class CaseInfoServiceImpl extends CaseInfoService{
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
     //逻辑库
-    val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicName === "默认库").headOption.get
+    val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     val logicDbCase = new GafisLogicDbCase()
     logicDbCase.pkId = CommonUtils.getUUID()
     logicDbCase.logicDbPkid = logicDb.pkId

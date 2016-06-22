@@ -57,7 +57,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库
-      val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicName === "默认库").headOption.get
+      val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
       val logicDbFingerprint = new GafisLogicDbFingerprint()
       logicDbFingerprint.pkId = CommonUtils.getUUID()
       logicDbFingerprint.fingerprintPkid = person.personid
