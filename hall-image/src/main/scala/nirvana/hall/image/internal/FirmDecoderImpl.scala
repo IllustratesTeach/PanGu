@@ -97,10 +97,10 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
          * 大库测试时候，发现虽然宽度和高度是500,但是实际输出还是640X640,
          * 所以此处最小buffer作为640X640
          */
-        var width = gafisImg.stHead.nWidth
-        if(width < 640) width = 640
-        var height = gafisImg.stHead.nHeight
-        if(height < 640) height = 640
+        val width = gafisImg.stHead.nWidth
+        //if(width != 640) width = 640
+        val height = gafisImg.stHead.nHeight
+        //if(height != 640) height = 640
 
         destImg.stHead.nWidth = width
         destImg.stHead.nHeight = height
