@@ -46,7 +46,7 @@ object HallImageSupervisorApp extends LoggerSupport {
         }
       }}
     }
-    executors.execute(new RestartThread())
+    //executors.execute(new RestartThread())
     sys.addShutdownHook{
       running = false
     }
