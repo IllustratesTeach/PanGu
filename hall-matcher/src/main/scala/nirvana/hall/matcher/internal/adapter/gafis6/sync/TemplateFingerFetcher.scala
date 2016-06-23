@@ -23,9 +23,9 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implic
   override val SYNC_SQL =  s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by t.modtime"
   val SELECT_TPCARD_SQL = "select t.ora_sid as sid," +
       " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
-      " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
+//      " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
       " t.tplainrmmnt, t.tplainrsmnt, t.tplainrzmnt, t.tplainrhmnt, t.tplainrxmnt, t.tplainlmmnt, t.tplainlsmnt, t.tplainlzmnt, t.tplainlhmnt, t.tplainlxmnt," +
-      " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin ," +
+//      " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin ," +
     s" ${wrapUpdateTimeAsLong()} as seq from normaltp_tpcardinfo t where t.ora_sid =?"
   //特征字段，根据指位1..20排序
   val mntColums: Array[String] = Array[String](
@@ -61,7 +61,7 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implic
         }
         pos += 1
       }
-      pos = 1 //获取纹线指位从1开始
+      /*pos = 1 //获取纹线指位从1开始
       binColums.foreach{col =>
         val bin = rs.getBytes(col)
         if(bin != null){
@@ -78,7 +78,7 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implic
           }
         }
         pos += 1
-      }
+      }*/
     }
   }
 

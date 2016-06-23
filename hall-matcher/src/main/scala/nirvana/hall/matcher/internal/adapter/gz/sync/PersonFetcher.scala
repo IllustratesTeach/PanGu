@@ -20,7 +20,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.deletag  from gafis_person t  where t.sid is not null and t.seq > ? and t.seq <= ? order by t.seq"
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.deletag  from gafis_person t  where t.seq > ? and t.seq <= ? order by t.seq"
    private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass")
    /**
     * 读取人员信息
