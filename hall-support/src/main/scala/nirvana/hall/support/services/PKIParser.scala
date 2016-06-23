@@ -18,6 +18,10 @@ import java.util.regex.Pattern
   *	keytool -importkeystore -srckeystore my.jks -destkeystore my.p12 -srcstoretype JKS -deststoretype PKCS12  \
   *		-srcstorepass mypass -deststorepass mypass -srcalias myalias -destalias myalias -srckeypass mypass -destkeypass mypass -noprompt
   *
+  * 如果证书的Certificate chain length为1,则需要使用下面语句
+  *	keytool -importkeystore -srckeystore my.jks -destkeystore my.p12 -srcstoretype JKS -deststoretype PKCS12  \
+  *		-srcstorepass mypass -deststorepass mypass
+  *
   *	上述命令在一行执行
   *
   *三、使用openssl把PKCS12文件(my.p12)转换成我们需要的pem文件(my.pem)
