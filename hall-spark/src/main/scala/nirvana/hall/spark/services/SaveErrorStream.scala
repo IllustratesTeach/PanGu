@@ -27,14 +27,17 @@ object SaveErrorStream {
     val ssc =  new StreamingContext(conf, Seconds(5))
     checkpointDirectory.foreach(ssc.checkpoint)
 
-
+    SysProperties.setConfig(parameter)
     val kafkaParams = Map[String, String]("metadata.broker.list" -> parameter.kafkaServer,"auto.offset.reset"->"smallest")
     //val kafkaParams = Map[String, String]("metadata.broker.list" -> parameter.kafkaServer)
     val kk = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc, kafkaParams,Set("ERROR"))
       .map(_._2) //only use message content
       .foreachRDD{rdd=>
-        rdd.foreachPartition(PartitionErrorSaver.savePartitionErrors(parameter))
+        rdd.foreachPartition {x=>
+          SysProperties.setConfig(parameter)
+          PartitionErrorSaver.savePartitionErrors(parameter)(x)
+        }
       }
 
     ssc

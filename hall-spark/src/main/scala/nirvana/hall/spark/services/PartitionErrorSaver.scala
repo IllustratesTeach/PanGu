@@ -8,20 +8,19 @@ import nirvana.hall.support.services.JdbcDatabase
  */
 object PartitionErrorSaver {
 
-  private lazy implicit val dataSource = SysProperties.getDataSource("gafis")
+  lazy implicit val dataSource = SysProperties.getDataSource("gafis")
 
   def savePartitionErrors(parameter: NirvanaSparkConfig)(errors:Iterator[(String)]):Unit = {
+
     errors.foreach(item=> {
       val error = item
       //println("-----------------------------------"+error)
       saveErrorInfo(error)
     }
     )
-
   }
-
   //save error info to database
-  private def saveErrorInfo(error:String): Unit = {
+  def saveErrorInfo(error:String): Unit = {
     val arr = error.split('|')
     val fpt_path = arr(0)//error file
     val keyId = arr(1)//key no
@@ -33,7 +32,6 @@ object PartitionErrorSaver {
     if ("template".equals(featureType)) {
       val group = arr(2).split('_')
       errorType = arr(3)
-
       if (group!=null) {
         if (group.length == 3) {
           featureType = group(0)
@@ -46,11 +44,7 @@ object PartitionErrorSaver {
       }
     } else
         cardId = arr(2)
-
-
     val errorDetail = arr(4)//error details
-
-
     val saveErrorSql = "INSERT INTO GAFIS_DAKU_ERROR(KEY_ID,FPT_PATH,FEATURE_TYPE,DIRECTION,POSITION,ERROR_TYPE,ERROR_DETAIL,CARDID,CREATE_TIME) VALUES(?,?,?,?,?,?,?,?,sysdate)"
     JdbcDatabase.update(saveErrorSql) { ps =>
       ps.setString(1,keyId)

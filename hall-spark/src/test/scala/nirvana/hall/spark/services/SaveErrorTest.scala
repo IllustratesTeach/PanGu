@@ -14,7 +14,7 @@ class SaveErrorTest {
 
   @Test
   def streamTest (){
-    val array = Array("src/test/resources/test_spark.xml")
+    val array = Array("src/test/resources/test_spark_error.xml")
     SaveErrorStream.main(array)
   }
 
