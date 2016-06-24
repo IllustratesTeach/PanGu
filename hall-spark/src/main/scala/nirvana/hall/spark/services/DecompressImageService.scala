@@ -58,7 +58,11 @@ object DecompressImageService {
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW_EZW.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_DEFAULT.toByte)){
-
+          if (compressedImg.stHead.nWidth != 640 || compressedImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
+            doReportException(parameter, event,new RuntimeException("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight))
+            compressedImg.stHead.nWidth = 640
+            compressedImg.stHead.nHeight = 640
+          }
           directDecode(parameter, event, compressedImg)
         }
         else
@@ -111,6 +115,11 @@ object DecompressImageService {
               val gafisImg = new GAFISIMAGESTRUCT
               val is = imgData.newInput()
               gafisImg.fromStreamReader(is)
+              if (gafisImg.stHead.nWidth != 640 || gafisImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
+                doReportException(parameter, event,new RuntimeException("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight))
+                gafisImg.stHead.nWidth = 640
+                gafisImg.stHead.nHeight = 640
+              }
               Some((event, gafisImg))
             } else {
               throw new IllegalAccessException("response haven't FirmImageDecompressResponse")
