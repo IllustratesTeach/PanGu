@@ -1,8 +1,6 @@
 package nirvana.hall.v62
 
-import nirvana.hall.api.internal.remote.TPCardRemoteServiceImpl
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.remote.TPCardRemoteService
 import nirvana.hall.api.services.sync.{SyncCaseInfoService, SyncLPCardService, SyncTPCardService}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
@@ -22,7 +20,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
-    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
+    binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
 
     //同步数据服务器类
     binder.bind(classOf[SyncTPCardService], classOf[SyncTPCardServiceImpl])
