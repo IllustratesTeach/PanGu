@@ -21,5 +21,19 @@ trait CaseInfoRemoteService {
    * @param url
    * @return
    */
-  def addCaseInfo(caseInfo: Case, url: String):Boolean
+  def addCaseInfo(caseInfo: Case, url: String)
+
+  /**
+   * 更新案件信息
+   * @param caseInfo
+   * @param url
+   */
+  def updateCaseInfo(caseInfo: Case, url: String)
+
+  /**
+   * 删除案件信息
+   * @param caseId
+   * @param url
+   */
+  def deleteCaseInfo(caseId: String, url: String)
 }

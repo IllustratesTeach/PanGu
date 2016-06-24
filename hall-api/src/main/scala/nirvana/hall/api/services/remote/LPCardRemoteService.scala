@@ -21,5 +21,19 @@ trait LPCardRemoteService {
    * @param url
    * @return
    */
-  def addLPCard(lPCard: LPCard, url: String): Boolean
+  def addLPCard(lPCard: LPCard, url: String)
+
+  /**
+   * 更新现场卡片
+   * @param lPCard
+   * @param url
+   */
+  def updateLPCard(lPCard: LPCard, url: String)
+
+  /**
+   * 删除现场卡信息
+   * @param cardId
+   * @param url
+   */
+  def deleteLPCard(cardId: String, url: String)
 }

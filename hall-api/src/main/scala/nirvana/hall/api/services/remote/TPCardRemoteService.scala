@@ -19,7 +19,20 @@ trait TPCardRemoteService {
    * @param tpCard
    * @param url
    */
-  def addTPCard(tpCard: TPCard, url: String): Boolean
+  def addTPCard(tpCard: TPCard, url: String)
+
+  /**
+   * 更新捺印卡片
+   * @param tPCard
+   * @param url
+   */
+  def updateTPCard(tPCard: TPCard, url: String)
+
+  /**
+   * 删除捺印卡片
+   * @param cardId
+   */
+  def deleteTPCard(cardId: String, url: String)
 
   /**
    * 验证编号是否已存在

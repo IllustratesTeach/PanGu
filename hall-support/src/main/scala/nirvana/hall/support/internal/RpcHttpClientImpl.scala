@@ -6,7 +6,7 @@ import java.io.Closeable
 
 import com.google.protobuf.ExtensionRegistry
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
-import monad.rpc.protocol.CommandProto.BaseCommand
+import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.RpcHttpClient
 import org.apache.commons.io.IOUtils
@@ -77,7 +77,11 @@ class RpcHttpClientImpl(extensionRegistry: ExtensionRegistry) extends RpcHttpCli
           try {
             //val bytes = IOUtils.toyteArray(entity.getContent)
             //responseBuilder.mergeFrom(entity.getContent)
-            BaseCommand.getDefaultInstance.getParserForType.parseFrom(entity.getContent,extensionRegistry)
+            val baseCommand = BaseCommand.getDefaultInstance.getParserForType.parseFrom(entity.getContent,extensionRegistry)
+            if(baseCommand.getStatus == CommandStatus.FAIL){
+              throw new RuntimeException(baseCommand.getMsg)
+            }
+            baseCommand
           } finally {
             EntityUtils.consume(entity)
           }

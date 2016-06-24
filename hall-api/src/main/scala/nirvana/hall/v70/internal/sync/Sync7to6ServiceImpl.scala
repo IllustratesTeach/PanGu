@@ -3,7 +3,8 @@ package nirvana.hall.v70.internal.sync
 import java.util.Date
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.v62.services.GafisException
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.jpa.SyncQueue
@@ -16,11 +17,14 @@ import org.springframework.transaction.annotation.Transactional
  * Created by songpeng on 15/12/1.
  */
 @EagerLoad
-class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient)
+class Sync7to6ServiceImpl(v70Config: HallV70Config,
+                          tPCardService: TPCardService,
+                          caseInfoService: CaseInfoService,
+                          lPCardService: LPCardService,
+                          tPCardRemoteService: TPCardRemoteService,
+                          caseInfoRemoteService: CaseInfoRemoteService,
+                          lPCardRemoteService: LPCardRemoteService)
   extends Sync7to6Service
-  with Sync7to6CaseService
-  with Sync7to6LPCardService
-  with Sync7to6TPCardService
   with LoggerSupport{
 
   //上报标记(1:捺印;2:案件;3:现场)
@@ -75,14 +79,42 @@ class Sync7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient
   @Transactional
   override def doTaskOfSyncQueue(syncQueue: SyncQueue): Unit = {
     val uploadFlag = syncQueue.uploadFlag
+    val url = "http://%s:%s".format(syncQueue.targetIp, syncQueue.targetPort)
     try {
       uploadFlag match {
         case UPLOAD_FLAG_TPCARD =>
-          syncTPCard(syncQueue, rpcHttpClient)
+          syncQueue.opration match {
+            case "insert" =>
+              val tpCard = tPCardService.getTPCard(syncQueue.uploadKeyid)
+              tPCardRemoteService.addTPCard(tpCard, url)
+            case "update" =>
+              val tpCard = tPCardService.getTPCard(syncQueue.uploadKeyid)
+              tPCardRemoteService.updateTPCard(tpCard, url)
+            case "delete" =>
+              tPCardRemoteService.deleteTPCard(syncQueue.uploadKeyid, url)
+          }
         case UPLOAD_FLAG_CASE =>
-          syncCase(syncQueue, rpcHttpClient)
+          syncQueue.opration match {
+            case "insert" =>
+              val caseInfo = caseInfoService.getCaseInfo(syncQueue.uploadKeyid)
+              caseInfoRemoteService.addCaseInfo(caseInfo, url)
+            case "update" =>
+              val caseInfo = caseInfoService.getCaseInfo(syncQueue.uploadKeyid)
+              caseInfoRemoteService.updateCaseInfo(caseInfo, url)
+            case "delete" =>
+              caseInfoRemoteService.deleteCaseInfo(syncQueue.uploadKeyid, url)
+          }
         case UPLOAD_FLAG_LPCARD =>
-          syncLPCard(syncQueue, rpcHttpClient)
+          syncQueue.opration match {
+            case "insert" =>
+              val lpCard = lPCardService.getLPCard(syncQueue.uploadKeyid)
+              lPCardRemoteService.addLPCard(lpCard, url)
+            case "update" =>
+              val lpCard = lPCardService.getLPCard(syncQueue.uploadKeyid)
+              lPCardRemoteService.updateLPCard(lpCard, url)
+            case "delete" =>
+              lPCardRemoteService.deleteLPCard(syncQueue.uploadKeyid, url)
+          }
         case other =>
           throw new UnsupportedOperationException("unknown uploadFlag " + other)
       }
