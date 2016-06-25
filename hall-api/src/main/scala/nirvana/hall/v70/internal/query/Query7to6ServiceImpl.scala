@@ -67,6 +67,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     matchTask.setObjectId(query.oraSid)//必填项，现在用于存放oraSid
     matchTask.setPriority(query.priority.toInt)
     matchTask.setScoreThreshold(query.minscore)
+    matchTask.setTopN(query.maxcandnum)
 
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
     mics.foreach{mic =>

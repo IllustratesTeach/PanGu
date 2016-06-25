@@ -35,6 +35,7 @@ object gaqryqueConverter {
     queryStruct.stSimpQry.nPriority = matchTask.getPriority.toByte
     queryStruct.stSimpQry.nFlag = (gaqryque.GAQRY_FLAG_USEFINGER).asInstanceOf[Byte]
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
+    queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN
 
     matchTask.getMatchType match {
       case MatchType.FINGER_TT =>
