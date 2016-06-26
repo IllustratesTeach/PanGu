@@ -192,8 +192,8 @@ object FPTLDataToMNTDISP {
   }
   def UTIL_Minutia_OneFPT2MntDisp(pszFPTMnt:String, stmnt:AFISMNTPOINTSTRUCT)
   {
-    stmnt.x = pszFPTMnt.substring(0,3).toShort
-    stmnt.y = pszFPTMnt.substring(3,6).toShort
+    stmnt.x = pszFPTMnt.substring(0,3).trim.toShort
+    stmnt.y = pszFPTMnt.substring(3,6).trim.toShort
     val zString = pszFPTMnt.substring(6,9)
     stmnt.z = UTIL_Angle_FPT2MntDisp(zString.trim.toInt)
     stmnt.nReliability = 1
