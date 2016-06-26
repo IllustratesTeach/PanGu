@@ -17,8 +17,6 @@ class QueryServiceImplTest extends BaseV62TestCase{
       val queryResult = service.queryMatchResultByCardId(20,2,Some("((KeyID LIKE '123'))"),10);
       println(queryResult.size)
 
-      var list = service.queryMatchInfo(None,10)
-      list = service.queryMatchInfo(Some("((SrcKey LIKE '010%')) "),10)
     }
   }
 

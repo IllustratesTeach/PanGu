@@ -1,10 +1,9 @@
 package nirvana.hall.api.internal.remote
 
-import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.LPCardRemoteService
 import nirvana.hall.protocol.api.FPTProto.LPCard
-import nirvana.hall.protocol.api.LPCardProto.{LPCardAddRequest, LPCardGetRequest, LPCardGetResponse}
+import nirvana.hall.protocol.api.LPCardProto._
 import nirvana.hall.support.services.RpcHttpClient
 
 /**
@@ -21,12 +20,7 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
     info("remote get lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardGetRequest.newBuilder().setCardId(cardId)
     val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build())
-    if(response.getStatus == CommandStatus.OK){
-      Option(response.getExtension(LPCardGetResponse.cmd).getCard)
-    }else{
-      error("remote get lpcard message:{}", response.getMsg)
-      None
-    }
+    Option(response.getExtension(LPCardGetResponse.cmd).getCard)
   }
 
   /**
@@ -35,15 +29,31 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param url
    * @return
    */
-  override def addLPCard(lPCard: LPCard, url: String): Boolean = {
+  override def addLPCard(lPCard: LPCard, url: String) = {
     info("remote add lpcard [cardId:{},url:{}]", lPCard.getStrCardID, url)
     val request = LPCardAddRequest.newBuilder().setCard(lPCard)
-    val response = rpcHttpClient.call(url, LPCardAddRequest.cmd, request.build())
-    if(response.getStatus == CommandStatus.OK){
-      true
-    }else{
-      error("remote add lpcard message:{}", response.getMsg)
-      false
-    }
+    rpcHttpClient.call(url, LPCardAddRequest.cmd, request.build())
+  }
+
+  /**
+   * 更新现场卡片
+   * @param lPCard
+   * @param url
+   */
+  override def updateLPCard(lPCard: LPCard, url: String): Unit = {
+    info("remote update lpcard [cardId:{},url:{}]", lPCard.getStrCardID, url)
+    val request = LPCardUpdateRequest.newBuilder().setCard(lPCard)
+    rpcHttpClient.call(url, LPCardUpdateRequest.cmd, request.build())
+  }
+
+  /**
+   * 删除现场卡信息
+   * @param cardId
+   * @param url
+   */
+  override def deleteLPCard(cardId: String, url: String): Unit = {
+    info("remote add lpcard [cardId:{},url:{}]", cardId, url)
+    val request = LPCardDelRequest.newBuilder().setCardId(cardId)
+    rpcHttpClient.call(url, LPCardDelRequest.cmd, request.build())
   }
 }

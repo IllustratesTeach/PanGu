@@ -33,8 +33,8 @@ class CaseInfoFilter(caseInfoService: CaseInfoService) extends RpcServerMessageF
      }//查询案件
      else if(commandRequest.hasExtension(CaseGetRequest.cmd)){
        val request = commandRequest.getExtension(CaseGetRequest.cmd)
-       caseInfoService.getCaseInfo(request.getCaseId)
-       val response = CaseGetResponse.newBuilder().build()
+       val caseInfo = caseInfoService.getCaseInfo(request.getCaseId)
+       val response = CaseGetResponse.newBuilder().setCase(caseInfo).build()
        commandResponse.writeMessage(commandRequest, CaseGetResponse.cmd, response)
        true
      }//是否已存在

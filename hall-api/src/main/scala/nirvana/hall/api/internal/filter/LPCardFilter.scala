@@ -33,8 +33,8 @@ class LPCardFilter(lPCardService: LPCardService) extends RpcServerMessageFilter{
     }//查询现场
     else if(commandRequest.hasExtension(LPCardGetRequest.cmd)){
       val request = commandRequest.getExtension(LPCardGetRequest.cmd)
-      lPCardService.getLPCard(request.getCardId)
-      val response = LPCardGetResponse.newBuilder().build()
+      val lpCard = lPCardService.getLPCard(request.getCardId)
+      val response = LPCardGetResponse.newBuilder().setCard(lpCard).build()
       commandResponse.writeMessage(commandRequest, LPCardGetResponse.cmd, response)
       true
     }//是否已存在

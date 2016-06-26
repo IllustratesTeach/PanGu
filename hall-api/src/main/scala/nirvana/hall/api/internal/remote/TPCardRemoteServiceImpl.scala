@@ -1,6 +1,5 @@
 package nirvana.hall.api.internal.remote
 
-import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.TPCardRemoteService
 import nirvana.hall.protocol.api.FPTProto.TPCard
@@ -19,12 +18,7 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
     info("remote get tpcard [personId:{},url:{}]", personId, url)
     val request = TPCardGetRequest.newBuilder().setCardId(personId).build()
     val baseResponse = rpcHttpClient.call(url, TPCardGetRequest.cmd, request)
-    if(baseResponse.getStatus == CommandStatus.OK){
-      Option(baseResponse.getExtension(TPCardGetResponse.cmd).getCard)
-    }else{
-      error("remote get tpcard message:{}", baseResponse.getMsg)
-      None
-    }
+    Option(baseResponse.getExtension(TPCardGetResponse.cmd).getCard)
   }
 
   /**
@@ -32,16 +26,21 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
    * @param tpCard
    * @param url
    */
-  override def addTPCard(tpCard: TPCard, url: String): Boolean= {
+  override def addTPCard(tpCard: TPCard, url: String) = {
     info("remote add tpcard [personId:{},url:{}]", tpCard.getStrCardID, url)
     val request = TPCardAddRequest.newBuilder().setCard(tpCard).build()
-    val baseResponse = rpcHttpClient.call(url, TPCardAddRequest.cmd, request)
-    if(baseResponse.getStatus == CommandStatus.OK){
-      true
-    }else{
-      error("remote get tpcard message:{}", baseResponse.getMsg)
-      false
-    }
+    rpcHttpClient.call(url, TPCardAddRequest.cmd, request)
+  }
+
+  /**
+   * 更新捺印卡片
+   * @param tPCard
+   * @param url
+   */
+  override def updateTPCard(tPCard: TPCard, url: String): Unit = {
+    info("remote update tpcard [personId:{},url:{}]", tPCard.getStrCardID, url)
+    val request = TPCardUpdateRequest.newBuilder().setCard(tPCard).build()
+    rpcHttpClient.call(url, TPCardUpdateRequest.cmd, request)
   }
 
   /**
@@ -54,11 +53,16 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
     info("remote isExist tpcard [personId:{},url:{}]", personId, url)
     val request = TPCardIsExistRequest.newBuilder().setCardId(personId).build()
     val baseResponse = rpcHttpClient.call(url, TPCardIsExistRequest.cmd, request)
-    if(baseResponse.getStatus == CommandStatus.OK){
-      baseResponse.getExtension(TPCardIsExistResponse.cmd).getIsExist
-    }else{
-      error("remote isExist tpcard message:{}", baseResponse.getMsg)
-      false
-    }
+    baseResponse.getExtension(TPCardIsExistResponse.cmd).getIsExist
+  }
+
+  /**
+   * 删除捺印卡片
+   * @param cardId
+   */
+  override def deleteTPCard(cardId: String, url: String): Unit = {
+    info("remote delete tpcard [personId:{},url:{}]", cardId, url)
+    val request = TPCardDelRequest.newBuilder().setCardId(cardId).build()
+    rpcHttpClient.call(url, TPCardDelRequest.cmd, request)
   }
 }
