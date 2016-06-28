@@ -12,7 +12,7 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, SyncTarget}
+import nirvana.hall.v70.jpa.{RemoteQueryConfig, GafisNormalqueryQueryque, GafisQuery7to6}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -92,9 +92,9 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     try {
       val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
       val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
-      val syncTarget = SyncTarget.find(gafisQuery.syncTargetSid)
+      val syncTarget = RemoteQueryConfig.find(gafisQuery.syncTargetSid)
 
-      val respnose = rpcHttpClient.call("http://" + syncTarget.targetIp + ":" + syncTarget.targetPort, QuerySendRequest.cmd, request.build())
+      val respnose = rpcHttpClient.call(syncTarget.url, QuerySendRequest.cmd, request.build())
       val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
       //记录关联62的查询任务号
       new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()

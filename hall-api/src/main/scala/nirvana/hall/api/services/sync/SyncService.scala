@@ -10,21 +10,4 @@ trait SyncService {
    */
   def doWork()
 
-  /**
-   * 同步捺印数据
-   */
-  def syncTPCard()
-
-  /**
-   * 同步现场数据
-   */
-  def syncLPCard()
-
-  /**
-   * 同步案件数据
-   */
-  def syncCaseInfo()
-
-
-
 }

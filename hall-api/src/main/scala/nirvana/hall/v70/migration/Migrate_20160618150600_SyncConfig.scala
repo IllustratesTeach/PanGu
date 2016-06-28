@@ -9,17 +9,24 @@ import stark.migration._
 class Migrate_20160618150600_SyncConfig extends Migration{
   override def up(): Unit = {
     createTable("SYNC_CONFIG",Comment("同步，记录同步的seq信息")){ t=>
-      t.column("PK_ID",VarcharType,Limit(1),NotNull,Comment("主键=1"),PrimaryKey)
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
+      t.column("NAME",VarcharType,Limit(100),Nullable,Comment("服务器名称"))
       t.column("URL",VarcharType,Limit(100),Nullable,Comment("同步服务器的URL"))
-      t.column("TPCARD_TIMESTAMP",BigintType,Limit(15),NotNull,Comment("同步捺印的时间戳"))
-      t.column("CASE_TIMESTAMP",BigintType,Limit(15),NotNull,Comment("同步案件的时间戳"))
-      t.column("LPCARD_TIMESTAMP",BigintType,Limit(15),NotNull,Comment("同步现场的时间戳"))
+      t.column("CONFIG",VarcharType,Limit(100),Nullable,Comment("配置json"))
+      t.column("TIMESTAMP",BigintType,Limit(15),NotNull,Comment("同步时间戳"))
+      t.column("DELETAG",VarcharType,Limit(1),NotNull,Comment("删除标记，0：删除"))
     }
-    //初始化一条数据
-    execute("insert into SYNC_CONFIG (PK_ID, URL, TPCARD_TIMESTAMP, CASE_TIMESTAMP, LPCARD_TIMESTAMP) values ('1','http://127.0.0.1:8080',0,0,0)")
+    createTable("REMOTE_QUERY_CONFIG",Comment("7向6发送远程查询配置")){ t=>
+      t.column("PK_ID",VarcharType,Limit(32),NotNull,Comment("主键"),PrimaryKey)
+      t.column("NAME",VarcharType,Limit(100),Nullable,Comment("服务器名称"))
+      t.column("URL",VarcharType,Limit(100),Nullable,Comment("同步服务器的URL"))
+      t.column("CONFIG",VarcharType,Limit(100),Nullable,Comment("配置json"))
+      t.column("DELETAG",VarcharType,Limit(1),NotNull,Comment("删除标记，0：删除"))
+    }
   }
 
   override def down(): Unit = {
     dropTable("SYNC_CONFIG")
+    dropTable("REMOTE_QUERY_CONFIG")
   }
 }
