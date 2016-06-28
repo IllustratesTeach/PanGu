@@ -111,6 +111,16 @@ object GafisPartitionRecordsSaver {
     }
   }
 
+  def queryFingerFgpAndFgpCaseByPersonId(personId : String) : List[Array[Int]] = {
+    var list : List[Array[Int]] = List()
+    JdbcDatabase.queryWithPsSetter("select t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ?"){ps =>
+      ps.setString(1,personId)
+    }{rs=>
+      val array = Array(rs.getInt("fgp"),rs.getInt("fgp_case"))
+      list = array :: list
+    }
+    list
+  }
 
   //保存人员指纹特征信息
   private def savePersonFingerMntInfo(personId : String,featureType : Integer,position : Integer,mnt : Array[Byte],path : String,groupId : Integer ,flag : String): Unit = {

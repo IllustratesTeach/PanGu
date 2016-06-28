@@ -58,11 +58,12 @@ class FPTImageProvider extends ImageProvider{
                 assert(fingerCount == tp.fingers.length)
                 personId = tp.personId
                 assert(personId != null, "person id is null")
-                val person = GafisPartitionRecordsSaver.queryPersonById(personId)
-                if(person.isEmpty) {
-                  tp.fingers.foreach { tData =>
-                    if (tData.imgData != null && tData.imgData.length > 0)
-                      buffer += createImageEvent(filePath, personId, tData)
+                val list = GafisPartitionRecordsSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
+                tp.fingers.foreach { tData =>
+                  if (tData.imgData != null && tData.imgData.length > 0) {
+                    val tBuffer = createImageEvent(filePath, personId, tData, list)
+                    if (tBuffer != null)
+                      buffer += tBuffer
                   }
                 }
               }
@@ -110,13 +111,14 @@ class FPTImageProvider extends ImageProvider{
                 assert(fingerCount == tp.fingers.length)
                 personId = tp.personId
                 assert(personId != null, "person id is null")
-
-                val person = GafisPartitionRecordsSaver.queryPersonById(personId)
-                if(person.isEmpty) {
-                  tp.fingers.foreach { tData =>
-                    if (tData.imgData != null && tData.imgData.length > 0)
-                      buffer += createImageEvent(filePath, personId, tData)
-                  }
+                val list = GafisPartitionRecordsSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
+                tp.fingers.foreach { tData =>
+                  if (tData.imgData != null && tData.imgData.length > 0)
+                    if (tData.imgData != null && tData.imgData.length > 0) {
+                      val tBuffer = createImageEvent(filePath, personId, tData, list)
+                      if (tBuffer != null)
+                        buffer += tBuffer
+                    }
                 }
               }
             }
@@ -164,11 +166,16 @@ class FPTImageProvider extends ImageProvider{
     fetchFPT(1)
   }
 
-  def createImageEvent(filePath: String, personId: String, tData: FPTFingerData): (StreamEvent,GAFISIMAGESTRUCT) = {
-    //pt4code.FPTFingerDataToGafisImage(tData)
+  def createImageEvent(filePath: String, personId: String, tData: FPTFingerData, list : List[Array[Int]]): (StreamEvent,GAFISIMAGESTRUCT) = {
     val gafisImg = fpt4code.FPTFingerDataToGafisImage(tData)
-    val event = new StreamEvent(filePath,personId, FeatureType.FingerTemplate, getFingerPosition(tData.fgp.toInt),"","","")
-    (event,gafisImg)
+    val fgp = getFingerPosition(tData.fgp.toInt)
+    val fgpCase = gafisImg.stHead.bIsPlain
+    val isExists = list.exists(x=> x(0) == fgp.getNumber && x(1) == fgpCase)
+
+    if (!isExists) {
+      val event = new StreamEvent(filePath, personId, FeatureType.FingerTemplate, fgp, "", "", "")
+      (event, gafisImg)
+    } else null
   }
 
   //Latent
