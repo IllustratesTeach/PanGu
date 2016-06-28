@@ -12,8 +12,8 @@ class SyncConfigServiceImpl extends SyncConfigService{
    * 获取同步配置信息
    * @return
    */
-  override def getSyncConfig(): SyncConfig = {
-    SyncConfig.find("1")
+  override def getSyncConfigList(): Seq[SyncConfig] = {
+    SyncConfig.all.toList.toSeq
   }
 
   /**
@@ -22,10 +22,8 @@ class SyncConfigServiceImpl extends SyncConfigService{
    */
   @Transactional
   override def updateSyncConfig(syncConfig: SyncConfig): Unit = {
-    val config = getSyncConfig()
-    config.tpcardTimestamp = syncConfig.tpcardTimestamp
-    config.caseTimestamp = syncConfig.caseTimestamp
-    config.lpcardTimestamp = syncConfig.lpcardTimestamp
+    val config = SyncConfig.find(syncConfig.pkId)
+    config.timestamp = syncConfig.timestamp
     config.save()
   }
 }

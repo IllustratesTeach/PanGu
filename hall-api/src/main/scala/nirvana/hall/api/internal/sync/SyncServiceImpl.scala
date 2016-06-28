@@ -9,16 +9,18 @@ import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v70.jpa.SyncConfig
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.json.JSONObject
 
 /**
  * Created by songpeng on 16/6/18.
  */
 class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService, tpCardService: TPCardService, lpCardService: LPCardService, caseInfoService: CaseInfoService) extends SyncService with LoggerSupport{
-  val SYNC_BATCH_SIZE = 1
+  val SYNC_BATCH_SIZE = apiConfig.sync.batchSize
   /**
-   * 上报任务定时器，向6.2上报数据
+   * 定时器，向6.2同步数据
    * @param periodicExecutor
    * @param syncService
    */
@@ -36,22 +38,29 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 定时任务调用方法
    */
   override def doWork(): Unit = {
-    //同步捺印
-    syncTPCard()
-    //同步案件
-    syncCaseInfo()
-    //同步现场
-    syncLPCard()
+    SyncConfig.all.foreach{syncConfig=>
+      doWork(syncConfig)
+    }
   }
 
-  override def syncTPCard(): Unit ={
-    val syncConfig = syncConfigService.getSyncConfig()
+  def doWork(syncConfig: SyncConfig): Unit ={
+    val config = new JSONObject(syncConfig.config)
+    config.get("type") match {
+      case "TPCard" =>
+        syncTPCard(syncConfig)
+      case "Case" =>
+      case "LPCard" =>
+      case other =>
+    }
+  }
+
+  def syncTPCard(syncConfig: SyncConfig): Unit ={
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
-    request.setTimestamp(syncConfig.tpcardTimestamp)
+    request.setTimestamp(syncConfig.timestamp)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
-      var timestamp = syncConfig.tpcardTimestamp
+      var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
       val iter = response.getSyncTPCardList.iterator()
       while (iter.hasNext){
@@ -64,22 +73,22 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         timestamp = syncTPCard.getTimestamp
       }
       if(response.getSyncTPCardCount > 0){
-        syncConfig.tpcardTimestamp = timestamp
+        syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncTPCard count {} timestamp {}", response.getSyncTPCardCount, timestamp)
-        syncTPCard()
+        syncTPCard(syncConfig)
       }
     }
   }
 
-  override def syncLPCard(): Unit ={
+  /*def syncLPCard(): Unit ={
     val syncConfig = syncConfigService.getSyncConfig()
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
-    request.setTimestamp(syncConfig.lpcardTimestamp)
+    request.setTimestamp(syncConfig.timestamp)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPCardRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
-      var timestamp = syncConfig.lpcardTimestamp
+      var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
       val iter = response.getSyncLPCardList.iterator()
       while (iter.hasNext){
@@ -92,7 +101,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         timestamp = syncLPCard.getTimestamp
       }
       if(response.getSyncLPCardCount > 0){
-        syncConfig.lpcardTimestamp = timestamp
+        syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncLPCard count {} timestamp {}", response.getSyncLPCardCount, timestamp)
         syncLPCard()
@@ -100,14 +109,14 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
-  override def syncCaseInfo(): Unit ={
+  def syncCaseInfo(): Unit ={
     val syncConfig = syncConfigService.getSyncConfig()
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
-    request.setTimestamp(syncConfig.caseTimestamp)
+    request.setTimestamp(syncConfig.timestamp)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncCaseRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
-      var timestamp = syncConfig.caseTimestamp
+      var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncCaseResponse.cmd)
       val iter = response.getSyncCaseList.iterator()
       while (iter.hasNext){
@@ -120,11 +129,11 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         timestamp = syncCaseInfo.getTimestamp
       }
       if(response.getSyncCaseCount > 0){
-        syncConfig.caseTimestamp = timestamp
+        syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncCaseInfo count {} timestamp {}", response.getSyncCaseCount, timestamp)
         syncCaseInfo()
       }
     }
-  }
+  }*/
 }

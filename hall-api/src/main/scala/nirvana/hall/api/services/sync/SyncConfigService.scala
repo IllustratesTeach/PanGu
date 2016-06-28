@@ -12,7 +12,7 @@ trait SyncConfigService {
    * 获取同步配置信息
    * @return
    */
-  def getSyncConfig(): SyncConfig
+  def getSyncConfigList(): Seq[SyncConfig]
 
   /**
    * 更新同步配置

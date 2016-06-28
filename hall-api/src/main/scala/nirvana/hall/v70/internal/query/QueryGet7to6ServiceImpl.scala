@@ -37,9 +37,9 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
     if(gafisQuery7to6.isEmpty){
       return false
     }else{
-      val syncTagert = SyncTarget.find(queryque.syncTargetSid)
-      val url = "http://%s:%s".format(syncTagert.targetIp, syncTagert.targetPort)
-      val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, syncTagert.targetIp, syncTagert.targetPort)
+      val syncTagert = RemoteQueryConfig.find(queryque.syncTargetSid)
+      val url = syncTagert.url
+      val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, url)
 
       if (matchResult != null){
         //写入比对结果

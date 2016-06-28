@@ -23,11 +23,6 @@
           <xs:documentation>字典同步定时计划</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="cronType" name="sync_7to6_cron" minOccurs="0" maxOccurs="1">
-        <xs:annotation>
-          <xs:documentation>上报6.2任务定时计划</xs:documentation>
-        </xs:annotation>
-      </xs:element>
       <xs:element type="cronType" name="query_7to6_cron" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>发送6.2查询任务定时计划</xs:documentation>

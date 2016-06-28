@@ -29,6 +29,8 @@ class HallApiConfig
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SyncConfig")
 class SyncConfig {
+    @XmlElement(name = "batch_size")
+    var batchSize: Int = 1
     @XmlElement(name = "sync_cron")
     var syncCron: String = _
 }
