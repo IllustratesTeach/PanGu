@@ -58,7 +58,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
-    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build())
+    val headerMap = getHeaderMap(syncConfig)
+//    val dbConfig = DBConfig()
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
@@ -67,7 +69,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncTPCard = iter.next()
         val tpCard = syncTPCard.getTpCard
         val cardId = tpCard.getStrCardID
-        if(!tpCardService.isExist(cardId)){
+        if(tpCardService.isExist(cardId)){
+          tpCardService.updateTPCard(tpCard)
+        }else{
           tpCardService.addTPCard(tpCard)
         }
         timestamp = syncTPCard.getTimestamp
@@ -81,8 +85,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
-  /*def syncLPCard(): Unit ={
-    val syncConfig = syncConfigService.getSyncConfig()
+  def syncLPCard(syncConfig: SyncConfig): Unit ={
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -104,13 +107,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncLPCard count {} timestamp {}", response.getSyncLPCardCount, timestamp)
-        syncLPCard()
+        syncLPCard(syncConfig)
       }
     }
   }
 
-  def syncCaseInfo(): Unit ={
-    val syncConfig = syncConfigService.getSyncConfig()
+  def syncCaseInfo(syncConfig: SyncConfig): Unit ={
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -132,8 +134,20 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncCaseInfo count {} timestamp {}", response.getSyncCaseCount, timestamp)
-        syncCaseInfo()
+        syncCaseInfo(syncConfig)
       }
     }
-  }*/
+  }
+
+  /**
+   * 获取request请求的头部信息
+   * @param syncConfig
+   * @return
+   */
+  private def getHeaderMap(syncConfig: SyncConfig): Map[String, String] ={
+    val json = new JSONObject(syncConfig.config)
+    val dbId = if(json.has("src_db_id")) json.getString("src_db_id") else ""
+    val tableId = if(json.has("src_table_id")) json.getString("src_table_id") else ""
+    Map("X_HALL_API_DB_ID" -> dbId, "X_HALL_API_TABLE_ID" -> tableId)
+  }
 }

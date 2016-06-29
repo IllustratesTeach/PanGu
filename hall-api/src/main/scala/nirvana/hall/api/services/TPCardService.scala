@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import org.springframework.transaction.annotation.Transactional
 
@@ -11,10 +12,11 @@ trait TPCardService {
   /**
    * 新增捺印卡片
    * @param tPCard
+   * @param dBConfig
    * @return
    */
   @Transactional
-  def addTPCard(tPCard: TPCard): Unit
+  def addTPCard(tPCard: TPCard, dBConfig: DBConfig = null): Unit
 
   /**
    * 删除捺印卡片
@@ -42,7 +44,8 @@ trait TPCardService {
   /**
    * 获取捺印卡信息
    * @param cardId
+   * @param dBConfig
    * @return
    */
-  def getTPCard(cardId: String): TPCard
+  def getTPCard(cardId: String, dBConfig: DBConfig = null): TPCard
 }

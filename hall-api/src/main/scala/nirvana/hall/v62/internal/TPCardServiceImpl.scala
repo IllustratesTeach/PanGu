@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
@@ -15,10 +16,10 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param tPCard
    * @return
    */
-  override def addTPCard(tPCard: TPCard): Unit = {
+  override def addTPCard(tPCard: TPCard, dbConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): Unit = {
     val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
-    facade.NET_GAFIS_FLIB_Add(config.templateTable.dbId.toShort,
-      config.templateTable.tableId.toShort,
+    facade.NET_GAFIS_FLIB_Add(dbConfig.dbId.left.get,
+      dbConfig.tableId.get,
       tPCard.getStrCardID,tpCard)
   }
 
@@ -56,11 +57,10 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param cardId
    * @return
    */
-  override def getTPCard(cardId: String): TPCard = {
+  override def getTPCard(cardId: String, dbConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): TPCard = {
     val tp = new GTPCARDINFOSTRUCT
-    facade.NET_GAFIS_FLIB_Get(config.templateTable.dbId.toShort, config.templateTable.tableId.toShort,
+    facade.NET_GAFIS_FLIB_Get(dbConfig.dbId.left.get, dbConfig.tableId.get,
       cardId, tp, null, 3)
-
     galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
   }
 }
