@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
 import nirvana.hall.api.services.sync.SyncConfigService
-import nirvana.hall.v70.jpa.SyncConfig
+import nirvana.hall.v70.jpa.GafisSyncConfig
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -12,8 +12,8 @@ class SyncConfigServiceImpl extends SyncConfigService{
    * 获取同步配置信息
    * @return
    */
-  override def getSyncConfigList(): Seq[SyncConfig] = {
-    SyncConfig.all.toList.toSeq
+  override def getSyncConfigList(): Seq[GafisSyncConfig] = {
+    GafisSyncConfig.all.toList.toSeq
   }
 
   /**
@@ -21,8 +21,8 @@ class SyncConfigServiceImpl extends SyncConfigService{
    * @param syncConfig
    */
   @Transactional
-  override def updateSyncConfig(syncConfig: SyncConfig): Unit = {
-    val config = SyncConfig.find(syncConfig.pkId)
+  override def updateSyncConfig(syncConfig: GafisSyncConfig): Unit = {
+    val config = GafisSyncConfig.find(syncConfig.pkId)
     config.timestamp = syncConfig.timestamp
     config.save()
   }
