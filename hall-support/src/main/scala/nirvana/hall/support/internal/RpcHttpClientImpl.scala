@@ -6,7 +6,7 @@ import java.io.Closeable
 
 import com.google.protobuf.ExtensionRegistry
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
+import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.RpcHttpClient
 import org.apache.commons.io.IOUtils
@@ -59,11 +59,13 @@ class RpcHttpClientImpl(extensionRegistry: ExtensionRegistry) extends RpcHttpCli
    * 通过protobuf的数据来调用远程的url
    * @param url web application url
    */
-  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T):BaseCommand={
+  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T, headerMap: Map[String, String] = Map()):BaseCommand={
     val httpClient: CloseableHttpClient = createHttpClient
     try {
       val post: HttpPost = new HttpPost(url)
+      //添加header头信息
       post.setHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER,HallSupportConstants.HTTP_PROTOBUF_HEADER_VALUE)
+      headerMap.foreach(header=> post.setHeader(header._1, header._2))
       val request = BaseCommand.newBuilder()
       request.setExtension(extension,value)
       request.setTaskId(1L)
