@@ -39,7 +39,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 定时任务调用方法
    */
   override def doWork(): Unit = {
-    GafisSyncConfig.all.foreach{syncConfig=>
+    //查询同步培训，依次执行同步任务
+    GafisSyncConfig.find_by_deletag("1").foreach{syncConfig=>
       doWork(syncConfig)
     }
   }
@@ -50,7 +51,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
       case "TPCard" =>
         syncTPCard(syncConfig)
       case "Case" =>
+        syncCaseInfo(syncConfig)
       case "LPCard" =>
+        syncLPCard(syncConfig)
       case other =>
     }
   }
@@ -60,9 +63,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
     val headerMap = getHeaderMap(syncConfig)
-    val destDBConfig = getDestDBConfig(syncConfig)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
+      val destDBConfig = getDestDBConfig(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
       val iter = response.getSyncTPCardList.iterator()
@@ -91,8 +94,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
-    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPCardRequest.cmd, request.build())
+    val headerMap = getHeaderMap(syncConfig)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
+      val destDBConfig = getDestDBConfig(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
       val iter = response.getSyncLPCardList.iterator()
@@ -100,8 +105,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncLPCard = iter.next()
         val lpCard = syncLPCard.getLpCard
         val cardId = lpCard.getStrCardID
-        if(!lpCardService.isExist(cardId)){
-          lpCardService.addLPCard(lpCard)
+        if(lpCardService.isExist(cardId, destDBConfig)){
+          lpCardService.updateLPCard(lpCard, destDBConfig)
+        }else{
+          lpCardService.addLPCard(lpCard, destDBConfig)
         }
         timestamp = syncLPCard.getTimestamp
       }
@@ -118,8 +125,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
-    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncCaseRequest.cmd, request.build())
+    val headerMap = getHeaderMap(syncConfig)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncCaseRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
+      val destDBConfig = getDestDBConfig(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncCaseResponse.cmd)
       val iter = response.getSyncCaseList.iterator()
@@ -127,8 +136,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncCaseInfo = iter.next()
         val caseInfo = syncCaseInfo.getCaseInfo
         val cardId = caseInfo.getStrCaseID
-        if(!caseInfoService.isExist(cardId)){
-          caseInfoService.addCaseInfo(caseInfo)
+        if(caseInfoService.isExist(cardId, destDBConfig)){
+          caseInfoService.updateCaseInfo(caseInfo, destDBConfig)
+        }else{
+          caseInfoService.addCaseInfo(caseInfo, destDBConfig)
         }
         timestamp = syncCaseInfo.getTimestamp
       }

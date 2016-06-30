@@ -3,10 +3,12 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
+import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -19,7 +21,7 @@ class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
    * @return
    */
   @Transactional
-  override def addLPCard(lpCard: LPCard): Unit = {
+  override def addLPCard(lpCard: LPCard, dBConfig: DBConfig): Unit = {
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
     val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
@@ -42,7 +44,7 @@ class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
    * @param fingerId
    * @return
    */
-  override def getLPCard(fingerId: String): LPCard = {
+  override def getLPCard(fingerId: String, dBConfig: DBConfig): LPCard = {
     val caseFinger = GafisCaseFinger.find(fingerId)
     val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
     ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
@@ -54,10 +56,12 @@ class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
    * @return
    */
   @Transactional
-  override def updateLPCard(lpCard: LPCard): Unit = {
-    val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+  override def updateLPCard(lpCard: LPCard, dBConfig: DBConfig): Unit = {
+    val caseFingerNew = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
+    val caseFinger = GafisCaseFinger.find(caseFingerNew.fingerId)
+    BeanUtils.copyProperties(caseFingerNew, caseFinger)
     caseFinger.modifiedpsn = Gafis70Constants.INPUTPSN
     caseFinger.modifiedtime = new Date()
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
@@ -82,7 +86,7 @@ class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
     GafisCaseFinger.find(cardId).delete
   }
 
-  override def isExist(cardId: String): Boolean = {
+  override def isExist(cardId: String, dBConfig: DBConfig): Boolean = {
     GafisCaseFinger.findOption(cardId).nonEmpty
   }
 }

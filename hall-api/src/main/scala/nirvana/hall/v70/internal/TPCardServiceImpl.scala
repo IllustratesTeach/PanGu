@@ -8,6 +8,7 @@ import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
+import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -110,12 +111,15 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    */
   @Transactional
   override def updateTPCard(tpCard: TPCard, dBConfig: DBConfig): Unit ={
-    val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+    val personNew  = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
 
+    val person = GafisPerson.find(tpCard.getStrCardID)
+    BeanUtils.copyProperties(personNew, person)
     person.modifiedpsn = Gafis70Constants.INPUTPSN
     person.modifiedtime = new Date()
     person.deletag = Gafis70Constants.DELETAG_USE
+    person.save()
 
     //删除指纹
     GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())

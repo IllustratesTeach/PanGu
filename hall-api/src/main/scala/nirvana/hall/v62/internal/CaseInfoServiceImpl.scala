@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
@@ -14,7 +15,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseInfo
    * @return
    */
-  override def addCaseInfo(caseInfo: Case): Unit = {
+  override def addCaseInfo(caseInfo: Case, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Unit = {
     val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
     facade.NET_GAFIS_CASE_Add(config.caseTable.dbId.toShort,
       config.caseTable.tableId.toShort, gCase)
@@ -25,7 +26,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseInfo
    * @return
    */
-  override def updateCaseInfo(caseInfo: Case): Unit = {
+  override def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Unit = {
     val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
     facade.NET_GAFIS_CASE_Update(config.caseTable.dbId.toShort, config.caseTable.tableId.toShort, gCase)
   }
@@ -35,7 +36,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseId
    * @return
    */
-  override def getCaseInfo(caseId: String): Case= {
+  override def getCaseInfo(caseId: String, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Case= {
     val gCase = facade.NET_GAFIS_CASE_Get(config.caseTable.dbId.toShort,
       config.caseTable.tableId.toShort, caseId)
     galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(gCase)
@@ -56,7 +57,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseId
    * @return
    */
-  override def isExist(caseId: String): Boolean = {
+  override def isExist(caseId: String, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Boolean = {
     throw new UnsupportedOperationException
   }
 }
