@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.internal.adapter.common.sync.{LatentPalmFetcher, LatentFingerFetcher, TemplatePalmFetcher, TemplateFingerFetcher}
 import nirvana.hall.matcher.service.SyncDataService
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
@@ -30,10 +31,10 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     val fetcher = syncDataType match {
       case SyncDataType.PERSON => new sync.PersonFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.CASE => new sync.CaseFetcher(hallMatcherConfig, dataSource)
-      case SyncDataType.TEMPLATE_FINGER => new sync.TemplateFingerFetcher(hallMatcherConfig, dataSource)
-      case SyncDataType.TEMPLATE_PALM => new sync.TemplatePalmFetcher(hallMatcherConfig, dataSource)
-      case SyncDataType.LATENT_FINGER => new sync.LatentFingerFetcher(hallMatcherConfig, dataSource)
-      case SyncDataType.LATENT_PALM => new sync.LatentPalmFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.TEMPLATE_FINGER => new TemplateFingerFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.TEMPLATE_PALM => new TemplatePalmFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.LATENT_FINGER => new LatentFingerFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.LATENT_PALM => new LatentPalmFetcher(hallMatcherConfig, dataSource)
       case other => null
     }
     if(fetcher != null)

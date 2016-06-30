@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.protocol.api.FPTProto.Case
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,7 +15,7 @@ trait CaseInfoService {
    * @return
    */
   @Transactional
-  def addCaseInfo(caseInfo: Case): Unit
+  def addCaseInfo(caseInfo: Case, dBConfig: DBConfig = null): Unit
 
   /**
    * 删除案件信息
@@ -30,19 +31,19 @@ trait CaseInfoService {
    * @return
    */
   @Transactional
-  def updateCaseInfo(caseInfo: Case): Unit
+  def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig = null): Unit
 
   /**
    * 获取案件信息
    * @param caseId
    * @return
    */
-  def getCaseInfo(caseId: String): Case
+  def getCaseInfo(caseId: String, dBConfig: DBConfig = null): Case
 
   /**
    * 验证案件编号是否已存在
    * @param caseId
    * @return
    */
-  def isExist(caseId: String): Boolean
+  def isExist(caseId: String, dBConfig: DBConfig = null): Boolean
 }

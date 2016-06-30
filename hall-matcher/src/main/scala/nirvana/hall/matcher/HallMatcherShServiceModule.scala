@@ -2,7 +2,8 @@ package nirvana.hall.matcher
 
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.matcher.internal.adapter.sh.{PutMatchProgressServiceImpl, PutMatchResultServiceImpl, GetMatchTaskServiceImpl, SyncDataServiceImpl}
+import nirvana.hall.matcher.internal.adapter.common.{PutMatchProgressServiceImpl, PutMatchResultServiceImpl}
+import nirvana.hall.matcher.internal.adapter.sh.{GetMatchTaskServiceImpl, SyncDataServiceImpl}
 import nirvana.hall.matcher.service.{PutMatchProgressService, PutMatchResultService, GetMatchTaskService, SyncDataService}
 import org.apache.tapestry5.ioc.ServiceBinder
 

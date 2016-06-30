@@ -2,10 +2,12 @@ package nirvana.hall.v70.internal
 
 import java.util.Date
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisLogicDbCase, GafisLogicDb, SysUser, GafisCase}
+import nirvana.hall.v70.jpa.{GafisLogicDbCase, GafisLogicDb, GafisCase, SysUser}
+import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -18,31 +20,18 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @return
    */
   @Transactional
-  override def addCaseInfo(caseInfo: Case): Unit = {
+  override def addCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
     gafisCase.inputpsn = Gafis70Constants.INPUTPSN
     gafisCase.inputtime = new Date()
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.save()
-  }
-
-  /**
-   * 更新案件信息
-   * @param caseInfo
-   * @return
-   */
-  @Transactional
-  override def updateCaseInfo(caseInfo: Case): Unit = {
-    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
-    val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
-    gafisCase.modifiedpsn = Gafis70Constants.INPUTPSN
-    gafisCase.modifiedtime = new Date()
-    gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.createUnitCode = sysUser.departCode
-    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
-    gafisCase.save()
+    val logicDb:GafisLogicDb = if(dBConfig == null){
+      GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+    }else{
+      GafisLogicDb.find(dBConfig.dbId.right.get)
+    }
     //逻辑库
-    val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     val logicDbCase = new GafisLogicDbCase()
     logicDbCase.pkId = CommonUtils.getUUID()
     logicDbCase.logicDbPkid = logicDb.pkId
@@ -51,11 +40,30 @@ class CaseInfoServiceImpl extends CaseInfoService{
   }
 
   /**
+   * 更新案件信息
+   * @param caseInfo
+   * @return
+   */
+  @Transactional
+  override def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
+    val gafisCaseNew = ProtobufConverter.convertCase2GafisCase(caseInfo)
+    val gafisCase = GafisCase.find(gafisCaseNew.caseId)
+    BeanUtils.copyProperties(gafisCaseNew, gafisCase)
+    val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
+    gafisCase.modifiedpsn = Gafis70Constants.INPUTPSN
+    gafisCase.modifiedtime = new Date()
+    gafisCase.deletag = Gafis70Constants.DELETAG_USE
+    gafisCase.createUnitCode = sysUser.departCode
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
+    gafisCase.save()
+  }
+
+  /**
    * 获取案件信息
    * @param caseId
    * @return
    */
-  override def getCaseInfo(caseId: String): Case= {
+  override def getCaseInfo(caseId: String, dBConfig: DBConfig): Case= {
     val gafisCase = GafisCase.findOption(caseId)
     if(gafisCase.isEmpty){
       throw new RuntimeException("记录不存在!");
@@ -78,7 +86,7 @@ class CaseInfoServiceImpl extends CaseInfoService{
    * @param caseId
    * @return
    */
-  override def isExist(caseId: String): Boolean = {
+  override def isExist(caseId: String, dBConfig: DBConfig): Boolean = {
     GafisCase.findOption(caseId).nonEmpty
   }
 }

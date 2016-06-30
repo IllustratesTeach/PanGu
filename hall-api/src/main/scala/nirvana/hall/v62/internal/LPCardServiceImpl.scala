@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.LPCard
@@ -15,12 +16,12 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @param lpCard
    * @return
    */
-  override def addLPCard(lpCard: LPCard): Unit = {
+  override def addLPCard(lpCard: LPCard, dBConfig: DBConfig = DBConfig(Left(config.latentTable.dbId.toShort), Option(config.latentTable.tableId.toShort))): Unit = {
     //转换为c的结构
     val gLPCard= galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
     //调用实现方法
-    facade.NET_GAFIS_FLIB_Add(config.latentTable.dbId.toShort,
-      config.latentTable.tableId.toShort,
+    facade.NET_GAFIS_FLIB_Add(dBConfig.dbId.left.get,
+      dBConfig.tableId.get,
       lpCard.getStrCardID, gLPCard)
   }
 
@@ -29,9 +30,9 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @param cardId
    * @return
    */
-  override def getLPCard(cardId: String): LPCard = {
+  override def getLPCard(cardId: String, dBConfig: DBConfig = DBConfig(Left(config.latentTable.dbId.toShort), Option(config.latentTable.tableId.toShort))): LPCard = {
     val gCard = new GLPCARDINFOSTRUCT
-    facade.NET_GAFIS_FLIB_Get(config.latentTable.dbId.toShort, config.latentTable.tableId.toShort, cardId, gCard, null, 3)
+    facade.NET_GAFIS_FLIB_Get(dBConfig.dbId.left.get, dBConfig.tableId.get, cardId, gCard, null, 3)
     val card = galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard)
     card.toBuilder.setStrCardID(cardId).build()
   }
@@ -41,10 +42,10 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @param lpCard
    * @return
    */
-  override def updateLPCard(lpCard: LPCard): Unit = {
+  override def updateLPCard(lpCard: LPCard, dBConfig: DBConfig = DBConfig(Left(config.latentTable.dbId.toShort), Option(config.latentTable.tableId.toShort))): Unit = {
     val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
-    facade.NET_GAFIS_FLIB_Update(config.latentTable.dbId.toShort,
-      config.latentTable.tableId.toShort,
+    facade.NET_GAFIS_FLIB_Update(dBConfig.dbId.left.get,
+      dBConfig.tableId.get,
       lpCard.getStrCardID, gLPCard)
   }
 
@@ -57,7 +58,7 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
     facade.NET_GAFIS_FLIB_Del(config.latentTable.dbId.toShort, config.latentTable.tableId.toShort, cardId)
   }
 
-  override def isExist(cardId: String): Boolean = {
+  override def isExist(cardId: String, dBConfig: DBConfig = DBConfig(Left(config.latentTable.dbId.toShort), Option(config.latentTable.tableId.toShort))): Boolean = {
     throw new UnsupportedOperationException
   }
 }

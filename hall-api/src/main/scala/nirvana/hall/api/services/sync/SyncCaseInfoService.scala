@@ -1,5 +1,6 @@
 package nirvana.hall.api.services.sync
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.protocol.api.SyncDataProto.SyncCaseResponse
 
 /**
@@ -12,5 +13,5 @@ trait SyncCaseInfoService {
    * @param size
    * @return
    */
-  def syncCaseInfo(responseBuilder: SyncCaseResponse.Builder, timestamp: Long, size: Int)
+  def syncCaseInfo(responseBuilder: SyncCaseResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig = null)
 }

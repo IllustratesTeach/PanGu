@@ -1,0 +1,69 @@
+package nirvana.hall.v62.services
+
+import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
+
+/**
+ * Created by songpeng on 16/6/23.
+ */
+object DictCodeConverter {
+
+  /**
+   * 校验字典数据，并将gafis6.2的字典转为7.0的字典,
+   * 如果字典不能匹配写到备注里
+   * @param tPCard
+   */
+  def convertTPCard6to7(tPCard: TPCard): Unit ={
+    val textBuilder = tPCard.getText.toBuilder
+    //校验字典是不是数字，长度不大于标准长度
+    checkNumber(textBuilder.setStrBirthAddrCode, textBuilder.getStrBirthAddrCode, 6)
+    checkNumber(textBuilder.setStrNation, textBuilder.getStrNation, 6)
+    checkNumber(textBuilder.setStrRace, textBuilder.getStrRace, 2)
+    checkNumber(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6)
+    checkNumber(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6)
+    checkNumber(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6)
+
+    //证件类型
+    val code = DictCode6Map7.certificatetype.get(textBuilder.getStrCertifType)
+    if(code != null && code.nonEmpty){
+      textBuilder.setStrCertifType(code.get)
+    }else{
+      textBuilder.setStrCertifType("")
+    }
+  }
+  def convertCaseInfo6to7(caseInfo: Case): Unit ={
+
+  }
+  def convertLPCard6to7(lPCard: LPCard): Unit ={
+
+  }
+
+  /**
+   * 校验字典数据，并将gafis6.2的字典转为7.0的字典,
+   * @param tPCard
+   */
+  def convertTPCard7to6(tPCard: TPCard): Unit ={
+    val textBuilder = tPCard.getText.toBuilder
+    //证件类型
+    val code = DictCode7Map6.certificatetype.get(textBuilder.getStrCertifType)
+    if(code != null && code.nonEmpty){
+      textBuilder.setStrCertifType(code.get)
+    }else{
+      textBuilder.setStrCertifType("")
+    }
+  }
+
+  /**
+   * 验证value是否是数字并且长度不大于len，否则setter赋值为空字符
+   * @param setter
+   * @param value
+   * @param len
+   */
+  private def checkNumber(setter: String => Any, value: String, len: Int = 0): Unit ={
+    if(value != null){
+      if(!value.matches("[0-9]+")
+        || value.length > len){
+        setter("")
+      }
+    }
+  }
+}

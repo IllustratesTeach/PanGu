@@ -3,10 +3,12 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
+import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -18,7 +20,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @param personId
    * @return
    */
-  override def getTPCard(personId: String): TPCard = {
+  override def getTPCard(personId: String, dBConfig: DBConfig): TPCard = {
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
@@ -32,7 +34,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @return
    */
   @Transactional
-  override def addTPCard(tpCard: TPCard): Unit = {
+  override def addTPCard(tpCard: TPCard, dbConfig: DBConfig = null): Unit = {
     //验证卡号是否已经存在
     if(isExist(tpCard.getStrCardID)){
       throw new RuntimeException("记录已存在")
@@ -57,7 +59,12 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库
-      val logicDb = GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+      val logicDb: GafisLogicDb = if(dbConfig != null){
+        GafisLogicDb.find(dbConfig.dbId.right.get)
+      }else{
+        //如果没有指定逻辑库，使用默认库
+        GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+      }
       val logicDbFingerprint = new GafisLogicDbFingerprint()
       logicDbFingerprint.pkId = CommonUtils.getUUID()
       logicDbFingerprint.fingerprintPkid = person.personid
@@ -88,9 +95,11 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @return
    */
   @Transactional
-  override def delTPCard(cardId: String): Unit = {
+  override def delTPCard(cardId: String, dbConfig: DBConfig = null): Unit = {
     //删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
+    //删除逻辑库
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
     GafisPerson.find(cardId).delete()
   }
@@ -101,13 +110,16 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @return
    */
   @Transactional
-  override def updateTPCard(tpCard: TPCard): Unit = {
-    val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+  override def updateTPCard(tpCard: TPCard, dBConfig: DBConfig): Unit ={
+    val personNew  = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
 
+    val person = GafisPerson.find(tpCard.getStrCardID)
+    BeanUtils.copyProperties(personNew, person)
     person.modifiedpsn = Gafis70Constants.INPUTPSN
     person.modifiedtime = new Date()
     person.deletag = Gafis70Constants.DELETAG_USE
+    person.save()
 
     //删除指纹
     GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
@@ -126,7 +138,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @param cardId
    * @return
    */
-  override def isExist(cardId: String): Boolean = {
+  override def isExist(cardId: String, dbConfig: DBConfig = null): Boolean = {
     GafisPerson.findOption(cardId).nonEmpty
   }
 }

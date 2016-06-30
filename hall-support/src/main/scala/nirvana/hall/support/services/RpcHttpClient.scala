@@ -14,5 +14,5 @@ trait RpcHttpClient {
    * @param url url
    * @return response
    */
-  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T):BaseCommand
+  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T, headerMap: Map[String, String] = Map()):BaseCommand
 }

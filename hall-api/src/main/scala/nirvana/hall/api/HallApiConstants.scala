@@ -8,6 +8,10 @@ package nirvana.hall.api
 object HallApiConstants {
   final val PROTOBUF_CONTEXT = "application/protobuf"
   //http://bigtext.org/?font=smslant&text=HALL
+
+  final val HALL_HTTP_HEADER_DBID = "X-Hall-DBID"
+  final val HALL_HTTP_HEADER_TABLEID = "X-Hall-TABLEID"
+
   final val HALL_TEXT_LOGO = """ #
    __ _____   __   __
   / // / _ | / /  / /

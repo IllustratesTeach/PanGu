@@ -65,7 +65,7 @@ object SparkRpcClient extends RpcHttpClient{
    * 通过protobuf的数据来调用远程的url
    * @param url web application url
    */
-  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T):BaseCommand={
+  def call[T](url: String,extension: GeneratedExtension[BaseCommand, T], value: T, headerMap: Map[String, String] = Map()):BaseCommand={
     try {
       val post: HttpPost = new HttpPost(url)
       post.setHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER,HallSupportConstants.HTTP_PROTOBUF_HEADER_VALUE)
