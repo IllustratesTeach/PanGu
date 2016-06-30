@@ -4,12 +4,13 @@ import javax.persistence.EntityManager
 
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.config.{DBConfig, HallApiConfig}
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.jpa.SyncConfig
+import nirvana.hall.v70.jpa.GafisSyncConfig
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
@@ -38,12 +39,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 定时任务调用方法
    */
   override def doWork(): Unit = {
-    SyncConfig.all.foreach{syncConfig=>
+    GafisSyncConfig.all.foreach{syncConfig=>
       doWork(syncConfig)
     }
   }
 
-  def doWork(syncConfig: SyncConfig): Unit ={
+  def doWork(syncConfig: GafisSyncConfig): Unit ={
     val config = new JSONObject(syncConfig.config)
     config.get("type") match {
       case "TPCard" =>
@@ -54,12 +55,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
-  def syncTPCard(syncConfig: SyncConfig): Unit ={
+  def syncTPCard(syncConfig: GafisSyncConfig): Unit ={
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
     val headerMap = getHeaderMap(syncConfig)
-//    val dbConfig = DBConfig()
+    val destDBConfig = getDestDBConfig(syncConfig)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
       var timestamp = syncConfig.timestamp
@@ -69,10 +70,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncTPCard = iter.next()
         val tpCard = syncTPCard.getTpCard
         val cardId = tpCard.getStrCardID
-        if(tpCardService.isExist(cardId)){
-          tpCardService.updateTPCard(tpCard)
+        if(tpCardService.isExist(cardId,destDBConfig)){
+          tpCardService.updateTPCard(tpCard, destDBConfig)
         }else{
-          tpCardService.addTPCard(tpCard)
+          tpCardService.addTPCard(tpCard, destDBConfig)
         }
         timestamp = syncTPCard.getTimestamp
       }
@@ -80,12 +81,13 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncTPCard count {} timestamp {}", response.getSyncTPCardCount, timestamp)
+        //递归
         syncTPCard(syncConfig)
       }
     }
   }
 
-  def syncLPCard(syncConfig: SyncConfig): Unit ={
+  def syncLPCard(syncConfig: GafisSyncConfig): Unit ={
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -112,7 +114,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
-  def syncCaseInfo(syncConfig: SyncConfig): Unit ={
+  def syncCaseInfo(syncConfig: GafisSyncConfig): Unit ={
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -144,10 +146,14 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * @param syncConfig
    * @return
    */
-  private def getHeaderMap(syncConfig: SyncConfig): Map[String, String] ={
+  private def getHeaderMap(syncConfig: GafisSyncConfig): Map[String, String] ={
     val json = new JSONObject(syncConfig.config)
     val dbId = if(json.has("src_db_id")) json.getString("src_db_id") else ""
     val tableId = if(json.has("src_table_id")) json.getString("src_table_id") else ""
-    Map("X_HALL_API_DB_ID" -> dbId, "X_HALL_API_TABLE_ID" -> tableId)
+    Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+  }
+  private def getDestDBConfig(syncConfig: GafisSyncConfig): DBConfig={
+    val json = new JSONObject(syncConfig.config)
+    DBConfig(Right(json.getString("dest_db_id")), if(json.has("dest_table_id")) Option(json.getString("dest_table_id").toShort) else None)
   }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dict>
+    <certificatetype>
+        <mapper code6="1" code7="34"/>
+        <mapper code6="2" code7="22"/>
+        <mapper code6="9" code7="99"/>
+    </certificatetype>
+</dict>
+

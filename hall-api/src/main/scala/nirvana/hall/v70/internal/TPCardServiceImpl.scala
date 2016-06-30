@@ -94,9 +94,11 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @return
    */
   @Transactional
-  override def delTPCard(cardId: String): Unit = {
+  override def delTPCard(cardId: String, dbConfig: DBConfig = null): Unit = {
     //删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
+    //删除逻辑库
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
     GafisPerson.find(cardId).delete()
   }
@@ -107,7 +109,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @return
    */
   @Transactional
-  override def updateTPCard(tpCard: TPCard): Unit = {
+  override def updateTPCard(tpCard: TPCard, dBConfig: DBConfig): Unit ={
     val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
 
@@ -132,7 +134,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @param cardId
    * @return
    */
-  override def isExist(cardId: String): Boolean = {
+  override def isExist(cardId: String, dbConfig: DBConfig = null): Boolean = {
     GafisPerson.findOption(cardId).nonEmpty
   }
 }
