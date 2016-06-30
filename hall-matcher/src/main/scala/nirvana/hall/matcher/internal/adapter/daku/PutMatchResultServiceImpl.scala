@@ -87,20 +87,27 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var sids = ""
     var sql = ""
     var map: Map[Long, String] = Map()
-    matchResultRequest.getCandidateResultList.foreach {
-      sids += _.getObjectId + ","
-    }
-    if (sids.lastIndexOf(",") > 0) {
-      sids = sids.substring(0, sids.length - 1)
-    }
-    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
-      sql = "select p.sid as sid, p.personid as cardid from gafis_person p where p.sid in (" + sids + ")"
-    } else {
-      sql = "select t.sid as sid, t.finger_id as cardid from gafis_case_finger t where t.sid in (" + sids + ")"
-    }
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-    } { rs =>
-      map +=(rs.getLong("sid") -> rs.getString("cardid"))
+    var i = 0
+    val batchSize = 100 //每100条执行一次sql
+    matchResultRequest.getCandidateResultList.foreach {cand=>
+      sids += cand.getObjectId + ","
+      i += 1
+      if(i % batchSize == 0 || i == matchResultRequest.getCandidateNum){
+        if (sids.lastIndexOf(",") > 0) {
+          sids = sids.substring(0, sids.length - 1)
+        }
+        if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
+          sql = "select p.sid as sid, p.personid as cardid from gafis_person p where p.sid in (" + sids + ")"
+        } else {
+          sql = "select t.sid as sid, t.finger_id as cardid from gafis_case_finger t where t.sid in (" + sids + ")"
+        }
+        JdbcDatabase.queryWithPsSetter(sql) { ps =>
+        } { rs =>
+          map +=(rs.getLong("sid") -> rs.getString("cardid"))
+        }
+        //清空sids
+        sids = ""
+      }
     }
     map
   }

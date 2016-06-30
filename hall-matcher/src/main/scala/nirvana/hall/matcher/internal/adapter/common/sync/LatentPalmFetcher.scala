@@ -1,4 +1,4 @@
-package nirvana.hall.matcher.internal.adapter.sh.sync
+package nirvana.hall.matcher.internal.adapter.common.sync
 
 import java.sql.ResultSet
 import javax.sql.DataSource
