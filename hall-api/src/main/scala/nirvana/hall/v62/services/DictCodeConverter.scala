@@ -21,6 +21,7 @@ object DictCodeConverter {
     checkNumber(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6)
     checkNumber(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6)
     checkNumber(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6)
+    checkNumber(textBuilder.setStrAddrCode, textBuilder.getStrAddrCode, 6)
 
     //证件类型
     val code = DictCode6Map7.certificatetype.get(textBuilder.getStrCertifType)
@@ -30,7 +31,21 @@ object DictCodeConverter {
       textBuilder.setStrCertifType("")
     }
   }
+
+  /**
+   * 校验案件文字信息
+   * @param caseInfo
+   */
   def convertCaseInfo6to7(caseInfo: Case): Unit ={
+    val textBuilder = caseInfo.getText.toBuilder
+    checkNumber(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6)
+    checkNumber(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6)
+    checkNumber(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6)
+    checkNumber(textBuilder.setStrSuspArea1Code, textBuilder.getStrSuspArea1Code, 6)
+    checkNumber(textBuilder.setStrSuspArea2Code, textBuilder.getStrSuspArea2Code, 6)
+    checkNumber(textBuilder.setStrSuspArea3Code, textBuilder.getStrSuspArea3Code, 6)
+    checkNumber(textBuilder.setStrCaseOccurPlaceCode, textBuilder.getStrCaseOccurPlaceCode, 6)
+    checkNumber(textBuilder.setStrExtractUnitCode, textBuilder.getStrExtractUnitCode, 12)
 
   }
   def convertLPCard6to7(lPCard: LPCard): Unit ={

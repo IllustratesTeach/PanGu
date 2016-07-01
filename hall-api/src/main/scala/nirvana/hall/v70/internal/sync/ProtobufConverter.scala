@@ -170,8 +170,8 @@ object ProtobufConverter {
       textBuilder.setNSex(Integer.parseInt(person.sexCode))
     magicSet(person.idcardno, textBuilder.setStrIdentityNum)
     textBuilder.setStrBirthDate(person.birthdayst)
-    magicSet(person.birthCode, textBuilder.setStrBirthAddrCode)
-    magicSet(person.birthdetail, textBuilder.setStrBirthAddr)
+    magicSet(person.door, textBuilder.setStrBirthAddrCode)
+    magicSet(person.doordetail, textBuilder.setStrBirthAddr)
     magicSet(person.nationCode, textBuilder.setStrRace)
     magicSet(person.nativeplaceCode, textBuilder.setStrNation)
     magicSet(person.caseClasses, textBuilder.setStrCaseType1)
@@ -179,7 +179,7 @@ object ProtobufConverter {
     magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
     magicSet(person.address, textBuilder.setStrAddrCode)
     magicSet(person.addressdetail, textBuilder.setStrAddr)
-    magicSet(person.personCategory, textBuilder.setStrPersonType)
+    magicSet(person.personType, textBuilder.setStrPersonType)
 
     magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
     magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
@@ -246,17 +246,18 @@ object ProtobufConverter {
   def convertTPCard2GafisPerson(tpCard: TPCard): GafisPerson={
     val person = new GafisPerson()
     person.personid = tpCard.getStrCardID
+    person.cardid = tpCard.getStrPersonID
     val text = tpCard.getText
     person.name = text.getStrName
     person.aliasname = text.getStrAliasName
     person.sexCode = text.getNSex.toString
-    person.birthdayed = text.getStrBirthDate
+    person.birthdayst = text.getStrBirthDate
     person.idcardno = text.getStrIdentityNum
-    person.birthCode = text.getStrBirthAddrCode
-    person.birthdetail = text.getStrBirthAddr
+    person.door = text.getStrBirthAddrCode
+    person.doordetail = text.getStrBirthAddr
     person.address = text.getStrAddrCode
     person.addressdetail = text.getStrAddr
-    person.personCategory = text.getStrPersonType
+    person.personType = text.getStrPersonType
     person.caseClasses = text.getStrCaseType1
     person.caseClasses2 = text.getStrCaseType2
     person.caseClasses3 = text.getStrCaseType3
@@ -270,6 +271,7 @@ object ProtobufConverter {
     person.nationCode = text.getStrRace
     person.certificatetype = text.getStrCertifType
     person.certificateid = text.getStrCertifID
+    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
 
     person.assistSign = text.getNXieChaFlag.toString
     person.assistLevel = text.getNXieChaLevel.toString

@@ -16,7 +16,7 @@ object Gafis70Constants {
   //数据来源，gafis6.2
   val DATA_SOURCE_GAFIS6= 4.toShort
   //默认采集类型
-  val GATHER_TYPE_ID_DEFAULT = "8a20fb2544baa8450144babc6a1e000d"
+  val GATHER_TYPE_ID_DEFAULT = "1"
   //主特征
   val IS_MAIN_MNT = "1"
 }
