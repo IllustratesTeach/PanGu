@@ -161,6 +161,9 @@ message	TPCard
 		optional string	strXieChaTelNo = 37;			//联系电话
 		optional string	strShenPiBy = 38;				//审批人
 
+		//6-7同步数据追加信息
+		optional string	strHuKouPlaceCode = 39;			//户籍地代码
+		optional string	strHuKouPlaceTail = 40;			//户籍地址
 	}
 
 	message	TPCardBlob
@@ -181,6 +184,7 @@ message	TPCard
 	optional string		strPersonID = 2;
 	optional TPCardText	text = 3;
 	repeated TPCardBlob	blob = 4;
+	optional AdminfoData admData = 5;	//操作信息
 }
 
 message	Case
@@ -220,6 +224,7 @@ message	Case
 	optional int32	nSendFingerCount = 5;	//GAFIS结构中无
 
 	optional CaseText	text = 6;
+	optional AdminfoData admData = 7;		//操作信息
 }
 
 message	LPCard
@@ -253,6 +258,7 @@ message	LPCard
 	required string		strCardID = 1;
 	optional LPCardText	text = 2;
 	optional LPCardBlob	blob = 3;
+	optional AdminfoData admData = 4;
 }
 
 message	TLLTHitLog
@@ -320,4 +326,13 @@ message	LLHitLog
 	optional string	strRecheckUnitCode = 17;
 	optional string	strRecheckDate = 18;
 }
-  
+
+//操作信息
+message AdminfoData {
+	optional string creator = 1;			//创建人
+	optional string updator = 2;			//更新人
+	optional string createDatetime = 3;		//创建时间yyyyMMddHHmmss
+	optional string updateDatetime = 4;		//更新时间yyyyMMddHHmmss
+	optional string createUnitCode = 5;		//创建单位代码
+	optional string updateUnitCode = 6;		//更新单位代码
+}

@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import java.util.Date
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -170,8 +171,10 @@ object ProtobufConverter {
       textBuilder.setNSex(Integer.parseInt(person.sexCode))
     magicSet(person.idcardno, textBuilder.setStrIdentityNum)
     textBuilder.setStrBirthDate(person.birthdayst)
-    magicSet(person.door, textBuilder.setStrBirthAddrCode)
-    magicSet(person.doordetail, textBuilder.setStrBirthAddr)
+    magicSet(person.birthCode, textBuilder.setStrBirthAddrCode)
+    magicSet(person.birthdetail, textBuilder.setStrBirthAddr)
+    magicSet(person.door, textBuilder.setStrHuKouPlaceCode)
+    magicSet(person.doordetail, textBuilder.setStrHuKouPlaceTail)
     magicSet(person.nationCode, textBuilder.setStrRace)
     magicSet(person.nativeplaceCode, textBuilder.setStrNation)
     magicSet(person.caseClasses, textBuilder.setStrCaseType1)
@@ -253,8 +256,10 @@ object ProtobufConverter {
     person.sexCode = text.getNSex.toString
     person.birthdayst = text.getStrBirthDate
     person.idcardno = text.getStrIdentityNum
-    person.door = text.getStrBirthAddrCode
-    person.doordetail = text.getStrBirthAddr
+    person.birthCode = text.getStrBirthAddrCode
+    person.birthdetail = text.getStrBirthAddr
+    person.door = text.getStrHuKouPlaceCode
+    person.doordetail = text.getStrHuKouPlaceTail
     person.address = text.getStrAddrCode
     person.addressdetail = text.getStrAddr
     person.personType = text.getStrPersonType
@@ -290,6 +295,20 @@ object ProtobufConverter {
     //数据校验
     if(person.idcardno.length > 18){
       person.idcardno = person.idcardno.substring(0, 18)
+    }
+
+    //操作信息
+    val admData = tpCard.getAdmData
+    if(admData != null){
+      person.inputpsn = admData.getCreator
+      person.modifiedpsn = admData.getUpdator
+      person.gatherOrgCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
     }
 
     person

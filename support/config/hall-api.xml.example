@@ -16,4 +16,7 @@
     <web>
       <bind>0.0.0.0:8080</bind>
     </web>
+    <!--<sync>
+      <sync_cron>0 * * * * ? *</sync_cron>
+    </sync>-->
 </hall_api>
