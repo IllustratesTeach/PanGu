@@ -5,6 +5,7 @@ import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
+import nirvana.hall.v62.services.DictCodeConverter
 
 /**
  * Created by songpeng on 16/1/26.
@@ -39,7 +40,11 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
   override def getCaseInfo(caseId: String, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Case= {
     val gCase = facade.NET_GAFIS_CASE_Get(config.caseTable.dbId.toShort,
       config.caseTable.tableId.toShort, caseId)
-    galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(gCase)
+    val caseInfo = galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(gCase)
+    //数据校验
+    DictCodeConverter.convertCaseInfo6to7(caseInfo)
+
+    caseInfo
   }
 
   /**

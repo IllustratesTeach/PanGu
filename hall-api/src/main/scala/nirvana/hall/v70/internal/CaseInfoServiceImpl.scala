@@ -25,6 +25,7 @@ class CaseInfoServiceImpl extends CaseInfoService{
     gafisCase.inputpsn = Gafis70Constants.INPUTPSN
     gafisCase.inputtime = new Date()
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
     val logicDb:GafisLogicDb = if(dBConfig == null){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get

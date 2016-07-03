@@ -166,7 +166,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
    * @return
    */
   private def updateStatusMatching(oraSid: String)(implicit dataSource: DataSource): Unit ={
-    JdbcDatabase.update("update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+", t.begintime=sysdate where t.ora_sid=?"){ps=>
+    JdbcDatabase.update("update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+" where t.ora_sid=?"){ps=>
       ps.setString(1, oraSid)
     }
   }

@@ -41,19 +41,14 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
     }else{
       //保存人员基本信息
       val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-      val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
       val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
       person.sid = sid
-      person.inputtime = new Date()
-      person.inputpsn = Gafis70Constants.INPUTPSN
+      //用户名获取用户ID
+      person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn, person.gatherOrgCode)
+      person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn, person.gatherOrgCode)
+
       person.deletag = Gafis70Constants.DELETAG_USE
-      person.inputtime = new Date()
-      person.inputpsn = Gafis70Constants.INPUTPSN
-      person.modifiedtime = new Date()
-      person.modifiedpsn = Gafis70Constants.INPUTPSN
       person.fingershowStatus = 1.toShort
-      person.gatherOrgCode = sysUser.departCode
-      person.cityCode = sysUser.departCode.substring(0,4)
       person.isfingerrepeat = "0"
       person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
@@ -90,6 +85,24 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
   }
 
   /**
+   * 根据用户名获取用户id，如果没有找到返回默认用户
+   * @param loginName
+   * @return
+   */
+  private def getSysUserPkIdByLoginName(loginName: String, departCode: String): String ={
+    if(loginName != null && loginName.nonEmpty){
+      val user = SysUser.find_by_loginName_and_departCode(loginName, departCode).headOption
+      if(user.nonEmpty){
+         user.get.pkId
+      } else{
+        Gafis70Constants.INPUTPSN
+      }
+    }else{
+      Gafis70Constants.INPUTPSN
+    }
+  }
+
+  /**
    * 删除捺印卡片
    * @param cardId
    * @return
@@ -114,10 +127,14 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
     val personNew  = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
 
+
     val person = GafisPerson.find(tpCard.getStrCardID)
     BeanUtils.copyProperties(personNew, person)
-    person.modifiedpsn = Gafis70Constants.INPUTPSN
-    person.modifiedtime = new Date()
+    //用户名获取用户ID
+    person.inputpsn = getSysUserPkIdByLoginName(personNew.inputpsn, person.gatherOrgCode)
+    person.modifiedpsn = getSysUserPkIdByLoginName(personNew.modifiedpsn, person.gatherOrgCode)
+    person.inputtime = personNew.inputtime
+    person.modifiedtime = personNew.modifiedtime
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
 

@@ -9,6 +9,7 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
+import nirvana.hall.v62.internal.c.GafisConverter
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -167,6 +168,14 @@ object galoclpConverter extends LoggerSupport{
           mic.setType(ImageType.IMAGETYPE_UNKNOWN)
       }
     }
+    //操作信息
+    val admData = card.getAdmDataBuilder
+    val stAdmData = gCard.stAdmData
+    admData.setCreator(stAdmData.szCUserName)
+    admData.setUpdator(stAdmData.szMUserName)
+    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
+    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+
     card.build()
   }
 
@@ -261,7 +270,7 @@ object galoclpConverter extends LoggerSupport{
     caseInfo.setNCaseFingerCount(gCase.nFingerCount)
     caseInfo.setStrCaseID(gCase.szCaseID)
     val text = caseInfo.getTextBuilder
-    text.setBPersonKilled(gCase.bHasPersonKilled == 1)
+    text.setBPersonKilled(gCase.bHasPersonKilled == 48)
     text.setNCancelFlag(gCase.pstText_Data.length)
     gCase.pstText_Data.foreach{ item=>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
@@ -317,6 +326,10 @@ object galoclpConverter extends LoggerSupport{
               text.setStrXieChaRequestUnitName(textContent)
             case "XieChaRequestUnitCode" =>
               text.setStrXieChaRequestUnitCode(textContent)
+            case "CreatorUnitCode" =>
+              caseInfo.getAdmDataBuilder.setCreateUnitCode(textContent)
+            case "UpdatorUnitCode" =>
+              caseInfo.getAdmDataBuilder.setUpdateUnitCode(textContent)
             case other =>
               warn("{} not mapped", other)
           }
@@ -333,6 +346,11 @@ object galoclpConverter extends LoggerSupport{
         caseInfo.addStrPalmID(f.szKey)
       }
     }
+    //操作信息
+    val admData = caseInfo.getAdmDataBuilder
+    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
+    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
+
     caseInfo.build()
   }
 }
