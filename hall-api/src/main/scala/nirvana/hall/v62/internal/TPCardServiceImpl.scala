@@ -63,6 +63,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     facade.NET_GAFIS_FLIB_Get(dbConfig.dbId.left.get, dbConfig.tableId.get,
       cardId, tp, null, 3)
     val tpCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
+    //数据校验
     DictCodeConverter.convertTPCard6to7(tpCard)
 
     tpCard

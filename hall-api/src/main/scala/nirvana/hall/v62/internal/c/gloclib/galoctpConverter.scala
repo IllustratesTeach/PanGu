@@ -11,6 +11,7 @@ import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.v62.internal.c.GafisConverter
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
 import scala.collection.JavaConversions._
@@ -48,8 +49,8 @@ object galoctpConverter extends LoggerSupport{
         appendTextStruct(buffer, "SexCode",text.getNSex.toString)
       appendTextStruct(buffer, "BirthDate",text.getStrBirthDate)
       appendTextStruct(buffer, "ShenFenID",text.getStrIdentityNum)
-      appendTextStruct(buffer, "HuKouPlaceCode",text.getStrBirthAddrCode)
-      appendTextStruct(buffer, "HuKouPlaceTail",text.getStrBirthAddr)
+      appendTextStruct(buffer, "HuKouPlaceCode",text.getStrHuKouPlaceCode)
+      appendTextStruct(buffer, "HuKouPlaceTail",text.getStrHuKouPlaceTail)
       appendTextStruct(buffer, "AddressCode",text.getStrAddrCode)
       appendTextStruct(buffer, "AddressTail",text.getStrAddr)
       appendTextStruct(buffer, "PersonClassCode",text.getStrPersonType)
@@ -219,9 +220,9 @@ object galoctpConverter extends LoggerSupport{
             case "ShenFenID" =>
               text.setStrIdentityNum(textContent)
             case "HuKouPlaceCode" =>
-              text.setStrBirthAddrCode(textContent)
+              text.setStrHuKouPlaceCode(textContent)
             case "HuKouPlaceTail" =>
-              text.setStrBirthAddr(textContent)
+              text.setStrHuKouPlaceTail(textContent)
             case "AddressCode" =>
               text.setStrAddrCode(textContent)
             case "AddressTail" =>
@@ -256,7 +257,12 @@ object galoctpConverter extends LoggerSupport{
               text.setBHasCriminalRecord("1".equals(textContent))
             case "CriminalRecordDesc" =>
               text.setStrCriminalRecordDesc(textContent)
+            case "CreatorUnitCode" =>
+              card.getAdmDataBuilder.setCreateUnitCode(textContent)
+            case "MicbUpdatorUnitCode" =>
+              card.getAdmDataBuilder.setUpdateUnitCode(textContent)
             case other =>
+              warn("{} not mapped", other)
           }
         }
       }
@@ -310,6 +316,13 @@ object galoctpConverter extends LoggerSupport{
       }
     }
 
+    //操作信息
+    val admData = card.getAdmDataBuilder
+    val stAdmData = data.stAdmData
+    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
+    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+    admData.setCreator(stAdmData.szCUserName)
+    admData.setUpdator(stAdmData.szMUserName)
 
     card.build()
   }

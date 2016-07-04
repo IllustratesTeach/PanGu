@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import java.util.Date
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -172,6 +173,8 @@ object ProtobufConverter {
     textBuilder.setStrBirthDate(person.birthdayst)
     magicSet(person.birthCode, textBuilder.setStrBirthAddrCode)
     magicSet(person.birthdetail, textBuilder.setStrBirthAddr)
+    magicSet(person.door, textBuilder.setStrHuKouPlaceCode)
+    magicSet(person.doordetail, textBuilder.setStrHuKouPlaceTail)
     magicSet(person.nationCode, textBuilder.setStrRace)
     magicSet(person.nativeplaceCode, textBuilder.setStrNation)
     magicSet(person.caseClasses, textBuilder.setStrCaseType1)
@@ -179,7 +182,7 @@ object ProtobufConverter {
     magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
     magicSet(person.address, textBuilder.setStrAddrCode)
     magicSet(person.addressdetail, textBuilder.setStrAddr)
-    magicSet(person.personCategory, textBuilder.setStrPersonType)
+    magicSet(person.personType, textBuilder.setStrPersonType)
 
     magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
     magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
@@ -246,17 +249,20 @@ object ProtobufConverter {
   def convertTPCard2GafisPerson(tpCard: TPCard): GafisPerson={
     val person = new GafisPerson()
     person.personid = tpCard.getStrCardID
+    person.cardid = tpCard.getStrPersonID
     val text = tpCard.getText
     person.name = text.getStrName
     person.aliasname = text.getStrAliasName
     person.sexCode = text.getNSex.toString
-    person.birthdayed = text.getStrBirthDate
+    person.birthdayst = text.getStrBirthDate
     person.idcardno = text.getStrIdentityNum
     person.birthCode = text.getStrBirthAddrCode
     person.birthdetail = text.getStrBirthAddr
+    person.door = text.getStrHuKouPlaceCode
+    person.doordetail = text.getStrHuKouPlaceTail
     person.address = text.getStrAddrCode
     person.addressdetail = text.getStrAddr
-    person.personCategory = text.getStrPersonType
+    person.personType = text.getStrPersonType
     person.caseClasses = text.getStrCaseType1
     person.caseClasses2 = text.getStrCaseType2
     person.caseClasses3 = text.getStrCaseType3
@@ -270,6 +276,7 @@ object ProtobufConverter {
     person.nationCode = text.getStrRace
     person.certificatetype = text.getStrCertifType
     person.certificateid = text.getStrCertifID
+    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
 
     person.assistSign = text.getNXieChaFlag.toString
     person.assistLevel = text.getNXieChaLevel.toString
@@ -288,6 +295,20 @@ object ProtobufConverter {
     //数据校验
     if(person.idcardno.length > 18){
       person.idcardno = person.idcardno.substring(0, 18)
+    }
+
+    //操作信息
+    val admData = tpCard.getAdmData
+    if(admData != null){
+      person.inputpsn = admData.getCreator
+      person.modifiedpsn = admData.getUpdator
+      person.gatherOrgCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
     }
 
     person
