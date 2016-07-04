@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal.c.gnetlib
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
-import nirvana.hall.v62.internal.NoneResponse
+import nirvana.hall.v62.internal.{V62Facade, NoneResponse}
 import nirvana.hall.v62.services.{GafisException, ChannelOperator}
 import org.jboss.netty.buffer.ChannelBuffer
 
@@ -14,6 +14,12 @@ import org.jboss.netty.buffer.ChannelBuffer
   * @since 2016-04-28
   */
 trait reqansop {
+
+  def GNETAPI_OPENCON(pReq:GNETREQUESTHEADOBJECT): Unit ={
+    val address = V62Facade.serverContext.value
+    pReq.szUserName = address.user
+    address.password.foreach(pReq.szUserPass = _)
+  }
   def NETREQ_GetOpClass(pstReq:GNETREQUESTHEADOBJECT)= {
     pstReq.nOpClass
   }

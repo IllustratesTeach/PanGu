@@ -23,6 +23,7 @@ class V62Facade(defaultConfig:HallV62Config)
   with ganetqry
   with ganetdbp
   with ganetlp
+  with ganettp
   with gnetflib
   with nettable
   with gnetfunc
@@ -85,7 +86,9 @@ object V62Facade{
     override def service(request: HttpServletRequest, response: HttpServletResponse, handler: HttpServletRequestHandler): Boolean = {
       val host = request.getHeader(X_V62_HOST_HEAD)
         if(host == null){
-          handler.service(request,response)
+          withConfigurationServer(config.appServer) {
+            handler.service(request, response)
+          }
         }else{
           val port = getHeader(request,X_V62_PORT_HEAD,config.appServer.port.toString).toInt
           val user = getHeader(request,X_V62_USER_HEAD,config.appServer.user)

@@ -4,10 +4,10 @@ import nirvana.hall.c.services.ganumia.gadbrec
 import nirvana.hall.c.services.ganumia.gadbrec._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp._
-import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_DUPCARDSTRUCT, GPERSONINFOSTRUCT, GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAFIS_QUERYINFO, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
-import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.c.services.gloclib.glocndef.{GNETREQUESTHEADOBJECT, GNETANSWERHEADOBJECT}
 import nirvana.hall.v62.internal.c.CodeHelper
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
@@ -530,5 +530,41 @@ trait gnetcsr {
       channel.writeMessage(response)
     }
 
+  }
+
+  def GAFIS_NETSCR_RecvPersonInfo(pstCon:ChannelOperator,pReq:GNETREQUESTHEADOBJECT ,
+    pAns:GNETANSWERHEADOBJECT , pstPerson:GPERSONINFOSTRUCT)
+  {
+    NETOP_RECVDATA(pstCon, pstPerson)
+
+
+    val n = pstPerson.nTextItemCount
+    val nc = pstPerson.nCardCount
+    // alloc memory
+    if ( nc>0 ) {
+      pstPerson.pstID_Data = Range(0,nc).map(x=>new GAFIS_DUPCARDSTRUCT()).toArray
+    }
+    if ( n>0 ) {
+      pstPerson.pstText_Data = Range(0,n).map(x=> new GATEXTITEMSTRUCT).toArray
+    }
+    NETANS_SetRetVal(pAns, 1);	// we allocate first step memory
+    NETOP_SENDANS(pstCon, pAns);
+    // now we will receive all the structure's
+    if ( nc>0 ) {
+      NETOP_RECVDATA(pstCon, pstPerson.pstID_Data)
+    }
+    if ( n>0 ) {
+      NETOP_RECVDATA(pstCon, pstPerson.pstText_Data)
+    }
+    NETANS_SetRetVal(pAns, 1);
+    NETOP_SENDANS(pstCon, pAns);
+    // now all memories have been allocated, we'll receive the data
+    if ( n>0 ) {
+      pstPerson.pstText_Data.foreach{text=>
+        if(text.bIsPointer == 1){
+          text.stData.textContent =NETOP_RECVDATA(pstCon,text.nItemLen).array()
+        }
+      }
+    }
   }
 }

@@ -4,12 +4,11 @@ import java.util
 import javax.xml.bind.annotation._
 
 import monad.support.services.XmlLoader
-import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
+import nirvana.hall.v62.services.GafisException._
 
 import scala.collection.JavaConversions._
 import scala.io.Source
-import GafisException._
 
 /**
  * exception from v62 system
@@ -61,12 +60,13 @@ class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
     val message = getSimpleMessage
     val sb = new StringBuilder
     sb.append(message)
+    /*
     if(gafisError.bnAFISErrData != null)
       sb.append("\n \t ErrorData: ").append(new String(gafisError.bnAFISErrData, AncientConstants.GBK_ENCODING).trim)
 
-//    if(gafisError.szFileName != null)
-//      message + "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum)
-//    else
+    if(gafisError.szFileName != null)
+      sb.append( "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum))
+    */
     sb.toString()
   }
 }
