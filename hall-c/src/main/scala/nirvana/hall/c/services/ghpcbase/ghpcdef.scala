@@ -31,7 +31,10 @@ object ghpcdef {
   // date time format, t[7:6]-year, t[5]-mon, t[4]-day, t[3]-hour, t[2]-minute, t[1:0]-millisec
   class GAFIS_TIME extends AncientData {
     private val calendar = Calendar.getInstance()
-    var tMilliSec: Short = calendar.get(Calendar.MILLISECOND).toShort;
+    var tMilliSec: Short = {
+      val sec = calendar.get(Calendar.SECOND) * 1000
+      (((sec & 0xff) << 8) | (sec >>> 8)).toShort
+    }
     // millisecond.	[0, 999]
     var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;
     // minute. [0, 59]

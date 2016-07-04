@@ -15,18 +15,27 @@ object GafisConverter {
    * @return
    */
   def convertAFISDateTime2String(dateTime: AFISDateTime): String ={
-    val arr = ByteBuffer.allocate(2).putShort(dateTime.tDate.tYear).array()
-    val t = arr(0)
-    arr(0) = arr(1)
-    arr(1) = t
-    val year = ByteBuffer.wrap(arr,0,2).getShort()
+    val year = shortConvert(dateTime.tDate.tYear)
     val month = dateTime.tDate.tMonth +1
     val day = dateTime.tDate.tDay
     val hour = dateTime.tTime.tHour
     val min = dateTime.tTime.tMin
-//    val sec = dateTime.tTime.tMilliSec
+    val sec = shortConvert(dateTime.tTime.tMilliSec)/1000
 
-    "%04d%02d%02d%02d%02d00".format(year, month, day, hour, min)
+    "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
+  }
+
+  /**
+   * short高地位转换
+   * @param short
+   * @return
+   */
+  private def shortConvert(short: Short):Short = {
+    val arr = ByteBuffer.allocate(2).putShort(short).array()
+    val t = arr(0)
+    arr(0) = arr(1)
+    arr(1) = t
+    ByteBuffer.wrap(arr,0,2).getShort()
   }
 
 }
