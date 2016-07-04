@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal.c.gnetlib
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.galoctp.{GPERSONINFOSTRUCT, GPERSONRETRSTRUCT}
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.AncientClientSupport
 
 /**
@@ -20,10 +20,9 @@ trait ganettp {
     nOption:Int,
     nOp:Int):Unit=executeInChannel {pstCon=>
 
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     val pAns = new GNETANSWERHEADOBJECT
 
-    GNETAPI_OPENCON(pReq)
 
     NETREQ_SetOption(pReq, nOption);
     NETREQ_SetDBID(pReq, nDBID);

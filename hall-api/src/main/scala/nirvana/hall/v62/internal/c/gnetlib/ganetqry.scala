@@ -98,7 +98,7 @@ trait ganetqry {
   }
   def NET_GAFIS_QUERY_Update(nDBID:Short,nTableID:Short,pstQry:GAQUERYSTRUCT,nOption:Int = 0) =executeInChannel{channel=>
     val pAns = new GNETANSWERHEADOBJECT
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     NETREQ_SetOption(pReq, nOption);
     NETREQ_SetDBID(pReq, nDBID);
     NETREQ_SetTableID(pReq, nTableID);

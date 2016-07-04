@@ -17,7 +17,7 @@ trait gnetfunc {
   this:AncientClientSupport with gnetcsr with reqansop with netpmadm =>
   def NET_GAFIS_RMTLIB_SERVER_Add(nDBID:Short, nTableID:Short, pServer:RMTSERVERSTRUCT, nOption:Int = 0):Unit=
     executeInChannel{pstCon=>
-      val pReq = new GNETREQUESTHEADOBJECT
+      val pReq = createRequestHeader
       val pAns = new GNETANSWERHEADOBJECT
 
       NETREQ_SetOpClass(pReq,OP_CLASS_RMTLIB);
@@ -34,7 +34,7 @@ trait gnetfunc {
   }
   def NET_GAFIS_RMTLIB_SERVER_Get(nDBID:Short, nTableID:Short, pServer:RMTSERVERSTRUCT, nOption:Int):Unit=
     executeInChannel{pstCon =>
-      val pReq = new GNETREQUESTHEADOBJECT
+      val pReq = createRequestHeader
 
       NETREQ_SetOpClass(pReq, OP_CLASS_RMTLIB);
       NETREQ_SetOpCode(pReq, OP_RMTLIB_SERVER_GET);

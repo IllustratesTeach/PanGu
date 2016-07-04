@@ -19,7 +19,7 @@ trait netpmadm {
   // get parameter.
   def NET_GAFIS_PMADM_Get(pstItems:Array[GBASE_PARAM_NETITEM],nOption:Int=0 ):Int=
     executeInChannel{ pstCon =>
-      val pReq = new GNETREQUESTHEADOBJECT
+      val pReq = createRequestHeader
       val pAns= new GNETANSWERHEADOBJECT
       NETREQ_SetOpClass(pReq, OP_CLASS_PARAMADM);
       NETREQ_SetOpCode(pReq, OP_PARAMADM_GET);

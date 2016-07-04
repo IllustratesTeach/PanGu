@@ -16,7 +16,7 @@ trait ganetdbp {
   def NET_GAFIS_SYS_GetAllDB(nOption:Int=0):Array[GADBPROPSTRUCT]=
     executeInChannel{pstCon=>
 
-      val pReq = new GNETREQUESTHEADOBJECT
+      val pReq = createRequestHeader
       val stAns = new GNETANSWERHEADOBJECT
       NETREQ_SetOpClass(pReq, OP_CLASS_SYS);	// set op class
       NETREQ_SetOpCode(pReq, OP_SYS_GETALLDB);	// set op code
@@ -35,7 +35,7 @@ trait ganetdbp {
   }
 
   def NET_GAFIS_SYS_GetDBByID(nDBID:Short,nOption:Int=0):GADBPROPSTRUCT=executeInChannel {channel=>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     pReq.nOpClass = OP_CLASS_SYS.asInstanceOf[Short]
     pReq.nOpCode = OP_SYS_GETDBBYID.asInstanceOf[Short]
 
@@ -46,7 +46,7 @@ trait ganetdbp {
     channel.receive[GADBPROPSTRUCT]()
   }
   def NET_GAFIS_SYS_GetTableSchema(nDBID:Short, nTableID:Short,nOption:Int=0):Array[GACOLUMNPROPSTRUCT]= executeInChannel { channel =>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     NETREQ_SetOption(pReq, nOption);
     NETREQ_SetDBID(pReq, nDBID);
     NETREQ_SetTableID(pReq, nTableID);

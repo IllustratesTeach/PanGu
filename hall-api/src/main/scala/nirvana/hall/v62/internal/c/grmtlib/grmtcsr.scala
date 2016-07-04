@@ -7,7 +7,7 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gafiserr
 import nirvana.hall.c.services.gbaselib.gafiserr.{FILENLSTRUCT, GAFISERRDATSTRUCT}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
@@ -73,7 +73,7 @@ trait grmtcsr {
     val dataLength = channelBuffer.readInt()
 
     //for normal net function, only for OP_CLASS_FILE and OP_CLASS_HOTUPDATE
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     debug("{} receiving pkg length:"+pReq.getDataSize,channelOperator.getServerInfo)
     if(dataLength == pReq.getDataSize)	//normal net function
     {

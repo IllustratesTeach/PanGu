@@ -15,7 +15,7 @@ trait nettable {
 
   def NET_GAFIS_TABLE_Select(nDBID:Short,nTID:Short,pstRes:GADB_SELRESULT,pstStmt:GADB_SELSTATEMENT):Int =  executeInChannel{channel=>
 
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     pReq.nDBID = nDBID
     pReq.nTableID = nTID
 

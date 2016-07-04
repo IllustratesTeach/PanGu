@@ -13,7 +13,7 @@ import nirvana.hall.v62.internal.AncientClientSupport
 trait netmisc {
   this:AncientClientSupport with gnetcsr with reqansop=>
   def NET_GAFIS_MISC_GetDefDBID():GAFIS_DEFDBIDSTRUCT=executeInChannel{channel=>
-    val pReq = new GNETREQUESTHEADOBJECT
+    val pReq = createRequestHeader
     val pAns = new GNETANSWERHEADOBJECT
     NETREQ_SetOpClass(pReq, OP_CLASS_MISC);
     NETREQ_SetOpCode(pReq, OP_MISC_GETDEFDBID);
