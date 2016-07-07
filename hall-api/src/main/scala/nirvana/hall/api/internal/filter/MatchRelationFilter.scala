@@ -6,7 +6,7 @@ import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 
 /**
- * Created by songpeng on 16/6/21.
+ * 查询比对关系信息filter
  */
 class MatchRelationFilter(matchRelationService: MatchRelationService) extends RpcServerMessageFilter{
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {

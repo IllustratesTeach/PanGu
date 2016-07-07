@@ -19,7 +19,6 @@
       </database>
     <cron>
         <sync_dict_cron>0 0 * * * ? *</sync_dict_cron>
-        <sync_7to6_cron>0 0 * * * ? *</sync_7to6_cron>
         <query_7to6_cron>0 0 * * * ? *</query_7to6_cron>
     </cron>
 </hall_v70>

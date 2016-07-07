@@ -65,7 +65,8 @@ class RpcHttpClientImpl(extensionRegistry: ExtensionRegistry) extends RpcHttpCli
       val post: HttpPost = new HttpPost(url)
       //添加header头信息
       post.setHeader(HallSupportConstants.HTTP_PROTOBUF_HEADER,HallSupportConstants.HTTP_PROTOBUF_HEADER_VALUE)
-      headerMap.foreach(header=> post.setHeader(header._1, header._2))
+      if(headerMap != null)
+        headerMap.foreach(header=> post.setHeader(header._1, header._2))
       val request = BaseCommand.newBuilder()
       request.setExtension(extension,value)
       request.setTaskId(1L)

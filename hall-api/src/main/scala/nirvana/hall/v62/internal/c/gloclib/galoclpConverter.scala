@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.{ByteString, ProtocolStringList}
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
@@ -9,7 +10,6 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
-import nirvana.hall.v62.internal.c.GafisConverter
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -173,8 +173,8 @@ object galoclpConverter extends LoggerSupport{
     val stAdmData = gCard.stAdmData
     admData.setCreator(stAdmData.szCUserName)
     admData.setUpdator(stAdmData.szMUserName)
-    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
-    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+    admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
+    admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
 
     card.build()
   }
@@ -330,6 +330,10 @@ object galoclpConverter extends LoggerSupport{
               caseInfo.getAdmDataBuilder.setCreateUnitCode(textContent)
             case "UpdatorUnitCode" =>
               caseInfo.getAdmDataBuilder.setUpdateUnitCode(textContent)
+            case "CreateUserName" =>
+              caseInfo.getAdmDataBuilder.setCreator(textContent)
+            case "UpdateUserName" =>
+              caseInfo.getAdmDataBuilder.setUpdator(textContent)
             case other =>
               warn("{} not mapped", other)
           }
@@ -348,8 +352,8 @@ object galoclpConverter extends LoggerSupport{
     }
     //操作信息
     val admData = caseInfo.getAdmDataBuilder
-    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
-    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
+    admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
+    admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
 
     caseInfo.build()
   }

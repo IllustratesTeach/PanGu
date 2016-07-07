@@ -5,12 +5,12 @@
 -->
 
 <hall_v62>
-    <!--<host>10.1.6.25</host>-->
-   <host>127.0.0.1</host>
-   <port>6798</port>
-   <user>afisadmin</user>
-   <!--<password></password>-->
-   <password>helloafis</password>
+   <app_server>
+      <host>192.168.1.253</host>
+      <port>6798</port>
+      <user>afisadmin</user>
+      <password>helloafis</password>
+   </app_server>
    <template_finger_table>
       <database_id>1</database_id>
       <table_id>2</table_id>
@@ -27,4 +27,10 @@
       <database_id>20</database_id>
       <table_id>2</table_id>
    </query_table>
+   <database>
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>afis</user>
+      <password>helloafis</password>
+      <url>jdbc:oracle:thin:@192.168.1.253:1521:oragafis</url>
+   </database>
 </hall_v62>

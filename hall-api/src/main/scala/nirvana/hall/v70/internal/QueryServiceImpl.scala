@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -14,11 +15,10 @@ import nirvana.hall.v70.internal.sync.ProtobufConverter
 class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
    * 发送查询任务
- *
    * @param querySendRequest
    * @return
    */
-  override def sendQuery(querySendRequest: QuerySendRequest): QuerySendResponse = {
+  override def sendQuery(querySendRequest: QuerySendRequest, dBConfig: DBConfig): QuerySendResponse = {
     val matchTask = querySendRequest.getMatchTask
     val gafisQuery = ProtobufConverter.convertMatchTask2GafisNormalqueryQueryque(matchTask)
     val query = entityManager.createNativeQuery("select SEQ_ORASID.nextval from dual")

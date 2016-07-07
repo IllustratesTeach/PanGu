@@ -23,9 +23,14 @@ class SyncTPCardServiceImpl(v62Config: HallV62Config,tPCardService: TPCardServic
    * @param size
    * @return
    */
-  override def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig = DBConfig(Left(v62Config.templateTable.dbId.toShort), Option(v62Config.templateTable.tableId.toShort))): Unit = {
+  override def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig): Unit = {
+    val dbConfig = if(dBConfig != null){
+      dBConfig
+    }else{
+      DBConfig(Left(v62Config.templateTable.dbId.toShort), Option(v62Config.templateTable.tableId.toShort))
+    }
     val cardIdBuffer = new ArrayBuffer[(String, Long)]()
-    doFetcher(cardIdBuffer, timestamp, size, getTableName(dBConfig))
+    doFetcher(cardIdBuffer, timestamp, size, getTableName(dbConfig))
     cardIdBuffer.foreach{cardId=>
       val syncTPCard = responseBuilder.addSyncTPCardBuilder()
       syncTPCard.setTpCard(tPCardService.getTPCard(cardId._1))

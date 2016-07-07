@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef
@@ -11,7 +12,6 @@ import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto._
-import nirvana.hall.v62.internal.c.GafisConverter
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 
 import scala.collection.JavaConversions._
@@ -319,8 +319,8 @@ object galoctpConverter extends LoggerSupport{
     //操作信息
     val admData = card.getAdmDataBuilder
     val stAdmData = data.stAdmData
-    admData.setCreateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
-    admData.setUpdateDatetime(GafisConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+    admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
+    admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
     admData.setCreator(stAdmData.szCUserName)
     admData.setUpdator(stAdmData.szMUserName)
 

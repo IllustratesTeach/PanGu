@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal
 
+import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESITEM, GADB_SELRESULT, _}
@@ -120,7 +121,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @param querySendRequest
    * @return
    */
-  override def sendQuery(querySendRequest: QuerySendRequest): QuerySendResponse = {
+  override def sendQuery(querySendRequest: QuerySendRequest, dBConfig: DBConfig = DBConfig(Left(config.queryTable.dbId.toShort), Option(config.queryTable.tableId.toShort))): QuerySendResponse = {
     val response = QuerySendResponse.newBuilder()
     val matchTask = querySendRequest.getMatchTask
     val key = matchTask.getMatchId.getBytes()

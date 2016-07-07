@@ -27,6 +27,12 @@
     <database_id>20</database_id>
     <table_id>2</table_id>
   </query_table>
+  <database>
+     <driver>oracle.jdbc.driver.OracleDriver</driver>
+     <user>afis</user>
+     <password>helloafis</password>
+     <url>jdbc:oracle:thin:@10.1.6.4:1521:oragafis</url>
+  </database>
 </hall_v62>
 
 
