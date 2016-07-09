@@ -69,6 +69,11 @@
                     <xs:documentation>捺印是否转换为新特征</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="has_ridge" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>是否对纹线分库</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

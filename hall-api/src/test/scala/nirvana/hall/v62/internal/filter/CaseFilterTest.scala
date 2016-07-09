@@ -71,7 +71,7 @@ class CaseFilterTest extends BaseV62TestCase{
   @Test
   def test_get(): Unit ={
     val caseInfoService = getService[CaseInfoService]
-    val caseInfo = caseInfoService.getCaseInfo("123456")
+    val caseInfo = caseInfoService.getCaseInfo("3100000000002016070601")
 
     Assert.assertNotNull(caseInfo)
   }

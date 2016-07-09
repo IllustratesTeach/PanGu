@@ -35,8 +35,9 @@ class MntSizeConfig {
   var palmTemplateSize = 8192
   @XmlElement(name = "palm_latent_size")
   var palmLatentSize = 5120
-
   @XmlElement(name = "is_new_feature")
   var isNewFeature= false
+  @XmlElement(name = "has_ridge")
+  var hasRidge = true
 }
 

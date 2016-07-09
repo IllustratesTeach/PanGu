@@ -15,18 +15,21 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
  * gafis6.2捺印指纹分库
  */
 class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+  val hasRidge = hallMatcherConfig.mnt.hasRidge
 //  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normaltp_tpcardinfo t "
 //  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t where ${wrapUpdateTimeAsLong()}  >"
-  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normaltp_tpcardinfo_mod_7 t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod_7 t where ${wrapModTimeAsLong()}  >"
+  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normaltp_tpcardinfo_mod t "
+  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()}  >"
 
-  override val SYNC_SQL =  s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod_7 t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
+  override val SYNC_SQL =  s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
   val SELECT_TPCARD_SQL = "select t.ora_sid as sid," +
       " t.fingerrhmmnt, t.fingerrhsmnt, t.fingerrhzmnt, t.fingerrhhmnt, t.fingerrhxmnt, t.fingerlhmmnt, t.fingerlhsmnt, t.fingerlhzmnt, t.fingerlhhmnt, t.fingerlhxmnt," +
-//      " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
       " t.tplainrmmnt, t.tplainrsmnt, t.tplainrzmnt, t.tplainrhmnt, t.tplainrxmnt, t.tplainlmmnt, t.tplainlsmnt, t.tplainlzmnt, t.tplainlhmnt, t.tplainlxmnt," +
-//      " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin ," +
-    s" 1 from normaltp_tpcardinfo t where t.ora_sid =?"
+      (if(hasRidge){
+        " t.fingerrhmbin, t.fingerrhsbin, t.fingerrhzbin, t.fingerrhhbin, t.fingerrhxbin, t.fingerlhmbin, t.fingerlhsbin, t.fingerlhzbin, t.fingerlhhbin, t.fingerlhxbin," +
+        " t.tplainrmbin, t.tplainrsbin, t.tplainrzbin, t.tplainrhbin, t.tplainrxbin, t.tplainlmbin, t.tplainlsbin, t.tplainlzbin, t.tplainlhbin, t.tplainlxbin "
+      }else " 1") +
+    "  from normaltp_tpcardinfo t where t.ora_sid =?"
   //特征字段，根据指位1..20排序
   val mntColums: Array[String] = Array[String](
     "fingerrhmmnt", "fingerrhsmnt", "fingerrhzmnt", "fingerrhhmnt", "fingerrhxmnt", "fingerlhmmnt", "fingerlhsmnt", "fingerlhzmnt", "fingerlhhmnt", "fingerlhxmnt",
@@ -61,24 +64,27 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implic
         }
         pos += 1
       }
-      /*pos = 1 //获取纹线指位从1开始
-      binColums.foreach{col =>
-        val bin = rs.getBytes(col)
-        if(bin != null){
-          val syncData = SyncData.newBuilder()
-          syncData.setObjectId(sid)
-          syncData.setData(ByteString.copyFrom(bin))
-          syncData.setObjectId(sid)
-          syncData.setPos(DataConverter.fingerPos6to8(pos))
-          syncData.setOperationType(SyncData.OperationType.PUT)
-          syncData.setMinutiaType(MinutiaType.RIDGE)
-          syncData.setTimestamp(seq)
-          if (validSyncData(syncData.build, false)) {
-            syncDataResponse.addSyncData(syncData.build)
+      if(hasRidge){
+        pos = 1 //获取纹线指位从1开始
+        binColums.foreach{col =>
+          val bin = rs.getBytes(col)
+          if(bin != null){
+            val syncData = SyncData.newBuilder()
+            syncData.setObjectId(sid)
+            syncData.setData(ByteString.copyFrom(bin))
+            syncData.setObjectId(sid)
+            syncData.setPos(DataConverter.fingerPos6to8(pos))
+            syncData.setOperationType(SyncData.OperationType.PUT)
+            syncData.setMinutiaType(MinutiaType.RIDGE)
+            syncData.setTimestamp(seq)
+            if (validSyncData(syncData.build, false)) {
+              syncDataResponse.addSyncData(syncData.build)
+            }
           }
+          pos += 1
         }
-        pos += 1
-      }*/
+      }
+
     }
   }
 

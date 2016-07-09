@@ -6,7 +6,7 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.adapter.common.sync.{LatentPalmFetcher, LatentFingerFetcher, TemplatePalmFetcher, TemplateFingerFetcher}
+import nirvana.hall.matcher.internal.adapter.common.sync.{TemplatePalmFetcher, LatentFingerFetcher, LatentPalmFetcher, TemplateFingerFetcher}
 import nirvana.hall.matcher.service.SyncDataService
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
