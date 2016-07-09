@@ -9,6 +9,7 @@ import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -225,4 +226,34 @@ object gaqryqueConverter {
   }
   def convertLongAsSixByteArray(sid: Long): Array[Byte]=
     ByteBuffer.allocate(8).putLong(sid).array().slice(2,8)
+
+  /**
+   * 比对状态status转换为protobuf
+   * @param status
+   * @return
+   */
+  def convertStatusAsMatchStatus(status: Short): MatchStatus={
+    status match {
+      case 0 =>
+        MatchStatus.WAITING_MATCH
+      case 1 =>
+        MatchStatus.MATCHING
+      case 2 =>
+        MatchStatus.WAITING_CHECK
+      case 5 =>
+        MatchStatus.FAILED
+      case 7 =>
+        MatchStatus.CHECKED
+      case 8 =>
+        MatchStatus.CHECKING
+      case 9 =>
+        MatchStatus.WAITING_RECHECK
+      case 10 =>
+        MatchStatus.RECHECKING
+      case 11 =>
+        MatchStatus.RECHECKED
+      case other =>
+        MatchStatus.UN_KNOWN
+    }
+  }
 }

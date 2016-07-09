@@ -15,8 +15,8 @@ class gnettpTest {
   @Test
   def test_getCardListByGroupId(): Unit ={
     val config = new HallV62Config
-    config.appServer.host = "10.1.6.4"
-    config.appServer.port = 6898
+    config.appServer.host = "192.168.1.253"
+    config.appServer.port = 6798
     config.appServer.user = "afisadmin"
     config.appServer.password="helloafis"
     V62Facade.withConfigurationServer(config.appServer) {

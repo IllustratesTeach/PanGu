@@ -259,7 +259,7 @@ object galoctpConverter extends LoggerSupport{
               text.setStrCriminalRecordDesc(textContent)
             case "CreatorUnitCode" =>
               card.getAdmDataBuilder.setCreateUnitCode(textContent)
-            case "MicbUpdatorUnitCode" =>
+            case "UpdatorUnitCode" =>
               card.getAdmDataBuilder.setUpdateUnitCode(textContent)
             case other =>
               warn("{} not mapped", other)

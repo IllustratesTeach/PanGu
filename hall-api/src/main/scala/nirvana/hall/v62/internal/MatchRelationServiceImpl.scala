@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.{LPCardService, MatchRelationService}
+import nirvana.hall.api.services.{QueryService, LPCardService, MatchRelationService}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
@@ -13,7 +13,7 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 /**
  * Created by songpeng on 16/6/21.
  */
-class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService) extends MatchRelationService{
+class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService{
   /**
    * 获取比对关系
    * @param request
@@ -21,7 +21,11 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
     val reponse = MatchRelationGetResponse.newBuilder()
+    reponse.setMatchType(request.getMatchType)
     val cardId = request.getCardId
+    //获取比对状态
+    val status = queryService.findFirstQueryStatusByCardId(cardId)
+    reponse.setMatchStatus(status)
     request.getMatchType match {
       case MatchType.FINGER_TL =>
         //倒查直接查询比中关系表
@@ -88,7 +92,6 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
           reponse.addMatchRelation(matchRelation.build())
         }
     }
-    reponse.setMatchType(request.getMatchType)
 
     reponse.build()
   }

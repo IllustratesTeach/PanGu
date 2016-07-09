@@ -1,7 +1,8 @@
 package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QuerySendRequest}
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
+import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
@@ -28,13 +29,15 @@ class QueryFilterTest extends BaseV62TestCase{
 
   @Test
   def test_getQuery: Unit ={
-    val requestBuilder = QueryGetRequest.newBuilder()
-    requestBuilder.setOraSid(40)
-
     val service = getService[QueryService]
-    val response = service.getQuery(requestBuilder.build())
-    println(response.getMatchResult.getCandidateNum)
-    println(response.getMatchResult.getCandidateResultCount)
-    Assert.assertNotNull(response)
+    val matchResult = service.getMatchResult(1)
+    Assert.assertNotNull(matchResult)
+  }
+
+  @Test
+  def test_findFirstQueryStatusByCardId: Unit ={
+    val service = getService[QueryService]
+    val status = service.findFirstQueryStatusByCardId("0000000000000000000008")
+    Assert.assertEquals(status, MatchStatus.RECHECKED)
   }
 }

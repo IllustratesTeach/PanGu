@@ -21,8 +21,14 @@ class QueryFilter(httpServletRequest: HttpServletRequest, queryService: QuerySer
       true
     } else if (commandRequest.hasExtension(QueryGetRequest.cmd)) {
       val request = commandRequest.getExtension(QueryGetRequest.cmd)
-      val response = queryService.getQuery(request)
-      commandResponse.writeMessage(commandRequest, QueryGetResponse.cmd, response)
+      val matchResult = queryService.getMatchResult(request.getOraSid)
+      val response = QueryGetResponse.newBuilder()
+      response.setIsComplete(false)
+      matchResult.foreach{result =>
+        response.setMatchResult(result)
+        response.setIsComplete(true)
+      }
+      commandResponse.writeMessage(commandRequest, QueryGetResponse.cmd, response.build())
       true
     } else {
       handler.handle(commandRequest, commandResponse)

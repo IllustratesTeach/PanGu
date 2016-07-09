@@ -5,7 +5,8 @@ import javax.persistence.EntityManager
 
 import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
+import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 
@@ -36,21 +37,29 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
    * 获取查询信息
- *
-   * @param queryGetRequest
+   * @param oraSid
    * @return
    */
-  override def getQuery(queryGetRequest: QueryGetRequest): QueryGetResponse = {
+  override def getMatchResult(oraSid: Long, dBConfig: DBConfig): Option[MatchResult]= {
     throw new UnsupportedOperationException
   }
 
   /**
     * 通过卡号查找第一个的比中结果
-    *
     * @param cardId 卡号
     * @return 比对结果
     */
-  override def findFirstQueryResultByCardId(dbId: Short, tableId: Short, cardId: String): Option[MatchResult] = {
+  override def findFirstQueryResultByCardId(cardId: String, dBConfig: DBConfig): Option[MatchResult] = {
+    throw new UnsupportedOperationException
+  }
+
+  /**
+   * 根据卡号查找第一个比对任务的状态, 如果没有获取到返回UN_KNOWN
+   * @param cardId
+   * @param dBConfig
+   * @return
+   */
+  override def findFirstQueryStatusByCardId(cardId: String, dBConfig: DBConfig): MatchStatus = {
     throw new UnsupportedOperationException
   }
 }
