@@ -1,5 +1,6 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardText
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 
 /**
@@ -10,10 +11,9 @@ object DictCodeConverter {
   /**
    * 校验字典数据，并将gafis6.2的字典转为7.0的字典,
    * 如果字典不能匹配写到备注里
-   * @param tPCard
+   * @param textBuilder
    */
-  def convertTPCard6to7(tPCard: TPCard): Unit ={
-    val textBuilder = tPCard.getText.toBuilder
+  def convertTPCardText6to7(textBuilder: TPCardText.Builder): Unit ={
     //校验字典是不是数字，长度不大于标准长度
     checkNumber(textBuilder.setStrBirthAddrCode, textBuilder.getStrBirthAddrCode, 6)
     checkNumber(textBuilder.setStrNation, textBuilder.getStrNation, 6)
@@ -28,6 +28,10 @@ object DictCodeConverter {
     if(code != null && code.nonEmpty){
       textBuilder.setStrCertifType(code.get)
     }else{
+      textBuilder.setStrCertifType("")
+    }
+    if(textBuilder.getStrCertifType.length > 2){
+      println(textBuilder.getStrCertifType)
       textBuilder.setStrCertifType("")
     }
   }

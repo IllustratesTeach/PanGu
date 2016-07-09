@@ -6,7 +6,6 @@ import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
-import nirvana.hall.v62.services.DictCodeConverter
 
 /**
  * Created by songpeng on 16/1/26.
@@ -62,10 +61,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     val tp = new GTPCARDINFOSTRUCT
     facade.NET_GAFIS_FLIB_Get(dbConfig.dbId.left.get, dbConfig.tableId.get,
       cardId, tp, null, 3)
-    val tpCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
-    //数据校验
-    DictCodeConverter.convertTPCard6to7(tpCard)
 
-    tpCard
+    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
   }
 }

@@ -13,6 +13,7 @@ import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
+import nirvana.hall.v62.services.DictCodeConverter
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -323,6 +324,9 @@ object galoctpConverter extends LoggerSupport{
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
     admData.setCreator(stAdmData.szCUserName)
     admData.setUpdator(stAdmData.szMUserName)
+
+    //数据校验和转换
+    DictCodeConverter.convertTPCardText6to7(card.getTextBuilder)
 
     card.build()
   }
