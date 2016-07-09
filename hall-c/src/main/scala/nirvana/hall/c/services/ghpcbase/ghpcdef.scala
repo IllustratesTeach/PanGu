@@ -32,7 +32,7 @@ object ghpcdef {
   class GAFIS_TIME extends AncientData {
     private val calendar = Calendar.getInstance()
     var tMilliSec: Short = {
-      val sec = calendar.get(Calendar.SECOND) * 1000
+      val sec = calendar.get(Calendar.SECOND)
       (((sec & 0xff) << 8) | (sec >>> 8)).toShort
     }
     // millisecond.	[0, 999]

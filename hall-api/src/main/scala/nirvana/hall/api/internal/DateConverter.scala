@@ -42,7 +42,7 @@ object DateConverter {
     val day = dateTime.tDate.tDay
     val hour = dateTime.tTime.tHour
     val min = dateTime.tTime.tMin
-    val sec = shortConvert(dateTime.tTime.tMilliSec) / 1000
+    val sec = Math.abs(shortConvert(dateTime.tTime.tMilliSec) / 1000)//TODO 转换不对
 
     "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
   }

@@ -5,6 +5,7 @@ import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
@@ -12,10 +13,11 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.jpa.{RemoteQueryConfig, GafisNormalqueryQueryque, GafisQuery7to6}
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.json.JSONObject
 import org.jboss.netty.buffer.ChannelBuffers
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,7 +41,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   @Transactional
   override def doWork: Unit ={
     getGafisNormalqueryQueryque.foreach{ gafisQuery =>
-      info("sync-70to62 sync_queue info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
+      info("remote-query info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
       sendQuery(gafisQuery)
       doWork
     }
@@ -92,9 +94,10 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     try {
       val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
       val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
-      val syncTarget = RemoteQueryConfig.find(gafisQuery.syncTargetSid)
-
-      val respnose = rpcHttpClient.call(syncTarget.url, QuerySendRequest.cmd, request.build())
+      //获取远程查询配置
+      val queryConfig = RemoteQueryConfig.find(gafisQuery.syncTargetSid)
+      val headerMap = getHeaderMap(queryConfig, matchTask.getMatchType)
+      val respnose = rpcHttpClient.call(queryConfig.url, QuerySendRequest.cmd, request.build(), headerMap)
       val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
       //记录关联62的查询任务号
       new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
@@ -106,4 +109,31 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     }
   }
 
+  /**
+   * 获取request请求的头部信息
+   * @return
+   */
+  private def getHeaderMap(remoteQueryConfig: RemoteQueryConfig, matchType: MatchType): Map[String, String] ={
+    //TODO 这里的参数指定查询库id还是目标数据的物理库？？？
+    val json = new JSONObject(remoteQueryConfig.config)
+    matchType match {
+      case MatchType.FINGER_TT | MatchType.FINGER_LT=>
+        if(json.has("TPCard")){
+          val db = json.getJSONObject("TPCard")
+          val dbId = db.getString("db_id")
+          val tableId = if(db.has("table_id")) db.getString("table_id") else ""
+          return Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+        }
+      case MatchType.FINGER_TL | MatchType.FINGER_LL =>
+        if(json.has("LPCard")){
+          val db = json.getJSONObject("LPCard")
+          val dbId = db.getString("db_id")
+          val tableId = if(db.has("table_id")) db.getString("table_id") else ""
+          return Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+        }
+      case other =>
+    }
+
+    Map()
+  }
 }

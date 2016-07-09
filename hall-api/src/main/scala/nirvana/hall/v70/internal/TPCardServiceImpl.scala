@@ -44,8 +44,13 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
       val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
       person.sid = sid
       //用户名获取用户ID
-      person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn, person.gatherOrgCode)
-      person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn, person.gatherOrgCode)
+      person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn)
+      person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn)
+      //根据用户信息获取单位信息
+      if(person.inputpsn != null){
+        val sysUser = SysUser.find(person.inputpsn)
+        person.gatherOrgCode = sysUser.departCode
+      }
 
       person.deletag = Gafis70Constants.DELETAG_USE
       person.fingershowStatus = 1.toShort
@@ -89,17 +94,16 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    * @param loginName
    * @return
    */
-  private def getSysUserPkIdByLoginName(loginName: String, departCode: String): String ={
+  private def getSysUserPkIdByLoginName(loginName: String): String ={
     if(loginName != null && loginName.nonEmpty){
-      val user = SysUser.find_by_loginName_and_departCode(loginName, departCode).headOption
+      val user = SysUser.find_by_loginName(loginName).headOption
       if(user.nonEmpty){
-         user.get.pkId
-      } else{
-        Gafis70Constants.INPUTPSN
+         return user.get.pkId
       }
-    }else{
-      Gafis70Constants.INPUTPSN
     }
+//    Gafis70Constants.INPUTPSN
+    //TODO 目前对应不上的用户设置为空,等以后处理
+    null
   }
 
   /**
@@ -131,8 +135,13 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
     val person = GafisPerson.find(tpCard.getStrCardID)
     BeanUtils.copyProperties(personNew, person)
     //用户名获取用户ID
-    person.inputpsn = getSysUserPkIdByLoginName(personNew.inputpsn, person.gatherOrgCode)
-    person.modifiedpsn = getSysUserPkIdByLoginName(personNew.modifiedpsn, person.gatherOrgCode)
+    person.inputpsn = getSysUserPkIdByLoginName(personNew.inputpsn)
+    //根据用户信息获取单位信息
+    if(person.inputpsn != null){
+      val sysUser = SysUser.find(person.inputpsn)
+      person.gatherOrgCode = sysUser.departCode
+    }
+    person.modifiedpsn = getSysUserPkIdByLoginName(personNew.modifiedpsn)
     person.inputtime = personNew.inputtime
     person.modifiedtime = personNew.modifiedtime
     person.deletag = Gafis70Constants.DELETAG_USE

@@ -30,7 +30,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     if(apiConfig.sync.syncCron != null){
       periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron), "sync-cron", new Runnable {
         override def run(): Unit = {
+          info("begin sync-cron")
           syncService.doWork
+          info("end sync-cron")
         }
       })
     }
@@ -58,6 +60,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
+  /**
+   * 同步捺印信息
+   * @param syncConfig
+   */
   def syncTPCard(syncConfig: GafisSyncConfig): Unit ={
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
@@ -75,8 +81,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val cardId = tpCard.getStrCardID
         if(tpCardService.isExist(cardId,destDBConfig)){
           tpCardService.updateTPCard(tpCard, destDBConfig)
+          info("success syncTPCard update cardId:{}", cardId)
         }else{
           tpCardService.addTPCard(tpCard, destDBConfig)
+          info("success syncTPCard add cardId:{}", cardId)
         }
         timestamp = syncTPCard.getTimestamp
       }
@@ -111,6 +119,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
           lpCardService.addLPCard(lpCard, destDBConfig)
         }
         timestamp = syncLPCard.getTimestamp
+        info("sync")
       }
       if(response.getSyncLPCardCount > 0){
         syncConfig.timestamp = timestamp
