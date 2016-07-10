@@ -1,6 +1,9 @@
 package nirvana.hall.matcher
 
-import nirvana.hall.matcher.internal.adapter.gz.{SyncDataServiceImpl, PutMatchProgressServiceImpl, PutMatchResultServiceImpl, GetMatchTaskServiceImpl}
+import nirvana.hall.extractor.internal.FeatureExtractorImpl
+import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.matcher.internal.adapter.common.{GetMatchTaskServiceImpl, PutMatchProgressServiceImpl}
+import nirvana.hall.matcher.internal.adapter.gz.{SyncDataServiceImpl, PutMatchResultServiceImpl}
 import nirvana.hall.matcher.service.{PutMatchProgressService, PutMatchResultService, GetMatchTaskService, SyncDataService}
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -14,5 +17,7 @@ object HallMatcherGzServiceModule {
     binder.bind(classOf[GetMatchTaskService], classOf[GetMatchTaskServiceImpl])
     binder.bind(classOf[PutMatchResultService], classOf[PutMatchResultServiceImpl])
     binder.bind(classOf[PutMatchProgressService], classOf[PutMatchProgressServiceImpl])
+    //特征转换service
+    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
   }
 }

@@ -1,6 +1,7 @@
 package nirvana.hall.matcher
 
-import nirvana.hall.matcher.internal.adapter.daku.{PutMatchProgressServiceImpl, GetMatchTaskServiceImpl, PutMatchResultServiceImpl, SyncDataServiceImpl}
+import nirvana.hall.matcher.internal.adapter.common.PutMatchProgressServiceImpl
+import nirvana.hall.matcher.internal.adapter.daku.{GetMatchTaskServiceImpl, PutMatchResultServiceImpl, SyncDataServiceImpl}
 import nirvana.hall.matcher.service.{GetMatchTaskService, PutMatchProgressService, PutMatchResultService, SyncDataService}
 import org.apache.tapestry5.ioc.ServiceBinder
 

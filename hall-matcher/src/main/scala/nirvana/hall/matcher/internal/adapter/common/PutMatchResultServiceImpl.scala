@@ -46,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
       candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
     }
-    if (queryQue.queryType != 0) {
+    if (queryQue.queryType != HallMatcherConstants.QUERY_TYPE_TT) {
       maxScore = maxScore / 10
     }
     JdbcDatabase.update(UPDATE_MATCH_RESULT_SQL) { ps =>
