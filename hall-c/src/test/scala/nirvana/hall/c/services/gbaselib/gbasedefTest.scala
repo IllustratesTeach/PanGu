@@ -1,12 +1,12 @@
-package nirvana.hall.c.services.ghpcbase
+package nirvana.hall.c.services.gbaselib
 
-import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
+import nirvana.hall.c.services.gbaselib.gbasedef.AFISDateTime
 import org.junit.Test
 
 /**
  * Created by songpeng on 16/6/4.
  */
-class ghpcdefTest {
+class gbasedefTest {
 
   @Test
   def testAFISDateTime: Unit ={

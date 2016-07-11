@@ -1,9 +1,8 @@
 package nirvana.hall.c.services.ghpcbase
 
-import java.util.Calendar
-
 import nirvana.hall.c.annotations.Length
 import nirvana.hall.c.services.AncientData
+import nirvana.hall.c.services.gbaselib.gbasedef
 
 /**
  *
@@ -29,47 +28,31 @@ object ghpcdef {
 
 
   // date time format, t[7:6]-year, t[5]-mon, t[4]-day, t[3]-hour, t[2]-minute, t[1:0]-millisec
-  class GAFIS_TIME extends AncientData {
-    private val calendar = Calendar.getInstance()
-    var tMilliSec: Short = {
-      val sec = calendar.get(Calendar.SECOND)
-      (((sec & 0xff) << 8) | (sec >>> 8)).toShort
-    }
-    // millisecond.	[0, 999]
-    var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;
-    // minute. [0, 59]
-    var tHour: Byte = calendar.get(Calendar.HOUR_OF_DAY).toByte; // hour,   [0, 23]
+  @deprecated
+  class GAFIS_TIME extends gbasedef.GAFIS_TIME{
   }
 
   // GAFIS_TIME;	// size is 4 bytes long
-
-  class GAFIS_DATE extends AncientData {
-    private val calendar = Calendar.getInstance()
-    var tDay: Byte = calendar.get(Calendar.DAY_OF_MONTH).toByte;
-    // day, [1, 31]
-    var tMonth: Byte = calendar.get(Calendar.MONTH).toByte;
-    // month, [0, 11]
-    var tYear: Short = converAsGafisYear()
-    def converAsGafisYear(): Short ={
-      val year = calendar.get(Calendar.YEAR)
-      (((year & 0xff) << 8) | (year >>> 8)).toShort
-    }
+  @deprecated
+  class GAFIS_DATE extends gbasedef.GAFIS_DATE{
   }
 
   // GAFIS_DATE;	// size is 4 bytes long.
 
-  class GAFIS_DATETIME extends AncientData {
-    var tTime = new GAFIS_TIME;
-    var tDate = new GAFIS_DATE; // date
+  @deprecated
+  class GAFIS_DATETIME extends gbasedef.GAFIS_DATE{
   }
 
   // GAFIS_DATETIME;	// gafis data time. size is 8 bytes long
 
-  type AFISDateTime = GAFIS_DATETIME
+  @deprecated
+  type AFISDateTime = gbasedef.AFISDateTime
   // can map to GAFIS_DATETIME structure
-  type AFISDate = GAFIS_DATE
+  @deprecated
+  type AFISDate = gbasedef.AFISDate
   // can map to GAFIS_DATE structure
-  type AFISTime = GAFIS_TIME // can map to GAFIS_TIME structure
+  @deprecated
+  type AFISTime = gbasedef.AFISTime// can map to GAFIS_TIME structure
   /*
   typedef UCHAR	AFISDateTime[8];
   typedef	UCHAR	AFISDate[4];
