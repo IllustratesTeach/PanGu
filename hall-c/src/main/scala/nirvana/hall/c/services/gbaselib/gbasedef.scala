@@ -105,7 +105,15 @@ object gbasedef {
   // date time format, t[7:6]-year, t[5]-mon, t[4]-day, t[3]-hour, t[2]-minute, t[1:0]-millisec
   class GAFIS_TIME extends AncientData {
     private val calendar = Calendar.getInstance()
-    var tMilliSec: Short = calendar.get(Calendar.MILLISECOND).toShort;
+    setJavaSecs(calendar.get(Calendar.SECOND))
+    var tMilliSec: Short = _
+    def setJavaSecs(sec:Int): Unit ={
+      val n = sec * 1000
+      tMilliSec = ( ((n & 0xff )<< 8) |  ((n >> 8 ) & 0xff) ).toShort
+    }
+    def convertAsJavaSecs(): Int ={
+      (((tMilliSec & 0xff) << 8 ) |((tMilliSec >>> 8) & 0xff)) / 1000
+    }
     // millisecond.	[0, 999]
     var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;
     // minute. [0, 59]
@@ -116,14 +124,17 @@ object gbasedef {
 
   class GAFIS_DATE extends AncientData {
     private val calendar = Calendar.getInstance()
+    setJavaYear(calendar.get(Calendar.YEAR))
     var tDay: Byte = calendar.get(Calendar.DAY_OF_MONTH).toByte;
     // day, [1, 31]
     var tMonth: Byte = calendar.get(Calendar.MONTH).toByte;
     // month, [0, 11]
-    var tYear: Short = converAsGafisYear()
-    def converAsGafisYear(): Short ={
-      val year = calendar.get(Calendar.YEAR)
-      (((year & 0xff) << 8) | (year >>> 8)).toShort
+    var tYear: Short = _
+    def setJavaYear(year:Int): Unit ={
+      tYear = (((year & 0xff) << 8) | (year >>> 8)).toShort
+    }
+    def convertAsJavaYear():Int ={
+      ((tYear & 0xff) << 8 ) |((tYear >>> 8) & 0xff)
     }
   }
 
