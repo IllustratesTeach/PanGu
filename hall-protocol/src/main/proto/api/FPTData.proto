@@ -178,6 +178,7 @@ message	TPCard
 		optional string			strMntExtractMethod = 8;				//GAFIS结构中无
 		optional FaceFgp		facefgp = 9 [default = FACE_UNKNOWN];	//脸位
 		optional PalmFgp		palmfgp = 10 [default = PALM_UNKNOWN];	//掌位
+		optional string			stBin = 11;	//纹线数据
 	}
 
 	required string		strCardID = 1;

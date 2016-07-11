@@ -14,7 +14,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gloclib.galoctp
-import nirvana.hall.v70.internal.CommonUtils
+import nirvana.hall.v70.internal.{Gafis70Constants, CommonUtils}
 import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -31,8 +31,7 @@ object ProtobufConverter {
    * @param caseInfo
    * @return
    */
-  def convertCase2GafisCase(caseInfo: Case): GafisCase = {
-    val gafisCase = new GafisCase()
+  def convertCase2GafisCase(caseInfo: Case, gafisCase: GafisCase = new GafisCase()): GafisCase = {
     gafisCase.caseId = caseInfo.getStrCaseID
     gafisCase.cardId = caseInfo.getStrCaseID
     val text = caseInfo.getText
@@ -93,8 +92,7 @@ object ProtobufConverter {
     caseBuilder.build()
   }
 
-  def convertLPCard2GafisCaseFinger(lpCard: LPCard): GafisCaseFinger = {
-    val caseFinger = new GafisCaseFinger()
+  def convertLPCard2GafisCaseFinger(lpCard: LPCard, caseFinger: GafisCaseFinger = new GafisCaseFinger()): GafisCaseFinger = {
     caseFinger.fingerId = lpCard.getStrCardID
     val text = lpCard.getText
     caseFinger.seqNo = text.getStrSeq
@@ -246,8 +244,13 @@ object ProtobufConverter {
     tpCard.build()
   }
 
-  def convertTPCard2GafisPerson(tpCard: TPCard): GafisPerson={
-    val person = new GafisPerson()
+  /**
+   * 将tpcard
+   * @param tpCard
+   * @param person
+   * @return
+   */
+  def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
     person.personid = tpCard.getStrCardID
     person.cardid = tpCard.getStrPersonID
     val text = tpCard.getText
@@ -314,6 +317,11 @@ object ProtobufConverter {
     person
   }
 
+  /**
+   * 指纹转换
+   * @param tpCard
+   * @return
+   */
   def convertTPCard2GafisGatherFinger(tpCard: TPCard): Seq[GafisGatherFinger] = {
     val fingerList = new ArrayBuffer[GafisGatherFinger]()
     val personId = tpCard.getStrCardID
@@ -329,8 +337,8 @@ object ProtobufConverter {
           finger.gatherData = imageData.toByteArray
           finger.fgp = blob.getFgp.getNumber.toShort
           finger.fgpCase = if(blob.getBPlain) "1" else "0"
-          finger.groupId = 1: Short
-          finger.lobtype = 1: Short
+          finger.groupId = Gafis70Constants.GROUP_ID_CPR
+          finger.lobtype = Gafis70Constants.LOBTYPE_DATA
           fingerList += finger
         }
         //特征
@@ -341,9 +349,25 @@ object ProtobufConverter {
           mnt.gatherData = mntData.toByteArray
           mnt.fgp = blob.getFgp.getNumber.toShort
           mnt.fgpCase = if(blob.getBPlain) "1" else "0"
-          mnt.groupId = 0: Short
-          mnt.lobtype = 0: Short
+          mnt.groupId = Gafis70Constants.GROUP_ID_MNT
+          mnt.lobtype = Gafis70Constants.LOBTYPE_MNT
           fingerList += mnt
+        }
+        //纹线
+        val binData = blob.getStBinBytes
+        if(binData.size() >0){
+          val bin = new GafisGatherFinger()
+          bin.personId = personId
+          bin.gatherData = binData.toByteArray
+          bin.fgp = blob.getPalmfgp match{
+            case PalmFgp.PALM_RIGHT => 11
+            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          bin.groupId = Gafis70Constants.GROUP_ID_BIN
+          bin.lobtype = Gafis70Constants.LOBTYPE_MNT
+
+          fingerList += bin
         }
       }
     }
@@ -351,6 +375,11 @@ object ProtobufConverter {
     fingerList.toSeq
   }
 
+  /**
+   * 人像转换
+   * @param tpCard
+   * @return
+   */
   def convertTPCard2GafisGatherPortrait(tpCard: TPCard): Seq[GafisGatherPortrait]={
     val portaitList = new ArrayBuffer[GafisGatherPortrait]()
     val personId = tpCard.getStrCardID
@@ -367,6 +396,69 @@ object ProtobufConverter {
       }
     }
     portaitList.toSeq
+  }
+
+  /**
+   * 掌纹转换
+   * @param tpCard
+   * @return
+   */
+  def convertTPCard2GafisGatherPalm(tpCard: TPCard): Seq[GafisGatherPalm] ={
+    val palmList = new ArrayBuffer[GafisGatherPalm]()
+    val personId = tpCard.getStrCardID
+    val blobIter = tpCard.getBlobList.iterator()
+    while (blobIter.hasNext){
+      val blob = blobIter.next()
+      if(blob.getType == ImageType.IMAGETYPE_PALM){
+        if( blob.getStImageBytes.size() > 0){
+          val palm = new GafisGatherPalm()
+          palm.gatherData = blob.getStImageBytes.toByteArray
+          palm.fgp = blob.getPalmfgp match {
+            case PalmFgp.PALM_RIGHT => 11
+            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          palm.personId = personId
+          palm.groupId = Gafis70Constants.GROUP_ID_CPR
+          palm.lobtype = Gafis70Constants.LOBTYPE_DATA
+
+          palmList += palm
+        }
+        //特征
+        val mntData = blob.getStMntBytes
+        if(mntData.size() >0){
+          val mnt = new GafisGatherPalm()
+          mnt.personId = personId
+          mnt.gatherData = mntData.toByteArray
+          mnt.fgp = blob.getPalmfgp match {
+            case PalmFgp.PALM_RIGHT => 11
+            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          mnt.groupId = Gafis70Constants.GROUP_ID_MNT
+          mnt.lobtype = Gafis70Constants.LOBTYPE_MNT
+
+          palmList += mnt
+        }
+        //纹线
+        val binData = blob.getStBinBytes
+        if(binData.size() >0){
+          val bin = new GafisGatherPalm()
+          bin.personId = personId
+          bin.gatherData = binData.toByteArray
+          bin.fgp = blob.getPalmfgp match{
+            case PalmFgp.PALM_RIGHT => 11
+            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          bin.groupId = Gafis70Constants.GROUP_ID_BIN
+          bin.lobtype = Gafis70Constants.LOBTYPE_MNT
+
+          palmList += bin
+        }
+      }
+    }
+    palmList.toSeq
   }
 
   def convertMatchTask2GafisNormalqueryQueryque(matchTask: MatchTask): GafisNormalqueryQueryque={

@@ -6,8 +6,7 @@ import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisLogicDbCase, GafisLogicDb, GafisCase, SysUser}
-import org.springframework.beans.BeanUtils
+import nirvana.hall.v70.jpa.{GafisCase, GafisLogicDb, GafisLogicDbCase, SysUser}
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -47,9 +46,8 @@ class CaseInfoServiceImpl extends CaseInfoService{
    */
   @Transactional
   override def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
-    val gafisCaseNew = ProtobufConverter.convertCase2GafisCase(caseInfo)
-    val gafisCase = GafisCase.find(gafisCaseNew.caseId)
-    BeanUtils.copyProperties(gafisCaseNew, gafisCase)
+    val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
+    ProtobufConverter.convertCase2GafisCase(caseInfo, gafisCase)
     val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
     gafisCase.modifiedpsn = Gafis70Constants.INPUTPSN
     gafisCase.modifiedtime = new Date()

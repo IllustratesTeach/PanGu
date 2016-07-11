@@ -273,10 +273,16 @@ object galoctpConverter extends LoggerSupport{
     if(data.nMicItemCount > 0){
       data.pstMIC_Data.foreach{ mic =>
         val micDataBuilder = TPCardBlob.newBuilder() //card.addBlobBuilder()
+        //特征
         if(mic.pstMnt_Data != null && mic.pstMnt_Data.length > 64)
           micDataBuilder.setStMntBytes(ByteString.copyFrom(mic.pstMnt_Data))
+        //压缩图像
         if(mic.pstCpr_Data != null && mic.pstCpr_Data.length > 64)
           micDataBuilder.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
+        //纹线
+        if(mic.pstBin_Data != null && mic.pstBin_Data.length > 64)
+          micDataBuilder.setStBinBytes(ByteString.copyFrom(mic.pstBin_Data))
+        //图像类型
         mic.nItemType match {
           case glocdef.GAIMG_IMAGETYPE_FINGER =>
             micDataBuilder.setType(ImageType.IMAGETYPE_FINGER)

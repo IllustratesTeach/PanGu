@@ -20,7 +20,6 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], timestamp: Long, size: Int, tableName: String): Unit ={
     val from = getMinSeq(timestamp, tableName)
     if(from > 0 && getMaxSeq(tableName) >= from){
-      println(getSyncSql(tableName, KEY_NAME))
       JdbcDatabase.queryWithPsSetter2(getSyncSql(tableName, KEY_NAME)){ps=>
         ps.setLong(1, from)
         ps.setLong(2, from + FETCH_BATCH_SIZE)

@@ -15,7 +15,7 @@ object DictCode6Map7 {
   //案件类别
   var caseClasses: Map[String,String] = _
   //人员类别
-  var personCategory: Map[String,String] = _
+  var personType: Map[String,String] = _
   //国籍
   var nativeplace: Map[String,String]= _
   //民族
@@ -35,7 +35,7 @@ object DictCode6Map7 {
     val content = Source.fromInputStream(getClass.getResourceAsStream("/nirvana/hall/v62/dict_code_mapper.xml")).mkString
     val codeMapper = XmlLoader.parseXML[DICT_CODE_MAPPER](content)
     caseClasses = codeMapper.caseClassesList.map(mapper=> mapper.code6 -> mapper.code7).toMap
-    personCategory = codeMapper.personCategoryList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    personType = codeMapper.personTypeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
     nativeplace = codeMapper.nativeplaceList.map(mapper=> mapper.code6 -> mapper.code7).toMap
     nation = codeMapper.nationList.map(mapper=> mapper.code6 -> mapper.code7).toMap
     certificatetype = codeMapper.certificatetypeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
@@ -48,7 +48,7 @@ object DictCode7Map6 {
   //案件类别
   var caseClasses: Map[String,String] = _
   //人员类别
-  var personCategory: Map[String,String] = _
+  var personType: Map[String,String] = _
   //国籍
   var nativeplace: Map[String,String]= _
   //民族
@@ -68,7 +68,7 @@ object DictCode7Map6 {
     val content = Source.fromInputStream(getClass.getResourceAsStream("/nirvana/hall/v62/dict_code_mapper.xml")).mkString
     val codeMapper = XmlLoader.parseXML[DICT_CODE_MAPPER](content)
     caseClasses = codeMapper.caseClassesList.map(mapper=> mapper.code7 -> mapper.code6).toMap
-    personCategory = codeMapper.personCategoryList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    personType = codeMapper.personTypeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
     nativeplace = codeMapper.nativeplaceList.map(mapper=> mapper.code7 -> mapper.code6).toMap
     nation = codeMapper.nationList.map(mapper=> mapper.code7 -> mapper.code6).toMap
     certificatetype = codeMapper.certificatetypeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
@@ -84,9 +84,9 @@ class DICT_CODE_MAPPER{
   @XmlElementWrapper(name="case_classes")
   @XmlElement(name = "mapper")
   var caseClassesList= new util.ArrayList[Mapper]
-  @XmlElementWrapper(name="person_category")
+  @XmlElementWrapper(name="person_type")
   @XmlElement(name = "mapper")
-  var personCategoryList= new util.ArrayList[Mapper]
+  var personTypeList= new util.ArrayList[Mapper]
   @XmlElementWrapper(name="nativeplace")
   @XmlElement(name = "mapper")
   var nativeplaceList= new util.ArrayList[Mapper]

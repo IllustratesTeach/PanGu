@@ -19,4 +19,17 @@ object Gafis70Constants {
   val GATHER_TYPE_ID_DEFAULT = "1"
   //主特征
   val IS_MAIN_MNT = "1"
+
+  //特征
+  val GROUP_ID_MNT = 0: Short
+  //压缩图
+  val GROUP_ID_CPR = 1: Short
+  //JPG
+  val GROUP_ID_JPG = 3: Short
+  //纹线
+  val GROUP_ID_BIN = 4: Short
+  //数据
+  val LOBTYPE_DATA = 1: Short
+  //特征
+  val LOBTYPE_MNT = 2: Short
 }

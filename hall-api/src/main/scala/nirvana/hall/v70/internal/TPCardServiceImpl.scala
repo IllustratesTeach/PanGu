@@ -8,7 +8,6 @@ import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
-import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -78,12 +77,22 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
         finger.inputpsn = Gafis70Constants.INPUTPSN
         finger.save()
       }
+      //掌纹
+      val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
+      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      palmList.foreach{palm=>
+        palm.pkId = CommonUtils.getUUID()
+        palm.inputtime = new Date()
+        palm.inputpsn = Gafis70Constants.INPUTPSN
+        palm.save()
+      }
       //保存人像
       val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
       portraitList.foreach{ portrait =>
         portrait.pkId = CommonUtils.getUUID()
         portrait.inputpsn = Gafis70Constants.INPUTPSN
         portrait.inputtime = new Date()
+        portrait.deletag = Gafis70Constants.DELETAG_USE
         portrait.save()
       }
     }
@@ -115,6 +124,10 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
   override def delTPCard(cardId: String, dbConfig: DBConfig = null): Unit = {
     //删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
+    //删除掌纹
+    GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
+    //删除人像
+    GafisGatherPortrait.find_by_personid(cardId).foreach(f=> f.delete())
     //删除逻辑库
     GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
@@ -128,33 +141,48 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
    */
   @Transactional
   override def updateTPCard(tpCard: TPCard, dBConfig: DBConfig): Unit ={
-    val personNew  = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-    val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-
-
     val person = GafisPerson.find(tpCard.getStrCardID)
-    BeanUtils.copyProperties(personNew, person)
+    ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
+
     //用户名获取用户ID
-    person.inputpsn = getSysUserPkIdByLoginName(personNew.inputpsn)
+    person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn)
+    person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn)
     //根据用户信息获取单位信息
     if(person.inputpsn != null){
       val sysUser = SysUser.find(person.inputpsn)
       person.gatherOrgCode = sysUser.departCode
     }
-    person.modifiedpsn = getSysUserPkIdByLoginName(personNew.modifiedpsn)
-    person.inputtime = personNew.inputtime
-    person.modifiedtime = personNew.modifiedtime
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
 
-    //删除指纹
+    //指纹
+    val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
     GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
-
     fingerList.foreach{finger =>
       finger.pkId = CommonUtils.getUUID()
       finger.inputtime = new Date()
       finger.inputpsn = Gafis70Constants.INPUTPSN
       finger.save()
+    }
+    //掌纹
+    val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
+    GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+    palmList.foreach{palm=>
+      palm.pkId = CommonUtils.getUUID()
+      palm.inputtime = new Date()
+      palm.inputpsn = Gafis70Constants.INPUTPSN
+      palm.save()
+    }
+
+    //人像
+    val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+    GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+    portraitList.foreach{portrait=>
+      portrait.pkId = CommonUtils.getUUID()
+      portrait.inputtime = new Date()
+      portrait.inputpsn = Gafis70Constants.INPUTPSN
+      portrait.deletag = Gafis70Constants.DELETAG_USE
+      portrait.save()
     }
 
   }

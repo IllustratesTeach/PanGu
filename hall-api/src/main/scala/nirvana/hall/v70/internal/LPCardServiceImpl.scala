@@ -8,7 +8,6 @@ import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
-import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -57,11 +56,10 @@ class LPCardServiceImpl(entityManager: EntityManager) extends LPCardService{
    */
   @Transactional
   override def updateLPCard(lpCard: LPCard, dBConfig: DBConfig): Unit = {
-    val caseFingerNew = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+    val caseFinger = GafisCaseFinger.find(lpCard.getStrCardID)
+    ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard, caseFinger)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
 
-    val caseFinger = GafisCaseFinger.find(caseFingerNew.fingerId)
-    BeanUtils.copyProperties(caseFingerNew, caseFinger)
     caseFinger.modifiedpsn = Gafis70Constants.INPUTPSN
     caseFinger.modifiedtime = new Date()
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
