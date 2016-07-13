@@ -23,13 +23,13 @@ class PutMatchResult {
   private var putMatchResultService: PutMatchResultService = _
 
   /**
-   * corePoolSize 核心线程池大小----10
-   * maximumPoolSize 最大线程池大小----30
-   * keepAliveTime 线程池中超过corePoolSize数目的空闲线程最大存活时间----30+单位TimeUnit
+   * corePoolSize 核心线程池大小
+   * maximumPoolSize 最大线程池大小
+   * keepAliveTime 线程池中超过corePoolSize数目的空闲线程最大存活时间
    * TimeUnit keepAliveTime时间单位----TimeUnit.MINUTES
    * workQueue 阻塞队列
    */
-  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(10, 30, 30, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
+  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(5, 15, 10, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
 
   def onActivate: StreamResponse = {
     val matchResultRequest = MatchResultRequest.parseFrom(request.getInputStream)
