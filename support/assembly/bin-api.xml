@@ -59,6 +59,8 @@
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>hall-api</include>
+        <include>hall-api.cmd</include>
+        <include>hall-env.cmd</include>
       </includes>
       <fileMode>755</fileMode>
     </fileSet>
