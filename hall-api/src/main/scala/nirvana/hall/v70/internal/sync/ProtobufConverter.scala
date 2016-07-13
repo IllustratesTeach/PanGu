@@ -359,11 +359,7 @@ object ProtobufConverter {
           val bin = new GafisGatherFinger()
           bin.personId = personId
           bin.gatherData = binData.toByteArray
-          bin.fgp = blob.getPalmfgp match{
-            case PalmFgp.PALM_RIGHT => 11
-            case PalmFgp.PALM_LEFT => 12
-            case PalmFgp.PALM_UNKNOWN => 0
-          }
+          bin.fgp = blob.getFgp.getNumber.toShort
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
 
