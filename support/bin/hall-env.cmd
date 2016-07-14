@@ -4,6 +4,7 @@ REM site: http://www.ganshane.com
 
 set HALLCFGDIR=%~dp0%..\config
 set HALL_LOG_DIR=%~dp0%..\log
+set SERVER_HOME=%~dp0%..\
 
 REM for sanity sake assume Java 1.6
 REM see: http://java.sun.com/javase/6/docs/technotes/tools/windows/java.html
