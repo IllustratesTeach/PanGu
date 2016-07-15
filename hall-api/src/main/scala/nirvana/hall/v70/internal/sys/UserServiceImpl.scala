@@ -36,4 +36,13 @@ class UserServiceImpl(authService: AuthService) extends UserService {
 
     (userOpt, tokenOpt)
   }
+
+  /**
+   * 根据登录名查找用户
+   * @param loginName
+   * @return
+   */
+  override def findSysUserByLoginName(loginName: String): Option[SysUser] = {
+    SysUser.where(SysUser.loginName === loginName).limit(1).headOption
+  }
 }

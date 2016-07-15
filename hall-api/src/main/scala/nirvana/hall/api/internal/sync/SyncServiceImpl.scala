@@ -8,6 +8,7 @@ import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.{DBConfig, HallApiConfig}
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.protocol.api.CaseProto.{CaseGetResponse, CaseGetRequest}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.jpa.GafisSyncConfig
@@ -41,7 +42,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 定时任务调用方法
    */
   override def doWork(): Unit = {
-    //查询同步培训，依次执行同步任务
+    //查询同步配置，依次执行同步任务
     GafisSyncConfig.find_by_deletag("1").foreach{syncConfig=>
       doWork(syncConfig)
     }
@@ -65,6 +66,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * @param syncConfig
    */
   def syncTPCard(syncConfig: GafisSyncConfig): Unit ={
+    info("syncTPCard name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -81,10 +83,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val cardId = tpCard.getStrCardID
         if(tpCardService.isExist(cardId,destDBConfig)){
           tpCardService.updateTPCard(tpCard, destDBConfig)
-          info("success syncTPCard update cardId:{}", cardId)
         }else{
           tpCardService.addTPCard(tpCard, destDBConfig)
-          info("success syncTPCard add cardId:{}", cardId)
         }
         timestamp = syncTPCard.getTimestamp
       }
@@ -98,7 +98,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
+  /**
+   * 同步现场指纹, 同时获取案件信息
+   * @param syncConfig
+   */
   def syncLPCard(syncConfig: GafisSyncConfig): Unit ={
+    info("syncLPCard name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -116,10 +121,14 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         if(lpCardService.isExist(cardId, destDBConfig)){
           lpCardService.updateLPCard(lpCard, destDBConfig)
         }else{
+          //如果没有案件信息获取案件
+          val caseId = lpCard.getText.getStrCaseId
+          if(!caseInfoService.isExist(caseId, destDBConfig)){
+            syncCaseInfo(caseId, syncConfig)
+          }
           lpCardService.addLPCard(lpCard, destDBConfig)
         }
         timestamp = syncLPCard.getTimestamp
-        info("sync")
       }
       if(response.getSyncLPCardCount > 0){
         syncConfig.timestamp = timestamp
@@ -130,7 +139,27 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
+  /**
+   * 根据案件编号同步案件信息
+   * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
+   * @param caseId
+   * @param syncConfig
+   */
+  def syncCaseInfo(caseId: String, syncConfig: GafisSyncConfig): Unit ={
+    val request = CaseGetRequest.newBuilder()
+    request.setCaseId(caseId)
+    val json = new JSONObject(syncConfig.config)
+    val dbId = json.getString("src_db_id")
+    val tableId = "4" //案件的tableId一般都是4
+    val headerMap = Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, CaseGetRequest.cmd, request.build(), headerMap)
+    val response = baseResponse.getExtension(CaseGetResponse.cmd)
+    caseInfoService.addCaseInfo(response.getCase)
+    info("syncCaseInfo caseId:{}", caseId)
+  }
+
   def syncCaseInfo(syncConfig: GafisSyncConfig): Unit ={
+    info("syncCaseInfo name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)

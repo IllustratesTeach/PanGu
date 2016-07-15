@@ -3,17 +3,19 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
  */
-class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
+class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) extends TPCardService with LoggerSupport{
   /**
    * 获取捺印卡信息
    * @param personId
@@ -43,12 +45,15 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
       val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
       person.sid = sid
       //用户名获取用户ID
-      person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn)
-      person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn)
-      //根据用户信息获取单位信息
-      if(person.inputpsn != null){
-        val sysUser = SysUser.find(person.inputpsn)
-        person.gatherOrgCode = sysUser.departCode
+      var user = userService.findSysUserByLoginName(person.inputpsn)
+      if (user.isEmpty){
+        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      }
+      person.inputpsn = user.get.pkId
+      person.gatherOrgCode = user.get.departCode
+      val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
+      if(modUser.nonEmpty){
+        person.modifiedpsn = modUser.get.pkId
       }
 
       person.deletag = Gafis70Constants.DELETAG_USE
@@ -95,24 +100,8 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
         portrait.deletag = Gafis70Constants.DELETAG_USE
         portrait.save()
       }
+      info("addTPCard cardId:{}", tpCard.getStrCardID)
     }
-  }
-
-  /**
-   * 根据用户名获取用户id，如果没有找到返回默认用户
-   * @param loginName
-   * @return
-   */
-  private def getSysUserPkIdByLoginName(loginName: String): String ={
-    if(loginName != null && loginName.nonEmpty){
-      val user = SysUser.find_by_loginName(loginName).headOption
-      if(user.nonEmpty){
-         return user.get.pkId
-      }
-    }
-//    Gafis70Constants.INPUTPSN
-    //TODO 目前对应不上的用户设置为空,等以后处理
-    null
   }
 
   /**
@@ -145,13 +134,17 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
 
     //用户名获取用户ID
-    person.inputpsn = getSysUserPkIdByLoginName(person.inputpsn)
-    person.modifiedpsn = getSysUserPkIdByLoginName(person.modifiedpsn)
-    //根据用户信息获取单位信息
-    if(person.inputpsn != null){
-      val sysUser = SysUser.find(person.inputpsn)
-      person.gatherOrgCode = sysUser.departCode
+    var user = userService.findSysUserByLoginName(person.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
     }
+    person.inputpsn = user.get.pkId
+    person.gatherOrgCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
+    if(modUser.nonEmpty){
+      person.modifiedpsn = modUser.get.pkId
+    }
+
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
 
@@ -184,7 +177,7 @@ class TPCardServiceImpl(entityManager: EntityManager) extends TPCardService{
       portrait.deletag = Gafis70Constants.DELETAG_USE
       portrait.save()
     }
-
+    info("updateTPCard cardId:{}", tpCard.getStrCardID)
   }
 
   /**

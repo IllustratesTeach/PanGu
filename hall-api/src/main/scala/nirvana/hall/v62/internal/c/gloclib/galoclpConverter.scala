@@ -10,6 +10,7 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
+import nirvana.hall.v62.services.DictCodeConverter
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -145,9 +146,13 @@ object galoclpConverter extends LoggerSupport{
     }
     val mic = card.getBlobBuilder
     gCard.pstMIC_Data.foreach{ item =>
-
+      //特征
       if(item.nMntLen > 0)
         mic.setStMntBytes(ByteString.copyFrom(item.pstMnt_Data))
+      //纹线
+      if(item.nBinLen > 0)
+        mic.setStBinBytes(ByteString.copyFrom(item.pstBin_Data))
+      //图像
       if(item.nCprLen > 0) {
         mic.setStImageBytes(ByteString.copyFrom(item.pstCpr_Data))
       }else if(item.nImgLen > 0) {
@@ -175,6 +180,8 @@ object galoclpConverter extends LoggerSupport{
     admData.setUpdator(stAdmData.szMUserName)
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+    //数据字典校验
+    DictCodeConverter.convertLPCardText6to7(card.getTextBuilder)
 
     card.build()
   }
@@ -354,6 +361,9 @@ object galoclpConverter extends LoggerSupport{
     val admData = caseInfo.getAdmDataBuilder
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
+
+    //数据校验
+    DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
 
     caseInfo.build()
   }

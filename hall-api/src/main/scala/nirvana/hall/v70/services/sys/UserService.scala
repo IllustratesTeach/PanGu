@@ -14,4 +14,11 @@ trait UserService {
 
   def login(loginName: String, password: String): (Option[SysUser], Option[String])
   def existsLoginName(loginName: String): Boolean
+
+  /**
+   * 根据登录名查找用户
+   * @param loginName
+   * @return
+   */
+  def findSysUserByLoginName(loginName: String): Option[SysUser]
 }

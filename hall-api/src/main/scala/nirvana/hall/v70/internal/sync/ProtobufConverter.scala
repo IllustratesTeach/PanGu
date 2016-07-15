@@ -117,6 +117,7 @@ object ProtobufConverter {
     caseFingerMnt.fingerId = lpCard.getStrCardID
     val blob = lpCard.getBlob
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
+    caseFingerMnt.fingerRidge = blob.getStBinBytes.toByteArray
     caseFingerMnt.captureMethod = blob.getStrMntExtractMethod
 
     caseFingerMnt

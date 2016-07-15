@@ -1,18 +1,17 @@
 package nirvana.hall.v70.internal
 
-import java.util.Date
-
 import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCase, GafisLogicDb, GafisLogicDbCase, SysUser}
+import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 16/1/26.
  */
-class CaseInfoServiceImpl extends CaseInfoService{
+class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
   /**
    * 新增案件信息
    * @param caseInfo
@@ -21,8 +20,17 @@ class CaseInfoServiceImpl extends CaseInfoService{
   @Transactional
   override def addCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
-    gafisCase.inputpsn = Gafis70Constants.INPUTPSN
-    gafisCase.inputtime = new Date()
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisCase.inputpsn = user.get.pkId
+    gafisCase.createUnitCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
+    if(modUser.nonEmpty){
+      gafisCase.modifiedpsn = modUser.get.pkId
+    }
+
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
@@ -48,11 +56,19 @@ class CaseInfoServiceImpl extends CaseInfoService{
   override def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     ProtobufConverter.convertCase2GafisCase(caseInfo, gafisCase)
-    val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
-    gafisCase.modifiedpsn = Gafis70Constants.INPUTPSN
-    gafisCase.modifiedtime = new Date()
+
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisCase.inputpsn = user.get.pkId
+    gafisCase.createUnitCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
+    if(modUser.nonEmpty){
+      gafisCase.modifiedpsn = modUser.get.pkId
+    }
+
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.createUnitCode = sysUser.departCode
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
   }

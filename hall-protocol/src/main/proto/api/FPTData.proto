@@ -254,6 +254,7 @@ message	LPCard
 		repeated FingerFgp		fgp = 4;		//候选指位
 		required ImageType		type = 5;
 		optional string			strMntExtractMethod = 6;	//"A" 自动提取	"U"	需要人工编辑	"E"	自动提取但经过人工编辑	"M"	人工提取//GAFIS结构中无
+		optional string			stBin = 7;		//纹线数据
 	}
 
 	required string		strCardID = 1;

@@ -1,5 +1,7 @@
 package nirvana.hall.api.internal.filter
 
+import javax.servlet.http.HttpServletRequest
+
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
 import nirvana.hall.api.services.CaseInfoService
@@ -8,7 +10,7 @@ import nirvana.hall.protocol.api.CaseProto._
 /**
   * Created by songpeng on 15/11/15.
   */
-class CaseInfoFilter(caseInfoService: CaseInfoService) extends RpcServerMessageFilter{
+class CaseInfoFilter(httpServletRequest: HttpServletRequest, caseInfoService: CaseInfoService) extends RpcServerMessageFilter{
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
      if(commandRequest.hasExtension(CaseAddRequest.cmd)){//增加案件
        val request = commandRequest.getExtension(CaseAddRequest.cmd)
@@ -33,7 +35,8 @@ class CaseInfoFilter(caseInfoService: CaseInfoService) extends RpcServerMessageF
      }//查询案件
      else if(commandRequest.hasExtension(CaseGetRequest.cmd)){
        val request = commandRequest.getExtension(CaseGetRequest.cmd)
-       val caseInfo = caseInfoService.getCaseInfo(request.getCaseId)
+       val dbConfig = getDBConfig(httpServletRequest)
+       val caseInfo = caseInfoService.getCaseInfo(request.getCaseId, dbConfig)
        val response = CaseGetResponse.newBuilder().setCase(caseInfo).build()
        commandResponse.writeMessage(commandRequest, CaseGetResponse.cmd, response)
        true

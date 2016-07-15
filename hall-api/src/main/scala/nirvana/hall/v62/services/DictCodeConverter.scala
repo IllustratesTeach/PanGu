@@ -1,7 +1,9 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.protocol.api.FPTProto.Case.CaseText
+import nirvana.hall.protocol.api.FPTProto.LPCard.LPCardText
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardText
-import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 
 import scala.collection.Map
 
@@ -17,13 +19,22 @@ object DictCodeConverter {
    */
   def convertTPCardText6to7(textBuilder: TPCardText.Builder): Unit ={
     //校验字典是不是数字，长度不大于标准长度
-    checkNormalCode(textBuilder.setStrBirthAddrCode, textBuilder.getStrBirthAddrCode, 6)
-    checkNormalCode(textBuilder.setStrNation, textBuilder.getStrNation, 6)
-    checkNormalCode(textBuilder.setStrRace, textBuilder.getStrRace, 2)
-    checkNormalCode(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6)
-    checkNormalCode(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6)
-    checkNormalCode(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6)
-    checkNormalCode(textBuilder.setStrAddrCode, textBuilder.getStrAddrCode, 6)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrBirthAddrCode, textBuilder.getStrBirthAddrCode, 6,
+      "出生地code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrNation, textBuilder.getStrNation, 6,
+      "国籍code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrRace, textBuilder.getStrRace, 2,
+      "民族code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6,
+      "案件类别1code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6,
+      "案件类别2code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6,
+      "案件类别3code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrAddrCode, textBuilder.getStrAddrCode, 6,
+      "住址code", textBuilder)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrHuKouPlaceCode, textBuilder.getStrHuKouPlaceCode, 6,
+      "出生地code", textBuilder)
 
     //证件类型
     convertCode(textBuilder.getStrCertifType, DictCode6Map7.certificatetype, textBuilder.setStrCertifType,
@@ -36,22 +47,41 @@ object DictCodeConverter {
 
   /**
    * 校验案件文字信息
-   * @param caseInfo
+   * @param textBuilder
    */
-  def convertCaseInfo6to7(caseInfo: Case): Unit ={
-    val textBuilder = caseInfo.getText.toBuilder
-    checkNormalCode(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6)
-    checkNormalCode(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6)
-    checkNormalCode(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6)
-    checkNormalCode(textBuilder.setStrSuspArea1Code, textBuilder.getStrSuspArea1Code, 6)
-    checkNormalCode(textBuilder.setStrSuspArea2Code, textBuilder.getStrSuspArea2Code, 6)
-    checkNormalCode(textBuilder.setStrSuspArea3Code, textBuilder.getStrSuspArea3Code, 6)
-    checkNormalCode(textBuilder.setStrCaseOccurPlaceCode, textBuilder.getStrCaseOccurPlaceCode, 6)
-    checkNormalCode(textBuilder.setStrExtractUnitCode, textBuilder.getStrExtractUnitCode, 12)
+  def convertCaseInfoText6to7(textBuilder: CaseText.Builder): Unit ={
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6,
+      "案件类别1", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6,
+      "案件类别2", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType3, textBuilder.getStrCaseType3, 6,
+      "案件类别3", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrSuspArea1Code, textBuilder.getStrSuspArea1Code, 6,
+      "可疑地区1", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrSuspArea2Code, textBuilder.getStrSuspArea2Code, 6,
+      "可疑地区2", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrSuspArea3Code, textBuilder.getStrSuspArea3Code, 6,
+      "可疑地区3", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseOccurPlaceCode, textBuilder.getStrCaseOccurPlaceCode, 6,
+      "案发地", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrExtractUnitCode, textBuilder.getStrExtractUnitCode, 6,
+      "提取单位", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrPremium, textBuilder.getStrPremium, 7,
+      "奖金", textBuilder)
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrXieChaRequestUnitCode, textBuilder.getStrXieChaRequestUnitCode, 12,
+      "协查单位", textBuilder)
 
   }
-  def convertLPCard6to7(lPCard: LPCard): Unit ={
 
+  /**
+   * 校验现场文字信息
+   * @param textBuilder
+   */
+  def convertLPCardText6to7(textBuilder: LPCardText.Builder): Unit ={
+    checkNormalCodeOfLPCardTextBuilder(textBuilder.setStrRidgeColor, textBuilder.getStrRidgeColor, 1,
+      "乳突线颜色", textBuilder)
+    checkNormalCodeOfLPCardTextBuilder(textBuilder.setStrCaptureMethod, textBuilder.getStrCaptureMethod, 2,
+      "提取方式", textBuilder)
   }
 
   /**
@@ -76,13 +106,22 @@ object DictCodeConverter {
    * @param code
    * @param len
    */
-  private def checkNormalCode(setter: String => Any, code: String, len: Int = 0): Unit ={
+  private def checkNormalCode(setter: String => Any, code: String, len: Int = 0, tag: String, comment:String, commentSetter: String => Any): Unit ={
     if(code != null){
       if(!code.matches("[0-9]+")
         || code.length > len){
         setter("")
       }
     }
+  }
+  private def checkNormalCodeOfTPCardTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: TPCardText.Builder): Unit ={
+    checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
+  }
+  private def checkNormalCodeOfLPCardTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: LPCardText.Builder): Unit ={
+    checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
+  }
+  private def checkNormalCodeOfCaseTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: CaseText.Builder): Unit ={
+    checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
 
   /**
