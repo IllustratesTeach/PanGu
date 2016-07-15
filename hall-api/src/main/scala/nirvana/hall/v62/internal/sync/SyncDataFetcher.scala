@@ -25,14 +25,17 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
         ps.setLong(2, from + FETCH_BATCH_SIZE)
       }{rs=>
         while (rs.next()){
+          val seq = rs.getLong("seq")
           if(cardIdBuffer.length >= size){
-            val seq = rs.getLong("seq")
             val lastSeq = cardIdBuffer.last._2
             if(lastSeq < seq){
               return
             }
           }
-          cardIdBuffer += (rs.getString("cardid") -> rs.getLong("seq"))
+          val cardid = rs.getString("cardid")
+          if(cardid != null){//存在对应不上卡号的数据,可能数据删除了
+            cardIdBuffer += (cardid -> seq)
+          }
         }
         if(cardIdBuffer.length < size){
           doFetcher(cardIdBuffer, from + FETCH_BATCH_SIZE, size, tableName)

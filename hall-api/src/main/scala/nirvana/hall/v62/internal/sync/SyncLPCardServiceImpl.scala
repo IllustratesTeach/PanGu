@@ -32,8 +32,8 @@ class SyncLPCardServiceImpl(v62Config: HallV62Config, lPCardService: LPCardServi
     doFetcher(cardIdBuffer, timestamp, size, tableName)
     cardIdBuffer.foreach{cardId=>
       val syncLPCard = responseBuilder.addSyncLPCardBuilder()
+      syncLPCard.setLpCard(lPCardService.getLPCard(cardId._1, dbConfig))
       syncLPCard.setTimestamp(cardId._2)
-      syncLPCard.setLpCard(lPCardService.getLPCard(cardId._1))
     }
   }
 }

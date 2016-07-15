@@ -33,7 +33,7 @@ class SyncTPCardServiceImpl(v62Config: HallV62Config,tPCardService: TPCardServic
     doFetcher(cardIdBuffer, timestamp, size, getTableName(dbConfig))
     cardIdBuffer.foreach{cardId=>
       val syncTPCard = responseBuilder.addSyncTPCardBuilder()
-      val tpCard = tPCardService.getTPCard(cardId._1)
+      val tpCard = tPCardService.getTPCard(cardId._1, dbConfig)
       syncTPCard.setTpCard(tpCard)
       syncTPCard.setTimestamp(cardId._2)
     }

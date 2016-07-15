@@ -57,7 +57,12 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param cardId
    * @return
    */
-  override def getTPCard(cardId: String, dbConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): TPCard = {
+  override def getTPCard(cardId: String, dBConfig: DBConfig): TPCard = {
+    val dbConfig = if(dBConfig != null){
+      dBConfig
+    }else{
+      DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))
+    }
     val tp = new GTPCARDINFOSTRUCT
     facade.NET_GAFIS_FLIB_Get(dbConfig.dbId.left.get, dbConfig.tableId.get,
       cardId, tp, null, 3)

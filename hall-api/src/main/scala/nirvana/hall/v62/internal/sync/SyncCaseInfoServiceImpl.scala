@@ -22,18 +22,18 @@ class SyncCaseInfoServiceImpl(v62Config: HallV62Config, caseInfoService: CaseInf
    * @return
    */
   override def syncCaseInfo(responseBuilder: SyncCaseResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig = null): Unit = {
-    val dbConfig = if(dBConfig == null){
-      DBConfig(Left(v62Config.caseTable.dbId.toShort), Option(v62Config.caseTable.tableId.toShort))
-    }else{
+    val dbConfig = if(dBConfig != null){
       dBConfig
+    }else{
+      DBConfig(Left(v62Config.caseTable.dbId.toShort), Option(v62Config.caseTable.tableId.toShort))
     }
     val cardIdBuffer = new ArrayBuffer[(String, Long)]()
     val tableName = getTableName(dbConfig)
     doFetcher(cardIdBuffer, timestamp, size, tableName)
     cardIdBuffer.foreach{cardId=>
       val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
+      syncCaseInfo.setCaseInfo(caseInfoService.getCaseInfo(cardId._1, dbConfig))
       syncCaseInfo.setTimestamp(cardId._2)
-      syncCaseInfo.setCaseInfo(caseInfoService.getCaseInfo(cardId._1))
     }
   }
 }
