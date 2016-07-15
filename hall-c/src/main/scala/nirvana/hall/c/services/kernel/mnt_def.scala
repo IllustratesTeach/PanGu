@@ -11,6 +11,8 @@ import nirvana.hall.c.services.AncientData
 object mnt_def {
   //2016.1.19
   final val MAXTTFEASIZE = 3320
+  final val FINGERMNTSTRUCT_NEWTT_SIZE = new FINGERMNTSTRUCT_NEWTT().getDataSize
+
   class FINGERMNTSTRUCT_NEWTT extends AncientData{
     var MNT:FINGERMNTSTRUCT = _
     @Length(MAXTTFEASIZE)
