@@ -22,11 +22,13 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
-  override val SYNC_SQL: String = "select c.case_id caseId, c.case_class_code caseClassCode, c.case_nature caseNature, c.case_occur_place_code caseOccurPlaceCode, c.suspicious_area_code suspiciousAreaCode, c.is_murder isMurder, c.assist_level assistLevel, c.case_state caseState, c.case_occur_date caseOccurDate, t.sid sid, t.cardid cardId, t.is_assist isAssist, t.seq seq, t.deletag, t.is_palm isPalm " +
+  override val SYNC_SQL: String = "select c.case_id caseId, c.case_class_code caseClassCode, c.case_nature caseNature, c.case_occur_place_code caseOccurPlaceCode, c.suspicious_area_code suspiciousAreaCode, c.is_murder isMurder, c.assist_level assistLevel, c.case_state caseState, c.case_occur_date caseOccurDate, " +
+    " t.sid sid, t.cardid cardId, t.is_assist isAssist, t.seq seq, t.deletag, t.is_palm isPalm, db.logic_db_pkid logicDB " +
     " from (select f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm   from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm   from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
-    " left join gafis_case c on t.case_id = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String]("cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm")
+    " left join gafis_case c on t.case_id = c.case_id " +
+    " left join gafis_logic_db_case db on db.case_pkid = c.case_id order by t.seq"
+  private val caseCols: Array[String] = Array[String]("cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm", "logicDB")
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -71,30 +73,8 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
           }
         }
       }
-      /*
-       * 将案件编号拆分为三部分, 由于案件编号可能包含字母，转为36进制的Long值
-       * 第一部分，单位编码12位(1, 13)，
-       * 第二部分，年月日6位(13,19)
-       * 第三部分，流水4位(19,23)
-       * */
+      //TODO 案件编号没有规则,考虑是否能直接转为数字通过区间模糊查询
       val caseId = rs.getString("caseId")
-      if(caseId != null){
-        try {
-          textData.addColBuilder().setColName("caseId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(caseId.getBytes()))
-          if(caseId.length == 23){
-            val cId_deptCode = caseId.substring(1, 13)
-            val cId_date = caseId.substring(13,19)
-            val cId_serialNum = caseId.substring(19)
-            textData.addColBuilder().setColName("cId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_deptCode, 36))))
-            textData.addColBuilder().setColName("cId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_date, 36))))
-            textData.addColBuilder().setColName("cId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(Integer.parseInt(cId_serialNum, 36))))
-          }
-        } catch {
-          case e: Exception =>{
-            error("caseId convert error：{}", caseId)
-          }
-        }
-      }
 
       val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0
       if(caseOccurDate > 0){
