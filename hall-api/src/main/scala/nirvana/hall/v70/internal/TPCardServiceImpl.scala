@@ -54,6 +54,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
       if(modUser.nonEmpty){
         person.modifiedpsn = modUser.get.pkId
+      }else{
+        person.modifiedpsn = ""
       }
 
       person.deletag = Gafis70Constants.DELETAG_USE
@@ -143,6 +145,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
     if(modUser.nonEmpty){
       person.modifiedpsn = modUser.get.pkId
+    }else{
+      person.modifiedpsn = ""
     }
 
     person.deletag = Gafis70Constants.DELETAG_USE

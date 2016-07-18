@@ -135,7 +135,7 @@ object DictCodeConverter {
    * @param commentSetter 备注setter
    */
   private def convertCode(code: String, mapper: Map[String,String], setter: String => Any,tag: String, comment:String, commentSetter: String => Any): Unit ={
-    if(code != null && code.nonEmpty){
+    if(code != null && code.nonEmpty && code.trim.length > 0){
       val codeNew = mapper.get(code)
       if(codeNew.isEmpty){
         setter("")

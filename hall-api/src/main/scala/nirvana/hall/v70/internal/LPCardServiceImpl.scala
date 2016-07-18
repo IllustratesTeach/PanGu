@@ -34,10 +34,12 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
     }
     caseFinger.inputpsn = user.get.pkId
-    caseFinger.modifiedpsn= user.get.departCode
+    caseFinger.creatorUnitCode = user.get.departCode
     val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
     if(modUser.nonEmpty){
       caseFinger.modifiedpsn = modUser.get.pkId
+    }else{
+      caseFinger.modifiedpsn = ""
     }
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
@@ -76,10 +78,12 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
     }
     caseFinger.inputpsn = user.get.pkId
-    caseFinger.modifiedpsn= user.get.departCode
+    caseFinger.creatorUnitCode= user.get.departCode
     val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
     if(modUser.nonEmpty){
       caseFinger.modifiedpsn = modUser.get.pkId
+    }else{
+      caseFinger.modifiedpsn = ""
     }
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
