@@ -6,9 +6,11 @@ import com.google.protobuf.ExtensionRegistry
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.internal.AuthServiceImpl
+import nirvana.hall.api.services.AuthService
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.EagerLoad
-import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder}
+import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -57,17 +59,19 @@ object TestV70Module{
   def buildHallApiConfig={
     new HallApiConfig
   }
-
+  def bind(binder: ServiceBinder): Unit = {
+    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+  }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.v70.jpa")
   }
-    @EagerLoad
-    def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
-      val registry = ExtensionRegistry.newInstance()
-      val it = configruation.iterator()
-      while (it.hasNext)
-        it.next().config(registry)
+  @EagerLoad
+  def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
+    val registry = ExtensionRegistry.newInstance()
+    val it = configruation.iterator()
+    while (it.hasNext)
+      it.next().config(registry)
 
-      registry
-    }
+    registry
+  }
 }

@@ -77,4 +77,27 @@ trait ganetlp {
     val response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(channel,response)
   }
+
+  /**
+   * 案件编号是否已经存在
+   * @param nDBID
+   * @param nTableID
+   * @param caseId
+   * @param nOption
+   * @return
+   */
+  def NET_GAFIS_CASE_Exist(nDBID:Short,nTableID:Short, caseId: String, nOption:Int = 0):Boolean =executeInChannel{channel=>
+    val pReq = createRequestHeader
+    pReq.nOption = nOption
+    pReq.nDBID = nDBID
+    pReq.nTableID = nTableID
+    pReq.nOpClass = OP_CLASS_CASE.asInstanceOf[Short]
+    pReq.nOpCode = OP_CASE_EXIST.asInstanceOf[Short]
+    pReq.bnData = caseId.getBytes
+
+    val response =channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
+    validateResponse(channel,response)
+
+    response.nReturnValue > 0
+  }
 }

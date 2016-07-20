@@ -43,9 +43,10 @@ class CaseInfoFilter(httpServletRequest: HttpServletRequest, caseInfoService: Ca
      }//是否已存在
      else if(commandRequest.hasExtension(CaseIsExistRequest.cmd)){
        val request = commandRequest.getExtension(CaseIsExistRequest.cmd)
+       val dbConfig = getDBConfig(httpServletRequest)
        val cardId = request.getCardId
        val response = CaseIsExistResponse.newBuilder()
-       response.setIsExist(caseInfoService.isExist(cardId))
+       response.setIsExist(caseInfoService.isExist(cardId, dbConfig))
        commandResponse.writeMessage(commandRequest, CaseIsExistResponse.cmd, response.build())
        true
      }else{

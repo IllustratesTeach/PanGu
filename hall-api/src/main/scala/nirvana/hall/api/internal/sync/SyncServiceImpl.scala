@@ -8,7 +8,7 @@ import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.{DBConfig, HallApiConfig}
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
-import nirvana.hall.protocol.api.CaseProto.{CaseGetResponse, CaseGetRequest}
+import nirvana.hall.protocol.api.CaseProto.{CaseIsExistResponse, CaseIsExistRequest, CaseGetResponse, CaseGetRequest}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.jpa.GafisSyncConfig
@@ -50,13 +50,17 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
 
   def doWork(syncConfig: GafisSyncConfig): Unit ={
     val config = new JSONObject(syncConfig.config)
+    //是否覆盖更新, 默认更新
+    val isUpdate = if(config.has("update")){
+      config.getBoolean("update")
+    }else true
     config.get("type") match {
       case "TPCard" =>
-        syncTPCard(syncConfig)
+        syncTPCard(syncConfig, isUpdate)
       case "Case" =>
-        syncCaseInfo(syncConfig)
+        syncCaseInfo(syncConfig, isUpdate)
       case "LPCard" =>
-        syncLPCard(syncConfig)
+        syncLPCard(syncConfig, isUpdate)
       case other =>
     }
   }
@@ -65,8 +69,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 同步捺印信息
    * @param syncConfig
    */
-  def syncTPCard(syncConfig: GafisSyncConfig): Unit ={
-    info("syncTPCard name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
+  def syncTPCard(syncConfig: GafisSyncConfig, isUpdate: Boolean): Unit ={
+    info("syncTPCard name:{} timestamp:{}", syncConfig.name, syncConfig.timestamp)
     val request = SyncTPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -82,7 +86,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val tpCard = syncTPCard.getTpCard
         val cardId = tpCard.getStrCardID
         if(tpCardService.isExist(cardId,destDBConfig)){
-          tpCardService.updateTPCard(tpCard, destDBConfig)
+          if(isUpdate)//更新
+            tpCardService.updateTPCard(tpCard, destDBConfig)
         }else{
           tpCardService.addTPCard(tpCard, destDBConfig)
         }
@@ -93,7 +98,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncTPCard count {} timestamp {}", response.getSyncTPCardCount, timestamp)
         //递归
-        syncTPCard(syncConfig)
+        syncTPCard(syncConfig, isUpdate)
       }
     }
   }
@@ -102,8 +107,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * 同步现场指纹, 同时获取案件信息
    * @param syncConfig
    */
-  def syncLPCard(syncConfig: GafisSyncConfig): Unit ={
-    info("syncLPCard name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
+  def syncLPCard(syncConfig: GafisSyncConfig, isUpdate: Boolean): Unit ={
+    info("syncLPCard name:{} timestamp:{}", syncConfig.name, syncConfig.timestamp)
     val request = SyncLPCardRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)
@@ -119,7 +124,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val lpCard = syncLPCard.getLpCard
         val cardId = lpCard.getStrCardID
         if(lpCardService.isExist(cardId, destDBConfig)){
-          lpCardService.updateLPCard(lpCard, destDBConfig)
+          if(isUpdate)
+            lpCardService.updateLPCard(lpCard, destDBConfig)
         }else{
           //如果没有案件信息获取案件
           val caseId = lpCard.getText.getStrCaseId
@@ -134,7 +140,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncLPCard count {} timestamp {}", response.getSyncLPCardCount, timestamp)
-        syncLPCard(syncConfig)
+        syncLPCard(syncConfig, isUpdate)
       }
     }
   }
@@ -142,23 +148,47 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
   /**
    * 根据案件编号同步案件信息
    * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
+   * 如果没有案件信息不同步案件信息，6.2存在只有现场没有案件的情况
    * @param caseId
    * @param syncConfig
    */
   def syncCaseInfo(caseId: String, syncConfig: GafisSyncConfig): Unit ={
-    val request = CaseGetRequest.newBuilder()
-    request.setCaseId(caseId)
+    info("syncCaseInfo caseId:{}", caseId)
+    if(caseIdIsExist(caseId, syncConfig)){
+      val request = CaseGetRequest.newBuilder()
+      request.setCaseId(caseId)
+      val json = new JSONObject(syncConfig.config)
+      val dbId = json.getString("src_db_id")
+      val tableId = "4" //案件的tableId一般都是4
+      val headerMap = Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+      val baseResponse = rpcHttpClient.call(syncConfig.url, CaseGetRequest.cmd, request.build(), headerMap)
+      val response = baseResponse.getExtension(CaseGetResponse.cmd)
+      caseInfoService.addCaseInfo(response.getCase)
+    }else{
+      warn("remote caseId:{} is not exist ", caseId)
+    }
+  }
+
+  /**
+   * 验证是否有案件信息
+   * @param caseId
+   * @param syncConfig
+   * @return
+   */
+  private def caseIdIsExist(caseId: String, syncConfig: GafisSyncConfig): Boolean = {
+    val request = CaseIsExistRequest.newBuilder()
+    request.setCardId(caseId)
     val json = new JSONObject(syncConfig.config)
     val dbId = json.getString("src_db_id")
     val tableId = "4" //案件的tableId一般都是4
     val headerMap = Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
-    val baseResponse = rpcHttpClient.call(syncConfig.url, CaseGetRequest.cmd, request.build(), headerMap)
-    val response = baseResponse.getExtension(CaseGetResponse.cmd)
-    caseInfoService.addCaseInfo(response.getCase)
-    info("syncCaseInfo caseId:{}", caseId)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, CaseIsExistRequest.cmd, request.build(), headerMap)
+    val response = baseResponse.getExtension(CaseIsExistResponse.cmd)
+
+    response.getIsExist
   }
 
-  def syncCaseInfo(syncConfig: GafisSyncConfig): Unit ={
+  def syncCaseInfo(syncConfig: GafisSyncConfig, isUpdate: Boolean): Unit ={
     info("syncCaseInfo name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
@@ -175,7 +205,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val caseInfo = syncCaseInfo.getCaseInfo
         val cardId = caseInfo.getStrCaseID
         if(caseInfoService.isExist(cardId, destDBConfig)){
-          caseInfoService.updateCaseInfo(caseInfo, destDBConfig)
+          if(isUpdate)
+            caseInfoService.updateCaseInfo(caseInfo, destDBConfig)
         }else{
           caseInfoService.addCaseInfo(caseInfo, destDBConfig)
         }
@@ -185,7 +216,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncConfig.timestamp = timestamp
         syncConfigService.updateSyncConfig(syncConfig)
         info("success syncCaseInfo count {} timestamp {}", response.getSyncCaseCount, timestamp)
-        syncCaseInfo(syncConfig)
+        syncCaseInfo(syncConfig, isUpdate)
       }
     }
   }

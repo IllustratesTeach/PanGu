@@ -1,10 +1,12 @@
 package nirvana.hall.v62
 
 import monad.support.services.XmlLoader
+import nirvana.hall.api.internal.AuthServiceImpl
+import nirvana.hall.api.services.AuthService
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.V62ServerAddress
-import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
+import org.apache.tapestry5.ioc.{ServiceBinder, Registry, RegistryBuilder}
 import org.junit.{After, Before}
 
 import scala.io.Source
@@ -68,5 +70,8 @@ object TestV62Module {
   def buildHallV62Config={
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test-v62.xml"),"utf8").mkString
     XmlLoader.parseXML[HallV62Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v62/v62.xsd")))
+  }
+  def bind(binder: ServiceBinder): Unit = {
+    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
   }
 }

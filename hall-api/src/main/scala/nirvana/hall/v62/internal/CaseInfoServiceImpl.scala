@@ -63,7 +63,13 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseId
    * @return
    */
-  override def isExist(caseId: String, dBConfig: DBConfig = DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))): Boolean = {
-    throw new UnsupportedOperationException
+  override def isExist(caseId: String, dBConfig: DBConfig): Boolean = {
+    val dbConfig = if(dBConfig != null){
+      dBConfig
+    }else{
+      DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))
+    }
+
+    facade.NET_GAFIS_CASE_Exist(dbConfig.dbId.left.get, dbConfig.tableId.get, caseId, 0)
   }
 }
