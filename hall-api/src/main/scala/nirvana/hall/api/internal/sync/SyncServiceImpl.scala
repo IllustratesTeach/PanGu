@@ -127,8 +127,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
           if(isUpdate)
             lpCardService.updateLPCard(lpCard, destDBConfig)
         }else{
+          var caseId = lpCard.getText.getStrCaseId
+          //如果没有案件编号，截掉指纹编号后两位作为案件编号同步案件信息
+          if(caseId.trim.length == 0){
+            caseId = cardId.substring(0, cardId.length - 2)
+          }
           //如果没有案件信息获取案件
-          val caseId = lpCard.getText.getStrCaseId
           if(!caseInfoService.isExist(caseId, destDBConfig)){
             syncCaseInfo(caseId, syncConfig)
           }
