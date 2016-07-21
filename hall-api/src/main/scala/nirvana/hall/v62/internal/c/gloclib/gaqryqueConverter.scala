@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal.c.gloclib
 import java.nio.ByteBuffer
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
@@ -15,6 +16,7 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -30,45 +32,73 @@ object gaqryqueConverter {
   final val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
   final val GAFIS_TEXTSQL_GetName = "TextSql"
 
-  def convertProtoBuf2GAQUERYSTRUCT(matchTask: MatchTask)(implicit v62Config: HallV62Config): GAQUERYSTRUCT = {
+  /**
+   * 将protobuf结构查询任务转为gafis结构
+   * @param matchTask
+   * @param queryDBConfig
+   * @return
+   */
+  def convertProtoBuf2GAQUERYSTRUCT(matchTask: MatchTask, queryDBConfig: QueryDBConfig)(implicit v62Config: HallV62Config): GAQUERYSTRUCT = {
     val queryStruct = new GAQUERYSTRUCT
     queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().asInstanceOf[Byte]
     queryStruct.stSimpQry.nPriority = matchTask.getPriority.toByte
     queryStruct.stSimpQry.nFlag = (gaqryque.GAQRY_FLAG_USEFINGER).asInstanceOf[Byte]
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
-    queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN
+    queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
+    queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
 
+    //TODO 支持指定物理库查询，但不支持多个物理库查询
+    val srcDB = new GADBIDSTRUCT  //特征来源数据库
+    val destDB = new GADBIDSTRUCT //被查数据库
+    //如果没有指定特征库来源，使用默认库
+    if(queryDBConfig.srcDB == None){
+      srcDB.nDBID = matchTask.getMatchType match {
+        case MatchType.FINGER_TT =>
+          v62Config.templateTable.dbId.toShort
+        case MatchType.FINGER_TL =>
+          v62Config.templateTable.dbId.toShort
+        case MatchType.FINGER_LT =>
+          v62Config.latentTable.dbId.toShort
+        case MatchType.FINGER_LL =>
+          v62Config.latentTable.dbId.toShort
+      }
+    }else{
+      srcDB.nDBID = queryDBConfig.srcDB.get
+    }
+    //如果没有指定被查库，使用默认库
+    if(queryDBConfig.destDB == None){
+      destDB.nDBID = matchTask.getMatchType match {
+        case MatchType.FINGER_TT =>
+          v62Config.templateTable.dbId.toShort
+        case MatchType.FINGER_TL =>
+          v62Config.latentTable.dbId.toShort
+        case MatchType.FINGER_LT =>
+          v62Config.templateTable.dbId.toShort
+        case MatchType.FINGER_LL =>
+          v62Config.latentTable.dbId.toShort
+      }
+    }else{
+      destDB.nDBID = queryDBConfig.destDB.get
+    }
+    //根据比对类型，设置tableid
     matchTask.getMatchType match {
       case MatchType.FINGER_TT =>
-        queryStruct.stSimpQry.stSrcDB.nDBID = v62Config.templateTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stSrcDB.nTableID= v62Config.templateTable.tableId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB = Array(new GADBIDSTRUCT)
-        queryStruct.stSimpQry.nDestDBCount = 1
-        queryStruct.stSimpQry.stDestDB.apply(0).nDBID = v62Config.templateTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB.apply(0).nTableID= v62Config.templateTable.tableId.asInstanceOf[Short]
+        srcDB.nTableID = V62Facade.TID_TPCARDINFO
+        destDB.nTableID = V62Facade.TID_TPCARDINFO
       case MatchType.FINGER_TL =>
-        queryStruct.stSimpQry.stSrcDB.nDBID = v62Config.templateTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stSrcDB.nTableID= v62Config.templateTable.tableId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB = Array(new GADBIDSTRUCT)
-        queryStruct.stSimpQry.nDestDBCount = 1
-        queryStruct.stSimpQry.stDestDB.apply(0).nDBID = v62Config.latentTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB.apply(0).nTableID= v62Config.latentTable.tableId.asInstanceOf[Short]
+        srcDB.nTableID = V62Facade.TID_TPCARDINFO
+        destDB.nTableID = V62Facade.TID_LATFINGER
       case MatchType.FINGER_LT =>
-        queryStruct.stSimpQry.stSrcDB.nDBID = v62Config.latentTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stSrcDB.nTableID= v62Config.latentTable.tableId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB = Array(new GADBIDSTRUCT)
-        queryStruct.stSimpQry.nDestDBCount = 1
-        queryStruct.stSimpQry.stDestDB.apply(0).nDBID = v62Config.templateTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB.apply(0).nTableID= v62Config.templateTable.tableId.asInstanceOf[Short]
+        srcDB.nTableID = V62Facade.TID_LATFINGER
+        destDB.nTableID = V62Facade.TID_TPCARDINFO
       case MatchType.FINGER_LL =>
-        queryStruct.stSimpQry.stSrcDB.nDBID = v62Config.latentTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stSrcDB.nTableID= v62Config.latentTable.tableId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB = Array(new GADBIDSTRUCT)
-        queryStruct.stSimpQry.nDestDBCount = 1
-        queryStruct.stSimpQry.stDestDB.apply(0).nDBID = v62Config.latentTable.dbId.asInstanceOf[Short]
-        queryStruct.stSimpQry.stDestDB.apply(0).nTableID= v62Config.latentTable.tableId.asInstanceOf[Short]
+        srcDB.nTableID = V62Facade.TID_LATFINGER
+        destDB.nTableID = V62Facade.TID_LATFINGER
       case other =>
     }
+    queryStruct.stSimpQry.stSrcDB = srcDB
+    queryStruct.stSimpQry.stDestDB = Array(destDB)
 
     //设置比对参数
     val item = new GAFIS_QRYPARAM

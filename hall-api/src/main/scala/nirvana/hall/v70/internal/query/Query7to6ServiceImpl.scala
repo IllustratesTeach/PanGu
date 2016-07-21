@@ -11,6 +11,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
@@ -114,26 +115,39 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
    * @return
    */
   private def getHeaderMap(remoteQueryConfig: RemoteQueryConfig, matchType: MatchType): Map[String, String] ={
-    //TODO 这里的参数指定查询库id还是目标数据的物理库？？？
+    val map = scala.collection.mutable.Map[String,String]()
     val json = new JSONObject(remoteQueryConfig.config)
+    //解析数据头信息
+    if(json.has("host")){
+      val value = json.getString("host")
+      map.+=(V62Facade.X_V62_HOST_HEAD -> value)
+    }
+    if(json.has("port")){
+      val value = json.getString("port")
+      map.+=(V62Facade.X_V62_PORT_HEAD -> value)
+    }
+    if(json.has("user")){
+      val value = json.getString("user")
+      map.+=(V62Facade.X_V62_USER_HEAD -> value)
+    }
+    if(json.has("password")){
+      val value = json.getString("password")
+      map.+=(V62Facade.X_V62_PASSWORD_HEAD -> value)
+    }
     matchType match {
       case MatchType.FINGER_TT | MatchType.FINGER_LT=>
-        if(json.has("TPCard")){
-          val db = json.getJSONObject("TPCard")
-          val dbId = db.getString("db_id")
-          val tableId = if(db.has("table_id")) db.getString("table_id") else ""
-          return Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+        if(json.has("TPLibDB")){
+          val dbId = json.getString("TPLibDB")
+          map.+=(HallApiConstants.HTTP_HEADER_QUERY_DEST_DBID -> dbId)
         }
       case MatchType.FINGER_TL | MatchType.FINGER_LL =>
-        if(json.has("LPCard")){
-          val db = json.getJSONObject("LPCard")
-          val dbId = db.getString("db_id")
-          val tableId = if(db.has("table_id")) db.getString("table_id") else ""
-          return Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+        if(json.has("LPLibDB")){
+          val dbId = json.getString("LPLibDB")
+          map.+=(HallApiConstants.HTTP_HEADER_QUERY_DEST_DBID -> dbId)
         }
       case other =>
     }
 
-    Map()
+    map.toMap
   }
 }

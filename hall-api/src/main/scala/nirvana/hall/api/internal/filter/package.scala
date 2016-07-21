@@ -15,9 +15,9 @@ package object filter {
    * @return
    */
   def getDBConfig(httpServletRequest: HttpServletRequest): DBConfig ={
-    val dbId = httpServletRequest.getHeader(HallApiConstants.HALL_HTTP_HEADER_DBID)
+    val dbId = httpServletRequest.getHeader(HallApiConstants.HTTP_HEADER_DBID)
     if(dbId != null){
-      val tableId = httpServletRequest.getHeader(HallApiConstants.HALL_HTTP_HEADER_TABLEID)
+      val tableId = httpServletRequest.getHeader(HallApiConstants.HTTP_HEADER_TABLEID)
       DBConfig(if(dbId.matches("\\d+")) Left(dbId.toShort) else Right(dbId), if(tableId != null ) Option(tableId.toShort) else None)
     }else{
       null

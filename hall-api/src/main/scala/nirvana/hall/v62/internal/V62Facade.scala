@@ -56,6 +56,12 @@ object V62Facade{
   val X_V62_USER_HEAD     ="X-V62-USER"
   val X_V62_PASSWORD_HEAD ="X-V62-PASS"
 
+  //tableid
+  val TID_TPCARDINFO:Short = 2
+  val TID_LATFINGER:Short  = 2
+  val TID_CASE:Short       = 4
+  val TID_QUERYQUE:Short   = 2
+
   /**
     * 动态获取服务器的地址，通过动态变量的上下文进行获取
     */

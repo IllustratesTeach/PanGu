@@ -164,7 +164,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
       val json = new JSONObject(syncConfig.config)
       val dbId = json.getString("src_db_id")
       val tableId = "4" //案件的tableId一般都是4
-      val headerMap = Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+      val headerMap = Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
       val baseResponse = rpcHttpClient.call(syncConfig.url, CaseGetRequest.cmd, request.build(), headerMap)
       val response = baseResponse.getExtension(CaseGetResponse.cmd)
       caseInfoService.addCaseInfo(response.getCase)
@@ -185,7 +185,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val json = new JSONObject(syncConfig.config)
     val dbId = json.getString("src_db_id")
     val tableId = "4" //案件的tableId一般都是4
-    val headerMap = Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+    val headerMap = Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
     val baseResponse = rpcHttpClient.call(syncConfig.url, CaseIsExistRequest.cmd, request.build(), headerMap)
     val response = baseResponse.getExtension(CaseIsExistResponse.cmd)
 
@@ -234,7 +234,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val json = new JSONObject(syncConfig.config)
     val dbId = if(json.has("src_db_id")) json.getString("src_db_id") else ""
     val tableId = if(json.has("src_table_id")) json.getString("src_table_id") else ""
-    Map(HallApiConstants.HALL_HTTP_HEADER_DBID -> dbId, HallApiConstants.HALL_HTTP_HEADER_TABLEID -> tableId)
+    Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
   }
   private def getDestDBConfig(syncConfig: GafisSyncConfig): DBConfig={
     val json = new JSONObject(syncConfig.config)

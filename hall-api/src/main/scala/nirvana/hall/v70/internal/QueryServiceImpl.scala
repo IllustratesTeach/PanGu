@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
-import nirvana.hall.api.config.DBConfig
+import nirvana.hall.api.config.{QueryDBConfig, DBConfig}
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
@@ -19,12 +19,12 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
    * @param querySendRequest
    * @return
    */
-  override def sendQuery(querySendRequest: QuerySendRequest, dBConfig: DBConfig): QuerySendResponse = {
+  override def sendQuery(querySendRequest: QuerySendRequest, queryDBConfig: QueryDBConfig): QuerySendResponse = {
     val matchTask = querySendRequest.getMatchTask
     val gafisQuery = ProtobufConverter.convertMatchTask2GafisNormalqueryQueryque(matchTask)
     val query = entityManager.createNativeQuery("select SEQ_ORASID.nextval from dual")
 
-    gafisQuery.oraSid = query.getResultList.get(0).asInstanceOf[Long]//TODO 查询序列
+    gafisQuery.oraSid = query.getResultList.get(0).asInstanceOf[Long]
     gafisQuery.pkId = CommonUtils.getUUID()
     gafisQuery.createtime = new Date()
     gafisQuery.deletag = Gafis70Constants.DELETAG_USE

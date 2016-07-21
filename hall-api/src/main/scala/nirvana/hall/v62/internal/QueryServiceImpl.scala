@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.config.DBConfig
+import nirvana.hall.api.config.{DBConfig, QueryDBConfig}
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
@@ -86,7 +86,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @param querySendRequest
    * @return
    */
-  override def sendQuery(querySendRequest: QuerySendRequest, dBConfig: DBConfig = DBConfig(Left(config.queryTable.dbId.toShort), Option(config.queryTable.tableId.toShort))): QuerySendResponse = {
+  override def sendQuery(querySendRequest: QuerySendRequest, queryDBConfig: QueryDBConfig): QuerySendResponse = {
     val response = QuerySendResponse.newBuilder()
     val matchTask = querySendRequest.getMatchTask
     val key = matchTask.getMatchId.getBytes()
@@ -102,8 +102,14 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 //      val queryId = gaqryqueConverter.convertSixByteArrayToLong(retval.nSID)
 //      response.setOraSid(queryId)
 //    }
-    val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask)(config)
-    val oraSid = facade.NET_GAFIS_QUERY_Add(config.queryTable.dbId.toShort, config.queryTable.tableId.toShort, queryStruct)
+
+    val dbId = if(queryDBConfig.dbId == None){
+      config.queryTable.dbId.toShort
+    }else{
+      queryDBConfig.dbId.get
+    }
+    val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask, queryDBConfig)(config)
+    val oraSid = facade.NET_GAFIS_QUERY_Add(dbId, V62Facade.TID_QUERYQUE, queryStruct)
     response.setOraSid(oraSid)
 
     response.build()

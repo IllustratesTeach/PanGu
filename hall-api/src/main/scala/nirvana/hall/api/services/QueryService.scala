@@ -1,6 +1,6 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.config.DBConfig
+import nirvana.hall.api.config.{QueryDBConfig, DBConfig}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -15,7 +15,7 @@ trait QueryService {
    * @param querySendRequest
    * @return
    */
-  def sendQuery(querySendRequest: QuerySendRequest, dBConfig: DBConfig = null): QuerySendResponse
+  def sendQuery(querySendRequest: QuerySendRequest, queryDBConfig: QueryDBConfig = null): QuerySendResponse
 
   /**
    * 获取查询结果信息

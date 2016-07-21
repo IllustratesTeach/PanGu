@@ -9,8 +9,12 @@ object HallApiConstants {
   final val PROTOBUF_CONTEXT = "application/protobuf"
   //http://bigtext.org/?font=smslant&text=HALL
 
-  final val HALL_HTTP_HEADER_DBID = "X-Hall-DBID"
-  final val HALL_HTTP_HEADER_TABLEID = "X-Hall-TABLEID"
+  //数据库ID
+  final val HTTP_HEADER_DBID = "X-HALL-DBID"
+  final val HTTP_HEADER_TABLEID = "X-HALL-TABLEID"
+
+  final val HTTP_HEADER_QUERY_SRC_DBID = "X-HALL-QUERY-SRC-DBID"
+  final val HTTP_HEADER_QUERY_DEST_DBID = "X-HALL-QUERY-DEST-DBID"
 
   final val HALL_TEXT_LOGO = """ #
    __ _____   __   __
