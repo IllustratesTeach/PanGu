@@ -76,4 +76,11 @@ class CaseFilterTest extends BaseV62TestCase{
     Assert.assertNotNull(caseInfo)
   }
 
+  @Test
+  def test_isExist: Unit ={
+    val caseInfoService = getService[CaseInfoService]
+    val flag = caseInfoService.isExist("3100000000002016070601")
+    Assert.assertTrue(flag)
+  }
+
  }
