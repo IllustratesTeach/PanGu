@@ -4,10 +4,11 @@ import java.io.OutputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import com.google.protobuf.ExtensionRegistry
-import monad.rpc.protocol.CommandProto.{CommandStatus, BaseCommand}
+import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.{ProtobufRequestGlobal, ProtobufRequestHandler}
+import nirvana.hall.v62.services.GafisException
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
 import org.apache.tapestry5.ioc.services.PerthreadManager
 import org.apache.tapestry5.services._
@@ -16,7 +17,8 @@ import scala.util.control.NonFatal
 
 /**
  * 实现基于http servlet的protobuf消息过滤
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-05-21
  */
 class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
@@ -42,7 +44,12 @@ class ProtobufServletFilter(protobufHandler: ProtobufRequestHandler,
       }
       catch {
         case NonFatal(e) =>
-          error(e.getMessage, e)
+          e match{
+            case ge:GafisException=>
+              error(ge.getFullMessage, e)
+            case _ =>
+              error(e.getMessage, e)
+          }
           responseBuilder.setStatus(CommandStatus.FAIL)
           responseBuilder.setMsg(e.toString)
       }
