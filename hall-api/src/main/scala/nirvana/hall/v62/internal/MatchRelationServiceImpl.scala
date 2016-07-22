@@ -9,6 +9,7 @@ import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelatio
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
+import org.apache.tapestry5.ioc.internal.util.InternalUtils
 
 /**
  * Created by songpeng on 16/6/21.
@@ -16,7 +17,8 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService{
   /**
    * 获取比对关系
-   * @param request
+    *
+    * @param request
    * @return
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
@@ -66,7 +68,11 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
         //重卡信息先从捺印表查到重卡组号，然后根据重卡组号查询重卡信息
         val tp = new GTPCARDINFOSTRUCT
         facade.NET_GAFIS_FLIB_Get(v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, cardId, tp, null, 3)
-        val personId = tp.stAdmData.szPersonID //重卡组号
+        val personId = tp.stAdmData.szPersonID.trim //重卡组号
+
+        if (InternalUtils.isBlank(personId)){
+          throw new IllegalStateException("duplicate card number is empty")
+        }
 
         val m_stPersonInfo = new GPERSONINFOSTRUCT
         m_stPersonInfo.szPersonID = personId
