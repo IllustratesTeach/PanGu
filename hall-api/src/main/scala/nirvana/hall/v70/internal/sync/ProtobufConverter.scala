@@ -55,6 +55,20 @@ object ProtobufConverter {
     gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
     gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
 
+    //操作信息
+    val admData = caseInfo.getAdmData
+    if(admData != null){
+      gafisCase.inputpsn = admData.getCreator
+      gafisCase.modifiedpsn = admData.getUpdator
+      gafisCase.createUnitCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        gafisCase.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        gafisCase.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
+    }
+
     gafisCase
   }
   def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String] = null): Case = {
@@ -107,6 +121,20 @@ object ProtobufConverter {
     caseFinger.caseId = text.getStrCaseId
     caseFinger.developMethod = text.getStrCaptureMethod
     caseFinger.remark = text.getStrComment
+
+    //操作信息
+    val admData = lpCard.getAdmData
+    if(admData != null){
+      caseFinger.inputpsn = admData.getCreator
+      caseFinger.modifiedpsn = admData.getUpdator
+      caseFinger.creatorUnitCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        caseFinger.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        caseFinger.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
+    }
 
     val blob = lpCard.getBlob
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray
