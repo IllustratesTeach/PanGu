@@ -12,7 +12,7 @@ trait TPCardRemoteService {
    * 获取捺印卡片
    * @return
    */
-  def getTPCard(personId: String, url: String): Option[TPCard]
+  def getTPCard(personId: String, url: String, headerMap: Map[String, String] = Map()): Option[TPCard]
 
   /**
    * 添加捺印卡片

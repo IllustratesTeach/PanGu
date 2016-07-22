@@ -6,6 +6,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.v70.config.HallV70Config
+import nirvana.hall.v70.internal.HttpHeaderUtils
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
@@ -39,7 +40,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
     }else{
       val syncTagert = RemoteQueryConfig.find(queryque.syncTargetSid)
       val url = syncTagert.url
-      val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, url)
+      val headerMap = HttpHeaderUtils.getV62HeaderMap(syncTagert.config)
+      val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, url, headerMap)
 
       if (matchResult != null){
         //写入比对结果
@@ -56,24 +58,27 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
           cand.getObjectId
           if(queryque.querytype == 0 || queryque.querytype == 2){
             //获取捺印信息
-            val person = GafisPerson.findOption(cand.getObjectId)
-            if(person.isEmpty){
-              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url)
+            if(GafisPerson.findOption(cand.getObjectId).isEmpty){
+              val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_TPLIB)
+              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url, headerMap.++(dbIdMap))
               tPCard.foreach{tpCard =>
+                //TODO 目前候选获取的数据存到本地库，后期会考虑存到远程库
                 tpCardService.addTPCard(tpCard)
               }
             }
           }else{
             //获取现场信息
             val cardId = cand.getObjectId
-            val caseFinger = GafisCaseFinger.findOption(cardId)
-            if(caseFinger.isEmpty){
-              val lPCard = lPCardRemoteService.getLPCard(cardId, url)
+            if(GafisCaseFinger.findOption(cardId).isEmpty){
+              val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
+              val lPCard = lPCardRemoteService.getLPCard(cardId, url, headerMap.++(dbIdMap))
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){
-                  val caseInfo = GafisCase.findOption(caseId)
-                  if(caseInfo.isEmpty){
+                  //如果本地没有对应的案件信息，先远程验证是否存在案件信息,远程获取案件到本地
+                  if(GafisCase.findOption(caseId).isEmpty){
+                    val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
+                    caseInfoRemoteService.isExist(caseId, url, headerMap.++(dbIdMap))
                     val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url)
                     caseInfoService.addCaseInfo(caseInfo)
                   }

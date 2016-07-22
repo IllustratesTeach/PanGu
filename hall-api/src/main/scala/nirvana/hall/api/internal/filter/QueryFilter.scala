@@ -42,7 +42,7 @@ class QueryFilter(httpServletRequest: HttpServletRequest, queryService: QuerySer
    * @param httpServletRequest
    * @return
    */
-  def getQueryDBConfig(httpServletRequest: HttpServletRequest): QueryDBConfig ={
+  private def getQueryDBConfig(httpServletRequest: HttpServletRequest): QueryDBConfig ={
     val destDB = httpServletRequest.getHeader(HallApiConstants.HTTP_HEADER_QUERY_DEST_DBID)
     val srcDB = httpServletRequest.getHeader(HallApiConstants.HTTP_HEADER_QUERY_SRC_DBID)
     val dbid = httpServletRequest.getHeader(HallApiConstants.HTTP_HEADER_DBID)

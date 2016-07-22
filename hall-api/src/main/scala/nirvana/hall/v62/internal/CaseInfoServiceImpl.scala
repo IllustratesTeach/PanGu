@@ -70,6 +70,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       DBConfig(Left(config.caseTable.dbId.toShort), Option(config.caseTable.tableId.toShort))
     }
 
-    facade.NET_GAFIS_CASE_Exist(dbConfig.dbId.left.get, dbConfig.tableId.get, caseId, 0)
+    facade.NET_GAFIS_CASE_Exist(dbConfig.dbId.left.get, V62Facade.TID_CASE, caseId, 0)
   }
 }

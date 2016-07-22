@@ -6,11 +6,12 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.{DBConfig, HallApiConfig}
+import nirvana.hall.api.services.remote.CaseInfoRemoteService
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
-import nirvana.hall.protocol.api.CaseProto.{CaseIsExistResponse, CaseIsExistRequest, CaseGetResponse, CaseGetRequest}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.jpa.GafisSyncConfig
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -19,7 +20,11 @@ import org.apache.tapestry5.json.JSONObject
 /**
  * Created by songpeng on 16/6/18.
  */
-class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService, tpCardService: TPCardService, lpCardService: LPCardService, caseInfoService: CaseInfoService) extends SyncService with LoggerSupport{
+class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService,
+                      tpCardService: TPCardService,
+                      lpCardService: LPCardService,
+                      caseInfoService: CaseInfoService,
+                      caseInfoRemoteService: CaseInfoRemoteService) extends SyncService with LoggerSupport{
   val SYNC_BATCH_SIZE = apiConfig.sync.batchSize
   /**
    * 定时器，向6.2同步数据
@@ -159,15 +164,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
   def syncCaseInfo(caseId: String, syncConfig: GafisSyncConfig): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
     if(caseIdIsExist(caseId, syncConfig)){
-      val request = CaseGetRequest.newBuilder()
-      request.setCaseId(caseId)
       val json = new JSONObject(syncConfig.config)
       val dbId = json.getString("src_db_id")
-      val tableId = "4" //案件的tableId一般都是4
+      val tableId = V62Facade.TID_CASE.toString
       val headerMap = Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
-      val baseResponse = rpcHttpClient.call(syncConfig.url, CaseGetRequest.cmd, request.build(), headerMap)
-      val response = baseResponse.getExtension(CaseGetResponse.cmd)
-      caseInfoService.addCaseInfo(response.getCase)
+      val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, syncConfig.url, headerMap)
+      caseInfoService.addCaseInfo(caseInfo)
     }else{
       warn("remote caseId:{} is not exist ", caseId)
     }
@@ -180,20 +182,15 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    * @return
    */
   private def caseIdIsExist(caseId: String, syncConfig: GafisSyncConfig): Boolean = {
-    val request = CaseIsExistRequest.newBuilder()
-    request.setCardId(caseId)
     val json = new JSONObject(syncConfig.config)
     val dbId = json.getString("src_db_id")
-    val tableId = "4" //案件的tableId一般都是4
+    val tableId = V62Facade.TID_CASE.toString
     val headerMap = Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
-    val baseResponse = rpcHttpClient.call(syncConfig.url, CaseIsExistRequest.cmd, request.build(), headerMap)
-    val response = baseResponse.getExtension(CaseIsExistResponse.cmd)
-
-    response.getIsExist
+    caseInfoRemoteService.isExist(caseId, syncConfig.url, headerMap)
   }
 
   def syncCaseInfo(syncConfig: GafisSyncConfig, isUpdate: Boolean): Unit ={
-    info("syncCaseInfo name:{} url:{} config:{} timestamp:{}", syncConfig.name, syncConfig.url, syncConfig.config, syncConfig.timestamp)
+    info("syncCaseInfo name:{} timestamp:{}", syncConfig.name, syncConfig.timestamp)
     val request = SyncCaseRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setTimestamp(syncConfig.timestamp)

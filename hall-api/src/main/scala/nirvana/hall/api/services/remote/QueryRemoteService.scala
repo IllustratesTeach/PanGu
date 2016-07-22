@@ -12,5 +12,5 @@ trait QueryRemoteService {
    * @param oraSid
    * @return
    */
-  def getQuery(oraSid: Long, url: String): MatchResult
+  def getQuery(oraSid: Long, url: String, headerMap: Map[String, String] = null): MatchResult
 }

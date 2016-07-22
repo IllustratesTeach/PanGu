@@ -16,7 +16,7 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param url
    * @return
    */
-  override def getCaseInfo(caseId: String, url: String): Case = {
+  override def getCaseInfo(caseId: String, url: String, headerMap: Map[String, String]): Case = {
     info("remote get caseInfo [caseId:{},url:{}]", caseId, url)
     val request = CaseGetRequest.newBuilder().setCaseId(caseId)
     val response = rpcHttpClient.call(url, CaseGetRequest.cmd, request.build())
@@ -55,4 +55,19 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
     val request = CaseDelRequest.newBuilder().setCaseId(caseId)
     rpcHttpClient.call(url, CaseDelRequest.cmd, request.build())
   }
+  /**
+   * 案件编号是否存在
+   * @param caseId
+   * @param url
+   * @param headerMap
+   */
+  override def isExist(caseId: String, url: String, headerMap: Map[String, String]): Boolean = {
+    val request = CaseIsExistRequest.newBuilder()
+    request.setCardId(caseId)
+    val baseResponse = rpcHttpClient.call(url, CaseIsExistRequest.cmd, request.build(), headerMap)
+    val response = baseResponse.getExtension(CaseIsExistResponse.cmd)
+
+    response.getIsExist
+  }
+
 }

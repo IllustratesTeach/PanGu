@@ -14,10 +14,10 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
    * 获取捺印卡片
    * @return
    */
-  override def getTPCard(personId: String, url: String): Option[TPCard]= {
+  override def getTPCard(personId: String, url: String, headerMap: Map[String, String]): Option[TPCard]= {
     info("remote get tpcard [personId:{},url:{}]", personId, url)
     val request = TPCardGetRequest.newBuilder().setCardId(personId).build()
-    val baseResponse = rpcHttpClient.call(url, TPCardGetRequest.cmd, request)
+    val baseResponse = rpcHttpClient.call(url, TPCardGetRequest.cmd, request, headerMap)
     Option(baseResponse.getExtension(TPCardGetResponse.cmd).getCard)
   }
 
