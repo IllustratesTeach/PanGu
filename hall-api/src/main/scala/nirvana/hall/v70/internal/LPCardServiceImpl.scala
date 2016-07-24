@@ -4,7 +4,6 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -22,7 +21,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def addLPCard(lpCard: LPCard, dBConfig: DBConfig): Unit = {
+  override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
     val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
@@ -57,7 +56,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @param fingerId
    * @return
    */
-  override def getLPCard(fingerId: String, dBConfig: DBConfig): LPCard = {
+  override def getLPCard(fingerId: String, dbId: Option[String]): LPCard = {
     val caseFinger = GafisCaseFinger.find(fingerId)
     val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
     ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
@@ -69,7 +68,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def updateLPCard(lpCard: LPCard, dBConfig: DBConfig): Unit = {
+  override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val caseFinger = GafisCaseFinger.find(lpCard.getStrCardID)
     ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard, caseFinger)
     //将用户名转为用户id
@@ -109,7 +108,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     GafisCaseFinger.find(cardId).delete
   }
 
-  override def isExist(cardId: String, dBConfig: DBConfig): Boolean = {
+  override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisCaseFinger.findOption(cardId).nonEmpty
   }
 }

@@ -5,7 +5,7 @@ import javax.persistence.EntityManager
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
-import nirvana.hall.api.config.{DBConfig, HallApiConfig}
+import nirvana.hall.api.config.{HallApiConfig}
 import nirvana.hall.api.services.remote.CaseInfoRemoteService
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
@@ -82,7 +82,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val headerMap = getHeaderMap(syncConfig)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncTPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
-      val destDBConfig = getDestDBConfig(syncConfig)
+      val destDBID = getDestDBID(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
       val iter = response.getSyncTPCardList.iterator()
@@ -90,11 +90,11 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncTPCard = iter.next()
         val tpCard = syncTPCard.getTpCard
         val cardId = tpCard.getStrCardID
-        if(tpCardService.isExist(cardId,destDBConfig)){
+        if(tpCardService.isExist(cardId, destDBID)){
           if(isUpdate)//更新
-            tpCardService.updateTPCard(tpCard, destDBConfig)
+            tpCardService.updateTPCard(tpCard, destDBID)
         }else{
-          tpCardService.addTPCard(tpCard, destDBConfig)
+          tpCardService.addTPCard(tpCard, destDBID)
         }
         timestamp = syncTPCard.getTimestamp
       }
@@ -120,7 +120,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val headerMap = getHeaderMap(syncConfig)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPCardRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
-      val destDBConfig = getDestDBConfig(syncConfig)
+      val destDBID = getDestDBID(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
       val iter = response.getSyncLPCardList.iterator()
@@ -128,9 +128,9 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncLPCard = iter.next()
         val lpCard = syncLPCard.getLpCard
         val cardId = lpCard.getStrCardID
-        if(lpCardService.isExist(cardId, destDBConfig)){
+        if(lpCardService.isExist(cardId, destDBID)){
           if(isUpdate)
-            lpCardService.updateLPCard(lpCard, destDBConfig)
+            lpCardService.updateLPCard(lpCard, destDBID)
         }else{
           var caseId = lpCard.getText.getStrCaseId
           //如果没有案件编号，截掉指纹编号后两位作为案件编号同步案件信息
@@ -138,10 +138,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
             caseId = cardId.substring(0, cardId.length - 2)
           }
           //如果没有案件信息获取案件
-          if(!caseInfoService.isExist(caseId, destDBConfig)){
+          if(!caseInfoService.isExist(caseId, destDBID)){
             syncCaseInfo(caseId, syncConfig)
           }
-          lpCardService.addLPCard(lpCard, destDBConfig)
+          lpCardService.addLPCard(lpCard, destDBID)
         }
         timestamp = syncLPCard.getTimestamp
       }
@@ -197,7 +197,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val headerMap = getHeaderMap(syncConfig)
     val baseResponse = rpcHttpClient.call(syncConfig.url, SyncCaseRequest.cmd, request.build(), headerMap)
     if(baseResponse.getStatus == CommandStatus.OK){
-      val destDBConfig = getDestDBConfig(syncConfig)
+      val destDBID = getDestDBID(syncConfig)
       var timestamp = syncConfig.timestamp
       val response = baseResponse.getExtension(SyncCaseResponse.cmd)
       val iter = response.getSyncCaseList.iterator()
@@ -205,11 +205,11 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         val syncCaseInfo = iter.next()
         val caseInfo = syncCaseInfo.getCaseInfo
         val cardId = caseInfo.getStrCaseID
-        if(caseInfoService.isExist(cardId, destDBConfig)){
+        if(caseInfoService.isExist(cardId, destDBID)){
           if(isUpdate)
-            caseInfoService.updateCaseInfo(caseInfo, destDBConfig)
+            caseInfoService.updateCaseInfo(caseInfo, destDBID)
         }else{
-          caseInfoService.addCaseInfo(caseInfo, destDBConfig)
+          caseInfoService.addCaseInfo(caseInfo, destDBID)
         }
         timestamp = syncCaseInfo.getTimestamp
       }
@@ -233,8 +233,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     val tableId = if(json.has("src_table_id")) json.getString("src_table_id") else ""
     Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
   }
-  private def getDestDBConfig(syncConfig: GafisSyncConfig): DBConfig={
+  private def getDestDBID(syncConfig: GafisSyncConfig): Option[String]={
     val json = new JSONObject(syncConfig.config)
-    DBConfig(Right(json.getString("dest_db_id")), if(json.has("dest_table_id")) Option(json.getString("dest_table_id").toShort) else None)
+     Option(json.getString("dest_table_id"))
   }
 }

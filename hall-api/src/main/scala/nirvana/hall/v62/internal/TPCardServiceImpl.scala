@@ -1,6 +1,5 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
@@ -16,10 +15,10 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param tPCard
    * @return
    */
-  override def addTPCard(tPCard: TPCard, dbConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): Unit = {
+  override def addTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
     val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
-    facade.NET_GAFIS_FLIB_Add(dbConfig.dbId.left.get,
-      dbConfig.tableId.get,
+    facade.NET_GAFIS_FLIB_Add(getDBID(dbId),
+      V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID,tpCard)
   }
 
@@ -28,8 +27,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param cardId
    * @return
    */
-  def delTPCard(cardId: String, dBConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): Unit ={
-    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, config.templateTable.tableId.toShort, cardId)
+  def delTPCard(cardId: String, dbId: Option[String]): Unit ={
+    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, cardId)
   }
 
   /**
@@ -37,9 +36,9 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param tPCard
    * @return
    */
-  override def updateTPCard(tPCard: TPCard, dBConfig: DBConfig = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): Unit = {
+  override def updateTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
     val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
-    facade.NET_GAFIS_FLIB_Update(config.templateTable.dbId.toShort, config.templateTable.tableId.toShort,
+    facade.NET_GAFIS_FLIB_Update(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID, tpCard)
   }
 
@@ -48,7 +47,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param cardId
    * @return
    */
-  override def isExist(cardId: String, dBConfig: DBConfig  = DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))): Boolean = {
+  override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     throw new UnsupportedOperationException
   }
 
@@ -57,16 +56,27 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @param cardId
    * @return
    */
-  override def getTPCard(cardId: String, dBConfig: DBConfig): TPCard = {
-    val dbConfig = if(dBConfig != null){
-      dBConfig
+  override def getTPCard(cardId: String, dbid: Option[String]): TPCard = {
+    val tdbId = if(dbid == None){
+      config.templateTable.dbId.toShort
     }else{
-      DBConfig(Left(config.templateTable.dbId.toShort), Option(config.templateTable.tableId.toShort))
+      dbid.get.toShort
     }
     val tp = new GTPCARDINFOSTRUCT
-    facade.NET_GAFIS_FLIB_Get(dbConfig.dbId.left.get, dbConfig.tableId.get,
+    facade.NET_GAFIS_FLIB_Get(tdbId, V62Facade.TID_TPCARDINFO,
       cardId, tp, null, 3)
 
     galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
+  }
+  /**
+   * 获取DBID
+   * @param dbId
+   */
+  private def getDBID(dbId: Option[String]): Short ={
+    if(dbId == None){
+      config.templateTable.dbId.toShort
+    }else{
+      dbId.get.toShort
+    }
   }
 }

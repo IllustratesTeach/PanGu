@@ -1,6 +1,5 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,11 +11,10 @@ trait TPCardService {
   /**
    * 新增捺印卡片
    * @param tPCard
-   * @param dBConfig
    * @return
    */
   @Transactional
-  def addTPCard(tPCard: TPCard, dBConfig: DBConfig = null): Unit
+  def addTPCard(tPCard: TPCard, dbId: Option[String] = None): Unit
 
   /**
    * 删除捺印卡片
@@ -24,7 +22,7 @@ trait TPCardService {
    * @return
    */
   @Transactional
-  def delTPCard(cardId: String, dBConfig: DBConfig = null): Unit
+  def delTPCard(cardId: String, dbId: Option[String] = None): Unit
 
   /**
    * 更新捺印卡片
@@ -32,20 +30,20 @@ trait TPCardService {
    * @return
    */
   @Transactional
-  def updateTPCard(tpCard: TPCard, dBConfig: DBConfig = null): Unit
+  def updateTPCard(tpCard: TPCard, dbId: Option[String] = None): Unit
 
   /**
    * 验证卡号是否已存在
    * @param cardId
    * @return
    */
-  def isExist(cardId: String, dBConfig: DBConfig = null): Boolean
+  def isExist(cardId: String, dbId: Option[String] = None): Boolean
 
   /**
    * 获取捺印卡信息
    * @param cardId
-   * @param dBConfig
+   * @param dbid
    * @return
    */
-  def getTPCard(cardId: String, dBConfig: DBConfig = null): TPCard
+  def getTPCard(cardId: String, dbid: Option[String] = None): TPCard
 }

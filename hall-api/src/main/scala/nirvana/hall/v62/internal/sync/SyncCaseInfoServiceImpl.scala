@@ -2,11 +2,11 @@ package nirvana.hall.v62.internal.sync
 
 import javax.sql.DataSource
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.api.services.sync.SyncCaseInfoService
 import nirvana.hall.protocol.api.SyncDataProto.SyncCaseResponse
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -21,19 +21,26 @@ class SyncCaseInfoServiceImpl(v62Config: HallV62Config, caseInfoService: CaseInf
    * @param size
    * @return
    */
-  override def syncCaseInfo(responseBuilder: SyncCaseResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig = null): Unit = {
-    val dbConfig = if(dBConfig != null){
-      dBConfig
-    }else{
-      DBConfig(Left(v62Config.caseTable.dbId.toShort), Option(v62Config.caseTable.tableId.toShort))
-    }
+  override def syncCaseInfo(responseBuilder: SyncCaseResponse.Builder, timestamp: Long, size: Int, dbId: Option[String]): Unit = {
     val cardIdBuffer = new ArrayBuffer[(String, Long)]()
-    val tableName = getTableName(dbConfig)
+
+    val tableName = getTableName(getDBID(dbId), V62Facade.TID_CASE)
     doFetcher(cardIdBuffer, timestamp, size, tableName)
     cardIdBuffer.foreach{cardId=>
       val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
-      syncCaseInfo.setCaseInfo(caseInfoService.getCaseInfo(cardId._1, dbConfig))
+      syncCaseInfo.setCaseInfo(caseInfoService.getCaseInfo(cardId._1, dbId))
       syncCaseInfo.setTimestamp(cardId._2)
+    }
+  }
+  /**
+   * 获取DBID
+   * @param dbId
+   */
+  private def getDBID(dbId: Option[String]):Short={
+    if(dbId == None){
+      v62Config.caseTable.dbId.toShort
+    }else{
+      dbId.get.toShort
     }
   }
 }

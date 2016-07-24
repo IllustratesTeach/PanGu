@@ -4,7 +4,7 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.{QueryService, LPCardService, MatchRelationService}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
-import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
+import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchStatus, MatchRelationGetRequest, MatchRelationGetResponse}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
 import nirvana.hall.v62.config.HallV62Config
@@ -28,75 +28,78 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     //获取比对状态
     val status = queryService.findFirstQueryStatusByCardId(cardId)
     reponse.setMatchStatus(status)
-    request.getMatchType match {
-      case MatchType.FINGER_TL =>
-        //倒查直接查询比中关系表
-        val statement = Option("(SrcKey=%s)".format(cardId))
-        val matchInfo = queryMatchInfo(statement, 1)
-        matchInfo.foreach{ verifyLog: GAFIS_VERIFYLOGSTRUCT=>
-          val matchRelationTL = MatchRelationTLAndLT.newBuilder()
-          matchRelationTL.setPersonId(verifyLog.szSrcKey)
-          matchRelationTL.setFpg(FingerFgp.valueOf(verifyLog.nFg))
-          matchRelationTL.setCapture(verifyLog.bIsCrimeCaptured > 0)
+    //如果复核完成，获取比对关系
+    if(status == MatchStatus.RECHECKED){
+      request.getMatchType match {
+        case MatchType.FINGER_TL =>
+          //倒查直接查询比中关系表
+          val statement = Option("(SrcKey=%s)".format(cardId))
+          val matchInfo = queryMatchInfo(statement, 1)
+          matchInfo.foreach{ verifyLog: GAFIS_VERIFYLOGSTRUCT=>
+            val matchRelationTL = MatchRelationTLAndLT.newBuilder()
+            matchRelationTL.setPersonId(verifyLog.szSrcKey)
+            matchRelationTL.setFpg(FingerFgp.valueOf(verifyLog.nFg))
+            matchRelationTL.setCapture(verifyLog.bIsCrimeCaptured > 0)
 
-          //根据现场卡号查询案件卡号，seqno信息
-          val fingerId = verifyLog.szDestKey
-          val lpCard = lPCardService.getLPCard(fingerId)
-          val caseId = lpCard.getText.getStrCaseId
-          matchRelationTL.setCaseId(caseId)
-          matchRelationTL.setSeqNo(lpCard.getText.getStrSeq)
+            //根据现场卡号查询案件卡号，seqno信息
+            val fingerId = verifyLog.szDestKey
+            val lpCard = lPCardService.getLPCard(fingerId)
+            val caseId = lpCard.getText.getStrCaseId
+            matchRelationTL.setCaseId(caseId)
+            matchRelationTL.setSeqNo(lpCard.getText.getStrSeq)
 
-          //TODO 获取单位名称信息
-          val matchSysInfo = MatchSysInfo.newBuilder()
-          matchSysInfo.setMatchUnitCode(verifyLog.szSubmitUserUnitCode)
-          matchSysInfo.setMatchUnitName("")
-          matchSysInfo.setMatcher(verifyLog.szSubmitUserName)
-          matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(verifyLog.tSubmitDateTime).substring(0, 8))
-          matchSysInfo.setInputer(verifyLog.szBreakUserName)
-          matchSysInfo.setInputUnitCode(verifyLog.szBreakUserUnitCode)
-          matchSysInfo.setInputDate(DateConverter.convertAFISDateTime2String(verifyLog.tBreakDateTime).substring(0, 8))
-          matchSysInfo.setApprover(verifyLog.szReCheckUserName)
-          matchSysInfo.setApproveDate(DateConverter.convertAFISDateTime2String(verifyLog.tReCheckDateTime).substring(0, 8))
+            //TODO 获取单位名称信息
+            val matchSysInfo = MatchSysInfo.newBuilder()
+            matchSysInfo.setMatchUnitCode(verifyLog.szSubmitUserUnitCode)
+            matchSysInfo.setMatchUnitName("")
+            matchSysInfo.setMatcher(verifyLog.szSubmitUserName)
+            matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(verifyLog.tSubmitDateTime).substring(0, 8))
+            matchSysInfo.setInputer(verifyLog.szBreakUserName)
+            matchSysInfo.setInputUnitCode(verifyLog.szBreakUserUnitCode)
+            matchSysInfo.setInputDate(DateConverter.convertAFISDateTime2String(verifyLog.tBreakDateTime).substring(0, 8))
+            matchSysInfo.setApprover(verifyLog.szReCheckUserName)
+            matchSysInfo.setApproveDate(DateConverter.convertAFISDateTime2String(verifyLog.tReCheckDateTime).substring(0, 8))
 
-          val matchRelation = MatchRelation.newBuilder()
-          matchRelation.setMatchSysInfo(matchSysInfo)
-          matchRelation.setExtension(MatchRelationTLAndLT.data, matchRelationTL.build())
+            val matchRelation = MatchRelation.newBuilder()
+            matchRelation.setMatchSysInfo(matchSysInfo)
+            matchRelation.setExtension(MatchRelationTLAndLT.data, matchRelationTL.build())
 
-          reponse.addMatchRelation(matchRelation.build())
-        }
-      case MatchType.FINGER_TT =>
-        //重卡信息先从捺印表查到重卡组号，然后根据重卡组号查询重卡信息
-        val tp = new GTPCARDINFOSTRUCT
-        facade.NET_GAFIS_FLIB_Get(v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, cardId, tp, null, 3)
-        val personId = tp.stAdmData.szPersonID.trim //重卡组号
+            reponse.addMatchRelation(matchRelation.build())
+          }
+        case MatchType.FINGER_TT =>
+          //重卡信息先从捺印表查到重卡组号，然后根据重卡组号查询重卡信息
+          val tp = new GTPCARDINFOSTRUCT
+          facade.NET_GAFIS_FLIB_Get(v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, cardId, tp, null, 3)
+          val personId = tp.stAdmData.szPersonID.trim //重卡组号
 
-        if (InternalUtils.isBlank(personId)){
-          throw new IllegalStateException("duplicate card number is empty")
-        }
+          if (InternalUtils.isBlank(personId)){
+            throw new IllegalStateException("duplicate card number is empty")
+          }
 
-        val m_stPersonInfo = new GPERSONINFOSTRUCT
-        m_stPersonInfo.szPersonID = personId
-        m_stPersonInfo.nItemFlag = (GPIS_ITEMFLAG_CARDCOUNT | GPIS_ITEMFLAG_CARDID | GPIS_ITEMFLAG_TEXT).toByte
-        m_stPersonInfo.nItemFlag2 = (GPIS_ITEMFLAG2_LPGROUPDBID | GPIS_ITEMFLAG2_LPGROUPTID | GPIS_ITEMFLAG2_FLAG).toByte
-        val dbId: Short = 1
-        val tableId: Short = 3
-        facade.NET_GAFIS_PERSON_Get(dbId, tableId, m_stPersonInfo)
-        m_stPersonInfo.pstID_Data.foreach{personInfo =>
-          val tt = MatchRelationTT.newBuilder()
-          tt.setPersonId1(cardId)
-          tt.setPersonId2(personInfo.szCardID)
-          //TODO 获取单位信息
-          val matchSysInfo = MatchSysInfo.newBuilder()
-          matchSysInfo.setMatchUnitCode("")
-          matchSysInfo.setMatchUnitName("")
-          matchSysInfo.setMatcher(personInfo.szUserName)
-          matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
-          val matchRelation = MatchRelation.newBuilder()
-          matchRelation.setMatchSysInfo(matchSysInfo)
-          matchRelation.setExtension(MatchRelationTT.data, tt.build())
+          val m_stPersonInfo = new GPERSONINFOSTRUCT
+          m_stPersonInfo.szPersonID = personId
+          m_stPersonInfo.nItemFlag = (GPIS_ITEMFLAG_CARDCOUNT | GPIS_ITEMFLAG_CARDID | GPIS_ITEMFLAG_TEXT).toByte
+          m_stPersonInfo.nItemFlag2 = (GPIS_ITEMFLAG2_LPGROUPDBID | GPIS_ITEMFLAG2_LPGROUPTID | GPIS_ITEMFLAG2_FLAG).toByte
+          val dbId: Short = 1
+          val tableId: Short = 3
+          facade.NET_GAFIS_PERSON_Get(dbId, tableId, m_stPersonInfo)
+          m_stPersonInfo.pstID_Data.foreach{personInfo =>
+            val tt = MatchRelationTT.newBuilder()
+            tt.setPersonId1(cardId)
+            tt.setPersonId2(personInfo.szCardID)
+            //TODO 获取单位信息
+            val matchSysInfo = MatchSysInfo.newBuilder()
+            matchSysInfo.setMatchUnitCode("")
+            matchSysInfo.setMatchUnitName("")
+            matchSysInfo.setMatcher(personInfo.szUserName)
+            matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
+            val matchRelation = MatchRelation.newBuilder()
+            matchRelation.setMatchSysInfo(matchSysInfo)
+            matchRelation.setExtension(MatchRelationTT.data, tt.build())
 
-          reponse.addMatchRelation(matchRelation.build())
-        }
+            reponse.addMatchRelation(matchRelation.build())
+          }
+      }
     }
 
     reponse.build()

@@ -2,11 +2,11 @@ package nirvana.hall.v62.internal.sync
 
 import javax.sql.DataSource
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.api.services.sync.SyncLPCardService
 import nirvana.hall.protocol.api.SyncDataProto.SyncLPCardResponse
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -21,19 +21,25 @@ class SyncLPCardServiceImpl(v62Config: HallV62Config, lPCardService: LPCardServi
    * @param size
    * @return
    */
-  override def syncLPCard(responseBuilder: SyncLPCardResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig): Unit = {
-    val dbConfig = if(dBConfig != null){
-      dBConfig
-    }else{
-      DBConfig(Left(v62Config.latentTable.dbId.toShort), Option(v62Config.latentTable.tableId.toShort))
-    }
+  override def syncLPCard(responseBuilder: SyncLPCardResponse.Builder, timestamp: Long, size: Int, dbId: Option[String]): Unit = {
     val cardIdBuffer = new ArrayBuffer[(String, Long)]()
-    val tableName = getTableName(dbConfig)
+    val tableName = getTableName(getDBID(dbId), V62Facade.TID_LATFINGER)
     doFetcher(cardIdBuffer, timestamp, size, tableName)
     cardIdBuffer.foreach{cardId=>
       val syncLPCard = responseBuilder.addSyncLPCardBuilder()
-      syncLPCard.setLpCard(lPCardService.getLPCard(cardId._1, dbConfig))
+      syncLPCard.setLpCard(lPCardService.getLPCard(cardId._1, dbId))
       syncLPCard.setTimestamp(cardId._2)
+    }
+  }
+  /**
+   * 获取DBID
+   * @param dbId
+   */
+  private def getDBID(dbId: Option[String]):Short={
+    if(dbId == None){
+      v62Config.latentTable.dbId.toShort
+    }else{
+      dbId.get.toShort
     }
   }
 }

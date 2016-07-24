@@ -2,11 +2,11 @@ package nirvana.hall.v62.internal.sync
 
 import javax.sql.DataSource
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.SyncTPCardService
 import nirvana.hall.protocol.api.SyncDataProto.SyncTPCardResponse
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -23,19 +23,26 @@ class SyncTPCardServiceImpl(v62Config: HallV62Config,tPCardService: TPCardServic
    * @param size
    * @return
    */
-  override def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig): Unit = {
-    val dbConfig = if(dBConfig != null){
-      dBConfig
-    }else{
-      DBConfig(Left(v62Config.templateTable.dbId.toShort), Option(v62Config.templateTable.tableId.toShort))
-    }
+  override def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dbId: Option[String]): Unit = {
     val cardIdBuffer = new ArrayBuffer[(String, Long)]()
-    doFetcher(cardIdBuffer, timestamp, size, getTableName(dbConfig))
+    val tableName = getTableName(getDBID(dbId), V62Facade.TID_TPCARDINFO)
+    doFetcher(cardIdBuffer, timestamp, size, tableName)
     cardIdBuffer.foreach{cardId=>
       val syncTPCard = responseBuilder.addSyncTPCardBuilder()
-      val tpCard = tPCardService.getTPCard(cardId._1, dbConfig)
+      val tpCard = tPCardService.getTPCard(cardId._1, dbId)
       syncTPCard.setTpCard(tpCard)
       syncTPCard.setTimestamp(cardId._2)
+    }
+  }
+  /**
+   * 获取DBID
+   * @param dbId
+   */
+  private def getDBID(dbId: Option[String]):Short={
+    if(dbId == None){
+      v62Config.templateTable.dbId.toShort
+    }else{
+      dbId.get.toShort
     }
   }
 }

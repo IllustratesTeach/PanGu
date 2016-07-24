@@ -1,6 +1,5 @@
 package nirvana.hall.api.services.sync
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.protocol.api.SyncDataProto.SyncTPCardResponse
 
 /**
@@ -15,5 +14,5 @@ trait SyncTPCardService {
    * @param size
    * @return
    */
-  def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dBConfig: DBConfig = null)
+  def syncTPCard(responseBuilder: SyncTPCardResponse.Builder, timestamp: Long, size: Int, dbId: Option[String] = None)
 }

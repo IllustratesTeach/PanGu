@@ -4,7 +4,6 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -21,7 +20,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @param personId
    * @return
    */
-  override def getTPCard(personId: String, dBConfig: DBConfig): TPCard = {
+  override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
@@ -35,7 +34,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def addTPCard(tpCard: TPCard, dbConfig: DBConfig = null): Unit = {
+  override def addTPCard(tpCard: TPCard, dbId: Option[String]): Unit = {
     //验证卡号是否已经存在
     if(isExist(tpCard.getStrCardID)){
       throw new RuntimeException("记录已存在")
@@ -65,11 +64,11 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库
-      val logicDb: GafisLogicDb = if(dbConfig != null){
-        GafisLogicDb.find(dbConfig.dbId.right.get)
-      }else{
+      val logicDb: GafisLogicDb = if(dbId == None){
         //如果没有指定逻辑库，使用默认库
         GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+      }else{
+        GafisLogicDb.find(dbId.get)
       }
       val logicDbFingerprint = new GafisLogicDbFingerprint()
       logicDbFingerprint.pkId = CommonUtils.getUUID()
@@ -112,7 +111,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def delTPCard(cardId: String, dbConfig: DBConfig = null): Unit = {
+  override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
     //删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除掌纹
@@ -131,7 +130,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def updateTPCard(tpCard: TPCard, dBConfig: DBConfig): Unit ={
+  override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit ={
     val person = GafisPerson.find(tpCard.getStrCardID)
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
 
@@ -189,7 +188,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @param cardId
    * @return
    */
-  override def isExist(cardId: String, dbConfig: DBConfig = null): Boolean = {
+  override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisPerson.findOption(cardId).nonEmpty
   }
 }

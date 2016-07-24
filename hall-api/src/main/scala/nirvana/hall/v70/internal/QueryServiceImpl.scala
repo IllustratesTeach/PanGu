@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
-import nirvana.hall.api.config.{QueryDBConfig, DBConfig}
+import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
@@ -40,7 +40,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
    * @param oraSid
    * @return
    */
-  override def getMatchResult(oraSid: Long, dBConfig: DBConfig): Option[MatchResult]= {
+  override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult]= {
     throw new UnsupportedOperationException
   }
 
@@ -49,17 +49,16 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     * @param cardId 卡号
     * @return 比对结果
     */
-  override def findFirstQueryResultByCardId(cardId: String, dBConfig: DBConfig): Option[MatchResult] = {
+  override def findFirstQueryResultByCardId(cardId: String, dbId: Option[String]): Option[MatchResult] = {
     throw new UnsupportedOperationException
   }
 
   /**
    * 根据卡号查找第一个比对任务的状态, 如果没有获取到返回UN_KNOWN
    * @param cardId
-   * @param dBConfig
    * @return
    */
-  override def findFirstQueryStatusByCardId(cardId: String, dBConfig: DBConfig): MatchStatus = {
+  override def findFirstQueryStatusByCardId(cardId: String, dbId: Option[String]): MatchStatus = {
     throw new UnsupportedOperationException
   }
 }

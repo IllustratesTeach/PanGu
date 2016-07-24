@@ -15,22 +15,22 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest, syncTPCardService: 
     if(commandRequest.hasExtension(SyncTPCardRequest.cmd)) {
       val request = commandRequest.getExtension(SyncTPCardRequest.cmd)
       val responseBuilder = SyncTPCardResponse.newBuilder()
-      val dbConfig = getDBConfig(httpServletRequest)
-      syncTPCardService.syncTPCard(responseBuilder: SyncTPCardResponse.Builder, request.getTimestamp, request.getSize, dbConfig)
+      val dbId = getDBID(httpServletRequest)
+      syncTPCardService.syncTPCard(responseBuilder: SyncTPCardResponse.Builder, request.getTimestamp, request.getSize, dbId)
       commandResponse.writeMessage(commandRequest, SyncTPCardResponse.cmd, responseBuilder.build())
       true
     }else if(commandRequest.hasExtension(SyncLPCardRequest.cmd)){
       val request = commandRequest.getExtension(SyncLPCardRequest.cmd)
       val responseBuilder = SyncLPCardResponse.newBuilder()
-      val dbConfig = getDBConfig(httpServletRequest)
-      syncLPCardService.syncLPCard(responseBuilder, request.getTimestamp, request.getSize, dbConfig)
+      val dbId = getDBID(httpServletRequest)
+      syncLPCardService.syncLPCard(responseBuilder, request.getTimestamp, request.getSize, dbId)
       commandResponse.writeMessage(commandRequest, SyncLPCardResponse.cmd, responseBuilder.build())
       true
     }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)){
       val request = commandRequest.getExtension(SyncCaseRequest.cmd)
       val responseBuilder = SyncCaseResponse.newBuilder()
-      val dbConfig = getDBConfig(httpServletRequest)
-      syncCaseInfoService.syncCaseInfo(responseBuilder, request.getTimestamp, request.getSize, dbConfig)
+      val dbId = getDBID(httpServletRequest)
+      syncCaseInfoService.syncCaseInfo(responseBuilder, request.getTimestamp, request.getSize, dbId)
       commandResponse.writeMessage(commandRequest, SyncCaseResponse.cmd, responseBuilder.build())
       true
     }else{

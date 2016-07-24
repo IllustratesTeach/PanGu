@@ -1,6 +1,5 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -18,7 +17,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    * @return
    */
   @Transactional
-  override def addCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
+  override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
     var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
@@ -34,10 +33,10 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
-    val logicDb:GafisLogicDb = if(dBConfig == null){
+    val logicDb:GafisLogicDb = if(dbId == None){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     }else{
-      GafisLogicDb.find(dBConfig.dbId.right.get)
+      GafisLogicDb.find(dbId.get)
     }
     //逻辑库
     val logicDbCase = new GafisLogicDbCase()
@@ -53,7 +52,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    * @return
    */
   @Transactional
-  override def updateCaseInfo(caseInfo: Case, dBConfig: DBConfig): Unit = {
+  override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     ProtobufConverter.convertCase2GafisCase(caseInfo, gafisCase)
 
@@ -78,7 +77,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    * @param caseId
    * @return
    */
-  override def getCaseInfo(caseId: String, dBConfig: DBConfig): Case= {
+  override def getCaseInfo(caseId: String, dbId: Option[String]): Case= {
     val gafisCase = GafisCase.findOption(caseId)
     if(gafisCase.isEmpty){
       throw new RuntimeException("记录不存在!");
@@ -101,7 +100,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    * @param caseId
    * @return
    */
-  override def isExist(caseId: String, dBConfig: DBConfig): Boolean = {
+  override def isExist(caseId: String, dbId: Option[String]): Boolean = {
     GafisCase.findOption(caseId).nonEmpty
   }
 }

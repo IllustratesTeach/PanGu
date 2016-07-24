@@ -3,7 +3,6 @@ package nirvana.hall.v62.internal.sync
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.DBConfig
 import nirvana.hall.api.internal.SqlUtils
 import nirvana.hall.support.services.JdbcDatabase
 
@@ -71,14 +70,15 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
 
   /**
    * 获取表名
-   * @param dBConfig
+   * @param dbId
+   * @param tableId
    * @return
    */
-  def getTableName(dBConfig: DBConfig): String={
+  def getTableName(dbId: Short, tableId: Short): String={
     val sql = "select t.TABLENAME from TABLECATLOG t where t.DBID =? and t.TABLEID =?"
     JdbcDatabase.queryFirst(sql){ps=>
-      ps.setInt(1, dBConfig.dbId.left.get)
-      ps.setInt(2, dBConfig.tableId.get)
+      ps.setInt(1, dbId)
+      ps.setInt(2, tableId)
     }{_.getString(1)}.get
   }
 

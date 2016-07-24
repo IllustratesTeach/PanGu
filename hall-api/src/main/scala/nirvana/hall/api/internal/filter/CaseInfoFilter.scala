@@ -35,7 +35,7 @@ class CaseInfoFilter(httpServletRequest: HttpServletRequest, caseInfoService: Ca
      }//查询案件
      else if(commandRequest.hasExtension(CaseGetRequest.cmd)){
        val request = commandRequest.getExtension(CaseGetRequest.cmd)
-       val dbConfig = getDBConfig(httpServletRequest)
+       val dbConfig = getDBID(httpServletRequest)
        val caseInfo = caseInfoService.getCaseInfo(request.getCaseId, dbConfig)
        val response = CaseGetResponse.newBuilder().setCase(caseInfo).build()
        commandResponse.writeMessage(commandRequest, CaseGetResponse.cmd, response)
@@ -43,14 +43,14 @@ class CaseInfoFilter(httpServletRequest: HttpServletRequest, caseInfoService: Ca
      }//是否已存在
      else if(commandRequest.hasExtension(CaseIsExistRequest.cmd)){
        val request = commandRequest.getExtension(CaseIsExistRequest.cmd)
-       val dbConfig = getDBConfig(httpServletRequest)
+       val dbId = getDBID(httpServletRequest)
        val cardId = request.getCardId
        val response = CaseIsExistResponse.newBuilder()
-       response.setIsExist(caseInfoService.isExist(cardId, dbConfig))
+       response.setIsExist(caseInfoService.isExist(cardId, dbId))
        commandResponse.writeMessage(commandRequest, CaseIsExistResponse.cmd, response.build())
        true
      }else{
-       handler.handle(commandRequest, commandResponse);
+       handler.handle(commandRequest, commandResponse)
      }
    }
  }

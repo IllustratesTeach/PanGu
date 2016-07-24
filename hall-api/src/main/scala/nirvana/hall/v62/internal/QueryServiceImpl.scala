@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.config.{DBConfig, QueryDBConfig}
+import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
@@ -22,11 +22,9 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @param cardId 卡号
     * @return 比对结果
     */
-  override def findFirstQueryResultByCardId(cardId: String, dBConfig: DBConfig = DBConfig(Left(config.queryTable.dbId.toShort), Option(config.queryTable.tableId.toShort))): Option[MatchResult] = {
-    val dbId = dBConfig.dbId.left.get
-    val tableId = dBConfig.tableId.get
-    val queryResult = queryMatchResultByCardId(dbId, tableId, Some("(KeyID=%s)".format(cardId)), 1)
-    queryResult.headOption.map(query => gaqryqueConverter.convertSixByteArrayToLong(query.nQueryID)).map(id => getMatchResult(id, dBConfig)).get
+  override def findFirstQueryResultByCardId(cardId: String, dbId: Option[String]): Option[MatchResult] = {
+    val queryResult = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID=%s)".format(cardId)), 1)
+    queryResult.headOption.map(query => gaqryqueConverter.convertSixByteArrayToLong(query.nQueryID)).map(id => getMatchResult(id, dbId)).get
   }
 
   /**
@@ -120,11 +118,9 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @param oraSid
    * @return
    */
-  override def getMatchResult(oraSid: Long, dBConfig: DBConfig = DBConfig(Left(config.queryTable.dbId.toShort), Option(config.queryTable.tableId.toShort))): Option[MatchResult] = {
-    val dbId = dBConfig.dbId.left.get
-    val tableId = dBConfig.tableId.get
+  override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult] = {
     val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(oraSid)
-    val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(dbId, tableId, pstQry)
+    val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(getDBID(dbId), V62Facade.TID_QUERYQUE, pstQry)
     if(gaQueryStruct.stSimpQry.nStatus >= 2){//比对完成
       return Option(gaqryqueConverter.convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct))
     }
@@ -134,17 +130,25 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   /**
    * 根据卡号查找第一个比对任务的状态
    * @param cardId
-   * @param dBConfig
    * @return
    */
-  override def findFirstQueryStatusByCardId( cardId: String, dBConfig: DBConfig = DBConfig(Left(config.queryTable.dbId.toShort), Option(config.queryTable.tableId.toShort))): MatchStatus = {
-    val dbId = dBConfig.dbId.left.get
-    val tableId = dBConfig.tableId.get
-    val simpleQuery = queryMatchResultByCardId(dbId, tableId, Some("(KeyID=%s)".format(cardId)), 1)
+  override def findFirstQueryStatusByCardId( cardId: String, dbId: Option[String]): MatchStatus = {
+    val simpleQuery = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID=%s)".format(cardId)), 1)
     if(simpleQuery.nonEmpty){
        return gaqryqueConverter.convertStatusAsMatchStatus(simpleQuery.head.nStatus)
     }
 
     MatchStatus.UN_KNOWN
+  }
+  /**
+   * 获取DBID
+   * @param dbId
+   */
+  private def getDBID(dbId: Option[String]): Short ={
+    if(dbId == None){
+      config.queryTable.dbId.toShort
+    }else{
+      dbId.get.toShort
+    }
   }
 }
