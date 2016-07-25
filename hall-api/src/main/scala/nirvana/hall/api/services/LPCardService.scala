@@ -22,7 +22,7 @@ trait LPCardService {
    * @return
    */
   @Transactional
-  def delLPCard(cardId: String): Unit
+  def delLPCard(cardId: String, dbId: Option[String] = None): Unit
 
   /**
    * 更新现场卡片

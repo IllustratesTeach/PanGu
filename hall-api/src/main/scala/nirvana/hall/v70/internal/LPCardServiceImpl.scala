@@ -103,7 +103,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   @Transactional
-  override def delLPCard(cardId: String): Unit = {
+  override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === cardId).execute
     GafisCaseFinger.find(cardId).delete
   }

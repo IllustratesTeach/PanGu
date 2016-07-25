@@ -53,8 +53,8 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @param cardId
    * @return
    */
-  override def delLPCard(cardId: String): Unit = {
-    facade.NET_GAFIS_FLIB_Del(config.latentTable.dbId.toShort, V62Facade.TID_LATFINGER, cardId)
+  override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
+    facade.NET_GAFIS_FLIB_Del(getDBID(dbId), V62Facade.TID_LATFINGER, cardId)
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
