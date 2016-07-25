@@ -91,7 +91,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    * @return
    */
   @Transactional
-  override def delCaseInfo(caseId: String): Unit = {
+  override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
     GafisCase.find(caseId).delete
   }
 

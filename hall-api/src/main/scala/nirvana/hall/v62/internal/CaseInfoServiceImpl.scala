@@ -47,7 +47,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @param caseId
    * @return
    */
-  override def delCaseInfo(caseId: String): Unit = {
+  override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
     facade.NET_GAFIS_CASE_Del(config.caseTable.dbId.toShort,
       V62Facade.TID_CASE, caseId)
   }

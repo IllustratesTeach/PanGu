@@ -310,8 +310,14 @@ object ProtobufConverter {
     person.certificateid = text.getStrCertifID
     person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
 
-    person.assistSign = text.getNXieChaFlag.toString
+//    person.assistSign = text.getNXieChaFlag.toString
     person.assistLevel = text.getNXieChaLevel.toString
+    //协查状态，根据协查级别确定是否是协查
+    if(text.getNXieChaLevel > 0){
+      person.assistSign = "1"
+    }else{
+      person.assistSign = "0"
+    }
     person.assistBonus = text.getStrPremium
     person.assistDate = text.getStrXieChaDate
     person.assistDeptCode = text.getStrXieChaRequestUnitCode

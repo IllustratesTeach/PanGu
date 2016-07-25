@@ -22,7 +22,7 @@ trait CaseInfoService {
    * @return
    */
   @Transactional
-  def delCaseInfo(caseId: String): Unit
+  def delCaseInfo(caseId: String, dbId: Option[String] = None): Unit
 
   /**
    * 更新案件信息

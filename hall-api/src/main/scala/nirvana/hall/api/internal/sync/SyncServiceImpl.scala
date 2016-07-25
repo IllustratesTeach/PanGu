@@ -230,11 +230,10 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
   private def getHeaderMap(syncConfig: GafisSyncConfig): Map[String, String] ={
     val json = new JSONObject(syncConfig.config)
     val dbId = if(json.has("src_db_id")) json.getString("src_db_id") else ""
-    val tableId = if(json.has("src_table_id")) json.getString("src_table_id") else ""
-    Map(HallApiConstants.HTTP_HEADER_DBID -> dbId, HallApiConstants.HTTP_HEADER_TABLEID -> tableId)
+    Map(HallApiConstants.HTTP_HEADER_DBID -> dbId)
   }
   private def getDestDBID(syncConfig: GafisSyncConfig): Option[String]={
     val json = new JSONObject(syncConfig.config)
-     Option(json.getString("dest_table_id"))
+     Option(json.getString("dest_db_id"))
   }
 }
