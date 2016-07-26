@@ -182,7 +182,11 @@ object galoclpConverter extends LoggerSupport{
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
     //数据字典校验
     DictCodeConverter.convertLPCardText6to7(card.getTextBuilder)
-
+    //seqNo如果没有，截取指纹编号后两位
+    val seqNo = card.getText.getStrSeq
+    if(seqNo == null && seqNo.length == 0){
+      card.getTextBuilder.setStrSeq(card.getStrCardID.substring(card.getStrCardID.length - 2))
+    }
     card.build()
   }
 

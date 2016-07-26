@@ -82,6 +82,9 @@ object DictCodeConverter {
       "乳突线颜色", textBuilder)
     checkNormalCodeOfLPCardTextBuilder(textBuilder.setStrCaptureMethod, textBuilder.getStrCaptureMethod, 2,
       "提取方式", textBuilder)
+    //seqNo
+    checkNormalCode(textBuilder.setStrSeq, textBuilder.getStrSeq, 2)
+
   }
 
   /**
@@ -100,13 +103,22 @@ object DictCodeConverter {
   }
 
   /**
-   * 验证value是否是数字并且长度不大于len，否则setter赋值为空字符
+   * 验证value是否是数字并且长度不大于len，否则setter赋值为空字符并记录到备注信息(tag:code)
    * 用于一般数字格式的字典，只需要验证格式和长度即可，不做字典转换
    * @param setter
    * @param code
    * @param len
    */
-  private def checkNormalCode(setter: String => Any, code: String, len: Int = 0, tag: String, comment:String, commentSetter: String => Any): Unit ={
+  private def checkNormalCode(setter: String => Any, code: String, len: Int, tag: String, comment:String, commentSetter: String => Any): Unit ={
+    if(code != null){
+      if(!code.matches("[0-9]+")
+        || code.length > len){
+        setter("")
+        commentSetter(comment +s"(${tag}:${code})")
+      }
+    }
+  }
+  private def checkNormalCode(setter: String => Any, code: String, len: Int): Unit ={
     if(code != null){
       if(!code.matches("[0-9]+")
         || code.length > len){
@@ -114,13 +126,13 @@ object DictCodeConverter {
       }
     }
   }
-  private def checkNormalCodeOfTPCardTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: TPCardText.Builder): Unit ={
+  private def checkNormalCodeOfTPCardTextBuilder(setter: String => Any, code: String, len: Int, tag: String, textBuilder: TPCardText.Builder): Unit ={
     checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
-  private def checkNormalCodeOfLPCardTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: LPCardText.Builder): Unit ={
+  private def checkNormalCodeOfLPCardTextBuilder(setter: String => Any, code: String, len: Int, tag: String, textBuilder: LPCardText.Builder): Unit ={
     checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
-  private def checkNormalCodeOfCaseTextBuilder(setter: String => Any, code: String, len: Int = 0, tag: String, textBuilder: CaseText.Builder): Unit ={
+  private def checkNormalCodeOfCaseTextBuilder(setter: String => Any, code: String, len: Int, tag: String, textBuilder: CaseText.Builder): Unit ={
     checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
 

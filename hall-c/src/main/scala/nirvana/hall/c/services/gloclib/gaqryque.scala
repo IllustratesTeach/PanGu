@@ -224,9 +224,9 @@ object gaqryque {
   var nTimeUsed:Int = _ ;		// in seconds
   var nMaxCandidateNum:Int = _ ;	// maximum candidate num
   var nCurCandidateNum:Int = _ ;	// current candidate num(to here is 96 bytes)
-  var tSubmitTime = new AFISDateTime;	// submit time
-  var tFinishTime = new AFISDateTime;	// finish time
-  var tCheckTime = new AFISDateTime;		// check time
+  var tSubmitTime:AFISDateTime = _;	// submit time
+  var tFinishTime:AFISDateTime = _;	// finish time
+  var tCheckTime:AFISDateTime = _;		// check time
   @Length(16)
   var szCheckUserName:String = _ ;	// this user name is in user id list
   ///////////////to here is 96+40=136 bytes
@@ -251,7 +251,7 @@ object gaqryque {
   var nSchCandCnt:Int = _ ;	// search candidate #.
   @Length(16)
   var szReCheckUserName:String = _ ;	// rechecker user name
-  var tReCheckDate = new AFISDateTime;			// re check date
+  var tReCheckDate:AFISDateTime = _;				// re check date
   } // GAQUERYSIMPSTRUCT;	// size of this structure is 192  bytes. too big?
 
   // remote query state may be wait sending query, wait collecting results, wait receive cand data, finished
