@@ -11,7 +11,7 @@ import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6Servic
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync.SyncConfigServiceImpl
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
-import nirvana.hall.v70.internal.{CaseInfoServiceImpl, LPCardServiceImpl, QueryServiceImpl, TPCardServiceImpl}
+import nirvana.hall.v70.internal._
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sys.{DictService, UserService}
@@ -31,6 +31,7 @@ object LocalV70ServiceModule {
     //api 接口实现类
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
+    binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[SyncConfigService], classOf[SyncConfigServiceImpl])

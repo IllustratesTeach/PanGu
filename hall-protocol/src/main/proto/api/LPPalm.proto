@@ -1,0 +1,69 @@
+package api;
+import "api/FPTData.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "LPPalmProto";
+
+//添加现场掌纹
+message LPPalmAddRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmAddRequest cmd = 10101;
+    }
+    required LPCard card = 1;
+}
+message LPPalmAddResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmAddResponse cmd = 10102;
+    }
+}
+//删除现场掌纹
+message LPPalmDelRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmDelRequest cmd = 10103;
+    }
+    required string card_id = 1;
+}
+message LPPalmDelResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmDelResponse cmd = 10104;
+    }
+}
+//更新现场掌纹
+message LPPalmUpdateRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmUpdateRequest cmd = 10105;
+    }
+    required LPCard card = 1;
+}
+message LPPalmUpdateResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmUpdateResponse cmd = 10106;
+    }
+}
+//查询现场掌纹
+message LPPalmGetRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmGetRequest cmd = 10107;
+    }
+    required string card_id = 1;
+}
+message LPPalmGetResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmGetResponse cmd = 10108;
+    }
+    optional LPCard card = 1;
+}
+//验证卡号是否已存在
+message LPPalmIsExistRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmIsExistRequest cmd = 10109;
+    }
+    required string card_id = 1;
+}
+message LPPalmIsExistResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional LPPalmIsExistResponse cmd = 10110;
+    }
+    required bool isExist = 1;
+}

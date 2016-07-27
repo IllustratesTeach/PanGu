@@ -43,9 +43,9 @@ class GafisCasePalm extends ActiveRecord {
   @Column(name = "IS_ASSIST", length = 1)
   var isAssist: java.lang.String = _
   @Column(name = "PALM_IMG")
-  var palmImg: java.sql.Blob = _
+  var palmImg: Array[Byte] = _
   @Column(name = "PALM_CPR")
-  var palmCpr: java.sql.Blob = _
+  var palmCpr: Array[Byte] = _
   @Column(name = "LT_COUNT")
   var ltCount: java.lang.Long = _
   @Column(name = "LL_COUNT")
@@ -107,7 +107,7 @@ class GafisCasePalm extends ActiveRecord {
     this.palmId = palmId
   }
 
-  def this(palmId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgp: java.lang.String, pattern: java.lang.String, ridgeColor: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, palmImg: java.sql.Blob, palmCpr: java.sql.Blob, ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, palmImgNosqlId: java.lang.String, palmCprNosqlId: java.lang.String, seq: java.lang.Long) {
+  def this(palmId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgp: java.lang.String, pattern: java.lang.String, ridgeColor: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, palmImg: Array[Byte], palmCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, palmImgNosqlId: java.lang.String, palmCprNosqlId: java.lang.String, seq: java.lang.Long) {
     this()
     this.palmId = palmId
     this.seqNo = seqNo

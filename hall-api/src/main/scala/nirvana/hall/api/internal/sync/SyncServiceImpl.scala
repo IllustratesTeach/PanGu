@@ -8,7 +8,7 @@ import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.{HallApiConfig}
 import nirvana.hall.api.services.remote.CaseInfoRemoteService
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.{LPPalmService, CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.V62Facade
@@ -23,6 +23,7 @@ import org.apache.tapestry5.json.JSONObject
 class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService,
                       tpCardService: TPCardService,
                       lpCardService: LPCardService,
+                      lpPalmService: LPPalmService,
                       caseInfoService: CaseInfoService,
                       caseInfoRemoteService: CaseInfoRemoteService) extends SyncService with LoggerSupport{
   val SYNC_BATCH_SIZE = apiConfig.sync.batchSize
@@ -66,6 +67,8 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
         syncCaseInfo(syncConfig, isUpdate)
       case "LPCard" =>
         syncLPCard(syncConfig, isUpdate)
+      case "LPPalm" =>
+        syncLPPalm(syncConfig, isUpdate)
       case other =>
     }
   }
@@ -154,6 +157,52 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
     }
   }
 
+  /**
+   * 同步现场掌纹
+   * @param syncConfig
+   * @param isUpdate
+   */
+  def syncLPPalm(syncConfig: GafisSyncConfig, isUpdate: Boolean): Unit ={
+    info("syncLPPalm name:{} timestamp:{}", syncConfig.name, syncConfig.timestamp)
+    val request = SyncLPPalmRequest.newBuilder()
+    request.setSize(SYNC_BATCH_SIZE)
+    request.setTimestamp(syncConfig.timestamp)
+    val headerMap = getHeaderMap(syncConfig)
+    val baseResponse = rpcHttpClient.call(syncConfig.url, SyncLPPalmRequest.cmd, request.build(), headerMap)
+    if(baseResponse.getStatus == CommandStatus.OK){
+      val destDBID = getDestDBID(syncConfig)
+      var timestamp = syncConfig.timestamp
+      val response = baseResponse.getExtension(SyncLPPalmResponse.cmd)
+      val iter = response.getSyncLPCardList.iterator()
+      while (iter.hasNext){
+        val syncLPCard = iter.next()
+        val lpCard = syncLPCard.getLpCard
+        val cardId = lpCard.getStrCardID
+        if(lpPalmService.isExist(cardId, destDBID)){
+          if(isUpdate)
+            lpPalmService.updateLPCard(lpCard, destDBID)
+        }else{
+          var caseId = lpCard.getText.getStrCaseId
+          //如果没有案件编号，截掉指纹编号后两位作为案件编号同步案件信息
+          if(caseId.trim.length == 0){
+            caseId = cardId.substring(0, cardId.length - 2)
+          }
+          //如果没有案件信息获取案件
+          if(!caseInfoService.isExist(caseId, destDBID)){
+            syncCaseInfo(caseId, syncConfig)
+          }
+          lpPalmService.addLPCard(lpCard, destDBID)
+        }
+        timestamp = syncLPCard.getTimestamp
+      }
+      if(response.getSyncLPCardCount > 0){
+        syncConfig.timestamp = timestamp
+        syncConfigService.updateSyncConfig(syncConfig)
+        info("success syncLPPalm count {} timestamp {}", response.getSyncLPCardCount, timestamp)
+        syncLPPalm(syncConfig, isUpdate)
+      }
+    }
+  }
   /**
    * 根据案件编号同步案件信息
    * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4

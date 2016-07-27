@@ -29,6 +29,8 @@ object galoclpConverter extends LoggerSupport{
   def convertProtoBuf2GLPCARDINFOSTRUCT(card: LPCard): GLPCARDINFOSTRUCT= {
     val data = new GLPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
+    //TODO 案件编号,操作信息
+    data.stAdmData.szCaseID = card.getText.getStrCaseId
 
     if(card.hasText) {
       val text = card.getText
@@ -96,6 +98,7 @@ object galoclpConverter extends LoggerSupport{
           throw new UnsupportedOperationException
       }
       mic.bIsLatent = 1 //是否位现场数据
+      //TODO 设置现场指位
 
       data.pstMIC_Data = Array(mic)
       data.nMicItemCount = 1

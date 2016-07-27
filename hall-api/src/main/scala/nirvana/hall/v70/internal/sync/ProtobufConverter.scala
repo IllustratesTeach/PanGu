@@ -140,6 +140,12 @@ object ProtobufConverter {
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray
     caseFinger
   }
+
+  /**
+   * 现在指纹protobuf转为现场指纹特征
+   * @param lpCard
+   * @return
+   */
   def convertLPCard2GafisCaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
     val caseFingerMnt = new GafisCaseFingerMnt()
     caseFingerMnt.fingerId = lpCard.getStrCardID
@@ -147,9 +153,18 @@ object ProtobufConverter {
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
     caseFingerMnt.fingerRidge = blob.getStBinBytes.toByteArray
     caseFingerMnt.captureMethod = blob.getStrMntExtractMethod
+    caseFingerMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
+    caseFingerMnt.inputtime = new Date()
 
     caseFingerMnt
   }
+
+  /**
+   * 现场指纹转为protobuf
+   * @param caseFinger
+   * @param caseFingerMnt
+   * @return
+   */
   def convertGafisCaseFinger2LPCard(caseFinger: GafisCaseFinger, caseFingerMnt: GafisCaseFingerMnt): LPCard = {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(caseFinger.fingerId)
@@ -185,6 +200,107 @@ object ProtobufConverter {
     lpCard.build()
   }
 
+  /**
+   * 现场掌纹protobuf转为GafisPalm
+   * @param lpCard
+   * @param casePalm
+   * @return
+   */
+  def convertLPCard2GafisCasePalm(lpCard: LPCard, casePalm: GafisCasePalm = new GafisCasePalm()): GafisCasePalm = {
+    casePalm.palmId = lpCard.getStrCardID
+    val text = lpCard.getText
+    casePalm.caseId = text.getStrCaseId
+    casePalm.seqNo = text.getStrSeq
+    casePalm.remainPlace = text.getStrRemainPlace
+    casePalm.ridgeColor = text.getStrRidgeColor
+    casePalm.isCorpse = if(text.getBDeadBody) "1" else "0"
+    casePalm.corpseNo = text.getStrDeadPersonNo
+    casePalm.isAssist = text.getNXieChaState.toString
+    casePalm.matchStatus = text.getNBiDuiState.toString
+    casePalm.developMethod = text.getStrCaptureMethod
+    casePalm.remark = text.getStrComment
+
+    //操作信息
+    val admData = lpCard.getAdmData
+    if(admData != null){
+      casePalm.inputpsn = admData.getCreator
+      casePalm.modifiedpsn = admData.getUpdator
+      casePalm.creatorUnitCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        casePalm.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        casePalm.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
+    }
+
+    val blob = lpCard.getBlob
+    casePalm.palmImg = blob.getStImageBytes.toByteArray
+    casePalm
+  }
+
+  /**
+   * 现场掌纹特征转换
+   * @param lpCard
+   * @return
+   */
+  def convertLPCard2GafisCasePalmMnt(lpCard: LPCard, casePalmMnt: GafisCasePalmMnt = new GafisCasePalmMnt()): GafisCasePalmMnt = {
+    casePalmMnt.palmId = lpCard.getStrCardID
+    val blob = lpCard.getBlob
+    casePalmMnt.palmMnt = blob.getStMntBytes.toByteArray
+    casePalmMnt.palmRidge = blob.getStBinBytes.toByteArray
+    casePalmMnt.captureMethod = blob.getStrMntExtractMethod
+    casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
+    casePalmMnt.inputtime = new Date()
+
+    casePalmMnt
+  }
+  /**
+   * 现场指纹转为protobuf
+   * @param casePalm
+   * @param casePalmMnt
+   * @return
+   */
+  def convertGafisCasePalm2LPCard(casePalm: GafisCasePalm, casePalmMnt: GafisCasePalmMnt): LPCard = {
+    val lpCard = LPCard.newBuilder()
+    lpCard.setStrCardID(casePalm.palmId)
+    val textBuilder = lpCard.getTextBuilder
+    magicSet(casePalm.seqNo, textBuilder.setStrSeq)
+    if ("1".equals(casePalm.isCorpse))
+      textBuilder.setBDeadBody(true)
+    magicSet(casePalm.corpseNo, textBuilder.setStrDeadPersonNo)
+    magicSet(casePalm.remainPlace, textBuilder.setStrRemainPlace)
+    magicSet(casePalm.ridgeColor, textBuilder.setStrRidgeColor)
+    textBuilder.setNXieChaState(casePalm.isAssist)
+    textBuilder.setNBiDuiState(casePalm.matchStatus)
+
+    val blobBuilder = lpCard.getBlobBuilder
+    blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+    blobBuilder.setStImageBytes(ByteString.copyFrom(casePalm.palmImg))
+    //特征
+    if(casePalmMnt.palmMnt != null)
+      blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
+    magicSet(casePalmMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
+    //指位
+    if (isNonBlank(casePalm.fgp))
+      0.until(casePalm.fgp.length)
+        .filter("1" == casePalm.fgp.charAt(_))
+        .foreach(i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
+    //纹型
+    if (isNonBlank(casePalm.pattern))
+      casePalm.pattern.split(",").foreach(f => blobBuilder.addRp(PatternType.valueOf(f)))
+
+    lpCard.build()
+  }
+
+  /**
+   * 捺印人员信息转为protobuf
+   * @param person
+   * @param photoList
+   * @param fingerList
+   * @param palmList
+   * @return
+   */
   def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)

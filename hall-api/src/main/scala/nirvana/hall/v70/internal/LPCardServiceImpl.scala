@@ -1,13 +1,12 @@
 package nirvana.hall.v70.internal
 
-import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{SysUser, GafisCaseFinger, GafisCaseFingerMnt}
+import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -44,9 +43,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     caseFinger.save()
 
     caseFingerMnt.pkId = CommonUtils.getUUID()
-    caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
-    caseFingerMnt.inputtime = new Date()
-    caseFingerMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
+    caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.save()
     info("addLPCard cardId:{}", lpCard.getStrCardID)
   }
@@ -91,8 +88,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     //先删除，后插入
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
     caseFingerMnt.pkId = CommonUtils.getUUID()
-    caseFingerMnt.inputpsn = Gafis70Constants.INPUTPSN
-    caseFingerMnt.inputtime = new Date()
+    caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.save()
     info("updateLPCard cardId:{}", lpCard.getStrCardID)
   }

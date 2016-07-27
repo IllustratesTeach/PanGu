@@ -59,6 +59,7 @@ object V62Facade{
   //tableid
   val TID_TPCARDINFO:Short = 2
   val TID_LATFINGER:Short  = 2
+  val TID_LATPALM:Short    = 3
   val TID_CASE:Short       = 4
   val TID_QUERYQUE:Short   = 2
 

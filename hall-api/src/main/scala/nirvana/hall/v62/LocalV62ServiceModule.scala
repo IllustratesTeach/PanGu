@@ -16,6 +16,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[RpcHttpClient],classOf[RpcHttpClientImpl]).withId("RpcHttpClient")
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
     binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
+    binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])

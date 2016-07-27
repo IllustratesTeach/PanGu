@@ -30,6 +30,7 @@ object LocalApiServiceModule {
   def provideProtobufFilter(configuration: OrderedConfiguration[RpcServerMessageFilter]): Unit = {
     configuration.addInstance("TPCardFilter", classOf[TPCardFilter])
     configuration.addInstance("LPCardFilter", classOf[LPCardFilter])
+    configuration.addInstance("LPPalmFilter", classOf[LPPalmFilter])
     configuration.addInstance("CaseFilter", classOf[CaseInfoFilter])
     configuration.addInstance("QueryFilter", classOf[QueryFilter])
     configuration.addInstance("SyncDataFilter", classOf[SyncDataFilter])

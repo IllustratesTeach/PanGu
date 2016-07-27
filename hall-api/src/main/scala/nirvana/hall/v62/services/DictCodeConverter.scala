@@ -110,7 +110,7 @@ object DictCodeConverter {
    * @param len
    */
   private def checkNormalCode(setter: String => Any, code: String, len: Int, tag: String, comment:String, commentSetter: String => Any): Unit ={
-    if(code != null){
+    if(code != null && code.length > 0){
       if(!code.matches("[0-9]+")
         || code.length > len){
         setter("")
@@ -119,7 +119,7 @@ object DictCodeConverter {
     }
   }
   private def checkNormalCode(setter: String => Any, code: String, len: Int): Unit ={
-    if(code != null){
+    if(code != null && code.length > 0){
       if(!code.matches("[0-9]+")
         || code.length > len){
         setter("")

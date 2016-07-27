@@ -27,9 +27,9 @@ class GafisCasePalmMnt extends ActiveRecord {
   @Column(name = "CAPTURE_METHOD", length = 1)
   var captureMethod: java.lang.String = _
   @Column(name = "PALM_MNT")
-  var palmMnt: java.sql.Blob = _
+  var palmMnt: Array[Byte] = _
   @Column(name = "PALM_RIDGE")
-  var palmRidge: java.sql.Blob = _
+  var palmRidge: Array[Byte] = _
   @Column(name = "IS_MAIN_MNT", length = 1)
   var isMainMnt: java.lang.String = _
   @Temporal(TemporalType.TIMESTAMP)
@@ -53,7 +53,7 @@ class GafisCasePalmMnt extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: java.sql.Blob, palmRidge: java.sql.Blob, isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String) {
+  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: Array[Byte], palmRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String) {
     this()
     this.pkId = pkId
     this.palmId = palmId

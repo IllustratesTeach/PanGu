@@ -3,9 +3,9 @@ package nirvana.hall.v62
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import nirvana.hall.api.services.sync.{SyncCaseInfoService, SyncLPCardService, SyncTPCardService}
+import nirvana.hall.api.services.sync.{SyncLPPalmService, SyncCaseInfoService, SyncLPCardService, SyncTPCardService}
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.sync.{SyncCaseInfoServiceImpl, SyncLPCardServiceImpl, SyncTPCardServiceImpl}
+import nirvana.hall.v62.internal.sync.{SyncLPPalmServiceImpl, SyncCaseInfoServiceImpl, SyncLPCardServiceImpl, SyncTPCardServiceImpl}
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
@@ -43,6 +43,7 @@ object LocalV62DataSourceModule {
     //同步数据服务器类
     binder.bind(classOf[SyncTPCardService], classOf[SyncTPCardServiceImpl])
     binder.bind(classOf[SyncLPCardService], classOf[SyncLPCardServiceImpl])
+    binder.bind(classOf[SyncLPPalmService], classOf[SyncLPPalmServiceImpl])
     binder.bind(classOf[SyncCaseInfoService], classOf[SyncCaseInfoServiceImpl])
   }
 }
