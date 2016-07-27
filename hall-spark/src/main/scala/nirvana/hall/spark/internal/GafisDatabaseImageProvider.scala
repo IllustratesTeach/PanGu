@@ -22,7 +22,7 @@ class GafisDatabaseImageProvider extends ImageProvider{
   private lazy val converterExtract = SysProperties.getBoolean("extractor.converter",defaultValue = false)
   private lazy implicit val dataSource = GafisPartitionRecordsSaver.dataSource
   val querySqlByPersonId = "select t.gather_data,t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ? and t.group_id = 1"
-  val querySql = "select t.gather_data,t.fgp,t.fgp_case,t.person_id from gafis_gather_finger0604 t where t.pk_id = ?"
+  val querySql = "select t.gather_data,t.fgp,t.fgp_case,t.person_id from gafis_gather_finger t where t.pk_id = ?"
 
   def requestImage(parameter:NirvanaSparkConfig,pkId:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] = {
     def reportException(e: Throwable,personId:String,fgp:Integer,pkId:String) = {

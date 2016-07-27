@@ -39,6 +39,7 @@ class FPTImageProvider extends ImageProvider{
         IOUtils.closeQuietly(is)*/
 
         val buffer = ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]()
+        if (filePath.isEmpty) return buffer.toSeq
         var personId: String = null
         fpt match {
           case Left(fpt3) =>
