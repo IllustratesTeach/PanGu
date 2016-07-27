@@ -8,7 +8,7 @@ import monad.support.services.XmlLoader
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
-import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.streaming.{Minutes, Seconds, StreamingContext}
 
 import scala.io.Source
 
@@ -24,7 +24,7 @@ object SaveErrorStream {
     //spark parell
     //    conf.set("spark.default.parallelism","1000")
     conf.set("spark.driver.host",parameter.host)
-    val ssc =  new StreamingContext(conf, Seconds(5))
+    val ssc =  new StreamingContext(conf, Minutes(parameter.streamingContextStartTime))
     checkpointDirectory.foreach(ssc.checkpoint)
 
     SysProperties.setConfig(parameter)
