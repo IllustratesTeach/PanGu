@@ -7,6 +7,7 @@ import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 
@@ -58,7 +59,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
    * @param cardId
    * @return
    */
-  override def findFirstQueryStatusByCardId(cardId: String, dbId: Option[String]): MatchStatus = {
+  override def findFirstQueryStatusByCardIdAndMatchType(cardId: String, matchType: MatchType, dbId: Option[String]): MatchStatus = {
     throw new UnsupportedOperationException
   }
 }

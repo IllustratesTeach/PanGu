@@ -6,6 +6,7 @@ import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
@@ -23,8 +24,12 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @return 比对结果
     */
   override def findFirstQueryResultByCardId(cardId: String, dbId: Option[String]): Option[MatchResult] = {
-    val queryResult = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID=%s)".format(cardId)), 1)
-    queryResult.headOption.map(query => gaqryqueConverter.convertSixByteArrayToLong(query.nQueryID)).map(id => getMatchResult(id, dbId)).get
+    val queryResult = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID='%s')".format(cardId)), 1)
+    if(queryResult != Nil){
+      queryResult.headOption.map(query => gaqryqueConverter.convertSixByteArrayToLong(query.nQueryID)).map(id => getMatchResult(id, dbId)).get
+    }else{
+      None
+    }
   }
 
   /**
@@ -132,8 +137,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @param cardId
    * @return
    */
-  override def findFirstQueryStatusByCardId( cardId: String, dbId: Option[String]): MatchStatus = {
-    val simpleQuery = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID=%s)".format(cardId)), 1)
+  override def findFirstQueryStatusByCardIdAndMatchType(cardId: String, matchType: MatchType, dbId: Option[String]): MatchStatus = {
+    val simpleQuery = queryMatchResultByCardId(getDBID(dbId), V62Facade.TID_QUERYQUE, Some("(KeyID='%s' AND QueryType=%d)".format(cardId, matchType.getNumber-1)), 1)
     if(simpleQuery.nonEmpty){
        return gaqryqueConverter.convertStatusAsMatchStatus(simpleQuery.head.nStatus)
     }

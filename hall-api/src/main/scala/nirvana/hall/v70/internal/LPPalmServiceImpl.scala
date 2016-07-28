@@ -46,7 +46,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.save()
-    info("addLPCard cardId:{}", lpCard.getStrCardID)
+    info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
 
   /**
@@ -91,7 +91,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.save()
-    info("updateLPCard cardId:{}", lpCard.getStrCardID)
+    info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
 
   /**

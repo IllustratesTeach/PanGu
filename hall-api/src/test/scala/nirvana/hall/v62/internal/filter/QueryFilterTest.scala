@@ -1,7 +1,6 @@
 package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
@@ -34,10 +33,4 @@ class QueryFilterTest extends BaseV62TestCase{
     Assert.assertNotNull(matchResult)
   }
 
-  @Test
-  def test_findFirstQueryStatusByCardId: Unit ={
-    val service = getService[QueryService]
-    val status = service.findFirstQueryStatusByCardId("0000000000000000000008")
-    Assert.assertEquals(status, MatchStatus.RECHECKED)
-  }
 }

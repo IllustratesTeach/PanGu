@@ -22,18 +22,19 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
    * @return
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
+    val matchType = request.getMatchType
     val reponse = MatchRelationGetResponse.newBuilder()
-    reponse.setMatchType(request.getMatchType)
+    reponse.setMatchType(matchType)
     val cardId = request.getCardId
     //获取比对状态
-    val status = queryService.findFirstQueryStatusByCardId(cardId)
+    val status = queryService.findFirstQueryStatusByCardIdAndMatchType(cardId, matchType)
     reponse.setMatchStatus(status)
     //如果复核完成，获取比对关系
     if(status == MatchStatus.RECHECKED){
-      request.getMatchType match {
+      matchType match {
         case MatchType.FINGER_TL =>
           //倒查直接查询比中关系表
-          val statement = Option("(SrcKey=%s)".format(cardId))
+          val statement = Option("(SrcKey='%s')".format(cardId))
           val matchInfo = queryMatchInfo(statement, 1)
           matchInfo.foreach{ verifyLog: GAFIS_VERIFYLOGSTRUCT=>
             val matchRelationTL = MatchRelationTLAndLT.newBuilder()

@@ -3,6 +3,7 @@ package nirvana.hall.api.services
 import nirvana.hall.api.config.{QueryDBConfig}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
+import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 
 /**
@@ -36,5 +37,5 @@ trait QueryService {
    * @param cardId
    * @return
    */
-  def findFirstQueryStatusByCardId(cardId:String, dbId: Option[String] = None):MatchStatus
+  def findFirstQueryStatusByCardIdAndMatchType(cardId:String, matchType: MatchType, dbId: Option[String] = None):MatchStatus
 }
