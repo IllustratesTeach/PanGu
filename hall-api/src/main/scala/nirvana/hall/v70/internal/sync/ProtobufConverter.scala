@@ -368,8 +368,8 @@ object ProtobufConverter {
       blobBuilder.setType(ImageType.IMAGETYPE_FACE)
       photo.fgp match {
         case "1" => blobBuilder.setFacefgp(FaceFgp.FACE_FRONT)
-        case "2" => blobBuilder.setFacefgp(FaceFgp.FACE_LEFT)
-        case "3" => blobBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
+        case "2" => blobBuilder.setFacefgp(FaceFgp.FACE_RIGHT)
+        case "3" => blobBuilder.setFacefgp(FaceFgp.FACE_LEFT)
       }
     }
 
@@ -535,7 +535,15 @@ object ProtobufConverter {
       val blob = blobIter.next()
       if(blob.getType == ImageType.IMAGETYPE_FACE && blob.getStImageBytes.size() > 0){
         val portrait = new GafisGatherPortrait()
-        portrait.fgp = blob.getFacefgp.getNumber.toString
+        //指纹系统人像字典对应
+        portrait.fgp = blob.getFacefgp match {
+          case FaceFgp.FACE_FRONT =>
+            "1"
+          case FaceFgp.FACE_RIGHT =>
+            "2"
+          case FaceFgp.FACE_LEFT=>
+            "3"
+        }
         portrait.gatherData = blob.getStImageBytes.toByteArray
         portrait.personid = personId
 
