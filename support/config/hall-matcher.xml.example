@@ -7,7 +7,7 @@
   <log_file>${server.home}/log/nirvana.hall.matcher.log</log_file>
   <local_store_dir>${server.home}/config/local</local_store_dir>
   <web>
-    <bind>127.0.0.1:9003</bind>
+    <bind>0.0.0.0:10000</bind>
   </web>
     <database>
       <driver>oracle.jdbc.driver.OracleDriver</driver>

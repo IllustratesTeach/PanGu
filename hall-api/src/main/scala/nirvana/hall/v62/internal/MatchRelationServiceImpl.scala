@@ -1,10 +1,10 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.{QueryService, LPCardService, MatchRelationService}
+import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
-import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchStatus, MatchRelationGetRequest, MatchRelationGetResponse}
+import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
 import nirvana.hall.v62.config.HallV62Config
@@ -17,8 +17,7 @@ import org.apache.tapestry5.ioc.internal.util.InternalUtils
 class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService{
   /**
    * 获取比对关系
-    *
-    * @param request
+   * @param request
    * @return
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
@@ -29,8 +28,8 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     //获取比对状态
     val status = queryService.findFirstQueryStatusByCardIdAndMatchType(cardId, matchType)
     reponse.setMatchStatus(status)
-    //如果复核完成，获取比对关系
-    if(status == MatchStatus.RECHECKED){
+    //如果核查完毕，获取比对关系
+    if(status.getNumber >= MatchStatus.CHECKED.getNumber){
       matchType match {
         case MatchType.FINGER_TL =>
           //倒查直接查询比中关系表
@@ -49,7 +48,6 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
             matchRelationTL.setCaseId(caseId)
             matchRelationTL.setSeqNo(lpCard.getText.getStrSeq)
 
-            //TODO 获取单位名称信息
             val matchSysInfo = MatchSysInfo.newBuilder()
             matchSysInfo.setMatchUnitCode(verifyLog.szSubmitUserUnitCode)
             matchSysInfo.setMatchUnitName("")
@@ -88,7 +86,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
             val tt = MatchRelationTT.newBuilder()
             tt.setPersonId1(cardId)
             tt.setPersonId2(personInfo.szCardID)
-            //TODO 获取单位信息
+            //TT没有单位信息
             val matchSysInfo = MatchSysInfo.newBuilder()
             matchSysInfo.setMatchUnitCode("")
             matchSysInfo.setMatchUnitName("")
