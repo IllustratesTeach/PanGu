@@ -289,4 +289,80 @@ object DataConverter {
 
     groupQuery.build()
   }
+
+  /**
+   * 人员编号区间查询
+   * @param personIdST
+   * @param personIdED
+   * @param isContain
+   * @return
+   */
+  def getPersonIdRangeGroupQuery(personIdST: String, personIdED: String, isContain: Boolean = true): GroupQuery ={
+    val groupQuery = GroupQuery.newBuilder()
+    val pid_st = checkPersonId(personIdST)
+    val pid_ed = checkPersonId(personIdED)
+    if(pid_st.length > 0 || pid_ed.length > 0){
+      val pId_deptCodeST = getDepartCodeByPersonId(pid_st)
+      val pId_deptCodeED = getDepartCodeByPersonId(pid_ed, 'z')
+      groupQuery.addClauseQueryBuilder.setName("pId_deptCode").setExtension(LongRangeQuery.query,
+        LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pId_deptCodeST, 36)).setMinInclusive(true)
+          .setMax(java.lang.Long.parseLong(pId_deptCodeED, 36)).setMaxInclusive(true).build)
+      if(pId_deptCodeST.equals(pId_deptCodeED) && pid_st.length > 12){
+        val pid_date_st = getDateByPersonId(pid_st)
+        val pid_date_ed = getDateByPersonId(pid_ed)
+        groupQuery.addClauseQueryBuilder.setName("pId_date").setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pid_date_st, 36)).setMinInclusive(true)
+            .setMax(java.lang.Long.parseLong(pid_date_ed, 36)).setMaxInclusive(true).build)
+      }
+    }
+
+    groupQuery.build()
+  }
+
+  /**
+   * 截取人员编号部门部分
+   * @param personId
+   * @param endFill
+   * @return
+   */
+  private def getDepartCodeByPersonId(personId: String, endFill: Char = '0'): String ={
+    if(personId.length >= 12){
+      personId.substring(0, 12)
+    }else{
+      var departCode = personId
+      for( i <- personId.length until 12){
+        departCode += endFill
+      }
+      departCode
+    }
+  }
+
+  private def getDateByPersonId(personId: String, endFill: Char = '0'): String ={
+    if(personId.length >= 18){
+      personId.substring(12, 18)
+    }else {
+      var date = personId.substring(12, personId.length)
+      for(i <- personId.length until 18){
+        date += endFill
+      }
+      date
+    }
+  }
+
+  /**
+   * 查询人员编号，去除空格，*，前缀字母
+   * @param personId
+   * @return
+   */
+  private def checkPersonId(personId: String): String ={
+    if(personId == null){
+      ""
+    }else{
+      var personid = personId.trim.replace("*","")//去除空格和*
+      if(personid.matches("^[a-za-z]\\w*")){//去除前缀
+        personid = personid.substring(1)
+      }
+      personid
+    }
+  }
 }

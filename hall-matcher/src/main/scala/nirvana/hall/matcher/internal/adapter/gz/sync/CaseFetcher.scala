@@ -77,14 +77,20 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
        * 第二部分，年月日6位(13,19)
        * 第三部分，流水4位(19,23)
        * */
-      val caseId = rs.getString("caseId")
+      var caseId = rs.getString("caseId")
       if(caseId != null){
         try {
           textData.addColBuilder().setColName("caseId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(caseId.getBytes()))
-          if(caseId.length == 23){
-            val cId_deptCode = caseId.substring(1, 13)
-            val cId_date = caseId.substring(13,19)
-            val cId_serialNum = caseId.substring(19)
+          //如果是字母开头截取第一位前缀
+          if (caseId.matches("^[a-zA-Z]\\w*")) {
+            val cId_pre: String = caseId.substring(0, 1)
+            textData.addColBuilder.setColName("cId_pre").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(cId_pre.getBytes))
+            caseId = caseId.substring(1)
+          }
+          if(caseId.length == 22){
+            val cId_deptCode = caseId.substring(, 12)
+            val cId_date = caseId.substring(12,18)
+            val cId_serialNum = caseId.substring(18)
             textData.addColBuilder().setColName("cId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_deptCode, 36))))
             textData.addColBuilder().setColName("cId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_date, 36))))
             textData.addColBuilder().setColName("cId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(Integer.parseInt(cId_serialNum, 36))))

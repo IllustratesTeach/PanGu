@@ -116,10 +116,15 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     }
     //文本查询
     if (textSql != null) {
-      if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) {
-        getTextQueryDataOfTemplate(textSql)
-      } else if (queryType == HallMatcherConstants.QUERY_TYPE_TL || queryType == HallMatcherConstants.QUERY_TYPE_LL) {
-        getTextQueryDataOfLatent(textSql)
+      queryType match {
+        case HallMatcherConstants.QUERY_TYPE_TT =>
+          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+        case HallMatcherConstants.QUERY_TYPE_TL =>
+          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
+        case HallMatcherConstants.QUERY_TYPE_LT =>
+          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+        case HallMatcherConstants.QUERY_TYPE_LL =>
+          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
       }
       //高级查询
       matchTaskBuilder.setConfig(DataConverter.getMatchConfig(textSql))

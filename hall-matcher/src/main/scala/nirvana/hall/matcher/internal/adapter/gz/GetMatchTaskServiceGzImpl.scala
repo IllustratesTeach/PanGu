@@ -10,7 +10,7 @@ import nirvana.hall.matcher.internal.{DataConverter, DateConverter}
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
 import nirvana.protocol.TextQueryProto
 import nirvana.protocol.TextQueryProto.TextQueryData
-import nirvana.protocol.TextQueryProto.TextQueryData.{LongRangeQuery, Occur, KeywordQuery, GroupQuery}
+import nirvana.protocol.TextQueryProto.TextQueryData._
 
 /**
  * Created by songpeng on 16/7/10.
@@ -49,46 +49,45 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
               textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
             }
           }
-          //处理其他特殊的查询条件
-          if(json.has("name")){
-            val keywordQuery = KeywordQuery.newBuilder()
-            keywordQuery.setValue(json.getString("name") + "*")
-            textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
-
+        }
+        //处理其他特殊的查询条件
+        if(json.has("name")){
+          val keywordQuery = KeywordQuery.newBuilder()
+          keywordQuery.setValue(json.getString("name") + "*")
+          textQuery.addQueryBuilder().setName("name").setExtension(KeywordQuery.query, keywordQuery.build())
+        }
+        if(json.has("birthdayST") && json.has("birthdayED")){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString("birthdayST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString("birthdayED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName("birthday").setExtension(LongRangeQuery.query, longQuery.build())
+        }
+        if(json.has("gatherDateST") && json.has("gatherDateED")){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString("gatherDateST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString("gatherDateED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName("gatherDate").setExtension(LongRangeQuery.query, longQuery.build())
+        }
+        //导入编号
+        if(json.has("impKeys")){
+          val personIds = json.getString("impKeys").split("\\|")
+          val groupQuery = GroupQuery.newBuilder()
+          personIds.foreach{personId =>
+            groupQuery.addClauseQueryBuilder().setName("personId").setExtension(KeywordQuery.query,
+              KeywordQuery.newBuilder().setValue(personId).build()).setOccur(Occur.SHOULD)
           }
-          if(json.has("birthdayST") && json.has("birthdayED")){
-            val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString("birthdayST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString("birthdayED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-            textQuery.addQueryBuilder().setName("birthday").setExtension(LongRangeQuery.query, longQuery.build())
+          textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
+        }
+        //TODO 人员编号区间
+        if(json.has("personIdST1") || json.has("personIdED1")){
+          val groupQuery = GroupQuery.newBuilder()
+          if (json.has("personIdST1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
           }
-          if(json.has("gatherDateST") && json.has("gatherDateED")){
-            val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString("gatherDateST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString("gatherDateED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-            textQuery.addQueryBuilder().setName("gatherDate").setExtension(LongRangeQuery.query, longQuery.build())
+          if (json.has("personIdED1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
           }
-          //导入编号
-          if(json.has("impKeys")){
-            val personIds = json.getString("impKeys").split("\\|")
-            val groupQuery = GroupQuery.newBuilder()
-            personIds.foreach{personId =>
-              groupQuery.addClauseQueryBuilder().setName("personId").setExtension(KeywordQuery.query,
-                KeywordQuery.newBuilder().setValue(personId).build()).setOccur(Occur.SHOULD)
-            }
-            textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
-          }
-          //人员编号区间
-          if(json.has("personIdST1") || json.has("personIdED1")){
-            val groupQuery = GroupQuery.newBuilder()
-            if (json.has("personIdST1")) {
-              groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
-            }
-            if (json.has("personIdED1")) {
-              groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
-            }
-            textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
-          }
+          textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
         }
       }
       catch {

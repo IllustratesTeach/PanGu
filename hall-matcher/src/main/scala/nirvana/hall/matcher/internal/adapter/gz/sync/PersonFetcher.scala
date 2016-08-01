@@ -60,16 +60,19 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
           * 第二部分，年月日6位(13,19)
           * 第三部分，流水4位(19,23)
           * */
-         val personId: String = rs.getString("personId")
+         var personId: String = rs.getString("personId")
          textData.addColBuilder.setColName("personId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(personId.getBytes))
          try {
-            if(personId.length == 23){
+            //如果是字母开头截取第一位前缀
+            if (personId.matches("^[a-zA-Z]\\w*")) {
                val pId_pre: String = personId.substring(0, 1)
-               val pId_deptCode = java.lang.Long.parseLong(personId.substring(1, 13), 36)
-               val pId_date = java.lang.Long.parseLong(personId.substring(13, 19), 36)
-               val pId_serialNum = Integer.parseInt(personId.substring(19), 36)
-
                textData.addColBuilder.setColName("pId_pre").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(pId_pre.getBytes))
+               personId = personId.substring(1)
+            }
+            if(personId.length == 22){
+               val pId_deptCode = java.lang.Long.parseLong(personId.substring(0, 12), 36)
+               val pId_date = java.lang.Long.parseLong(personId.substring(12, 18), 36)
+               val pId_serialNum = Integer.parseInt(personId.substring(18), 36)
                textData.addColBuilder.setColName("pId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_deptCode)))
                textData.addColBuilder.setColName("pId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_date)))
                textData.addColBuilder.setColName("pId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(pId_serialNum)))
