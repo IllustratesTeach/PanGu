@@ -32,8 +32,12 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
             }
           }
           val cardid = rs.getString("cardid")
-          if(cardid != null){//存在对应不上卡号的数据,可能数据删除了
+          //存在对应不上卡号的数据,可能数据删除了, 卡号存在空格的情况
+          if(cardid != null && cardid.trim.length > 0){
             cardIdBuffer += (cardid -> seq)
+          }else{
+            val oraSid = rs.getString("ora_sid")
+            error("SyncDataFetcher ora_sid:{}, cardId:{}", oraSid, cardid)
           }
         }
         if(cardIdBuffer.length < size){
@@ -65,7 +69,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   }
 
   def getSyncSql(tableName: String, cardId: String): String ={
-    s"select tp.${KEY_NAME} as cardid, ${SqlUtils.wrapModTimeAsLong()} as seq from ${tableName}_mod t left join ${tableName} tp on tp.ora_sid= t.ora_sid where ${SqlUtils.wrapModTimeAsLong()} >=? and ${SqlUtils.wrapModTimeAsLong()} <=? order by seq"
+    s"select tp.ora_sid, tp.${KEY_NAME} as cardid, ${SqlUtils.wrapModTimeAsLong()} as seq from ${tableName}_mod t left join ${tableName} tp on tp.ora_sid= t.ora_sid where ${SqlUtils.wrapModTimeAsLong()} >=? and ${SqlUtils.wrapModTimeAsLong()} <=? order by seq"
   }
 
   /**

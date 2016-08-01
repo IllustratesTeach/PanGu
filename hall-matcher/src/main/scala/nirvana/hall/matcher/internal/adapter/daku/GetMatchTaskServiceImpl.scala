@@ -57,7 +57,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
      val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
      if(flag == 2 || flag == 22){
-        throw new UnsupportedOperationException("unsupp")
+        throw new UnsupportedOperationException("unsupported palm query")
      }
      matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, flag))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
