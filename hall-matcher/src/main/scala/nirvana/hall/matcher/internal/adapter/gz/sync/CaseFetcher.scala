@@ -88,7 +88,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
             caseId = caseId.substring(1)
           }
           if(caseId.length == 22){
-            val cId_deptCode = caseId.substring(, 12)
+            val cId_deptCode = caseId.substring(0, 12)
             val cId_date = caseId.substring(12,18)
             val cId_serialNum = caseId.substring(18)
             textData.addColBuilder().setColName("cId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_deptCode, 36))))
