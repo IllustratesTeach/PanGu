@@ -277,7 +277,7 @@ object DataConverter {
       else {
         var cid_deptcode_beg: String = caseId
         var cid_deptcode_end: String = caseId
-        for (i <- len until 18) {
+        for (i <- len until 12) {
           cid_deptcode_beg += "0"
           cid_deptcode_end += "z"
         }
@@ -291,7 +291,7 @@ object DataConverter {
   }
 
   /**
-   * 人员编号区间查询
+   * 人员编号区间查询, 目前支持单位，时间
    * @param personIdST
    * @param personIdED
    * @param isContain

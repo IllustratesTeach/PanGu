@@ -18,7 +18,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.data_type, t.data_in  from gafis_person t  where t.seq >= ? and t.seq <= ? order by t.seq"
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.data_type, t.data_in, t.person_category  from gafis_person t  where t.seq >= ? and t.seq <= ? order by t.seq"
 
    /**
     * 读取人员信息
@@ -35,12 +35,16 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
          syncDataBuilder.setTimestamp(rs.getLong("seq"))
          val dataType = rs.getString("data_type")
          val dataIn = rs.getString("data_in")
+         //人员类型, 用于特定500w数据的比对
+         val personCategory = rs.getString("person_category")
 
          val textData = TextData.newBuilder()
          if(dataType != null)
             textData.addColBuilder.setColName("dataType").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(dataType.getBytes("UTF-8")))
          if(dataIn != null)
             textData.addColBuilder.setColName("dataIn").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(dataIn.getBytes("UTF-8")))
+         if(personCategory != null)
+            textData.addColBuilder.setColName("personCategory").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(personCategory.getBytes("UTF-8")))
 
          syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
          if (validSyncData(syncDataBuilder.build, false)) {

@@ -103,8 +103,14 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          }
        }else if(queryType == HallMatcherConstants.QUERY_TYPE_TL){
          //只比参与比对的现场指纹
-         val queryBuilder = matchTaskBuilder.getLDataBuilder.getTextQueryBuilder
+         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
          queryBuilder.addQueryBuilder().setName("dataMatcher").setExtension(KeywordQuery.query, KeywordQuery.newBuilder().setValue("1").build());
+       }
+       if(queryType == HallMatcherConstants.QUERY_TYPE_LT){
+         if(json.has("personCategory")){//人员类型文字筛选
+         val personCategory = json.getString("personCategory")
+           matchTaskBuilder.getLDataBuilder.getTextQueryBuilder.addQueryBuilder.setName("personCategory").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personCategory).build)
+         }
        }
        //高级查询
        matchTaskBuilder.setConfig(getMatchConfig(textSql))
