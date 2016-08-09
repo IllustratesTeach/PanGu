@@ -1,5 +1,6 @@
 #ifdef WIN32
-#include <strsafe.h>
+#include <windows.h>
+#include <stdio.h>
 
 
 #include <jni.h>
