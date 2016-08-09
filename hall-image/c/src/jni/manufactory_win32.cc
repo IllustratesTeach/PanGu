@@ -1,4 +1,6 @@
 #ifdef WIN32
+#include <strsafe.h>
+
 
 #include <jni.h>
 #include <crtdbg.h>
@@ -43,8 +45,12 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	HMODULE hHandle = LoadLibraryEx(dll_path, NULL, nOption);
 	//release string
 	jenv->ReleaseStringUTFChars(pszFileName,dll_path);
-	if(hHandle == NULL)
-		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "fail to load dll");
+	if(hHandle == NULL){
+    DWORD dw = GetLastError();
+    char szString[100];
+    sprintf(szString,"fail to load dll,code:%u",dwNum);
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, szString);
+	}
 	char* fun_name = (char*)jenv->GetStringUTFChars(pszFunName,JNI_FALSE);
 
 	bool bGetProc = false;
