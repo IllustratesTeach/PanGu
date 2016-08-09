@@ -46,7 +46,7 @@ JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLib
 	//release string
 	jenv->ReleaseStringUTFChars(pszFileName,dll_path);
 	if(hHandle == NULL){
-    DWORD dw = GetLastError();
+    DWORD dwNum = GetLastError();
     char szString[100];
     sprintf(szString,"fail to load dll,code:%u",dwNum);
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, szString);
