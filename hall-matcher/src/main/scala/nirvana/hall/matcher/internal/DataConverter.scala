@@ -294,10 +294,9 @@ object DataConverter {
    * 人员编号区间查询, 目前支持单位，时间
    * @param personIdST
    * @param personIdED
-   * @param isContain
    * @return
    */
-  def getPersonIdRangeGroupQuery(personIdST: String, personIdED: String, isContain: Boolean = true): GroupQuery ={
+  def getPersonIdRangeGroupQuery(personIdST: String, personIdED: String): GroupQuery ={
     val groupQuery = GroupQuery.newBuilder()
     val pid_st = checkPersonId(personIdST)
     val pid_ed = checkPersonId(personIdED)

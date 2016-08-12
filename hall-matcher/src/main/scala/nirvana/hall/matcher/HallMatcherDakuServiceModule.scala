@@ -1,5 +1,7 @@
 package nirvana.hall.matcher
 
+import nirvana.hall.extractor.internal.FeatureExtractorImpl
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.internal.adapter.common.PutMatchProgressServiceImpl
 import nirvana.hall.matcher.internal.adapter.daku.{GetMatchTaskServiceImpl, PutMatchResultServiceImpl, SyncDataServiceImpl}
 import nirvana.hall.matcher.service.{GetMatchTaskService, PutMatchProgressService, PutMatchResultService, SyncDataService}
@@ -15,5 +17,7 @@ object HallMatcherDakuServiceModule {
     binder.bind(classOf[GetMatchTaskService], classOf[GetMatchTaskServiceImpl])
     binder.bind(classOf[PutMatchResultService], classOf[PutMatchResultServiceImpl])
     binder.bind(classOf[PutMatchProgressService], classOf[PutMatchProgressServiceImpl])
+    //特征转换service
+    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
   }
 }

@@ -35,6 +35,18 @@ object HallMatcherDataSourceModule {
     hikariConfig.setMaximumPoolSize(15)
     //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
 
-    new HikariDataSource(hikariConfig)
+    val dataSource = new HikariDataSource(hikariConfig)
+    /*val dataSource = new HikariDataSource(hikariConfig){
+      override def getConnection: Connection = {
+        new ConnectionSpy(super.getConnection)
+      }
+    }*/
+    hub.addRegistryShutdownListener(new Runnable {
+      override def run(): Unit = {
+        dataSource.close()
+      }
+    })
+
+    dataSource
   }
 }

@@ -5,7 +5,9 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import net.sf.json.JSONObject
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
@@ -18,7 +20,7 @@ import org.jboss.netty.buffer.ChannelBuffers
 /**
   * Created by songpeng on 16/4/8.
   */
-class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchTaskService{
+class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor: FeatureExtractor, implicit val dataSource: DataSource) extends GetMatchTaskService{
    /** 获取比对任务  */
    private val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status="+HallMatcherConstants.QUERY_STATUS_WAIT+" and t.deletag=1 order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
    /** 获取sid根据卡号（人员编号） */
@@ -84,7 +86,12 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
-         matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
+         var mnt = micStruct.pstMnt_Data
+         //TT，TL查询老特征转新特征
+         if (hallMatcherConfig.mnt.isNewFeature && (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL)) {
+           mnt = featureExtractor.ConvertMntOldToNew(ByteString.copyFrom(mnt).newInput()).get
+         }
+         matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
        }
      }
      if(textSql != null){

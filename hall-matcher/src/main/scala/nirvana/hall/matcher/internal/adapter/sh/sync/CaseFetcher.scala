@@ -28,7 +28,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm   from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
     " left join gafis_case c on t.case_id = c.case_id " +
     " left join gafis_logic_db_case db on db.case_pkid = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String]("cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm", "logicDB")
+  private val caseCols: Array[String] = Array[String]("caseId", "cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm", "logicDB")
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -73,8 +73,6 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
           }
         }
       }
-      //TODO 案件编号没有规则,考虑是否能直接转为数字通过区间模糊查询
-      val caseId = rs.getString("caseId")
 
       val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0
       if(caseOccurDate > 0){
