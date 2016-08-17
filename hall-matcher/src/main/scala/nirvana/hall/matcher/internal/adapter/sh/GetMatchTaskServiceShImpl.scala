@@ -84,16 +84,32 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
           textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
         }
-        //人员编号区间
-        if(json.has("personIdST1") || json.has("personIdED1")){
-          val groupQuery = GroupQuery.newBuilder()
-          if (json.has("personIdST1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
+        //人员编号模糊查询，由于人员编号没有规则，不能区间查询
+        if(json.has("personIdST1")){
+          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString("personIdST1"))
+          val sendKeyStr = json.getString("sendKey1Str")
+          val occur = sendKeyStr match {
+            case "yes" =>
+              Occur.MUST
+            case "no" =>
+              Occur.MUST_NOT
+            case other =>
+              Occur.SHOULD
           }
-          if (json.has("personIdED1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
+          textQuery.addQueryBuilder().setName("personId").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(occur)
+        }
+        if(json.has("personIdST2")){
+          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString("personIdST2"))
+          val sendKeyStr = json.getString("sendKey2Str")
+          val occur = sendKeyStr match {
+            case "yes" =>
+              Occur.MUST
+            case "no" =>
+              Occur.MUST_NOT
+            case other =>
+              Occur.SHOULD
           }
-          textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
+          textQuery.addQueryBuilder().setName("personId").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(occur)
         }
         //逻辑库
         if(json.has("logicDBValues")){
