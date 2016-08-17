@@ -1,0 +1,99 @@
+--创建sequence
+create sequence gafis_case_finger_palm_seq 
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+create sequence gafis_case_sid_seq
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+create sequence gafis_gather_finger_seq
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+create sequence gafis_gather_palm_seq
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+create sequence gafis_person_seq
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+create sequence gafis_person_sid_seq
+	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
+	
+--初始化seq
+UPDATE gafis_person p SET p.seq=gafis_person_seq.nextval WHERE p.seq IS NULL;
+UPDATE gafis_person p SET p.sid=gafis_person_sid_seq.nextval WHERE p.sid IS NULL;
+
+UPDATE gafis_case_finger t SET t.seq=gafis_case_finger_palm_seq.nextval WHERE t.seq IS NULL;
+UPDATE gafis_case_finger t SET t.sid=gafis_case_sid_seq.nextval WHERE t.sid IS NULL;
+
+UPDATE gafis_case_palm t SET t.seq=gafis_case_finger_palm_seq.nextval WHERE t.seq IS NULL;
+UPDATE gafis_case_palm t SET t.sid=gafis_case_sid_seq.nextval WHERE t.sid IS NULL;
+
+UPDATE gafis_gather_finger t SET t.seq=gafis_gather_finger_seq.nextval WHERE t.seq IS NULL;
+
+UPDATE gafis_gather_palm t SET t.seq=gafis_gather_palm_seq.nextval WHERE t.seq IS NULL;
+
+
+--创建触发器
+CREATE OR REPLACE TRIGGER GAFIS_CASE_FINGER_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_CASE_FINGER
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     SELECT GAFIS_CASE_FINGER_PALM_SEQ.NEXTVAL INTO :NEW_VALUE.SEQ FROM DUAL;
+END;
+\
+CREATE OR REPLACE TRIGGER GAFIS_CASE_PALM_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_CASE_PALM
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     SELECT GAFIS_CASE_FINGER_PALM_SEQ.NEXTVAL INTO :NEW_VALUE.SEQ FROM DUAL;
+END;
+\
+CREATE OR REPLACE TRIGGER GAFIS_CASE_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_CASE
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     --通过更新现场指纹和掌纹的seq，触发器gafis_case_finger_trigger和gafis_case_palm_trigger来更新seq
+     update GAFIS_CASE_FINGER f set f.seq=0 where f.case_id= :OLD_VALUE.CASE_ID;
+     update GAFIS_CASE_PALM p set p.seq=0 where p.case_id= :OLD_VALUE.CASE_ID;
+END;
+\
+CREATE OR REPLACE TRIGGER GAFIS_GATHER_FINGER_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_GATHER_FINGER
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     SELECT GAFIS_GATHER_FINGER_SEQ.NEXTVAL INTO :NEW_VALUE.SEQ FROM DUAL;
+END;
+\
+CREATE OR REPLACE TRIGGER GAFIS_GATHER_PALM_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_GATHER_PALM
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     SELECT GAFIS_GATHER_PALM_SEQ.NEXTVAL INTO :NEW_VALUE.SEQ FROM DUAL;
+END;
+\
+CREATE OR REPLACE TRIGGER GAFIS_PERSON_TRIGGER
+  BEFORE
+  INSERT
+  OR UPDATE ON GAFIS_PERSON
+  REFERENCING OLD AS OLD_VALUE NEW AS NEW_VALUE
+  FOR EACH ROW
+BEGIN
+     IF inserting AND :NEW_VALUE.SID IS NULL THEN 
+       SELECT GAFIS_PERSON_SID_SEQ.NEXTVAL INTO :NEW_VALUE.SID FROM DUAL;
+     END IF;
+     SELECT GAFIS_PERSON_SEQ.NEXTVAL INTO :NEW_VALUE.SEQ FROM DUAL;
+     --处理人员信息删除，更新指纹seq值
+     IF updating AND :new_value.deletag != :OLD_VALUE.deletag  THEN
+       UPDATE gafis_gather_finger SET seq=GAFIS_GATHER_FINGER_SEQ.Nextval WHERE PERSON_ID= :OLD_VALUE.personid;
+       UPDATE gafis_gather_palm SET seq=GAFIS_GATHER_PALM_SEQ.Nextval WHERE PERSON_ID= :OLD_VALUE.personid;
+     END IF;
+END;
