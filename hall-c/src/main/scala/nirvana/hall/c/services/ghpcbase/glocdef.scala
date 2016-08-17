@@ -44,5 +44,26 @@ object glocdef {
   final val FPX_ITEMFLAG_FOREIGNUNITCODE = 0x8
 
 
+  // if nItemType==GTPIO_ITEMTYPE_FACE, then nItemIndex can have the following values
+  final val	GTPIO_ITEMINDEX_FACEFRONT			= 0x1
+  final val	GTPIO_ITEMINDEX_FACENOSELEFT		= 0x2
+  final val	GTPIO_ITEMINDEX_FACENOSERIGHT		= 0x3
+  // 3 other items on June 1st, we want to add face and voice recognition into afis system.
+  final val	GTPIO_ITEMINDEX_FACE1				= 0x4
+  final val	GTPIO_ITEMINDEX_FACE2				= 0x5
+  final val	GTPIO_ITEMINDEX_FACE3				= 0x6
+
+  // if nItemType==GTPIO_ITEMTYPE_PALM then nItemIndex can be the following values
+  // nItemIndex-1 is the index in name array g_stCN.stTPm
+  final val	GTPIO_ITEMINDEX_PALM_RIGHT		= 0x1
+  final val	GTPIO_ITEMINDEX_PALM_LEFT		= 0x2
+  final val	GTPIO_ITEMINDEX_PALM_RFINGER	= 0x3
+  final val	GTPIO_ITEMINDEX_PALM_LFINGER	= 0x4
+  final val	GTPIO_ITEMINDEX_PALM_RTHUMBLOW	= 0x5
+  final val	GTPIO_ITEMINDEX_PALM_RTHUMBUP	= 0x6
+  final val	GTPIO_ITEMINDEX_PALM_LTHUMBLOW	= 0x7
+  final val	GTPIO_ITEMINDEX_PALM_LTHUMBUP	= 0x8
+  final val	GTPIO_ITEMINDEX_PALM_WHOLERIGHT	= 0x9	// 9		// not stored.
+  final val	GTPIO_ITEMINDEX_PALM_WHOLELEFT	= 0xa	// 10		// not stored.
 
 }

@@ -1,13 +1,22 @@
 package nirvana.hall.v62
 
+import javax.persistence.EntityManagerFactory
+
+import com.google.protobuf.ExtensionRegistry
+import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import monad.support.services.XmlLoader
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.AuthServiceImpl
 import nirvana.hall.api.services.AuthService
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.V62ServerAddress
-import org.apache.tapestry5.ioc.{ServiceBinder, Registry, RegistryBuilder}
+import org.apache.tapestry5.ioc.annotations.EagerLoad
+import org.apache.tapestry5.ioc.{Configuration, ServiceBinder, Registry, RegistryBuilder}
 import org.junit.{After, Before}
+import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
+import org.springframework.transaction.support.TransactionSynchronizationManager
+import stark.activerecord.config.ActiveRecordConfigSupport
 
 import scala.io.Source
 import scala.reflect._
@@ -25,14 +34,22 @@ class BaseV62TestCase {
   @Before
   def setup: Unit ={
     val modules = Seq[String](
+      "stark.activerecord.StarkActiveRecordModule",
        "nirvana.hall.v62.LocalV62ServiceModule",
       "nirvana.hall.v62.LocalV62DataSourceModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
+    val entityManagerFactory= getService[EntityManagerFactory]
+    val emHolder= new EntityManagerHolder(entityManagerFactory.createEntityManager())
+    TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
   }
   @After
   def down: Unit ={
+    val emf: EntityManagerFactory = registry.getService(classOf[EntityManagerFactory])
+    val emHolder: EntityManagerHolder = TransactionSynchronizationManager.unbindResource(emf).asInstanceOf[EntityManagerHolder]
+    EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager)
+
     registry.shutdown()
   }
 
@@ -73,5 +90,23 @@ object TestV62Module {
   }
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+  }
+  def buildHallApiConfig={
+    new HallApiConfig
+  }
+  def buildActiveRecordConfigSupport={
+    new ActiveRecordConfigSupport{}
+  }
+  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
+    configuration.add("nirvana.hall.v70.jpa")
+  }
+  @EagerLoad
+  def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
+    val registry = ExtensionRegistry.newInstance()
+    val it = configruation.iterator()
+    while (it.hasNext)
+      it.next().config(registry)
+
+    registry
   }
 }

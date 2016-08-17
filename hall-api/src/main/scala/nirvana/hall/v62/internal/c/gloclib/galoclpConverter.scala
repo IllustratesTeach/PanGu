@@ -31,6 +31,9 @@ object galoclpConverter extends LoggerSupport{
     data.szCardID = card.getStrCardID
     //TODO 案件编号,操作信息
     data.stAdmData.szCaseID = card.getText.getStrCaseId
+    data.stAdmData.szCUserName = card.getAdmData.getCreator
+    data.stAdmData.szMUserName = card.getAdmData.getUpdator
+//    data.stAdmData.tCDateTime =
 
     if(card.hasText) {
       val text = card.getText

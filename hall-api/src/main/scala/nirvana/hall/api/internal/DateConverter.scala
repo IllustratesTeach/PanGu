@@ -4,7 +4,8 @@ import java.nio.ByteBuffer
 import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
-import nirvana.hall.c.services.ghpcbase.ghpcdef._
+import nirvana.hall.c.services.gbaselib.gbasedef.GAFIS_DATETIME
+
 
 /**
  * Created by songpeng on 16/7/2.
@@ -36,7 +37,7 @@ object DateConverter {
    * @param dateTime
    * @return
    */
-  def convertAFISDateTime2String(dateTime: AFISDateTime): String = {
+  def convertAFISDateTime2String(dateTime: GAFIS_DATETIME): String = {
     val year = shortConvert(dateTime.tDate.tYear)
     val month = dateTime.tDate.tMonth + 1
     val day = dateTime.tDate.tDay
@@ -45,6 +46,28 @@ object DateConverter {
     val sec = Math.abs(shortConvert(dateTime.tTime.tMilliSec) / 1000)
 
     "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
+  }
+
+  /**
+   * 将字符yyyyMMddHHmmss 转为gafis日期
+   * @param str
+   * @return
+   */
+  def convertString2AFISDateTime(str: String): GAFIS_DATETIME ={
+    if(str.length == 14){
+      val date = convertString2Date(str, "yyyyMMddHHmmss")
+      val dateTime = new GAFIS_DATETIME
+      dateTime.tDate.setJavaYear(date.getYear)
+      dateTime.tDate.tMonth = date.getMonth.toByte
+      dateTime.tDate.tDay = date.getDate.toByte
+      dateTime.tTime.tHour = date.getHours.toByte
+      dateTime.tTime.tMin = date.getMinutes.toByte
+      dateTime.tTime.setJavaSecs(date.getSeconds)
+
+      dateTime
+    }else{
+      return null
+    }
   }
 
   /**

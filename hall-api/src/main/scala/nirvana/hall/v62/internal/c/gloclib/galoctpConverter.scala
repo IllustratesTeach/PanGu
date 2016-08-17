@@ -333,6 +333,11 @@ object galoctpConverter extends LoggerSupport{
 
     //数据校验和转换
     DictCodeConverter.convertTPCardText6to7(card.getTextBuilder)
+    //人员编号长度,中文校验
+    if(card.getStrPersonID.length > 25 || !card.getStrPersonID.matches("[a-zA-z0-9]*")){
+      card.getTextBuilder.setStrComment( card.getText.getStrComment + s"(人员编号:${card.getStrPersonID})")
+      card.setStrPersonID("")
+    }
 
     card.build()
   }
