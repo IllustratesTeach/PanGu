@@ -13,7 +13,7 @@ class SyncConfigServiceImpl extends SyncConfigService{
    * @return
    */
   override def getSyncConfigList(): Seq[GafisSyncConfig] = {
-    GafisSyncConfig.all.toList.toSeq
+    GafisSyncConfig.find_by_deletag("1").toSeq
   }
 
   /**

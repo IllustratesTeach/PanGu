@@ -1,14 +1,13 @@
 package nirvana.hall.api.internal.sync
 
-import javax.persistence.EntityManager
-
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
-import nirvana.hall.api.config.{HallApiConfig}
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.remote.CaseInfoRemoteService
 import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
-import nirvana.hall.api.services.{LPPalmService, CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
+import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.V62Facade
@@ -20,7 +19,7 @@ import org.apache.tapestry5.json.JSONObject
 /**
  * Created by songpeng on 16/6/18.
  */
-class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService,
+class SyncServiceImpl(apiConfig: HallApiConfig,rpcHttpClient: RpcHttpClient,syncConfigService: SyncConfigService,
                       tpCardService: TPCardService,
                       lpCardService: LPCardService,
                       lpPalmService: LPPalmService,
@@ -49,7 +48,7 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
    */
   override def doWork(): Unit = {
     //查询同步配置，依次执行同步任务
-    GafisSyncConfig.find_by_deletag("1").foreach{syncConfig=>
+    syncConfigService.getSyncConfigList().foreach{syncConfig=>
       doWork(syncConfig)
     }
   }
@@ -220,7 +219,12 @@ class SyncServiceImpl(entityManager: EntityManager, apiConfig: HallApiConfig,rpc
       val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, syncConfig.url, headerMap)
       caseInfoService.addCaseInfo(caseInfo)
     }else{
-      warn("remote caseId:{} is not exist ", caseId)
+      //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
+      warn("remote caseId:{} is not exist, system auto create", caseId)
+      val caseInfo = Case.newBuilder()
+      caseInfo.setStrCaseID(caseId)
+      val destDBID = getDestDBID(syncConfig)
+      caseInfoService.addCaseInfo(caseInfo.build(), destDBID)
     }
   }
 

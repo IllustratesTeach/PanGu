@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.services
 
 import nirvana.hall.api.services.sync.{SyncCaseInfoService, SyncLPCardService, SyncTPCardService}
 import nirvana.hall.protocol.api.SyncDataProto.{SyncCaseResponse, SyncLPCardResponse, SyncTPCardResponse}
@@ -8,7 +8,7 @@ import org.junit.{Assert, Test}
 /**
  * Created by songpeng on 16/6/18.
  */
-class SyncDataTest extends BaseV62TestCase{
+class SyncDataServiceTest extends BaseV62TestCase{
 
   @Test
   def test_syncTPCard(): Unit ={

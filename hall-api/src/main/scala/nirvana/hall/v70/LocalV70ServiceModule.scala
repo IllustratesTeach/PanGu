@@ -4,12 +4,12 @@ import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemote
 import nirvana.hall.api.internal.sync.SyncServiceImpl
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
-import nirvana.hall.api.services.sync.{SyncConfigService, SyncService}
+import nirvana.hall.api.services.sync._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6ServiceImpl}
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
-import nirvana.hall.v70.internal.sync.SyncConfigServiceImpl
+import nirvana.hall.v70.internal.sync._
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.internal._
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
@@ -47,6 +47,10 @@ object LocalV70ServiceModule {
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[SyncService], classOf[SyncServiceImpl]).eagerLoad()
+    binder.bind(classOf[SyncTPCardService], classOf[SyncTPCardServiceImpl]).eagerLoad()
+    binder.bind(classOf[SyncLPCardService], classOf[SyncLPCardServiceImp]).eagerLoad()
+    binder.bind(classOf[SyncLPPalmService], classOf[SyncLPPalmServiceImpl]).eagerLoad()
+    binder.bind(classOf[SyncCaseInfoService], classOf[SyncCaseInfoServiceImpl]).eagerLoad()
   }
 
 //  @Contribute(classOf[ProtobufRequestHandler])

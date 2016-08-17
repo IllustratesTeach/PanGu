@@ -3,9 +3,13 @@ package nirvana.hall.v62
 import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import nirvana.hall.api.services.sync.{SyncLPPalmService, SyncCaseInfoService, SyncLPCardService, SyncTPCardService}
+import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, TPCardRemoteServiceImpl}
+import nirvana.hall.api.internal.sync.SyncServiceImpl
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.sync._
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.sync.{SyncLPPalmServiceImpl, SyncCaseInfoServiceImpl, SyncLPCardServiceImpl, SyncTPCardServiceImpl}
+import nirvana.hall.v62.internal.sync._
+import nirvana.hall.v70.internal.sync.SyncConfigServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
@@ -37,6 +41,24 @@ object LocalV62DataSourceModule {
     //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
 
     new HikariDataSource(hikariConfig)
+    /*val dataSource = new HikariDataSource(hikariConfig){
+      override def getConnection: Connection = {
+        new ConnectionSpy(super.getConnection)
+      }
+    }
+    hub.addRegistryShutdownListener(new Runnable {
+      override def run(): Unit = {
+        dataSource.close()
+      }
+    })
+    //用之前先升级数据库
+    val driverClassName: String = config.db.driver
+    val vendor = Vendor.forDriver(driverClassName)
+    val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.db.user))
+    val migrator = new Migrator(dataSource, databaseAdapter)
+    migrator.migrate(InstallAllMigrations, "nirvana.hall.v62.migration", searchSubPackages = false)
+
+    dataSource*/
   }
 
   def bind(binder:ServiceBinder): Unit ={
@@ -45,5 +67,12 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[SyncLPCardService], classOf[SyncLPCardServiceImpl])
     binder.bind(classOf[SyncLPPalmService], classOf[SyncLPPalmServiceImpl])
     binder.bind(classOf[SyncCaseInfoService], classOf[SyncCaseInfoServiceImpl])
+    binder.bind(classOf[SyncService], classOf[SyncServiceImpl])
+    binder.bind(classOf[SyncConfigService], classOf[SyncConfigServiceImpl])
+
+    //远程服务类
+    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
+    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
+    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
   }
 }
