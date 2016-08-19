@@ -66,7 +66,7 @@ class FirmDecoderImplTest extends BaseJniTest{
   }
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "C:\\Users\\wangjue\\Desktop\\FPT_IMG\\fpt\\gafis\\R2247526324226454323227.FPT"
+    val filePath = "C:\\Users\\wangjue\\Desktop\\full_information_FPT\\C3702000000002016000484.fpt"
     val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
     fptEither match{
       case Right(fpt4)=>
