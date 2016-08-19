@@ -88,6 +88,7 @@ object fpt4code {
   private final val EGFS_CODE_PATTERN="19([0-9][0-9])".r
   private final val PKU_CODE_PATTERN = "13([0-9][0-9])".r
   private final val WSQ_CODE_PATTERN = "14([0-9][0-9])".r
+  private final val WSQ_CODE_PATTERN_31 = "([0-9][0-9])31".r
   private final val COGENT_CODE_PATTERN = "17([0-9][0-9])".r
   private final val NEC_CODE_PATTERN = "18([0-9][0-9])".r
   private final val BUPT_CODE_PATTERN = "12([0-9][0-9])".r
@@ -101,15 +102,16 @@ object fpt4code {
         0
       case GA10_PATTERN(subCode) => 	// 公安部10倍压缩方法
         glocdef.GAIMG_CPRMETHOD_GA10
-      case EGFS_CODE_PATTERN(subCode)  => 	// golden
-        glocdef.GAIMG_CPRMETHOD_GFS
       case PKU_CODE_PATTERN(subCode)  => 	// call pku's compress method
         glocdef.GAIMG_CPRMETHOD_PKU
       case COGENT_CODE_PATTERN(subCode)  => 	// cogent compress method
         glocdef.GAIMG_CPRMETHOD_COGENT
       case WSQ_CODE_PATTERN(code) => 	// was method
-        //case WSQ_CODE => 	// was method
         glocdef.GAIMG_CPRMETHOD_WSQ
+      case WSQ_CODE_PATTERN_31(code) => 	// was method
+        glocdef.GAIMG_CPRMETHOD_WSQ
+      case EGFS_CODE_PATTERN(subCode)  => 	// golden
+        glocdef.GAIMG_CPRMETHOD_GFS
       case NEC_CODE_PATTERN(subCode)  => 	// nec compress method
         glocdef.GAIMG_CPRMETHOD_NEC
       case TSINGHUA_CODE_PATTERN(subCode)  => 	// tsing hua
@@ -153,6 +155,21 @@ object fpt4code {
 
     gafisImg
   }
+
+  def FPTFingerLDataToGafisImage(lData: FPTFingerData): GAFISIMAGESTRUCT = {
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 0
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nWidth = lData.imgHorizontalLength.toShort
+    gafisImg.stHead.nHeight = lData.imgVerticalLength.toShort
+    gafisImg.stHead.nBits = 8
+    gafisImg.stHead.nResolution = lData.dpi.toShort
+    gafisImg.bnData = lData.imgData
+    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+
+    gafisImg
+  }
+
 }
 
 
