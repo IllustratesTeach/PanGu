@@ -113,6 +113,9 @@ object FPT4File {
 
   }
 
+  /**
+   * 十指指纹信息记录结构
+   */
   class Logic02Rec extends DynamicFingerData {
     var head = new LogicHeadV4
     @Length(6)
@@ -212,6 +215,9 @@ object FPT4File {
     override protected def getFingerDataCountString: String = sendFingerCount
   }
 
+  /**
+   * 十指指纹信息
+   */
   class FingerTData extends AncientData {
     @Length(7)
     var dataLength: String = _
@@ -258,6 +264,9 @@ object FPT4File {
     var end: Byte = FPTFile.GS
   }
 
+  /**
+   * 现场指纹信息记录结构
+   */
   class Logic03Rec extends DynamicFingerData {
     var head = new LogicHeadV4
     @Length(6)
@@ -327,6 +336,9 @@ object FPT4File {
     override protected def getFingerDataCountString: String = sendFingerCount
   }
 
+  /**
+   * 现场指纹信息
+   */
   class FingerLData extends AncientData{
     @Length(7)
     var dataLength: String = _
@@ -392,16 +404,27 @@ object FPT4File {
     var end: Byte = FPTFile.GS
   }
 
+  /**
+   * 指纹正查和倒查比中信息记录结构
+   */
   class Logic04Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
     var systemType: String = _
-    @Length(23) //人员编号1
-    var personId1: String = _
-    @Length(23) //人员编号2
-    var personId2: String = _
+    @Length(23) //案件编号
+    var caseId: String = _
+    @Length(2) //现场指纹序号
+    var seqNo: String = _
+    @Length(23) //人员编号
+    var personId: String = _
+    @Length(2) //指纹指位
+    var fgp: String = _
+    @Length(1) //直接抓获1：是；0：否
+    var capture: String = _
+    @Length(1) //比对方法
+    var matchMethod: String = _
     @Length(12) //比对单位代码
     var matchUnitCode: String = _
     @Length(70) //比对单位名称
@@ -433,6 +456,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 指纹查重比中信息记录结构
+   */
   class Logic05Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -474,6 +500,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 指纹串查比中信息记录结构
+   */
   class Logic06Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -519,6 +548,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 现场指纹查询请求信息记录结构
+   */
   class Logic07Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -534,6 +566,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 十指指纹查询请求信息记录结构
+   */
   class Logic08Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -547,6 +582,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 正查比对结果候选信息记录结构
+   */
   class Logic09Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -576,6 +614,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 倒查比对结果候选信息记录结构
+   */
   class Logic10Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -603,6 +644,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 查重比对结果候选信息记录结构
+   */
   class Logic11Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -626,6 +670,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 串查比对结果候选信息记录结构
+   */
   class Logic12Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
@@ -653,6 +700,9 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+   * 自定义逻辑记录结构
+   */
   class Logic99Rec extends AncientData {
     var head = new LogicHeadV4
     @Length(6) //序号
