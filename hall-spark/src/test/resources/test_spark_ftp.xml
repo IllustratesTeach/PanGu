@@ -3,23 +3,23 @@
   <host>127.0.0.1</host>
   <app_name>spark</app_name>
   <master_server>local[1]</master_server>
-  <kafka_server>192.168.1.106:9092</kafka_server>
-  <kafka_topic_name>DBDATA</kafka_topic_name>
+  <kafka_server>10.1.7.201:9092</kafka_server>
+  <kafka_topic_name>FPT</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
-  <image_provider_class>nirvana.hall.spark.internal.FPTImageFromFTPServerProvide</image_provider_class>
+  <image_provider_class>nirvana.hall.spark.internal.FPTProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
-  <data_saver_class>nirvana.hall.spark.internal.DumpSaver</data_saver_class>
+  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsFullSaver</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>
-  <is_extractor_bin>true</is_extractor_bin>
+  <is_extractor_bin>false</is_extractor_bin>
   <!-- 支持多种数据源，可以和image_provider_class以及 data_saver_class配合使用 -->
   <database_list>
     <database name="gafis">
       <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <user>gafis_sh</user>
+      <user>gafis_sh_px</user>
       <password>gafis</password>
-      <url>jdbc:oracle:thin:@192.168.1.103:1521:oragafis</url>
+      <url>jdbc:oracle:thin:@10.1.7.181:1521:gafisdb</url>
     </database>
   </database_list>
   <properties>
@@ -39,8 +39,8 @@
     <property key="decompress.gfs.direct" value="true"/>
     <property key="decompress.wsq.direct" value="true"/>
     <property key="decompress.server" value="http://127.0.0.1:9001/image"/>
-    <property key="extractor.server" value="http://127.0.0.1:9002/extractor"/>
-    <property key="extractor.direct" value="true"/>
+    <property key="extractor.server" value="http://10.1.7.144:9002/extractor"/>
+    <property key="extractor.direct" value="false"/>
     <property key="extractor.converter" value="false"/>
     <!-- ftp 配置-->
     <property key="ftp.post" value="127.0.0.1"/>
