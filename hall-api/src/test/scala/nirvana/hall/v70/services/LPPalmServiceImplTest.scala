@@ -1,4 +1,4 @@
-package nirvana.hall.v70.service
+package nirvana.hall.v70.services
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.LPPalmService

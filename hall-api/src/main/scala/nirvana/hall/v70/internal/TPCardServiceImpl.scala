@@ -35,6 +35,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def addTPCard(tpCard: TPCard, dbId: Option[String]): Unit = {
+    info("addTPCard cardId:{}", tpCard.getStrCardID)
     //验证卡号是否已经存在
     if(isExist(tpCard.getStrCardID)){
       throw new RuntimeException("记录已存在")
@@ -101,18 +102,20 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
         portrait.deletag = Gafis70Constants.DELETAG_USE
         portrait.save()
       }
-      info("addTPCard cardId:{}", tpCard.getStrCardID)
     }
   }
 
   /**
-   * 删除捺印卡片
+   * 删除捺印卡片, 更新删除状态
    * @param cardId
    * @return
    */
   @Transactional
   override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
-    //删除指纹
+    val gafisPerson = GafisPerson.find(cardId)
+    gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
+    gafisPerson.save()
+    /*//删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除掌纹
     GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
@@ -121,7 +124,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     //删除逻辑库
     GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
-    GafisPerson.find(cardId).delete()
+    GafisPerson.find(cardId).delete()*/
   }
 
   /**
@@ -131,6 +134,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit ={
+    info("updateTPCard cardId:{}", tpCard.getStrCardID)
     val person = GafisPerson.find(tpCard.getStrCardID)
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
 
@@ -151,6 +155,20 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
 
+    //删除原来的逻辑库
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
+    //保存逻辑库
+    val logicDb: GafisLogicDb = if(dbId == None){
+      //如果没有指定逻辑库，使用默认库
+      GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+    }else{
+      GafisLogicDb.find(dbId.get)
+    }
+    val logicDbFingerprint = new GafisLogicDbFingerprint()
+    logicDbFingerprint.pkId = CommonUtils.getUUID()
+    logicDbFingerprint.fingerprintPkid = person.personid
+    logicDbFingerprint.logicDbPkid = logicDb.pkId
+    logicDbFingerprint.save()
     //指纹
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
     GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
@@ -180,7 +198,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       portrait.deletag = Gafis70Constants.DELETAG_USE
       portrait.save()
     }
-    info("updateTPCard cardId:{}", tpCard.getStrCardID)
   }
 
   /**

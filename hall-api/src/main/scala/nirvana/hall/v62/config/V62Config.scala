@@ -6,6 +6,7 @@ import monad.core.config.DatabaseConfig
 import monad.rpc.config.RpcBind
 import org.apache.tapestry5.ioc.annotations.Marker
 import org.apache.tapestry5.services.Core
+import stark.activerecord.config.ActiveRecordConfigSupport
 
 /**
  * v62 configuration
@@ -17,7 +18,7 @@ import org.apache.tapestry5.services.Core
 @XmlType(name = "HallV62Config")
 @XmlRootElement(name = "hall_v62")
 @Marker(Array(classOf[Core]))
-class HallV62Config {
+class HallV62Config extends ActiveRecordConfigSupport{
   @XmlElement(name="app_server")
   var appServer:V62ServerConfig = new V62ServerConfig()
   @XmlElement(name="template_finger_table")

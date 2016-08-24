@@ -58,7 +58,7 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config) extends LPPalmSer
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    throw new UnsupportedOperationException
+    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_LATPALM, cardId)
   }
 
   /**

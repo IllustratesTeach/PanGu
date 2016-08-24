@@ -5,65 +5,72 @@ import "monad/rpc/protocol/command.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "LPPalmProto";
 
+//现场指纹信息操作接口 cmd[10400-10499]
 //添加现场掌纹
 message LPPalmAddRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmAddRequest cmd = 10101;
+        optional LPPalmAddRequest cmd = 10400;
     }
     required LPCard card = 1;
+    optional string dbid = 2;
 }
 message LPPalmAddResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmAddResponse cmd = 10102;
+        optional LPPalmAddResponse cmd = 10401;
     }
 }
 //删除现场掌纹
 message LPPalmDelRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmDelRequest cmd = 10103;
+        optional LPPalmDelRequest cmd = 10402;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message LPPalmDelResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmDelResponse cmd = 10104;
+        optional LPPalmDelResponse cmd = 10403;
     }
 }
 //更新现场掌纹
 message LPPalmUpdateRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmUpdateRequest cmd = 10105;
+        optional LPPalmUpdateRequest cmd = 10404;
     }
     required LPCard card = 1;
+    optional string dbid = 2;
 }
 message LPPalmUpdateResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmUpdateResponse cmd = 10106;
+        optional LPPalmUpdateResponse cmd = 10405;
     }
 }
 //查询现场掌纹
 message LPPalmGetRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmGetRequest cmd = 10107;
+        optional LPPalmGetRequest cmd = 10406;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message LPPalmGetResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmGetResponse cmd = 10108;
+        optional LPPalmGetResponse cmd = 10407;
     }
     optional LPCard card = 1;
+    optional string dbid = 2;
 }
 //验证卡号是否已存在
 message LPPalmIsExistRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmIsExistRequest cmd = 10109;
+        optional LPPalmIsExistRequest cmd = 10408;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message LPPalmIsExistResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional LPPalmIsExistResponse cmd = 10110;
+        optional LPPalmIsExistResponse cmd = 10409;
     }
     required bool isExist = 1;
 }

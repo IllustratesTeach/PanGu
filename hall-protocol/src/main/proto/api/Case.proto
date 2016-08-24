@@ -5,66 +5,72 @@ import "monad/rpc/protocol/command.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "CaseProto";
 
+//案件信息操作接口 cmd[10200-10299]
 //添加案件
 message CaseAddRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseAddRequest cmd = 10011;
+        optional CaseAddRequest cmd = 10200;
     }
     required Case case = 1;
+    optional string dbid = 2;
 }
 message CaseAddResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseAddResponse cmd = 10012;
+        optional CaseAddResponse cmd = 10201;
     }
 }
 //删除案件
 message CaseDelRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseDelRequest cmd = 10013;
+        optional CaseDelRequest cmd = 10202;
     }
     required string case_id = 1;
+    optional string dbid = 2;
 }
 message CaseDelResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseDelResponse cmd = 10014;
+        optional CaseDelResponse cmd = 10203;
     }
 }
 //更新案件
 message CaseUpdateRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseUpdateRequest cmd = 10015;
+        optional CaseUpdateRequest cmd = 10204;
     }
     required Case case = 1;
+    optional string dbid = 2;
 }
 message CaseUpdateResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseUpdateResponse cmd = 10016;
+        optional CaseUpdateResponse cmd = 10205;
     }
 }
 //查询案件
 message CaseGetRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseGetRequest cmd = 10017;
+        optional CaseGetRequest cmd = 10206;
     }
     required string case_id = 1;
+    optional string dbid = 2;
 }
 
 message CaseGetResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseGetResponse cmd = 10018;
+        optional CaseGetResponse cmd = 10207;
     }
     optional Case case = 1;
 }
 //验证卡号是否已存在
 message CaseIsExistRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseIsExistRequest cmd = 10019;
+        optional CaseIsExistRequest cmd = 10208;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message CaseIsExistResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional CaseIsExistResponse cmd = 10020;
+        optional CaseIsExistResponse cmd = 10209;
     }
     required bool isExist = 1;
 }

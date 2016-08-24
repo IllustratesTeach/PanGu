@@ -12,11 +12,10 @@ import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.V62ServerAddress
 import org.apache.tapestry5.ioc.annotations.EagerLoad
-import org.apache.tapestry5.ioc.{Configuration, ServiceBinder, Registry, RegistryBuilder}
+import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.support.TransactionSynchronizationManager
-import stark.activerecord.config.ActiveRecordConfigSupport
 
 import scala.io.Source
 import scala.reflect._
@@ -35,7 +34,8 @@ class BaseV62TestCase {
   def setup: Unit ={
     val modules = Seq[String](
       "stark.activerecord.StarkActiveRecordModule",
-       "nirvana.hall.v62.LocalV62ServiceModule",
+      "nirvana.hall.api.LocalProtobufModule",
+      "nirvana.hall.v62.LocalV62ServiceModule",
       "nirvana.hall.v62.LocalV62DataSourceModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
@@ -94,11 +94,8 @@ object TestV62Module {
   def buildHallApiConfig={
     new HallApiConfig
   }
-  def buildActiveRecordConfigSupport={
-    new ActiveRecordConfigSupport{}
-  }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.v70.jpa")
+    configuration.add("nirvana.hall.api.jpa")
   }
   @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {

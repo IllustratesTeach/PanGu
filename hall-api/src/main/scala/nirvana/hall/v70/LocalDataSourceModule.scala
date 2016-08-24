@@ -95,6 +95,7 @@ object LocalDataSourceModule {
     val migrator = new Migrator(dataSource, databaseAdapter)
     //migrator.migrate(RemoveAllMigrations, "nirvana.hall.v70.migration", false)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.v70.migration", searchSubPackages = false)
+    migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
 
     dataSource
   }

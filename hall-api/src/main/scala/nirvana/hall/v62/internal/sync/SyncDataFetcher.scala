@@ -3,7 +3,6 @@ package nirvana.hall.v62.internal.sync
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.SqlUtils
 import nirvana.hall.support.services.JdbcDatabase
 
 import scala.collection.mutable.ArrayBuffer
@@ -12,18 +11,21 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/6/18.
  */
 abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSupport{
-  //卡号(tablecatlog.keyname),用来查询数据信息
+  /**
+   * 卡号(tablecatlog.keyname),用来查询数据信息
+   */
   val KEY_NAME: String
   val FETCH_BATCH_SIZE = 100
 
-  def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], timestamp: Long, size: Int, tableName: String): Unit ={
-    val from = getMinSeq(timestamp, tableName)
+  def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], seq: Long, size: Int, tableName: String): Unit ={
+    val from = getMinSeq(seq, tableName)
     if(from > 0 && getMaxSeq(tableName) >= from){
       JdbcDatabase.queryWithPsSetter2(getSyncSql(tableName, KEY_NAME)){ps=>
         ps.setLong(1, from)
         ps.setLong(2, from + FETCH_BATCH_SIZE)
       }{rs=>
         while (rs.next()){
+          val cardid = rs.getString("sid")
           val seq = rs.getLong("seq")
           if(cardIdBuffer.length >= size){
             val lastSeq = cardIdBuffer.last._2
@@ -31,13 +33,9 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
               return
             }
           }
-          val cardid = rs.getString("cardid")
           //存在对应不上卡号的数据,可能数据删除了, 卡号存在空格的情况
           if(cardid != null && cardid.trim.length > 0){
             cardIdBuffer += (cardid -> seq)
-          }else{
-            val oraSid = rs.getString("ora_sid")
-            error("SyncDataFetcher ora_sid:{}, cardId:{}", oraSid, cardid)
           }
         }
         if(cardIdBuffer.length < size){
@@ -51,7 +49,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMaxSeq(tableName: String): Long = {
-    val sql = s"select ${SqlUtils.wrapModTimeAsLong(Some("max"))} from ${tableName}_mod t "
+    val sql = s"select max(seq) from ${tableName}_mod_7 t "
     getSeqBySql(sql)
   }
 
@@ -60,7 +58,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMinSeq(from: Long, tableName: String): Long = {
-    val sql = s"select ${SqlUtils.wrapModTimeAsLong(Some("min"))} from ${tableName}_mod t where ${SqlUtils.wrapModTimeAsLong()} > ${from}"
+    val sql = s"select min(seq) from ${tableName}_mod_7 t where seq > ${from}"
     getSeqBySql(sql)
   }
 
@@ -69,7 +67,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   }
 
   def getSyncSql(tableName: String, cardId: String): String ={
-    s"select tp.ora_sid, tp.${KEY_NAME} as cardid, ${SqlUtils.wrapModTimeAsLong()} as seq from ${tableName}_mod t left join ${tableName} tp on tp.ora_sid= t.ora_sid where ${SqlUtils.wrapModTimeAsLong()} >=? and ${SqlUtils.wrapModTimeAsLong()} <=? order by seq"
+    s"select sid, seq from ${tableName}_mod_7 t where seq >=? and seq <=? order by seq"
   }
 
   /**

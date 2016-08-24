@@ -6,6 +6,7 @@ import "monad/rpc/protocol/command.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "HallMatchRelationProto";
 
+//比对关系接口 cmd[10600-10699]
 //比对状态
 enum MatchStatus{
     WAITING_MATCH = 1;  //等待比对 6.2:0    7.0:0
@@ -23,7 +24,7 @@ enum MatchStatus{
 //获取比对关系请求
 message MatchRelationGetRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional MatchRelationGetRequest cmd = 11001;
+        optional MatchRelationGetRequest cmd = 10600;
     }
     required fpt.MatchType match_type = 1; //比对类型
     required string card_id = 2; //卡号
@@ -32,7 +33,7 @@ message MatchRelationGetRequest{
 //获取比对关系响应
 message MatchRelationGetResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional MatchRelationGetResponse cmd = 11002;
+        optional MatchRelationGetResponse cmd = 10601;
     }
     required fpt.MatchType match_type = 1; //比对类型
     required MatchStatus match_status = 2; //比对状态
