@@ -14,42 +14,37 @@ class LPPalmFilter(httpServletRequest: HttpServletRequest, lPPalmService: LPPalm
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(LPPalmAddRequest.cmd)) {
       val request = commandRequest.getExtension(LPPalmAddRequest.cmd)
-      val dbId = getDBID(httpServletRequest)
-      lPPalmService.addLPCard(request.getCard, dbId)
+      lPPalmService.addLPCard(request.getCard, Option(request.getDbid))
       val response = LPPalmAddResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPPalmAddResponse.cmd, response)
       true
     }//删除现场
     else if(commandRequest.hasExtension(LPPalmDelRequest.cmd)) {
       val request = commandRequest.getExtension(LPPalmDelRequest.cmd)
-      val dbId = getDBID(httpServletRequest)
-      lPPalmService.delLPCard(request.getCardId, dbId)
+      lPPalmService.delLPCard(request.getCardId, Option(request.getDbid))
       val response = LPPalmDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPPalmDelResponse.cmd, response)
       true
     }//更新现场
     else if(commandRequest.hasExtension(LPPalmUpdateRequest.cmd)) {
       val request = commandRequest.getExtension(LPPalmUpdateRequest.cmd)
-      val dbId = getDBID(httpServletRequest)
-      lPPalmService.updateLPCard(request.getCard, dbId)
+      lPPalmService.updateLPCard(request.getCard, Option(request.getDbid))
       val response = LPPalmUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPPalmUpdateResponse.cmd, response)
       true
     }//查询现场
     else if(commandRequest.hasExtension(LPPalmGetRequest.cmd)){
       val request = commandRequest.getExtension(LPPalmGetRequest.cmd)
-      val dbId = getDBID(httpServletRequest)
-      val LPPalm = lPPalmService.getLPCard(request.getCardId, dbId)
+      val LPPalm = lPPalmService.getLPCard(request.getCardId, Option(request.getDbid))
       val response = LPPalmGetResponse.newBuilder().setCard(LPPalm).build()
       commandResponse.writeMessage(commandRequest, LPPalmGetResponse.cmd, response)
       true
     }//是否已存在
     else if(commandRequest.hasExtension(LPPalmIsExistRequest.cmd)){
       val request = commandRequest.getExtension(LPPalmIsExistRequest.cmd)
-      val dbId = getDBID(httpServletRequest)
       val cardId = request.getCardId
       val response = LPPalmIsExistResponse.newBuilder()
-      response.setIsExist(lPPalmService.isExist(cardId, dbId))
+      response.setIsExist(lPPalmService.isExist(cardId, Option(request.getDbid)))
       commandResponse.writeMessage(commandRequest, LPPalmIsExistResponse.cmd, response.build())
       true
     }else{

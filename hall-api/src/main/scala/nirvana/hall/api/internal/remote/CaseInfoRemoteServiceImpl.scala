@@ -16,9 +16,10 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param url
    * @return
    */
-  override def getCaseInfo(caseId: String, url: String, headerMap: Map[String, String]): Case = {
+  override def getCaseInfo(caseId: String, url: String, dbId: Option[String]): Case = {
     info("remote get caseInfo [caseId:{},url:{}]", caseId, url)
     val request = CaseGetRequest.newBuilder().setCaseId(caseId)
+    request.setDbid(dbId.get)
     val response = rpcHttpClient.call(url, CaseGetRequest.cmd, request.build())
     response.getExtension(CaseGetResponse.cmd).getCase
   }
@@ -28,9 +29,10 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param caseInfo
    * @return
    */
-  override def addCaseInfo(caseInfo: Case, url: String) = {
+  override def addCaseInfo(caseInfo: Case, url: String, dbId: Option[String]) = {
     info("remote add caseInfo [caseId:{},url:{}]", caseInfo.getStrCaseID, url)
     val request = CaseAddRequest.newBuilder().setCase(caseInfo)
+    request.setDbid(dbId.get)
     rpcHttpClient.call(url, CaseAddRequest.cmd, request.build())
   }
 
@@ -39,9 +41,10 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param caseInfo
    * @param url
    */
-  override def updateCaseInfo(caseInfo: Case, url: String): Unit = {
+  override def updateCaseInfo(caseInfo: Case, url: String, dbId: Option[String]): Unit = {
     info("remote update caseInfo [caseId:{},url:{}]", caseInfo.getStrCaseID, url)
     val request = CaseUpdateRequest.newBuilder().setCase(caseInfo)
+    request.setDbid(dbId.get)
     rpcHttpClient.call(url, CaseUpdateRequest.cmd, request.build())
   }
 
@@ -50,21 +53,23 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param caseId
    * @param url
    */
-  override def deleteCaseInfo(caseId: String, url: String): Unit = {
+  override def deleteCaseInfo(caseId: String, url: String, dbId: Option[String]): Unit = {
     info("remote delete caseInfo [caseId:{},url:{}]", caseId, url)
     val request = CaseDelRequest.newBuilder().setCaseId(caseId)
+    request.setDbid(dbId.get)
     rpcHttpClient.call(url, CaseDelRequest.cmd, request.build())
   }
   /**
    * 案件编号是否存在
    * @param caseId
    * @param url
-   * @param headerMap
+   * @param dbId
    */
-  override def isExist(caseId: String, url: String, headerMap: Map[String, String]): Boolean = {
+  override def isExist(caseId: String, url: String, dbId: Option[String]): Boolean = {
     val request = CaseIsExistRequest.newBuilder()
     request.setCardId(caseId)
-    val baseResponse = rpcHttpClient.call(url, CaseIsExistRequest.cmd, request.build(), headerMap)
+    request.setDbid(dbId.get)
+    val baseResponse = rpcHttpClient.call(url, CaseIsExistRequest.cmd, request.build())
     val response = baseResponse.getExtension(CaseIsExistResponse.cmd)
 
     response.getIsExist

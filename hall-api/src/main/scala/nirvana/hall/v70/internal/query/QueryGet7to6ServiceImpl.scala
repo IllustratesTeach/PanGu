@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal.query
 import java.util.Date
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.v70.config.HallV70Config
@@ -78,8 +79,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                   //如果本地没有对应的案件信息，先远程验证是否存在案件信息,远程获取案件到本地
                   if(GafisCase.findOption(caseId).isEmpty){
                     val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
-                    caseInfoRemoteService.isExist(caseId, url, headerMap.++(dbIdMap))
-                    val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url)
+                    caseInfoRemoteService.isExist(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
+                    val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
                     caseInfoService.addCaseInfo(caseInfo)
                   }
                 }

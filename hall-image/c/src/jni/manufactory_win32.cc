@@ -1,9 +1,9 @@
+#include <jni.h>
 #ifdef WIN32
 #include <windows.h>
 #include <stdio.h>
 
 
-#include <jni.h>
 #include <crtdbg.h>
 
 #include "manufactory_win32.h"

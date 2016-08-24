@@ -5,86 +5,112 @@ import "monad/rpc/protocol/command.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "SyncDataProto";
 
-//同步捺印数据，添加timestamp时间
+//数据同步接口，cmd[10600-10699]
+/**
+    10600   SyncTPCardRequest
+    10601   SyncTPCardResponse
+    10602   SyncLPCardRequest
+    10603   SyncLPCardResponse
+    10604   SyncCaseRequest
+    10605   SyncCaseResponse
+    10606   SyncLPPalmRequest
+    10607   SyncLPPalmResponse
+*/
+enum OperationType {
+    PUT = 1; //新增或者修改
+    DEL = 2; //删除
+}
+//同步捺印数据，添加seq时间
 message SyncTPCard{
     required TPCard tpCard = 1;
-    required int64 timestamp = 2;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步现场数据
+message SyncLPCard{
+    required LPCard lpCard = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步案件数据
+message SyncCase{
+    required Case caseInfo = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
 }
 //同步TPCard
 message SyncTPCardRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncTPCardRequest cmd = 11501;
+        optional SyncTPCardRequest cmd = 10600;
     }
     //数据时间戳,Web服务器可以用此时间戳进行数据查询
-    required int64 timestamp = 1;
+    required int64 seq = 1;
     //数据大小，一次传送的数据大小,默认为100
     optional int32 size = 2 [default = 100];
+    //物理库dbid
+    optional string dbid = 3;
 }
 message SyncTPCardResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncTPCardResponse cmd = 11502;
+        optional SyncTPCardResponse cmd = 10601;
     }
     repeated SyncTPCard syncTPCard = 1;
-}
-
-//同步捺印数据，添加timestamp时间
-message SyncLPCard{
-    required LPCard lpCard = 1;
-    required int64 timestamp = 2;
+    optional int64 seq = 2;
 }
 //同步LPCard
 message SyncLPCardRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncLPCardRequest cmd = 11503;
+        optional SyncLPCardRequest cmd = 10602;
     }
     //数据时间戳,Web服务器可以用此时间戳进行数据查询
-    required int64 timestamp = 1;
+    required int64 seq = 1;
     //数据大小，一次传送的数据大小,默认为100
     optional int32 size = 2 [default = 100];
+    optional string dbid = 3;
 }
 message SyncLPCardResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncLPCardResponse cmd = 11504;
+        optional SyncLPCardResponse cmd = 10603;
     }
     repeated SyncLPCard syncLPCard = 1;
+    optional int64 seq = 2;
 }
 
-//同步捺印数据，添加timestamp时间
-message SyncCase{
-    required Case caseInfo = 1;
-    required int64 timestamp = 2;
-}
 //同步Case
 message SyncCaseRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncCaseRequest cmd = 11505;
+        optional SyncCaseRequest cmd = 10604;
     }
     //数据时间戳,Web服务器可以用此时间戳进行数据查询
-    required int64 timestamp = 1;
+    required int64 seq = 1;
     //数据大小，一次传送的数据大小,默认为100
     optional int32 size = 2 [default = 100];
+    optional string dbid = 3;
 }
 message SyncCaseResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncCaseResponse cmd = 11506;
+        optional SyncCaseResponse cmd = 10605;
     }
     repeated SyncCase syncCase = 1;
+    optional int64 seq = 2;
 }
 
 //同步LPPalm
 message SyncLPPalmRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncLPPalmRequest cmd = 11507;
+        optional SyncLPPalmRequest cmd = 10606;
     }
     //数据时间戳,Web服务器可以用此时间戳进行数据查询
-    required int64 timestamp = 1;
+    required int64 seq = 1;
     //数据大小，一次传送的数据大小,默认为100
     optional int32 size = 2 [default = 100];
+    optional string dbid = 3;
 }
 message SyncLPPalmResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional SyncLPPalmResponse cmd = 11508;
+        optional SyncLPPalmResponse cmd = 10607;
     }
     repeated SyncLPCard syncLPCard = 1;
+    optional int64 seq = 2;
 }
 

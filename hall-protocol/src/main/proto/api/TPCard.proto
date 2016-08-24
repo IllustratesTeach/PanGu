@@ -5,65 +5,72 @@ import "monad/rpc/protocol/command.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "TPCardProto";
 
+//捺印信息操作接口 cmd[10100-10199]
 //新增
 message TPCardAddRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardAddRequest cmd = 10041;
+        optional TPCardAddRequest cmd = 10100;
     }
     required TPCard card = 1;
+    optional string dbid = 2;
 }
 message TPCardAddResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardAddResponse cmd = 10042;
+        optional TPCardAddResponse cmd = 10101;
     }
 }
 //删除
 message TPCardDelRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardDelRequest cmd = 10043;
+        optional TPCardDelRequest cmd = 10102;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message TPCardDelResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardDelResponse cmd = 10044;
+        optional TPCardDelResponse cmd = 10103;
     }
 }
 //修改
 message TPCardUpdateRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardUpdateRequest cmd = 10045;
+        optional TPCardUpdateRequest cmd = 10104;
     }
     required TPCard card = 1;
+    optional string dbid = 2;
 }
 message TPCardUpdateResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardUpdateResponse cmd = 10046;
+        optional TPCardUpdateResponse cmd = 10105;
     }
 }
 //查询
 message TPCardGetRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardGetRequest cmd = 10047;
+        optional TPCardGetRequest cmd = 10106;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message TPCardGetResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardGetResponse cmd = 10048;
+        optional TPCardGetResponse cmd = 10107;
     }
     required TPCard card = 1;
+    optional string dbid = 2;
 }
 //验证卡号是否已存在
 message TPCardIsExistRequest{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardIsExistRequest cmd = 10049;
+        optional TPCardIsExistRequest cmd = 10108;
     }
     required string card_id = 1;
+    optional string dbid = 2;
 }
 message TPCardIsExistResponse{
     extend monad.rpc.protocol.BaseCommand{
-        optional TPCardIsExistResponse cmd = 10050;
+        optional TPCardIsExistResponse cmd = 10109;
     }
     required bool isExist = 1;
 }

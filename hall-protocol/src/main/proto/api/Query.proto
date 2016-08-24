@@ -6,16 +6,17 @@ import "matcher/match_result.proto";
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "QueryProto";
 
+//查询接口 cmd[10500-10599]
 //发送查询
 message QuerySendRequest {
     extend monad.rpc.protocol.BaseCommand{
-        optional QuerySendRequest cmd = 10031;
+        optional QuerySendRequest cmd = 10500;
     }
     required matcher.MatchTask matchTask = 1;
 }
 message QuerySendResponse {
     extend monad.rpc.protocol.BaseCommand{
-        optional QuerySendResponse cmd = 10032;
+        optional QuerySendResponse cmd = 10501;
     }
     required int64 ora_sid = 1;
 }
@@ -23,13 +24,13 @@ message QuerySendResponse {
 //获取查询结果
 message QueryGetRequest {
     extend monad.rpc.protocol.BaseCommand{
-        optional QueryGetRequest cmd = 10033;
+        optional QueryGetRequest cmd = 10502;
     }
     required int64 ora_sid = 1;
 }
 message QueryGetResponse {
     extend monad.rpc.protocol.BaseCommand{
-        optional QueryGetResponse cmd = 10034;
+        optional QueryGetResponse cmd = 10503;
     }
     required bool isComplete = 1 [default = true];
     optional matcher.MatchResult matchResult = 2;

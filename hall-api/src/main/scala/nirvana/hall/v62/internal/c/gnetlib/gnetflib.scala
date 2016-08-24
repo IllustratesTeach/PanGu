@@ -157,4 +157,30 @@ trait gnetflib {
     val response = channel.receive[GNETANSWERHEADOBJECT]()
     validateResponse(channel, response)
   }
+  def NET_GAFIS_FLIB_Exist(nDBID:Short,nTableID:Short, cardId: String, nOption:Int = 0):Boolean =executeInChannel{channel=>
+    val pReq = createRequestHeader
+    pReq.nOption = nOption
+    pReq.nDBID = nDBID
+    pReq.nTableID = nTableID
+    pReq.bnData = cardId.getBytes
+
+    //判断数据库类型，捺印or现场
+    val stDBProp = NET_GAFIS_SYS_GetDBType(nDBID)
+    stDBProp.nType  match {
+      case gadbprop.GADBPROP_TYPE_TENPRINT =>
+        // tenprint database
+        pReq.nOpClass = OP_CLASS_TPLIB.asInstanceOf[Short]
+        pReq.nOpCode = OP_TPLIB_EXIST.asInstanceOf[Short]
+      case gadbprop.GADBPROP_TYPE_LATENT =>
+        // latent
+        pReq.nOpClass = OP_CLASS_LPLIB.asInstanceOf[Short]
+        pReq.nOpCode = OP_LPLIB_EXIST.asInstanceOf[Short]
+      case other=>
+        throw new IllegalArgumentException("dbType"+stDBProp.nType)
+    }
+    val response =channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
+    validateResponse(channel,response)
+
+    response.nReturnValue > 0
+  }
 }

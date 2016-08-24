@@ -10,18 +10,19 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/8/4.
  */
 abstract class SyncDataFetcher(implicit dataSource: DataSource) {
-  //TODO
   val SYNC_SQL: String
   val FETCH_BATCH_SIZE = 10
 
-  def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], timestamp: Long, size: Int, dbId: Option[String]): Unit ={
-    val from = getMinSeq(timestamp, dbId)
-    if(from < getMaxSeq(dbId)){
+  def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], seq: Long, size: Int, dbId: Option[String]): Unit ={
+    val from = getMinSeq(seq, dbId)
+    if(from >0 && from <= getMaxSeq(dbId)){
       JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
-        ps.setLong(1, from)
-        ps.setLong(2, from + FETCH_BATCH_SIZE)
+        ps.setString(1, dbId.get)
+        ps.setLong(2, from)
+        ps.setLong(3, from + FETCH_BATCH_SIZE)
       }{rs=>
         while (rs.next()){
+          val cardid = rs.getString("sid")
           val seq = rs.getLong("seq")
           if(cardIdBuffer.length >= size){
             val lastSeq = cardIdBuffer.last._2
@@ -29,7 +30,6 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) {
               return
             }
           }
-          val cardid = rs.getString("cardid")
           cardIdBuffer += (cardid -> seq)
         }
         if(cardIdBuffer.length < size){

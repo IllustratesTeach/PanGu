@@ -5,7 +5,7 @@ import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade.AutoSetupServerContextFilter
-import org.apache.tapestry5.ioc.OrderedConfiguration
+import org.apache.tapestry5.ioc.{Configuration, OrderedConfiguration}
 import org.apache.tapestry5.ioc.annotations.{Contribute, Symbol}
 import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletRequestHandler}
 
@@ -24,4 +24,8 @@ object LocalV62Module {
   def provideAutoSetupServerContextFilter(configuration: OrderedConfiguration[HttpServletRequestFilter]): Unit = {
     configuration.addInstance("AutoSetupServerContext", classOf[AutoSetupServerContextFilter], "before:protobuf")
   }
+  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
+    configuration.add("nirvana.hall.api.jpa")
+  }
 }
+
