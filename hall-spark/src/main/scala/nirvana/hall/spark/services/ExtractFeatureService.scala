@@ -9,6 +9,7 @@ import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractResponse, ExtractRequest}
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 import org.apache.commons.io.FileUtils
 import scala.util.control.NonFatal
@@ -28,21 +29,20 @@ object ExtractFeatureService {
   case class ExtractError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "E|"+message
   }
-  def requestExtract(parameter:NirvanaSparkConfig,event:StreamEvent,originalImg:GAFISIMAGESTRUCT):Option[(StreamEvent,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]= {
+  def requestExtract(parameter:NirvanaSparkConfig,event:StreamEvent, originalImg : GAFISIMAGESTRUCT, fingerImg : TemplateFingerConvert):Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]= {
     if (event.personId != null && event.personId.length > 0) {
       try {
         val featureTryVersion = if (parameter.isNewFeature) ExtractProto.NewFeatureTry.V2 else ExtractProto.NewFeatureTry.V1
-        //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\dd\\"+event.path+".data"),originalImg.toByteArray())
         if(directExtract) {
           SparkFunctions.loadExtractorJNI()
           if (converterExtract) {
             val is = new ByteArrayInputStream(originalImg.toByteArray())
             val newFeature = extractor.ConvertMntOldToNew(is)
-            Some(event, new GAFISIMAGESTRUCT().fromByteArray(newFeature.get),null)
+            val mnt = new GAFISIMAGESTRUCT().fromByteArray(newFeature.get)
+            Some(event, fingerImg,mnt,null)
           } else {
-            //FileUtils.writeStringToFile(new File("C:\\Users\\wangjue\\Desktop\\dd\\1.txt"),event.path+"\r\n",true)
             val (mnt, bin) = extractor.extractByGAFISIMG(originalImg, event.position, event.featureType, featureTryVersion)
-            Some(event, mnt, bin)
+            Some(event, fingerImg,mnt, bin)
           }
         }else {
           val rpcHttpClient = SparkFunctions.httpClient
@@ -56,18 +56,16 @@ object ExtractFeatureService {
             case CommandStatus.OK =>
               if (baseResponse.hasExtension(ExtractResponse.cmd)) {
                 val response = baseResponse.getExtension(ExtractResponse.cmd)
-                val imgData = response.getMntData
+                val mntData = response.getMntData
                 val binData = response.getBinData
 
-                val gafisImg = new GAFISIMAGESTRUCT
-                val is = imgData.newInput()
-                gafisImg.fromStreamReader(is)
-
+                val gafisMnt = new GAFISIMAGESTRUCT
+                val is = binData.newInput()
+                gafisMnt.fromStreamReader(is)
                 val gafisBin = new GAFISIMAGESTRUCT
                 val bin = binData.newInput()
                 gafisBin.fromStreamReader(bin)
-
-                Some((event, gafisImg, gafisBin))
+                Some((event, fingerImg, gafisMnt, gafisBin))
               } else {
                 throw new IllegalAccessException("response haven't ExtractResponse")
               }
@@ -82,7 +80,7 @@ object ExtractFeatureService {
           None
       }
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
-      Some((event, originalImg,null))
+      Some((event, null,null,null))
     } else {
       SparkFunctions.reportError(parameter, ExtractError(event, "personId and caseId are null!"))
       None

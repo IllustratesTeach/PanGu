@@ -2,6 +2,7 @@ package nirvana.hall.spark.internal
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.{PartitionRecordsSaver, SysProperties, SparkFunctions}
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 import nirvana.hall.support.services.JdbcDatabase
@@ -16,9 +17,9 @@ import scala.util.control.NonFatal
  */
 class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
   import GafisPartitionRecordsSaver._
-  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
+  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
     val flag= parameter.kafkaTopicName
-    records.foreach { case (event, mnt ,bin) =>
+    records.foreach { case (event, fingerImg,fingerMnt ,fingerBin) =>
       try {
         if (event.personId != null && event.personId.length > 0) { //save template
         var fagCase = 0
@@ -32,13 +33,13 @@ class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
             }
           }
 
-          if (mnt.stHead.bIsPlain == 1) //is plain finger
+          if (fingerMnt.stHead.bIsPlain == 1) //is plain finger
             fagCase = 1
           //save mnt
-          savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, mnt.toByteArray(), event.path, 0,flag)
+          savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, fingerMnt.toByteArray(), event.path, 0,flag)
           //save bin
           if (parameter.isExtractorBin)
-            savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, bin.toByteArray(), event.path ,4,flag)
+            savePersonFingerMntInfo(event.personId, fagCase, event.position.getNumber, fingerBin.toByteArray(), event.path ,4,flag)
         }
 
         if (event.caseId != null && event.caseId.length > 0) { //save latent
@@ -68,7 +69,7 @@ class GafisPartitionRecordsSaver  extends PartitionRecordsSaver {
           //save mnt
           val hasMnt = updateCaseFingerMntInfo(event.cardId)
           if (hasMnt == 0)
-            saveCaseFingerMntInfo(event.cardId,event.caseId,mnt.toByteArray())
+            saveCaseFingerMntInfo(event.cardId,event.caseId,fingerMnt.toByteArray())
         }
       } catch {
         case NonFatal(e) =>

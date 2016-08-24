@@ -2,6 +2,7 @@ package nirvana.hall.spark.internal
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.{PartitionRecordsSaver, SysProperties, SparkFunctions}
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
 import nirvana.hall.support.services.JdbcDatabase
@@ -13,10 +14,10 @@ import scala.util.control.NonFatal
  */
 class GafisPartitionRecordsUpdate extends PartitionRecordsSaver {
   import GafisPartitionRecordsUpdate._
-  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
-    records.foreach { case (event, mnt, bin) =>
+  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
+    records.foreach { case (event, fingerImg, fingerMnt, fingerBin) =>
       try {
-        savePersonFingerMntInfo(event.path,mnt.toByteArray())
+        savePersonFingerMntInfo(event.path,fingerMnt.toByteArray())
       }  catch {
         case NonFatal(e) =>
           e.printStackTrace(System.err)

@@ -1,15 +1,18 @@
 package nirvana.hall.spark.services
 
+import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.image.internal.FirmDecoderImpl
+import nirvana.hall.image.internal.{ImageEncoderImpl, FirmDecoderImpl}
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
+import org.apache.commons.io.FileUtils
 
 import scala.util.control.NonFatal
 
@@ -27,6 +30,7 @@ object DecompressImageService {
   private lazy val imageServers = SysProperties.getPropertyOption("decompress.server").get
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
+  private lazy val wsqDecode = new ImageEncoderImpl
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "D|"+message
   }
@@ -45,15 +49,14 @@ object DecompressImageService {
       }
     }
   }
-  def requestDecompress(parameter:NirvanaSparkConfig,event:StreamEvent,compressedImg: GAFISIMAGESTRUCT):Option[(StreamEvent,GAFISIMAGESTRUCT)]= {
+  def requestDecompress(parameter:NirvanaSparkConfig,event:StreamEvent,compressedImg: GAFISIMAGESTRUCT):Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)]= {
     if (event.personId != null && event.personId.length > 0) {
-    //if (true) {
-
+      val finger = FptPropertiesConverter.fptFingerDataToTemplateFingerConvert(event.personId,event.position.getNumber.toString,"1","1",compressedImg,event.path)
       if (compressedImg.stHead.bIsCompressed == 1) {
         //using direct decompress method for WSQ and GFS
         if (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_WSQ.toByte
         && wsqDirect){
-          directDecode(parameter, event, compressedImg)
+          directDecode(parameter, event,finger, compressedImg)
         }else if( gfsDirect && (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW_EZW.toByte
@@ -63,29 +66,33 @@ object DecompressImageService {
             compressedImg.stHead.nWidth = 640
             compressedImg.stHead.nHeight = 640
           }
-          directDecode(parameter, event, compressedImg)
+          directDecode(parameter, event, finger, compressedImg)
         }
         else
-          decompressWithHttpService(parameter, event, compressedImg)
+          decompressWithHttpService(parameter, event, finger, compressedImg)
       } else {
-        Some((event, compressedImg))
+        val fingerImg = finger
+        val wsqImg = wsqDecode.encodeWSQ(compressedImg)
+        fingerImg.gatherData = wsqImg.toByteArray()
+        Some((event, compressedImg, fingerImg))
       }
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
-      Some((event, compressedImg))
+      Some((event, null, null))
     } else {
       doReportException(parameter, event,new RuntimeException("personId and caseId are null!"))
       None
     }
   }
 
-  private def directDecode(parameter: NirvanaSparkConfig, event: StreamEvent, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT)] = {
+  private def directDecode(parameter: NirvanaSparkConfig, event: StreamEvent, finger : TemplateFingerConvert, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
     try {
-      //load jni
-      //          println("jni decompress code:"+compressedImg.stHead.nCompressMethod)
+      val fingerImg = finger
       SparkFunctions.loadImageJNI()
-      //FileUtils.writeByteArrayToFile(new File("/home/gafis/spark/"+event.path+".data"),decoder.decode(compressedImg).toByteArray())
       val result = decoder.decode(compressedImg)
-      Some((event, result))
+      finger.gatherData = result.toByteArray()
+      val wsqImg = wsqDecode.encodeWSQ(result)
+      fingerImg.gatherData = wsqImg.toByteArray()
+      Some((event, result, fingerImg))
     } catch {
       case NonFatal(e) =>
         doReportException(parameter, event,
@@ -99,12 +106,12 @@ object DecompressImageService {
     None
   }
 
-  private def decompressWithHttpService(parameter: NirvanaSparkConfig, event: StreamEvent, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT)] = {
+  private def decompressWithHttpService(parameter: NirvanaSparkConfig, event: StreamEvent, finger: TemplateFingerConvert , compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
     val rpcHttpClient = SparkFunctions.httpClient
     val request = FirmImageDecompressRequest.newBuilder()
     request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
     //    @tailrec
-    def doDecompress(seq: Int): Option[(StreamEvent, GAFISIMAGESTRUCT)] = {
+    def doDecompress(seq: Int): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
       try {
         val baseResponse = rpcHttpClient.call(serverRandom(), FirmImageDecompressRequest.cmd, request.build())
         baseResponse.getStatus match {
@@ -120,7 +127,12 @@ object DecompressImageService {
                 gafisImg.stHead.nWidth = 640
                 gafisImg.stHead.nHeight = 640
               }
-              Some((event, gafisImg))
+              finger.gatherData = gafisImg.toByteArray()
+              val fingerImg = finger
+              FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\非脱密FPT入库\\gafisImg\\gafisImg.img"),gafisImg.toByteArray())
+              val wsqImg = wsqDecode.encodeWSQ(gafisImg)
+              fingerImg.gatherData = wsqImg.toByteArray()
+              Some((event, gafisImg, fingerImg))
             } else {
               throw new IllegalAccessException("response haven't FirmImageDecompressResponse")
             }

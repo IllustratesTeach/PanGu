@@ -2,6 +2,7 @@ package nirvana.hall.spark.services
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.StreamEvent
 
 /**
@@ -17,7 +18,7 @@ object PartitionRecordsSaverService {
       .loadClass(saverClassName).newInstance()
       .asInstanceOf[PartitionRecordsSaver]
   }
-  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit={
+  def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit={
     saverClassName = parameter.dataSaverClass
     saver.savePartitionRecords(parameter)(records)
   }
