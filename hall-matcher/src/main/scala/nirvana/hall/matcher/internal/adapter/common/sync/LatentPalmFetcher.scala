@@ -16,15 +16,16 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
 class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
   override val MAX_SEQ_SQL: String = "select max(t.seq) as seq from gafis_case_palm t "
   override val MIN_SEQ_SQL: String = "select min(t.seq) as seq from gafis_case_palm t where t.seq >"
-  override val SYNC_SQL: String = "select t.sid, t.fgp, mnt.palm_mnt, t.seq, t.deletag " +
+  override val SYNC_SQL: String = "select t.sid, t.fgp, mnt.palm_mnt, mnt.palm_ridge, t.seq, t.deletag " +
     " from gafis_case_palm t left join gafis_case_palm_mnt mnt on mnt.palm_id=t.palm_id and mnt.is_main_mnt ='1' " +
     " where mnt.palm_mnt is not null and t.seq >= ? and t.seq <= ? order by t.seq"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
       val syncDataBuilder = SyncData.newBuilder
-      syncDataBuilder.setObjectId(rs.getInt("sid"))
       syncDataBuilder.setMinutiaType(SyncData.MinutiaType.PALM)
+      val sid = rs.getInt("sid")
+      syncDataBuilder.setObjectId(sid)
       val deletag = rs.getString("deletag")
       val lastSeq = rs.getLong("seq")
       if ("0" == deletag) {
@@ -36,6 +37,25 @@ class LatentPalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSo
       syncDataBuilder.setPos(1)
       syncDataBuilder.setData(ByteString.copyFrom(rs.getBytes("palm_mnt")))
       syncDataBuilder.setTimestamp(lastSeq)
+      val ridge = rs.getBytes("palm_ridge")
+      //如果有纹线数据，同步纹线数据
+      if (ridge != null) {
+        val ridgeBuilder = SyncData.newBuilder()
+        ridgeBuilder.setObjectId(sid)
+        ridgeBuilder.setMinutiaType(SyncData.MinutiaType.RIDGE)
+        ridgeBuilder.setOperationType(OperationType.PUT)
+        if ("0" == deletag) {
+          ridgeBuilder.setOperationType(OperationType.DEL)
+        } else {
+          ridgeBuilder.setOperationType(OperationType.PUT)
+        }
+        ridgeBuilder.setPos(1)
+        ridgeBuilder.setTimestamp(lastSeq)
+        ridgeBuilder.setData(ByteString.copyFrom(ridge))
+        if (validSyncData(ridgeBuilder.build, true)) {
+          syncDataResponse.addSyncData(ridgeBuilder.build)
+        }
+      }
       if (validSyncData(syncDataBuilder.build, true)) {
         syncDataResponse.addSyncData(syncDataBuilder.build)
       }
