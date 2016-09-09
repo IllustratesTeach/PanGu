@@ -364,4 +364,8 @@ object DataConverter {
       personid
     }
   }
+
+  def long2SidArray(sid:Long):Array[Byte]={
+    ByteBuffer.allocate(8).putLong(sid).array().drop(2)
+  }
 }
