@@ -97,8 +97,13 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          if(micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
-         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
-         matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
+         val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
+         val mnt = micStruct.pstMnt_Data
+         tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
+         //纹线数据
+         if (micStruct.pstBin_Data.length > 0)
+           tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }
      }
      //TODO 高级查询
