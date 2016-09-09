@@ -98,7 +98,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     candHead.nQueryType = queryType.toByte
     candHead.nSrcDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) 1 else 2
     candHead.nTableID = 2
-    candHead.nQueryID = DataConverter.long2SidArray(queryQue.oraSid).toString
+    candHead.nQueryID = DataConverter.long2SidArray(queryQue.oraSid)
     candHead.nCandidateNum = matchResultRequest.getCandidateNum
     candHead.tFinishTime = new AFISDateTime
     return candHead.toByteArray()
