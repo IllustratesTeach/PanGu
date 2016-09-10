@@ -8,7 +8,6 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpConverter, gaqryqueConverter}
@@ -152,10 +151,8 @@ trait grmtsvr {
         stQuery.map{query =>
           gaqryqueConverter.convertGAQUERYSTRUCT2MatchTask(query)
         }.foreach{matchTask =>
-          val request = QuerySendRequest.newBuilder()
-          request.setMatchTask(matchTask)
-          val response = findQueryService.sendQuery(request.build())
-          nAddRet = response.getOraSid.toInt
+          val oraSid = findQueryService.addMatchTask(matchTask)
+          nAddRet = oraSid.toInt
         }
 
         NETANS_SetRetVal(pAns,nAddRet);

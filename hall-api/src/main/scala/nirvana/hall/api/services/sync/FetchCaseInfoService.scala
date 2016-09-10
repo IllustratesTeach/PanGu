@@ -2,8 +2,6 @@ package nirvana.hall.api.services.sync
 
 import nirvana.hall.protocol.api.FPTProto.Case
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
  * Created by songpeng on 16/8/22.
  */
@@ -15,7 +13,7 @@ trait FetchCaseInfoService {
    * @param size
    * @param dbId
    */
-  def fetchCaseId(seq: Long, size: Int, dbId: Option[String] = None): ArrayBuffer[(String, Long)]
+  def fetchCaseId(seq: Long, size: Int, dbId: Option[String] = None): Seq[(String, Long)]
 
   /**
    * 验证读取策略

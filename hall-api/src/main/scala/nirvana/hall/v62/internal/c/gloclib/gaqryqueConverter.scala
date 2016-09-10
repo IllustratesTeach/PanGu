@@ -6,13 +6,13 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
-import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.{MatchResultObject, MatcherStatus}
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
@@ -20,6 +20,7 @@ import nirvana.hall.v62.internal.V62Facade
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 
 /**
@@ -169,7 +170,7 @@ object gaqryqueConverter {
    * @param gaQueryStruct
    * @return
    */
-  def convertGAQUERYSTRUCT2ProtoBuf(gaQueryStruct: GAQUERYSTRUCT): MatchResult={
+  def convertGAQUERYSTRUCT2MatchResult(gaQueryStruct: GAQUERYSTRUCT): MatchResult={
     val matchResult = MatchResult.newBuilder()
 
     val queryId = gaQueryStruct.stSimpQry.nQueryID
@@ -208,8 +209,8 @@ object gaqryqueConverter {
     matchTask.setMatchId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID).toString)
     //优先级
     matchTask.setPriority(gaQueryStruct.stSimpQry.nPriority)
-    //查询类型
-    matchTask.setMatchType(MatchType.valueOf(gaQueryStruct.stSimpQry.nQueryType))
+    //查询类型 TODO 掌纹查询类型?
+    matchTask.setMatchType(MatchType.valueOf(gaQueryStruct.stSimpQry.nQueryType + 1))
     //任务本身的sid
     matchTask.setObjectId(1)
     matchTask.setScoreThreshold(gaQueryStruct.stSimpQry.nMinScore)
@@ -286,4 +287,25 @@ object gaqryqueConverter {
         MatchStatus.UN_KNOWN
     }
   }
+
+  /**
+   * 转换候选列表
+   * @param candList
+   * @return
+   */
+  def convertCandList2GAQUERYCANDSTRUCT(candList: Array[Byte]): Seq[MatchResultObject]={
+    val buffer = ChannelBuffers.wrappedBuffer(candList)
+    val result = mutable.Buffer[MatchResultObject]()
+    while(buffer.readableBytes() >= 96) {
+      val gaCand = new GAQUERYCANDSTRUCT
+      gaCand.fromStreamReader(buffer)
+      val matchResultObject = MatchResultObject.newBuilder()
+      matchResultObject.setObjectId(gaCand.szKey)
+      matchResultObject.setPos(gaCand.nIndex)
+      matchResultObject.setScore(gaCand.nScore)
+      result += matchResultObject.build()
+    }
+    result.toSeq
+  }
+
 }

@@ -16,11 +16,9 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def testQuery: Unit ={
     executeInContext{
-
       val service  = new QueryServiceImpl(createFacade,null)
-      val queryResult = service.queryMatchResultByCardId(20,2,Some("((KeyID LIKE '123'))"),10);
+      val queryResult = service.findSimpleQuery(20,Some("((KeyID LIKE '123'))"),10)
       println(queryResult.size)
-
     }
   }
 
@@ -35,5 +33,12 @@ class QueryServiceImplTest extends BaseV62TestCase{
     val service = getService[QueryService]
     val status = service.findFirstQueryStatusByCardIdAndMatchType("1234567890", MatchType.FINGER_TL)
     Assert.assertEquals(status, MatchStatus.WAITING_CHECK)
+  }
+
+  @Test
+  def test_getMatchResult: Unit ={
+    val service = getService[QueryService]
+    val matchResult = service.getMatchResult(1).get
+    Assert.assertTrue(matchResult.getCandidateNum > 0)
   }
 }

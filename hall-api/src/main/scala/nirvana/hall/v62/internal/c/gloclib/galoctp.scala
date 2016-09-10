@@ -105,10 +105,10 @@ trait galoctp {
   }
   def GAFIS_MIC_AddDataToStream(pstream:ChannelBuffer,pszName:String,pData:Array[Byte]) //, int nLen, void *pData)
   {
-    val pos = pstream.writerIndex()
-    pstream.writeBytes(pszName.getBytes())
-
-    pstream.writeZero(32-pos)
+    val bytes = pszName.getBytes()
+    pstream.writeBytes(bytes)
+    //不足32位补0
+    pstream.writeZero(32 - bytes.length)
 
     val nLen = if(pData == null) 0 else pData.length
     pstream.writeInt(nLen)

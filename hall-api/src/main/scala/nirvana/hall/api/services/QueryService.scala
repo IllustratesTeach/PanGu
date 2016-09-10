@@ -1,10 +1,10 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.api.config.{QueryDBConfig}
+import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 
 /**
   * Created by songpeng on 16/1/26.
@@ -13,10 +13,10 @@ trait QueryService {
 
   /**
    * 发送查询任务
-   * @param querySendRequest
-   * @return
+   * @param matchTask
+   * @return 任务号
    */
-  def sendQuery(querySendRequest: QuerySendRequest, queryDBConfig: QueryDBConfig = null): QuerySendResponse
+  def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig = null): Long
 
   /**
    * 获取查询结果信息
@@ -38,4 +38,5 @@ trait QueryService {
    * @return
    */
   def findFirstQueryStatusByCardIdAndMatchType(cardId:String, matchType: MatchType, dbId: Option[String] = None):MatchStatus
+
 }

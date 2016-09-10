@@ -4,12 +4,14 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, TPCardRemoteService}
-import nirvana.hall.api.services.sync.SyncCronService
-import nirvana.hall.api.services.{LPPalmService, CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.remote.{LPCardRemoteService, CaseInfoRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
+import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.protocol.api.SyncDataProto._
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v70.internal.query.QueryConstants
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
@@ -23,14 +25,19 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           lPCardService: LPCardService,
                           lPPalmService: LPPalmService,
                           caseInfoService: CaseInfoService,
+                          queryService: QueryService,
+                          fetchQueryService: FetchQueryService,
                           tPCardRemoteService: TPCardRemoteService,
+                          lPCardRemoteService: LPCardRemoteService,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
-  final val SYNC_BATCH_SIZE = 10
+  final val SYNC_BATCH_SIZE = 1
   final val FETCH_TYPE_TPCARD = "TPCard"
   final val FETCH_TYPE_LPCARD = "LPCard"
   final val FETCH_TYPE_LPPALM= "LPPalm"
   final val FETCH_TYPE_CASEINFO = "CaseInfo"
+  final val FETCH_TYPE_MATCH_TASK = "MatchTask"
+  final val FETCH_TYPE_MATCH_RESULT = "MatchResult"
   /**
    * 定时器，向6.2同步数据
    * @param periodicExecutor
@@ -64,6 +71,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         case FETCH_TYPE_CASEINFO =>
         case FETCH_TYPE_LPPALM =>
           fetchLPPalm(fetchConfig, update)
+        case FETCH_TYPE_MATCH_TASK =>
+          fetchMatchTask(fetchConfig, update)
+        case FETCH_TYPE_MATCH_RESULT =>
+          fetchMatchResult(fetchConfig, update)
         case other =>
           warn("unsupport fetch type:{}", other)
       }
@@ -110,10 +121,15 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          fetchConfig.seq = seq
+          e.printStackTrace()
+          fetchConfig.seq = seq //如果异常中断，记录成功的最后seq值
       }
-      //更新配置
-      fetchConfig.save()
+      //如果获取到数据递归获取
+      if(response.getSyncTPCardCount > 0){
+        //更新配置seq
+        fetchConfig.save()
+        fetchTPCard(fetchConfig, update)
+      }
     }
   }
 
@@ -167,10 +183,15 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
+          e.printStackTrace()
           fetchConfig.seq = seq
       }
-      //更新配置
-      fetchConfig.save()
+      //如果获取到数据递归获取
+      if(response.getSyncLPCardCount > 0){
+        //更新配置seq
+        fetchConfig.save()
+        fetchLPCard(fetchConfig, update)
+      }
     }
   }
 
@@ -184,8 +205,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   def fetchCaseInfo(caseId: String, fetchConfig: HallFetchConfig): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
     if(caseInfoRemoteService.isExist(caseId, fetchConfig.url, Option(fetchConfig.dbid))){
-      val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
-      caseInfoService.addCaseInfo(caseInfo)
+      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
+      caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))
     }else{
       //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
       warn("remote caseId:{} is not exist, system auto create", caseId)
@@ -247,9 +268,109 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         case e: Exception =>
           fetchConfig.seq = seq
       }
-      //更新配置
-      fetchConfig.save()
+      //如果获取到数据递归获取
+      if(response.getSyncLPCardCount > 0){
+        //更新配置seq
+        fetchConfig.save()
+        fetchLPPalm(fetchConfig, update)
+      }
     }
   }
 
+  /**
+   * 抓取比对任务
+   * @param fetchConfig
+   * @param update
+   */
+  def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
+    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    val request = SyncMatchTaskRequest.newBuilder()
+    request.setSize(SYNC_BATCH_SIZE)
+    request.setDbid(fetchConfig.dbid)
+    request.setSeq(fetchConfig.seq)
+
+    val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchTaskRequest.cmd, request.build())
+    if(baseResponse.getStatus == CommandStatus.OK){
+      val response = baseResponse.getExtension(SyncMatchTaskResponse.cmd)
+      var seq = fetchConfig.seq
+      val iter = response.getMatchTaskList.iterator()
+      try {
+        while (iter.hasNext) {
+          val matchTask = iter.next()
+          if(validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
+            //TODO queryDBConfig 添加是否更新校验
+            queryService.addMatchTask(matchTask)
+            seq = matchTask.getObjectId
+          }
+        }
+        fetchConfig.seq = seq
+      } catch {
+        case e: Exception =>
+          e.printStackTrace()
+      }
+      //如果获取到数据递归获取
+      if(response.getMatchTaskCount > 0){
+        //更新配置seq
+        fetchConfig.save()
+        fetchMatchTask(fetchConfig, update)
+      }
+    }
+  }
+
+  /**
+   * 抓取比对结果候选列表 TODO 先查询本地正在比对的任务号，根据任务号获取候选
+   * @param fetchConfig
+   */
+  def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
+    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    val request = SyncMatchResultRequest.newBuilder()
+    request.setSid(fetchConfig.seq)
+    request.setDbid(fetchConfig.dbid)
+    val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
+    if(baseResponse.getStatus == CommandStatus.OK){
+      val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
+      val matchStatus = response.getMatchStatus
+      if(matchStatus.getNumber > 2){//大于2有候选信息
+        val matchResult = response.getMatchResult
+        if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
+          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig)
+        }
+        //获取候选信息
+        fetchCandListDataByMatchResult(matchResult, fetchConfig)
+        fetchConfig.seq += 1
+        fetchConfig.save()
+      }
+    }
+
+  }
+  /**
+   * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
+   * @param matchResult
+   */
+  private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Unit ={
+    val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
+    val candIter = matchResult.getCandidateResultList.iterator()
+    while (candIter.hasNext){
+      val cand = candIter.next()
+      val cardId = cand.getObjectId
+      if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
+        if(!tpCardService.isExist(cardId)){ //本地是否存在，如果不存在远程获取候选信息，保存到默认库
+          val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url)
+          tpCardOpt.foreach(tpCardService.addTPCard(_))
+        }
+      }else{//候选是现场
+        if(!lPCardService.isExist(cardId)){
+          val lPCard = lPCardRemoteService.getLPCard(cardId, fetchConfig.url)
+          lPCard.foreach{ lpCard =>
+            lPCardService.addLPCard(lpCard)
+            val caseId = lpCard.getText.getStrCaseId
+            if(!caseInfoService.isExist(caseId)){//获取案件
+              fetchCaseInfo(caseId, fetchConfig)
+            }
+          }
+        }
+      }
+
+    }
+  }
 }

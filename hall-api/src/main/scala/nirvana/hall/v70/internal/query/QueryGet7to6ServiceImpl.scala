@@ -57,7 +57,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
         while (candIter.hasNext){
           val cand = candIter.next()
           cand.getObjectId
-          if(queryque.querytype == 0 || queryque.querytype == 2){
+          if(queryque.querytype == QueryConstants.QUERY_TYPE_TT || queryque.querytype == QueryConstants.QUERY_TYPE_LT){
             //获取捺印信息
             if(GafisPerson.findOption(cand.getObjectId).isEmpty){
               val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_TPLIB)
@@ -80,8 +80,8 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                   if(GafisCase.findOption(caseId).isEmpty){
                     val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
                     caseInfoRemoteService.isExist(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
-                    val caseInfo = caseInfoRemoteService.getCaseInfo(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
-                    caseInfoService.addCaseInfo(caseInfo)
+                    val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
+                    caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))
                   }
                 }
                 lpCardService.addLPCard(lpCard)

@@ -19,7 +19,7 @@ class FetchCaseInfoServiceImpl (implicit dataSource: DataSource) extends SyncDat
    * @param size
    * @param dbId
    */
-  override def fetchCaseId(seq: Long, size: Int, dbId: Option[String]): ArrayBuffer[(String, Long)] = {
+  override def fetchCaseId(seq: Long, size: Int, dbId: Option[String]): Seq[(String, Long)] = {
     val cardIdList = new ArrayBuffer[(String, Long)]
     val tableName = getTableName(dbId.get.toShort, V62Facade.TID_CASE)
     doFetcher(cardIdList, seq, size, tableName)

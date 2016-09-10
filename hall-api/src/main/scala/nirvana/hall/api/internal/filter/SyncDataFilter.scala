@@ -8,6 +8,7 @@ import nirvana.hall.api.jpa.HallReadConfig
 import nirvana.hall.api.services.{CaseInfoService, LPPalmService, LPCardService, TPCardService}
 import nirvana.hall.api.services.sync._
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 
 /**
@@ -18,6 +19,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                      fetchLPCardService: FetchLPCardService,
                      fetchLPPalmService: FetchLPPalmService,
                      fetchCaseInfoService: FetchCaseInfoService,
+                     fetchQueryService: FetchQueryService,
                      tPCardService: TPCardService,
                      lPCardService: LPCardService,
                      lPPalmService: LPPalmService,
@@ -113,25 +115,25 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       }
       commandResponse.writeMessage(commandRequest, SyncLPPalmResponse.cmd, responseBuilder.build())
       true
-    }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)){
+    }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)) {
       val request = commandRequest.getExtension(SyncCaseRequest.cmd)
       val responseBuilder = SyncCaseResponse.newBuilder()
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "CaseInfo", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
+      if (hallReadConfig.nonEmpty) {
         val caseIdList = fetchCaseInfoService.fetchCaseId(request.getSeq, request.getSize, dbId)
-        caseIdList.foreach{caseId =>
-          if(tPCardService.isExist(caseId._1, dbId)){
+        caseIdList.foreach { caseId =>
+          if (tPCardService.isExist(caseId._1, dbId)) {
             val caseInfo = caseInfoService.getCaseInfo(caseId._1, dbId)
-            if(fetchCaseInfoService.validateByReadStrategy(caseInfo, hallReadConfig.get.readStrategy)){
+            if (fetchCaseInfoService.validateByReadStrategy(caseInfo, hallReadConfig.get.readStrategy)) {
               val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
               syncCaseInfo.setCaseInfo(caseInfo)
               syncCaseInfo.setOperationType(OperationType.PUT)
               syncCaseInfo.setSeq(caseId._2)
             }
-          }else{
+          } else {
             val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
             val caseInfo = Case.newBuilder().setStrCaseID(caseId._1)
             syncCaseInfo.setCaseInfo(caseInfo)
@@ -142,6 +144,37 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       }
 
       commandResponse.writeMessage(commandRequest, SyncCaseResponse.cmd, responseBuilder.build())
+      true
+    }else if(commandRequest.hasExtension(SyncMatchTaskRequest.cmd)){
+      val request = commandRequest.getExtension(SyncMatchTaskRequest.cmd)
+      val responseBuilder = SyncMatchTaskResponse.newBuilder()
+      val dbId = Option(request.getDbid)
+      val ip = httpServletRequest.getRemoteAddr
+      //验证是否有权限
+      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "MatchTask", request.getDbid, "1").headOption
+      if(hallReadConfig.nonEmpty){
+        val matchTaskList = fetchQueryService.fetchMatchTask(request.getSeq, request.getSize, dbId)
+        matchTaskList.foreach{matchTask=>
+          responseBuilder.addMatchTask(matchTask)
+        }
+      }
+
+      commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
+      true
+    }else if(commandRequest.hasExtension(SyncMatchResultRequest.cmd)){
+      val request = commandRequest.getExtension(SyncMatchResultRequest.cmd)
+      val responseBuilder = SyncMatchResultResponse.newBuilder()
+      val ip = httpServletRequest.getRemoteAddr
+      val dbId = Option(request.getDbid)
+      //验证是否有权限
+      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "MatchTask", request.getDbid, "1").headOption
+      if(hallReadConfig.nonEmpty){
+        val matchResult = fetchQueryService.getMatchResultByQueryid(request.getSid, dbId)
+        responseBuilder.setMatchResult(matchResult.get)
+      }
+      responseBuilder.setMatchStatus(MatchStatus.CHECKED)
+
+      commandResponse.writeMessage(commandRequest, SyncMatchResultResponse.cmd, responseBuilder.build())
       true
     }else{
       handler.handle(commandRequest, commandResponse)

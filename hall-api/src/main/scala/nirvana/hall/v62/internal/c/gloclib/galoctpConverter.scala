@@ -92,8 +92,8 @@ object galoctpConverter extends LoggerSupport{
       data.nTextItemCount = data.pstText_Data.length.asInstanceOf[Byte]
     }
 
-    //mic
-    val mics = card.getBlobList.map{blob=>
+    //mic TODO 人像7.0存在有头和没头数据，暂时不处理人像
+    val mics = card.getBlobList.filter(_.getType != ImageType.IMAGETYPE_FACE).map{blob=>
       val mic = new GAFISMICSTRUCT
       var flag = 0
       if(blob.hasStMnt){
@@ -115,17 +115,6 @@ object galoctpConverter extends LoggerSupport{
           mic.nImgLen = mic.pstImg_Data.length
           flag |= glocdef.GAMIC_ITEMFLAG_IMG
         }
-//        //头部特征转换7to6
-//        val sMagic = Array[Byte](4)
-//        val imageBytes = blob.getStImageBytes.toByteArray
-//        System.arraycopy(imageBytes, 4, sMagic,0, 4)
-//        if("BLOB".equals(new String(sMagic))){//gafis7
-//          val headData = Array[Byte](64)
-//          System.arraycopy(imageBytes, 64, headData,0, 64)
-//          val gafis7Head= new GAFIS7LOB_IMGHEADSTRUCT
-//          gafis7Head.fromByteArray(headData)
-//          val gafis6Head = convertHead7to6(gafis7Head)
-//        }
       }
 
       //TODO 纹线数据？
@@ -306,9 +295,11 @@ object galoctpConverter extends LoggerSupport{
             micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
           case glocdef.GAMIC_ITEMTYPE_PALM =>
             micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
+            import nirvana.hall.c.services.ghpcbase.glocdef
             mic.nItemData match {
-              case 1 => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
-              case 2 => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
+              case glocdef.GTPIO_ITEMINDEX_PALM_RIGHT => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LEFT => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder
               case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
             }
           case glocdef.GAMIC_ITEMTYPE_VOICE =>

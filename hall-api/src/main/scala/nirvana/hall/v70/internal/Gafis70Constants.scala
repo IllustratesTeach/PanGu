@@ -32,4 +32,5 @@ object Gafis70Constants {
   val LOBTYPE_DATA = 1: Short
   //特征
   val LOBTYPE_MNT = 2: Short
+
 }

@@ -49,7 +49,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMaxSeq(tableName: String): Long = {
-    val sql = s"select max(seq) from ${tableName}_mod_7 t "
+    val sql = s"select max(seq) from hall_${tableName} t "
     getSeqBySql(sql)
   }
 
@@ -58,7 +58,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMinSeq(from: Long, tableName: String): Long = {
-    val sql = s"select min(seq) from ${tableName}_mod_7 t where seq > ${from}"
+    val sql = s"select min(seq) from hall_${tableName} t where seq > ${from}"
     getSeqBySql(sql)
   }
 
@@ -67,7 +67,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   }
 
   def getSyncSql(tableName: String, cardId: String): String ={
-    s"select sid, seq from ${tableName}_mod_7 t where seq >=? and seq <=? order by seq"
+    s"select sid, seq from hall_${tableName} t where seq >=? and seq <=? order by seq"
   }
 
   /**

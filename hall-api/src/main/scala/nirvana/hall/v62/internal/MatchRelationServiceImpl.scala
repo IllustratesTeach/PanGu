@@ -1,11 +1,12 @@
 package nirvana.hall.v62.internal
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
-import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
+import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelationTLAndLT, MatchRelation, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
@@ -14,7 +15,7 @@ import org.apache.tapestry5.ioc.internal.util.InternalUtils
 /**
  * Created by songpeng on 16/6/21.
  */
-class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService{
+class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService with LoggerSupport{
   /**
    * 获取比对关系
    * @param request
@@ -28,12 +29,11 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     //获取比对状态
     val status = queryService.findFirstQueryStatusByCardIdAndMatchType(cardId, matchType)
     reponse.setMatchStatus(status)
-    //如果核查完毕，获取比对关系
-    if(status.getNumber >= MatchStatus.CHECKED.getNumber){
-      matchType match {
-        case MatchType.FINGER_TL =>
-          //倒查直接查询比中关系表
-          val statement = Option("(SrcKey='%s')".format(cardId))
+    matchType match {
+      case MatchType.FINGER_TL =>
+        if(status == MatchStatus.RECHECKED){//倒查复核后生成比对关系
+        //倒查直接查询比中关系表
+        val statement = Option("(SrcKey='%s')".format(cardId))
           val matchInfo = queryMatchInfo(statement, 1)
           matchInfo.foreach{ verifyLog: GAFIS_VERIFYLOGSTRUCT=>
             val matchRelationTL = MatchRelationTLAndLT.newBuilder()
@@ -65,7 +65,10 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
 
             reponse.addMatchRelation(matchRelation.build())
           }
-        case MatchType.FINGER_TT =>
+        }
+      case MatchType.FINGER_TT =>
+        //查重核查完毕后生成比对关系
+        if(status.getNumber == MatchStatus.CHECKED.getNumber){
           //重卡信息先从捺印表查到重卡组号，然后根据重卡组号查询重卡信息
           val tp = new GTPCARDINFOSTRUCT
           facade.NET_GAFIS_FLIB_Get(v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, cardId, tp, null, 3)
@@ -98,7 +101,9 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
 
             reponse.addMatchRelation(matchRelation.build())
           }
-      }
+        }
+      case other =>
+        warn("unsupport matchType:{}", matchType)
     }
 
     reponse.build()

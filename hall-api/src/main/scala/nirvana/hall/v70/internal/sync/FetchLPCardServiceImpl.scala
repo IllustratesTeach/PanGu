@@ -35,7 +35,7 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
    * @param size
    * @param dbId
    */
-  override def fetchCardId(seq: Long, size: Int, dbId: Option[String]): ArrayBuffer[(String, Long)] = {
+  override def fetchCardId(seq: Long, size: Int, dbId: Option[String]): Seq[(String, Long)] = {
     val cardIdList = new ArrayBuffer[(String, Long)]()
     doFetcher(cardIdList, seq, size, dbId)
     cardIdList

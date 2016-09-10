@@ -13,7 +13,7 @@ trait CaseInfoRemoteService {
    * @param url
    * @return
    */
-  def getCaseInfo(caseId: String, url: String, dbId: Option[String]): Case
+  def getCaseInfo(caseId: String, url: String, dbId: Option[String] = None): Option[Case]
 
   /**
    * 添加案件信息

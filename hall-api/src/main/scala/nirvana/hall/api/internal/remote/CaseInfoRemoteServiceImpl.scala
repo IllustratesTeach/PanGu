@@ -16,12 +16,12 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
    * @param url
    * @return
    */
-  override def getCaseInfo(caseId: String, url: String, dbId: Option[String]): Case = {
+  override def getCaseInfo(caseId: String, url: String, dbId: Option[String]): Option[Case] = {
     info("remote get caseInfo [caseId:{},url:{}]", caseId, url)
     val request = CaseGetRequest.newBuilder().setCaseId(caseId)
     request.setDbid(dbId.get)
     val response = rpcHttpClient.call(url, CaseGetRequest.cmd, request.build())
-    response.getExtension(CaseGetResponse.cmd).getCase
+    Option(response.getExtension(CaseGetResponse.cmd).getCase)
   }
 
   /**

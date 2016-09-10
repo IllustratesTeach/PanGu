@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal.filter
 
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.protocol.api.QueryProto.QuerySendRequest
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
@@ -13,8 +13,7 @@ class QueryFilterTest extends BaseV62TestCase{
 
   @Test
   def test_sendQuery: Unit ={
-    val requestBuilder = QuerySendRequest.newBuilder()
-    val matchTask = requestBuilder.getMatchTaskBuilder()
+    val matchTask = MatchTask.newBuilder()
     matchTask.setMatchId("P3702000000002015129996")
     matchTask.setMatchType(MatchType.FINGER_TT)
     matchTask.setPriority(1)
@@ -22,7 +21,7 @@ class QueryFilterTest extends BaseV62TestCase{
     matchTask.setObjectId(1)
 
     val service = getService[QueryService]
-    val response = service.sendQuery(requestBuilder.build())
+    val response = service.addMatchTask(matchTask.build())
     Assert.assertNotNull(response)
   }
 
