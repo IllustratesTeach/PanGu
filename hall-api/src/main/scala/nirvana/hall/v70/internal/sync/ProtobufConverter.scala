@@ -13,8 +13,9 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.v62.internal.c.gloclib.galoctp
-import nirvana.hall.v70.internal.{Gafis70Constants, CommonUtils}
+import nirvana.hall.v62.internal.c.gbaselib.gitempkg
+import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -169,6 +170,7 @@ object ProtobufConverter {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(caseFinger.fingerId)
     val textBuilder = lpCard.getTextBuilder
+    magicSet(caseFinger.caseId, textBuilder.setStrCaseId)
     magicSet(caseFinger.seqNo, textBuilder.setStrSeq)
     if ("1".equals(caseFinger.isCorpse))
       textBuilder.setBDeadBody(true)
@@ -373,6 +375,7 @@ object ProtobufConverter {
       }
     }
 
+    //掌纹数据
     if (palmList != null){
       palmList.foreach{ palm =>
         val blobBuilder = tpCard.addBlobBuilder()
@@ -621,11 +624,15 @@ object ProtobufConverter {
     gafisQuery.keyid = matchTask.getMatchId
     gafisQuery.querytype = (matchTask.getMatchType.getNumber - 1).toShort
     gafisQuery.priority = matchTask.getPriority.toShort
+    gafisQuery.prioritynew = matchTask.getPriority.toShort
     gafisQuery.minscore = matchTask.getScoreThreshold
+    gafisQuery.maxcandnum = matchTask.getTopN
+    gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
     gafisQuery.flag = 1.toShort //指纹
 
     //特征mic
     val matchType = matchTask.getMatchType.getNumber
+    val ga = new galocpkg with gitempkg with galoctp{}
     if (matchType == MatchType.FINGER_LL.getNumber || matchType == MatchType.FINGER_LT.getNumber){
       val mic = new GAFISMICSTRUCT
       mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
@@ -633,9 +640,12 @@ object ProtobufConverter {
       mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
       mic.nItemData = 1
       mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
-      gafisQuery.mic = mic.toByteArray()
+
+      val micBuf = ChannelBuffers.buffer(ga.GAFIS_MIC_MicStreamLen(Array(mic)))
+      ga.GAFIS_MIC_Mic2Stream(mic, micBuf)
+      gafisQuery.mic = micBuf.array()
     }else if(matchType == MatchType.FINGER_TT.getNumber || matchType == MatchType.FINGER_TL.getNumber){
-      val micBuf = new ByteArrayOutputStream()
+      var mics = new ArrayBuffer[GAFISMICSTRUCT]
       matchTask.getTData.getMinutiaDataList.foreach{ md =>
         val mic = new GAFISMICSTRUCT
         mic.pstMnt_Data = md.getMinutia.toByteArray
@@ -643,19 +653,16 @@ object ProtobufConverter {
         mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
         mic.nItemData =  md.getPos.toByte
         mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
-
-        micBuf.write(mic.toByteArray())
+        mics += mic
       }
-      gafisQuery.mic = micBuf.toByteArray
+      val micBuf = ChannelBuffers.buffer(ga.GAFIS_MIC_MicStreamLen(mics.toArray))
+      ga.GAFIS_MIC_MicArray2Stream(mics.toArray, micBuf)
+      gafisQuery.mic = micBuf.array()
     }
-
-    gafisQuery.oraSid = 1L
     gafisQuery.status = 0.toShort
 
     //TODO textsql 文本
-
-    gafisQuery.save()
-
+    gafisQuery
   }
 
   def convertGafisNormalqueryQueryque2MatchTask(gafisQuery: GafisNormalqueryQueryque): MatchTask = {
@@ -665,27 +672,35 @@ object ProtobufConverter {
     matchTask.setObjectId(gafisQuery.oraSid)//必填项，现在用于存放oraSid
     matchTask.setPriority(gafisQuery.priority.toInt)
     matchTask.setScoreThreshold(gafisQuery.minscore)
+    matchTask.setTopN(gafisQuery.maxcandnum)
 
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(gafisQuery.mic))
     mics.foreach{mic =>
       if(mic.bIsLatent == 1){
         val ldata = LatentMatchData.newBuilder()
         ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
+        if(mic.pstBin_Data != null){
+          ldata.setRidge(ByteString.copyFrom(mic.pstBin_Data))
+        }
         matchTask.setLData(ldata)
       }else{
+        val tdata = matchTask.getTDataBuilder.addMinutiaDataBuilder()
         mic.nItemType match {
           case 1 =>
-            matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
           case 8 =>
-            matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData+10)
+            //平面
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData+10)
           case 2 =>
             //TODO 掌纹
+            throw new UnsupportedOperationException
+        }
+        if(mic.pstBin_Data != null){
+          tdata.setRidge(ByteString.copyFrom(mic.pstBin_Data))
         }
       }
     }
     matchTask.build()
-
-    throw new UnsupportedOperationException
   }
 
   def convertMatchResult2GafisNormalqueryQueryque(matchResult: MatchResult, gafisQuery: GafisNormalqueryQueryque = new GafisNormalqueryQueryque()): GafisNormalqueryQueryque ={

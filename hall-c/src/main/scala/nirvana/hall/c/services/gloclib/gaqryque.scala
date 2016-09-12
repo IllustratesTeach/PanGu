@@ -460,7 +460,7 @@ object gaqryque {
   @Length(3)
   var bnRes:Array[Byte] = _ ;	// to here is 64 bytes
   @Length(SID_SIZE)
-  var nQueryID:String = _ ;	// query id
+  var nQueryID:Array[Byte] = _ ;	// query id
   var nCandidateNum:Int = _ ;	// current candidate num
   var tSubmitTime = new AFISDateTime;	// submit time
   var tFinishTime = new AFISDateTime;	// finish time

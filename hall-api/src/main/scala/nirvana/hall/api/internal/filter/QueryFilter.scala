@@ -18,8 +18,9 @@ class QueryFilter(httpServletRequest: HttpServletRequest, queryService: QuerySer
     if (commandRequest.hasExtension(QuerySendRequest.cmd)) {
       val request = commandRequest.getExtension(QuerySendRequest.cmd)
       val queryDBConfig = getQueryDBConfig(httpServletRequest)
-      val response = queryService.sendQuery(request, queryDBConfig)
-      commandResponse.writeMessage(commandRequest, QuerySendResponse.cmd, response)
+      val oraSid = queryService.addMatchTask(request.getMatchTask, queryDBConfig)
+      val response = QuerySendResponse.newBuilder().setOraSid(oraSid)
+      commandResponse.writeMessage(commandRequest, QuerySendResponse.cmd, response.build())
       true
     } else if (commandRequest.hasExtension(QueryGetRequest.cmd)) {
       val request = commandRequest.getExtension(QueryGetRequest.cmd)

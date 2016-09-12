@@ -5,7 +5,7 @@ import javax.sql.DataSource
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDHEADSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.internal.GafisConverter
+import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
@@ -98,7 +98,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     candHead.nQueryType = queryType.toByte
     candHead.nSrcDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) 1 else 2
     candHead.nTableID = 2
-    candHead.nQueryID = queryQue.oraSid.toString
+    candHead.nQueryID = DataConverter.long2SidArray(queryQue.oraSid)
     candHead.nCandidateNum = matchResultRequest.getCandidateNum
     candHead.tFinishTime = new AFISDateTime
     return candHead.toByteArray()

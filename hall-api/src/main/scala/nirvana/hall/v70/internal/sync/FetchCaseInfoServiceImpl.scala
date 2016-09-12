@@ -35,7 +35,7 @@ class FetchCaseInfoServiceImpl(implicit dataSource: DataSource) extends SyncData
    * @param size
    * @param dbId
    */
-  override def fetchCaseId(seq: Long, size: Int, dbId: Option[String]): ArrayBuffer[(String, Long)] = {
+  override def fetchCaseId(seq: Long, size: Int, dbId: Option[String]): Seq[(String, Long)] = {
     val cardIdList = new ArrayBuffer[(String, Long)]()
     doFetcher(cardIdList, seq, size, dbId)
     cardIdList

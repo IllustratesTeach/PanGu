@@ -11,7 +11,7 @@ import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteServ
 import nirvana.hall.api.services.sync._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.sync._
-import org.apache.tapestry5.ioc.ServiceBinder
+import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
@@ -69,11 +69,15 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
+    binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
     binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl])
 
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
     binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
+  }
+  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
+    configuration.add("nirvana.hall.api.jpa")
   }
 }

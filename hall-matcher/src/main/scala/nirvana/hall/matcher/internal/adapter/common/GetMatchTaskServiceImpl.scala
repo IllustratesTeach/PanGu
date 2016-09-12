@@ -105,13 +105,17 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
         if (micStruct.pstBin_Data.length > 0)
           ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
       } else {
-        val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
+        val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+        val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
         var mnt = micStruct.pstMnt_Data
         //TT，TL查询老特征转新特征
         if (hallMatcherConfig.mnt.isNewFeature && !isPalm && (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL)) {
           mnt = featureExtractor.ConvertMntOldToNew(ByteString.copyFrom(mnt).newInput()).get
         }
-        matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
+        tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
+        //纹线数据
+        if (micStruct.pstBin_Data.length > 0)
+          tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
       }
     }
     //文本查询

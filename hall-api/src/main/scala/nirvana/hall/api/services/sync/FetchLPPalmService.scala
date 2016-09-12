@@ -2,8 +2,6 @@ package nirvana.hall.api.services.sync
 
 import nirvana.hall.protocol.api.FPTProto.LPCard
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
   * Created by songpeng on 16/8/22.
   */
@@ -14,7 +12,7 @@ trait FetchLPPalmService {
     * @param size
     * @param dbId
     */
-   def fetchCardId(seq: Long, size: Int, dbId: Option[String] = None): ArrayBuffer[(String, Long)]
+   def fetchCardId(seq: Long, size: Int, dbId: Option[String] = None): Seq[(String, Long)]
 
    /**
     * 验证读取策略

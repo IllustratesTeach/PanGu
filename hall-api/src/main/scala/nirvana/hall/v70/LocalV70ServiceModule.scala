@@ -41,10 +41,11 @@ object LocalV70ServiceModule {
 
     //同步
     binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
-    binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl]).eagerLoad()
-    binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl]).eagerLoad()
-    binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl]).eagerLoad()
-    binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl]).eagerLoad()
+    binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
+    binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
+    binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
+    binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
+    binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
 
     //定时服务
 //    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()

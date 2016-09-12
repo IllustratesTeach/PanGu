@@ -58,7 +58,7 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    facade.NET_GAFIS_FLIB_Exist(dbId.get.toShort, V62Facade.TID_LATFINGER, cardId)
+    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_LATFINGER, cardId)
   }
 
   /**
