@@ -46,7 +46,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
+      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm, true)
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
 

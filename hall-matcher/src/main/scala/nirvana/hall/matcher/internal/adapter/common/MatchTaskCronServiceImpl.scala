@@ -12,7 +12,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
  * Created by songpeng on 16/9/7.
  */
 class MatchTaskCronServiceImpl(implicit dataSource: DataSource) extends MatchTaskCronService with LoggerSupport{
-  val cron = "0 * * * * ? *"
+  val cron = "0 0/5 * * * ? *"
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, matchTaskCronService: MatchTaskCronService): Unit = {
