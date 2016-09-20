@@ -6,6 +6,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import net.sf.json.JSONObject
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
@@ -17,7 +18,7 @@ import org.jboss.netty.buffer.ChannelBuffers
 /**
   * Created by songpeng on 16/4/8.
   */
-class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchTaskService{
+class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService{
    /** 获取比对任务  */
    private val MATCH_TASK_QUERY: String = "select * from " +
      "(select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  " +
@@ -94,7 +95,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
        if(micStruct.bIsLatent == 1){
          val ldata = matchTaskBuilder.getLDataBuilder
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-         if(micStruct.pstBin_Data.length > 0)
+         if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
          val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
@@ -102,7 +103,7 @@ class GetMatchTaskServiceImpl(implicit dataSource: DataSource) extends GetMatchT
          val mnt = micStruct.pstMnt_Data
          tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
          //纹线数据
-         if (micStruct.pstBin_Data.length > 0)
+         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
            tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }
      }
