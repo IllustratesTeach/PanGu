@@ -635,6 +635,7 @@ object ProtobufConverter {
     val ga = new galocpkg with gitempkg with galoctp{}
     if (matchType == MatchType.FINGER_LL.getNumber || matchType == MatchType.FINGER_LT.getNumber){
       val mic = new GAFISMICSTRUCT
+      mic.bIsLatent = 1
       mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
       mic.nMntLen = mic.pstMnt_Data.length
       mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]

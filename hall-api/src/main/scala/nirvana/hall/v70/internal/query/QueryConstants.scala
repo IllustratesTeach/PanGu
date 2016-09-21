@@ -17,4 +17,7 @@ object QueryConstants {
   val QUERY_TYPE_TL = 1 //倒查
   val QUERY_TYPE_LT = 2 //正查
   val QUERY_TYPE_LL = 3 //串查
+
+  val FETCH_CONFIG_TPDB = "TPDB"
+  val FETCH_CONFIG_LPDB = "LPDB"
 }

@@ -2,19 +2,24 @@ package nirvana.hall.api.internal.sync
 
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.remote.{LPCardRemoteService, CaseInfoRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
 import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/8/18.
@@ -32,12 +37,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
-  final val FETCH_TYPE_TPCARD = "TPCard"
-  final val FETCH_TYPE_LPCARD = "LPCard"
-  final val FETCH_TYPE_LPPALM= "LPPalm"
-  final val FETCH_TYPE_CASEINFO = "CaseInfo"
-  final val FETCH_TYPE_MATCH_TASK = "MatchTask"
-  final val FETCH_TYPE_MATCH_RESULT = "MatchResult"
   /**
    * 定时器，向6.2同步数据
    * @param periodicExecutor
@@ -64,16 +63,16 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val strategy = new JSONObject(fetchConfig.writeStrategy)
       val update = if (strategy.has("update")) strategy.getBoolean("update") else true
       fetchConfig.typ match {
-        case FETCH_TYPE_TPCARD =>
+        case HallApiConstants.SYNC_TYPE_TPCARD =>
           fetchTPCard(fetchConfig, update)
-        case FETCH_TYPE_LPCARD =>
+        case HallApiConstants.SYNC_TYPE_LPCARD =>
           fetchLPCard(fetchConfig, update)
-        case FETCH_TYPE_CASEINFO =>
-        case FETCH_TYPE_LPPALM =>
+        case HallApiConstants.SYNC_TYPE_CASEINFO =>
+        case HallApiConstants.SYNC_TYPE_LPPALM =>
           fetchLPPalm(fetchConfig, update)
-        case FETCH_TYPE_MATCH_TASK =>
+        case HallApiConstants.SYNC_TYPE_MATCH_TASK =>
           fetchMatchTask(fetchConfig, update)
-        case FETCH_TYPE_MATCH_RESULT =>
+        case HallApiConstants.SYNC_TYPE_MATCH_RESULT =>
           fetchMatchResult(fetchConfig, update)
         case other =>
           warn("unsupport fetch type:{}", other)
@@ -117,17 +116,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
           seq = syncTPCard.getSeq
         }
-        fetchConfig.seq = response.getSeq
+        seq = response.getSeq
       }
       catch {
         case e: Exception =>
           e.printStackTrace()
-          fetchConfig.seq = seq //如果异常中断，记录成功的最后seq值
       }
       //如果获取到数据递归获取
       if(response.getSyncTPCardCount > 0){
         //更新配置seq
-        fetchConfig.save()
+        fetchConfig.seq = seq
+        updateSeq(fetchConfig)
         fetchTPCard(fetchConfig, update)
       }
     }
@@ -170,7 +169,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               }
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
-                fetchCaseInfo(caseId, fetchConfig)
+                fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid), destDBID)
               }
               lPCardService.addLPCard(lpCard, destDBID)
             }
@@ -179,17 +178,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
           seq = syncLPCard.getSeq
         }
-        fetchConfig.seq = response.getSeq
+        seq = response.getSeq
       }
       catch {
         case e: Exception =>
           e.printStackTrace()
-          fetchConfig.seq = seq
       }
       //如果获取到数据递归获取
       if(response.getSyncLPCardCount > 0){
         //更新配置seq
-        fetchConfig.save()
+        fetchConfig.seq = seq
+        updateSeq(fetchConfig)
         fetchLPCard(fetchConfig, update)
       }
     }
@@ -200,19 +199,18 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
    * 如果没有案件信息不同步案件信息，6.2存在只有现场没有案件的情况
    * @param caseId
-   * @param fetchConfig
    */
-  def fetchCaseInfo(caseId: String, fetchConfig: HallFetchConfig): Unit ={
+  def fetchCaseInfo(caseId: String, url: String, dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
-    if(caseInfoRemoteService.isExist(caseId, fetchConfig.url, Option(fetchConfig.dbid))){
-      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
-      caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))
+    if(caseInfoRemoteService.isExist(caseId, url, dbId)){
+      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId)
+      caseInfoOpt.foreach(caseInfoService.addCaseInfo(_, destDbId))
     }else{
       //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
       warn("remote caseId:{} is not exist, system auto create", caseId)
       val caseInfo = Case.newBuilder()
       caseInfo.setStrCaseID(caseId)
-      caseInfoService.addCaseInfo(caseInfo.build(), Option(fetchConfig.destDbid))
+      caseInfoService.addCaseInfo(caseInfo.build(), destDbId)
     }
   }
 
@@ -253,7 +251,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               }
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
-                fetchCaseInfo(caseId, fetchConfig)
+                fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid), destDBID)
               }
               lPPalmService.addLPCard(lpCard, destDBID)
             }
@@ -262,16 +260,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
           seq = syncLPCard.getSeq
         }
-        fetchConfig.seq = response.getSeq
+        seq = response.getSeq
       }
       catch {
         case e: Exception =>
-          fetchConfig.seq = seq
+          e.printStackTrace()
       }
       //如果获取到数据递归获取
       if(response.getSyncLPCardCount > 0){
         //更新配置seq
-        fetchConfig.save()
+        fetchConfig.seq = seq
+        updateSeq(fetchConfig)
         fetchLPPalm(fetchConfig, update)
       }
     }
@@ -303,7 +302,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             seq = matchTask.getObjectId
           }
         }
-        fetchConfig.seq = seq
       } catch {
         case e: Exception =>
           e.printStackTrace()
@@ -311,66 +309,164 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       //如果获取到数据递归获取
       if(response.getMatchTaskCount > 0){
         //更新配置seq
-        fetchConfig.save()
+        fetchConfig.seq = seq
+        updateSeq(fetchConfig)
         fetchMatchTask(fetchConfig, update)
       }
     }
   }
 
   /**
-   * 抓取比对结果候选列表 TODO 先查询本地正在比对的任务号，根据任务号获取候选
+   * 抓取比对结果候选列表
+   * TODO 先查询比对状态是正在比对的任务sid，然后再根据sid获取比对结果
    * @param fetchConfig
    */
   def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
     val request = SyncMatchResultRequest.newBuilder()
+/*    val sidSeq = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE, Option(fetchConfig.destDbid))
+    if(sidSeq.nonEmpty){
+      sidSeq.foreach{sid=>
+        request.setSid(sid)
+        request.setDbid(fetchConfig.dbid)
+
+      }
+    }*/
     request.setSid(fetchConfig.seq)
     request.setDbid(fetchConfig.dbid)
     val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
       val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
       val matchStatus = response.getMatchStatus
-      if(matchStatus.getNumber > 2){//大于2有候选信息
+      if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
         val matchResult = response.getMatchResult
         if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig)
+          //获取候选信息
+          val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
         }
-        //获取候选信息
-        fetchCandListDataByMatchResult(matchResult, fetchConfig)
         fetchConfig.seq += 1
-        fetchConfig.save()
+        updateSeq(fetchConfig)
+        //递归获取
+        fetchMatchResult(fetchConfig, update)
       }
     }
-
   }
   /**
    * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
+   * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
+   * 解决方法需要候选信息增加dbid信息
    * @param matchResult
    */
-  private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Unit ={
+  private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
+    val candDBIDMap = Map[String, Short]()
     val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
+    val dbidList = getDBIDList(fetchConfig, queryQue.queryType)
     val candIter = matchResult.getCandidateResultList.iterator()
     while (candIter.hasNext){
       val cand = candIter.next()
       val cardId = cand.getObjectId
+      val candDbId = if(cand.getDbid.nonEmpty) Option(cand.getDbid) else None
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-        if(!tpCardService.isExist(cardId)){ //本地是否存在，如果不存在远程获取候选信息，保存到默认库
+        val dbId = getTPDBIDByCardId(cardId, dbidList)
+        if(dbId.nonEmpty){
+          candDBIDMap.+(cardId -> dbId.get)
+        }else{
           val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url)
           tpCardOpt.foreach(tpCardService.addTPCard(_))
+          candDBIDMap.+(cardId -> V62Facade.DBID_TP_DEFAULT)
         }
       }else{//候选是现场
-        if(!lPCardService.isExist(cardId)){
-          val lPCard = lPCardRemoteService.getLPCard(cardId, fetchConfig.url)
-          lPCard.foreach{ lpCard =>
+        val dbId = getLPDBIDByCardId(cardId, dbidList)
+        if(dbId.nonEmpty){
+          candDBIDMap.+(cardId -> dbId.get)
+        }else{
+          val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
+          lPCardOpt.foreach{ lpCard =>
             lPCardService.addLPCard(lpCard)
             val caseId = lpCard.getText.getStrCaseId
-            if(!caseInfoService.isExist(caseId)){//获取案件
-              fetchCaseInfo(caseId, fetchConfig)
+            if(!caseInfoService.isExist(caseId, candDbId)){//获取案件
+              fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
             }
+            candDBIDMap.+(cardId -> V62Facade.DBID_LP_DEFAULT)
           }
         }
       }
 
     }
+
+    candDBIDMap
+  }
+
+  /**
+   * 根据捺印卡号查找所在DBID
+   * @param cardId
+   * @param dbidList
+   * @return
+   */
+  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+    dbidList.foreach{dbid =>
+      if(tpCardService.isExist(cardId, Option(dbid))){
+        return Option(dbid)
+      }
+    }
+    None
+  }
+
+  /**
+   * 根据现场卡号查找所在DBID
+   * @param cardId
+   * @param dbidList
+   * @return
+   */
+  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+    dbidList.foreach{dbid =>
+      if(lPCardService.isExist(cardId, Option(dbid))){
+        return Option(dbid)
+      }
+    }
+    None
+  }
+
+  /**
+   * 获取DBID列表
+   * @param fetchConfig
+   * @param queryType
+   * @return
+   */
+  private def getDBIDList(fetchConfig: HallFetchConfig, queryType: Int): Seq[String]={
+    val dbidList = new ArrayBuffer[String]()
+    if(fetchConfig.config != null){
+      val jsonObj= new JSONObject(fetchConfig.config)
+      val key = queryType match {
+        case QueryConstants.QUERY_TYPE_TT =>
+          QueryConstants.FETCH_CONFIG_TPDB
+        case QueryConstants.QUERY_TYPE_TL =>
+          QueryConstants.FETCH_CONFIG_LPDB
+        case QueryConstants.QUERY_TYPE_LT =>
+          QueryConstants.FETCH_CONFIG_TPDB
+        case QueryConstants.QUERY_TYPE_LL =>
+          QueryConstants.FETCH_CONFIG_LPDB
+        case other =>
+          throw new RuntimeException("unsupport queryType:"+ queryType)
+      }
+      if(jsonObj.has(key)){
+        val iter = jsonObj.getJSONArray(key).iterator()
+        while (iter.hasNext){
+          val db = iter.next()
+          dbidList += db.toString
+        }
+      }
+    }
+
+    dbidList.toSeq
+  }
+
+  /**
+   * 更新同步HallFetchConfig.seq 的值, 因为直接调用save方法，session问题,程序调用insert而不是update
+   * @param fetchConfig
+   */
+  private def updateSeq(fetchConfig: HallFetchConfig): Unit ={
+    HallFetchConfig.update.set(seq = fetchConfig.seq).where(HallFetchConfig.pkId === fetchConfig.pkId).execute
   }
 }

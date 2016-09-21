@@ -22,4 +22,13 @@ object HallApiConstants {
  / _  / __ |/ /__/ /__ module : |@@|red %s|@#
 /_//_/_/ |_/____/____/ version: |@@|yellow %s|@
                                """.replaceAll("#", "@|green ")
+
+
+
+  final val SYNC_TYPE_TPCARD = "TPCard"
+  final val SYNC_TYPE_LPCARD = "LPCard"
+  final val SYNC_TYPE_LPPALM= "LPPalm"
+  final val SYNC_TYPE_CASEINFO = "CaseInfo"
+  final val SYNC_TYPE_MATCH_TASK = "MatchTask"
+  final val SYNC_TYPE_MATCH_RESULT = "MatchResult"
 }

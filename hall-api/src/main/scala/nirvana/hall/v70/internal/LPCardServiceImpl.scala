@@ -54,9 +54,13 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def getLPCard(fingerId: String, dbId: Option[String]): LPCard = {
-    val caseFinger = GafisCaseFinger.find(fingerId)
-    val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
-    ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
+    if(isExist(fingerId, dbId)){
+      val caseFinger = GafisCaseFinger.find(fingerId)
+      val caseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption.get
+      ProtobufConverter.convertGafisCaseFinger2LPCard(caseFinger, caseFingerMnt)
+    }else{
+      null
+    }
   }
 
   /**

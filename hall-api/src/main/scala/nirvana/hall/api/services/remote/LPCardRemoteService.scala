@@ -13,7 +13,7 @@ trait LPCardRemoteService {
    * @param url
    * @return
    */
-  def getLPCard(cardId: String, url: String, headerMap: Map[String, String] = Map()): Option[LPCard]
+  def getLPCard(cardId: String, url: String, dbid: Option[String] = None): Option[LPCard]
 
   /**
    * 添加现场卡

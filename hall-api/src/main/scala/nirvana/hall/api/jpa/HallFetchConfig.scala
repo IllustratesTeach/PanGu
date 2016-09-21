@@ -26,6 +26,8 @@ class HallFetchConfig extends ActiveRecord {
   var destDbid: java.lang.String = _
   @Column(name = "WRITE_STRATEGY", length = 1000)
   var writeStrategy: java.lang.String = _
+  @Column(name = "CONFIG", length = 1000)
+  var config: java.lang.String = _
   @Column(name = "SEQ")
   var seq: java.lang.Long = _
   @Column(name = "DELETAG", length = 1)
@@ -36,7 +38,7 @@ class HallFetchConfig extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, name: java.lang.String, url: java.lang.String, typ: java.lang.String, dbid: java.lang.String, destDbid: java.lang.String, writeStrategy: java.lang.String, seq: java.lang.Long, deletag: java.lang.String){
+  def this(pkId: java.lang.String, name: java.lang.String, url: java.lang.String, typ: java.lang.String, dbid: java.lang.String, destDbid: java.lang.String, writeStrategy: java.lang.String,config: java.lang.String, seq: java.lang.Long, deletag: java.lang.String){
     this()
     this.pkId = pkId
     this.url = url
@@ -45,6 +47,7 @@ class HallFetchConfig extends ActiveRecord {
     this.dbid = dbid
     this.destDbid = destDbid
     this.writeStrategy = writeStrategy
+    this.config = config
     this.seq = seq
     this.deletag = deletag
   }

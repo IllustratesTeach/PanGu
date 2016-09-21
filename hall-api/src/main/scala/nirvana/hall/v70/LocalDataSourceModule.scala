@@ -10,7 +10,7 @@ import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
-import stark.migration.{InstallAllMigrations, Migrator, DatabaseAdapter, Vendor}
+import stark.migration._
 
 /**
  * 针对数据的操作
@@ -91,7 +91,7 @@ object LocalDataSourceModule {
     //用之前先升级数据库
     val driverClassName: String = config.db.driver
     val vendor = Vendor.forDriver(driverClassName)
-    val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.db.user))
+    val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
     //migrator.migrate(RemoveAllMigrations, "nirvana.hall.v70.migration", false)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.v70.migration", searchSubPackages = false)

@@ -10,14 +10,14 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/8/22.
  */
 class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataFetcher with FetchLPCardService{
-  override val SYNC_SQL: String = "select t.sid, t.seq from gafis_case_finger_mod t left join gafis_case_finger f on f.finger_id=t.sid left join gafis_logic_db_case db on f.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
+  override val SYNC_SQL: String = "select t.finger_id as sid, t.seq from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
 
   /**
    * 获取最大的seq值
    * @return
    */
   override def getMaxSeq(dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    getSeqBySql(s"select max(t.seq) from gafis_case_finger_mod t left join gafis_case_finger f on f.finger_id=t.sid left join gafis_logic_db_case db on f.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}'")
+    getSeqBySql(s"select max(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}'")
   }
 
   /**
@@ -26,7 +26,7 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
    * @return
    */
   override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    getSeqBySql(s"select min(t.seq) from gafis_case_finger_mod t left join gafis_case_finger f on f.finger_id=t.sid left join gafis_logic_db_case db on f.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} ")
+    getSeqBySql(s"select min(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} ")
   }
 
   /**

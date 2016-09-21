@@ -8,12 +8,16 @@ import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
+import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/8/26.
@@ -34,7 +38,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
    * 保存候选信息
    * @param matchResult
    */
-  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig) = {
+  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
     val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
@@ -119,5 +123,47 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       val flag = rs.getInt("flag")
       new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
     }.get
+  }
+
+  /**
+   * 根据queryid获取比对状态
+   * @param queryId
+   */
+  override def getMatchStatusByQueryid(queryId: Long): MatchStatus = {
+    val sql = "select t.status from GAFIS_NORMALQUERY_QUERYQUE t where t.queryid=?"
+    JdbcDatabase.queryFirst(sql){ps=>
+      ps.setLong(1, queryId)
+    }{rs=>
+      val status = java.lang.Short.valueOf(rs.getShort("status"))
+      return status match {
+        case QueryConstants.STATUS_WAIT=>
+          MatchStatus.WAITING_MATCH
+        case QueryConstants.STATUS_MATCHING=>
+          MatchStatus.MATCHING
+        case QueryConstants.STATUS_SUCCESS=>
+          MatchStatus.FINISHED
+        case QueryConstants.STATUS_FAIL=>
+          MatchStatus.FAILED
+        case other => MatchStatus.UN_KNOWN
+      }
+    }
+
+    MatchStatus.UN_KNOWN
+  }
+
+  /**
+   * 获取比对状态正在比对任务SID
+   * @param size
+   * @return
+   */
+  override def getSidByStatusMatching(size: Int, dbId: Option[String]): Seq[Long] = {
+    val sidArr = ArrayBuffer[Long]()
+    val sql = "select t.ora_sid from GAFIS_NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setInt(1, size)
+    }{rs=>
+      sidArr += rs.getLong("ora_sid")
+    }
+    sidArr.toSeq
   }
 }

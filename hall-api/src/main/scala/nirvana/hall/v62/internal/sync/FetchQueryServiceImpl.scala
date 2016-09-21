@@ -9,11 +9,13 @@ import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 
@@ -31,13 +33,13 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
    */
   override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
     val matchTaskList = new ArrayBuffer[MatchTask]
-    val sql = "select t.ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid >? and t.ora_sid <=?"
+    val sql = "select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.seq>? and t.seq<=?"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setLong(1, seq)
       ps.setLong(2, seq + size)
     }{rs=>
       val gaQuery = new GafisNormalqueryQueryque()
-      gaQuery.oraSid = rs.getLong("ora_sid")
+      gaQuery.oraSid = rs.getLong("seq")//使用seq，查询任务被删除后oraSid会被重新使用
       gaQuery.keyid = rs.getString("keyid")
       gaQuery.minscore = rs.getInt("minscore")
       gaQuery.querytype = rs.getShort("querytype")
@@ -55,8 +57,8 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
    * @param oraSid
    * @param status
    */
-  def updateMatchStatus(oraSid: Long, status: Int): Unit ={
-    val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.ora_sid =?"
+  private def updateMatchStatus(oraSid: Long, status: Int): Unit ={
+    val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.seq=?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1, status)
       ps.setLong(2, oraSid)
@@ -75,8 +77,8 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
    * 保存候选信息
    * @param matchResult
    */
-  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig) = {
-    val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.ora_sid =?"
+  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
+    val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.seq =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
     val maxScore = matchResult.getMaxScore
@@ -84,7 +86,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     val candHead = getCandHead(matchResult, queryQue)
     var candList:Array[Byte] = null
     if(candNum > 0){
-      candList = convertMatchResult2CandList(matchResult, queryQue.queryType)
+      candList = convertMatchResult2CandList(matchResult, queryQue.queryType, candDBIDMap)
     }
 
     JdbcDatabase.update(sql) { ps =>
@@ -96,7 +98,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     }
   }
   //TODO dbid要遍历数据库查找
-  private def convertMatchResult2CandList(matchResult: MatchResult, queryType: Int): Array[Byte] ={
+  private def convertMatchResult2CandList(matchResult: MatchResult, queryType: Int, candDBIDMap: Map[String, Short] = Map()): Array[Byte] ={
     val result = new ByteArrayOutputStream()
     val candIter = matchResult.getCandidateResultList.iterator()
     var index = 0 //比对排名
@@ -106,7 +108,12 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       val gCand = new GAQUERYCANDSTRUCT
       gCand.nScore = cand.getScore
       gCand.szKey = cand.getObjectId
-      gCand.nDBID = if (queryType == 0 || queryType == 1) 1 else 2
+      //根据候选卡号获取dbid，如果没有使用默认库dbid
+      if(candDBIDMap.nonEmpty && candDBIDMap.get(cand.getObjectId).nonEmpty){
+        gCand.nDBID = candDBIDMap.get(cand.getObjectId).get
+      }else{
+        gCand.nDBID = if (queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_TL) 1 else 2
+      }
       gCand.nTableID = 2
       gCand.nIndex = cand.getPos.toByte
       gCand.tFinishTime = new AFISDateTime
@@ -119,18 +126,18 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
    * 获取查询信息
-   * @param oraSid
+   * @param seq
    * @return
    */
-  override def getQueryQue(oraSid: Int): QueryQue = {
-    val sql = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid =?"
+  override def getQueryQue(seq: Int): QueryQue = {
+    val sql = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.seq =?"
     JdbcDatabase.queryFirst(sql) { ps =>
-      ps.setInt(1, oraSid)
+      ps.setInt(1, seq)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      new QueryQue(keyId, seq, queryType, if(flag == 2 || flag == 22) true else false)
     }.get
   }
 
@@ -143,4 +150,27 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   }
 
+  /**
+   * 根据queryid获取比对状态
+   * @param queryId
+   */
+  override def getMatchStatusByQueryid(queryId: Long): MatchStatus = {
+    throw new UnsupportedOperationException
+  }
+
+  /**
+   * 获取比对状态正在比对任务SID
+   * @param size
+   * @return
+   */
+  override def getSidByStatusMatching(size: Int, dbId: Option[String]): Seq[Long] = {
+    val sidArr = ArrayBuffer[Long]()
+    val sql = "select t.seq from NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setInt(1, size)
+    }{rs=>
+      sidArr += rs.getLong("seq")
+    }
+    sidArr.toSeq
+  }
 }
