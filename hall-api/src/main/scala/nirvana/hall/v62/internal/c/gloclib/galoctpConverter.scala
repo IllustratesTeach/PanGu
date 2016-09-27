@@ -204,7 +204,8 @@ object galoctpConverter extends LoggerSupport{
             case "Alias" =>
               text.setStrAliasName(textContent)
             case "SexCode" =>
-              text.setNSex(Integer.parseInt(textContent))
+              if(textContent.matches("\\d"))
+                text.setNSex(Integer.parseInt(textContent))
             case "BirthDate" =>
               text.setStrBirthDate(textContent)
             case "ShenFenID" =>

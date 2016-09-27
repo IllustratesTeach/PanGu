@@ -10,8 +10,8 @@ object QueryConstants {
   val STATUS_FAIL: java.lang.Short = 3.toShort//任务状态，失败
 
   //提交比对的系统
-  val SUBMIT_SYS_GATHER = "1" //标采
-  val SUBMIT_SYS_FINGER = "2" //指纹系统
+  val SUBMIT_SYS_FINGER = "1" //指纹系统
+  val SUBMIT_SYS_GATHER = "2" //标采
 
   val QUERY_TYPE_TT = 0 //查重
   val QUERY_TYPE_TL = 1 //倒查

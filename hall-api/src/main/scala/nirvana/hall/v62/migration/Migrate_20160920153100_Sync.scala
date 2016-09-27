@@ -11,7 +11,7 @@ import scala.io.Source
 class Migrate_20160920153100_Sync extends Migration{
   override def up(): Unit = {
     addColumn("NORMALQUERY_QUERYQUE", "SEQ", BigintType,Limit(15), Nullable, Comment("hall同步SID用来确定唯一性"))
-    execute(Source.fromFile("Migration_20160920153100_Sync.sql").mkString)
+    execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20160920153100_Sync.sql")).mkString)
   }
 
   override def down(): Unit = {

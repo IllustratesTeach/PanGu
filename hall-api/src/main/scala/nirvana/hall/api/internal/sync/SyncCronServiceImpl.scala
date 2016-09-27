@@ -107,12 +107,15 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
                 tpCardService.updateTPCard(tpCard, destDBID)
+                info("update TPCard:{}", cardId)
               }
             } else {
               tpCardService.addTPCard(tpCard, destDBID)
+              info("add TPCard:{}", cardId)
             }
-          } else {
+          } else if(syncTPCard.getOperationType == OperationType.DEL){
             tpCardService.delTPCard(cardId, destDBID)
+            info("delete TPCard:{}", cardId)
           }
           seq = syncTPCard.getSeq
         }
@@ -121,9 +124,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       catch {
         case e: Exception =>
           e.printStackTrace()
+          error(e.getMessage)
       }
       //如果获取到数据递归获取
-      if(response.getSyncTPCardCount > 0){
+      if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
@@ -152,29 +156,35 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       try {
         while (iter.hasNext) {
           val syncLPCard = iter.next()
-          val lpCard = syncLPCard.getLpCard
+          var lpCard = syncLPCard.getLpCard
           val cardId = lpCard.getStrCardID
           if (syncLPCard.getOperationType == OperationType.PUT &&
             validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
+            //如果没有案件编号，截掉指纹编号后两位作为案件编号
+            var caseId = lpCard.getText.getStrCaseId
+            if(caseId.trim.length == 0){
+              caseId = cardId.substring(0, cardId.length - 2)
+              val lPCardBuilder = lpCard.toBuilder
+              lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
+              lpCard = lPCardBuilder.build()
+            }
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
                 lPCardService.updateLPCard(lpCard, destDBID)
+                info("update LPCard:{}", cardId)
               }
             } else {
-              var caseId = lpCard.getText.getStrCaseId
-              //如果没有案件编号，截掉指纹编号后两位作为案件编号同步案件信息
-              if(caseId.trim.length == 0){
-                caseId = cardId.substring(0, cardId.length - 2)
-              }
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
                 fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid), destDBID)
               }
               lPCardService.addLPCard(lpCard, destDBID)
+              info("add LPCard:{}", cardId)
             }
-          } else {
+          } else if (syncLPCard.getOperationType == OperationType.PUT){
             lPCardService.delLPCard(cardId, destDBID)
+            info("delete LPCard:{}", cardId)
           }
           seq = syncLPCard.getSeq
         }
@@ -183,9 +193,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       catch {
         case e: Exception =>
           e.printStackTrace()
+          error(e.getMessage)
       }
       //如果获取到数据递归获取
-      if(response.getSyncLPCardCount > 0){
+      if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
@@ -234,29 +245,35 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       try {
         while (iter.hasNext) {
           val syncLPCard = iter.next()
-          val lpCard = syncLPCard.getLpCard
+          var lpCard = syncLPCard.getLpCard
           val cardId = lpCard.getStrCardID
           if (syncLPCard.getOperationType == OperationType.PUT &&
             validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
+            //如果没有案件编号，截掉指纹编号后两位作为案件编号
+            var caseId = lpCard.getText.getStrCaseId
+            if(caseId.trim.length == 0){
+              caseId = cardId.substring(0, cardId.length - 2)
+              val lPCardBuilder = lpCard.toBuilder
+              lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
+              lpCard = lPCardBuilder.build()
+            }
             //验证本地是否存在
             if (lPPalmService.isExist(cardId, destDBID)) {
               if (update) {//更新
                 lPPalmService.updateLPCard(lpCard, destDBID)
+                info("update LPPalm:{}", cardId)
               }
             } else {
-              var caseId = lpCard.getText.getStrCaseId
-              //如果没有案件编号，截掉指纹编号后两位作为案件编号同步案件信息
-              if(caseId.trim.length == 0){
-                caseId = cardId.substring(0, cardId.length - 2)
-              }
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
                 fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid), destDBID)
               }
               lPPalmService.addLPCard(lpCard, destDBID)
+              info("add LPPalm:{}", cardId)
             }
-          } else {
+          } else if (syncLPCard.getOperationType == OperationType.PUT){
             lPPalmService.delLPCard(cardId, destDBID)
+            info("delete LPPalm:{}", cardId)
           }
           seq = syncLPCard.getSeq
         }
@@ -265,9 +282,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       catch {
         case e: Exception =>
           e.printStackTrace()
+          error(e.getMessage)
       }
       //如果获取到数据递归获取
-      if(response.getSyncLPCardCount > 0){
+      if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
@@ -299,15 +317,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           if(validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
             //TODO queryDBConfig 添加是否更新校验
             queryService.addMatchTask(matchTask)
+            info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType)
             seq = matchTask.getObjectId
           }
         }
       } catch {
         case e: Exception =>
           e.printStackTrace()
+          error(e.getMessage)
       }
       //如果获取到数据递归获取
-      if(response.getMatchTaskCount > 0){
+      if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
@@ -344,6 +364,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           //获取候选信息
           val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
           fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+          info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
         }
         fetchConfig.seq += 1
         updateSeq(fetchConfig)
