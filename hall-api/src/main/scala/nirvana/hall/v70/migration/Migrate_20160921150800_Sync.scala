@@ -13,5 +13,6 @@ class Migrate_20160921150800_Sync extends Migration{
   }
 
   override def down(): Unit = {
+    removeColumn("GAFIS_CASE", "SEQ")
   }
 }

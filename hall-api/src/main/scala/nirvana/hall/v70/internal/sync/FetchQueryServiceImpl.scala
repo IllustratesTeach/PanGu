@@ -24,14 +24,32 @@ import scala.collection.mutable.ArrayBuffer
  */
 class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryService{
   /**
+    * 获取比对任务号
+    * @param size
+    * @param dbId
+    * @return
+    */
+  override def fetchMatchTaskSid(seq: Long, size: Int, dbId: Option[String]): Seq[Long] = {
+    val sidList = new ArrayBuffer[Long]()
+    val sql = "select t.ora_sid from GAFIS_NORMALQUERY_QUERYQUE t where t.seq >? and t.seq <=? order by t.seq"
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setLong(1, seq)
+      ps.setLong(2, seq + size)
+    }{rs=>
+      sidList += rs.getLong("ora_sid")
+    }
+    sidList
+  }
+
+  /**
    * 获取查询任务
-   * @param size
+    * @param sid
    * @return
    */
-  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
-    GafisNormalqueryQueryque.find_by_status(0.toShort).limit(size).map{gafisQuery=>
+  override def getMatchTask(sid: Long, dbId: Option[String]): Option[MatchTask] = {
+    GafisNormalqueryQueryque.find_by_oraSid(sid).map{gafisQuery=>
       ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
-    }.toSeq
+    }.headOption
   }
 
   /**
@@ -39,7 +57,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
    * @param matchResult
    */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
-    val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
+    val sql = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
     val maxScore = matchResult.getMaxScore

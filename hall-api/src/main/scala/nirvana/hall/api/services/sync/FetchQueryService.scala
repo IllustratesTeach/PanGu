@@ -22,7 +22,15 @@ trait FetchQueryService {
    * @param dbId
    * @return
    */
-  def fetchMatchTask(seq: Long, size: Int, dbId: Option[String] = None): Seq[MatchTask]
+  def fetchMatchTaskSid(seq: Long, size: Int, dbId: Option[String] = None): Seq[Long]
+
+  /**
+    * 根据任务号获取比对任务
+    * @param sid
+    * @param dbId
+    * @return
+    */
+  def getMatchTask(sid: Long, dbId: Option[String] = None): Option[MatchTask]
 
   /**
    * 保存候选信息

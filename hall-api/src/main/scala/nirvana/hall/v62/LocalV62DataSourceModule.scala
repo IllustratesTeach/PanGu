@@ -59,7 +59,6 @@ object LocalV62DataSourceModule {
     val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
-    migrator.migrate(InstallAllMigrations, "nirvana.hall.v62.migration", searchSubPackages = false)
 
     dataSource
   }

@@ -31,12 +31,21 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
    * @param dbId
    * @return
    */
-  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
-    val matchTaskList = new ArrayBuffer[MatchTask]
-    val sql = "select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.seq>? and t.seq<=?"
+  override def fetchMatchTaskSid(seq: Long, size: Int, dbId: Option[String]): Seq[Long] = {
+    val sidList = new ArrayBuffer[Long]()
+    val sql = "select t.sid, seq from HALL_NORMALQUERY_QUERYQUE t where t.seq >? and t.seq<=? order by t.seq"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setLong(1, seq)
       ps.setLong(2, seq + size)
+    }{rs=>
+      sidList += rs.getLong("sid")
+    }
+    sidList
+  }
+  override def getMatchTask(sid: Long, dbId: Option[String]): Option[MatchTask] = {
+    val sql = "select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid =?"
+    JdbcDatabase.queryFirst(sql){ps=>
+      ps.setLong(1, sid)
     }{rs=>
       val gaQuery = new GafisNormalqueryQueryque()
       gaQuery.oraSid = rs.getLong("seq")//使用seq，查询任务被删除后oraSid会被重新使用
@@ -46,10 +55,9 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       gaQuery.priority = rs.getShort("priority")
       gaQuery.maxcandnum = rs.getInt("maxcandnum")
       gaQuery.mic = rs.getBytes("mic")
-      matchTaskList += ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gaQuery)
+      return Option(ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gaQuery))
     }
-
-    matchTaskList.toSeq
+    None
   }
 
   /**

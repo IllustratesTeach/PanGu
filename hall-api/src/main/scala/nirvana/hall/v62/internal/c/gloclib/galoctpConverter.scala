@@ -207,7 +207,8 @@ object galoctpConverter extends LoggerSupport{
               if(textContent.matches("\\d"))
                 text.setNSex(Integer.parseInt(textContent))
             case "BirthDate" =>
-              text.setStrBirthDate(textContent)
+              if(textContent.matches("\\d{8}"))
+                text.setStrBirthDate(textContent)
             case "ShenFenID" =>
               text.setStrIdentityNum(textContent)
             case "HuKouPlaceCode" =>
@@ -233,7 +234,8 @@ object galoctpConverter extends LoggerSupport{
             case "PrinterName" =>
               text.setStrPrinter(textContent)
             case "PrintDate" =>
-              text.setStrPrintDate(textContent)
+              if(textContent.matches("\\d{8}"))
+                text.setStrPrintDate(textContent)
             case "Comment" =>
               text.setStrComment(textContent)
             case "Nationality" =>
