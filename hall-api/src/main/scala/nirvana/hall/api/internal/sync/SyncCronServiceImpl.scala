@@ -5,7 +5,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
-import nirvana.hall.api.services.remote.{LPCardRemoteService, CaseInfoRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
 import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
@@ -19,6 +19,7 @@ import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -372,7 +373,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * @param matchResult
    */
   private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
-    val candDBIDMap = Map[String, Short]()
+    val candDBIDMap = mutable.HashMap[String, Short]()
     val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
     val dbidList = getDBIDList(fetchConfig, queryQue.queryType)
     val candIter = matchResult.getCandidateResultList.iterator()
@@ -383,16 +384,16 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
         val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
-          candDBIDMap.+(cardId -> dbId.get)
+          candDBIDMap.+=(cardId -> dbId.get.toShort)
         }else{
           val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url)
           tpCardOpt.foreach(tpCardService.addTPCard(_))
-          candDBIDMap.+(cardId -> V62Facade.DBID_TP_DEFAULT)
+          candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
         }
       }else{//候选是现场
         val dbId = getLPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
-          candDBIDMap.+(cardId -> dbId.get)
+          candDBIDMap.+=(cardId -> dbId.get.toShort)
         }else{
           val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
           lPCardOpt.foreach{ lpCard =>
@@ -401,14 +402,14 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             if(!caseInfoService.isExist(caseId, candDbId)){//获取案件
               fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
             }
-            candDBIDMap.+(cardId -> V62Facade.DBID_LP_DEFAULT)
+            candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
           }
         }
       }
 
     }
 
-    candDBIDMap
+    candDBIDMap.toMap
   }
 
   /**
@@ -472,7 +473,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
     }
 
-    dbidList.toSeq
+    dbidList
   }
 
   /**
