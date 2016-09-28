@@ -344,14 +344,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
     val request = SyncMatchResultRequest.newBuilder()
-/*    val sidSeq = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE, Option(fetchConfig.destDbid))
-    if(sidSeq.nonEmpty){
-      sidSeq.foreach{sid=>
-        request.setSid(sid)
-        request.setDbid(fetchConfig.dbid)
-
-      }
-    }*/
     request.setSid(fetchConfig.seq)
     request.setDbid(fetchConfig.dbid)
     val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())

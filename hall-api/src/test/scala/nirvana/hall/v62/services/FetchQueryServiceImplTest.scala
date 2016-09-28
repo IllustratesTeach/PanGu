@@ -13,9 +13,8 @@ class FetchQueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_fetchMatchTask: Unit ={
     val service = getService[FetchQueryService]
-    val sidList = service.fetchMatchTaskSid(0, 1)
-    val matchTask = service.getMatchTask(sidList.head)
-    Assert.assertNotNull(matchTask)
+    val matchTask = service.fetchMatchTask(0, 1)
+    Assert.assertEquals(matchTask.size, 1)
   }
 
   @Test

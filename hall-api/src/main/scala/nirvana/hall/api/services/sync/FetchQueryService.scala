@@ -12,59 +12,51 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 
 /**
- * Created by songpeng on 16/8/31.
- */
+  * Created by songpeng on 16/8/31.
+  */
 trait FetchQueryService {
 
   /**
-   * 获取比对任务
-   * @param size
-   * @param dbId
-   * @return
-   */
-  def fetchMatchTaskSid(seq: Long, size: Int, dbId: Option[String] = None): Seq[Long]
-
-  /**
-    * 根据任务号获取比对任务
-    * @param sid
+    * 获取比对任务
+    * @param size
     * @param dbId
     * @return
     */
-  def getMatchTask(sid: Long, dbId: Option[String] = None): Option[MatchTask]
+  def fetchMatchTask(seq: Long, size: Int, dbId: Option[String] = None): Seq[MatchTask]
 
   /**
-   * 保存候选信息
-   * @param matchResult 候选信息
-   * @param fetchConfig 同步配置
-   * @param candDBIDMap 候选卡号->dbid
-   */
+    * 保存候选信息
+    * @param matchResult 候选信息
+    * @param fetchConfig 同步配置
+    * @param candDBIDMap 候选卡号->dbid
+    */
   def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map())
 
   /**
-   * 根据远程查询queryid获取查询结果信息
-   * @param queryid
-   * @return
-   */
+    * 根据远程查询queryid获取查询结果信息
+    * @param queryid
+    * @return
+    */
   def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
 
   /**
-   * 获取比对状态正在比对任务SID
-   * @param size
-   * @return
-   */
+    * 获取比对状态正在比对任务SID
+    * @param size
+    * @return
+    */
   def getSidByStatusMatching(size: Int, dbId: Option[String] = None): Seq[Long]
 
   /**
-   * 根据queryid获取比对状态
-   * @param queryId
-   */
+    * 根据queryid获取比对状态
+    * @param queryId
+    */
   def getMatchStatusByQueryid(queryId: Long): MatchStatus
 
   /**
-   * 获取候选头结构信息
-   * @param matchResult
-   * @param queryQue
-   */
+    * 获取候选头结构信息
+    * @param matchResult
+    * @param queryQue
+    */
   protected def getCandHead(matchResult: MatchResult, queryQue: QueryQue, cardIdDBIDMap: Map[String, Short] = Map()): Array[Byte] ={
     val queryType = queryQue.queryType
     val candHead = new GAQUERYCANDHEADSTRUCT
@@ -80,9 +72,9 @@ trait FetchQueryService {
   }
 
   /**
-   * 获取查询信息
-   * @param oraSid
-   * @return
-   */
+    * 获取查询信息
+    * @param oraSid
+    * @return
+    */
   def getQueryQue(oraSid: Int): QueryQue
 }

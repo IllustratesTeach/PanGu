@@ -20,44 +20,26 @@ import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by songpeng on 16/8/26.
- */
+  * Created by songpeng on 16/8/26.
+  */
 class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryService{
   /**
-    * 获取比对任务号
+    * 获取查询任务
     * @param size
-    * @param dbId
     * @return
     */
-  override def fetchMatchTaskSid(seq: Long, size: Int, dbId: Option[String]): Seq[Long] = {
-    val sidList = new ArrayBuffer[Long]()
-    val sql = "select t.ora_sid from GAFIS_NORMALQUERY_QUERYQUE t where t.seq >? and t.seq <=? order by t.seq"
-    JdbcDatabase.queryWithPsSetter(sql){ps=>
-      ps.setLong(1, seq)
-      ps.setLong(2, seq + size)
-    }{rs=>
-      sidList += rs.getLong("ora_sid")
-    }
-    sidList
-  }
-
-  /**
-   * 获取查询任务
-    * @param sid
-   * @return
-   */
-  override def getMatchTask(sid: Long, dbId: Option[String]): Option[MatchTask] = {
-    GafisNormalqueryQueryque.find_by_oraSid(sid).map{gafisQuery=>
+  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
+    GafisNormalqueryQueryque.find_by_status(0.toShort).limit(size).map{gafisQuery=>
       ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
-    }.headOption
+    }.toSeq
   }
 
   /**
-   * 保存候选信息
-   * @param matchResult
-   */
+    * 保存候选信息
+    * @param matchResult
+    */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
-    val sql = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
+    val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
     val maxScore = matchResult.getMaxScore
@@ -78,10 +60,10 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-   * 根据远程查询queryid获取查询结果信息
-   * @param queryid
-   * @return
-   */
+    * 根据远程查询queryid获取查询结果信息
+    * @param queryid
+    * @return
+    */
   override def getMatchResultByQueryid(queryid: Long, dbId: Option[String]): Option[MatchResult] = {
     val matchResult = MatchResult.newBuilder()
     matchResult.setMatchId(queryid.toString)
@@ -107,11 +89,11 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-   * 候选列表转换
-   * @param matchResult
-   * @param queryType
-   * @return
-   */
+    * 候选列表转换
+    * @param matchResult
+    * @param queryType
+    * @return
+    */
   def convertMatchResult2CandList(matchResult: MatchResult, queryType: Int): Array[Byte] ={
     val result = new ByteArrayOutputStream()
     val candIter = matchResult.getCandidateResultList.iterator()
@@ -144,9 +126,9 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-   * 根据queryid获取比对状态
-   * @param queryId
-   */
+    * 根据queryid获取比对状态
+    * @param queryId
+    */
   override def getMatchStatusByQueryid(queryId: Long): MatchStatus = {
     val sql = "select t.status from GAFIS_NORMALQUERY_QUERYQUE t where t.queryid=?"
     JdbcDatabase.queryFirst(sql){ps=>
@@ -170,10 +152,10 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-   * 获取比对状态正在比对任务SID
-   * @param size
-   * @return
-   */
+    * 获取比对状态正在比对任务SID
+    * @param size
+    * @return
+    */
   override def getSidByStatusMatching(size: Int, dbId: Option[String]): Seq[Long] = {
     val sidArr = ArrayBuffer[Long]()
     val sql = "select t.ora_sid from GAFIS_NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
