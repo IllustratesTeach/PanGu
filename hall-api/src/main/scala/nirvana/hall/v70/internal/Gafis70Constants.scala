@@ -33,4 +33,14 @@ object Gafis70Constants {
   //特征
   val LOBTYPE_MNT = 2: Short
 
+  val PALM_RIGHT        = 11: Short //右掌
+  val PALM_LEFT         = 12: Short //左掌
+  val PALM_FINGER_R     = 3: Short  //右手指尖
+  val PALM_FINGER_L     = 4: Short  //左手指尖
+  val PALM_THUMB_R_LOW  = 5: Short  //右掌拇指下部区域
+  val PALM_THUMB_R_UP   = 6: Short  //右掌拇指上部区域
+  val PALM_THUMB_L_LOW  = 7: Short  //左掌拇指下部区域
+  val PALM_THUMB_L_UP   = 8: Short  //左掌拇指上部区域
+  val PALM_RIGHT_SIDE   = 17: Short //右侧掌纹
+  val PALM_LEFT_SIDE    = 18: Short //左侧掌纹
 }

@@ -302,7 +302,12 @@ object galoctpConverter extends LoggerSupport{
             mic.nItemData match {
               case glocdef.GTPIO_ITEMINDEX_PALM_RIGHT => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
               case glocdef.GTPIO_ITEMINDEX_PALM_LEFT => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder
+              case glocdef.GTPIO_ITEMINDEX_PALM_RFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
               case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
             }
           case glocdef.GAMIC_ITEMTYPE_VOICE =>

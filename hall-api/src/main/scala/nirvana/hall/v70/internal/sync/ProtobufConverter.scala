@@ -572,8 +572,14 @@ object ProtobufConverter {
           val palm = new GafisGatherPalm()
           palm.gatherData = blob.getStImageBytes.toByteArray
           palm.fgp = blob.getPalmfgp match {
-            case PalmFgp.PALM_RIGHT => 11
-            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
+            case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
+            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
+            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
+            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
+            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
+            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
+            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
             case PalmFgp.PALM_UNKNOWN => 0
           }
           palm.personId = personId
