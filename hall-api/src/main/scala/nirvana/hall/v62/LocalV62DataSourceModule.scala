@@ -56,7 +56,7 @@ object LocalV62DataSourceModule {
     //用之前先升级数据库
     val driverClassName: String = config.db.driver
     val vendor = Vendor.forDriver(driverClassName)
-    val databaseAdapter = DatabaseAdapter.forVendor(vendor, None) //Some(config.db.user))
+    val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
 
@@ -70,7 +70,7 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl])
+    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
 
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])

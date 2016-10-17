@@ -63,6 +63,13 @@ object V62Facade{
   val TID_CASE:Short       = 4
   val TID_QUERYQUE:Short   = 2
 
+  //默认捺印库
+  val DBID_TP_DEFAULT: Short = 1
+  //默认现场库
+  val DBID_LP_DEFAULT: Short = 2
+  //默认查询库
+  val DBID_QRY_DEFAULT: Short = 20
+
   /**
     * 动态获取服务器的地址，通过动态变量的上下文进行获取
     */
@@ -83,7 +90,6 @@ object V62Facade{
     * NOTICE: 此filter的位置需要放置在protobuf的前端
     *
     * 如果前端的请求指定了服务器相关信息，则采用指定的信息进行连接
- *
     * @see ProtobufServletFilter
     * @see LocalV62ServiceModule
     * @see LocalApiWebModule

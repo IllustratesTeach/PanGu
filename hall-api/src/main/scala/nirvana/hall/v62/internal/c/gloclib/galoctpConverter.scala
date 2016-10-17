@@ -204,9 +204,11 @@ object galoctpConverter extends LoggerSupport{
             case "Alias" =>
               text.setStrAliasName(textContent)
             case "SexCode" =>
-              text.setNSex(Integer.parseInt(textContent))
+              if(textContent.matches("\\d"))
+                text.setNSex(Integer.parseInt(textContent))
             case "BirthDate" =>
-              text.setStrBirthDate(textContent)
+              if(textContent.matches("\\d{8}"))
+                text.setStrBirthDate(textContent)
             case "ShenFenID" =>
               text.setStrIdentityNum(textContent)
             case "HuKouPlaceCode" =>
@@ -232,7 +234,8 @@ object galoctpConverter extends LoggerSupport{
             case "PrinterName" =>
               text.setStrPrinter(textContent)
             case "PrintDate" =>
-              text.setStrPrintDate(textContent)
+              if(textContent.matches("\\d{8}"))
+                text.setStrPrintDate(textContent)
             case "Comment" =>
               text.setStrComment(textContent)
             case "Nationality" =>
@@ -299,7 +302,12 @@ object galoctpConverter extends LoggerSupport{
             mic.nItemData match {
               case glocdef.GTPIO_ITEMINDEX_PALM_RIGHT => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
               case glocdef.GTPIO_ITEMINDEX_PALM_LEFT => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder
+              case glocdef.GTPIO_ITEMINDEX_PALM_RFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
               case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
             }
           case glocdef.GAMIC_ITEMTYPE_VOICE =>

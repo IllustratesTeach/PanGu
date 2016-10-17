@@ -25,7 +25,6 @@ object GafisConverter {
    */
   def GAFIS_MIC_GetDataFromStream(buffer:ChannelBuffer): Seq[GAFISMICSTRUCT]={
     val result= mutable.Buffer[GAFISMICSTRUCT]()
-    var dataLength = 0
     while(buffer.readableBytes() >= 360) {
       GADB_COL_CmpName(buffer.readBytes(36),streamParameter.pszMICName_Data)
       val pmic = new GAFISMICSTRUCT
@@ -93,7 +92,7 @@ object GafisConverter {
    * @param sidKeyidMap
    * @return
    */
-  def convertMatchResult2CandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String], isPalm: Boolean = false): Array[Byte] ={
+  def convertMatchResult2CandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String], isPalm: Boolean = false, isGafis6: Boolean = false): Array[Byte] ={
     val result = new ByteArrayOutputStream()
     val candIter = matchResultRequest.getCandidateResultList.iterator()
     var index = 0 //比对排名
@@ -102,12 +101,15 @@ object GafisConverter {
       val cand = candIter.next()
       val keyId = sidKeyidMap.get(cand.getObjectId)
       if (keyId.nonEmpty) {
+        var fgp = cand.getPos
         //指位转换
-        var fgp = 0
-        if(isPalm){
-          fgp = DataConverter.palmPos8to6(cand.getPos)
-        }else{
+        if(!isPalm){
           fgp = DataConverter.fingerPos8to6(cand.getPos)
+          if(isGafis6){
+            if(fgp > 10){//gafis6.2中平指指位[21,30]
+              fgp += 10
+            }
+          }
         }
         val gCand = new GAQUERYCANDSTRUCT
         gCand.nScore = cand.getScore

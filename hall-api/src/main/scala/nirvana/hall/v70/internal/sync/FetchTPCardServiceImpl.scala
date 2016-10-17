@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/8/18.
  */
 class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFetcher with FetchTPCardService{
-  override val SYNC_SQL: String = "select t.sid, t.seq from gafis_person_mod t left join gafis_logic_db_fingerprint db on t.sid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
+  override val SYNC_SQL: String = "select t.personid as sid, t.seq from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
 
   /**
    * 获取捺印同步卡号列表
@@ -29,7 +29,7 @@ class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
    * @return
    */
   override def getMaxSeq(dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    getSeqBySql(s"select max(seq) from gafis_person_mod t left join gafis_logic_db_fingerprint db on t.sid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' ")
+    getSeqBySql(s"select max(seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' ")
   }
 
   /**
@@ -38,6 +38,6 @@ class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
    * @return
    */
   override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    getSeqBySql(s"select min(seq) from gafis_person_mod t left join gafis_logic_db_fingerprint db on t.sid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} ")
+    getSeqBySql(s"select min(seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} ")
   }
 }

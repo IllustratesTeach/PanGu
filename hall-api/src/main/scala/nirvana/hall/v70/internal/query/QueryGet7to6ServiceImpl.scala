@@ -13,6 +13,7 @@ import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.json.JSONObject
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -71,8 +72,9 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             //获取现场信息
             val cardId = cand.getObjectId
             if(GafisCaseFinger.findOption(cardId).isEmpty){
-              val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
-              val lPCard = lPCardRemoteService.getLPCard(cardId, url, headerMap.++(dbIdMap))
+              val jsonObj = new JSONObject(syncTagert.config)
+              val dbId = if(jsonObj.has(HttpHeaderUtils.DB_KEY_TPLIB)) Option(jsonObj.getString(HttpHeaderUtils.DB_KEY_TPLIB)) else None
+              val lPCard = lPCardRemoteService.getLPCard(cardId, url, dbId)
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){

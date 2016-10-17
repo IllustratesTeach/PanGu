@@ -24,6 +24,8 @@ class HallReadConfig extends ActiveRecord{
   var dbid: java.lang.String = _
   @Column(name = "READ_STRATEGY", length = 1000)
   var readStrategy: java.lang.String = _
+  @Column(name = "CONFIG", length = 1000)
+  var config: java.lang.String = _
   @Column(name = "SEQ")
   var seq: java.lang.Long = _
   @Column(name = "DELETAG", length = 1)
@@ -33,7 +35,7 @@ class HallReadConfig extends ActiveRecord{
     this()
     this.pkId = pkId
   }
-  def this(pkId: java.lang.String, name: java.lang.String, ip: java.lang.String, typ: java.lang.String, dbid: java.lang.String, readStrategy: java.lang.String, seq: java.lang.Long, deletag: java.lang.String){
+  def this(pkId: java.lang.String, name: java.lang.String, ip: java.lang.String, typ: java.lang.String, dbid: java.lang.String, readStrategy: java.lang.String, config: java.lang.String, seq: java.lang.Long, deletag: java.lang.String){
     this()
     this.pkId = pkId
     this.ip = ip
@@ -41,6 +43,7 @@ class HallReadConfig extends ActiveRecord{
     this.typ = typ
     this.dbid = dbid
     this.readStrategy = readStrategy
+    this.config = config
     this.seq = seq
     this.deletag = deletag
   }

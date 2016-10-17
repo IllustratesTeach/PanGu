@@ -32,7 +32,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
-//    binder.bind(classOf[SyncConfigService], classOf[SyncConfigServiceImpl])
+    binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])

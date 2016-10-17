@@ -16,10 +16,13 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param url
    * @return
    */
-  override def getLPCard(cardId: String, url: String, headerMap: Map[String, String]): Option[LPCard] = {
+  override def getLPCard(cardId: String, url: String, dbid: Option[String] = None): Option[LPCard] = {
     info("remote get lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardGetRequest.newBuilder().setCardId(cardId)
-    val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build(), headerMap)
+    if(dbid.nonEmpty){
+      request.setDbid(dbid.get)
+    }
+    val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build())
     Option(response.getExtension(LPCardGetResponse.cmd).getCard)
   }
 

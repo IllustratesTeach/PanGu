@@ -102,7 +102,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       if (micStruct.bIsLatent == 1) {
         val ldata = matchTaskBuilder.getLDataBuilder
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-        if (micStruct.pstBin_Data.length > 0)
+        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
           ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
       } else {
         val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
@@ -114,7 +114,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
         }
         tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
         //纹线数据
-        if (micStruct.pstBin_Data.length > 0)
+        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
           tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
       }
     }

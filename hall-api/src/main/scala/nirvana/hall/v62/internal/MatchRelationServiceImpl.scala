@@ -73,33 +73,31 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
           val tp = new GTPCARDINFOSTRUCT
           facade.NET_GAFIS_FLIB_Get(v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, cardId, tp, null, 3)
           val personId = tp.stAdmData.szPersonID.trim //重卡组号
+          //如果没有重卡组号不获取重卡信息
+          if (InternalUtils.isNonBlank(personId)){
+            val m_stPersonInfo = new GPERSONINFOSTRUCT
+            m_stPersonInfo.szPersonID = personId
+            m_stPersonInfo.nItemFlag = (GPIS_ITEMFLAG_CARDCOUNT | GPIS_ITEMFLAG_CARDID | GPIS_ITEMFLAG_TEXT).toByte
+            m_stPersonInfo.nItemFlag2 = (GPIS_ITEMFLAG2_LPGROUPDBID | GPIS_ITEMFLAG2_LPGROUPTID | GPIS_ITEMFLAG2_FLAG).toByte
+            val dbId: Short = 1
+            val tableId: Short = 3
+            facade.NET_GAFIS_PERSON_Get(dbId, tableId, m_stPersonInfo)
+            m_stPersonInfo.pstID_Data.foreach{personInfo =>
+              val tt = MatchRelationTT.newBuilder()
+              tt.setPersonId1(cardId)
+              tt.setPersonId2(personInfo.szCardID)
+              //TT没有单位信息
+              val matchSysInfo = MatchSysInfo.newBuilder()
+              matchSysInfo.setMatchUnitCode("")
+              matchSysInfo.setMatchUnitName("")
+              matchSysInfo.setMatcher(personInfo.szUserName)
+              matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
+              val matchRelation = MatchRelation.newBuilder()
+              matchRelation.setMatchSysInfo(matchSysInfo)
+              matchRelation.setExtension(MatchRelationTT.data, tt.build())
 
-          if (InternalUtils.isBlank(personId)){
-            throw new IllegalStateException("duplicate card number is empty")
-          }
-
-          val m_stPersonInfo = new GPERSONINFOSTRUCT
-          m_stPersonInfo.szPersonID = personId
-          m_stPersonInfo.nItemFlag = (GPIS_ITEMFLAG_CARDCOUNT | GPIS_ITEMFLAG_CARDID | GPIS_ITEMFLAG_TEXT).toByte
-          m_stPersonInfo.nItemFlag2 = (GPIS_ITEMFLAG2_LPGROUPDBID | GPIS_ITEMFLAG2_LPGROUPTID | GPIS_ITEMFLAG2_FLAG).toByte
-          val dbId: Short = 1
-          val tableId: Short = 3
-          facade.NET_GAFIS_PERSON_Get(dbId, tableId, m_stPersonInfo)
-          m_stPersonInfo.pstID_Data.foreach{personInfo =>
-            val tt = MatchRelationTT.newBuilder()
-            tt.setPersonId1(cardId)
-            tt.setPersonId2(personInfo.szCardID)
-            //TT没有单位信息
-            val matchSysInfo = MatchSysInfo.newBuilder()
-            matchSysInfo.setMatchUnitCode("")
-            matchSysInfo.setMatchUnitName("")
-            matchSysInfo.setMatcher(personInfo.szUserName)
-            matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
-            val matchRelation = MatchRelation.newBuilder()
-            matchRelation.setMatchSysInfo(matchSysInfo)
-            matchRelation.setExtension(MatchRelationTT.data, tt.build())
-
-            reponse.addMatchRelation(matchRelation.build())
+              reponse.addMatchRelation(matchRelation.build())
+            }
           }
         }
       case other =>

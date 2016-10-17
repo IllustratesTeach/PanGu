@@ -45,7 +45,7 @@ class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, override implici
       syncDataBuilder.setTimestamp(seq)
       val finger_ridge = rs.getBytes("fingerbin")
       //如果有纹线数据，同步纹线数据
-      if (finger_ridge != null) {
+      if (hallMatcherConfig.mnt.hasRidge && finger_ridge != null) {
         val ridgeBuilder = SyncData.newBuilder()
         ridgeBuilder.setObjectId(rs.getInt("sid"))
         ridgeBuilder.setMinutiaType(SyncData.MinutiaType.RIDGE)

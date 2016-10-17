@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest
 
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.jpa.HallReadConfig
 import nirvana.hall.api.services.{CaseInfoService, LPPalmService, LPCardService, TPCardService}
 import nirvana.hall.api.services.sync._
@@ -31,14 +32,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "TPCard", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_TPCARD, request.getDbid, "1").headOption
+      if(hallReadConfigOpt.nonEmpty){
         val cardIdList = fetchTPCardService.fetchCardId(request.getSeq, request.getSize, dbId)
         cardIdList.foreach{ cardId =>
           responseBuilder.setSeq(cardId._2)
           if(tPCardService.isExist(cardId._1, dbId)){
             val tpCard = tPCardService.getTPCard(cardId._1, dbId)
-            if(fetchTPCardService.validateByReadStrategy(tpCard, hallReadConfig.get.readStrategy)){
+            if(fetchTPCardService.validateByReadStrategy(tpCard, hallReadConfigOpt.get.readStrategy)){
               val syncTPCard = responseBuilder.addSyncTPCardBuilder()
               syncTPCard.setTpCard(tpCard)
               syncTPCard.setSeq(cardId._2)
@@ -52,6 +53,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncTPCard.setSeq(cardId._2)
           }
         }
+        hallReadConfigOpt.get.seq = request.getSeq
+        updateSeq(hallReadConfigOpt.get)
       }
       commandResponse.writeMessage(commandRequest, SyncTPCardResponse.cmd, responseBuilder.build())
       true
@@ -61,14 +64,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "LPCard", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPCARD, request.getDbid, "1").headOption
+      if(hallReadConfigOpt.nonEmpty){
         val cardIdList = fetchLPCardService.fetchCardId(request.getSeq, request.getSize, dbId)
         cardIdList.foreach{cardId =>
           responseBuilder.setSeq(cardId._2)
           if(lPCardService.isExist(cardId._1, dbId)){
             val lPCard = lPCardService.getLPCard(cardId._1, dbId)
-            if(fetchLPCardService.validateByReadStrategy(lPCard, hallReadConfig.get.readStrategy)){
+            if(fetchLPCardService.validateByReadStrategy(lPCard, hallReadConfigOpt.get.readStrategy)){
               val syncLPCard = responseBuilder.addSyncLPCardBuilder()
               syncLPCard.setLpCard(lPCard)
               syncLPCard.setOperationType(OperationType.PUT)
@@ -82,6 +85,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncLPCard.setSeq(cardId._2)
           }
         }
+        hallReadConfigOpt.get.seq = request.getSeq
+        updateSeq(hallReadConfigOpt.get)
       }
       commandResponse.writeMessage(commandRequest, SyncLPCardResponse.cmd, responseBuilder.build())
       true
@@ -91,14 +96,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "LPPalm", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPPALM, request.getDbid, "1").headOption
+      if(hallReadConfigOpt.nonEmpty){
         val cardIdList = fetchLPPalmService.fetchCardId(request.getSeq, request.getSize, dbId)
         cardIdList.foreach{cardId =>
           responseBuilder.setSeq(cardId._2)
           if(lPPalmService.isExist(cardId._1, dbId)){
             val lPCard = lPPalmService.getLPCard(cardId._1, dbId)
-            if(fetchLPPalmService.validateByReadStrategy(lPCard, hallReadConfig.get.readStrategy)){
+            if(fetchLPPalmService.validateByReadStrategy(lPCard, hallReadConfigOpt.get.readStrategy)){
               val syncLPCard = responseBuilder.addSyncLPCardBuilder()
               syncLPCard.setLpCard(lPCard)
               syncLPCard.setOperationType(OperationType.PUT)
@@ -112,6 +117,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncLPCard.setSeq(cardId._2)
           }
         }
+        hallReadConfigOpt.get.seq = request.getSeq
+        updateSeq(hallReadConfigOpt.get)
       }
       commandResponse.writeMessage(commandRequest, SyncLPPalmResponse.cmd, responseBuilder.build())
       true
@@ -121,13 +128,13 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "CaseInfo", request.getDbid, "1").headOption
-      if (hallReadConfig.nonEmpty) {
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_CASEINFO, request.getDbid, "1").headOption
+      if (hallReadConfigOpt.nonEmpty) {
         val caseIdList = fetchCaseInfoService.fetchCaseId(request.getSeq, request.getSize, dbId)
         caseIdList.foreach { caseId =>
-          if (tPCardService.isExist(caseId._1, dbId)) {
+          if (caseInfoService.isExist(caseId._1, dbId)) {
             val caseInfo = caseInfoService.getCaseInfo(caseId._1, dbId)
-            if (fetchCaseInfoService.validateByReadStrategy(caseInfo, hallReadConfig.get.readStrategy)) {
+            if (fetchCaseInfoService.validateByReadStrategy(caseInfo, hallReadConfigOpt.get.readStrategy)) {
               val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
               syncCaseInfo.setCaseInfo(caseInfo)
               syncCaseInfo.setOperationType(OperationType.PUT)
@@ -141,6 +148,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncCaseInfo.setSeq(caseId._2)
           }
         }
+        hallReadConfigOpt.get.seq = request.getSeq
+        updateSeq(hallReadConfigOpt.get)
       }
 
       commandResponse.writeMessage(commandRequest, SyncCaseResponse.cmd, responseBuilder.build())
@@ -151,12 +160,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val dbId = Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "MatchTask", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_TASK, request.getDbid, "1").headOption
+      if(hallReadConfigOpt.nonEmpty){
         val matchTaskList = fetchQueryService.fetchMatchTask(request.getSeq, request.getSize, dbId)
         matchTaskList.foreach{matchTask=>
           responseBuilder.addMatchTask(matchTask)
         }
+        hallReadConfigOpt.get.seq = request.getSeq
+        updateSeq(hallReadConfigOpt.get)
       }
 
       commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
@@ -167,18 +178,32 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val ip = httpServletRequest.getRemoteAddr
       val dbId = Option(request.getDbid)
       //验证是否有权限
-      val hallReadConfig = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, "MatchTask", request.getDbid, "1").headOption
-      if(hallReadConfig.nonEmpty){
-        val matchResult = fetchQueryService.getMatchResultByQueryid(request.getSid, dbId)
-        responseBuilder.setMatchResult(matchResult.get)
+      val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RESULT, request.getDbid, "1").headOption
+      if(hallReadConfigOpt.nonEmpty){
+        val status = fetchQueryService.getMatchStatusByQueryid(request.getSid)
+        responseBuilder.setMatchStatus(status)
+        val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, dbId)
+        if(matchResultOpt.nonEmpty)
+          responseBuilder.setMatchResult(matchResultOpt.get)
+        hallReadConfigOpt.get.seq = request.getSid
+        updateSeq(hallReadConfigOpt.get)
+      }else{
+        responseBuilder.setMatchStatus(MatchStatus.UN_KNOWN)
       }
-      responseBuilder.setMatchStatus(MatchStatus.CHECKED)
 
       commandResponse.writeMessage(commandRequest, SyncMatchResultResponse.cmd, responseBuilder.build())
       true
     }else{
       handler.handle(commandRequest, commandResponse)
     }
+  }
+
+  /**
+   * 更新seq
+   * @param readConfig
+   */
+  private def updateSeq(readConfig: HallReadConfig): Unit ={
+    HallReadConfig.update.set(seq = readConfig.seq).where(HallReadConfig.pkId === readConfig.pkId).execute
   }
 
 }

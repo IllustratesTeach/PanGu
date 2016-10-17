@@ -92,6 +92,16 @@ enum	PalmFgp
 	PALM_UNKNOWN	= 0;//未知
 	PALM_RIGHT		= 1;//右掌
 	PALM_LEFT		= 2;//左掌
+	//新增6.2定义的掌纹
+	PALM_FINGER_R   = 3;//右手指尖
+	PALM_FINGER_L   = 4;//左手指尖
+	PALM_THUMB_R_LOW  = 5;//右掌拇指下部区域
+	PALM_THUMB_R_UP  = 6;//右掌拇指上部区域
+	PALM_THUMB_L_LOW  = 7;//左掌拇指下部区域
+	PALM_THUMB_L_UP  = 8;//左掌拇指上部区域
+	//7.0掌纹
+	PALM_RIGTH_SIDE = 9;//右侧掌纹
+	PALM_LEFT_SIDE = 10;//左侧掌纹
 }
 
 //脸位
