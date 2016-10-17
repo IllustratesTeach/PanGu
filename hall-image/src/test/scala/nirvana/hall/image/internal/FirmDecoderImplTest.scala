@@ -66,7 +66,7 @@ class FirmDecoderImplTest extends BaseJniTest{
   }
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "C:\\Users\\wangjue\\Desktop\\full_information_FPT\\C3702000000002016000484.fpt"
+    val filePath = "D:\\BaiduYunDownload\\各省200脱密后文件\\2957.fpt"
     val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
     fptEither match{
       case Right(fpt4)=>
@@ -83,7 +83,8 @@ class FirmDecoderImplTest extends BaseJniTest{
               val gafisImg = fpt4code.FPTFingerDataToGafisImage(tData)
               val decoder = new FirmDecoderImpl("support",new HallImageConfig)
               val dest = decoder.decode(gafisImg)
-              println(dest.getBnDataLength)
+              FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\full_information_FPT\\gz\\img\\"+tp.personId+"_"+tData.fgp+".img"),dest.toByteArray())
+              println(tData.fgp+"_"+dest.getBnDataLength)
             }
         }
       case Left(fpt3)=>

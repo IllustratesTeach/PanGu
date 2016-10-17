@@ -13,6 +13,8 @@
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>
   <is_extractor_bin>true</is_extractor_bin>
+  <is_image_save>false</is_image_save>
+  <streaming_context_startTime>1</streaming_context_startTime>
   <!-- 支持多种数据源，可以和image_provider_class以及 data_saver_class配合使用 -->
   <database_list>
     <database name="gafis">

@@ -1,29 +1,27 @@
 package nirvana.hall.spark.internal
 
+import java.io.ByteArrayInputStream
 
-import java.io.{File, ByteArrayInputStream}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code._
-import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
+import nirvana.hall.c.services.gfpt4lib.{fpt4code, FPTFile}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.extractor.internal.FPTLatentConverter
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.spark.config.NirvanaSparkConfig
-import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
-import nirvana.hall.spark.services.SparkFunctions.{StreamEvent, _}
+import nirvana.hall.spark.config.{NirvanaSparkConfig}
+import nirvana.hall.spark.services.SparkFunctions._
 import nirvana.hall.spark.services._
-import org.apache.commons.io.{FileUtils, IOUtils}
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
 
 /**
-  * Created by wangjue on 2016/7/27.
+  * Created by wangjue on 2016/9/29.
   */
-class FPTProvider extends ImageProvider {
-
+class FPTDakuProvider extends ImageProvider{
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
   def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
@@ -111,7 +109,7 @@ class FPTProvider extends ImageProvider {
                   else
                     latentCase.latentFingers = latentCase.latentFingers ::: latentFinger :: Nil
                 }
-                GafisPartitionRecordsFullSaver.saveLatent(latentCase)
+                GafisPartitionRecordsDakuSaver.saveLatent(latentCase)
               }
             }
           case Right(fpt4) =>
@@ -144,11 +142,11 @@ class FPTProvider extends ImageProvider {
                 }
                 val list = GafisPartitionRecordsFullSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
                 tp.fingers.foreach { tData =>
-                    if (tData.imgData != null && tData.imgData.length > 0) {
-                      val tBuffer = createImageEvent(filePath, personId, tData, list)
-                      if (tBuffer != null)
-                        buffer += tBuffer
-                    }
+                  if (tData.imgData != null && tData.imgData.length > 0) {
+                    val tBuffer = createImageEvent(filePath, personId, tData, list)
+                    if (tBuffer != null)
+                      buffer += tBuffer
+                  }
                 }
               }
             }
@@ -185,7 +183,7 @@ class FPTProvider extends ImageProvider {
                   else
                     latentCase.latentFingers = latentCase.latentFingers ::: latentFinger :: Nil
                 }
-                GafisPartitionRecordsFullSaver.saveLatent(latentCase)
+                GafisPartitionRecordsDakuSaver.saveLatent(latentCase)
               }
             }
         }

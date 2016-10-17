@@ -12,8 +12,6 @@ import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompress
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
-import org.apache.commons.io.FileUtils
-
 import scala.util.control.NonFatal
 
 /**
@@ -51,7 +49,8 @@ object DecompressImageService {
   }
   def requestDecompress(parameter:NirvanaSparkConfig,event:StreamEvent,compressedImg: GAFISIMAGESTRUCT):Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)]= {
     if (event.personId != null && event.personId.length > 0) {
-      val finger = FptPropertiesConverter.fptFingerDataToTemplateFingerConvert(event.personId,event.position.getNumber.toString,"1","1",compressedImg,event.path)
+      SparkFunctions.loadImageJNI()
+      val finger = FptPropertiesConverter.fptFingerDataToTemplateFingerConvert(event.personId,event.position.getNumber.toString,FingerConstants.GROUP_IMAGE,FingerConstants.LOBTYPE_DATA,compressedImg,event.path)
       if (compressedImg.stHead.bIsCompressed == 1) {
         //using direct decompress method for WSQ and GFS
         if (compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_WSQ.toByte
@@ -72,9 +71,14 @@ object DecompressImageService {
           decompressWithHttpService(parameter, event, finger, compressedImg)
       } else {
         val fingerImg = finger
-        val wsqImg = wsqDecode.encodeWSQ(compressedImg)
-        fingerImg.gatherData = wsqImg.toByteArray()
-        Some((event, compressedImg, fingerImg))
+        if (parameter.isImageSave) {
+          val wsqImg = wsqDecode.encodeWSQ(compressedImg)
+          fingerImg.gatherData = wsqImg.toByteArray()
+          Some((event, compressedImg, fingerImg))
+        } else {
+          fingerImg.gatherData = null
+          Some((event, compressedImg, fingerImg))
+        }
       }
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
       Some((event, null, null))
@@ -86,13 +90,16 @@ object DecompressImageService {
 
   private def directDecode(parameter: NirvanaSparkConfig, event: StreamEvent, finger : TemplateFingerConvert, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
     try {
-      val fingerImg = finger
-      SparkFunctions.loadImageJNI()
       val result = decoder.decode(compressedImg)
-      finger.gatherData = result.toByteArray()
-      val wsqImg = wsqDecode.encodeWSQ(result)
-      fingerImg.gatherData = wsqImg.toByteArray()
-      Some((event, result, fingerImg))
+      val fingerImg = finger
+      if (parameter.isImageSave) {
+        val wsqImg = wsqDecode.encodeWSQ(result)
+        fingerImg.gatherData = wsqImg.toByteArray()
+        Some((event, result, fingerImg))
+      } else {
+        fingerImg.gatherData = null
+        Some((event, result, fingerImg))
+      }
     } catch {
       case NonFatal(e) =>
         doReportException(parameter, event,
@@ -127,12 +134,15 @@ object DecompressImageService {
                 gafisImg.stHead.nWidth = 640
                 gafisImg.stHead.nHeight = 640
               }
-              finger.gatherData = gafisImg.toByteArray()
               val fingerImg = finger
-              FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\非脱密FPT入库\\gafisImg\\gafisImg.img"),gafisImg.toByteArray())
-              val wsqImg = wsqDecode.encodeWSQ(gafisImg)
-              fingerImg.gatherData = wsqImg.toByteArray()
-              Some((event, gafisImg, fingerImg))
+              if (parameter.isImageSave) {
+                val wsqImg = wsqDecode.encodeWSQ(gafisImg)
+                fingerImg.gatherData = wsqImg.toByteArray()
+                Some((event, gafisImg, fingerImg))
+              } else {
+                fingerImg.gatherData = null
+                Some((event, gafisImg, fingerImg))
+              }
             } else {
               throw new IllegalAccessException("response haven't FirmImageDecompressResponse")
             }

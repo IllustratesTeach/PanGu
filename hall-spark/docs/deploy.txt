@@ -17,6 +17,9 @@ deployment setup:
   4.2 install JDK to same location on all machine
   4.3 install libnirvana-kernel.so on all machine
     copy so file to /usr/local/lib and run ldconfig
+    vim nirvana.conf
+    path
+    /etc/
   4.4 distribute spark-1.6.0-bin-jcai-spark.tgz to all cluster node and extract to same directory
   4.5 in spark master machine
       4.5.1 cp conf/spark-env.sh.template conf/spark-env.sh

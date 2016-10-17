@@ -12,7 +12,7 @@
     <module>hall-c</module>
     <module>hall-extractor</module>
     <module>hall-image</module>
-    <module>hall-matcher</module>
+    <!--<module>hall-matcher</module> -->
     <module>hall-protocol</module>
     <!-- <module>hall-sdk</module> -->
     <module>hall-spark</module>

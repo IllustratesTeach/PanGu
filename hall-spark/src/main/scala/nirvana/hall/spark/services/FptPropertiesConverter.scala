@@ -168,11 +168,11 @@ object FptPropertiesConverter {
   }
 
 
-  def fpt3ToLatentFingerConvert(lData : FingerLData, fptPath : String, caseId : String): LatentFingerConvert = {
+  def fpt3ToLatentFingerConvert(lData : FingerLData, fptPath : String, caseId : String, cardId : String ,seqNo : String): LatentFingerConvert = {
     val latentFinger = new LatentFingerConvert
     latentFinger.caseId = caseId
-    latentFinger.seqNo = lData.fingerNo
-    latentFinger.caseId = lData.fingerId
+    latentFinger.seqNo = seqNo
+    latentFinger.fingerId = cardId
     latentFinger.remainPlace = lData.remainPlace
     latentFinger.fgp = lData.fgp
     latentFinger.ridgeColor = lData.ridgeColor
@@ -184,11 +184,11 @@ object FptPropertiesConverter {
     latentFinger
   }
 
-  def fpt4ToLatentFingerConvert(lData : nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData, fptPath : String, caseId : String): LatentFingerConvert = {
+  def fpt4ToLatentFingerConvert(lData : nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData, fptPath : String, caseId : String, cardId : String, seqNo : String): LatentFingerConvert = {
     val latentFinger = new LatentFingerConvert
     latentFinger.caseId = caseId
-    latentFinger.seqNo = lData.fingerNo
-    latentFinger.fingerId = lData.fingerId
+    latentFinger.seqNo = seqNo
+    latentFinger.fingerId = cardId
     latentFinger.remainPlace = lData.remainPlace
     latentFinger.fgp = lData.fgp
     latentFinger.ridgeColor = lData.ridgeColor
