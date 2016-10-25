@@ -29,7 +29,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     if(commandRequest.hasExtension(SyncTPCardRequest.cmd)) {
       val request = commandRequest.getExtension(SyncTPCardRequest.cmd)
       val responseBuilder = SyncTPCardResponse.newBuilder()
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_TPCARD, request.getDbid, "1").headOption
@@ -61,7 +61,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncLPCardRequest.cmd)){
       val request = commandRequest.getExtension(SyncLPCardRequest.cmd)
       val responseBuilder = SyncLPCardResponse.newBuilder()
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPCARD, request.getDbid, "1").headOption
@@ -93,7 +93,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncLPPalmRequest.cmd)){
       val request = commandRequest.getExtension(SyncLPPalmRequest.cmd)
       val responseBuilder = SyncLPPalmResponse.newBuilder()
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPPALM, request.getDbid, "1").headOption
@@ -125,7 +125,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)) {
       val request = commandRequest.getExtension(SyncCaseRequest.cmd)
       val responseBuilder = SyncCaseResponse.newBuilder()
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_CASEINFO, request.getDbid, "1").headOption
@@ -157,7 +157,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncMatchTaskRequest.cmd)){
       val request = commandRequest.getExtension(SyncMatchTaskRequest.cmd)
       val responseBuilder = SyncMatchTaskResponse.newBuilder()
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val ip = httpServletRequest.getRemoteAddr
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_TASK, request.getDbid, "1").headOption
@@ -176,7 +176,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val request = commandRequest.getExtension(SyncMatchResultRequest.cmd)
       val responseBuilder = SyncMatchResultResponse.newBuilder()
       val ip = httpServletRequest.getRemoteAddr
-      val dbId = Option(request.getDbid)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RESULT, request.getDbid, "1").headOption
       if(hallReadConfigOpt.nonEmpty){
