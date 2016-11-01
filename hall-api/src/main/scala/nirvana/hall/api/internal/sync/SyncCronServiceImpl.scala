@@ -39,7 +39,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   final val SYNC_BATCH_SIZE = 1
   /**
-   * 定时器，向6.2同步数据
+   * 定时器，同步数据
    * @param periodicExecutor
    * @param syncCronService
    */

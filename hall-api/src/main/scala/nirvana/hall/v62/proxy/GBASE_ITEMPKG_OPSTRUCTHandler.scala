@@ -3,10 +3,9 @@ package nirvana.hall.v62.proxy
 import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
-import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.AncientClientSupport
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
-import nirvana.hall.v62.internal.c.gnetlib.{reqansop, gnetcsr}
+import nirvana.hall.v62.internal.c.gnetlib.{gnetcsr, reqansop}
 import nirvana.hall.v62.internal.c.grmtlib.{grmtcsr, grmtpkg}
 import nirvana.hall.v62.proxy.filter.NettyChannelOperator
 import nirvana.hall.v62.services.HallV62ExceptionCode.FAIL_TO_FIND_PROCESSOR
@@ -19,7 +18,7 @@ import org.jboss.netty.channel._
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-27
   */
-class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler, config:HallV62Config) extends SimpleChannelUpstreamHandler
+class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler) extends SimpleChannelUpstreamHandler
   with grmtpkg with gitempkg with grmtcsr with gnetcsr with reqansop with AncientClientSupport with LoggerSupport{
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
     val msg = e.getMessage
