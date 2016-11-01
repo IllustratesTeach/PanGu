@@ -104,7 +104,7 @@
       <dependency>
         <groupId>nirvana</groupId>
         <artifactId>nirvana-protocol</artifactId>
-        <version>1.0.8</version>
+        <version>1.1.0</version>
       </dependency>
       <!-- javassist -->
       <dependency>
@@ -571,8 +571,8 @@
       <dependencies>
         <dependency>
           <groupId>com.oracle</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <version>11.2.0.3.0</version>
+          <artifactId>ojdbc14</artifactId>
+          <version>10.2.0.3</version>
         </dependency>
       </dependencies>
     </profile>
