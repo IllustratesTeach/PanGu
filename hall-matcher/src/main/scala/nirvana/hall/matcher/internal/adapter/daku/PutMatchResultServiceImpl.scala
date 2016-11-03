@@ -1,9 +1,13 @@
 package nirvana.hall.matcher.internal.adapter.daku
 
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import javax.sql.DataSource
 
+import nirvana.hall.c.services.gbaselib.gbasedef.AFISDateTime
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.internal.GafisConverter
+import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
@@ -44,7 +48,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue.queryType)
-      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap)
+      candList = convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap)
     }
 
     if (queryQue.queryType != 0) {
@@ -121,6 +125,52 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       //      val flag = rs.getInt("flag")
       new QueryQue(keyId, oraSid, queryType)
     }.get
+  }
+
+  /**
+    * 候选列表转换，
+    * @param matchResultRequest
+    * @param queryType
+    * @param sidKeyidMap
+    * @param isPalm
+    * @param isGafis6
+    * @return
+    */
+  def convertMatchResult2CandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String], isPalm: Boolean = false, isGafis6: Boolean = false): Array[Byte] ={
+    val result = new ByteArrayOutputStream()
+    val candIter = matchResultRequest.getCandidateResultList.iterator()
+    var index = 0 //比对排名
+    while (candIter.hasNext) {
+      index += 1
+      val cand = candIter.next()
+      val keyId = sidKeyidMap.get(cand.getObjectId)
+      if (keyId.nonEmpty) {
+        var fgp = cand.getPos
+        //指位转换
+        if(!isPalm){
+          fgp = DataConverter.fingerPos8to6(cand.getPos)
+          if(isGafis6){
+            if(fgp > 10){//gafis6.2中平指指位[21,30]
+              fgp += 10
+            }
+          }
+        }
+        val gCand = new GAQUERYCANDSTRUCT
+        gCand.nScore = cand.getScore
+        gCand.szKey = keyId.get
+        //dbid, tableid 分别截取desc的前两位字节和三四位字节, 分别表示比对类型和指位
+        val desc = ByteBuffer.allocate(8).putLong(cand.getDesc)
+        gCand.nDBID = desc.getShort(4)
+        gCand.nTableID = desc.getShort(6)
+//        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
+//        gCand.nTableID = 2
+        gCand.nIndex = fgp.toByte
+        gCand.tFinishTime = new AFISDateTime
+        gCand.nStepOneRank = index
+        result.write(gCand.toByteArray())
+      }
+    }
+    result.toByteArray
   }
 }
 class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int)

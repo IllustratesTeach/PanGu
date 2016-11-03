@@ -65,7 +65,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库
-      val logicDb: GafisLogicDb = if(dbId == None){
+      val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length > 0){
         //如果没有指定逻辑库，使用默认库
         GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
       }else{

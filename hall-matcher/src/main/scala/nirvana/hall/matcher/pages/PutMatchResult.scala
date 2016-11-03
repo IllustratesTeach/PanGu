@@ -4,6 +4,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.protocol.MatchResult.MatchResultResponse.MatchResultResponseStatus
 import nirvana.protocol.MatchResult.{MatchResultRequest, MatchResultResponse}
@@ -14,7 +15,7 @@ import org.apache.tapestry5.services.Response
 /**
  * Created by songpeng on 16/3/20.
  */
-class PutMatchResult {
+class PutMatchResult extends LoggerSupport{
   @Inject
   private var request: HttpServletRequest = _
   @Inject
@@ -33,6 +34,7 @@ class PutMatchResult {
 
   def onActivate: StreamResponse = {
     val matchResultRequest = MatchResultRequest.parseFrom(request.getInputStream)
+    info("PutMatchResult matchId:{} candNum:{}", matchResultRequest.getMatchId, matchResultRequest.getCandidateNum)
 //    val matchResultResponse = putMatchResultService.putMatchResult(matchResultRequest)
     //异步处理
     executor.execute(new PutMatchResultThread(matchResultRequest))

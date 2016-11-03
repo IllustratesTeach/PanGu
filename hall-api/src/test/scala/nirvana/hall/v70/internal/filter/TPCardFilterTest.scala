@@ -1,10 +1,11 @@
 package nirvana.hall.v70.internal.filter
 
-import com.google.protobuf.ByteString
+import com.google.protobuf.{ByteString, ExtensionRegistry}
 import nirvana.hall.api.services.TPCardService
-import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.{FPTProto, TPCardProto}
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, TPCard}
 import nirvana.hall.protocol.api.TPCardProto._
+import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.{Assert, Test}
 
@@ -14,6 +15,11 @@ import org.junit.{Assert, Test}
  * @since 2015-11-04
  */
 class TPCardFilterTest extends BaseV70TestCase{
+  val url = "http://127.0.0.1:8080"
+  val registry = ExtensionRegistry.newInstance()
+  TPCardProto.registerAllExtensions(registry)
+  val httpClient = new RpcHttpClientImpl(registry)
+
   @Test
   def test_add: Unit ={
     //新建
@@ -129,9 +135,12 @@ class TPCardFilterTest extends BaseV70TestCase{
   }
   @Test
   def test_get: Unit ={
-    val tpCardService = getService[TPCardService]
-    val tpCard = tpCardService.getTPCard("1234567890")
-    Assert.assertNotNull(tpCard)
+    val requestBuilder = TPCardGetRequest.newBuilder()
+    requestBuilder.setCardId("1234567890")
+
+    val response = httpClient.call(url, TPCardGetRequest.cmd, requestBuilder.build())
+    val tPCard = response.getExtension(TPCardGetResponse.cmd)
+    Assert.assertNotNull(tPCard)
   }
   @Test
   def test_isExist: Unit ={

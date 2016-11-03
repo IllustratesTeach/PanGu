@@ -14,37 +14,42 @@ class LPCardFilter(httpServletRequest: HttpServletRequest, lPCardService: LPCard
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(LPCardAddRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardAddRequest.cmd)
-      lPCardService.addLPCard(request.getCard, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      lPCardService.addLPCard(request.getCard, dbId)
       val response = LPCardAddResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardAddResponse.cmd, response)
       true
     }//删除现场
     else if(commandRequest.hasExtension(LPCardDelRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardDelRequest.cmd)
-      lPCardService.delLPCard(request.getCardId, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      lPCardService.delLPCard(request.getCardId, dbId)
       val response = LPCardDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardDelResponse.cmd, response)
       true
     }//更新现场
     else if(commandRequest.hasExtension(LPCardUpdateRequest.cmd)) {
       val request = commandRequest.getExtension(LPCardUpdateRequest.cmd)
-      lPCardService.updateLPCard(request.getCard, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      lPCardService.updateLPCard(request.getCard, dbId)
       val response = LPCardUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPCardUpdateResponse.cmd, response)
       true
     }//查询现场
     else if(commandRequest.hasExtension(LPCardGetRequest.cmd)){
       val request = commandRequest.getExtension(LPCardGetRequest.cmd)
-      val lpCard = lPCardService.getLPCard(request.getCardId, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      val lpCard = lPCardService.getLPCard(request.getCardId, dbId)
       val response = LPCardGetResponse.newBuilder().setCard(lpCard).build()
       commandResponse.writeMessage(commandRequest, LPCardGetResponse.cmd, response)
       true
     }//是否已存在
     else if(commandRequest.hasExtension(LPCardIsExistRequest.cmd)){
       val request = commandRequest.getExtension(LPCardIsExistRequest.cmd)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val cardId = request.getCardId
       val response = LPCardIsExistResponse.newBuilder()
-      response.setIsExist(lPCardService.isExist(cardId, Option(request.getDbid)))
+      response.setIsExist(lPCardService.isExist(cardId, dbId))
       commandResponse.writeMessage(commandRequest, LPCardIsExistResponse.cmd, response.build())
       true
     }else{

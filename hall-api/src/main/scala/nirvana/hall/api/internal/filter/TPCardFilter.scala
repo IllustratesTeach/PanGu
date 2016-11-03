@@ -17,36 +17,41 @@ class TPCardFilter(httpServletRequest: HttpServletRequest, tpCardService: TPCard
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if(commandRequest.hasExtension(TPCardAddRequest.cmd)){
       val request = commandRequest.getExtension(TPCardAddRequest.cmd)
-      tpCardService.addTPCard(request.getCard, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      tpCardService.addTPCard(request.getCard, dbId)
       val response = TPCardAddResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardAddResponse.cmd, response)
       true
     }//删除
     else if(commandRequest.hasExtension(TPCardDelRequest.cmd)){
       val request = commandRequest.getExtension(TPCardDelRequest.cmd)
-      tpCardService.delTPCard(request.getCardId, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      tpCardService.delTPCard(request.getCardId, dbId)
       val response = TPCardDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardDelResponse.cmd, response)
       true
     }//修改
     else if(commandRequest.hasExtension(TPCardUpdateRequest.cmd)){
       val request = commandRequest.getExtension(TPCardUpdateRequest.cmd)
-      tpCardService.updateTPCard(request.getCard, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      tpCardService.updateTPCard(request.getCard, dbId)
       val response = TPCardUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardUpdateResponse.cmd, response)
       true
     }//查询
     else if(commandRequest.hasExtension(TPCardGetRequest.cmd)) {
       val request = commandRequest.getExtension(TPCardGetRequest.cmd)
-      val tpCard = tpCardService.getTPCard(request.getCardId, Option(request.getDbid))
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+      val tpCard = tpCardService.getTPCard(request.getCardId, dbId)
       val response = TPCardGetResponse.newBuilder().setCard(tpCard).build()
       commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response)
       true
     }//是否已存在
     else if(commandRequest.hasExtension(TPCardIsExistRequest.cmd)){
       val request = commandRequest.getExtension(TPCardIsExistRequest.cmd)
+      val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
       val response = TPCardIsExistResponse.newBuilder()
-      response.setIsExist(tpCardService.isExist(request.getCardId, Option(request.getDbid)))
+      response.setIsExist(tpCardService.isExist(request.getCardId, dbId))
       commandResponse.writeMessage(commandRequest, TPCardIsExistResponse.cmd, response.build())
       true
     }else{

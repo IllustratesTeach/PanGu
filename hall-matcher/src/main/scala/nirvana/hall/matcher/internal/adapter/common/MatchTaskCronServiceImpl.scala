@@ -18,7 +18,7 @@ class MatchTaskCronServiceImpl(implicit dataSource: DataSource) extends MatchTas
   def startUp(periodicExecutor: PeriodicExecutor, matchTaskCronService: MatchTaskCronService): Unit = {
     periodicExecutor.addJob(new CronSchedule(cron), "sync-cron", new Runnable {
       override def run(): Unit = {
-        info("begin match task cron")
+        info("begin match task cron, update status waiting when timeout 1 hour no result")
         matchTaskCronService.updateMatchStatusWaitingByMatchTaskTimeout()
         info("end match task cron")
       }
