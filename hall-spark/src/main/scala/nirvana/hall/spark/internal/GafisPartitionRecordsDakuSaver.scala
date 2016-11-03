@@ -57,71 +57,19 @@ object GafisPartitionRecordsDakuSaver {
     list
   }
 
-  def saveFullPersonInfo(person : PersonConvert): Unit ={
-    val saveFullPersonInfo = "INSERT INTO GAFIS_PERSON(PERSONID,CARDID,NAME,ALIASNAME,SEX_CODE,BIRTHDAYST,IDCARDNO,DOOR,DOORDETAIL," +
-      "ADDRESS,ADDRESSDETAIL,PERSON_CATEGORY,CASE_CLASSES,GATHERDEPARTCODE,GATHERDEPARTNAME,GATHERUSERNAME," +
-      "GATHER_DATE,REMARK,NATIVEPLACE_CODE,NATION_CODE,ASSIST_LEVEL,ASSIST_BONUS,ASSIST_PURPOSE,ASSIST_REF_PERSON," +
-      "ASSIST_REF_CASE,ASSIST_VALID_DATE,ASSIST_EXPLAIN,ASSIST_DEPT_CODE,ASSIST_DEPT_NAME,ASSIST_DATE,ASSIST_CONTACTS," +
-      "ASSIST_NUMBER,ASSIST_APPROVAL,ASSIST_SIGN,ISFINGERREPEAT,DATA_SOURCES,FINGERSHOW_STATUS,DELETAG,INPUTTIME,SEQ,SID,FPT_PATH) " +
-      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysDate,gafis_person_seq.nextval,gafis_person_sid_seq.nextval,?)"
-
-    JdbcDatabase.update(saveFullPersonInfo) { ps =>
+  def savePersonInfo(person : PersonConvert): Unit = {
+    val savePersonSql = "insert into gafis_person(personid,sid,seq,deletag,data_sources,fingershow_status,inputtime,gather_date,data_in,fpt_path) " +
+      "values(?,gafis_person_sid_seq.nextval,gafis_person_seq.nextval,1,5,1,sysdate,sysdate,2,?)"
+    JdbcDatabase.update(savePersonSql) { ps =>
       ps.setString(1, person.personId)
-      ps.setString(2, person.cardId)
-      ps.setString(3, person.name)
-      ps.setString(4, person.aliasName)
-      ps.setString(5, person.sexCode)
-      ps.setDate(6,person.birthday)
-      ps.setString(7, person.idCardNo)
-      ps.setString(8, person.door)
-      ps.setString(9, person.doorDetail)
-      ps.setString(10, person.address)
-      ps.setString(11, person.addressDetail)
-      ps.setString(12, person.personCategory)
-      ps.setString(13, person.caseClasses)
-      ps.setString(14, person.gatherDepartCode)
-      ps.setString(15, person.gatherDepartName)
-      ps.setString(16, person.gatherUserName)
-      ps.setDate(17, person.gatherDate)
-      ps.setString(18, person.remark)
-      ps.setString(19, person.nativePlaceCode)
-      ps.setString(20, person.nationCode)
-      ps.setString(21, person.assistLevel)
-      ps.setString(22, person.assistBonus)
-      ps.setString(23, person.assistPurpose)
-      ps.setString(24, person.assistRefPerson)
-      ps.setString(25, person.assistRefCase)
-      ps.setString(26, person.assistValidate)
-      ps.setString(27, person.assistExplain)
-      ps.setString(28, person.assistDeptCode)
-      ps.setString(29, person.assistDeptName)
-      ps.setDate(30, person.assistDate)
-      ps.setString(31, person.assistContacts)
-      ps.setString(32, person.assistNumber)
-      ps.setString(33, person.assistApproval)
-      ps.setString(34, person.assistSign)
-      ps.setString(35, person.isFingerRepeat)
-      ps.setInt(36, person.dataSource)
-      ps.setInt(37, person.fingerShowStatus)
-      ps.setString(38, person.delTag)
-      ps.setString(39,person.fptPath)
+      ps.setString(2, person.fptPath)
     }
   }
 
-  def savePortrait(portrait : PortraitConvert): Unit ={
-    val savePortraitSql = "INSERT INTO GAFIS_GATHER_PORTRAIT(PK_ID,PERSONID,FGP,GATHER_DATA,INPUTPSN,INPUTTIME,DELETAG)" +
-      "VALUES(SYS_GUID(),?,?,?,'1',SYSDATE,?)"
-    JdbcDatabase.update(savePortraitSql){ ps =>
-      ps.setString(1,portrait.personId)
-      ps.setString(2,portrait.fgp)
-      ps.setBytes(3,portrait.gatherData)
-      ps.setString(4,portrait.delTag)
-    }
-  }
 
   def saveTemplateFinger(finger : TemplateFingerConvert): Unit ={
-    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path,main_pattern,vice_pattern)" +
-      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?,?)"
+    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path)" +
+      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?)"
     //保存指纹特征信息
     JdbcDatabase.update(saveFingerSql) { ps =>
       ps.setString(1, finger.personId)
@@ -131,15 +79,21 @@ object GafisPartitionRecordsDakuSaver {
       ps.setString(5,finger.lobType)
       ps.setBytes(6, finger.gatherData)
       ps.setString(7, finger.path)
-      ps.setString(8, finger.mainPattern)
-      ps.setString(9, finger.vicePattern)
+    }
+  }
+
+  //重提特征（先删除）
+  def deleteTemplateFingerMntOrBin(personId : String): Unit ={
+    val deleteFingerMntOrBinSql = "DELETE FROM gafis_gather_finger t WHERE t.person_id = ?"
+    JdbcDatabase.update(deleteFingerMntOrBinSql) { ps =>
+      ps.setString(1,personId)
     }
   }
 
 
   def saveTemplateFingerMntAndBin(finger : TemplateFingerConvert,groupId : String, lobType : String, data : Array[Byte]): Unit ={
-    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path,main_pattern,vice_pattern)" +
-      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?,?)"
+    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path)" +
+      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?)"
     //保存指纹特征信息
     JdbcDatabase.update(saveFingerSql) { ps =>
       ps.setString(1, finger.personId)
@@ -149,8 +103,6 @@ object GafisPartitionRecordsDakuSaver {
       ps.setString(5,lobType)
       ps.setBytes(6, data)
       ps.setString(7, finger.path)
-      ps.setString(8, finger.mainPattern)
-      ps.setString(9, finger.vicePattern)
     }
   }
 

@@ -23,11 +23,13 @@ import scala.util.control.NonFatal
   */
 class FPTDakuProvider extends ImageProvider{
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
+  private lazy val reExtract = SysProperties.getBoolean("extractor.is.reset",defaultValue = false)
   def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       try {
-        //val path = "http://10.1.7.204/fpt/fpt-full/R0033435324111257542353.fpt"
-        val data = SparkFunctions.httpClient.download(imageFileServer.get + filePathSuffix)
+        val path = "http://10.1.7.204/fpt/out_700_950w/P1201606301467274240740.fpt"
+        val data = SparkFunctions.httpClient.download(path)
+        //val data = SparkFunctions.httpClient.download(imageFileServer.get + filePathSuffix)
         //val data = SparkFunctions.httpClient.download(path)
         val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
 
@@ -62,11 +64,13 @@ class FPTDakuProvider extends ImageProvider{
                 val hasPerson = GafisPartitionRecordsSaver.queryPersonById(personId)
                 if (hasPerson.isEmpty) {
                   val person = FptPropertiesConverter.fpt3ToPersonConvert(tp,filePath)
-                  GafisPartitionRecordsFullSaver.saveFullPersonInfo(person)
-                  if (person.portrait.personId!=null)
-                    GafisPartitionRecordsFullSaver.savePortrait(person.portrait)
+                  GafisPartitionRecordsDakuSaver.savePersonInfo(person)
                 }
-                val list = GafisPartitionRecordsSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
+                var list : List[Array[Int]] = List()
+                if (reExtract) //reset finger mnt
+                  GafisPartitionRecordsDakuSaver.deleteTemplateFingerMntOrBin(personId)
+                else
+                  list = GafisPartitionRecordsDakuSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
                 tp.fingers.foreach { tData =>
                   if (tData.imgData != null && tData.imgData.length > 0) {
                     val tBuffer = createImageEvent(filePath, personId, tData, list)
@@ -133,14 +137,16 @@ class FPTDakuProvider extends ImageProvider{
                 personId = tp.personId
                 assert(personId != null, "person id is null")
                 //save person base information
-                val hasPerson = GafisPartitionRecordsFullSaver.queryPersonById(personId)
+                val hasPerson = GafisPartitionRecordsDakuSaver.queryPersonById(personId)
                 if (hasPerson.isEmpty) {
                   val person = FptPropertiesConverter.fpt4ToPersonConvert(tp, filePath)
-                  GafisPartitionRecordsFullSaver.saveFullPersonInfo(person)
-                  if (person.portrait.personId!=null)
-                    GafisPartitionRecordsFullSaver.savePortrait(person.portrait)
+                  GafisPartitionRecordsDakuSaver.savePersonInfo(person)
                 }
-                val list = GafisPartitionRecordsFullSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
+                var list : List[Array[Int]] = List()
+                if (reExtract) //reset finger mnt
+                  GafisPartitionRecordsDakuSaver.deleteTemplateFingerMntOrBin(personId)
+                else
+                  list = GafisPartitionRecordsDakuSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
                 tp.fingers.foreach { tData =>
                   if (tData.imgData != null && tData.imgData.length > 0) {
                     val tBuffer = createImageEvent(filePath, personId, tData, list)

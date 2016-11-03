@@ -6,9 +6,9 @@
   <kafka_server>10.1.7.204:9092</kafka_server>
   <kafka_topic_name>FPT</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
-  <image_provider_class>nirvana.hall.spark.internal.FPTProvider</image_provider_class>
+  <image_provider_class>nirvana.hall.spark.internal.FPTDakuProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
-  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsFullSaver</data_saver_class>
+  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsDakuSaver</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>
@@ -19,7 +19,7 @@
   <database_list>
     <database name="gafis">
       <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <user>gafis</user>
+      <user>gafis_sh_px</user>
       <password>gafis</password>
       <url>jdbc:oracle:thin:@10.1.7.181:1521:gafisdb</url>
     </database>
@@ -40,7 +40,7 @@
     <property key="fpt.file.server" value="http://10.1.7.204/fpt/"/>
     <property key="decompress.gfs.direct" value="true"/>
     <property key="decompress.wsq.direct" value="true"/>
-    <property key="decompress.server" value="http://127.0.0.1:9001/image"/>
+    <property key="decompress.server" value="http://10.1.7.204/image"/>
     <property key="extractor.server" value="http://10.1.7.144:9002/extractor"/>
     <property key="extractor.direct" value="true"/>
     <property key="extractor.converter" value="false"/>
@@ -49,6 +49,9 @@
     <property key="ftp.port" value="21"/>
     <property key="ftp.username" value="fptuser"/>
     <property key="fpt.password" value="fpt@user07!"/>
+
+    <!-- 是否重提特征 -->
+    <property key="extractor.is.reset" value="true"/>
 
 
   </properties>

@@ -68,7 +68,7 @@ class FPTProvider extends ImageProvider {
                   if (person.portrait.personId!=null)
                     GafisPartitionRecordsFullSaver.savePortrait(person.portrait)
                 }
-                val list = GafisPartitionRecordsSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
+                val list = GafisPartitionRecordsFullSaver.queryFingerFgpAndFgpCaseByPersonId(personId)
                 tp.fingers.foreach { tData =>
                   if (tData.imgData != null && tData.imgData.length > 0) {
                     val tBuffer = createImageEvent(filePath, personId, tData, list)

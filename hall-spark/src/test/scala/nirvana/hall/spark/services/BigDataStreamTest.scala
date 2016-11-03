@@ -31,4 +31,10 @@ class BigDataStreamTest {
     val array = Array("src/test/resources/test_spark_full.xml")
     BigDataStream.main(array)
   }
+
+  @Test
+  def streamTestReExtract (){
+    val array = Array("src/test/resources/test_spark_reExtract.xml")
+    BigDataStream.main(array)
+  }
 }
