@@ -82,4 +82,15 @@ object DateConverter {
     arr(1) = t
     ByteBuffer.wrap(arr, 0, 2).getShort()
   }
+
+  /**
+    * 获得系统当前时间
+    * @return
+    */
+  def getNowDate():Date={
+    val now:Date = new Date()
+    val formatter = new SimpleDateFormat("yyyy-MM-dd HH:ss:mm")
+    val date = formatter.parse(formatter.format(now), new ParsePosition(0))
+    date
+  }
 }
