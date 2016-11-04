@@ -464,13 +464,13 @@ object ProtobufConverter {
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }else{
-        person.inputtime = DateConverter.getNowDate
+        person.inputtime = new Date
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
     }else{
-      person.inputtime = DateConverter.getNowDate
+      person.inputtime = new Date
     }
 
     person
