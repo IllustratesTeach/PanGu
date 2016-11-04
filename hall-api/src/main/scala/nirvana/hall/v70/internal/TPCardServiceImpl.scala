@@ -7,7 +7,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.jpa.{GafisGatherPalm, _}
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,11 +21,13 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
+
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
+    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
 
-    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
+    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, palmList)
   }
 
   /**
