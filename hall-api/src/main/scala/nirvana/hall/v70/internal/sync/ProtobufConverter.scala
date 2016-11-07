@@ -2,6 +2,7 @@ package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.google.protobuf.ByteString
@@ -462,10 +463,14 @@ object ProtobufConverter {
       person.gatherOrgCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }else{
+        person.inputtime = new Date
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
+    }else{
+      person.inputtime = new Date
     }
 
     person
@@ -759,5 +764,4 @@ object ProtobufConverter {
 
     result.toByteArray
   }
-
 }
