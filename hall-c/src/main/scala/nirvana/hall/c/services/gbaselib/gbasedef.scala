@@ -109,10 +109,10 @@ object gbasedef {
     var tMilliSec: Short = _
     def setJavaSecs(sec:Int): Unit ={
       val n = sec * 1000
-      tMilliSec = shortConvert(n.toShort)
+      tMilliSec = switchShortEndian(n.toShort)
     }
     def convertAsJavaSecs(): Int ={
-      shortConvert(tMilliSec) / 1000
+      switchShortEndian(tMilliSec) / 1000
     }
     // millisecond.	[0, 999]
     var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;
@@ -125,7 +125,7 @@ object gbasedef {
     * @param short
     * @return
     */
-  private def shortConvert(short: Short): Short = {
+  private def switchShortEndian(short: Short): Short = {
     (((short >>> 8) & 0xff) | (short << 8)).toShort
   }
 
@@ -139,10 +139,10 @@ object gbasedef {
     // month, [0, 11]
     var tYear: Short = _
     def setJavaYear(year:Int): Unit ={
-      tYear = shortConvert(year.toShort)
+      tYear = switchShortEndian(year.toShort)
     }
     def convertAsJavaYear():Int ={
-      shortConvert(tYear)
+      switchShortEndian(tYear)
     }
   }
 
