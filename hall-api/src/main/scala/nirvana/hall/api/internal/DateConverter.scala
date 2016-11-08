@@ -1,6 +1,5 @@
 package nirvana.hall.api.internal
 
-import java.nio.ByteBuffer
 import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
@@ -76,10 +75,6 @@ object DateConverter {
    * @return
    */
   private def shortConvert(short: Short): Short = {
-    val arr = ByteBuffer.allocate(2).putShort(short).array()
-    val t = arr(0)
-    arr(0) = arr(1)
-    arr(1) = t
-    ByteBuffer.wrap(arr, 0, 2).getShort()
+    (((short >>> 8) & 0xff) | (short << 8)).toShort
   }
 }

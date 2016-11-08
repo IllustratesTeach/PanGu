@@ -109,10 +109,10 @@ object gbasedef {
     var tMilliSec: Short = _
     def setJavaSecs(sec:Int): Unit ={
       val n = sec * 1000
-      tMilliSec = ( ((n & 0xff )<< 8) |  ((n >> 8 ) & 0xff) ).toShort
+      tMilliSec = shortConvert(n.toShort)
     }
     def convertAsJavaSecs(): Int ={
-      (((tMilliSec & 0xff) << 8 ) |((tMilliSec >>> 8) & 0xff)) / 1000
+      shortConvert(tMilliSec) / 1000
     }
     // millisecond.	[0, 999]
     var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;
@@ -120,8 +120,16 @@ object gbasedef {
     var tHour: Byte = calendar.get(Calendar.HOUR_OF_DAY).toByte; // hour,   [0, 23]
   }
 
-  // GAFIS_TIME;	// size is 4 bytes long
+  /**
+    * short高地位转换
+    * @param short
+    * @return
+    */
+  private def shortConvert(short: Short): Short = {
+    (((short >>> 8) & 0xff) | (short << 8)).toShort
+  }
 
+  // GAFIS_TIME;	// size is 4 bytes long
   class GAFIS_DATE extends AncientData {
     private val calendar = Calendar.getInstance()
     setJavaYear(calendar.get(Calendar.YEAR))
@@ -131,10 +139,10 @@ object gbasedef {
     // month, [0, 11]
     var tYear: Short = _
     def setJavaYear(year:Int): Unit ={
-      tYear = (((year & 0xff) << 8) | (year >>> 8)).toShort
+      tYear = shortConvert(year.toShort)
     }
     def convertAsJavaYear():Int ={
-      ((tYear & 0xff) << 8 ) |((tYear >>> 8) & 0xff)
+      shortConvert(tYear)
     }
   }
 
