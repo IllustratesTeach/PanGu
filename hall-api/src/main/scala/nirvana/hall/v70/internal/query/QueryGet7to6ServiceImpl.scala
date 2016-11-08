@@ -3,7 +3,6 @@ package nirvana.hall.v70.internal.query
 import java.util.Date
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.v70.config.HallV70Config
@@ -17,7 +16,7 @@ import org.apache.tapestry5.json.JSONObject
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Created by songpeng on 15/12/30.
+ * 7.0获取发送远程6.2的比对结果
  */
 class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                               queryRemoteService: QueryRemoteService,
@@ -40,9 +39,9 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
     if(gafisQuery7to6.isEmpty){
       return false
     }else{
-      val syncTagert = RemoteQueryConfig.find(queryque.syncTargetSid)
-      val url = syncTagert.url
-      val headerMap = HttpHeaderUtils.getV62HeaderMap(syncTagert.config)
+      val queryConfig = RemoteQueryConfig.find(queryque.syncTargetSid)
+      val url = queryConfig.url
+      val headerMap = HttpHeaderUtils.getV62HeaderMap(queryConfig.config)
       val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, url, headerMap)
 
       if (matchResult != null){
@@ -57,12 +56,11 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
         val candIter = candList.iterator()
         while (candIter.hasNext){
           val cand = candIter.next()
-          cand.getObjectId
           if(queryque.querytype == QueryConstants.QUERY_TYPE_TT || queryque.querytype == QueryConstants.QUERY_TYPE_LT){
             //获取捺印信息
             if(GafisPerson.findOption(cand.getObjectId).isEmpty){
-              val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_TPLIB)
-              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url, headerMap.++(dbIdMap))
+              val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_TPLIB)
+              val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url, dbId, headerMap)
               tPCard.foreach{tpCard =>
                 //TODO 目前候选获取的数据存到本地库，后期会考虑存到远程库
                 tpCardService.addTPCard(tpCard)
@@ -72,17 +70,17 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             //获取现场信息
             val cardId = cand.getObjectId
             if(GafisCaseFinger.findOption(cardId).isEmpty){
-              val jsonObj = new JSONObject(syncTagert.config)
-              val dbId = if(jsonObj.has(HttpHeaderUtils.DB_KEY_TPLIB)) Option(jsonObj.getString(HttpHeaderUtils.DB_KEY_TPLIB)) else None
-              val lPCard = lPCardRemoteService.getLPCard(cardId, url, dbId)
+              val jsonObj = new JSONObject(queryConfig.config)
+              val dbId = if(jsonObj.has(HttpHeaderUtils.DB_KEY_TPLIB)) jsonObj.getString(HttpHeaderUtils.DB_KEY_TPLIB) else ""
+              val lPCard = lPCardRemoteService.getLPCard(cardId, url, dbId, headerMap)
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){
                   //如果本地没有对应的案件信息，先远程验证是否存在案件信息,远程获取案件到本地
                   if(GafisCase.findOption(caseId).isEmpty){
-                    val dbIdMap = HttpHeaderUtils.getHeaderMapOfDBID(syncTagert.config, HttpHeaderUtils.DB_KEY_LPLIB)
-                    caseInfoRemoteService.isExist(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
-                    val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbIdMap.get(HallApiConstants.HTTP_HEADER_DBID))
+                    val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
+                    caseInfoRemoteService.isExist(caseId, url, dbId)
+                    val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId, headerMap)
                     caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))
                   }
                 }
