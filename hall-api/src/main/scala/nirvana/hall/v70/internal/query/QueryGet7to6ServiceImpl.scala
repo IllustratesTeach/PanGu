@@ -29,6 +29,29 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   extends QueryGet7to6Service with LoggerSupport{
 
   /**
+   * 定时任务
+   * @param periodicExecutor
+   */
+  @PostInjection
+  def startUp(periodicExecutor: PeriodicExecutor, queryGet7to6Service: QueryGet7to6Service): Unit = {
+    if(v70Config.cron.query7to6Cron != null){
+      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-get-70to62", new Runnable {
+        override def run(): Unit = {
+          queryGet7to6Service.doWork
+        }
+      })
+    }
+  }
+  @Transactional
+  override def doWork: Unit ={
+    getGafisNormalqueryQueryqueMatching().foreach{ gafisQuery =>
+      info("query-get-70to62 info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
+      if(getQueryAndSaveMatchResult(gafisQuery)){
+        doWork
+      }
+    }
+  }
+  /**
    * 从6.2获取查询结果，保存候选列表信息
    * @param queryque
    * @return
@@ -96,29 +119,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
 
   }
 
-  /**
-   * 定时任务
-   * @param periodicExecutor
-   */
-  @PostInjection
-  def startUp(periodicExecutor: PeriodicExecutor, queryGet7to6Service: QueryGet7to6Service): Unit = {
-    if(v70Config.cron.query7to6Cron != null){
-      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-get-70to62", new Runnable {
-        override def run(): Unit = {
-          queryGet7to6Service.doWork
-        }
-      })
-    }
-  }
-  @Transactional
-  override def doWork: Unit ={
-    getGafisNormalqueryQueryqueMatching().foreach{ gafisQuery =>
-      info("query-get-70to62 info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
-      if(getQueryAndSaveMatchResult(gafisQuery)){
-        doWork
-      }
-    }
-  }
   /**
    * 获取正在比对的6.2查询任务
    * @return

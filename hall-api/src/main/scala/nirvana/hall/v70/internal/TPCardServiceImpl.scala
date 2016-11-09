@@ -44,8 +44,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     }else{
       //保存人员基本信息
       val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-//      val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
-//      person.sid = sid
+      val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
+      person.sid = sid
       //用户名获取用户ID
       var user = userService.findSysUserByLoginName(person.inputpsn)
       if (user.isEmpty){
