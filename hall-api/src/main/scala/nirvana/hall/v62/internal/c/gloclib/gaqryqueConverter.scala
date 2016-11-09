@@ -184,6 +184,7 @@ object gaqryqueConverter {
         val cand = matchResult.addCandidateResultBuilder()
         cand.setObjectId(candData.szKey)
         cand.setPos(candData.nIndex)
+        cand.setDbid(candData.nDBID.toString)
         cand.setScore(candData.nScore)
         if(maxScore < candData.nScore)
           maxScore = candData.nScore
