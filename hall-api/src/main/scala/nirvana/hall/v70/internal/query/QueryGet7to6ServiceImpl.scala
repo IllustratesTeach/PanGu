@@ -12,7 +12,6 @@ import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.apache.tapestry5.json.JSONObject
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -60,6 +59,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   override def getQueryAndSaveMatchResult(queryque: GafisNormalqueryQueryque): Boolean= {
     val gafisQuery7to6 = GafisQuery7to6.findOption(queryque.oraSid)
     if(gafisQuery7to6.isEmpty){
+      error("没有对应的远程查询id")
       return false
     }else{
       val queryConfig = RemoteQueryConfig.find(queryque.syncTargetSid)
@@ -93,15 +93,13 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             //获取现场信息
             val cardId = cand.getObjectId
             if(GafisCaseFinger.findOption(cardId).isEmpty){
-              val jsonObj = new JSONObject(queryConfig.config)
-              val dbId = if(jsonObj.has(HttpHeaderUtils.DB_KEY_TPLIB)) jsonObj.getString(HttpHeaderUtils.DB_KEY_TPLIB) else ""
+              val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
               val lPCard = lPCardRemoteService.getLPCard(cardId, url, dbId, headerMap)
               lPCard.foreach{lpCard=>
                 val caseId = lpCard.getText.getStrCaseId
                 if(caseId != null && caseId.length >0){
                   //如果本地没有对应的案件信息，先远程验证是否存在案件信息,远程获取案件到本地
                   if(GafisCase.findOption(caseId).isEmpty){
-                    val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
                     caseInfoRemoteService.isExist(caseId, url, dbId)
                     val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId, headerMap)
                     caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))

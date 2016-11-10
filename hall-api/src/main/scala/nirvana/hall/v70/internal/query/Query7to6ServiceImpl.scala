@@ -98,6 +98,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
       val respnose = rpcHttpClient.call(queryConfig.url, QuerySendRequest.cmd, request.build(), headerMap)
       val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
       //记录关联62的查询任务号, TODO 删除GafisQuery7to6表 远程查询ID 存到GafisNormalqueryQueryque.queryid字段，获取比对结果一并修改，同时兼顾来自远方的查询
+      GafisQuery7to6.where(GafisQuery7to6.oraSid === gafisQuery.oraSid).foreach(_.delete())//删除原有的6.2比对关系，防止重复发6.2远程比对后GafisQuery7to6主键唯一约束报错
       new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
       //更新比对状态为正在比对
       GafisNormalqueryQueryque.update.set(status = QueryConstants.STATUS_MATCHING, begintime = new Date()).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
