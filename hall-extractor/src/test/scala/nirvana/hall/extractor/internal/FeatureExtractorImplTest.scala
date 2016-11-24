@@ -57,10 +57,10 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_bmp: Unit ={
-    val imgData = getClass.getResourceAsStream("/bmp.bmp")
+    val imgData = getClass.getResourceAsStream("/52022200000000000000000000009409.bmp")
 
     val extractor = new FeatureExtractorImpl
-    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V2)
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
     val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
