@@ -214,8 +214,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    */
   def fetchCaseInfo(caseId: String, url: String, dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
-    if(caseInfoRemoteService.isExist(caseId, url, dbId)){
-      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId)
+    if(caseInfoRemoteService.isExist(caseId, url, dbId.get)){
+      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId.get)
       caseInfoOpt.foreach(caseInfoService.addCaseInfo(_, destDbId))
     }else{
       //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
@@ -380,13 +380,13 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     while (candIter.hasNext){
       val cand = candIter.next()
       val cardId = cand.getObjectId
-      val candDbId = if(cand.getDbid.nonEmpty) Option(cand.getDbid) else None
+      val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
         val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         }else{
-          val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url)
+          val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url, candDbId)
           tpCardOpt.foreach(tpCardService.addTPCard(_))
           candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
         }
@@ -399,7 +399,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           lPCardOpt.foreach{ lpCard =>
             lPCardService.addLPCard(lpCard)
             val caseId = lpCard.getText.getStrCaseId
-            if(!caseInfoService.isExist(caseId, candDbId)){//获取案件
+            if(!caseInfoService.isExist(caseId, Option(candDbId))){//获取案件
               fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
             }
             candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)

@@ -42,13 +42,17 @@ object HttpHeaderUtils {
     map.toMap
   }
 
-  def getHeaderMapOfDBID(config: String, key: String): Map[String, String]={
+  /**
+    * @param config
+    * @param key
+    * @return
+    */
+  def getDBIDBySyncTagert(config: String, key: String): String={
     val json = new JSONObject(config)
     if(json.has(key)){
-      val dbId = json.getString(key)
-      Map(HallApiConstants.HTTP_HEADER_DBID -> dbId)
+      json.getString(key)
     }else{
-      Map()
+      ""
     }
   }
 

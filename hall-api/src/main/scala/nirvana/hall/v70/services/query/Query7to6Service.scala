@@ -14,17 +14,16 @@ trait Query7to6Service {
    * @param gafisQuery
    * @return
    */
+  @Transactional
   def sendQuery(gafisQuery: GafisNormalqueryQueryque)
 
   /**
-   * 获取比对任务，一条
+   * 获取一条等待比对的任务
    */
-  @Transactional
-  def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque]
+  def getGafisNormalqueryQueryqueWait: Option[GafisNormalqueryQueryque]
 
   /**
    * 读取任务队列，处理发送查询任务
    */
-  @Transactional
   def doWork
 }

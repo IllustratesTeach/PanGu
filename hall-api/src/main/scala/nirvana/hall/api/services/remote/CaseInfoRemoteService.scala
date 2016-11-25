@@ -13,7 +13,7 @@ trait CaseInfoRemoteService {
    * @param url
    * @return
    */
-  def getCaseInfo(caseId: String, url: String, dbId: Option[String] = None): Option[Case]
+  def getCaseInfo(caseId: String, url: String, dbId: String = "", headerMap: Map[String, String] = Map()): Option[Case]
 
   /**
    * 添加案件信息
@@ -21,21 +21,21 @@ trait CaseInfoRemoteService {
    * @param url
    * @return
    */
-  def addCaseInfo(caseInfo: Case, url: String, dbId: Option[String])
+  def addCaseInfo(caseInfo: Case, url: String, dbId: String = "", headerMap: Map[String, String] = Map())
 
   /**
    * 更新案件信息
    * @param caseInfo
    * @param url
    */
-  def updateCaseInfo(caseInfo: Case, url: String, dbId: Option[String])
+  def updateCaseInfo(caseInfo: Case, url: String, dbId: String = "", headerMap: Map[String, String] = Map())
 
   /**
    * 删除案件信息
    * @param caseId
    * @param url
    */
-  def deleteCaseInfo(caseId: String, url: String, dbId: Option[String])
+  def deleteCaseInfo(caseId: String, url: String, dbId: String = "", headerMap: Map[String, String] = Map())
 
   /**
    * 案件编号是否存在
@@ -43,5 +43,5 @@ trait CaseInfoRemoteService {
    * @param url
    * @param dbId
    */
-  def isExist(caseId: String, url: String, dbId: Option[String]): Boolean
+  def isExist(caseId: String, url: String, dbId: String = "", headerMap: Map[String, String] = Map()): Boolean
 }

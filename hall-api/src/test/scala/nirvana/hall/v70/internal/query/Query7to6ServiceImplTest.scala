@@ -12,7 +12,7 @@ class Query7to6ServiceImplTest extends BaseV70TestCase{
   def test_sendQuery(): Unit ={
     val service = getService[Query7to6Service]
 
-    val task = service.getGafisNormalqueryQueryque
+    val task = service.getGafisNormalqueryQueryqueWait
 
     Assert.assertNotNull(task)
 

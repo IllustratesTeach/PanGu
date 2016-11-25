@@ -98,7 +98,7 @@ class Migrate_20151202092825_CopyCaseTable extends Migration{
       t.column("FPT_EXTRACT_UNIT_CODE",VarcharType,Limit(12),Nullable,Comment("FPT提取单位代码"))
       t.column("FPT_EXTRACT_UNIT_NAME",VarcharType,Limit(90),Nullable,Comment("FPT提取单位名称"))
       t.column("SID",BigintType,Limit(22),Nullable,Comment("SID比对唯一标识"))
-      t.column("ASSIST_BONUS",VarcharType,Limit(6),Nullable,Comment("协查标识"))
+      t.column("ASSIST_BONUS",VarcharType,Limit(6),Nullable,Comment("协查奖金"))
       t.column("ASSIST_DEPT_CODE",VarcharType,Limit(12),Nullable,Comment("协查单位代码"))
       t.column("ASSIST_DEPT_NAME",VarcharType,Limit(70),Nullable,Comment("协查单位名称"))
       t.column("ASSIST_DATE",VarcharType,Limit(8),Nullable,Comment("协查日期(格式:YYYYMMDD)"))
