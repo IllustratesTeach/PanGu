@@ -140,4 +140,28 @@ class FeatureExtractorImplTest extends BaseJniTest{
     Assert.assertEquals(4024,newFeature.size)
   }
 
+  @Test
+  def test_extract_idcard_bmp: Unit ={
+    val imgData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\img.bmp"))
+    val in = ByteString.copyFrom(imgData).newInput()
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\mnt.mnt"),mnt.toByteArray())
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+
+
+  @Test
+  def test_extract_wjw_jpg: Unit ={
+    val imgData = getClass.getResourceAsStream("/jpg.jpg")
+
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+
 }
