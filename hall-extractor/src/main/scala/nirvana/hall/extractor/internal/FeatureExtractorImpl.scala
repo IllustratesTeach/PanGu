@@ -124,7 +124,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
       case COLOR_GRAY_SPACE=>
         img
       case other=>
-        val dstImage = new BufferedImage(img.getWidth, img.getHeight, img.getType);
+        val dstImage = new BufferedImage(img.getWidth, img.getHeight, BufferedImage.TYPE_BYTE_GRAY);
         val colorConvertOp = new ColorConvertOp(COLOR_GRAY_SPACE, null);
         colorConvertOp.filter(img, dstImage)
         dstImage
@@ -132,7 +132,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val originalHeadObject = img.getProperty(HallSupportConstants.GAFIS_IMG_HEAD_KEY)
     val gafisImg = new GAFISIMAGESTRUCT
-    val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    val dataBuffer = grayImg.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
     if(originalHeadObject == null || originalHeadObject == Image.UndefinedProperty) {
       gafisImg.stHead.nResolution = 500
       gafisImg.stHead.nWidth = grayImg.getWidth.toShort
