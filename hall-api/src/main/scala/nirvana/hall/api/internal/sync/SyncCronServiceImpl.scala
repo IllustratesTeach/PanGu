@@ -40,7 +40,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   final val SYNC_BATCH_SIZE = 1
   /**
    * 定时器，同步数据
-   * @param periodicExecutor
+    *
+    * @param periodicExecutor
    * @param syncCronService
    */
   @PostInjection
@@ -83,7 +84,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 执行抓取数据
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    */
   def fetchTPCard(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("syncTPCard name:{} timestamp:{}", fetchConfig.name, fetchConfig.seq)
@@ -139,7 +141,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 抓取现场指纹
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    * @param update
    */
   def fetchLPCard(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
@@ -210,7 +213,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * 根据案件编号同步案件信息
    * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
    * 如果没有案件信息不同步案件信息，6.2存在只有现场没有案件的情况
-   * @param caseId
+    *
+    * @param caseId
    */
   def fetchCaseInfo(caseId: String, url: String, dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
@@ -228,7 +232,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 抓取现场掌纹
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    * @param update
    */
   def fetchLPPalm(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
@@ -297,7 +302,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 抓取比对任务
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    * @param update
    */
   def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
@@ -340,37 +346,46 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   /**
    * 抓取比对结果候选列表
    * TODO 先查询比对状态是正在比对的任务sid，然后再根据sid获取比对结果
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    */
   def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
-    val request = SyncMatchResultRequest.newBuilder()
-    request.setSid(fetchConfig.seq)
-    request.setDbid(fetchConfig.dbid)
-    val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
-    if(baseResponse.getStatus == CommandStatus.OK){
-      val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
-      val matchStatus = response.getMatchStatus
-      if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
-        val matchResult = response.getMatchResult
-        if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-          //获取候选信息
-          val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
-          info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+
+
+      val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
+      try{
+        while(sidIter.hasNext){
+          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          val request = SyncMatchResultRequest.newBuilder()
+          request.setSid(sidIter.next)
+          request.setDbid(fetchConfig.dbid)
+          val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
+          if(baseResponse.getStatus == CommandStatus.OK){
+            val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
+            val matchStatus = response.getMatchStatus
+            if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
+            val matchResult = response.getMatchResult
+              if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
+                //获取候选信息
+                val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+                info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+              }
+            }
+          }
         }
-        fetchConfig.seq += 1
-        updateSeq(fetchConfig)
-        //递归获取
-        fetchMatchResult(fetchConfig, update)
+      } catch {
+        case e: Exception => error("抓取比对结果时异常:" + e.getMessage)
       }
-    }
-  }
-  /**
+}
+
+
+/**
    * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
    * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
    * 解决方法需要候选信息增加dbid信息
-   * @param matchResult
+  *
+  * @param matchResult
    */
   private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
     val candDBIDMap = mutable.HashMap[String, Short]()
@@ -414,7 +429,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 根据捺印卡号查找所在DBID
-   * @param cardId
+    *
+    * @param cardId
    * @param dbidList
    * @return
    */
@@ -429,7 +445,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 根据现场卡号查找所在DBID
-   * @param cardId
+    *
+    * @param cardId
    * @param dbidList
    * @return
    */
@@ -444,7 +461,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 获取DBID列表
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    * @param queryType
    * @return
    */
@@ -478,7 +496,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 更新同步HallFetchConfig.seq 的值, 因为直接调用save方法，session问题,程序调用insert而不是update
-   * @param fetchConfig
+    *
+    * @param fetchConfig
    */
   private def updateSeq(fetchConfig: HallFetchConfig): Unit ={
     HallFetchConfig.update.set(seq = fetchConfig.seq).where(HallFetchConfig.pkId === fetchConfig.pkId).execute
