@@ -128,7 +128,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
     }
     return textQuery.build()
@@ -182,7 +182,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
       }catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
     }
 

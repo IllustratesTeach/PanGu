@@ -3,10 +3,12 @@ package nirvana.hall.matcher.internal
 import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
+import monad.support.services.LoggerSupport
+
 /**
  * Created by songpeng on 16/6/13.
  */
-object DateConverter {
+object DateConverter extends LoggerSupport{
 
   /**
    * 将字符串转换为日期
@@ -22,7 +24,7 @@ object DateConverter {
         date = formatter.parse(str,new ParsePosition(0))
       }catch {
         case e: Exception=>
-          e.printStackTrace()
+          error(e.getMessage, e)
           if(str.length == 10){
             val formatter = new SimpleDateFormat("yyyy-MM-dd");
             date = formatter.parse(str)

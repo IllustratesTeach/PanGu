@@ -107,7 +107,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
       case e: Exception =>
         //发送比对异常，状态更新为失败
         GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
-        e.printStackTrace()
+        error(e.getMessage, e)
     }
   }
 

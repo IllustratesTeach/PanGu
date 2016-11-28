@@ -124,8 +124,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
@@ -193,8 +192,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
@@ -282,7 +280,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
           error(e.getMessage)
       }
       //如果获取到数据递归获取
@@ -324,8 +321,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
       } catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
