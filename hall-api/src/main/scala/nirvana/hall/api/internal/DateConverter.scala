@@ -32,6 +32,20 @@ object DateConverter {
   }
 
   /**
+    * 日期格式化转换
+    * @param date
+    * @param format (default YYYYMMDD)
+    * @return
+    */
+  def convertDate2String(date: Date, format: String = "YYYYMMDD"): String = {
+    if(date != null){
+      new SimpleDateFormat(format).format(date)
+    } else {
+      ""
+    }
+  }
+
+  /**
    * 将gafis日期转换为字符串yyyyMMddHHmmss
    * @param dateTime
    * @return
