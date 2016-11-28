@@ -91,7 +91,7 @@ object LocalDataSourceModule {
     //用之前先升级数据库
     val driverClassName: String = config.db.driver
     val vendor = Vendor.forDriver(driverClassName)
-    val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user))
+    val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user)); 如果是H2不设置schema（None）
     val migrator = new Migrator(dataSource, databaseAdapter)
     //migrator.migrate(RemoveAllMigrations, "nirvana.hall.v70.migration", false)
     migrator.migrate(InstallAllMigrations, "nirvana.hall.v70.migration", searchSubPackages = false)

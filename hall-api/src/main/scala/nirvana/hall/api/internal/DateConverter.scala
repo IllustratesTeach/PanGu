@@ -1,16 +1,16 @@
 package nirvana.hall.api.internal
 
-import java.nio.ByteBuffer
 import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gbasedef.GAFIS_DATETIME
 
 
 /**
  * Created by songpeng on 16/7/2.
  */
-object DateConverter {
+object DateConverter extends LoggerSupport{
 
   /**
    * 将字符串转为Date
@@ -26,10 +26,24 @@ object DateConverter {
         date = formatter.parse(str, new ParsePosition(0))
       } catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
     }
     date
+  }
+
+  /**
+    * 日期格式化转换
+    * @param date
+    * @param format (default YYYYMMDD)
+    * @return
+    */
+  def convertDate2String(date: Date, format: String = "YYYYMMDD"): String = {
+    if(date != null){
+      new SimpleDateFormat(format).format(date)
+    } else {
+      ""
+    }
   }
 
   /**
@@ -38,12 +52,12 @@ object DateConverter {
    * @return
    */
   def convertAFISDateTime2String(dateTime: GAFIS_DATETIME): String = {
-    val year = shortConvert(dateTime.tDate.tYear)
+    val year = switchShortEndian(dateTime.tDate.tYear)
     val month = dateTime.tDate.tMonth + 1
     val day = dateTime.tDate.tDay
     val hour = dateTime.tTime.tHour
     val min = dateTime.tTime.tMin
-    val sec = Math.abs(shortConvert(dateTime.tTime.tMilliSec) / 1000)
+    val sec = Math.abs(switchShortEndian(dateTime.tTime.tMilliSec) / 1000)
 
     "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
   }
@@ -75,11 +89,7 @@ object DateConverter {
    * @param short
    * @return
    */
-  private def shortConvert(short: Short): Short = {
-    val arr = ByteBuffer.allocate(2).putShort(short).array()
-    val t = arr(0)
-    arr(0) = arr(1)
-    arr(1) = t
-    ByteBuffer.wrap(arr, 0, 2).getShort()
+  private def switchShortEndian(short: Short): Short = {
+    (((short >>> 8) & 0xff) | (short << 8)).toShort
   }
 }

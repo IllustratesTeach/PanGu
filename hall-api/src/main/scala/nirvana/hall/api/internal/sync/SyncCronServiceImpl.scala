@@ -124,8 +124,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
@@ -193,8 +192,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
@@ -214,8 +212,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    */
   def fetchCaseInfo(caseId: String, url: String, dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
-    if(caseInfoRemoteService.isExist(caseId, url, dbId)){
-      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId)
+    if(caseInfoRemoteService.isExist(caseId, url, dbId.get)){
+      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId.get)
       caseInfoOpt.foreach(caseInfoService.addCaseInfo(_, destDbId))
     }else{
       //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
@@ -282,7 +280,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
           error(e.getMessage)
       }
       //如果获取到数据递归获取
@@ -324,8 +321,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
       } catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
@@ -343,30 +339,37 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * @param fetchConfig
    */
   def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
-    val request = SyncMatchResultRequest.newBuilder()
-    request.setSid(fetchConfig.seq)
-    request.setDbid(fetchConfig.dbid)
-    val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
-    if(baseResponse.getStatus == CommandStatus.OK){
-      val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
-      val matchStatus = response.getMatchStatus
-      if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
-        val matchResult = response.getMatchResult
-        if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-          //获取候选信息
-          val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
-          info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+
+
+      val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
+      try{
+        while(sidIter.hasNext){
+          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          val request = SyncMatchResultRequest.newBuilder()
+          request.setSid(sidIter.next)
+          request.setDbid(fetchConfig.dbid)
+          val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
+          if(baseResponse.getStatus == CommandStatus.OK){
+            val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
+            val matchStatus = response.getMatchStatus
+            if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
+            val matchResult = response.getMatchResult
+              if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
+                //获取候选信息
+                val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+                info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+              }
+            }
+          }
         }
-        fetchConfig.seq += 1
-        updateSeq(fetchConfig)
-        //递归获取
-        fetchMatchResult(fetchConfig, update)
+      } catch {
+        case e: Exception => error("抓取比对结果时异常:" + e.getMessage)
       }
-    }
-  }
-  /**
+}
+
+
+/**
    * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
    * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
    * 解决方法需要候选信息增加dbid信息
@@ -380,13 +383,13 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     while (candIter.hasNext){
       val cand = candIter.next()
       val cardId = cand.getObjectId
-      val candDbId = if(cand.getDbid.nonEmpty) Option(cand.getDbid) else None
+      val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
         val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         }else{
-          val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url)
+          val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url, candDbId)
           tpCardOpt.foreach(tpCardService.addTPCard(_))
           candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
         }
@@ -399,7 +402,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           lPCardOpt.foreach{ lpCard =>
             lPCardService.addLPCard(lpCard)
             val caseId = lpCard.getText.getStrCaseId
-            if(!caseInfoService.isExist(caseId, candDbId)){//获取案件
+            if(!caseInfoService.isExist(caseId, Option(candDbId))){//获取案件
               fetchCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid))
             }
             candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)

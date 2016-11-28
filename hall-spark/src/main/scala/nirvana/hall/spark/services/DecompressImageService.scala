@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.internal.FirmDecoderImpl
@@ -19,7 +20,7 @@ import scala.util.control.NonFatal
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-02-09
  */
-object DecompressImageService {
+object DecompressImageService extends LoggerSupport{
   private lazy val serverRandom = randomImageServer()
   private lazy val seq = new AtomicLong(0)
   private lazy val gfsDirect = SysProperties.getBoolean("decompress.gfs.direct",defaultValue = false)
@@ -94,7 +95,7 @@ object DecompressImageService {
   }
 
   def doReportException(parameter:NirvanaSparkConfig, event:StreamEvent, e: Throwable) = {
-    e.printStackTrace()
+    error(e.getMessage, e)
     SparkFunctions.reportError(parameter, DecompressError(event, e.toString))
     None
   }

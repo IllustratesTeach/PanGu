@@ -23,12 +23,12 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {
     val matchType = request.getMatchType
-    val reponse = MatchRelationGetResponse.newBuilder()
-    reponse.setMatchType(matchType)
+    val response = MatchRelationGetResponse.newBuilder()
+    response.setMatchType(matchType)
     val cardId = request.getCardId
     //获取比对状态
     val status = queryService.findFirstQueryStatusByCardIdAndMatchType(cardId, matchType)
-    reponse.setMatchStatus(status)
+    response.setMatchStatus(status)
     matchType match {
       case MatchType.FINGER_TL =>
         if(status == MatchStatus.RECHECKED){//倒查复核后生成比对关系
@@ -63,7 +63,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
             matchRelation.setMatchSysInfo(matchSysInfo)
             matchRelation.setExtension(MatchRelationTLAndLT.data, matchRelationTL.build())
 
-            reponse.addMatchRelation(matchRelation.build())
+            response.addMatchRelation(matchRelation.build())
           }
         }
       case MatchType.FINGER_TT =>
@@ -96,7 +96,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
               matchRelation.setMatchSysInfo(matchSysInfo)
               matchRelation.setExtension(MatchRelationTT.data, tt.build())
 
-              reponse.addMatchRelation(matchRelation.build())
+              response.addMatchRelation(matchRelation.build())
             }
           }
         }
@@ -104,7 +104,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
         warn("unsupport matchType:{}", matchType)
     }
 
-    reponse.build()
+    response.build()
   }
   /**
    * 查询比中关系

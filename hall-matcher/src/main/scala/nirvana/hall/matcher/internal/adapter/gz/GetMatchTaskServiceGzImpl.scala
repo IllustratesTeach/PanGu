@@ -92,7 +92,7 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
 
     }
@@ -147,7 +147,7 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
       }catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
     }
 

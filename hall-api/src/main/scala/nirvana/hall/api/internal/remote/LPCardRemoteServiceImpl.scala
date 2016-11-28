@@ -16,12 +16,10 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param url
    * @return
    */
-  override def getLPCard(cardId: String, url: String, dbid: Option[String] = None): Option[LPCard] = {
+  override def getLPCard(cardId: String, url: String, dbId: String, headerMap: Map[String, String]): Option[LPCard] = {
     info("remote get lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardGetRequest.newBuilder().setCardId(cardId)
-    if(dbid.nonEmpty){
-      request.setDbid(dbid.get)
-    }
+    request.setDbid(dbId)
     val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build())
     Option(response.getExtension(LPCardGetResponse.cmd).getCard)
   }
@@ -32,9 +30,10 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param url
    * @return
    */
-  override def addLPCard(lPCard: LPCard, url: String) = {
+  override def addLPCard(lPCard: LPCard, url: String, dbId: String, headerMap: Map[String, String]) = {
     info("remote add lpcard [cardId:{},url:{}]", lPCard.getStrCardID, url)
     val request = LPCardAddRequest.newBuilder().setCard(lPCard)
+    request.setDbid(dbId)
     rpcHttpClient.call(url, LPCardAddRequest.cmd, request.build())
   }
 
@@ -43,9 +42,10 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param lPCard
    * @param url
    */
-  override def updateLPCard(lPCard: LPCard, url: String): Unit = {
+  override def updateLPCard(lPCard: LPCard, url: String, dbId: String, headerMap: Map[String, String]): Unit = {
     info("remote update lpcard [cardId:{},url:{}]", lPCard.getStrCardID, url)
     val request = LPCardUpdateRequest.newBuilder().setCard(lPCard)
+    request.setDbid(dbId)
     rpcHttpClient.call(url, LPCardUpdateRequest.cmd, request.build())
   }
 
@@ -54,9 +54,10 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
    * @param cardId
    * @param url
    */
-  override def deleteLPCard(cardId: String, url: String): Unit = {
+  override def deleteLPCard(cardId: String, url: String, dbId: String, headerMap: Map[String, String]): Unit = {
     info("remote add lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardDelRequest.newBuilder().setCardId(cardId)
+    request.setDbid(dbId)
     rpcHttpClient.call(url, LPCardDelRequest.cmd, request.build())
   }
 }

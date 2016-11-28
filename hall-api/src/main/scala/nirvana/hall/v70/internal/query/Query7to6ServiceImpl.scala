@@ -37,30 +37,28 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     }
   }
 
-  @Transactional
   override def doWork: Unit ={
-    getGafisNormalqueryQueryque.foreach{ gafisQuery =>
+    getGafisNormalqueryQueryqueWait.foreach{ gafisQuery =>
       info("remote-query info[oraSid:{} keyId:{} type:{}]", gafisQuery.oraSid , gafisQuery.keyid, gafisQuery.querytype)
       sendQuery(gafisQuery)
+      //递归调用
       doWork
     }
   }
 
   /**
-   * 获取一条查询任务
+   * 获取一条等待比对的查询任务
    * @return
    */
-  @Transactional
-  override def getGafisNormalqueryQueryque: Option[GafisNormalqueryQueryque] ={
-    val gafisQuery = GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.status === QueryConstants.STATUS_WAIT).and(GafisNormalqueryQueryque.deletag === "1").and(GafisNormalqueryQueryque.syncTargetSid[String].notNull).orderBy(GafisNormalqueryQueryque.priority[java.lang.Short].desc).orderBy(GafisNormalqueryQueryque.oraSid).headOption
-    // 更新状态为正在比对
-    gafisQuery.foreach{ query =>
-      GafisNormalqueryQueryque.update.set(status = QueryConstants.STATUS_MATCHING, begintime = new Date()).where(GafisNormalqueryQueryque.pkId === query.pkId).execute
-    }
-
-    gafisQuery
+  override def getGafisNormalqueryQueryqueWait: Option[GafisNormalqueryQueryque] ={
+    GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.status === QueryConstants.STATUS_WAIT).and(GafisNormalqueryQueryque.deletag === "1").and(GafisNormalqueryQueryque.syncTargetSid[String].notNull).orderBy(GafisNormalqueryQueryque.priority[java.lang.Short].desc).orderBy(GafisNormalqueryQueryque.oraSid).headOption
   }
 
+  /**
+    * 转换比对任务类型GafisNormalqueryQueryque-->MatchTask
+    * @param query
+    * @return
+    */
   private def convertGafisNormalqueryQueryque2MatchTask(query: GafisNormalqueryQueryque): MatchTask = {
     val matchTask = MatchTask.newBuilder()
     matchTask.setMatchId(query.keyid)
@@ -70,6 +68,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     matchTask.setScoreThreshold(query.minscore)
     matchTask.setTopN(query.maxcandnum)
 
+    //解析特征数据
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
     mics.foreach{mic =>
       if(mic.bIsLatent == 1){
@@ -98,13 +97,17 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
       val headerMap = HttpHeaderUtils.getHeaderMapOfQueryConfig(queryConfig.config, matchTask.getMatchType)
       val respnose = rpcHttpClient.call(queryConfig.url, QuerySendRequest.cmd, request.build(), headerMap)
       val querySendResponse = respnose.getExtension(QuerySendResponse.cmd)
-      //记录关联62的查询任务号
+      //记录关联62的查询任务号, TODO 删除GafisQuery7to6表 远程查询ID 存到GafisNormalqueryQueryque.queryid字段，获取比对结果一并修改，同时兼顾来自远方的查询
+      GafisQuery7to6.where(GafisQuery7to6.oraSid === gafisQuery.oraSid).foreach(_.delete())//删除原有的6.2比对关系，防止重复发6.2远程比对后GafisQuery7to6主键唯一约束报错
       new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
+      //更新比对状态为正在比对
+      GafisNormalqueryQueryque.update.set(status = QueryConstants.STATUS_MATCHING, begintime = new Date()).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
     }
     catch {
       case e: Exception =>
         //发送比对异常，状态更新为失败
         GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
+        error(e.getMessage, e)
     }
   }
 

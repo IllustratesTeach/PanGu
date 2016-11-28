@@ -129,28 +129,28 @@ message	TPCard
 {
 	message	TPCardText
 	{
-		optional string	strName = 1;
-		optional string	strAliasName = 2;
-		optional int32	nSex = 3;
-		optional string	strBirthDate = 4;
-		optional string	strIdentityNum = 5;
-		optional string	strBirthAddrCode = 6;
-		optional string	strBirthAddr = 7;
-		optional string	strAddrCode = 8;
-		optional string	strAddr = 9;
-		optional string	strPersonType = 10;
-		optional string	strCaseType1 = 11;
+		optional string	strName = 1;                    //姓名
+		optional string	strAliasName = 2;               //别名
+		optional int32	nSex = 3;                       //性别
+		optional string	strBirthDate = 4;               //出生日期
+		optional string	strIdentityNum = 5;             //身份证
+		optional string	strBirthAddrCode = 6;           //出生地代码
+		optional string	strBirthAddr = 7;               //出生地详址
+		optional string	strAddrCode = 8;                //现住址代码
+		optional string	strAddr = 9;                    //现住址详址
+		optional string	strPersonType = 10;             //人员类型
+		optional string	strCaseType1 = 11;              //案件类别
 		optional string	strCaseType2 = 12;
 		optional string	strCaseType3 = 13;
-		optional string	strPrintUnitCode = 14;
-		optional string	strPrintUnitName = 15;
-		optional string	strPrinter = 16;
-		optional string	strPrintDate = 17;
-		optional string	strComment = 18;
+		optional string	strPrintUnitCode = 14;          //采集单位代码
+		optional string	strPrintUnitName = 15;          //采集单位名称
+		optional string	strPrinter = 16;                //采集人姓名
+		optional string	strPrintDate = 17;              //采集时间
+		optional string	strComment = 18;                //备注
 
 		//追加4.0文字信息
-		optional string	strNation = 19;
-		optional string	strRace = 20;
+		optional string	strNation = 19;                 //国籍
+		optional string	strRace = 20;                   //民族
 		optional string	strCertifType = 21;				//证件类型
 		optional string	strCertifID = 22;				//证件号
 		optional bool	bHasCriminalRecord = 23;		//前科标记
@@ -178,21 +178,21 @@ message	TPCard
 
 	message	TPCardBlob
 	{
-		optional string			stImage = 1;
-		optional string			stMnt = 2;
+		optional string			stImage = 1;                            //图像数据
+		optional string			stMnt = 2;                              //特征数据
 		optional PatternType	rp = 3 [default = PATTERN_UNDET];		//主纹型
 		optional PatternType	vrp = 4 [default = PATTERN_UNDET];		//副纹型
 		optional FingerFgp		fgp = 5 [default = FINGER_UNDET];		//指位
-		required ImageType		type = 6 [default = IMAGETYPE_UNKNOWN];
-		optional bool			bPlain = 7;
+		required ImageType		type = 6 [default = IMAGETYPE_UNKNOWN]; //图像类型
+		optional bool			bPlain = 7;                             //是否平面
 		optional string			strMntExtractMethod = 8;				//GAFIS结构中无
 		optional FaceFgp		facefgp = 9 [default = FACE_UNKNOWN];	//脸位
 		optional PalmFgp		palmfgp = 10 [default = PALM_UNKNOWN];	//掌位
 		optional string			stBin = 11;	//纹线数据
 	}
 
-	required string		strCardID = 1;
-	optional string		strPersonID = 2;
+	required string		strCardID = 1;      //捺印卡号
+	optional string		strPersonID = 2;    //人员编号
 	optional TPCardText	text = 3;
 	repeated TPCardBlob	blob = 4;
 	optional AdminfoData admData = 5;	//操作信息
@@ -202,35 +202,35 @@ message	Case
 {
 	message	CaseText
 	{
-		optional string	strCaseType1 = 1;
+		optional string	strCaseType1 = 1;           //案件类别
 		optional string	strCaseType2 = 2;
 		optional string	strCaseType3 = 3;
-		optional string	strSuspArea1Code = 4;
+		optional string	strSuspArea1Code = 4;       //可疑地区行政区划
 		optional string	strSuspArea2Code = 5;
 		optional string	strSuspArea3Code = 6;
-		optional string	strCaseOccurDate = 7;
-		optional string	strCaseOccurPlaceCode = 8;
-		optional string	strCaseOccurPlace = 9;
-		optional int32	nSuperviseLevel = 10;
-		optional string	strExtractUnitCode = 11;
-		optional string	strExtractUnitName = 12;
-		optional string	strExtractor = 13;
-		optional string	strExtractDate = 14;
-		optional string	strMoneyLost = 15;
-		optional string	strPremium = 16;
-		optional bool	bPersonKilled = 17;
-		optional string	strComment = 18;
-		optional int32	nCaseState = 19;
-		optional int32	nXieChaState = 20;
-		optional int32	nCancelFlag = 21;
-		optional string	strXieChaDate = 22;
-		optional string	strXieChaRequestUnitName = 23;
-		optional string	strXieChaRequestUnitCode = 24;
+		optional string	strCaseOccurDate = 7;       //案发日期
+		optional string	strCaseOccurPlaceCode = 8;  //案发地点代码
+		optional string	strCaseOccurPlace = 9;      //案发地址详情
+		optional int32	nSuperviseLevel = 10;       //协查级别
+		optional string	strExtractUnitCode = 11;    //提取单位代码
+		optional string	strExtractUnitName = 12;    //提取单位
+		optional string	strExtractor = 13;          //提取人
+		optional string	strExtractDate = 14;        //提取时间
+		optional string	strMoneyLost = 15;          //涉案金额
+		optional string	strPremium = 16;            //协查奖金
+		optional bool	bPersonKilled = 17;         //命案标识
+		optional string	strComment = 18;            //备注
+		optional int32	nCaseState = 19;            //案件状态
+		optional int32	nXieChaState = 20;          //协查状态
+		optional int32	nCancelFlag = 21;           //撤销标识
+		optional string	strXieChaDate = 22;         //协查日期
+		optional string	strXieChaRequestUnitName = 23;  //协查单位名称
+		optional string	strXieChaRequestUnitCode = 24;  //协查单位代码
 	}
 
-	required string	strCaseID = 1;
-	repeated string	strFingerID = 2;
-	repeated string	strPalmID = 3;
+	required string	strCaseID = 1;          //案件编号
+	repeated string	strFingerID = 2;        //指纹编号
+	repeated string	strPalmID = 3;          //掌纹编号
 	optional int32	nCaseFingerCount = 4;	//GAFIS结构中无
 	optional int32	nSendFingerCount = 5;	//GAFIS结构中无
 
@@ -243,32 +243,32 @@ message	LPCard
 	message	LPCardText
 	{
 		optional string	strSeq = 1;
-		optional string	strRemainPlace = 2;
-		optional string	strRidgeColor = 3;
-		optional bool	bDeadBody = 4;
-		optional string	strDeadPersonNo = 5;
-		optional int32	nXieChaState = 6;
-		optional int32	nBiDuiState = 7;
-		optional string	strStart = 8;
-		optional string	strEnd = 9;
-		optional string	strCaseId= 10;//案件编号
-		optional string strCaptureMethod = 11;//提取方式
-		optional string	strComment= 12;//备注
+		optional string	strRemainPlace = 2;     //遗留部位
+		optional string	strRidgeColor = 3;      //乳突线颜色
+		optional bool	bDeadBody = 4;          //未知名尸体标识
+		optional string	strDeadPersonNo = 5;    //未知名尸体编号
+		optional int32	nXieChaState = 6;       //协查状态
+		optional int32	nBiDuiState = 7;        //比对状态
+		optional string	strStart = 8;           //联指开始序号
+		optional string	strEnd = 9;             //联指结束序号
+		optional string	strCaseId= 10;          //案件编号
+		optional string strCaptureMethod = 11;  //提取方式
+		optional string	strComment= 12;         //备注
 	}
 
 	message	LPCardBlob
 	{
-		optional string			stImage = 1;
-		optional string			stMnt = 2;
+		optional string			stImage = 1;    //图像
+		optional string			stMnt = 2;      //特征
 		repeated PatternType	rp = 3;			//候选纹型
 		repeated FingerFgp		fgp = 4;		//候选指位
-		required ImageType		type = 5;
+		required ImageType		type = 5;       //图像类型
 		optional string			strMntExtractMethod = 6;	//"A" 自动提取	"U"	需要人工编辑	"E"	自动提取但经过人工编辑	"M"	人工提取//GAFIS结构中无
 		optional string			stBin = 7;		//纹线数据
 		optional PalmFgp		palmFgp = 8;	//掌位
 	}
 
-	required string		strCardID = 1;
+	required string		strCardID = 1;  //现场卡号
 	optional LPCardText	text = 2;
 	optional LPCardBlob	blob = 3;
 	optional AdminfoData admData = 4;

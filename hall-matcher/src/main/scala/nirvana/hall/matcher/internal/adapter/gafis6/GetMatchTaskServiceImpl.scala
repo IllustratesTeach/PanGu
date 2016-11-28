@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
@@ -18,7 +19,7 @@ import org.jboss.netty.buffer.ChannelBuffers
 /**
   * Created by songpeng on 16/4/8.
   */
-class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService{
+class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
    /** 获取比对任务  */
    private val MATCH_TASK_QUERY: String = "select * from " +
      "(select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  " +
@@ -158,7 +159,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        }
        catch {
          case e: Exception => {
-           e.printStackTrace()
+           error(e.getMessage, e)
          }
        }
      }
