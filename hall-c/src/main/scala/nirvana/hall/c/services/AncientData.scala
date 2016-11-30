@@ -10,6 +10,7 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
+import org.slf4j.LoggerFactory
 import org.xsocket.IDataSource
 
 import scala.annotation.tailrec
@@ -29,6 +30,7 @@ import scala.util.control.NonFatal
  * @since 2015-10-29
  */
 object AncientData extends AncientDataStreamWrapper{
+  val logger = LoggerFactory getLogger getClass
   //global scala reflect mirror
   lazy val mirror = universe.runtimeMirror(Thread.currentThread().getContextClassLoader)
   lazy val STRING_CLASS = typeOf[String]
@@ -151,6 +153,7 @@ trait AncientData{
 
   /**
     * 通过给定的field的名称来得到对应字段在类中数据的 偏移量 和 本字段的占用字节数
+ *
     * @param fieldName 待查询的字段名称
     * @return 偏移量和字节数
     */
@@ -241,7 +244,15 @@ trait AncientData{
       0
     } else {
       val stringValue = value.toString.trim()
-      if (stringValue.isEmpty) 0 else  stringValue.toInt
+      if (stringValue.isEmpty) 0 else  {
+        try{
+          stringValue.toInt
+        } catch{
+          case e:NumberFormatException =>
+            logger.warn("%s invalid number".format(termSymbol.name),e)
+            0
+        }
+      }
     }
   }
   private def findLength(lengthDef:Option[Either[Int,TermSymbol]]):Option[Int]={

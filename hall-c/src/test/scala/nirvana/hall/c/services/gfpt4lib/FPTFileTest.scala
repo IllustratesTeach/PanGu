@@ -135,4 +135,11 @@ class FPTFileTest {
     val bytes = fpt4.toByteArray(encoding=AncientConstants.GBK_ENCODING)
     Assert.assertEquals(fpt4.getDataSize,bytes.size)
   }
+  @Test
+  def test_read_crash: Unit ={
+    val fpt4 = new FPT4File
+    val fileName ="/crash_fpt/B6220161123125135823645.FPT"
+    fpt4.fromStreamReader(getClass.getResourceAsStream(fileName),AncientConstants.GBK_ENCODING)
+    val head = fpt4.head
+  }
 }
