@@ -124,8 +124,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
@@ -193,8 +192,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
@@ -282,7 +280,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
       catch {
         case e: Exception =>
-          e.printStackTrace()
           error(e.getMessage)
       }
       //如果获取到数据递归获取
@@ -324,8 +321,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
       } catch {
         case e: Exception =>
-          e.printStackTrace()
-          error(e.getMessage)
+          error(e.getMessage,e)
       }
       //如果获取到数据递归获取
       if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
@@ -343,30 +339,37 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * @param fetchConfig
    */
   def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
-    val request = SyncMatchResultRequest.newBuilder()
-    request.setSid(fetchConfig.seq)
-    request.setDbid(fetchConfig.dbid)
-    val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
-    if(baseResponse.getStatus == CommandStatus.OK){
-      val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
-      val matchStatus = response.getMatchStatus
-      if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
-        val matchResult = response.getMatchResult
-        if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-          //获取候选信息
-          val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-          fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
-          info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+
+
+      val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
+      try{
+        while(sidIter.hasNext){
+          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          val request = SyncMatchResultRequest.newBuilder()
+          request.setSid(sidIter.next)
+          request.setDbid(fetchConfig.dbid)
+          val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
+          if(baseResponse.getStatus == CommandStatus.OK){
+            val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
+            val matchStatus = response.getMatchStatus
+            if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
+            val matchResult = response.getMatchResult
+              if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
+                //获取候选信息
+                val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+                info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+              }
+            }
+          }
         }
-        fetchConfig.seq += 1
-        updateSeq(fetchConfig)
-        //递归获取
-        fetchMatchResult(fetchConfig, update)
+      } catch {
+        case e: Exception => error("抓取比对结果时异常:" + e.getMessage)
       }
-    }
-  }
-  /**
+}
+
+
+/**
    * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
    * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
    * 解决方法需要候选信息增加dbid信息

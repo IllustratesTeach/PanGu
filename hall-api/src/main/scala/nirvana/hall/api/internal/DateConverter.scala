@@ -3,13 +3,14 @@ package nirvana.hall.api.internal
 import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gbasedef.GAFIS_DATETIME
 
 
 /**
  * Created by songpeng on 16/7/2.
  */
-object DateConverter {
+object DateConverter extends LoggerSupport{
 
   /**
    * 将字符串转为Date
@@ -25,10 +26,24 @@ object DateConverter {
         date = formatter.parse(str, new ParsePosition(0))
       } catch {
         case e: Exception =>
-          e.printStackTrace()
+          error(e.getMessage, e)
       }
     }
     date
+  }
+
+  /**
+    * 日期格式化转换
+    * @param date
+    * @param format (default YYYYMMDD)
+    * @return
+    */
+  def convertDate2String(date: Date, format: String = "YYYYMMDD"): String = {
+    if(date != null){
+      new SimpleDateFormat(format).format(date)
+    } else {
+      ""
+    }
   }
 
   /**
