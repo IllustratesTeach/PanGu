@@ -35,15 +35,16 @@ object HallApiApp
       //v62
 //      Class.forName("nirvana.hall.v62.LocalV62Module"),
 //      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
-//      Class.forName("nirvana.hall.v62.proxy.LocalV62ProxyServiceModule"),
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
+//      Class.forName("nirvana.hall.v62.proxy.LocalV62ProxyServiceModule"),
       //公共配置
       Class.forName("monad.core.LocalMonadCoreModule"),
       Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("monad.rpc.LocalRpcServerModule"),
-      Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
+      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+//      Class.forName("nirvana.hall.api.LocalApiWebServiceModule"),
 
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
       Class.forName("nirvana.hall.api.HallApiModule")
