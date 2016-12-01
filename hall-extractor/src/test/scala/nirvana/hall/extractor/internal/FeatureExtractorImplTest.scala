@@ -164,4 +164,16 @@ class FeatureExtractorImplTest extends BaseJniTest{
     feature.fromByteArray(mnt.bnData)
   }
 
+  @Test
+  def test_extract_idcard_jpg_mnt_save: Unit ={
+    val imgData = FileUtils.readFileToByteArray(new File("d:\\img.img"))
+    val in = ByteString.copyFrom(imgData).newInput()
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    FileUtils.writeByteArrayToFile(new File("D:\\mnt.mnt"),mnt.toByteArray())
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+
 }

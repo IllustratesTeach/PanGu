@@ -26,12 +26,13 @@ class GAFISImageReaderTest {
   def test_read_dir: Unit ={
     val iioRegistry = IIORegistry.getDefaultInstance
     iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
-    val files  = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\full_information_FPT\\gz\\img"),Array[String]("img"),true)
+    val files  = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\image\\"),Array[String]("img"),true)
     val itt = files.iterator()
     while (itt.hasNext) {
       val imgFile = itt.next()
+      println(imgFile.getName)
       val img = ImageIO.read(imgFile)
-      ImageIO.write(img, "bmp", new File("C:\\Users\\wangjue\\Desktop\\full_information_FPT\\gz\\bmp\\"+imgFile.getName+".bmp"))
+      ImageIO.write(img, "bmp", new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\bmp\\"+imgFile.getName+".bmp"))
     }
 
   }
