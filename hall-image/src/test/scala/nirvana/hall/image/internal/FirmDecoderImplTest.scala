@@ -66,24 +66,23 @@ class FirmDecoderImplTest extends BaseJniTest{
   }
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "D:\\BaiduYunDownload\\各省200脱密后文件\\2957.fpt"
+    val filePath = "C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\fpt\\R1111326224222286523227.fpt"
     val fptEither= FPTFile.parseFromInputStream(new FileInputStream(new File(filePath)))
     fptEither match{
       case Right(fpt4)=>
-        /*val tData = fpt4.logic02Recs.head.fingers.head
-        val gafisImg = fpt4code.FPTFingerDataToGafisImage(tData)
-        val decoder = new FirmDecoderImpl("support",new HallImageConfig)
-        val dest = decoder.decode(gafisImg)
-        println(dest.getBnDataLength)*/
-
         fpt4.logic02Recs.foreach { tp =>
           val fingerCount = tp.sendFingerCount.toInt
           assert(fingerCount == tp.fingers.length)
             tp.fingers.foreach { tData =>
               val gafisImg = fpt4code.FPTFingerDataToGafisImage(tData)
+              /*if (gafisImg.stHead.nWidth != 640 || gafisImg.stHead.nHeight != 640) {
+                println("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight)
+                gafisImg.stHead.nWidth = 640
+                gafisImg.stHead.nHeight = 640
+              }*/
               val decoder = new FirmDecoderImpl("support",new HallImageConfig)
               val dest = decoder.decode(gafisImg)
-              FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\full_information_FPT\\gz\\img\\"+tp.personId+"_"+tData.fgp+".img"),dest.toByteArray())
+              FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\image\\"+tp.personId+"_"+tData.fgp+".img"),dest.toByteArray())
               println(tData.fgp+"_"+dest.getBnDataLength)
             }
         }
@@ -212,9 +211,10 @@ class FirmDecoderImplTest extends BaseJniTest{
   def test_decodeWSQ: Unit ={
     val decoder = new ImageEncoderImpl
     val gafisImg = new GAFISIMAGESTRUCT
-    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\非脱密FPT入库\\gafisImg\\gafisImg.img"))
+    val cprData = FileUtils.readFileToByteArray(new File("D:\\img.img"))
     gafisImg.fromByteArray(cprData)
     val originalImg = decoder.encodeWSQ(gafisImg)
+    //FileUtils.writeByteArrayToFile(new File(""),originalImg.toByteArray())
     println(originalImg.toByteArray().length)
   }
 }

@@ -97,13 +97,13 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
          * 大库测试时候，发现虽然宽度和高度是500,但是实际输出还是640X640,
          * 所以此处最小buffer作为640X640
          */
-        var width = gafisImg.stHead.nWidth
-        var height = gafisImg.stHead.nHeight
-        if (width != 640 || height != 640) {
+        val width = gafisImg.stHead.nWidth
+        val height = gafisImg.stHead.nHeight
+        /*if (width != 640 || height != 640) {
           logger.warn("width or height is not 640,actual width:" + gafisImg.stHead.nWidth + " height:" + gafisImg.stHead.nHeight)
           height = 640
           width = 640
-        }
+        }*/
         destImg.stHead.nWidth = width
         destImg.stHead.nHeight = height
 
@@ -172,8 +172,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       }
     }
     */
-
-
     destImg
   }
   private def Helper_GetBitsPerPixel(nBitsPerPixel:Int):Int={
