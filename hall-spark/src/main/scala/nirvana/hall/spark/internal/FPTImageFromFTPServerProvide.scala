@@ -3,7 +3,7 @@ package nirvana.hall.spark.internal
 import java.io.ByteArrayInputStream
 
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gfpt4lib.{fpt4code, FPTFile}
+import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gfpt4lib.fpt4code._
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
@@ -12,6 +12,7 @@ import nirvana.hall.extractor.internal.FPTLatentConverter
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions._
 import nirvana.hall.spark.services._
 
@@ -22,6 +23,9 @@ import scala.util.control.NonFatal
  * Created by wangjue on 2016/6/5.
  */
 class FPTImageFromFTPServerProvide  extends ImageProvider {
+
+  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+
   def requestImage(parameter:NirvanaSparkConfig,filePath:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
 
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {

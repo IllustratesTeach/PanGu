@@ -60,7 +60,7 @@ object ExtractFeatureService {
                 val binData = response.getBinData
 
                 val gafisMnt = new GAFISIMAGESTRUCT
-                val is = binData.newInput()
+                val is = mntData.newInput()
                 gafisMnt.fromStreamReader(is)
                 val gafisBin = new GAFISIMAGESTRUCT
                 val bin = binData.newInput()

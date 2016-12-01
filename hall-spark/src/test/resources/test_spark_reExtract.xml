@@ -13,13 +13,13 @@
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>
   <is_extractor_bin>true</is_extractor_bin>
-  <is_image_save>false</is_image_save>
+  <is_image_save>true</is_image_save>
   <streaming_context_startTime>1</streaming_context_startTime>
   <!-- 支持多种数据源，可以和image_provider_class以及 data_saver_class配合使用 -->
   <database_list>
     <database name="gafis">
       <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <user>gafis_sh_px</user>
+      <user>gafis</user>
       <password>gafis</password>
       <url>jdbc:oracle:thin:@10.1.7.181:1521:gafisdb</url>
     </database>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nirvana_spark>
   <host>127.0.0.1</host>
-  <app_name>spark</app_name>
+  <app_name>spark-wjw</app_name>
   <master_server>local[1]</master_server>
   <kafka_server>192.168.56.128:9092</kafka_server>
   <kafka_topic_name>WJW</kafka_topic_name>
@@ -70,7 +70,7 @@
     <property key="extractor.is.reset" value="false"/>
 
     <!-- 指定数据源名称 -->
-    <property key="data.source.name" value="idcard"/>
+    <property key="data.source.name" value="wjw"/>
 
   </properties>
 </nirvana_spark>

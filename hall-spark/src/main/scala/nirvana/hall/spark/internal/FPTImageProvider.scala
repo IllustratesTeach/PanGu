@@ -12,6 +12,7 @@ import nirvana.hall.extractor.internal.FPTLatentConverter
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamEvent, _}
 import nirvana.hall.spark.services._
 
@@ -25,6 +26,9 @@ import scala.util.control.NonFatal
   */
 class FPTImageProvider extends ImageProvider{
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
+
+  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+
   def requestImage(parameter:NirvanaSparkConfig,filePath:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     //PartitionRecordsSaver.databaseConfig=Some(parameter.db)
     //    @tailrec

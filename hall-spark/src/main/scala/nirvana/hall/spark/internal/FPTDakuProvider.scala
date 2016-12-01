@@ -1,19 +1,21 @@
 package nirvana.hall.spark.internal
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, File}
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code._
-import nirvana.hall.c.services.gfpt4lib.{fpt4code, FPTFile}
+import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.extractor.internal.FPTLatentConverter
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.spark.config.{NirvanaSparkConfig}
+import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions._
 import nirvana.hall.spark.services._
+import org.apache.commons.io.{FileUtils, IOUtils}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
@@ -24,23 +26,27 @@ import scala.util.control.NonFatal
 class FPTDakuProvider extends ImageProvider{
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
   private lazy val reExtract = SysProperties.getBoolean("extractor.is.reset",defaultValue = false)
+  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+
   def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       try {
-        val path = "http://10.1.7.204/fpt/out_700_950w/P1201606301467274240740.fpt"
-        val data = SparkFunctions.httpClient.download(path)
+        /*val path = "http://10.1.7.204/fpt/out_700_950w/P1201606301467274240740.fpt"
+        val data = SparkFunctions.httpClient.download(path)*/
         //val data = SparkFunctions.httpClient.download(imageFileServer.get + filePathSuffix)
-        //val data = SparkFunctions.httpClient.download(path)
+        var path = filePathSuffix
+        if (!filePathSuffix.startsWith("http")) path = imageFileServer.get + filePathSuffix
+        //if (filePathSuffix.indexOf("http") == -1) path = imageFileServer.get + filePathSuffix
+        val data = SparkFunctions.httpClient.download(path)
         val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
 
-        //FileUtils.writeByteArrayToFile(new File("/tmp/"+filePath.substring(filePath.lastIndexOf("/"))),dat
-        /*val is = FileUtils.openInputStream(new File("C:\\Users\\wangjue\\Desktop\\full_information_FPT\\A2016072111111111111111.fpt"))
+        /*val is = FileUtils.openInputStream(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\R1111326224222286523227.fpt"))
         val fpt= FPTFile.parseFromInputStream(is,AncientConstants.GBK_ENCODING)
         IOUtils.closeQuietly(is)*/
 
         val buffer = ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]()
         if (filePathSuffix.isEmpty) return buffer.toSeq
-        val filePath : String = imageFileServer.get + filePathSuffix
+        val filePath : String = path
         var personId: String = null
         fpt match {
           case Left(fpt3) =>
@@ -204,7 +210,9 @@ class FPTDakuProvider extends ImageProvider{
     }
     def reportException(e: Throwable) = {
       e.printStackTrace(System.err)
-      val event = StreamEvent(imageFileServer.get + filePathSuffix, "",  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,"","","")
+      var path = filePathSuffix
+      if (!filePathSuffix.startsWith("http")) path = imageFileServer.get + filePathSuffix
+      val event = StreamEvent(path, "",  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,"","","")
       reportError(parameter, RequestRemoteFileError(event, e.toString))
       Nil
     }

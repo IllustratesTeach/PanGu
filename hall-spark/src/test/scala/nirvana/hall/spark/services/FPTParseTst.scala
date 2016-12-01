@@ -13,7 +13,7 @@ import org.junit.Test
 class FPTParseTst {
   @Test
   def fpt (){
-    val files = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\forinputstring\\10len"),Array[String]("fpt","FPT"),true)
+    val files = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\20161201"),Array[String]("fpt","FPT"),true)
     val itt = files.iterator()
     while (itt.hasNext) {
       val fptFile = itt.next()

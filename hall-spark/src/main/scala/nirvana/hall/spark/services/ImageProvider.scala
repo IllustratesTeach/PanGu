@@ -4,6 +4,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import SparkFunctions.{StreamError, StreamEvent}
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 
 /**
   * 基础的图像提供
@@ -20,6 +21,14 @@ trait ImageProvider {
     * @return 消息序列
     */
   def requestImage(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)]
+
+  /**
+    * 请求图像数据为BMP,不需要解压缩，获取数据直接提特征并入库
+    * @param parameter
+    * @param message
+    * @return
+    */
+  def requestImageByBMP(parameter:NirvanaSparkConfig,message:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
 
   case class RequestRemoteFileError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "R|"+message

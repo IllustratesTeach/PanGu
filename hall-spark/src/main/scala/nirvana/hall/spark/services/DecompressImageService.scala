@@ -61,9 +61,10 @@ object DecompressImageService {
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_XGW_EZW.toByte
           || compressedImg.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_DEFAULT.toByte)){
           if (compressedImg.stHead.nWidth != 640 || compressedImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
-            doReportException(parameter, event,new RuntimeException("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight))
-            compressedImg.stHead.nWidth = 640
-            compressedImg.stHead.nHeight = 640
+            doReportException(parameter, event,new IllegalAccessException("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight+" fpt path is "+event.path))
+            //println("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight+" fpt path is "+event.path)
+            //compressedImg.stHead.nWidth = 640
+            //compressedImg.stHead.nHeight = 640
           }
           directDecode(parameter, event, finger, compressedImg)
         }
@@ -83,7 +84,7 @@ object DecompressImageService {
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
       Some((event, null, null))
     } else {
-      doReportException(parameter, event,new RuntimeException("personId and caseId are null!"))
+      doReportException(parameter, event,new IllegalAccessException("personId and caseId are null!"))
       None
     }
   }
@@ -130,9 +131,10 @@ object DecompressImageService {
               val is = imgData.newInput()
               gafisImg.fromStreamReader(is)
               if (gafisImg.stHead.nWidth != 640 || gafisImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
-                doReportException(parameter, event,new RuntimeException("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight))
-                gafisImg.stHead.nWidth = 640
-                gafisImg.stHead.nHeight = 640
+                doReportException(parameter, event,new IllegalAccessException("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight +" fpt path is  "+event.path))
+                //println("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight +" fpt path is  "+event.path)
+                //gafisImg.stHead.nWidth = 640
+                //gafisImg.stHead.nHeight = 640
               }
               val fingerImg = finger
               if (parameter.isImageSave) {

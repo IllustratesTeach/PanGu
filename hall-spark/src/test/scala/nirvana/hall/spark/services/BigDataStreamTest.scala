@@ -37,4 +37,16 @@ class BigDataStreamTest {
     val array = Array("src/test/resources/test_spark_reExtract.xml")
     BigDataStream.main(array)
   }
+
+  @Test
+  def streamTestIdCard (){
+    val array = Array("src/test/resources/test_spark_idcard.xml")
+    BigDataForBMPStream.main(array)
+  }
+
+  @Test
+  def streamTestWJW (){
+    val array = Array("src/test/resources/test_spark_wjw.xml")
+    BigDataForBMPStream.main(array)
+  }
 }

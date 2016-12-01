@@ -18,7 +18,7 @@ import scala.io.Source
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2016-01-30
  */
-object BigDataStream {
+object BigDataForBMPStream {
 
   def createStreamContext(checkpointDirectory:Option[String],parameter:NirvanaSparkConfig): StreamingContext ={
     val conf = new SparkConf().setAppName(parameter.appName)
@@ -44,16 +44,8 @@ object BigDataStream {
       .map(_._2) //only use message content
       .flatMap{x=>
           SysProperties.setConfig(parameter)
-          ImageProviderService.requestRemoteFile(parameter,x)
+          ImageProviderService.requestRemoteFileByBMP(parameter,x)
       } //fetch files
-      .flatMap{x=>
-          SysProperties.setConfig(parameter)
-          DecompressImageService.requestDecompress(parameter,x._1,x._2)
-      } // decompress image
-      .flatMap{x=>
-          SysProperties.setConfig(parameter)
-          ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
-        } //extract feature
       .foreachRDD{rdd=>
         //save records for partition
         rdd.foreachPartition{x=>

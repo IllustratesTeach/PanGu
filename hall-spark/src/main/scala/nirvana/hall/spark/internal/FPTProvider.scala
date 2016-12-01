@@ -25,6 +25,9 @@ import scala.util.control.NonFatal
 class FPTProvider extends ImageProvider {
 
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
+
+  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+
   def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       try {
