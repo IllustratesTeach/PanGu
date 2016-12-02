@@ -36,6 +36,6 @@ message MatchRelationGetResponse{
         optional MatchRelationGetResponse cmd = 10701;
     }
     required fpt.MatchType match_type = 1; //比对类型
-    required MatchStatus match_status = 2; //比对状态
+    required MatchStatus match_status = 2; //比对状态, 江西获取6.2比对关系添加，记录查询的状态
     repeated fpt.MatchRelation match_relation = 3; //比对关系
 }
