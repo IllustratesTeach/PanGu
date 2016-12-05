@@ -2,12 +2,15 @@ package nirvana.hall.api.webservice.services.internal
 
 import javax.activation.DataHandler
 
+import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.webservice.services.WsFingerService
+import nirvana.hall.api.webservice.util.CommonUtil
+import org.apache.axiom.attachments.ByteArrayDataSource
 
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl extends WsFingerService{
+class WsFingerServiceImpl(tpCardService: TPCardService) extends WsFingerService{
 
   /**
     * 查询十指指纹文字信息供用户选择进行任务的协查
@@ -44,7 +47,12 @@ class WsFingerServiceImpl extends WsFingerService{
     * @return 返回的FPT文件信息需用soap的附件形式存储
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
-override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = ???
+override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
+
+    val fptObj = CommonUtil.convertProtoBuf2FPT(tpCardService.getTPCard(ryno))
+    new DataHandler(new ByteArrayDataSource(fptObj))
+    null
+  }
 
   /**
     * 查询现场指纹文字信息供用户选择进行任务的协查
