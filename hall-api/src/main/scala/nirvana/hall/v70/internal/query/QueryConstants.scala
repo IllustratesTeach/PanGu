@@ -4,7 +4,7 @@ package nirvana.hall.v70.internal.query
  * Created by songpeng on 16/5/10.
  */
 object QueryConstants {
-  val STATUS_WAIT: java.lang.Short = 0.toShort//任务状态，正在比对
+  val STATUS_WAIT: java.lang.Short = 0.toShort//任务状态，等待比对
   val STATUS_MATCHING: java.lang.Short = 1.toShort//任务状态，正在比对
   val STATUS_SUCCESS: java.lang.Short = 2.toShort//完成比对
   val STATUS_FAIL: java.lang.Short = 3.toShort//任务状态，失败
@@ -20,4 +20,16 @@ object QueryConstants {
 
   val FETCH_CONFIG_TPDB = "TPDB"
   val FETCH_CONFIG_LPDB = "LPDB"
+
+  val CONFIRM_STATUS_UNKNOWN: java.lang.Short = (-1).toShort //初始值
+  val CONFIRM_STATUS_WAIT: java.lang.Short = 0.toShort //待认定
+  val CONFIRM_STATUS_YES: java.lang.Short = 98.toShort //认定
+  val CONFIRM_STATUS_NO: java.lang.Short = 99.toShort //否定
+
+  val REVIEW_STATUS_WAIT: java.lang.Short = 0.toShort //待复核
+  val REVIEW_STATUS_YES: java.lang.Short = 1.toShort //复核成功
+  val REVIEW_STATUS_NO: java.lang.Short = 2.toShort //符合失败
+  val REVIEW_STATUS_NOT: java.lang.Short = 3.toShort //确认符合失败
+  val REVIEW_STATUS_CANCEL : java.lang.Short = 4.toShort //撤销
+
 }
