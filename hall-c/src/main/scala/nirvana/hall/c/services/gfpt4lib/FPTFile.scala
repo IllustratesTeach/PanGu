@@ -95,7 +95,8 @@ object FPTFile {
       if (sendFingerCount != null && sendFingerCount.nonEmpty)
         sendFingerCount.toInt
       else
-        throw new AncientDataException("sendFingerCount field is "+sendFingerCount)
+        0
+        //throw new AncientDataException("sendFingerCount field is "+sendFingerCount)
     }
     override def getDataSize: Int = {
       var count = super.getDataSize
