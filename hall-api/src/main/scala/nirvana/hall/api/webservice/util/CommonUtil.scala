@@ -10,7 +10,8 @@ import nirvana.hall.protocol.api.FPTProto.TPCard
   * Created by yuchen on 2016/12/2.
   */
 object CommonUtil {
-  def convertProtoBuf2FPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
+
+  def convertProtoBuf2TPFPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
     val fpt4File = new FPT4File
     fpt4File.head.flag = "FPT"
     fpt4File.head.majorVersion = "04"
@@ -65,7 +66,7 @@ object CommonUtil {
       logic02Rec.caseClass1Code = card.getText.getStrCaseType1
       logic02Rec.caseClass2Code = card.getText.getStrCaseType2
       logic02Rec.caseClass3Code = card.getText.getStrCaseType3
-      logic02Rec.isCriminal = card.getText.getBHasCriminalRecord.toString
+      logic02Rec.isCriminal = if(card.getText.getBHasCriminalRecord) "1" else "0"
       logic02Rec.criminalInfo = card.getText.getStrCriminalRecordDesc
       logic02Rec.gatherUnitCode = card.getText.getStrPrintUnitCode
       logic02Rec.gatherUnitName = card.getText.getStrPrintUnitName
@@ -100,10 +101,10 @@ object CommonUtil {
         val fingerTData = new FingerTData
         fingerTData.dataLength = card.getBlobList.get(j).toByteArray.length.toString
         fingerTData.sendNo = "" //发送编号如何定义???
-        fingerTData.fgp = card.getBlobList.get(j).getFgp.toString
+        fingerTData.fgp = card.getBlobList.get(j).getFgp.getNumber.toString
         fingerTData.extractMethod = card.getBlobList.get(j).getStrMntExtractMethod
-        fingerTData.pattern1 = card.getBlobList.get(j).getRp.toString
-        fingerTData.pattern2 = card.getBlobList.get(j).getVrp.toString
+        fingerTData.pattern1 = card.getBlobList.get(j).getRp.getNumber.toString
+        fingerTData.pattern2 = card.getBlobList.get(j).getVrp.getNumber.toString
         fingerTData.fingerDirection = ""
         fingerTData.centerPoint = ""
         fingerTData.subCenterPoint = ""
@@ -125,13 +126,5 @@ object CommonUtil {
     }
     fpt4File
 
-  }
-
-  def fptObjToFile(fptFile:FPT4File): Unit ={
-    def outStream = new FileOutputStream("E:/test111.fpt");
-    def objectOutputStream = new ObjectOutputStream(outStream);
-
-    objectOutputStream.writeObject(fptFile.toByteArray());
-    outStream.close();
   }
 }
