@@ -1,16 +1,27 @@
 package nirvana.hall.api.webservice.util
 
 
-import java.io.{FileOutputStream, ObjectOutputStream}
-
+import javax.activation.DataHandler
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerTData, Logic02Rec}
 import nirvana.hall.protocol.api.FPTProto.TPCard
+import org.apache.axiom.attachments.ByteArrayDataSource
 
 /**
   * Created by yuchen on 2016/12/2.
   */
 object CommonUtil {
 
+  /**
+    * 空FPT
+    */
+  val emptyFPT = new DataHandler(new ByteArrayDataSource(new Array[Byte](0)))
+
+  /**
+    * protobuffer转换为十指指纹FPT
+    * @param card 人员卡号
+    * @param logic02RecsNum 逻辑记录类的数量
+    * @return FPT4File对象
+    */
   def convertProtoBuf2TPFPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
     val fpt4File = new FPT4File
     fpt4File.head.flag = "FPT"
