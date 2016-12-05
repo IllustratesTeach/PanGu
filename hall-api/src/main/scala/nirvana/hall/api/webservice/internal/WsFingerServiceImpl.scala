@@ -5,6 +5,7 @@ import javax.activation.DataHandler
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.api.webservice.util.CommonUtil
+import nirvana.hall.c.AncientConstants
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 /**
@@ -47,11 +48,10 @@ class WsFingerServiceImpl(tpCardService: TPCardService) extends WsFingerService{
     * @return 返回的FPT文件信息需用soap的附件形式存储
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
-override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
-
-    val fptObj = CommonUtil.convertProtoBuf2FPT(tpCardService.getTPCard(ryno))
-    new DataHandler(new ByteArrayDataSource(fptObj))
-    null
+  override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
+    val tpCard = tpCardService.getTPCard(ryno)
+    val fptObj = CommonUtil.convertProtoBuf2FPT4File(tpCard)
+    new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
   }
 
   /**
