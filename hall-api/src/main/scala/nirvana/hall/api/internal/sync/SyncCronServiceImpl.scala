@@ -338,15 +338,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * TODO 先查询比对状态是正在比对的任务sid，然后再根据sid获取比对结果
    * @param fetchConfig
    */
-  def fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
+  def  fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
 
 
       val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
       try{
         while(sidIter.hasNext){
-          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          val tmp=sidIter.next
+          //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, tmp)
           val request = SyncMatchResultRequest.newBuilder()
-          request.setSid(sidIter.next)
+          request.setSid(tmp)
           request.setDbid(fetchConfig.dbid)
           val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
           if(baseResponse.getStatus == CommandStatus.OK){
