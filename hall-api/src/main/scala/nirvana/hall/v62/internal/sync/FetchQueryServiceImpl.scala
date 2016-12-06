@@ -33,7 +33,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     */
   override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
     val matchTaskList = new ArrayBuffer[MatchTask]
-    val sql = "select * from (select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.seq >? order by t.seq) tt where rownum <=?"
+    val sql = "select * from (select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where t.seq >? and t.status=0 order by t.seq) tt where rownum <=?"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setLong(1, seq)
       ps.setLong(2, seq + size)
@@ -52,21 +52,22 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     matchTaskList.toSeq
   }
 
-  /**
-    * 更新比对状态
-    * @param oraSid
-    * @param status
-    */
-  private def updateMatchStatus(oraSid: Long, status: Int): Unit ={
+  ///**
+  //  * 更新比对状态
+  //  * @param oraSid
+  //  * @param status
+  // */
+ /* private def updateMatchStatus(oraSid: Long, status: Int): Unit ={
     val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.seq=?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1, status)
       ps.setLong(2, oraSid)
     }
-  }
+  }*/
 
   /**
     * 根据远程查询queryid获取查询结果信息
+ *
     * @param queryid
     * @return
     */
@@ -166,11 +167,27 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   override def getSidByStatusMatching(size: Int, dbId: Option[String]): Seq[Long] = {
     val sidArr = ArrayBuffer[Long]()
     val sql = "select t.seq from NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
+ // val sql = "select t.ora_sid from NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setInt(1, size)
     }{rs=>
       sidArr += rs.getLong("seq")
+      //sidArr += rs.getLong("ora_sid")
     }
     sidArr
+  }
+
+  /**
+    * 更新Status比对状态
+    *
+    * @param oraSid
+    * @param status
+    */
+  override def updateMatchStatus(oraSid: Long, status: Int): Unit = {
+    val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.seq=?"
+    JdbcDatabase.update(sql){ps=>
+      ps.setInt(1, status)
+      ps.setLong(2, oraSid)
+    }
   }
 }
