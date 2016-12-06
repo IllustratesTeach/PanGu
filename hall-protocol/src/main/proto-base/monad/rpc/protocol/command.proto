@@ -23,5 +23,16 @@ message BaseCommand {
     extract#ExtractResponse 10004
     image_compress#ImageCompressRequest 1005
     image_compress#ImageCompressResponse 1006
+
+    api接口
+    TPCard.proto [10100-10199]
+    TPCardAddRequest 10100
+    TPCardAddResponse 10101
+    Case.Proto [10200-10299]
+    LPCard.proto [10300-10399]
+    LPPalm.proto [10400-10499]
+    Query.proto [10500-10599]
+    sync_data.proto [10600-10699]
+    hall_match_relation.proto [10700-10799]
    */
 }
