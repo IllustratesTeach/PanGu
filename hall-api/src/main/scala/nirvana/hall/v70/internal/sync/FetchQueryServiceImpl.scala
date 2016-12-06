@@ -166,4 +166,13 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     }
     sidArr.toSeq
   }
+
+  /**
+    * 更新Status 不实现
+    *
+    * @param oraSid
+    * @param status
+    */
+  override def updateMatchStatus(oraSid: Long, status: Int): Unit ={
+  }
 }
