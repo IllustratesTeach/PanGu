@@ -77,4 +77,11 @@ trait FetchQueryService {
     * @return
     */
   def getQueryQue(oraSid: Int): QueryQue
+  /**
+    * 更新status
+    * sjr 2016/11/28
+    * @param oraSid
+    * @param status
+    */
+  def updateMatchStatus(oraSid: Long, status: Int)
 }
