@@ -5,7 +5,7 @@ import javax.activation.DataHandler
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.webservice.services.WsFingerService
-import nirvana.hall.api.webservice.util.CommonUtil
+import nirvana.hall.api.webservice.util.{FPTFileBuilder}
 import nirvana.hall.c.AncientConstants
 import org.apache.axiom.attachments.ByteArrayDataSource
 
@@ -54,18 +54,19 @@ class WsFingerServiceImpl(tpCardService: TPCardService) extends WsFingerService 
 
     info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{}",userid,password,ryno)
     try{
-      val tpCard = tpCardService.getTPCard(ryno)
-      if(null == tpCard){
-        CommonUtil.emptyFPT
-      }else{
-        val fptObj = CommonUtil.convertProtoBuf2TPFPT4File(tpCard)
+      if(tpCardService.isExist(ryno)){
+        val tpCard = tpCardService.getTPCard(ryno)
+        val fptObj = FPTFileBuilder.convertProtoBuf2TPFPT4File(tpCard)
         new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
+      }else{
+        FPTFileBuilder.emptyFPT
       }
+
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" +
         ",inputParam-userid:{};password:{};ryno:{},errormessage:{}"
         ,userid,password,ryno,e.getMessage)
-        CommonUtil.emptyFPT
+        FPTFileBuilder.emptyFPT
     }
   }
 
