@@ -304,6 +304,7 @@ object gaqryqueConverter {
       matchResultObject.setObjectId(gaCand.szKey)
       matchResultObject.setPos(gaCand.nIndex)
       matchResultObject.setScore(gaCand.nScore)
+      matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
       result += matchResultObject.build()
     }
     result.toSeq
