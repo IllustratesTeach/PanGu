@@ -40,7 +40,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
  *
     * @param matchResult
     */
-  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
+  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(), configMap : scala.collection.mutable.HashMap[String, String]) = {
     val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
@@ -88,6 +88,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
         matchResult.setTimeElapsed(queryQue.timeElapsed)
         matchResult.setRecordNumMatched(queryQue.recordNumMatched)
         matchResult.setMaxScore(queryQue.hitpossibility.toInt)
+        matchResult.setMaxcandnum(queryQue.maxcandnum.toLong) //最大候选数量
         return Option(matchResult.build())
       }
     }
@@ -202,4 +203,9 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param sid
     */
   override def getQueryTypeArrByOraSid(sid: Long): Seq[String] = ???
+  
+    /**
+    * 获得配置信息
+    */
+  override def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]  = ???
 }

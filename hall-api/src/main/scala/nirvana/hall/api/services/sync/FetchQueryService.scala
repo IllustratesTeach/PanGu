@@ -30,7 +30,7 @@ trait FetchQueryService {
     * @param fetchConfig 同步配置
     * @param candDBIDMap 候选卡号->dbid
     */
-  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map())
+  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(),configMap : scala.collection.mutable.HashMap[String, String])
 
   /**
     * 根据远程查询queryid获取查询结果信息
@@ -104,6 +104,11 @@ trait FetchQueryService {
     * @param oraSid
     */
   def getQueryTypeArrByOraSid(oraSid: Long): Seq[String]
+  
+    /**
+    * 获得配置信息
+    */
+  def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
 }
 
 

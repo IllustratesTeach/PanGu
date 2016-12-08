@@ -370,7 +370,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
                 //获取候选信息
                 val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+		            val configMap = fetchQueryService.getAfisinitConfig()
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
                 info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
               }
             }
