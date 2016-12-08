@@ -25,6 +25,7 @@ import scala.collection.mutable.ArrayBuffer
 class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryService{
   /**
     * 获取查询任务
+ *
     * @param size
     * @return
     */
@@ -36,6 +37,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 保存候选信息
+ *
     * @param matchResult
     */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
@@ -61,14 +63,18 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 根据远程查询queryid获取查询结果信息
-    * @param queryid
+    * @param queryId
+    * @param pkId
+    * @param typ
+    * @param dbId
     * @return
     */
-  override def getMatchResultByQueryid(queryid: Long, dbId: Option[String]): Option[MatchResult] = {
+  override def getMatchResultByQueryid(queryId: Long, pkId: String, typ: Short, dbId: Option[String]): Option[MatchResult] = {
     val matchResult = MatchResult.newBuilder()
-    matchResult.setMatchId(queryid.toString)
+    matchResult.setMatchId(queryId.toString)
     matchResult.setStatus(MatcherStatus.newBuilder().setCode(0))
-    val queryQueOpt = GafisNormalqueryQueryque.find_by_queryid(queryid).headOption
+    //val queryQueOpt = GafisNormalqueryQueryque.find_by_queryid(queryid).headOption
+    val queryQueOpt = GafisNormalqueryQueryque.find_by_queryid_and_keyid_and_querytype(queryId, pkId, typ).headOption
     if(queryQueOpt.nonEmpty){
       val queryQue = queryQueOpt.get
       if(queryQue.status >= 2){
@@ -90,6 +96,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 候选列表转换
+ *
     * @param matchResult
     * @param queryType
     * @return
@@ -128,13 +135,18 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   /**
     * 根据queryid获取比对状态
     * @param queryId
+    * @param pkId
+    * @param typ
+    * @return
     */
-  override def getMatchStatusByQueryid(queryId: Long): MatchStatus = {
-    val sql = "select t.status from GAFIS_NORMALQUERY_QUERYQUE t where t.queryid=?"
+  override def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus = {
+    val sql = "select t.status from GAFIS_NORMALQUERY_QUERYQUE t where t.queryid=? and t.keyid=? and t.querytype=?"
     JdbcDatabase.queryFirst(sql){ps=>
       ps.setLong(1, queryId)
+      ps.setString(2, pkId)     //新增两个判断条件
+      ps.setShort(3, typ)
     }{rs=>
-      val status = java.lang.Short.valueOf(rs.getShort("status"))
+    val status = java.lang.Short.valueOf(rs.getShort("status"))
       return status match {
         case QueryConstants.STATUS_WAIT=>
           MatchStatus.WAITING_MATCH
@@ -153,6 +165,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 获取比对状态正在比对任务SID
+ *
     * @param size
     * @return
     */
@@ -166,4 +179,27 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     }
     sidArr.toSeq
   }
+
+  /**
+    * 更新Status 不实现
+    *
+    * @param oraSid
+    * @param status
+    */
+  override def updateMatchStatus(oraSid: Long, status: Int): Unit = {
+  }
+
+  /**
+    * 根据orasid获取对应任务的捺印卡号 keyId
+    *
+    * @param sid
+    */
+  override def getKeyIdArrByOraSid(oraSid: Long): Seq[String] = ???
+
+  /**
+    * 根据orasid获取对应任务的查询类型 queryType
+    *
+    * @param sid
+    */
+  override def getQueryTypeArrByOraSid(sid: Long): Seq[String] = ???
 }

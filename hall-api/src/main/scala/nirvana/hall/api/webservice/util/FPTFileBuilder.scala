@@ -9,7 +9,7 @@ import org.apache.axiom.attachments.ByteArrayDataSource
 /**
   * Created by yuchen on 2016/12/2.
   */
-object CommonUtil {
+object FPTFileBuilder {
 
   /**
     * 空FPT

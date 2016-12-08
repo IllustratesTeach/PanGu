@@ -144,6 +144,8 @@ message SyncMatchResultRequest{
     //比对任务号
     required int64 sid = 1;
     optional string dbid = 2;
+    optional string pkid = 3; //捺印卡号
+    optional string typ = 4; //查询类型
 }
 message SyncMatchResultResponse{
     extend monad.rpc.protocol.BaseCommand{
