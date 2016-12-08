@@ -12,6 +12,7 @@ import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import org.slf4j.LoggerFactory
 
 /**
  * Created by songpeng on 16/6/17.
@@ -177,8 +178,10 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         * sjr 2016/11/29
         * 更新状态
         */
-      matchTaskList.foreach{matchTask=>
-        fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+      if(matchTaskList!=null&&matchTaskList.size>0) {
+        matchTaskList.foreach { matchTask =>
+          fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+        }
       }
 
       true
