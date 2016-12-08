@@ -69,11 +69,13 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
     * 根据远程查询queryid获取查询结果信息
-    *
-    * @param queryid
+    * @param queryId
+    * @param pkId
+    * @param typ
+    * @param dbId
     * @return
     */
-  override def getMatchResultByQueryid(queryid: Long, dbId: Option[String]): Option[MatchResult] = {
+  override def getMatchResultByQueryid(queryId: Long, pkId: String, typ: Short, dbId: Option[String]): Option[MatchResult] = {
     throw new UnsupportedOperationException
   }
 
@@ -164,10 +166,12 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
     * 根据queryid获取比对状态
-    *
     * @param queryId
+    * @param pkId
+    * @param typ
+    * @return
     */
-  override def getMatchStatusByQueryid(queryId: Long): MatchStatus = {
+  override def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus = {
     throw new UnsupportedOperationException
   }
 
