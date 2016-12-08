@@ -84,4 +84,19 @@ trait FetchQueryService {
     * @param status
     */
   def updateMatchStatus(oraSid: Long, status: Int)
+
+
+  /**
+    * 根据orasid获取对应任务的捺印卡号 keyId
+    * @param oraSid
+    */
+  def getKeyIdArrByOraSid(oraSid: Long):Seq[String]
+
+  /**
+    * 根据orasid获取对应任务的查询类型 queryType
+    * @param oraSid
+    */
+  def getQueryTypeArrByOraSid(oraSid: Long): Seq[String]
 }
+
+
