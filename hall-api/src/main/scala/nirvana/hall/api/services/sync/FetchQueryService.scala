@@ -34,10 +34,14 @@ trait FetchQueryService {
 
   /**
     * 根据远程查询queryid获取查询结果信息
-    * @param queryid
+    * @param queryId
+    * @param pkId
+    * @param typ
+    * @param dbId
     * @return
     */
-  def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
+  //def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
+  def getMatchResultByQueryid(queryId: Long, pkId: String, typ: Short, dbId: Option[String] = None): Option[MatchResult]
 
   /**
     * 获取比对状态正在比对任务SID
@@ -49,8 +53,11 @@ trait FetchQueryService {
   /**
     * 根据queryid获取比对状态
     * @param queryId
+    * @param pkId
+    * @param typ
+    * @return
     */
-  def getMatchStatusByQueryid(queryId: Long): MatchStatus
+  def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus
 
   /**
     * 获取候选头结构信息
