@@ -193,9 +193,9 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RESULT, request.getDbid, "1").headOption
       if(hallReadConfigOpt.nonEmpty){
-        val status = fetchQueryService.getMatchStatusByQueryid(request.getSid)
+        val status = fetchQueryService.getMatchStatusByQueryid(request.getSid, request.getPkid, request.getTyp.toShort)
         responseBuilder.setMatchStatus(status)
-        val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, dbId)
+        val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, request.getPkid, request.getTyp.toShort, dbId)
         if(matchResultOpt.nonEmpty) {
           responseBuilder.setMatchResult(matchResultOpt.get)
           hallReadConfigOpt.get.seq = request.getSid
