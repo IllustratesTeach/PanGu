@@ -166,7 +166,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
 
       var matchTaskList: Seq[MatchTask] = null
       if(hallReadConfigOpt.nonEmpty){
-        matchTaskList = fetchQueryService.fetchMatchTask(request.getSeq, request.getSize, dbId)
+        matchTaskList = fetchQueryService.fetchMatchTask(request.getSize, dbId)
         matchTaskList.foreach{matchTask=>
           responseBuilder.addMatchTask(matchTask)
         }
