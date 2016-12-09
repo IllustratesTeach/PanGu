@@ -193,7 +193,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   /**
     * 根据orasid获取对应任务的捺印卡号 keyId
     *
-    * @param sid
+    * @param oraSid
     */
   override def getKeyIdArrByOraSid(oraSid: Long): Seq[String] = ???
 
