@@ -22,7 +22,8 @@ import scala.util.control.NonFatal
 
 /**
  * firm decoder
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-12-10
  */
 class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,imageConfigSupport: ImageConfigSupport) extends FirmDecoder{
@@ -38,7 +39,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
   /**
    * decode compressed data using firm's algorithm
-   * @return original image data
+    *
+    * @return original image data
    */
   def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT={
     if(gafisImg.stHead.bIsCompressed == 0)
@@ -46,7 +48,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
     val cprMethod =gafisImg.stHead.nCompressMethod
     val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
-
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
     destImg.stHead.bIsCompressed = 0
@@ -97,10 +98,12 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
          * 所以此处最小buffer作为640X640
          */
         val width = gafisImg.stHead.nWidth
-        //if(width != 640) width = 640
         val height = gafisImg.stHead.nHeight
-        //if(height != 640) height = 640
-
+        /*if (width != 640 || height != 640) {
+          logger.warn("width or height is not 640,actual width:" + gafisImg.stHead.nWidth + " height:" + gafisImg.stHead.nHeight)
+          height = 640
+          width = 640
+        }*/
         destImg.stHead.nWidth = width
         destImg.stHead.nHeight = height
 
@@ -169,8 +172,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       }
     }
     */
-
-
     destImg
   }
   private def Helper_GetBitsPerPixel(nBitsPerPixel:Int):Int={
@@ -183,7 +184,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
   /**
    * find dll handle by code
-   * @param code "1300"
+    *
+    * @param code "1300"
    * @return
    */
   private def findDllHandle(code:String,cprMethod:Int):Dll = {

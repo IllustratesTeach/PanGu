@@ -36,4 +36,20 @@ class ImageEncoderImpl extends ImageEncoder{
         throw new IllegalArgumentException("only support wsq,"+other+" not supported")
     }
   }
+
+  override def encodeWSQ(image : GAFISIMAGESTRUCT) : GAFISIMAGESTRUCT = {
+    val destImg = new GAFISIMAGESTRUCT
+    destImg.stHead.fromByteArray(image.stHead.toByteArray())
+    destImg.stHead.bIsCompressed = 1
+    destImg.stHead.nBits = 8
+    val cpr = NativeImageConverter.encodeByWSQ(image.bnData,
+          image.stHead.nWidth,
+          image.stHead.nHeight,
+          image.stHead.nResolution,
+          10)
+    destImg.bnData = cpr
+    destImg.stHead.nImgSize = destImg.bnData.length
+    destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ
+    destImg
+  }
 }

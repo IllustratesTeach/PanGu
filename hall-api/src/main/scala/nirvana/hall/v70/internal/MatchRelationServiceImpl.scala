@@ -26,9 +26,8 @@ class MatchRelationServiceImpl extends MatchRelationService{
     response.setMatchStatus(MatchStatus.UN_KNOWN)//默认状态未知
     matchType match {
       case MatchType.FINGER_TT =>
-        val checkinInfoOpt = GafisCheckinInfo.find_by_querytype_and_code(QueryConstants.QUERY_TYPE_TT.toShort, cardId).headOption
-        if(checkinInfoOpt.nonEmpty){
-          val checkinInfo = checkinInfoOpt.get
+        val checkinInfoList = GafisCheckinInfo.find_by_querytype_and_confirmStatus_and_code(QueryConstants.QUERY_TYPE_TT.toShort, QueryConstants.CONFIRM_STATUS_YES, cardId)
+        checkinInfoList.foreach{checkinInfo =>
           val tt = MatchRelationTT.newBuilder()
           tt.setPersonId1(checkinInfo.code)
           tt.setPersonId2(checkinInfo.tcode)
@@ -43,13 +42,12 @@ class MatchRelationServiceImpl extends MatchRelationService{
           matchRelation.setMatchSysInfo(matchSysInfo)
           matchRelation.setExtension(MatchRelationTT.data, tt.build())
 
-          response.setMatchStatus(MatchStatus.CHECKED)//TT没有复核???
+          response.setMatchStatus(MatchStatus.CHECKED)//TT没有复核
           response.addMatchRelation(matchRelation.build())
         }
       case MatchType.FINGER_TL =>
-        val checkinInfoOpt = GafisCheckinInfo.find_by_querytype_and_tcode(QueryConstants.QUERY_TYPE_TL.toShort, cardId).headOption
-        if(checkinInfoOpt.nonEmpty){
-          val checkinInfo = checkinInfoOpt.get
+        val checkinInfoList = GafisCheckinInfo.find_by_querytype_and_reviewStatus_and_tcode(QueryConstants.QUERY_TYPE_TL.toShort, QueryConstants.REVIEW_STATUS_YES, cardId)
+        checkinInfoList.foreach{checkinInfo =>
           val code = checkinInfo.code
           val tl = MatchRelationTLAndLT.newBuilder()
           tl.setCaseId(code.substring(0, code.length-2))
@@ -70,25 +68,13 @@ class MatchRelationServiceImpl extends MatchRelationService{
           matchRelation.setMatchSysInfo(matchSysInfo)
           matchRelation.setExtension(MatchRelationTLAndLT.data, tl.build())
 
-          checkinInfo.reviewStatus.toInt match{
-            case 0 =>
-              response.setMatchStatus(MatchStatus.RECHECKING)
-            case 1 =>
-              response.setMatchStatus(MatchStatus.RECHECKED)
-            case 2 =>
-              response.setMatchStatus(MatchStatus.FAILED)
-            case 3 =>
-              response.setMatchStatus(MatchStatus.FAILED)//???
-            case 4 =>
-              response.setMatchStatus(MatchStatus.FINISHED)//???
-          }
+          response.setMatchStatus(MatchStatus.RECHECKED)
           response.addMatchRelation(matchRelation.build())
         }
 
       case MatchType.FINGER_LT =>
-        val checkinInfoOpt = GafisCheckinInfo.find_by_querytype_and_code(QueryConstants.QUERY_TYPE_LT.toShort, cardId).headOption
-        if(checkinInfoOpt.nonEmpty){
-          val checkinInfo = checkinInfoOpt.get
+        val checkinInfoList = GafisCheckinInfo.find_by_querytype_and_reviewStatus_and_code(QueryConstants.QUERY_TYPE_LT.toShort, QueryConstants.REVIEW_STATUS_YES, cardId).headOption
+        checkinInfoList.foreach{checkinInfo =>
           val code = checkinInfo.code
           val tl = MatchRelationTLAndLT.newBuilder()
           tl.setCaseId(code.substring(0, code.length-2))
@@ -109,18 +95,7 @@ class MatchRelationServiceImpl extends MatchRelationService{
           matchRelation.setMatchSysInfo(matchSysInfo)
           matchRelation.setExtension(MatchRelationTLAndLT.data, tl.build())
 
-          checkinInfo.reviewStatus.toInt match{
-            case 0 =>
-              response.setMatchStatus(MatchStatus.RECHECKING)
-            case 1 =>
-              response.setMatchStatus(MatchStatus.RECHECKED)
-            case 2 =>
-              response.setMatchStatus(MatchStatus.FAILED)
-            case 3 =>
-              response.setMatchStatus(MatchStatus.FAILED)//???
-            case 4 =>
-              response.setMatchStatus(MatchStatus.FINISHED)//???
-          }
+          response.setMatchStatus(MatchStatus.RECHECKED)
           response.addMatchRelation(matchRelation.build())
         }
       case MatchType.FINGER_LL =>

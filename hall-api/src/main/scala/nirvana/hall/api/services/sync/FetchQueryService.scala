@@ -30,14 +30,18 @@ trait FetchQueryService {
     * @param fetchConfig 同步配置
     * @param candDBIDMap 候选卡号->dbid
     */
-  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map())
+  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(),configMap : scala.collection.mutable.HashMap[String, String])
 
   /**
     * 根据远程查询queryid获取查询结果信息
-    * @param queryid
+    * @param queryId
+    * @param pkId
+    * @param typ
+    * @param dbId
     * @return
     */
-  def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
+  //def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
+  def getMatchResultByQueryid(queryId: Long, pkId: String, typ: Short, dbId: Option[String] = None): Option[MatchResult]
 
   /**
     * 获取比对状态正在比对任务SID
@@ -49,8 +53,11 @@ trait FetchQueryService {
   /**
     * 根据queryid获取比对状态
     * @param queryId
+    * @param pkId
+    * @param typ
+    * @return
     */
-  def getMatchStatusByQueryid(queryId: Long): MatchStatus
+  def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus
 
   /**
     * 获取候选头结构信息
@@ -77,4 +84,31 @@ trait FetchQueryService {
     * @return
     */
   def getQueryQue(oraSid: Int): QueryQue
+  /**
+    * 更新status
+    * sjr 2016/11/28
+    * @param oraSid
+    * @param status
+    */
+  def updateMatchStatus(oraSid: Long, status: Int)
+
+
+  /**
+    * 根据orasid获取对应任务的捺印卡号 keyId
+    * @param oraSid
+    */
+  def getKeyIdArrByOraSid(oraSid: Long):Seq[String]
+
+  /**
+    * 根据orasid获取对应任务的查询类型 queryType
+    * @param oraSid
+    */
+  def getQueryTypeArrByOraSid(oraSid: Long): Seq[String]
+  
+    /**
+    * 获得配置信息
+    */
+  def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
 }
+
+

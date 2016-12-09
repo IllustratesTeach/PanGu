@@ -37,6 +37,9 @@ class NirvanaSparkConfig extends Serializable{
   var isNewFeature:Boolean = false
   @XmlElement(name="is_extractor_bin")
   var isExtractorBin:Boolean = false
+  @XmlElement(name="is_image_save")
+  var isImageSave:Boolean = false
+
   @XmlElement(name="partitions_num")
   var partitionsNum:Int = 4
 
@@ -65,7 +68,7 @@ class DatabaseConfig extends Serializable{
   @XmlElement(name = "url")
   var url: String = _
   @XmlElement(name = "max_pool_size")
-  var max: Int= 20
+  var max: Int= 10
 }
 /**
  * JPA属性配置

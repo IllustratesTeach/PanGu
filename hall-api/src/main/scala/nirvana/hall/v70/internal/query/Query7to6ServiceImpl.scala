@@ -67,7 +67,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     matchTask.setPriority(query.priority.toInt)
     matchTask.setScoreThreshold(query.minscore)
     matchTask.setTopN(query.maxcandnum)
-
+    matchTask.setCommitUser(query.username)
     //解析特征数据
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
     mics.foreach{mic =>

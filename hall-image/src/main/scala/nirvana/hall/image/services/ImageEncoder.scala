@@ -11,4 +11,6 @@ import nirvana.hall.protocol.image.ImageCompressProto.ImageCompressRequest
   */
 trait ImageEncoder {
   def encode(imageCompressRequest: ImageCompressRequest):GAFISIMAGESTRUCT
+
+  def encodeWSQ(gafisImg : GAFISIMAGESTRUCT):GAFISIMAGESTRUCT
 }

@@ -90,4 +90,7 @@ message MatchTask {
   optional int32 pos = 10;
   //纹型
   optional int32 ridge_pattern = 11;
+
+  //提交人
+  optional string commit_user = 12;
 }

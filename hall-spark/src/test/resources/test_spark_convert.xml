@@ -3,12 +3,12 @@
   <host>127.0.0.1</host>
   <app_name>spark</app_name>
   <master_server>local[1]</master_server>
-  <kafka_server>localhost:9092</kafka_server>
+  <kafka_server>10.1.6.37:9092</kafka_server>
   <kafka_topic_name>DBDATA</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
   <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseImageProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
-  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsUpdate</data_saver_class>
+  <data_saver_class>nirvana.hall.spark.internal.DumpSaver</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>
@@ -17,9 +17,9 @@
   <database_list>
     <database name="gafis">
       <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <user>gafis_sh</user>
+      <user>gafis_gz</user>
       <password>gafis</password>
-      <url>jdbc:oracle:thin:@192.168.1.103:1521:oragafis</url>
+      <url>jdbc:oracle:thin:@10.1.6.37:1521:gafisnew7</url>
     </database>
   </database_list>
   <properties>

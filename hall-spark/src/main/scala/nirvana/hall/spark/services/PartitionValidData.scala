@@ -6,7 +6,6 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.SparkFunctions._
-import nirvana.hall.spark.services.bianjian.BianjianImageProviderService.RequestRemoteFileError
 import nirvana.hall.support.services.JdbcDatabase
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
@@ -16,6 +15,9 @@ import scala.util.control.NonFatal
 /**
   * Created by wangjue on 2016/7/21.
   */
+case class RequestRemoteFileError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
+    override def getMessage: String = "R|"+message
+}
 object PartitionValidData {
 
   lazy implicit val dataSource = SysProperties.getDataSource("gafis")

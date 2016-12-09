@@ -48,7 +48,7 @@ object gaqryqueConverter {
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
     queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
-
+    queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     //TODO 支持指定物理库查询，但不支持多个物理库查询
     val srcDB = new GADBIDSTRUCT  //特征来源数据库
     val destDB = new GADBIDSTRUCT //被查数据库
@@ -304,6 +304,7 @@ object gaqryqueConverter {
       matchResultObject.setObjectId(gaCand.szKey)
       matchResultObject.setPos(gaCand.nIndex)
       matchResultObject.setScore(gaCand.nScore)
+      matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
       result += matchResultObject.build()
     }
     result.toSeq

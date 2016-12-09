@@ -52,7 +52,7 @@ object BigDataStream {
       } // decompress image
       .flatMap{x=>
           SysProperties.setConfig(parameter)
-          ExtractFeatureService.requestExtract(parameter,x._1,x._2)
+          ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
         } //extract feature
       .foreachRDD{rdd=>
         //save records for partition

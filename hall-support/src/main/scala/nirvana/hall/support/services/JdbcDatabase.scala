@@ -25,6 +25,7 @@ object JdbcDatabase {
       ret
     } catch {
       case NonFatal(e) =>
+        e.printStackTrace()
         if (!autoCommit) conn.rollback()
         throw MonadException.wrap(e)
     }finally {

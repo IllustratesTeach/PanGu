@@ -57,10 +57,10 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_bmp: Unit ={
-    val imgData = getClass.getResourceAsStream("/bmp.bmp")
+    val imgData = getClass.getResourceAsStream("/52022200000000000000000000009409.bmp")
 
     val extractor = new FeatureExtractorImpl
-    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V2)
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
     val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
@@ -102,11 +102,11 @@ class FeatureExtractorImplTest extends BaseJniTest{
   @Test
   def test_extract: Unit ={
     //val img = IOUtils.toByteArray(getClass.getResourceAsStream("/tp_1.img"))
-    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\dd\\t1.data"))
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\tt\\t1.data"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(img)
 
     val extractor = new FeatureExtractorImpl
-    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_R_THUMB,FeatureType.FingerTemplate)
+    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_LITTLE,FeatureType.FingerTemplate)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt._1.bnData)
 
@@ -138,6 +138,42 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val extractor = new FeatureExtractorImpl
     val newFeature = extractor.ConvertMntOldToNew(bytes)
     Assert.assertEquals(4024,newFeature.size)
+  }
+
+  @Test
+  def test_extract_idcard_bmp: Unit ={
+    val imgData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\img.bmp"))
+    val in = ByteString.copyFrom(imgData).newInput()
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\mnt.mnt"),mnt.toByteArray())
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+
+
+  @Test
+  def test_extract_wjw_jpg: Unit ={
+    val imgData = getClass.getResourceAsStream("/jpg.jpg")
+
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+  }
+
+  @Test
+  def test_extract_idcard_jpg_mnt_save: Unit ={
+    val imgData = FileUtils.readFileToByteArray(new File("d:\\img.img"))
+    val in = ByteString.copyFrom(imgData).newInput()
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    FileUtils.writeByteArrayToFile(new File("D:\\mnt.mnt"),mnt.toByteArray())
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
   }
 
 }

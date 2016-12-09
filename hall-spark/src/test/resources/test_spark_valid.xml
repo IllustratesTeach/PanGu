@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nirvana_spark>
+  <host>127.0.0.1</host>
+  <app_name>spark</app_name>
+  <master_server>local[1]</master_server>
+  <kafka_server>10.1.7.201:9092</kafka_server>
+  <kafka_topic_name>VALID</kafka_topic_name>
+  <!-- 图像源数据提供的服务类 -->
+  <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseValidProvide</image_provider_class>
+  <!-- 特征数据保存的服务类 -->
+  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsSaver</data_saver_class>
+  <hdfs_server>None</hdfs_server>
+  <partitions_num>4</partitions_num>
+  <is_new_feature>false</is_new_feature>
+  <is_extractor_bin>false</is_extractor_bin>
+  <!-- 容器启动间隔时间 单位分钟-->
+  <streaming_context_startTime>1</streaming_context_startTime>
+  <!-- 支持多种数据源，可以和image_provider_class以及 data_saver_class配合使用 -->
+  <database_list>
+    <database name="gafis">
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>gafis_sh_px</user>
+      <password>gafis</password>
+      <url>jdbc:oracle:thin:@10.1.7.181:1521:gafisdb</url>
+    </database>
+  </database_list>
+  <properties>
+    <!--
+    系统内已经定义的如下:
+    decompress.gfs.direct   boolean  //是否针对GFS的数据采取直接解压缩模式
+    decompress.wsq.direct   boolean  //是否针对WSQ的数据采取直接解压缩模式
+    decompress.server       string   //解压缩服务器地址
+    extractor.direct        boolean  // 是否进行直接提特征模式
+    extractor.converter     boolean  // 是否进行新特征转换
+    extractor.server        string   // 提取特征的时候http服务器
+    extractor.bin.support   boolean  // 是否支持提取纹线数据
+
+    系统属性,除了系统内置的属性之外，还可以增加和自己类相关的自定义属性
+    -->
+    <property key="fpt.file.server" value="http://10.1.7.78/fpt"/>
+    <property key="decompress.gfs.direct" value="true"/>
+    <property key="decompress.wsq.direct" value="true"/>
+    <property key="decompress.server" value="http://127.0.0.1:9001/image"/>
+    <property key="extractor.server" value="http://127.0.0.1:9002/extractor"/>
+    <property key="extractor.direct" value="true"/>
+    <property key="extractor.converter" value="false"/>
+
+  </properties>
+</nirvana_spark>

@@ -102,7 +102,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val mntData = mntBuffer.array()
 
     val sbinHead = new GAFISIMAGEHEADSTRUCT
-    val binBuffer = ChannelBuffers.buffer(20480 *  imgHead.nWidth/640 * imgHead.nHeight /640)
+    //val binBuffer = ChannelBuffers.buffer(20480 *  imgHead.nWidth/640 * imgHead.nHeight /640)
+    val binBuffer = ChannelBuffers.buffer(20480*10)
 //    println(binBuffer.capacity())
     sbinHead.writeToStreamWriter(binBuffer)
     val binData = binBuffer.array()
@@ -115,8 +116,6 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val bin = ChannelBuffers.buffer(sbinHead.nImgSize+64)
     val sbinData = bin.array()
     System.arraycopy(binData,0,sbinData,0,sbinHead.nImgSize+64)
-    //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\mnt.mnt"),mntData)
-    //FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\testImR\\bin.bin"),sbinData)
     Some((mntData,sbinData))
   }
   private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
@@ -125,7 +124,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
       case COLOR_GRAY_SPACE=>
         img
       case other=>
-        val dstImage = new BufferedImage(img.getWidth, img.getHeight, img.getType);
+        val dstImage = new BufferedImage(img.getWidth, img.getHeight, BufferedImage.TYPE_BYTE_GRAY);
         val colorConvertOp = new ColorConvertOp(COLOR_GRAY_SPACE, null);
         colorConvertOp.filter(img, dstImage)
         dstImage
@@ -133,7 +132,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
     val originalHeadObject = img.getProperty(HallSupportConstants.GAFIS_IMG_HEAD_KEY)
     val gafisImg = new GAFISIMAGESTRUCT
-    val dataBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
+    val dataBuffer = grayImg.getRaster.getDataBuffer.asInstanceOf[DataBufferByte].getData
     if(originalHeadObject == null || originalHeadObject == Image.UndefinedProperty) {
       gafisImg.stHead.nResolution = 500
       gafisImg.stHead.nWidth = grayImg.getWidth.toShort

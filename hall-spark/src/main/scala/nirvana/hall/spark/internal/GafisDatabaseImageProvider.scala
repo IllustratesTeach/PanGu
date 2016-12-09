@@ -3,8 +3,9 @@ package nirvana.hall.spark.internal
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions._
-import nirvana.hall.spark.services.{SysProperties, ImageProvider}
+import nirvana.hall.spark.services.{ImageProvider, SysProperties}
 import nirvana.hall.support.services.JdbcDatabase
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
@@ -23,6 +24,8 @@ class GafisDatabaseImageProvider extends ImageProvider{
   private lazy implicit val dataSource = GafisPartitionRecordsSaver.dataSource
   val querySqlByPersonId = "select t.gather_data,t.fgp,t.fgp_case from gafis_gather_finger t where t.person_id = ? and t.group_id = 1"
   val querySql = "select t.gather_data,t.fgp,t.fgp_case,t.person_id from gafis_gather_finger t where t.pk_id = ?"
+
+  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
 
   def requestImage(parameter:NirvanaSparkConfig,pkId:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] = {
     def reportException(e: Throwable,personId:String,fgp:Integer,pkId:String) = {

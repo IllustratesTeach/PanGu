@@ -6,6 +6,7 @@ import nirvana.hall.c.services.kernel.mnt_def._
 
 /**
   * convert fpt latent data to MNTDISPSTRUCT structure
+  *
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-03-17
   */
@@ -119,6 +120,7 @@ object FPTLDataToMNTDISP {
     if(CoreDelta.length != 14)
       return
     val szCoreDelta = UTIL_FPT4LIB_StrTrimSpace(CoreDelta, UTIL_FPT4LIB_STRTRIM_STYLE_LEFT)
+
     stCoreDelta.x = szCoreDelta.take(3).trim().toShort
 
     stCoreDelta.y = szCoreDelta.substring(3,6).trim().toShort
@@ -192,10 +194,12 @@ object FPTLDataToMNTDISP {
   }
   def UTIL_Minutia_OneFPT2MntDisp(pszFPTMnt:String, stmnt:AFISMNTPOINTSTRUCT)
   {
-    stmnt.x = pszFPTMnt.substring(0,3).trim.toShort
-    stmnt.y = pszFPTMnt.substring(3,6).trim.toShort
-    val zString = pszFPTMnt.substring(6,9)
-    stmnt.z = UTIL_Angle_FPT2MntDisp(zString.trim.toInt)
-    stmnt.nReliability = 1
+    if (pszFPTMnt.replace(" ","").length> 0) {
+      stmnt.x = pszFPTMnt.substring(0, 3).replace(" ","").toShort
+      stmnt.y = pszFPTMnt.substring(3, 6).replace(" ","").toShort
+      val zString = pszFPTMnt.substring(6, 9)
+      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.replace(" ","").toInt)
+      stmnt.nReliability = 1
+    }
   }
 }

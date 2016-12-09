@@ -7,7 +7,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>hall-spark</artifactId>
-  <name>Nirvana Hall Stream Processor Server</name>
+  <name>Nirvana Hall Spark Processor Server</name>
   <parent>
     <groupId>nirvana</groupId>
     <artifactId>nirvana-hall</artifactId>
