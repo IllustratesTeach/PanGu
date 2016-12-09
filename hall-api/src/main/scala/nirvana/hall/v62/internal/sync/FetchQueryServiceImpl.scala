@@ -26,15 +26,19 @@ import scala.collection.mutable.ArrayBuffer
   */
 class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardService: TPCardService, implicit val dataSource: DataSource) extends FetchQueryService {
   /**
-    * 获取比对任务, 任务号使用seq字段，确保唯一性
+    * 获取比对任务, 使用ora_uuid字段及不在7.0抓取6.2记录表中，确保不被重复抓取
     *
     * @param size
     * @param dbId
     * @return
     */
-  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
+  override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
     val matchTaskList = new ArrayBuffer[MatchTask]
-    val sql = "select * from (select t.ora_sid, t.seq, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where  t.status=0 ) tt where rownum <=?" //取消seq作为查询条件
+    val sql = ("select * from (select ora_uuid from  "
+              +"( select t.ora_uuid  from NORMALQUERY_QUERYQUE t where  t.status<=2 "
+              +"and not exists (select h.ora_uuid from Hall_Fetch_Record_7to6 h where h.ora_uuid=t.ora_uuid) ) t1 ) "
+              +" where  rownum <=?") //取消seq作为查询条件
+
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
       //ps.setLong(1, seq)
       //ps.setLong(2, seq + size)
@@ -102,8 +106,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
     if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT){
       var userunitcode = "" //单位代码
-      //val sql = "select userunitcode, querytype from normalquery_queryque where ora_sid = ? and rownum = 1"
-      val sql = "select userunitcode from normalquery_queryque  where seq = ? and rownum = 1"
+      val sql = "select userunitcode, querytype from normalquery_queryque where ora_sid = ? and rownum = 1"
       JdbcDatabase.queryWithPsSetter(sql){ps=>
         ps.setLong(1,oraSid.toLong)
       }{rs=>

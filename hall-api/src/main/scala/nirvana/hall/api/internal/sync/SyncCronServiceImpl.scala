@@ -304,16 +304,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * @param update
    */
   def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    info("fetchMatchTask name:{} seq:{}", fetchConfig.name)
     val request = SyncMatchTaskRequest.newBuilder()
     request.setSize(SYNC_BATCH_SIZE)
     request.setDbid(fetchConfig.dbid)
-    request.setSeq(fetchConfig.seq)
+    //request.setSeq(fetchConfig.seq)
 
     val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchTaskRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
       val response = baseResponse.getExtension(SyncMatchTaskResponse.cmd)
-      var seq = fetchConfig.seq
+      //var seq = fetchConfig.seq
       val iter = response.getMatchTaskList.iterator()
       try {
         while (iter.hasNext) {
@@ -322,7 +323,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             //TODO queryDBConfig 添加是否更新校验
             queryService.addMatchTask(matchTask)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType)
-            seq = matchTask.getObjectId
+            //seq = matchTask.getObjectId
           }
         }
       } catch {
@@ -330,12 +331,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           error(e.getMessage,e)
       }
       //如果获取到数据递归获取
-      if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
+ /*     if(response.getMatchTaskCount  > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
         fetchMatchTask(fetchConfig, update)
-      }
+      }*/
     }
   }
 
