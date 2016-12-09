@@ -170,19 +170,19 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         matchTaskList.foreach{matchTask=>
           responseBuilder.addMatchTask(matchTask)
         }
-        hallReadConfigOpt.get.seq = request.getSeq
-        updateSeq(hallReadConfigOpt.get)
+        //hallReadConfigOpt.get.seq = request.getSeq
+        //updateSeq(hallReadConfigOpt.get)
       }
       commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
       /**
         * sjr 2016/11/29
         * 更新状态
         */
-      if(matchTaskList!=null&&matchTaskList.size>0) {
+/*      if(matchTaskList!=null&&matchTaskList.size>0) {
         matchTaskList.foreach { matchTask =>
           fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
         }
-      }
+      }*/
 
       true
     }else if(commandRequest.hasExtension(SyncMatchResultRequest.cmd)){
@@ -198,8 +198,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, request.getPkid, request.getTyp.toShort, dbId)
         if(matchResultOpt.nonEmpty) {
           responseBuilder.setMatchResult(matchResultOpt.get)
-          hallReadConfigOpt.get.seq = request.getSid
-          updateSeq(hallReadConfigOpt.get)
+          //hallReadConfigOpt.get.seq = request.getSid
+          //updateSeq(hallReadConfigOpt.get)
         }
       }else{
         responseBuilder.setMatchStatus(MatchStatus.UN_KNOWN)
