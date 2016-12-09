@@ -5,8 +5,8 @@ package nirvana.hall.api.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
-import nirvana.hall.api.jni.JniLoader
 import nirvana.hall.api.{HallApiConstants, HallApiModule, HallApiSymbols}
+import nirvana.hall.extractor.jni.JniLoader
 import org.slf4j.LoggerFactory
 
 /**
