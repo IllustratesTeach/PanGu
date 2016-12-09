@@ -29,7 +29,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param size
     * @return
     */
-  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
+  override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
     GafisNormalqueryQueryque.find_by_status(0.toShort).limit(size).map{gafisQuery=>
       ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
     }.toSeq
