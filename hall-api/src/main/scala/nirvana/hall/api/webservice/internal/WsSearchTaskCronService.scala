@@ -60,7 +60,7 @@ class WsSearchTaskCronService(hallApiConfig: HallApiConfig,
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    if(fpt4.logic02Recs.foreach(tp => tp.head.dataType) == "02"){
+                    if(fpt4.logic02Recs.foreach(tp => tp.head.dataType).equals("02")){
                       var tPCard:TPCard = null
                       tPCard = TPFPT2ProtoBuffer(fpt4)
                       tPCardService.addTPCard(tPCard)
@@ -68,7 +68,7 @@ class WsSearchTaskCronService(hallApiConfig: HallApiConfig,
                       queryService.addMatchTask(null)
                     }
                   }else if(fpt4.logic03Recs.length>0){
-                    if(fpt4.logic03Recs.foreach(tp => tp.head.dataType) == "03"){
+                    if(fpt4.logic03Recs.foreach(tp => tp.head.dataType).equals("03")){
                       // TODO 现场处理
                     }
                   }else{
