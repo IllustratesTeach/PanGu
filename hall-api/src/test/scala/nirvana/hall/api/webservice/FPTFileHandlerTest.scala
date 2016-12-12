@@ -8,15 +8,11 @@ import nirvana.hall.api.services.{QueryService, TPCardService}
 import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.v62.BaseV62TestCase
-import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 import org.junit.Test
-
-import scala.collection.mutable
 
 /**
   * Created by yuchen on 2016/12/7.
@@ -83,6 +79,39 @@ class FPTFileHandlerTest extends BaseV62TestCase{
     }
   }
 
+
+
+
+  /**
+    * 将解析出的指位翻译成系统中的枚举类型,ProtoBuffer
+    */
+  def fgpParesProtoBuffer(fgp:String): FingerFgp ={
+    fgp match {
+      case "01" =>
+        FingerFgp.FINGER_R_THUMB
+      case "02" =>
+        FingerFgp.FINGER_R_INDEX
+      case "03" =>
+        FingerFgp.FINGER_R_MIDDLE
+      case "04" =>
+        FingerFgp.FINGER_R_RING
+      case "05" =>
+        FingerFgp.FINGER_R_LITTLE
+      case "06" =>
+        FingerFgp.FINGER_L_THUMB
+      case "07" =>
+        FingerFgp.FINGER_L_INDEX
+      case "08" =>
+        FingerFgp.FINGER_L_MIDDLE
+      case "09" =>
+        FingerFgp.FINGER_L_RING
+      case "10" =>
+        FingerFgp.FINGER_L_LITTLE
+      case other =>
+        FingerFgp.FINGER_UNDET
+    }
+  }
+
   /**
     *
     * @param tpCount
@@ -120,9 +149,10 @@ class FPTFileHandlerTest extends BaseV62TestCase{
             if(fpt4.logic02Recs(0).head.dataType.equals("02")){
               var tPCard:TPCard = null
               tPCard = TPFPT2ProtoBuffer(fpt4)
+              println("测试测试......")
               tpCardService.addTPCard(tPCard)
               // TODO 发比对任务
-              queryService.addMatchTask(null)
+              queryService.sendQuery(null)
             }
           }else if(fpt4.logic03Recs.length>0){
             if(fpt4.logic03Recs(0).head.dataType.equals("03")){
@@ -148,7 +178,7 @@ class FPTFileHandlerTest extends BaseV62TestCase{
   def TPFPT2ProtoBuffer(fpt4:FPT4File):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-    tpCard.setStrCardID(fpt4.sid)
+    tpCard.setStrCardID("201612120001")
     fpt4.logic02Recs.foreach { tp =>
       textBuilder.setStrName(tp.personName)
       textBuilder.setStrAliasName (tp.alias)
@@ -198,6 +228,8 @@ class FPTFileHandlerTest extends BaseV62TestCase{
           val blobBuilder = tpCard.addBlobBuilder()
           mnt.foreach { blob =>
             blobBuilder.setStMntBytes(ByteString.copyFrom(blob.toByteArray()))
+            blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+            blobBuilder.setFgp(fgpParesProtoBuffer(tData.fgp))
           }
         }
       }

@@ -2,6 +2,7 @@ package nirvana.hall.api.webservice.internal
 
 
 import javax.sql.DataSource
+
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
@@ -11,7 +12,7 @@ import nirvana.hall.api.webservice.services.WsSearchTaskService
 import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import org.apache.tapestry5.ioc.annotations.PostInjection
@@ -162,6 +163,8 @@ class WsSearchTaskCronService(hallApiConfig: HallApiConfig,
           val blobBuilder = tpCard.addBlobBuilder()
           mnt.foreach { blob =>
             blobBuilder.setStMntBytes(ByteString.copyFrom(blob.toByteArray()))
+            blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+            blobBuilder.setFgp(fgpParesProtoBuffer(tData.fgp))
           }
         }
       }
@@ -197,6 +200,37 @@ class WsSearchTaskCronService(hallApiConfig: HallApiConfig,
         FingerPosition.FINGER_L_LITTLE
       case other =>
         FingerPosition.FINGER_UNDET
+    }
+  }
+
+
+  /**
+    * 将解析出的指位翻译成系统中的枚举类型,ProtoBuffer
+    */
+  def fgpParesProtoBuffer(fgp:String): FingerFgp ={
+    fgp match {
+      case "01" =>
+        FingerFgp.FINGER_R_THUMB
+      case "02" =>
+        FingerFgp.FINGER_R_INDEX
+      case "03" =>
+        FingerFgp.FINGER_R_MIDDLE
+      case "04" =>
+        FingerFgp.FINGER_R_RING
+      case "05" =>
+        FingerFgp.FINGER_R_LITTLE
+      case "06" =>
+        FingerFgp.FINGER_L_THUMB
+      case "07" =>
+        FingerFgp.FINGER_L_INDEX
+      case "08" =>
+        FingerFgp.FINGER_L_MIDDLE
+      case "09" =>
+        FingerFgp.FINGER_L_RING
+      case "10" =>
+        FingerFgp.FINGER_L_LITTLE
+      case other =>
+        FingerFgp.FINGER_UNDET
     }
   }
 

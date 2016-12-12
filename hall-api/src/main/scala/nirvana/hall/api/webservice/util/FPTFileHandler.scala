@@ -54,7 +54,7 @@ object FPTFileHandler {
     request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
 
 
-    val baseResponse = httpClient.call("url", FirmImageDecompressRequest.cmd, request.build())
+    val baseResponse = httpClient.call("http://192.168.1.214:9001", FirmImageDecompressRequest.cmd, request.build())
     baseResponse.getStatus match {
       case CommandStatus.OK =>
         if (baseResponse.hasExtension(FirmImageDecompressResponse.cmd)) {
