@@ -359,8 +359,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           request.setSid(tmp)
           request.setDbid(fetchConfig.dbid)
 
-          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).head) //6.2比对任务的捺印卡号
-          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).head) //6.2比对任务的查询类型
+          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
+          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
 
           val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
           if(baseResponse.getStatus == CommandStatus.OK){
