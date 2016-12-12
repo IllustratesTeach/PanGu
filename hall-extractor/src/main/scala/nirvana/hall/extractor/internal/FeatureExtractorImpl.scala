@@ -8,8 +8,7 @@ import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGESTRUCT, GAFISIMAGEHEADSTRUCT}
-import nirvana.hall.c.services.kernel.mnt_def
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def._
 import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.NativeExtractor
@@ -28,6 +27,7 @@ import org.jboss.netty.buffer.ChannelBuffers
  * @since 2015-12-11
  */
 class FeatureExtractorImpl extends FeatureExtractor{
+  final private val FINGERMNTSTRUCT_NEWTT_SIZE = new FINGERMNTSTRUCT_NEWTT().getDataSize
   val iioRegistry = IIORegistry.getDefaultInstance
   iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
@@ -40,7 +40,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
    */
   override def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]] = {
     val feature  = new GAFISIMAGESTRUCT().fromByteArray(IOUtils.toByteArray(oldMnt))
-    val nmnt = ChannelBuffers.buffer(mnt_def.FINGERMNTSTRUCT_NEWTT_SIZE)
+    val nmnt = ChannelBuffers.buffer(FINGERMNTSTRUCT_NEWTT_SIZE)
     val newMntBuffer = nmnt.array()
     NativeExtractor.ConvertMntOldToNew(feature.bnData,newMntBuffer)
     feature.bnData = newMntBuffer
