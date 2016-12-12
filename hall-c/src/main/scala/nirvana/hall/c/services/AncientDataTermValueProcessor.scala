@@ -212,12 +212,12 @@ class AncientDataArrayProcessor(val term:TermSymbol,tpe:Type) extends AncientDat
   override def fromStreamReader(dataSource: StreamReader, valueManipulation: ValueManipulation, length: Option[Int], encoding: Charset): Unit = {
     val len = returnLengthOrThrowException(term,length)
     val ancientDataArray = lang.reflect.Array.newInstance(typeClass,len)
-    //先设置数组数据,即时后面的操作发生错误,也最大化的获得数据,目的是保证最大化获得数据.
-    valueManipulation.set(ancientDataArray)
 
     0 until len foreach {i=>
       lang.reflect.Array.set(ancientDataArray,i,typeClass.newInstance().fromStreamReader(dataSource,encoding))
     }
+    //先设置数组数据,即时后面的操作发生错误,也最大化的获得数据,目的是保证最大化获得数据.
+    valueManipulation.set(ancientDataArray)
   }
 }
 
