@@ -38,6 +38,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
+  final val SYNC_MATCH_TASK_BATCH_SIZE = 10          //一批抓取的比对任务数
   /**
    * 定时器，同步数据
     *
@@ -307,7 +308,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
     info("fetchMatchTask name:{} seq:{}", fetchConfig.name)
     val request = SyncMatchTaskRequest.newBuilder()
-    request.setSize(SYNC_BATCH_SIZE)
+    request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
     request.setDbid(fetchConfig.dbid)
     //request.setSeq(fetchConfig.seq)
 
