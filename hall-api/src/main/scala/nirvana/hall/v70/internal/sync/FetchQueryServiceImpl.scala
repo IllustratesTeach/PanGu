@@ -220,5 +220,5 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param ORA_UUID
     * @return
     */
-  override def saveFetchRecord(ORA_UUID: String)
+  override def saveFetchRecord(ORA_UUID: String)= ???
 }
