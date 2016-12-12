@@ -1,5 +1,6 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
@@ -54,7 +55,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
     matchTask.setObjectId(1)
 
     val service = getService[QueryService]
-    val response = service.addMatchTask(matchTask.build())
+    val response = service.sendQuery(matchTask.build())
     Assert.assertNotNull(response)
   }
 
