@@ -22,7 +22,7 @@ trait FetchQueryService {
     * @param dbId
     * @return
     */
-  def fetchMatchTask(seq: Long, size: Int, dbId: Option[String] = None): Seq[MatchTask]
+  def fetchMatchTask(size: Int, dbId: Option[String] = None): Seq[MatchTask]
 
   /**
     * 保存候选信息
@@ -30,7 +30,7 @@ trait FetchQueryService {
     * @param fetchConfig 同步配置
     * @param candDBIDMap 候选卡号->dbid
     */
-  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map())
+  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(),configMap : scala.collection.mutable.HashMap[String, String])
 
   /**
     * 根据远程查询queryid获取查询结果信息
@@ -104,6 +104,26 @@ trait FetchQueryService {
     * @param oraSid
     */
   def getQueryTypeArrByOraSid(oraSid: Long): Seq[String]
+  
+    /**
+    * 获得配置信息
+    */
+  def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
+
+  /**
+    * 获得Ora_UUID 比对任务对应的唯一标识
+    * @param oraSid
+    * @return
+    */
+  def getOraUUID(oraSid: Long): Seq[String]
+
+  /**
+    * 保存抓取记录
+    * @param ORA_UUID
+    * @return
+    */
+  def saveFetchRecord(ORA_UUID: String)
+
 }
 
 

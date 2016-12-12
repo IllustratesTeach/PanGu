@@ -38,6 +38,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
+  final val SYNC_MATCH_TASK_BATCH_SIZE = 10          //一批抓取的比对任务数
   /**
    * 定时器，同步数据
     *
@@ -304,16 +305,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    * @param update
    */
   def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+    info("fetchMatchTask name:{} seq:{}", fetchConfig.name)
     val request = SyncMatchTaskRequest.newBuilder()
-    request.setSize(SYNC_BATCH_SIZE)
+    request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
     request.setDbid(fetchConfig.dbid)
-    request.setSeq(fetchConfig.seq)
+    //request.setSeq(fetchConfig.seq)
 
     val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchTaskRequest.cmd, request.build())
     if(baseResponse.getStatus == CommandStatus.OK){
       val response = baseResponse.getExtension(SyncMatchTaskResponse.cmd)
-      var seq = fetchConfig.seq
+      //var seq = fetchConfig.seq
       val iter = response.getMatchTaskList.iterator()
       try {
         while (iter.hasNext) {
@@ -322,7 +324,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             //TODO queryDBConfig 添加是否更新校验
             queryService.addMatchTask(matchTask)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType)
-            seq = matchTask.getObjectId
+            //seq = matchTask.getObjectId
           }
         }
       } catch {
@@ -330,12 +332,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           error(e.getMessage,e)
       }
       //如果获取到数据递归获取
-      if(response.getMatchTaskCount > 0 && fetchConfig.seq != seq){
+ /*     if(response.getMatchTaskCount  > 0 && fetchConfig.seq != seq){
         //更新配置seq
         fetchConfig.seq = seq
         updateSeq(fetchConfig)
         fetchMatchTask(fetchConfig, update)
-      }
+      }*/
     }
   }
 
@@ -358,8 +360,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           request.setSid(tmp)
           request.setDbid(fetchConfig.dbid)
 
-          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).head) //6.2比对任务的捺印卡号
-          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).head) //6.2比对任务的查询类型
+          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
+          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
 
           val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
           if(baseResponse.getStatus == CommandStatus.OK){
@@ -370,7 +372,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
                 //获取候选信息
                 val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+		            val configMap = fetchQueryService.getAfisinitConfig()
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
                 info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
               }
             }

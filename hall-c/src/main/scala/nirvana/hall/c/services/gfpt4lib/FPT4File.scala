@@ -270,65 +270,65 @@ object FPT4File {
   class Logic03Rec extends DynamicFingerData {
     var head = new LogicHeadV4
     @Length(6)
-    var index: String = _
+    var index: String = _   //序号
     @Length(4)
-    var systemType: String = _
+    var systemType: String = _    //系统类型
     @Length(23)
-    var caseId: String = _
+    var caseId: String = _    //案件编号
     @Length(23)
-    var cardId: String = _
+    var cardId: String = _     //卡号
     @Length(6)
-    var caseClass1Code: String = _
+    var caseClass1Code: String = _    //案件类别1
     @Length(6)
-    var caseClass2Code: String = _
+    var caseClass2Code: String = _    //案件类别2
     @Length(6)
-    var caseClass3Code: String = _
+    var caseClass3Code: String = _    //案件类别3
     @Length(8)
-    var occurDate: String = _
+    var occurDate: String = _   //发案日期
     @Length(6)
-    var occurPlaceCode: String = _
+    var occurPlaceCode: String = _    //发案地点代码
     @Length(70)
-    var occurPlace: String = _
+    var occurPlace: String = _    //发案地点
     @Length(512)
-    var caseBriefDetail: String = _
+    var caseBriefDetail: String = _   //简要案情
     @Length(1)
-    var isMurder: String = _
+    var isMurder: String = _    //命案标识
     @Length(10)
-    var amount: String = _
+    var amount: String = _    //涉案金额
     @Length(12)
-    var extractUnitCode: String = _
+    var extractUnitCode: String = _   //提取单位代码
     @Length(70)
-    var extractUnitName: String = _
+    var extractUnitName: String = _   //提取单位名称
     @Length(8)
-    var extractDate: String = _
+    var extractDate: String = _   //提取日期
     @Length(30)
-    var extractor: String = _
+    var extractor: String = _   //提取人
     @Length(6)
-    var suspiciousArea1Code: String = _
+    var suspiciousArea1Code: String = _   //可疑地区线索1
     @Length(6)
-    var suspiciousArea2Code: String = _
+    var suspiciousArea2Code: String = _   //可疑地区线索2
     @Length(6)
-    var suspiciousArea3Code: String = _
+    var suspiciousArea3Code: String = _   //可疑地区线索3
     @Length(1)
-    var assistLevel: String = _
+    var assistLevel: String = _   //协查级别
     @Length(6)
-    var bonus: String = _
+    var bonus: String = _   //奖金
     @Length(12)
-    var assistUnitCode: String = _
+    var assistUnitCode: String = _    //协查单位代码
     @Length(70)
-    var assistUnitName: String = _
+    var assistUnitName: String = _    //协查单位名称
     @Length(8)
-    var assistDate: String = _
+    var assistDate: String = _    //协查日期
     @Length(1)
-    var isCaseAssist: String = _
+    var isCaseAssist: String = _    //案件协查标识
     @Length(1)
-    var isRevoke: String = _
+    var isRevoke: String = _    //部撤销标识
     @Length(1)
-    var caseStatus: String = _
+    var caseStatus: String = _    //案件状态
     @Length(2)
-    var fingerCount: String = _
+    var fingerCount: String = _   //本案现场指纹个数
     @Length(2)
-    var sendFingerCount: String = _
+    var sendFingerCount: String = _   //发送现场指纹个数
     @LengthRef("sendFingerCount")
     var fingers: Array[FingerLData] = _
 
@@ -341,67 +341,67 @@ object FPT4File {
    */
   class FingerLData extends AncientData{
     @Length(7)
-    var dataLength: String = _
+    var dataLength: String = _    //指纹信息长度
     @Length(2)
-    var sendNo: String = _
+    var sendNo: String = _    //发送序号
     @Length(2)
-    var fingerNo: String = _
+    var fingerNo: String = _    //指纹序号
     @Length(25)
-    var fingerId: String = _
+    var fingerId: String = _    //指纹编号
     @Length(1)
-    var isCorpse: String = _
+    var isCorpse: String = _    //是否为尸体指纹
     @Length(23)
-    var corpseNo: String = _
+    var corpseNo: String = _    //未知名尸体编号
     @Length(30)
-    var remainPlace: String = _
+    var remainPlace: String = _   //遗留部位
     @Length(10)
-    var fgp: String = _
+    var fgp: String = _   //分析指位
     @Length(1)
-    var ridgeColor: String = _
+    var ridgeColor: String = _    //乳突线颜色
     @Length(2)
-    var mittensBegNo: String = _
+    var mittensBegNo: String = _    //连指开始序号
     @Length(2)
-    var mittensEndNo: String = _
+    var mittensEndNo: String = _    //连指结束序号
     @Length(1)
-    var isFingerAssist: String = _
+    var isFingerAssist: String = _    //指纹协查标识
     @Length(1)
-    var matchStatus: String = _
+    var matchStatus: String = _   //指纹比对状态
     @Length(1)
-    var extractMethod: String = _
+    var extractMethod: String = _   //特征提取方式
     @Length(7)
-    var pattern: String = _
+    var pattern: String = _   //指纹纹型分类
     @Length(5)
-    var fingerDirection: String = _
+    var fingerDirection: String = _   //指纹方向
     @Length(14)
-    var centerPoint: String = _
+    var centerPoint: String = _   //中心点
     @Length(14)
-    var subCenterPoint: String = _
+    var subCenterPoint: String = _    //副中心
     @Length(14)
-    var leftTriangle: String = _
+    var leftTriangle: String = _    //左三角
     @Length(14)
-    var rightTriangle: String = _
+    var rightTriangle: String = _   //右三角
     @Length(3)
-    var featureCount: String = _
+    var featureCount: String = _    //特征点个数
     @NotTrim
     @Length(1800)
-    var feature: String = _
+    var feature: String = _   //特征点
     @Length(6)
-    var customInfoLength: String = _
+    var customInfoLength: String = _    //自定义信息长度
     @LengthRef("customInfoLength")
-    var customInfo: Array[Byte] = _
+    var customInfo: Array[Byte] = _   //自定义信息
     @Length(3)
-    var imgHorizontalLength: String = _
+    var imgHorizontalLength: String = _   //图像水平方向长度
     @Length(3)
-    var imgVerticalLength: String = _
+    var imgVerticalLength: String = _   //图像垂直方向长度
     @Length(3)
-    var dpi: String = _
+    var dpi: String = _   //图像分辨率
     @Length(4)
-    var imgCompressMethod: String = _
+    var imgCompressMethod: String = _   //图像压缩方法代码
     @Length(6)
-    var imgDataLength: String = _
+    var imgDataLength: String = _   //图像长度
     @LengthRef("imgDataLength")
-    var imgData: Array[Byte] = _
-    var end: Byte = FPTFile.GS
+    var imgData: Array[Byte] = _    //图像数据
+    var end: Byte = FPTFile.GS    //分隔符或结束符
   }
 
   /**

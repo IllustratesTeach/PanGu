@@ -1,15 +1,16 @@
 package nirvana.hall.api.webservice.util
 
-
 import javax.activation.DataHandler
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerTData, Logic02Rec}
-import nirvana.hall.protocol.api.FPTProto.TPCard
+
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerLData, FingerTData, Logic02Rec, Logic03Rec}
+import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 /**
   * Created by yuchen on 2016/12/2.
   */
 object FPTFileBuilder {
+
 
   /**
     * 空FPT
@@ -18,6 +19,7 @@ object FPTFileBuilder {
 
   /**
     * protobuffer转换为十指指纹FPT
+    *
     * @param card 人员卡号
     * @param logic02RecsNum 逻辑记录类的数量
     * @return FPT4File对象
@@ -138,4 +140,125 @@ object FPTFileBuilder {
     fpt4File
 
   }
+
+  /**
+    * protobuffer转换为案件指纹FPT
+    *
+    * @param card 案件卡号
+    * @param logic03RecsNum 逻辑记录类的数量
+    * @author ssj
+    * @return FPT4File对象
+    */
+  def convertProtoBuf2LPFPT4File(card: LPCard,caseInfo: Case, logic03RecsNum: Int = 1): FPT4File = {
+    val fpt4File = new FPT4File
+    fpt4File.head.flag = "FPT"
+    fpt4File.head.majorVersion = "04"
+    fpt4File.head.minorVersion = "00"
+    fpt4File.fileLength = ""
+    fpt4File.tpCount = "0"
+    fpt4File.lpCount = "1"
+    fpt4File.tl_ltCount = "0"
+    fpt4File.ttCount = "0"
+    fpt4File.llCount = "0"
+    fpt4File.lpRequestCount = "0"
+    fpt4File.tpRequestCount = "0"
+    fpt4File.ltCandidateCount =  "0"
+    fpt4File.tlCandidateCount = "0"
+    fpt4File.ttCandidateCount = "0"
+    fpt4File.llCandidateCount = "0"
+    fpt4File.customCandidateCount = "0"
+    fpt4File.sendTime = ""
+    fpt4File.receiveUnitCode = ""
+    fpt4File.sendUnitCode = ""
+    fpt4File.sendUnitName = ""
+    fpt4File.sender = ""
+    fpt4File.sendUnitSystemType =""
+    fpt4File.sid = ""
+    fpt4File.remark = ""
+
+
+    val arrLogic03Rec = new Array[Logic03Rec](logic03RecsNum)
+    for( i <- 0 to  logic03RecsNum-1){
+
+      val logic03Rec = new Logic03Rec
+      logic03Rec.head.fileLength = "0"
+      logic03Rec.head.dataType = "0"
+      logic03Rec.index = ""
+      logic03Rec.systemType = ""
+      logic03Rec.caseId = caseInfo.getStrCaseID
+      logic03Rec.cardId = caseInfo.getStrCaseID
+      logic03Rec.caseClass1Code = caseInfo.getText.getStrCaseType1
+      logic03Rec.caseClass2Code = caseInfo.getText.getStrCaseType2
+      logic03Rec.caseClass3Code = caseInfo.getText.getStrCaseType3
+      logic03Rec.occurDate = caseInfo.getText.getStrCaseOccurDate
+      logic03Rec.occurPlaceCode = caseInfo.getText.getStrCaseOccurPlaceCode
+      logic03Rec.occurPlace = caseInfo.getText.getStrCaseOccurPlace
+      logic03Rec.caseBriefDetail = caseInfo.getText.getStrComment
+      logic03Rec.isMurder = if(caseInfo.getText.getBPersonKilled) "1" else "0"
+      logic03Rec.amount = caseInfo.getText.getStrMoneyLost
+      logic03Rec.extractUnitCode = caseInfo.getText.getStrExtractUnitCode
+      logic03Rec.extractUnitName = caseInfo.getText.getStrExtractUnitName
+      logic03Rec.extractDate = caseInfo.getText.getStrExtractDate
+      logic03Rec.extractor = caseInfo.getText.getStrExtractor
+      logic03Rec.suspiciousArea1Code = caseInfo.getText.getStrSuspArea1Code
+      logic03Rec.suspiciousArea2Code = caseInfo.getText.getStrSuspArea2Code
+      logic03Rec.suspiciousArea3Code = caseInfo.getText.getStrSuspArea3Code
+      logic03Rec.assistLevel = caseInfo.getText.getNSuperviseLevel.toString
+      logic03Rec.bonus = caseInfo.getText.getStrPremium
+      logic03Rec.assistUnitCode = caseInfo.getText.getStrXieChaRequestUnitName
+      logic03Rec.assistUnitName = caseInfo.getText.getStrXieChaRequestUnitCode
+      logic03Rec.assistDate = caseInfo.getText.getStrXieChaDate
+      logic03Rec.isCaseAssist = caseInfo.getText.getNXieChaState.toString
+      logic03Rec.isRevoke = caseInfo.getText.getNCancelFlag.toString  ///获取到 是 31
+      logic03Rec.caseStatus = caseInfo.getText.getNCaseState.toString
+      logic03Rec.fingerCount = logic03RecsNum.toString
+      val fingerCount = logic03RecsNum
+      logic03Rec.sendFingerCount = fingerCount.toString
+      arrLogic03Rec.update(i,logic03Rec)
+      fpt4File.logic03Recs = arrLogic03Rec
+
+
+
+      val arrFingers = new Array[FingerLData](fingerCount)
+      for(j <- 0 to fingerCount-1) {
+
+        val fingerLData = new FingerLData
+        fingerLData.dataLength = ""
+        fingerLData.sendNo = "" //发送编号如何定义???
+        fingerLData.fingerNo = ""
+        fingerLData.fingerId = ""
+        fingerLData.isCorpse = ""
+        fingerLData.corpseNo = ""
+        fingerLData.remainPlace = card.getText.getStrRemainPlace
+        fingerLData.fgp = ""
+        fingerLData.ridgeColor = card.getText.getStrRidgeColor
+        fingerLData.mittensBegNo = card.getText.getStrStart
+        fingerLData.mittensEndNo = card.getText.getStrEnd
+        fingerLData.isFingerAssist = card.getText.getNXieChaState.toString
+        fingerLData.matchStatus = card.getText.getNBiDuiState.toString
+        fingerLData.extractMethod = card.getText.getStrCaptureMethod
+        fingerLData.pattern = ""
+        fingerLData.fingerDirection = ""
+        fingerLData.centerPoint = ""
+        fingerLData.subCenterPoint = ""
+        fingerLData.leftTriangle = ""
+        fingerLData.rightTriangle = ""
+        fingerLData.featureCount = card.getBlob.getStMntBytes.size.toString //特征点个数
+        fingerLData.feature = card.getBlob.getStMnt
+        fingerLData.customInfoLength = ""
+        fingerLData.customInfo = new Array[Byte](0)
+        fingerLData.imgHorizontalLength = "640"
+        fingerLData.imgVerticalLength = "640"
+        fingerLData.dpi = "500"
+        fingerLData.imgCompressMethod = "1900"
+        fingerLData.imgDataLength = ""
+        fingerLData.imgData = new Array[Byte](0)
+        arrFingers.update(j,fingerLData)
+      }
+      fpt4File.logic03Recs(i).fingers = arrFingers
+    }
+    fpt4File
+
+  }
+
 }

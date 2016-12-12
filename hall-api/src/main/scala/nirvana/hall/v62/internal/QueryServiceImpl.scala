@@ -82,7 +82,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   /**
    * 发送查询任务
    * @param matchTask
-   * @return
+   * @return 查询任务号
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
     val key = matchTask.getMatchId.getBytes()
@@ -127,6 +127,29 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
 
     MatchStatus.UN_KNOWN
+  }
+
+  /**
+    * 根据卡号信息发送查询, 不需要特征信息
+    * @param matchTask 只有查询信息不需要特征信息
+    * @param queryDBConfig
+    * @return 任务号
+    */
+  override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
+    val key = matchTask.getMatchId.getBytes()
+    val pstKey = new GADB_KEYARRAY
+    pstKey.nKeyCount = 1
+    pstKey.nKeySize = key.size.asInstanceOf[Short]
+    pstKey.pKey_Data = key
+
+    val idx = 1 to 10 map (x => x.asInstanceOf[Byte]) toArray
+    val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask, queryDBConfig)(config)
+    val retvals = facade.NET_GAFIS_QUERY_Submit(config.queryTable.dbId.toShort, config.queryTable.tableId.toShort, pstKey, queryStruct, idx)
+    retvals.foreach{retval =>
+      val queryId = gaqryqueConverter.convertSixByteArrayToLong(retval.nSID)
+      return queryId
+    }
+    0
   }
   /**
    * 获取DBID

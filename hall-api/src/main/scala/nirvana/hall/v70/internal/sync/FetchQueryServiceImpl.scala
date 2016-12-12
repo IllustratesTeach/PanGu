@@ -29,7 +29,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param size
     * @return
     */
-  override def fetchMatchTask(seq: Long, size: Int, dbId: Option[String]): Seq[MatchTask] = {
+  override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
     GafisNormalqueryQueryque.find_by_status(0.toShort).limit(size).map{gafisQuery=>
       ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
     }.toSeq
@@ -40,7 +40,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
  *
     * @param matchResult
     */
-  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
+  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(), configMap : scala.collection.mutable.HashMap[String, String]) = {
     val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid =?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
@@ -88,6 +88,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
         matchResult.setTimeElapsed(queryQue.timeElapsed)
         matchResult.setRecordNumMatched(queryQue.recordNumMatched)
         matchResult.setMaxScore(queryQue.hitpossibility.toInt)
+        matchResult.setMaxcandnum(queryQue.maxcandnum.toLong) //最大候选数量
         return Option(matchResult.build())
       }
     }
@@ -186,13 +187,12 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param oraSid
     * @param status
     */
-  override def updateMatchStatus(oraSid: Long, status: Int): Unit = {
-  }
+  override def updateMatchStatus(oraSid: Long, status: Int): Unit = ???
 
   /**
     * 根据orasid获取对应任务的捺印卡号 keyId
     *
-    * @param sid
+    * @param oraSid
     */
   override def getKeyIdArrByOraSid(oraSid: Long): Seq[String] = ???
 
@@ -202,4 +202,22 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param sid
     */
   override def getQueryTypeArrByOraSid(sid: Long): Seq[String] = ???
+  
+    /**
+    * 获得配置信息
+    */
+  override def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]  = ???
+
+  /**
+    * 获得Ora_UUID 比对任务对应的唯一标识
+    * @return
+    */
+  override def getOraUUID(oraSid: Long): Seq[String]= ???
+
+  /**
+    * 保存抓取记录
+    * @param ORA_UUID
+    * @return
+    */
+  override def saveFetchRecord(ORA_UUID: String)= ???
 }

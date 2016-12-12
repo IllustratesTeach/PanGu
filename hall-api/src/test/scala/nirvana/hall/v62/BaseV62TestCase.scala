@@ -56,16 +56,16 @@ class BaseV62TestCase {
 
   def createFacade:V62Facade = {
     val config = new HallV62Config
-    config.appServer.host = "10.1.6.182"
-    config.appServer.port = 6798
+    config.appServer.host = "192.168.0.214"
+    config.appServer.port = 6898
     config.appServer.user = "afisadmin"
     config.appServer.password=""
     new V62Facade(config)
   }
   def executeInContext[T](function: => T): Unit ={
     val config = new HallV62Config
-    config.appServer.host = "10.1.6.182"
-    config.appServer.port = 6798
+    config.appServer.host = "192.168.0.214"
+    config.appServer.port = 6898
     config.appServer.user = "afisadmin"
     config.appServer.password=""
 

@@ -1,18 +1,21 @@
 package nirvana.hall.api.webservice.services.internal
 
 import javax.activation.DataHandler
+import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.TPCardService
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
-import nirvana.hall.api.webservice.util.{FPTFileBuilder}
+import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.AncientConstants
+import nirvana.hall.support.services.JdbcDatabase
 import org.apache.axiom.attachments.ByteArrayDataSource
+
 
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl(tpCardService: TPCardService) extends WsFingerService with LoggerSupport
+class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService,implicit val dataSource: DataSource) extends WsFingerService with LoggerSupport
 {
 
   /**
@@ -88,14 +91,46 @@ class WsFingerServiceImpl(tpCardService: TPCardService) extends WsFingerService 
     */
   override def getLatent(userid: String, password: String, ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): DataHandler = ???
 
+
   /**
     * 通过查询参数返回指定返回相应案件的全部信息（包含文字信息和图像信息）
     *
     * @param userid   用户名
     * @param password 密码
     * @param ajno     案件编号
+    * @author ssj
     * @return 返回的FPT文件信息需用soap的附件形式存储，只返回相应文字信息，不包含图像信息（FPT文件中132项“发送现场指纹个数”应为0）
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
-  override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = ???
+  override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
+    info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{}",userid,password,ajno)
+    try{
+      val ss = ajno.split("A")
+      val caseid = ss(1)
+      if(caseInfoService.isExist(caseid)){
+        var fingerid = ""
+
+        val sql = "select t.fingerid from NORMALLP_LATFINGER t where t.caseid =?"
+        JdbcDatabase.queryFirst(sql) { ps =>
+          ps.setString(1, caseid)
+        } { rs =>
+          fingerid = rs.getString("fingerid")
+        }.get
+
+        val lpCard = lpCardService.getLPCard(fingerid)   //NORMALLP_LATFINGER  fingerid
+        val caseInfo = caseInfoService.getCaseInfo(caseid)  //NORMALLP_CASE  caseid
+
+        val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCard,caseInfo)
+        new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
+      }else{
+        FPTFileBuilder.emptyFPT
+      }
+
+    }catch{
+      case e : Exception => error("fun:getLatentFinger Exception" +
+        ",inputParam-userid:{};password:{};ajno:{},errormessage:{}"
+        ,userid,password,ajno,e.getMessage)
+        FPTFileBuilder.emptyFPT
+    }
+  }
 }

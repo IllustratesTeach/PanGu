@@ -1,4 +1,4 @@
-package nirvana.hall.extractor.internal
+package nirvana.hall.api.internal
 
 import java.awt.Image
 import java.awt.color.ColorSpace
@@ -7,16 +7,16 @@ import java.io.{ByteArrayInputStream, InputStream}
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
+import nirvana.hall.api.jni.NativeExtractor
+import nirvana.hall.api.services.FeatureExtractor
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def
 import nirvana.hall.c.services.kernel.mnt_def._
-import nirvana.hall.extractor.HallExtractorConstants
-import nirvana.hall.extractor.jni.NativeExtractor
-import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 import nirvana.hall.support.HallSupportConstants
-import nirvana.hall.support.services.GAFISImageReaderSpi
+import nirvana.hall.support.services.{GAFISImageReaderSpi, HallExtractorConstants}
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -27,7 +27,6 @@ import org.jboss.netty.buffer.ChannelBuffers
  * @since 2015-12-11
  */
 class FeatureExtractorImpl extends FeatureExtractor{
-  final private val FINGERMNTSTRUCT_NEWTT_SIZE = new FINGERMNTSTRUCT_NEWTT().getDataSize
   val iioRegistry = IIORegistry.getDefaultInstance
   iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
@@ -40,7 +39,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
    */
   override def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]] = {
     val feature  = new GAFISIMAGESTRUCT().fromByteArray(IOUtils.toByteArray(oldMnt))
-    val nmnt = ChannelBuffers.buffer(FINGERMNTSTRUCT_NEWTT_SIZE)
+    val nmnt = ChannelBuffers.buffer(mnt_def.FINGERMNTSTRUCT_NEWTT_SIZE)
     val newMntBuffer = nmnt.array()
     NativeExtractor.ConvertMntOldToNew(feature.bnData,newMntBuffer)
     feature.bnData = newMntBuffer
@@ -102,8 +101,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
     val mntData = mntBuffer.array()
 
     val sbinHead = new GAFISIMAGEHEADSTRUCT
-    val binBuffer = ChannelBuffers.buffer(20480 *  imgHead.nWidth/640 * imgHead.nHeight /640)
-    //val binBuffer = ChannelBuffers.buffer(20480*10)
+    //val binBuffer = ChannelBuffers.buffer(20480 *  imgHead.nWidth/640 * imgHead.nHeight /640)
+    val binBuffer = ChannelBuffers.buffer(20480*10)
 //    println(binBuffer.capacity())
     sbinHead.writeToStreamWriter(binBuffer)
     val binData = binBuffer.array()

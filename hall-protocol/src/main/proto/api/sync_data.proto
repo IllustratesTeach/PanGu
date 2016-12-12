@@ -124,10 +124,10 @@ message SyncMatchTaskRequest{
     extend monad.rpc.protocol.BaseCommand{
         optional SyncMatchTaskRequest cmd = 10608;
     }
-    required int64 seq = 1;
+   // optional int64 seq = 1;
     //数据大小，一次传送的数据大小,默认为1
-    optional int32 size = 2 [default = 1];
-    optional string dbid = 3;
+    optional int32 size = 1 [default = 1];
+    optional string dbid = 2;
 }
 message SyncMatchTaskResponse{
     extend monad.rpc.protocol.BaseCommand{

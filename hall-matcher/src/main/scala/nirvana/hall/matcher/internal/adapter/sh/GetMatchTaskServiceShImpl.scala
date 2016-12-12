@@ -114,16 +114,14 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         //逻辑库
         if(json.has("logicDBValues")){
           val logicDB = json.getString("logicDBValues")
-          if(logicDB.indexOf("|") > 0){
-            val values = logicDB.split("|")
-            val groupQuery = GroupQuery.newBuilder()
-            values.foreach{value =>
-              val keywordQuery = KeywordQuery.newBuilder()
-              keywordQuery.setValue(value)
-              groupQuery.addClauseQueryBuilder().setName("logicDB").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
-            }
-            textQuery.addQueryBuilder().setName("logicDB").setExtension(GroupQuery.query, groupQuery.build())
+          val values = logicDB.split("\\|")
+          val groupQuery = GroupQuery.newBuilder()
+          values.foreach{value =>
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            groupQuery.addClauseQueryBuilder().setName("logicDB").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
           }
+          textQuery.addQueryBuilder().setName("logicDB").setExtension(GroupQuery.query, groupQuery.build())
         }
       }
       catch {
