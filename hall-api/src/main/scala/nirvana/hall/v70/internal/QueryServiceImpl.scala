@@ -83,4 +83,14 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   override def findFirstQueryStatusByCardIdAndMatchType(cardId: String, matchType: MatchType, dbId: Option[String]): MatchStatus = {
     throw new UnsupportedOperationException
   }
+
+  /**
+    * 根据卡号信息发送查询, 不需要特征信息
+    * @param matchTask 只有查询信息不需要特征信息
+    * @param queryDBConfig
+    * @return 任务号
+    */
+  override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long = {
+    throw new UnsupportedOperationException
+  }
 }
