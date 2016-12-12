@@ -109,6 +109,21 @@ trait FetchQueryService {
     * 获得配置信息
     */
   def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
+
+  /**
+    * 获得Ora_UUID 比对任务对应的唯一标识
+    * @param oraSid
+    * @return
+    */
+  def getOraUUID(oraSid: Long): Seq[String]
+
+  /**
+    * 保存抓取记录
+    * @param ORA_UUID
+    * @return
+    */
+  def saveFetchRecord(ORA_UUID: String)
+
 }
 
 
