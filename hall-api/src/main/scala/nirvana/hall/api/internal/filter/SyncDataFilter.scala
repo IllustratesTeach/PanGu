@@ -178,11 +178,12 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         * sjr 2016/11/29
         * 更新状态
         */
-/*      if(matchTaskList!=null&&matchTaskList.size>0) {
+      if(matchTaskList!=null&&matchTaskList.size>0) {
         matchTaskList.foreach { matchTask =>
-          fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+          //fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+          fetchQueryService.saveFetchRecord(fetchQueryService.getOraUUID(matchTask.getObjectId).headOption.get) //按照Ora_sid查询比对任务表中的ora_UUID保存到记录表中
         }
-      }*/
+      }
 
       true
     }else if(commandRequest.hasExtension(SyncMatchResultRequest.cmd)){
