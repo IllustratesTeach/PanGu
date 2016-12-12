@@ -6,6 +6,7 @@ import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
 import nirvana.hall.api.{HallApiConstants, HallApiModule, HallApiSymbols}
+import nirvana.hall.extractor.jni.JniLoader
 import org.slf4j.LoggerFactory
 
 /**
@@ -19,10 +20,13 @@ object HallApiApp
   with SystemEnvDetectorSupport
   with BootstrapTextSupport {
   def main(args: Array[String]) {
+
     val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
     val config = HallApiModule.buildHallApiConfig(serverHome)
     configLogger(config.logFile, "API", "egf", "nirvana.hall")
+
+    JniLoader.loadJniLibrary(serverHome,config.logFile)
 
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall api server ....")

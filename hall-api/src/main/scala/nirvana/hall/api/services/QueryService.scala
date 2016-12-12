@@ -16,7 +16,7 @@ trait QueryService {
    * @param matchTask
    * @return 任务号
    */
-  def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig = null): Long
+  def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
 
   /**
    * 获取查询结果信息
@@ -39,4 +39,11 @@ trait QueryService {
    */
   def findFirstQueryStatusByCardIdAndMatchType(cardId:String, matchType: MatchType, dbId: Option[String] = None):MatchStatus
 
+  /**
+    * 根据卡号信息发送查询, 不需要特征信息
+    * @param matchTask 只有查询信息不需要特征信息
+    * @param queryDBConfig
+    * @return 任务号
+    */
+  def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
 }

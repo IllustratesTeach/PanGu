@@ -12,6 +12,7 @@ import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import org.slf4j.LoggerFactory
 
 /**
  * Created by songpeng on 16/6/17.
@@ -165,20 +166,23 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
 
       var matchTaskList: Seq[MatchTask] = null
       if(hallReadConfigOpt.nonEmpty){
-        matchTaskList = fetchQueryService.fetchMatchTask(request.getSeq, request.getSize, dbId)
+        matchTaskList = fetchQueryService.fetchMatchTask(request.getSize, dbId)
         matchTaskList.foreach{matchTask=>
           responseBuilder.addMatchTask(matchTask)
         }
-        hallReadConfigOpt.get.seq = request.getSeq
-        updateSeq(hallReadConfigOpt.get)
+        //hallReadConfigOpt.get.seq = request.getSeq
+        //updateSeq(hallReadConfigOpt.get)
       }
       commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
       /**
         * sjr 2016/11/29
         * 更新状态
         */
-      matchTaskList.foreach{matchTask=>
-        fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+      if(matchTaskList!=null&&matchTaskList.size>0) {
+        matchTaskList.foreach { matchTask =>
+          //fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq
+          fetchQueryService.saveFetchRecord(fetchQueryService.getOraUUID(matchTask.getObjectId).headOption.get) //按照Ora_sid查询比对任务表中的ora_UUID保存到记录表中
+        }
       }
 
       true
@@ -190,13 +194,13 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       //验证是否有权限
       val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RESULT, request.getDbid, "1").headOption
       if(hallReadConfigOpt.nonEmpty){
-        val status = fetchQueryService.getMatchStatusByQueryid(request.getSid)
+        val status = fetchQueryService.getMatchStatusByQueryid(request.getSid, request.getPkid, request.getTyp.toShort)
         responseBuilder.setMatchStatus(status)
-        val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, dbId)
+        val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, request.getPkid, request.getTyp.toShort, dbId)
         if(matchResultOpt.nonEmpty) {
           responseBuilder.setMatchResult(matchResultOpt.get)
-          hallReadConfigOpt.get.seq = request.getSid
-          updateSeq(hallReadConfigOpt.get)
+          //hallReadConfigOpt.get.seq = request.getSid
+          //updateSeq(hallReadConfigOpt.get)
         }
       }else{
         responseBuilder.setMatchStatus(MatchStatus.UN_KNOWN)
