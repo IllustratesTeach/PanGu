@@ -187,8 +187,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @param oraSid
     * @param status
     */
-  override def updateMatchStatus(oraSid: Long, status: Int): Unit = {
-  }
+  override def updateMatchStatus(oraSid: Long, status: Int): Unit = ???
 
   /**
     * 根据orasid获取对应任务的捺印卡号 keyId
