@@ -388,7 +388,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @param ORA_UUID
     */
   def saveFetchRecord(ORA_UUID: String)={
-    val sql ="update HALL_FETCH_RECORD_7TO6 t set t.ora_uuid=?"
+    val sql ="insert into HALL_FETCH_RECORD_7TO6 ORA_UUID  values(?)"
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, ORA_UUID)
     }
