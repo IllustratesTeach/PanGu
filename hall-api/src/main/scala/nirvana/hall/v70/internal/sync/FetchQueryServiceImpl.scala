@@ -208,4 +208,17 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * 获得配置信息
     */
   override def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]  = ???
+
+  /**
+    * 获得Ora_UUID 比对任务对应的唯一标识
+    * @return
+    */
+  override def getOraUUID(oraSid: Long): Seq[String]= ???
+
+  /**
+    * 保存抓取记录
+    * @param ORA_UUID
+    * @return
+    */
+  override def saveFetchRecord(ORA_UUID: String)
 }
