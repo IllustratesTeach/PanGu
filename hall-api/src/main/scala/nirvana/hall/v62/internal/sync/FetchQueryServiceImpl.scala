@@ -34,10 +34,10 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     */
   override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
     val matchTaskList = new ArrayBuffer[MatchTask]
-    val sql = "select * from (select ora_uuid from  "
+    val sql = ("select * from (select ora_uuid from  "
               +"( select t.ora_uuid  from NORMALQUERY_QUERYQUE t where  t.status<=2 "
               +"and not exists (select h.ora_uuid from Hall_Fetch_Record_7to6 h where h.ora_uuid=t.ora_uuid) ) t1 ) "
-              +" where  rownum <=1" //取消seq作为查询条件
+              +" where  rownum <=?") //取消seq作为查询条件
 
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
       //ps.setLong(1, seq)
