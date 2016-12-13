@@ -295,19 +295,23 @@ object gaqryqueConverter {
    * @return
    */
   def convertCandList2GAQUERYCANDSTRUCT(candList: Array[Byte]): Seq[MatchResultObject]={
-    val buffer = ChannelBuffers.wrappedBuffer(candList)
-    val result = mutable.Buffer[MatchResultObject]()
-    while(buffer.readableBytes() >= 96) {
-      val gaCand = new GAQUERYCANDSTRUCT
-      gaCand.fromStreamReader(buffer)
-      val matchResultObject = MatchResultObject.newBuilder()
-      matchResultObject.setObjectId(gaCand.szKey)
-      matchResultObject.setPos(gaCand.nIndex)
-      matchResultObject.setScore(gaCand.nScore)
-      matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
-      result += matchResultObject.build()
+    if(candList != null && candList.size > 0){
+      val buffer = ChannelBuffers.wrappedBuffer(candList)
+      val result = mutable.Buffer[MatchResultObject]()
+      while(buffer.readableBytes() >= 96) {
+        val gaCand = new GAQUERYCANDSTRUCT
+        gaCand.fromStreamReader(buffer)
+        val matchResultObject = MatchResultObject.newBuilder()
+        matchResultObject.setObjectId(gaCand.szKey)
+        matchResultObject.setPos(gaCand.nIndex)
+        matchResultObject.setScore(gaCand.nScore)
+        matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
+        result += matchResultObject.build()
+      }
+      result
+    }else{
+      Seq()
     }
-    result.toSeq
   }
 
 }

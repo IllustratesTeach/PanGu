@@ -50,7 +50,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult]= {
     val matchResult = MatchResult.newBuilder()
     val queryQue = GafisNormalqueryQueryque.find_by_oraSid(oraSid).head
-    if(queryQue.status >= 2){
+    if(queryQue.status == QueryConstants.STATUS_SUCCESS){
       val matchResultObj = gaqryqueConverter.convertCandList2GAQUERYCANDSTRUCT(queryQue.candlist)
       matchResultObj.foreach{cand=>
         matchResult.addCandidateResult(cand)
