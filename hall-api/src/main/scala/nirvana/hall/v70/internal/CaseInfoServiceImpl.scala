@@ -102,4 +102,21 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
   override def isExist(caseId: String, dbId: Option[String]): Boolean = {
     GafisCase.findOption(caseId).nonEmpty
   }
+
+  /**
+    * 查询案件编号列表
+    *
+    * @param ajno        案件编号
+    * @param ajlb        案件类别
+    * @param fadddm      发案地代码
+    * @param mabs        命案标识
+    * @param xcjb        协查级别
+    * @param xcdwdm      查询单位代码
+    * @param startfadate 开始时间（检索发案时间，时间格式YYYYMMDD）
+    * @param endfadate   结束时间（检索发案时间，时间格式YYYYMMDD）
+    * @return
+    */
+  override def getCaseIdList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[String] = {
+    throw new UnsupportedOperationException
+  }
 }
