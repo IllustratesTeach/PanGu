@@ -1,6 +1,5 @@
 package nirvana.hall.v62.services
 
-import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType

@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.services
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.TPCardService
@@ -8,11 +8,9 @@ import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 
 /**
- *
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
- * @since 2015-11-04
+ * TPCardServiceImpl v62 单元测试类
  */
-class TPCardFilterTest extends BaseV62TestCase{
+class TPCardServiceImplTest extends BaseV62TestCase{
   @Test
   def test_add: Unit ={
     //新建
@@ -131,6 +129,13 @@ class TPCardFilterTest extends BaseV62TestCase{
     val tpCardService = getService[TPCardService]
     val tpCard = tpCardService.getTPCard("1234567890")
     Assert.assertNotNull(tpCard)
+  }
+
+  @Test
+  def test_getCardIdList: Unit ={
+    val tpCardService = getService[TPCardService]
+    val cardIdList = tpCardService.getCardIdList("1234567890", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+    Assert.assertEquals(cardIdList.size, 1)
   }
 
 }
