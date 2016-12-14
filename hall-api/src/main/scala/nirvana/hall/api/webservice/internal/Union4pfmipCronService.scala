@@ -8,7 +8,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
-import nirvana.hall.api.webservice.services.WsSearchTaskService
+import nirvana.hall.api.webservice.services.union4pfmip
 import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
@@ -22,30 +22,29 @@ import stark.webservice.services.StarkWebServiceClient
 /**
   * 互查系统定时任务
   */
-class WsSearchTaskCronService(hallApiConfig: HallApiConfig,
-                              tPCardService: TPCardService,
-                              lPCardService: LPCardService,
-                              caseInfoService: CaseInfoService,
-                              queryService: QueryService,
-                              fetchQueryService: FetchQueryService,
-                              implicit val dataSource: DataSource) extends LoggerSupport{
+class Union4pfmipCronService(hallApiConfig: HallApiConfig,
+                             tPCardService: TPCardService,
+                             lPCardService: LPCardService,
+                             caseInfoService: CaseInfoService,
+                             queryService: QueryService,
+                             fetchQueryService: FetchQueryService,
+                             implicit val dataSource: DataSource) extends LoggerSupport{
 
-  val cronSchedule = "0 0/5 * * * ? *" //TODO 可配置
   /**
     * 定时器，获取比对任务
     * @param periodicExecutor
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-      periodicExecutor.addJob(new CronSchedule(cronSchedule), "SearchTaskWsService-cron", new Runnable {
+      periodicExecutor.addJob(new CronSchedule(hallApiConfig.webservice.union4pfmip.cron), "union4pfmip-cron", new Runnable {
         override def run(): Unit = {
           //发送请求获取任务
-          val url = "http://127.0.0.1:8080/ws/WsSearchTaskService?wsdl"
-          val targetNamespace = "http://www.egfit.cn/"
-          val userid = ""
-          val password = ""
+          val url = hallApiConfig.webservice.union4pfmip.url
+          val targetNamespace = hallApiConfig.webservice.union4pfmip.targetNamespace
+          val userid = hallApiConfig.webservice.union4pfmip.user
+          val password = hallApiConfig.webservice.union4pfmip.password
           var taskControlID = ""
-          val searchTaskService = StarkWebServiceClient.createClient(classOf[WsSearchTaskService], url, targetNamespace)
+          val searchTaskService = StarkWebServiceClient.createClient(classOf[union4pfmip], url, targetNamespace)
           val taskDataHandler = searchTaskService.getSearchTask(userid, password)
 
             try{

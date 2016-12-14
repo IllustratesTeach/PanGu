@@ -24,6 +24,8 @@ class HallApiConfig
 
     @XmlElement(name = "sync")
     var sync: SyncConfig = new SyncConfig
+    @XmlElement(name = "webservice")
+    var webservice = new WebserviceConfig
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -33,4 +35,26 @@ class SyncConfig {
     var batchSize: Int = 1
     @XmlElement(name = "sync_cron")
     var syncCron: String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "WebserviceConfig")
+class WebserviceConfig{
+    @XmlElement(name = "union4pfmip")
+    var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Union4pfmip")
+class Union4pfmipConfig{
+    @XmlElement(name = "cron")
+    var cron: String = _
+    @XmlElement(name = "url")
+    var url: String = _
+    @XmlElement(name = "target_amespace")
+    var targetNamespace: String = _
+    @XmlElement(name = "user")
+    var user: String = _
+    @XmlElement(name = "password")
+    var password: String = _
 }

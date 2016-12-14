@@ -6,8 +6,8 @@ import javax.jws.{WebMethod, WebService}
 /**
   * 互查系统提供的获取比对任务接口
   */
-@WebService(serviceName = "WsSearchTaskService", targetNamespace = "http://www.egfit.com/")
-trait WsSearchTaskService {
+@WebService(serviceName = "union4pfmip", targetNamespace = "http://www.union4pfmip.com")
+trait union4pfmip {
 
   /**
     * 获取十指指纹查重\现场正查协查任务
