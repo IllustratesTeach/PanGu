@@ -88,10 +88,10 @@ object FPTFileHandler {
     * @param featureType 特征类型
     * @return
     */
-  def extractorFeature(img: GAFISIMAGESTRUCT,fingerPos: FingerPosition, featureType: FeatureType): Option[GAFISIMAGESTRUCT] = {
+  def extractorFeature(img: GAFISIMAGESTRUCT,fingerPos: FingerPosition, featureType: FeatureType): Option[(GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {
     loadExtractorJNI
     val (mnt, bin) = extractor.extractByGAFISIMG(img, fingerPos, featureType)
-    Some(mnt)
+    Some(mnt,bin)
   }
 
 
@@ -130,5 +130,11 @@ object FPTFileHandler {
       NativeExtractor.ConvertFPTLatentMNT2Std(dispBytes, bytes)
       new FINGERLATMNTSTRUCT().fromByteArray(bytes)
     }
+  }
+
+  def createImageLatentEvent(disp: MNTDISPSTRUCT): Array[Byte] = {
+    loadExtractorJNI
+    val latentFeature = FPTLatentConverter.convert(disp)
+    latentFeature.toByteArray()
   }
 }
