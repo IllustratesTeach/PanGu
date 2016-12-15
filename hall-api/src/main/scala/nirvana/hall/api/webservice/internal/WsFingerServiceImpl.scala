@@ -42,7 +42,27 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         每次返回的FPT信息数量不多于256条
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
-  override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = ???
+  override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = {
+      info("fun:getTenprintRecord,inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{}",userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate)
+      try{
+        //1 根据查询条件查询 cardIdList
+        val cardIdList = tpCardService.getCardIdList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
+        //2 使用 cardIdList 查询捺印基础数据 list
+        if(null != cardIdList && cardIdList.size > 0){
+        //3 将捺印文字信息数据集合 封装成FPT
+          val tpCardList = tpCardService.getTpCardList(cardIdList)
+          val FPT4File = FPTFileBuilder.build(tpCardList)
+          new DataHandler(new ByteArrayDataSource(FPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
+        } else {
+          FPTFileBuilder.emptyFPT
+        }
+      }catch{
+        case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{},errormessage:{}"
+          ,userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate,e.getMessage)
+          e.printStackTrace()
+          FPTFileBuilder.emptyFPT
+      }
+  }
 
   /**
     * 通过查询参数返回指定返回相应人员的全部信息（包含文字信息和图像信息）
