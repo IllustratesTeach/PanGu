@@ -276,8 +276,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config,implicit val dataS
 
   /**
    * 获取DBID
-    *
-    * @param dbId
+   * @param dbId
    */
   private def getDBID(dbId: Option[String]): Short ={
     if(dbId == None){
