@@ -11,6 +11,9 @@ import nirvana.hall.v70.jpa.{GafisGatherPalm, _}
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 /**
  * Created by songpeng on 16/1/26.
  */
@@ -232,4 +235,11 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     * @return
     */
   override def getCardIdList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[String] = ???
+
+  /**
+    * 根据查询捺印卡id列表查询捺印数据
+    * @param cardIdList
+    * @return
+    */
+  override def getTpCardList(cardIdList: Seq[String]): ListBuffer[mutable.HashMap[String, Any]] = ???
 }
