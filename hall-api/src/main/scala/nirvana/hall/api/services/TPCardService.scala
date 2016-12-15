@@ -3,6 +3,8 @@ package nirvana.hall.api.services
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import org.springframework.transaction.annotation.Transactional
 
+import scala.collection.mutable
+
 /**
  * Created by songpeng on 16/1/26.
  */
@@ -67,4 +69,11 @@ trait TPCardService {
     * @return
     */
   def getCardIdList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[String]
+
+  /**
+    * 根据查询捺印卡id列表查询捺印数据
+    * @param cardIdList
+    * @return
+    */
+  def getTpCardList(cardIdList: Seq[String]): mutable.ListBuffer[mutable.HashMap[String,Any]]
 }
