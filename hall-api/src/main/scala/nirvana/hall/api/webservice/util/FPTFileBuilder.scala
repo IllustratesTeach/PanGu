@@ -62,9 +62,7 @@ object FPTFileBuilder {
       logic02Rec.head.dataType = "0"
       logic02Rec.index = ""
       logic02Rec.systemType = ""
-      //人员编号
       logic02Rec.personId = card.getStrPersonID
-      //卡号
       logic02Rec.cardId = card.getStrCardID
       logic02Rec.personName = card.getText.getStrName
       logic02Rec.alias = card.getText.getStrAliasName
@@ -106,7 +104,7 @@ object FPTFileBuilder {
       logic02Rec.isAssist = card.getText.getNXieChaFlag.toString
       logic02Rec.portraitDataLength = ""
       logic02Rec.portraitData = new Array[Byte](0)
-        val fingerCount = card.getBlobList.size()
+      val fingerCount = card.getBlobList.size()
       logic02Rec.sendFingerCount = fingerCount.toString
       arrLogic02Rec.update(i,logic02Rec)
       fpt4File.logic02Recs = arrLogic02Rec
@@ -166,7 +164,7 @@ object FPTFileBuilder {
     fpt4File.llCount = "0"
     fpt4File.lpRequestCount = "0"
     fpt4File.tpRequestCount = "0"
-    fpt4File.ltCandidateCount =  "0"
+    fpt4File.ltCandidateCount = "0"
     fpt4File.tlCandidateCount = "0"
     fpt4File.ttCandidateCount = "0"
     fpt4File.llCandidateCount = "0"
@@ -176,20 +174,24 @@ object FPTFileBuilder {
     fpt4File.sendUnitCode = ""
     fpt4File.sendUnitName = ""
     fpt4File.sender = ""
-    fpt4File.sendUnitSystemType =""
+    fpt4File.sendUnitSystemType = ""
     fpt4File.sid = ""
     fpt4File.remark = ""
 
 
     val arrLogic03Rec = new Array[Logic03Rec](logic03RecsNum)
-    for( i <- 0 to  logic03RecsNum-1){
+    for (i <- 0 to logic03RecsNum - 1) {
 
       val logic03Rec = new Logic03Rec
       logic03Rec.head.fileLength = "0"
       logic03Rec.head.dataType = "0"
       logic03Rec.index = ""
       logic03Rec.systemType = ""
-      logic03Rec.caseId = caseInfo.getStrCaseID
+      logic03Rec.caseId = if (22 == caseInfo.getStrCaseID.length) {
+        "A".concat(caseInfo.getStrCaseID)
+      } else {
+        caseInfo.getStrCaseID
+      }
       logic03Rec.cardId = caseInfo.getStrCaseID
       logic03Rec.caseClass1Code = caseInfo.getText.getStrCaseType1
       logic03Rec.caseClass2Code = caseInfo.getText.getStrCaseType2
@@ -198,7 +200,7 @@ object FPTFileBuilder {
       logic03Rec.occurPlaceCode = caseInfo.getText.getStrCaseOccurPlaceCode
       logic03Rec.occurPlace = caseInfo.getText.getStrCaseOccurPlace
       logic03Rec.caseBriefDetail = caseInfo.getText.getStrComment
-      logic03Rec.isMurder = if(caseInfo.getText.getBPersonKilled) "1" else "0"
+      logic03Rec.isMurder = if (caseInfo.getText.getBPersonKilled) "1" else "0"
       logic03Rec.amount = caseInfo.getText.getStrMoneyLost
       logic03Rec.extractUnitCode = caseInfo.getText.getStrExtractUnitCode
       logic03Rec.extractUnitName = caseInfo.getText.getStrExtractUnitName
@@ -213,26 +215,26 @@ object FPTFileBuilder {
       logic03Rec.assistUnitName = caseInfo.getText.getStrXieChaRequestUnitCode
       logic03Rec.assistDate = caseInfo.getText.getStrXieChaDate
       logic03Rec.isCaseAssist = caseInfo.getText.getNXieChaState.toString
-      logic03Rec.isRevoke = caseInfo.getText.getNCancelFlag.toString  ///获取到 是 31
+      logic03Rec.isRevoke = "" ///获取到 是 31 caseInfo.getText.getNCancelFlag.toString
       logic03Rec.caseStatus = caseInfo.getText.getNCaseState.toString
-      logic03Rec.fingerCount = logic03RecsNum.toString
-      val fingerCount = logic03RecsNum
+      logic03Rec.fingerCount = caseInfo.getStrFingerIDCount.toString
+      val fingerCount = caseInfo.getStrFingerIDCount
       logic03Rec.sendFingerCount = fingerCount.toString
-      arrLogic03Rec.update(i,logic03Rec)
+      arrLogic03Rec.update(i, logic03Rec)
       fpt4File.logic03Recs = arrLogic03Rec
 
 
 
       val arrFingers = new Array[FingerLData](fingerCount)
-      for(j <- 0 to fingerCount-1) {
+      for (j <- 0 to fingerCount - 1) {
 
         val fingerLData = new FingerLData
         fingerLData.dataLength = ""
         fingerLData.sendNo = "" //发送编号如何定义???
-        fingerLData.fingerNo = ""
-        fingerLData.fingerId = ""
-        fingerLData.isCorpse = ""
-        fingerLData.corpseNo = ""
+        fingerLData.fingerNo = card.getText.getStrSeq
+        fingerLData.fingerId = card.getStrCardID
+        fingerLData.isCorpse = if (card.getText.getBDeadBody) "1" else "0"
+        fingerLData.corpseNo = card.getText.getStrDeadPersonNo
         fingerLData.remainPlace = card.getText.getStrRemainPlace
         fingerLData.fgp = ""
         fingerLData.ridgeColor = card.getText.getStrRidgeColor
@@ -251,22 +253,22 @@ object FPTFileBuilder {
         fingerLData.feature = card.getBlob.getStMnt
         fingerLData.customInfoLength = ""
         fingerLData.customInfo = new Array[Byte](0)
-        fingerLData.imgHorizontalLength = "640"
-        fingerLData.imgVerticalLength = "640"
+        fingerLData.imgHorizontalLength = "512"
+        fingerLData.imgVerticalLength = "512"
         fingerLData.dpi = "500"
-        fingerLData.imgCompressMethod = "1900"
-        fingerLData.imgDataLength = ""
-        fingerLData.imgData = new Array[Byte](0)
-        arrFingers.update(j,fingerLData)
+        fingerLData.imgCompressMethod = ""
+        fingerLData.imgDataLength = card.getBlob.getStImageBytes.size.toString
+        fingerLData.imgData = card.getBlob.getStImageBytes.toByteArray
+        arrFingers.update(j, fingerLData)
       }
       fpt4File.logic03Recs(i).fingers = arrFingers
     }
     fpt4File
-
   }
 
   /**
     * 建造十指FPT文件
+    *
     * @param tpCardList 十指数据集合
     * @return FPT4File对象
     */
@@ -389,6 +391,7 @@ object FPTFileBuilder {
 
   /**
     * 获取数据
+    *
     * @param map 数据集合
     * @param key 数据属性
     * @return data 数据
