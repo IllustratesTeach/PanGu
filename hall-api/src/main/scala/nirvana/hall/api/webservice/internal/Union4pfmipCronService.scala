@@ -10,7 +10,7 @@ import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.services.union4pfmip
 import nirvana.hall.api.webservice.util.FPTFileHandler
-import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
@@ -59,19 +59,17 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    if(fpt4.logic02Recs.foreach(tp => tp.head.dataType).equals("02")){
-                      var tPCard:TPCard = null
-                      tPCard = TPFPT2ProtoBuffer(fpt4)
-                      tPCardService.addTPCard(tPCard)
-                      //TODO 发查询
-                      queryService.addMatchTask(null)
-                    }
+                    var tPCard:TPCard = null
+                    fpt4.logic02Recs.foreach( sLogic02Rec =>
+                      tPCard = TPFPT2ProtoBuffer(sLogic02Rec,fpt4)
+                    )
+                    tPCardService.addTPCard(tPCard)
+                    //TODO 发查询
+                    queryService.addMatchTask(null)
                   }else if(fpt4.logic03Recs.length>0){
-                    if(fpt4.logic03Recs.foreach(tp => tp.head.dataType).equals("03")){
-                      // TODO 现场处理
-                    }
+                    // TODO 现场处理
                   }else{
-                      throw new Exception("接收FPT逻辑描述记录类型不正确")
+                    throw new Exception("接收FPT逻辑描述记录类型不正确")
                   }
               }
               try{
@@ -107,67 +105,64 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     * @param fpt4
     * @return
     */
-  def TPFPT2ProtoBuffer(fpt4:FPT4File):TPCard ={
+  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-        tpCard.setStrCardID(fpt4.sid)
-    fpt4.logic02Recs.foreach { tp =>
-      textBuilder.setStrName(tp.personName)
-      textBuilder.setStrAliasName (tp.alias)
-      textBuilder.setNSex(tp.gender.toInt)
-      textBuilder.setStrBirthDate (tp.birthday)
-      textBuilder.setStrIdentityNum (tp.idCardNo)
-      textBuilder.setStrBirthAddrCode (tp.addressDetail)
-      textBuilder.setStrBirthAddr (tp.address)
-      textBuilder.setStrAddrCode (tp.doorDetail)
-      textBuilder.setStrAddr (tp.door)
-      textBuilder.setStrPersonType (tp.category)
-      textBuilder.setStrCaseType1 (tp.caseClass1Code)
-      textBuilder.setStrCaseType2 (tp.caseClass2Code)
-      textBuilder.setStrCaseType3 (tp.caseClass3Code)
-      textBuilder.setStrPrintUnitCode (tp.gatherUnitCode)
-      textBuilder.setStrPrintUnitName (tp.gatherName)
-      textBuilder.setStrPrinter (tp.gatherName)
-      textBuilder.setStrPrintDate (tp.gatherDate)
-      textBuilder.setStrComment (tp.remark)
-      textBuilder.setStrNation (tp.nation)
-      textBuilder.setStrRace (tp.nativeplace)
-      textBuilder.setStrCertifType (tp.certificateType)
-      textBuilder.setStrCertifID (tp.certificateNo)
-      textBuilder.setBHasCriminalRecord (tp.isCriminal.toBoolean)
-      textBuilder.setStrCriminalRecordDesc (tp.criminalInfo)
-      textBuilder.setStrPremium (tp.assistUnitName)
-      textBuilder.setNXieChaFlag (tp.isAssist.toInt)
-      textBuilder.setStrXieChaRequestUnitName (tp.assistUnitName)
-      textBuilder.setStrXieChaRequestUnitCode (tp.assistUnitCode)
-      textBuilder.setNXieChaLevel (tp.assistLevel.toInt)
-      textBuilder.setStrXieChaForWhat (tp.assistPurpose)
-      textBuilder.setStrRelPersonNo (tp.relatedPersonId)
-      textBuilder.setStrRelCaseNo (tp.relatedCaseId)
-      textBuilder.setStrXieChaTimeLimit (tp.assistTimeLimit)
-      textBuilder.setStrXieChaDate (tp.assistDate)
-      textBuilder.setStrXieChaRequestComment (tp.assistAskingInfo)
-      textBuilder.setStrXieChaContacter (tp.contact)
-      textBuilder.setStrXieChaTelNo (tp.contactPhone)
-      textBuilder.setStrShenPiBy (tp.approver)
+    tpCard.setStrCardID(fpt4.sid)
+    textBuilder.setStrName(logic02Rec.personName)
+    textBuilder.setStrAliasName (logic02Rec.alias)
+    textBuilder.setNSex(if(logic02Rec.gender==null){logic02Rec.gender.toInt}else{9})
+    textBuilder.setStrBirthDate (logic02Rec.birthday)
+    textBuilder.setStrIdentityNum (logic02Rec.idCardNo)
+    textBuilder.setStrBirthAddrCode (logic02Rec.addressDetail)
+    textBuilder.setStrBirthAddr (logic02Rec.address)
+    textBuilder.setStrAddrCode (logic02Rec.doorDetail)
+    textBuilder.setStrAddr (logic02Rec.door)
+    textBuilder.setStrPersonType (logic02Rec.category)
+    textBuilder.setStrCaseType1 (logic02Rec.caseClass1Code)
+    textBuilder.setStrCaseType2 (logic02Rec.caseClass2Code)
+    textBuilder.setStrCaseType3 (logic02Rec.caseClass3Code)
+    textBuilder.setStrPrintUnitCode (logic02Rec.gatherUnitCode)
+    textBuilder.setStrPrintUnitName (logic02Rec.gatherName)
+    textBuilder.setStrPrinter (logic02Rec.gatherName)
+    textBuilder.setStrPrintDate (logic02Rec.gatherDate)
+    textBuilder.setStrComment (logic02Rec.remark)
+    textBuilder.setStrNation (logic02Rec.nation)
+    textBuilder.setStrRace (logic02Rec.nativeplace)
+    textBuilder.setStrCertifType (logic02Rec.certificateType)
+    textBuilder.setStrCertifID (logic02Rec.certificateNo)
+    textBuilder.setBHasCriminalRecord (if(logic02Rec.isCriminal==0){logic02Rec.isCriminal == false}else{logic02Rec.isCriminal == true})
+    textBuilder.setStrCriminalRecordDesc (logic02Rec.criminalInfo)
+    textBuilder.setStrPremium (logic02Rec.assistUnitName)
+    textBuilder.setNXieChaFlag (if(logic02Rec.isAssist==null){logic02Rec.isAssist.toInt}else{9})
+    textBuilder.setStrXieChaRequestUnitName (logic02Rec.assistUnitName)
+    textBuilder.setStrXieChaRequestUnitCode (logic02Rec.assistUnitCode)
+    textBuilder.setNXieChaLevel (if(logic02Rec.assistLevel==null){logic02Rec.assistLevel.toInt}else{9})
+    textBuilder.setStrXieChaForWhat (logic02Rec.assistPurpose)
+    textBuilder.setStrRelPersonNo (logic02Rec.relatedPersonId)
+    textBuilder.setStrRelCaseNo (logic02Rec.relatedCaseId)
+    textBuilder.setStrXieChaTimeLimit (logic02Rec.assistTimeLimit)
+    textBuilder.setStrXieChaDate (logic02Rec.assistDate)
+    textBuilder.setStrXieChaRequestComment (logic02Rec.assistAskingInfo)
+    textBuilder.setStrXieChaContacter (logic02Rec.contact)
+    textBuilder.setStrXieChaTelNo (logic02Rec.contactPhone)
+    textBuilder.setStrShenPiBy (logic02Rec.approver)
 
 
-      tp.fingers.foreach { tData =>
-        if (tData.imgData != null && tData.imgData.length > 0) {
-          val tBuffer = FPTFileHandler.fingerDataToGafisImage(tData)
-          //图像解压
-          val s = FPTFileHandler.callHallImageDecompressionImage(tBuffer)
-          //提取特征
-          val mnt = FPTFileHandler.extractorFeature(s,fgpParesEnum(tData.fgp),ParseFeatureTypeEnum(fpt4.tpCount.toInt,fpt4.lpCount.toInt))
-          val blobBuilder = tpCard.addBlobBuilder()
-          mnt.foreach { blob =>
-            blobBuilder.setStMntBytes(ByteString.copyFrom(blob.toByteArray()))
-            blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-            blobBuilder.setFgp(fgpParesProtoBuffer(tData.fgp))
-          }
-        }
+    logic02Rec.fingers.foreach { tData =>
+      if (tData.imgData != null && tData.imgData.length > 0) {
+        val tBuffer = FPTFileHandler.fingerDataToGafisImage(tData)
+        //图像解压
+        val s = FPTFileHandler.callHallImageDecompressionImage(tBuffer)
+        //提取特征
+        val mntAndBin = FPTFileHandler.extractorFeature(s,fgpParesEnum(tData.fgp),ParseFeatureTypeEnum(fpt4.tpCount.toInt,fpt4.lpCount.toInt))
+        val blobBuilder = tpCard.addBlobBuilder()
+        blobBuilder.setStMntBytes(ByteString.copyFrom(mntAndBin.get._1.toByteArray()))
+        blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+        blobBuilder.setFgp(fgpParesProtoBuffer(tData.fgp))
+        blobBuilder.setStImageBytes(ByteString.copyFrom(s.toByteArray()))
+        blobBuilder.setStBinBytes(ByteString.copyFrom(mntAndBin.get._2.toByteArray()))
       }
-      textBuilder.build()
     }
     tpCard.build()
   }
