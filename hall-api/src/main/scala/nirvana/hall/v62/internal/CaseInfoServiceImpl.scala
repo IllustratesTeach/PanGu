@@ -84,7 +84,29 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       LCaseText.pszCaseClass2Code -> "caseClass2Code",
       LCaseText.pszCaseClass3Code -> "caseClass3Code",
       LCaseText.pszCaseOccurPlaceCode -> "occurPlaceCode",
-      LCaseText.pszSuperviseLevel -> "assistLevel"
+      LCaseText.pszSuperviseLevel -> "assistLevel",
+      LCaseText.pszCaseOccurDate -> "occurDate",
+      LCaseText.pszCaseState -> "caseStatus",
+      LCaseText.pszCreatorUnitCode -> "",
+      LCaseText.pszCreateUserName -> "",
+      LCaseText.pszCaseOccurPlaceTail -> "occurPlace",
+      LCaseText.pszExtractDate -> "extractDate",
+      LCaseText.pszExtractor1 -> "extractor",
+      LCaseText.pszExtractor2 -> "extractor",
+      LCaseText.pszExtractor3 -> "extractor",
+      LCaseText.pszExtractUnitCode -> "extractUnitCode",
+      LCaseText.pszExtractUnitNameTail -> "extractUnitName",
+      LCaseText.pszHitHistory -> "",
+      LCaseText.pszIllicitMoney -> "amount",
+      LCaseText.pszIsUnknownBody -> "",
+      LCaseText.pszPremium -> "bonus",
+      LCaseText.pszSenderCardID -> "",
+      LCaseText.pszSuspiciousArea1Code -> "suspiciousArea1Code",
+      LCaseText.pszSuspiciousArea2Code -> "suspiciousArea2Code",
+      LCaseText.pszSuspiciousArea3Code -> "suspiciousArea3Code",
+      LCaseText.pszUnknownBodyCode -> "",
+      LCaseText.pszUpdateUserName -> "",
+      LCaseText.pszUpdatorUnitCode -> ""
     )
     var statement = "(1=1)"
     statement += likeSQL(g_stCN.stLCsID.pszName, ajno)
