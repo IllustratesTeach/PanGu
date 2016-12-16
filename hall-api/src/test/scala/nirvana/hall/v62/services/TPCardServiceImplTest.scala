@@ -132,21 +132,10 @@ class TPCardServiceImplTest extends BaseV62TestCase{
   }
 
   @Test
-  def test_getCardIdList: Unit ={
+  def getFPT4Logic02RecList: Unit ={
     val tpCardService = getService[TPCardService]
-    val cardIdList = tpCardService.getCardIdList("4420030222242342422271", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-    Assert.assertEquals(cardIdList.size, 1)
-  }
-
-  @Test
-  def test_getTpCardList: Unit = {
-    val tpCardService = getService[TPCardService]
-    val cardList = List("4420030222242342422271","44200372622242323324371","44200372722242333222238")
-    var resultList = tpCardService.getTpCardList(cardList)
-    resultList.foreach { map =>
-      println(map("mispersonid").toString)
-      println(map("alias") == null)
-    }
+    val cardList = tpCardService.getFPT4Logic02RecList("1234567890", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+    Assert.assertEquals(cardList.size, 1)
   }
 
 }

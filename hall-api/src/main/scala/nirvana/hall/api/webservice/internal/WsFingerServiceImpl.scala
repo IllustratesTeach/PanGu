@@ -44,7 +44,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = {
       info("fun:getTenprintRecord,inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{}",userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate)
-      try{
+      /*try{
         //1 根据查询条件查询 cardIdList
         val cardIdList = tpCardService.getCardIdList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
         //2 使用 cardIdList 查询捺印基础数据 list
@@ -61,7 +61,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
           ,userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate,e.getMessage)
           e.printStackTrace()
           FPTFileBuilder.emptyFPT
-      }
+      }*/
+    FPTFileBuilder.emptyFPT
   }
 
   /**
