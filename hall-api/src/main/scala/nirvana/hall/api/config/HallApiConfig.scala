@@ -51,7 +51,7 @@ class Union4pfmipConfig{
     var cron: String = _
     @XmlElement(name = "url")
     var url: String = _
-    @XmlElement(name = "target_amespace")
+    @XmlElement(name = "target_namespace")
     var targetNamespace: String = _
     @XmlElement(name = "user")
     var user: String = _
