@@ -1,5 +1,6 @@
 package nirvana.hall.api.webservice.services.internal
 
+import java.util.Date
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
@@ -76,7 +77,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
 
-    info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{}",userid,password,ryno)
+    info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{};time:{}",userid,password,ryno,new Date)
     try{
       if(tpCardService.isExist(ryno)){
         val tpCard = tpCardService.getTPCard(ryno)
@@ -88,8 +89,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
 
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" +
-        ",inputParam-userid:{};password:{};ryno:{},errormessage:{}"
-        ,userid,password,ryno,e.getMessage)
+        ",inputParam-userid:{};password:{};ryno:{},errormessage:{},outtime:{}"
+        ,userid,password,ryno,e.getMessage,new Date)
         FPTFileBuilder.emptyFPT
     }
   }
@@ -124,7 +125,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
   override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
-    info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{}",userid,password,ajno)
+    info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
     try{
       var caseid = ""
       var fingerid = ""
@@ -153,8 +154,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       }
     }catch{
       case e : Exception => error("fun:getLatentFinger Exception" +
-        ",inputParam-userid:{};password:{};ajno:{},errormessage:{}"
-        ,userid,password,ajno,e.getMessage)
+        ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
+        ,userid,password,ajno,e.getMessage,new Date)
         FPTFileBuilder.emptyFPT
     }
   }
