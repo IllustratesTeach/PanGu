@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
@@ -75,20 +75,42 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
     * @param endfadate   结束时间（检索发案时间，时间格式YYYYMMDD）
     * @return
     */
-  override def getCaseIdList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[String] = {
+  override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = {
+    val LCaseText = g_stCN.stLCaseText
+    //TODO 补全查询的文本信息
     val mapper = Map(
-      g_stCN.stLCsID.pszName -> "szKey"
+      g_stCN.stLCsID.pszName -> "caseId",
+      LCaseText.pszCaseClass1Code -> "caseClass1Code",
+      LCaseText.pszCaseClass2Code -> "caseClass2Code",
+      LCaseText.pszCaseClass3Code -> "caseClass3Code",
+      LCaseText.pszCaseOccurPlaceCode -> "occurPlaceCode",
+      LCaseText.pszSuperviseLevel -> "assistLevel"
     )
     var statement = "(1=1)"
-    //TODO 补全所有查询条件，并支持like
-    if(isNonBlank(ajno)){
-      statement += " AND (caseid='%s')".format(ajno)
+    statement += likeSQL(g_stCN.stLCsID.pszName, ajno)
+    statement += andSQL(LCaseText.pszCaseOccurPlaceCode, fadddm)
+    if(isNonBlank(ajlb)){
+      statement += " AND (%s = '%s' OR %s = '%s' OR %s = '%s')"
+        .format(LCaseText.pszCaseClass1Code,ajlb,LCaseText.pszCaseClass2Code,ajlb, LCaseText.pszCaseClass3Code, ajlb)
     }
 
-    val caseIdList = facade.queryV62Table[GAKEYSTRUCT](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
-    caseIdList.map(_.szKey)
+    facade.queryV62Table[Logic03Rec](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
   }
   def isNonBlank(string: String):Boolean = string != null && string.length >0
+  def likeSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s LIKE '%s%%')".format(column, value)
+    }else{
+      ""
+    }
+  }
+  def andSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s = '%s')".format(column, value)
+    }else{
+      ""
+    }
+  }
 
   /**
    * 获取DBID

@@ -129,7 +129,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       statement += " AND (%s >= %s)".format(TCardText.pszPrintDate, startnydate)
     }
     if(isNonBlank(endnydate)){
-      statement += " AND (%s >= %s)".format(TCardText.pszPrintDate, endnydate)
+      statement += " AND (%s <= %s)".format(TCardText.pszPrintDate, endnydate)
     }
 
     facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256

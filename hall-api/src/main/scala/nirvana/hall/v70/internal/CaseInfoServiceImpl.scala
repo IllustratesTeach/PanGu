@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal
 
 import nirvana.hall.api.services.CaseInfoService
+import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisCase, GafisLogicDb, GafisLogicDbCase, SysUser}
@@ -116,7 +117,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     * @param endfadate   结束时间（检索发案时间，时间格式YYYYMMDD）
     * @return
     */
-  override def getCaseIdList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[String] = {
+  override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = {
     throw new UnsupportedOperationException
   }
 }
