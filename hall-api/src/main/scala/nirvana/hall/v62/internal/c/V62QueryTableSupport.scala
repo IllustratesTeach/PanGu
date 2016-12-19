@@ -1,5 +1,6 @@
 package nirvana.hall.v62.internal.c
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.ganumia.gadbrec
 import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESULT, GADB_SELSTATEMENT}
@@ -57,7 +58,7 @@ trait V62QueryTableSupport {
       val count = stSelRes.nRecGot
       if(count > 0) {
         val buffer = ChannelBuffers.wrappedBuffer(stSelRes.pDataBuf_Data)
-        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer)).toList
+        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer,AncientConstants.GBK_ENCODING)).toList
       }
     }
     Nil

@@ -15,4 +15,11 @@ class WsFingerServiceImplTest extends BaseV62TestCase{
     val obj = service.getTenprintFinger("", "", "1234567890")
     println(obj)
   }
+
+  @Test
+  def test_getLatent: Unit ={
+    val service = getService[WsFingerService]
+    val dataHandler = service.getLatent("", "", "123456", null, null, null, null, null, null, null)
+    println(dataHandler)
+  }
 }
