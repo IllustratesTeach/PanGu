@@ -77,7 +77,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
     */
   override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = {
     val LCaseText = g_stCN.stLCaseText
-    //TODO 补全查询的文本信息
+
     val mapper = Map(
       g_stCN.stLCsID.pszName -> "caseId",
       LCaseText.pszCaseClass1Code -> "caseClass1Code",
@@ -87,8 +87,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       LCaseText.pszSuperviseLevel -> "assistLevel",
       LCaseText.pszCaseOccurDate -> "occurDate",
       LCaseText.pszCaseState -> "caseStatus",
-      LCaseText.pszCreatorUnitCode -> "",
-      LCaseText.pszCreateUserName -> "",
       LCaseText.pszCaseOccurPlaceTail -> "occurPlace",
       LCaseText.pszExtractDate -> "extractDate",
       LCaseText.pszExtractor1 -> "extractor",
@@ -96,17 +94,11 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       LCaseText.pszExtractor3 -> "extractor",
       LCaseText.pszExtractUnitCode -> "extractUnitCode",
       LCaseText.pszExtractUnitNameTail -> "extractUnitName",
-      LCaseText.pszHitHistory -> "",
       LCaseText.pszIllicitMoney -> "amount",
-      LCaseText.pszIsUnknownBody -> "",
       LCaseText.pszPremium -> "bonus",
-      LCaseText.pszSenderCardID -> "",
       LCaseText.pszSuspiciousArea1Code -> "suspiciousArea1Code",
       LCaseText.pszSuspiciousArea2Code -> "suspiciousArea2Code",
-      LCaseText.pszSuspiciousArea3Code -> "suspiciousArea3Code",
-      LCaseText.pszUnknownBodyCode -> "",
-      LCaseText.pszUpdateUserName -> "",
-      LCaseText.pszUpdatorUnitCode -> ""
+      LCaseText.pszSuspiciousArea3Code -> "suspiciousArea3Code"
     )
     var statement = "(1=1)"
     statement += likeSQL(g_stCN.stLCsID.pszName, ajno)
