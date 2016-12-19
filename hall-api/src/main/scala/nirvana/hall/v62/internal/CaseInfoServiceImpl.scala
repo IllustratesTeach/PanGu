@@ -103,9 +103,17 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
     var statement = "(1=1)"
     statement += likeSQL(g_stCN.stLCsID.pszName, ajno)
     statement += andSQL(LCaseText.pszCaseOccurPlaceCode, fadddm)
+    statement += andSQL(LCaseText.pszSuperviseLevel,xcjb)
+    statement += andSQL(LCaseText.pszExtractUnitCode,xcdwdm)
     if(isNonBlank(ajlb)){
       statement += " AND (%s = '%s' OR %s = '%s' OR %s = '%s')"
         .format(LCaseText.pszCaseClass1Code,ajlb,LCaseText.pszCaseClass2Code,ajlb, LCaseText.pszCaseClass3Code, ajlb)
+    }
+    if(isNonBlank(startfadate)){
+      statement += " AND (%s >= %s)".format(LCaseText.pszCaseOccurDate, startfadate.substring(0,8))
+    }
+    if(isNonBlank(endfadate)){
+      statement += " AND (%s <= %s)".format(LCaseText.pszCaseOccurDate, endfadate.substring(0,8))
     }
 
     facade.queryV62Table[Logic03Rec](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
