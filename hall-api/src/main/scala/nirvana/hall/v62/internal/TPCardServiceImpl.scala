@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.TPCardService
-import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.config.HallV62Config
@@ -89,34 +89,66 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     * @param nydwdm      捺印单位代码
     * @param startnydate 开始时间（检索捺印时间，时间格式YYYYMMDDHHMM）
     * @param endnydate   结束时间（检索捺印时间，时间格式YYYYMMDDHHMM）
-    * @return
+    * @return Logic02Rec(fpt4捺印文本信息)
     */
-  override def getCardIdList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[String] = {
+  override def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec] = {
+    val TCardText = g_stCN.stTCardText
+    //TODO 补全查询的文本信息，解决中文乱码
     val mapper = Map(
-      g_stCN.stTcID.pszName -> "szKey"
+      g_stCN.stTcID.pszName -> "cardId",
+      TCardText.pszName -> "personName",
+      TCardText.pszSexCode -> "gender",
+      TCardText.pszShenFenID -> "idCardNo",
+      TCardText.pszCertificateCode -> "certificateNo",
+      TCardText.pszCertificateType -> "certificateType",
+      TCardText.pszHuKouPlaceCode -> "door",
+      TCardText.pszAddressCode -> "address",
+//      TCardText.pszPersonClassCode -> "",
+      TCardText.pszCaseClass1Code -> "caseClass1Code",
+//      TCardText.pszIsCriminalRecord -> "",
+      TCardText.pszUnitNameCode -> "gatherUnitCode"
     )
     var statement = "(1=1)"
-    //TODO 补全所有查询条件，并支持like
-    if(isNonBlank(ryno)){
-      statement += " AND (cardid='%s')".format(ryno)
+    statement += likeSQL(g_stCN.stTcID.pszName, ryno)
+    statement += likeSQL(TCardText.pszName, xm)
+    statement += andSQL(TCardText.pszSexCode, xb)
+    statement += andSQL(TCardText.pszShenFenID, idno)
+    statement += andSQL(TCardText.pszCertificateCode, zjhm)
+    statement += andSQL(TCardText.pszCertificateType, zjlb)
+    statement += andSQL(TCardText.pszHuKouPlaceCode, hjddm)
+    statement += andSQL(TCardText.pszAddressCode, xzzdm)
+    statement += andSQL(TCardText.pszPersonClassCode, rylb)
+    statement += andSQL(TCardText.pszIsCriminalRecord, qkbs)
+    statement += andSQL(TCardText.pszUnitNameCode, nydwdm)
+    //xcj
+    if(isNonBlank(ajlb)){
+      statement += " AND (%s = '%s' OR %s = '%s' OR %s = '%s')"
+        .format(TCardText.pszCaseClass1Code,ajlb,TCardText.pszCaseClass2Code,ajlb, TCardText.pszCaseClass3Code, ajlb)
     }
-    if(isNonBlank(xm)){
-      statement += " AND (name='%s')".format(xm)
+    if(isNonBlank(startnydate)){
+      statement += " AND (%s >= %s)".format(TCardText.pszPrintDate, startnydate)
     }
-    if(isNonBlank(xb)){
-      statement += " AND (sexcode='%s')".format(xb)
-    }
-    if(isNonBlank(idno)){
-      statement += " AND (shenfenid='%s')".format(idno)
+    if(isNonBlank(endnydate)){
+      statement += " AND (%s <= %s)".format(TCardText.pszPrintDate, endnydate)
     }
 
-    val cardIdList = facade.queryV62Table[GAKEYSTRUCT](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
-    cardIdList.map{ key =>
-      key.szKey
+    facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
+  }
+  def isNonBlank(string: String):Boolean = string != null && string.length >0
+  def likeSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s LIKE '%s%%')".format(column, value)
+    }else{
+      ""
     }
   }
-
-  def isNonBlank(string: String):Boolean = string != null && string.length >0
+  def andSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s = '%s')".format(column, value)
+    }else{
+      ""
+    }
+  }
 
   /**
    * 获取DBID

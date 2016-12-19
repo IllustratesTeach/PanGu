@@ -1,5 +1,6 @@
 package nirvana.hall.api.webservice.services.internal
 
+import java.util.Date
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
@@ -42,7 +43,28 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         每次返回的FPT信息数量不多于256条
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
-  override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = ???
+  override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = {
+      info("fun:getTenprintRecord,inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{}",userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate)
+      /*try{
+        //1 根据查询条件查询 cardIdList
+        val cardIdList = tpCardService.getCardIdList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
+        //2 使用 cardIdList 查询捺印基础数据 list
+        if(null != cardIdList && cardIdList.size > 0){
+        //3 将捺印文字信息数据集合 封装成FPT
+          val tpCardList = tpCardService.getTpCardList(cardIdList)
+          val FPT4File = FPTFileBuilder.build(tpCardList)
+          new DataHandler(new ByteArrayDataSource(FPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
+        } else {
+          FPTFileBuilder.emptyFPT
+        }
+      }catch{
+        case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{},errormessage:{}"
+          ,userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate,e.getMessage)
+          e.printStackTrace()
+          FPTFileBuilder.emptyFPT
+      }*/
+    FPTFileBuilder.emptyFPT
+  }
 
   /**
     * 通过查询参数返回指定返回相应人员的全部信息（包含文字信息和图像信息）
@@ -55,7 +77,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
 
-    info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{}",userid,password,ryno)
+    info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{};time:{}",userid,password,ryno,new Date)
     try{
       if(tpCardService.isExist(ryno)){
         val tpCard = tpCardService.getTPCard(ryno)
@@ -67,8 +89,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
 
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" +
-        ",inputParam-userid:{};password:{};ryno:{},errormessage:{}"
-        ,userid,password,ryno,e.getMessage)
+        ",inputParam-userid:{};password:{};ryno:{},errormessage:{},outtime:{}"
+        ,userid,password,ryno,e.getMessage,new Date)
         FPTFileBuilder.emptyFPT
     }
   }
@@ -103,33 +125,37 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
   override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
-    info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{}",userid,password,ajno)
+    info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
     try{
-      val ss = ajno.split("A")
-      val caseid = ss(1)
-      if(caseInfoService.isExist(caseid)){
-        var fingerid = ""
+      var caseid = ""
+      var fingerid = ""
+      if(null != ajno && ajno.contains("A") && 23 == ajno.length){
+        val ss = ajno.split("A")
+        caseid = ss(1)
+        if(caseInfoService.isExist(caseid)){
 
-        val sql = "select t.fingerid from NORMALLP_LATFINGER t where t.caseid =?"
-        JdbcDatabase.queryFirst(sql) { ps =>
-          ps.setString(1, caseid)
-        } { rs =>
-          fingerid = rs.getString("fingerid")
-        }.get
+          val sql = "select t.fingerid from NORMALLP_LATFINGER t where t.caseid =?"
+          JdbcDatabase.queryFirst(sql) { ps =>
+            ps.setString(1, caseid)
+          } { rs =>
+            fingerid = rs.getString("fingerid")
+          }.get
 
-        val lpCard = lpCardService.getLPCard(fingerid)   //NORMALLP_LATFINGER  fingerid
-        val caseInfo = caseInfoService.getCaseInfo(caseid)  //NORMALLP_CASE  caseid
+          val lpCard = lpCardService.getLPCard(fingerid)   //NORMALLP_LATFINGER  fingerid
+          val caseInfo = caseInfoService.getCaseInfo(caseid)  //NORMALLP_CASE  caseid
 
-        val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCard,caseInfo)
-        new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
+          val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCard,caseInfo)
+          new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
+        }else{
+          FPTFileBuilder.emptyFPT
+        }
       }else{
-        FPTFileBuilder.emptyFPT
+        throw new Exception("传入的案件编号ajno:不符合要求")
       }
-
     }catch{
       case e : Exception => error("fun:getLatentFinger Exception" +
-        ",inputParam-userid:{};password:{};ajno:{},errormessage:{}"
-        ,userid,password,ajno,e.getMessage)
+        ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
+        ,userid,password,ajno,e.getMessage,new Date)
         FPTFileBuilder.emptyFPT
     }
   }

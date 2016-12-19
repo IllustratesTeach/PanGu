@@ -132,10 +132,10 @@ class TPCardServiceImplTest extends BaseV62TestCase{
   }
 
   @Test
-  def test_getCardIdList: Unit ={
+  def getFPT4Logic02RecList: Unit ={
     val tpCardService = getService[TPCardService]
-    val cardIdList = tpCardService.getCardIdList("1234567890", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-    Assert.assertEquals(cardIdList.size, 1)
+    val cardList = tpCardService.getFPT4Logic02RecList("1234567890", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+    Assert.assertEquals(cardList.size, 1)
   }
 
 }

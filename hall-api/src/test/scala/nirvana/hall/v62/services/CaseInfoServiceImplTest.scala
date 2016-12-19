@@ -84,9 +84,9 @@ class CaseInfoServiceImplTest extends BaseV62TestCase{
   }
 
   @Test
-  def test_getCaseIdList: Unit ={
+  def test_getLogic03RecList: Unit ={
     val caseInfoService = getService[CaseInfoService]
-    val caseIdList = caseInfoService.getCaseIdList("123456", null, null, null, null, null, null, null)
+    val caseIdList = caseInfoService.getFPT4Logic03RecList("123456", null, null, null, null, null, null, null)
     Assert.assertEquals(caseIdList.size, 1)
   }
 }

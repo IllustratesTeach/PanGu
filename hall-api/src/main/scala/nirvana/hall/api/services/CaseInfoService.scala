@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import org.springframework.transaction.annotation.Transactional
 
@@ -58,5 +59,5 @@ trait CaseInfoService {
     * @param endfadate   结束时间（检索发案时间，时间格式YYYYMMDD）
     * @return
     */
-  def getCaseIdList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[String]
+  def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec]
 }
