@@ -39,7 +39,7 @@ class BaseV62TestCase {
       "nirvana.hall.v62.LocalV62DataSourceModule",
       //LiaoNing
       "nirvana.hall.v62.LocalV62LiaoNingServiceModule",
-      //"nirvana.hall.api.LocalApiWebServiceModule",
+      "nirvana.hall.api.LocalApiWebServiceModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)

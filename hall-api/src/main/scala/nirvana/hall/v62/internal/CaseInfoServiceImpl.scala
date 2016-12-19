@@ -90,8 +90,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       LCaseText.pszCaseOccurPlaceTail -> "occurPlace",
       LCaseText.pszExtractDate -> "extractDate",
       LCaseText.pszExtractor1 -> "extractor",
-      LCaseText.pszExtractor2 -> "extractor",
-      LCaseText.pszExtractor3 -> "extractor",
       LCaseText.pszExtractUnitCode -> "extractUnitCode",
       LCaseText.pszExtractUnitNameTail -> "extractUnitName",
       LCaseText.pszIllicitMoney -> "amount",

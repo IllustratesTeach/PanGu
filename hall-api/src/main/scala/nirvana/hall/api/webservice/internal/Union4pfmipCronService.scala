@@ -33,8 +33,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
                              queryService: QueryService,
-                             fetchQueryService: FetchQueryService,
-                             implicit val dataSource: DataSource) extends LoggerSupport{
+                             fetchQueryService: FetchQueryService) extends LoggerSupport{
 
   /**
     * 定时器，获取比对任务
@@ -43,6 +42,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
+    if(hallApiConfig.webservice.union4pfmip.cron != null)
       periodicExecutor.addJob(new CronSchedule(hallApiConfig.webservice.union4pfmip.cron), "union4pfmip-cron", new Runnable {
         override def run(): Unit = {
           //发送请求获取任务

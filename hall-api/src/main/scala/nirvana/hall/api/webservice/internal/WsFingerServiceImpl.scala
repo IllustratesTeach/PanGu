@@ -2,22 +2,20 @@ package nirvana.hall.api.webservice.services.internal
 
 import java.util.Date
 import javax.activation.DataHandler
-import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
-import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService,implicit val dataSource: DataSource) extends WsFingerService with LoggerSupport
+class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService) extends WsFingerService with LoggerSupport
 {
 
   /**
@@ -109,25 +107,14 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
   override def getLatent(userid: String, password: String, ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): DataHandler = {
-    info("fun:getLatent,inputParam-userid:{};password:{};ajno:{};ajlb:{};fadddm:{};mabs:{};xcjb:{};xcdwdm:{};startfadate:{};endfadate:{}",userid,password, ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
-    try{
-      //1 根据查询条件查询现场文字信息数据集合
-      val logic03RecList :Seq[Logic03Rec] = caseInfoService.getFPT4Logic03RecList(ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
-      if(null != logic03RecList && logic03RecList.size > 0){
-        //2 将现场文字信息数据集合 封装成FPT
-        val FPT4File = FPTFileBuilder.buildLatentFpt(logic03RecList)
-        new DataHandler(new ByteArrayDataSource(FPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
-      } else {
-        FPTFileBuilder.emptyFPT
-      }
-    }catch{
-      case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ajno:{};ajlb:{};fadddm:{};mabs:{};xcjb:{};xcdwdm:{};startfadate:{};endfadate:{},errormessage:{}"
-        ,userid,password,userid,password, ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate, e.getMessage)
-        e.printStackTrace()
-        FPTFileBuilder.emptyFPT
+    val fpt = new FPT4File
+    val logic03RecList = caseInfoService.getFPT4Logic03RecList(ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
+    if(logic03RecList.nonEmpty){
+      fpt.lpCount = logic03RecList.size.toString
+      fpt.logic03Recs = logic03RecList.toArray
     }
+    new DataHandler(new ByteArrayDataSource(fpt.toByteArray()))
   }
-
 
 
   /**
@@ -142,7 +129,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
     info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
-    try{
+    //TODO 使用接口方法查询
+   /* try{
       var caseid = ""
       var fingerid = ""
       if(null != ajno && ajno.contains("A") && 23 == ajno.length){
@@ -173,6 +161,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
         ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
         ,userid,password,ajno,e.getMessage,new Date)
         FPTFileBuilder.emptyFPT
-    }
+    }*/
+    FPTFileBuilder.emptyFPT
   }
 }
