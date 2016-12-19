@@ -10,4 +10,5 @@ import java.nio.charset.Charset
 object AncientConstants {
   final val UTF8_ENCODING=Charset.forName("UTF-8")
   final val GBK_ENCODING=Charset.forName("GBK")
+  final val GB2312_ENCODING=Charset.forName("GB2312")
 }

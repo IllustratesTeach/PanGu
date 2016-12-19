@@ -58,7 +58,7 @@ trait V62QueryTableSupport {
       val count = stSelRes.nRecGot
       if(count > 0) {
         val buffer = ChannelBuffers.wrappedBuffer(stSelRes.pDataBuf_Data)
-        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer,AncientConstants.GBK_ENCODING)).toList
+        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer,AncientConstants.GB2312_ENCODING)).toList
       }
     }
     Nil
@@ -73,7 +73,7 @@ object V62SqlHelper{
   /**
     * 判断字符串不为空
     * @param string
-    * @return true：不为空
+    * @return true
     */
   def isNonBlank(string: String):Boolean = string != null && string.length >0
 

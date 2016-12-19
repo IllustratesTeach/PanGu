@@ -94,7 +94,6 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     */
   override def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec] = {
     val TCardText = g_stCN.stTCardText
-    //TODO 补全查询的文本信息，解决中文乱码
     val mapper = Map(
       //MISPERSONID	MIS人员信息编号
       g_stCN.stTPnID.pszName -> "personId",
