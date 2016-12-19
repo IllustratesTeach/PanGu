@@ -5,6 +5,7 @@ import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.c.V62SqlHelper
 import nirvana.hall.v62.internal.c.gloclib.galoctpConverter
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 
@@ -150,45 +151,30 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       //      TCardText.pszUnitNameCode -> "gatherUnitCode"
     )
     var statement = "(1=1)"
-    statement += likeSQL(g_stCN.stTcID.pszName, ryno)
-    statement += likeSQL(TCardText.pszName, xm)
-    statement += andSQL(TCardText.pszSexCode, xb)
-    statement += andSQL(TCardText.pszShenFenID, idno)
-    statement += andSQL(TCardText.pszCertificateType, zjlb)
-    statement += andSQL(TCardText.pszCertificateCode, zjhm)
-    statement += andSQL(TCardText.pszHuKouPlaceCode, hjddm)
-    statement += andSQL(TCardText.pszAddressCode, xzzdm)
-    statement += andSQL(TCardText.pszPersonClassCode, rylb)
-    statement += andSQL(TCardText.pszIsCriminalRecord, qkbs)
-    statement += andSQL(TCardText.pszPrinterUnitCode, nydwdm)
+    statement += V62SqlHelper.likeSQL(g_stCN.stTcID.pszName, ryno)
+    statement += V62SqlHelper.likeSQL(TCardText.pszName, xm)
+    statement += V62SqlHelper.andSQL(TCardText.pszSexCode, xb)
+    statement += V62SqlHelper.andSQL(TCardText.pszShenFenID, idno)
+    statement += V62SqlHelper.andSQL(TCardText.pszCertificateType, zjlb)
+    statement += V62SqlHelper.andSQL(TCardText.pszCertificateCode, zjhm)
+    statement += V62SqlHelper.andSQL(TCardText.pszHuKouPlaceCode, hjddm)
+    statement += V62SqlHelper.andSQL(TCardText.pszAddressCode, xzzdm)
+    statement += V62SqlHelper.andSQL(TCardText.pszPersonClassCode, rylb)
+    statement += V62SqlHelper.andSQL(TCardText.pszIsCriminalRecord, qkbs)
+    statement += V62SqlHelper.andSQL(TCardText.pszPrinterUnitCode, nydwdm)
     //无协查级别 xcjb
-    if(isNonBlank(ajlb)){
+    if(V62SqlHelper.isNonBlank(ajlb)){
       statement += " AND (%s = '%s' OR %s = '%s' OR %s = '%s')"
         .format(TCardText.pszCaseClass1Code,ajlb,TCardText.pszCaseClass2Code,ajlb, TCardText.pszCaseClass3Code, ajlb)
     }
-    if(isNonBlank(startnydate)){
+    if(V62SqlHelper.isNonBlank(startnydate)){
       statement += " AND (%s >= %s)".format(TCardText.pszPrintDate, startnydate.substring(0,8))
     }
-    if(isNonBlank(endnydate)){
+    if(V62SqlHelper.isNonBlank(endnydate)){
       statement += " AND (%s <= %s)".format(TCardText.pszPrintDate, endnydate.substring(0,8))
     }
 
     facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
-  }
-  def isNonBlank(string: String):Boolean = string != null && string.length >0
-  def likeSQL(column: String, value: String): String ={
-    if(isNonBlank(value)){
-      " AND (%s LIKE '%s%%')".format(column, value)
-    }else{
-      ""
-    }
-  }
-  def andSQL(column: String, value: String): String ={
-    if(isNonBlank(value)){
-      " AND (%s = '%s')".format(column, value)
-    }else{
-      ""
-    }
   }
 
   /**

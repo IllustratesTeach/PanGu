@@ -64,3 +64,44 @@ trait V62QueryTableSupport {
     Nil
   }
 }
+
+/**
+  * 6.2通用查询SQL工具类
+  */
+object V62SqlHelper{
+
+  /**
+    * 判断字符串不为空
+    * @param string
+    * @return true：不为空
+    */
+  def isNonBlank(string: String):Boolean = string != null && string.length >0
+
+  /**
+    * 拼接like 查询 后模糊
+    * @param column
+    * @param value
+    * @return
+    */
+  def likeSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s LIKE '%s%%')".format(column, value)
+    }else{
+      ""
+    }
+  }
+
+  /**
+    * 拼接and 查询
+    * @param column
+    * @param value
+    * @return
+    */
+  def andSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s = '%s')".format(column, value)
+    }else{
+      ""
+    }
+  }
+}
