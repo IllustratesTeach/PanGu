@@ -2,7 +2,6 @@ package nirvana.hall.api.webservice.services.internal
 
 import java.util.Date
 import javax.activation.DataHandler
-
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
@@ -11,7 +10,6 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.apache.axiom.attachments.ByteArrayDataSource
-
 import scala.collection.mutable
 
 
