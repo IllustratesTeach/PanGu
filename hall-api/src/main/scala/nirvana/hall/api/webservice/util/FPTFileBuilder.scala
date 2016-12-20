@@ -2,6 +2,7 @@ package nirvana.hall.api.webservice.util
 
 import javax.activation.DataHandler
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerLData, FingerTData, Logic02Rec, Logic03Rec}
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import org.apache.axiom.attachments.ByteArrayDataSource
@@ -32,8 +33,9 @@ object FPTFileBuilder {
     fpt4File.head.majorVersion = "04"
     fpt4File.head.minorVersion = "00"
     fpt4File.fileLength = ""
-    fpt4File.tpCount = card.getBlobCount.toString
-    fpt4File.lpCount = "0"
+//    fpt4File.tpCount = card.getBlobCount.toString
+    fpt4File.tpCount = "1"                          //十指指纹信息记录数量
+    fpt4File.lpCount = "0"                          //现场指纹信息记录数量
     fpt4File.tl_ltCount = "0"
     fpt4File.ttCount = "0"
     fpt4File.llCount = "0"
@@ -49,19 +51,18 @@ object FPTFileBuilder {
     fpt4File.sendUnitCode = ""
     fpt4File.sendUnitName = ""
     fpt4File.sender = ""
-    fpt4File.sendUnitSystemType =""
+    fpt4File.sendUnitSystemType ="1900" //1900 东方金指
     fpt4File.sid = ""
     fpt4File.remark = card.getText.getStrComment
-
 
     val arrLogic02Rec = new Array[Logic02Rec](logic02RecsNum)
     for( i <- 0 to  logic02RecsNum-1){
 
       val logic02Rec = new Logic02Rec
       logic02Rec.head.fileLength = "0"
-      logic02Rec.head.dataType = "0"
+      logic02Rec.head.dataType = "02"
       logic02Rec.index = ""
-      logic02Rec.systemType = ""
+      logic02Rec.systemType = "1900" //1900 东方金指
       logic02Rec.personId = card.getStrPersonID
       logic02Rec.cardId = card.getStrCardID
       logic02Rec.personName = card.getText.getStrName
@@ -106,9 +107,9 @@ object FPTFileBuilder {
       logic02Rec.portraitData = new Array[Byte](0)
       val fingerCount = card.getBlobList.size()
       logic02Rec.sendFingerCount = fingerCount.toString
+      logic02Rec.head.fileLength = logic02Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
       arrLogic02Rec.update(i,logic02Rec)
       fpt4File.logic02Recs = arrLogic02Rec
-
 
       val arrFingers = new Array[FingerTData](fingerCount)
       for(j <- 0 to fingerCount-1) {
@@ -139,8 +140,8 @@ object FPTFileBuilder {
       }
       fpt4File.logic02Recs(i).fingers = arrFingers
     }
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
     fpt4File
-
   }
 
   /**
@@ -174,7 +175,7 @@ object FPTFileBuilder {
     fpt4File.sendUnitCode = ""
     fpt4File.sendUnitName = ""
     fpt4File.sender = ""
-    fpt4File.sendUnitSystemType = ""
+    fpt4File.sendUnitSystemType = "1900"
     fpt4File.sid = ""
     fpt4File.remark = ""
 
@@ -184,9 +185,9 @@ object FPTFileBuilder {
 
       val logic03Rec = new Logic03Rec
       logic03Rec.head.fileLength = "0"
-      logic03Rec.head.dataType = "0"
+      logic03Rec.head.dataType = "03"
       logic03Rec.index = ""
-      logic03Rec.systemType = ""
+      logic03Rec.systemType = "1900"
       logic03Rec.caseId = if (22 == caseInfo.getStrCaseID.length) {
         "A".concat(caseInfo.getStrCaseID)
       } else {
@@ -220,6 +221,7 @@ object FPTFileBuilder {
       logic03Rec.fingerCount = caseInfo.getStrFingerIDCount.toString
       val fingerCount = caseInfo.getStrFingerIDCount
       logic03Rec.sendFingerCount = fingerCount.toString
+      logic03Rec.head.fileLength = logic03Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
       arrLogic03Rec.update(i, logic03Rec)
       fpt4File.logic03Recs = arrLogic03Rec
 
@@ -263,6 +265,7 @@ object FPTFileBuilder {
       }
       fpt4File.logic03Recs(i).fingers = arrFingers
     }
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
     fpt4File
   }
 
