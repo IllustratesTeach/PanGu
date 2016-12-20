@@ -2,28 +2,18 @@ package nirvana.hall.api.webservice.internal
 
 
 import java.util.Date
-import javax.sql.DataSource
-
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.services.union4pfmip
-import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer, FPTFileHandler}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
-import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
-import nirvana.hall.c.services.kernel.FPTLDataToMNTDISP
+import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer}
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File}
+import nirvana.hall.c.services.gfpt4lib.{FPTFile}
 import nirvana.hall.protocol.api.FPTProto._
-import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
-
-import scala.util.Success
 
 /**
   * 互查系统定时任务
