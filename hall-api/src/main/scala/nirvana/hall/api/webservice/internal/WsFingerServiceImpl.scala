@@ -9,7 +9,10 @@ import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
+import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.apache.axiom.attachments.ByteArrayDataSource
+
+import scala.collection.mutable
 
 
 /**
@@ -52,13 +55,14 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
         val FPT4File = FPTFileBuilder.buildTenprintRecordFpt(logic02RecList)
         new DataHandler(new ByteArrayDataSource(FPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
       } else {
-        FPTFileBuilder.emptyFPT
+        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
+
       }
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{},errormessage:{}"
         ,userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate,e.getMessage)
         e.printStackTrace()
-        FPTFileBuilder.emptyFPT
+        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
     }
   }
 
@@ -79,14 +83,14 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
         val fptObj = FPTFileBuilder.convertProtoBuf2TPFPT4File(tpCard)
         new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
       }else{
-        FPTFileBuilder.emptyFPT
+        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
       }
 
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" +
         ",inputParam-userid:{};password:{};ryno:{},errormessage:{},outtime:{}"
         ,userid,password,ryno,e.getMessage,new Date)
-        FPTFileBuilder.emptyFPT
+        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
     }
   }
 
@@ -129,29 +133,22 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
     info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
-    //TODO 使用接口方法查询
-   /* try{
-      var caseid = ""
-      var fingerid = ""
+    try{
+      var caseId = ""
+      val lpCardList = new mutable.ListBuffer[LPCard]
       if(null != ajno && ajno.contains("A") && 23 == ajno.length){
         val ss = ajno.split("A")
-        caseid = ss(1)
-        if(caseInfoService.isExist(caseid)){
-
-          val sql = "select t.fingerid from NORMALLP_LATFINGER t where t.caseid =?"
-          JdbcDatabase.queryFirst(sql) { ps =>
-            ps.setString(1, caseid)
-          } { rs =>
-            fingerid = rs.getString("fingerid")
-          }.get
-
-          val lpCard = lpCardService.getLPCard(fingerid)   //NORMALLP_LATFINGER  fingerid
-          val caseInfo = caseInfoService.getCaseInfo(caseid)  //NORMALLP_CASE  caseid
-
-          val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCard,caseInfo)
+        caseId = ss(1)
+        if(caseInfoService.isExist(caseId)){
+          val caseInfo = caseInfoService.getCaseInfo(caseId)
+          val fingerIdCount = caseInfo.getStrFingerIDList.size
+          for(i <-0 to fingerIdCount-1){
+            lpCardList.append(lpCardService.getLPCard(caseInfo.getStrFingerID(i)))
+          }
+          val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCardList,caseInfo)
           new DataHandler(new ByteArrayDataSource(fptObj.toByteArray(AncientConstants.GBK_ENCODING)))
         }else{
-          FPTFileBuilder.emptyFPT
+          new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
         }
       }else{
         throw new Exception("传入的案件编号ajno:不符合要求")
@@ -160,8 +157,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       case e : Exception => error("fun:getLatentFinger Exception" +
         ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
         ,userid,password,ajno,e.getMessage,new Date)
-        FPTFileBuilder.emptyFPT
-    }*/
-    FPTFileBuilder.emptyFPT
+        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
+    }
   }
 }
