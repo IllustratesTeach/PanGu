@@ -48,6 +48,9 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     try{
       //1 根据查询条件查询捺印文字信息数据集合
       val logic02RecList :Seq[Logic02Rec] = tpCardService.getFPT4Logic02RecList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
+      logic02RecList.foreach{ logic02Rec =>
+        logic02Rec.head.dataType = "02"
+      }
       if(null != logic02RecList && logic02RecList.size > 0){
         //2 将捺印文字信息数据集合 封装成FPT
         val FPT4File = FPTFileBuilder.buildTenprintRecordFpt(logic02RecList)
