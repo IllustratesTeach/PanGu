@@ -71,8 +71,8 @@ object FPTFileBuilder {
       logic02Rec.certificateNo = card.getText.getStrCertifID
       logic02Rec.door = card.getText.getStrHuKouPlaceCode
       logic02Rec.doorDetail = card.getText.getStrHuKouPlaceTail
-      logic02Rec.address = card.getText.getStrAddr
-      logic02Rec.addressDetail = card.getText.getStrAddrCode
+      logic02Rec.address = card.getText.getStrAddrCode
+      logic02Rec.addressDetail = card.getText.getStrAddr
       logic02Rec.category = card.getText.getStrPersonType
       logic02Rec.caseClass1Code = card.getText.getStrCaseType1
       logic02Rec.caseClass2Code = card.getText.getStrCaseType2
