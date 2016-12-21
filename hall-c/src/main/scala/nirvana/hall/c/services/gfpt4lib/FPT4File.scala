@@ -10,12 +10,31 @@ import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
  * @since 2016-01-27
  */
 object FPT4File {
+  //逻辑记录类型
+  final val LOGIC01REC_DATATYPE = "01"
+  final val LOGIC02REC_DATATYPE = "02"
+  final val LOGIC03REC_DATATYPE = "03"
+  final val LOGIC04REC_DATATYPE = "04"
+  final val LOGIC05REC_DATATYPE = "05"
+  final val LOGIC06REC_DATATYPE = "06"
+  final val LOGIC07REC_DATATYPE = "07"
+  final val LOGIC08REC_DATATYPE = "08"
+  final val LOGIC09REC_DATATYPE = "09"
+  final val LOGIC10REC_DATATYPE = "10"
+  final val LOGIC11REC_DATATYPE = "11"
+  final val LOGIC12REC_DATATYPE = "12"
+  final val LOGIC99REC_DATATYPE = "99"
+
   private lazy val headSize = 10
   class LogicHeadV4 extends AncientData{
     @Length(8)
     var fileLength: String = _
     @Length(2)
     var dataType:String = _
+    def this(dataType: String){
+      this()
+      this.dataType = dataType
+    }
 
     /**
      * calculate data size and return.
@@ -30,7 +49,7 @@ object FPT4File {
     @Length(12)
     var fileLength: String = _
     @Length(2)
-    var dataType: String = "1"
+    var dataType: String = LOGIC01REC_DATATYPE
     @Length(6)
     var tpCount: String = _
     @Length(6)
@@ -117,7 +136,7 @@ object FPT4File {
    * 十指指纹信息记录结构
    */
   class Logic02Rec extends DynamicFingerData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC02REC_DATATYPE)
     @Length(6)
     var index: String = _
     @Length(4)
@@ -268,7 +287,7 @@ object FPT4File {
    * 现场指纹信息记录结构
    */
   class Logic03Rec extends DynamicFingerData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC03REC_DATATYPE)
     @Length(6)
     var index: String = _   //序号
     @Length(4)
@@ -408,7 +427,7 @@ object FPT4File {
    * 指纹正查和倒查比中信息记录结构
    */
   class Logic04Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC04REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -460,7 +479,7 @@ object FPT4File {
    * 指纹查重比中信息记录结构
    */
   class Logic05Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC05REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -504,7 +523,7 @@ object FPT4File {
    * 指纹串查比中信息记录结构
    */
   class Logic06Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC06REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -552,7 +571,7 @@ object FPT4File {
    * 现场指纹查询请求信息记录结构
    */
   class Logic07Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC07REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -570,7 +589,7 @@ object FPT4File {
    * 十指指纹查询请求信息记录结构
    */
   class Logic08Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC08REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -586,7 +605,7 @@ object FPT4File {
    * 正查比对结果候选信息记录结构
    */
   class Logic09Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC09REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -618,7 +637,7 @@ object FPT4File {
    * 倒查比对结果候选信息记录结构
    */
   class Logic10Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC10REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -648,7 +667,7 @@ object FPT4File {
    * 查重比对结果候选信息记录结构
    */
   class Logic11Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC11REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -674,7 +693,7 @@ object FPT4File {
    * 串查比对结果候选信息记录结构
    */
   class Logic12Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC12REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -704,7 +723,7 @@ object FPT4File {
    * 自定义逻辑记录结构
    */
   class Logic99Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC99REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
