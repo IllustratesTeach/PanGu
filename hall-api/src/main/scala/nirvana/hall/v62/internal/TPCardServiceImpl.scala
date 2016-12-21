@@ -101,6 +101,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       g_stCN.stTcID.pszName -> "cardId",
       //NAME	姓名
       TCardText.pszName -> "personName",
+      //ALIAS 别名
+      TCardText.pszAlias -> "alias",
       //SEXCODE	性别
       TCardText.pszSexCode -> "gender",
       //BIRTHDATE	出生日期
@@ -119,11 +121,11 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       TCardText.pszHuKouPlaceCode -> "door",
       //HUKOUPLACETAIL	户口所在地
       TCardText.pszHuKouPlaceTail -> "doorDetail",
-      //ADDRESSTAIL	现住址
-      TCardText.pszAddressTail -> "address",
       //ADDRESSCODE	现住址代码
-      TCardText.pszAddressCode -> "addressDetail",
-      //PERSONCLASSCODE 人员类别代码 （未确定，有可能是人员类别描述）
+      TCardText.pszAddressCode -> "address",
+      //ADDRESSTAIL	现住址
+      TCardText.pszAddressTail -> "addressDetail",
+      //PERSONCLASSCODE 人员类别代码
       TCardText.pszPersonClassCode -> "category",
       //CASECLASS1CODE	案件类别1
       TCardText.pszCaseClass1Code -> "caseClass1Code",
