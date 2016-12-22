@@ -130,7 +130,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     }
     var dataHandler = new DataHandler(new ByteArrayDataSource(fpt.toByteArray()))
     //debug 保存fpt
-    saveFpt(dataHandler,"getTenprintFinger",ajno)
+    saveFpt(dataHandler,"getLatent",ajno)
     dataHandler
   }
 
@@ -166,7 +166,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
           dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
         }
         //debug 保存fpt
-        saveFpt(dataHandler,"getTenprintFinger",ajno)
+        saveFpt(dataHandler,"getLatentFinger",ajno)
         dataHandler
       }else{
         throw new Exception("传入的案件编号ajno:不符合要求")
