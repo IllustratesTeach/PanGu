@@ -2,22 +2,26 @@ package nirvana.hall.api.webservice
 
 
 import java.io.FileInputStream
+import java.util.Date
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.services.{QueryService, TPCardService}
-import nirvana.hall.api.webservice.util.FPTFileHandler
+import monad.support.services.LoggerSupport
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
+import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer, FPTFileHandler}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.Test
 
 /**
   * Created by yuchen on 2016/12/7.
   */
-class FPTFileHandlerTest extends BaseV62TestCase{
+class FPTFileHandlerTest extends BaseV62TestCase with LoggerSupport{
   @Test
   def test_getTenprintFinger: Unit ={  //A1200002018881996110060.fpt  //44200481222242352823638.fpt
     val fptFile = FPTFileHandler.FPTFileParse(new FileInputStream("E:\\A1311230000002014070004.fpt"))
@@ -134,10 +138,11 @@ class FPTFileHandlerTest extends BaseV62TestCase{
   def test_getSearchTask(): Unit ={
     try{
 
-      val taskFpt = FPTFile.parseFromInputStream(new FileInputStream("E:\\44200374222242333422277.fpt"))
+      val taskFpt = FPTFile.parseFromInputStream(new FileInputStream("E:\\44200372722242342922290.fpt"))
 
       //解析比对任务FPT
       val taskControlID = taskFpt.right.get.sid
+      info("fun:Union4pfmipCronService,taskControlID:{};time:{}",taskControlID,new Date)
 
 
       taskFpt match {
@@ -153,8 +158,10 @@ class FPTFileHandlerTest extends BaseV62TestCase{
             println("测试测试......")
             tpCardService.addTPCard(tPCard)
             // TODO 发比对任务
-            queryService.sendQuery(null)
-
+            var matchTask:MatchTask = null
+            matchTask = FPT2MatchTaskProtoBuffer(fpt4)
+            queryService.sendQuery(matchTask)
+            info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
           }else if(fpt4.logic03Recs.length>0){
               // TODO 现场处理
           }else{
@@ -177,7 +184,7 @@ class FPTFileHandlerTest extends BaseV62TestCase{
   def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-    tpCard.setStrCardID(fpt4.sid)
+    tpCard.setStrCardID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName (logic02Rec.alias)
     textBuilder.setNSex(if(logic02Rec.gender==null){logic02Rec.gender.toInt}else{9})
@@ -235,4 +242,50 @@ class FPTFileHandlerTest extends BaseV62TestCase{
     }
     tpCard.build()
   }
+
+  /**
+    * 根据接口获得的FPT文件构建matchtask protobuffer对象
+    * 在构建过程中,需要解压图片获得原图，提取特征
+    * @param fpt4
+    * @return
+    */
+  def FPT2MatchTaskProtoBuffer(fpt4:FPT4File):MatchTask = {
+
+    val matchTask = MatchTask.newBuilder()
+    fpt4.logic02Recs.foreach { tp =>
+      matchTask.setMatchId(tp.personId)
+      matchTask.setMatchType(NirvanaTypeDefinition.MatchType.FINGER_TT)
+      matchTask.setPriority(1)
+      matchTask.setObjectId(1)
+      matchTask.setScoreThreshold(50)
+      matchTask.setTopN(50)
+    }
+    matchTask.build()
+  }
+
+
+
+  /**
+    * 处理LPCard数据
+    */
+  @Test
+  def handlerLPCardData(): Unit ={
+
+    val taskFpt = FPTFile.parseFromInputStream(
+      new FileInputStream("E:\\A1311230000002014070004.fpt"))
+    taskFpt match {
+      case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
+      case Right(fpt4) =>
+        val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
+        val caseInfo = FPTConvertToProtoBuffer.FPT2CaseProtoBuffer(fpt4)
+        val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
+        val lPCardService = getService[LPCardService]
+        val queryService =  getService[QueryService]
+        val caseInfoService = getService[CaseInfoService]
+        lPCardService.addLPCard(lPCard)
+        caseInfoService.addCaseInfo(caseInfo)
+        queryService.sendQuery(matchTask)
+    }
+  }
+
 }
