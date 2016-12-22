@@ -304,4 +304,25 @@ object FPTConvertToProtoBuffer {
     }
     matchTask.build()
   }
+
+  /**
+    * 根据接口获得的FPT文件构建matchtask Case protobuffer对象
+    * 在构建过程中,需要解压图片获得原图，提取特征
+    *
+    * @param fpt4
+    * @return
+    */
+  def FPT2MatchTaskCaseProtoBuffer(fpt4:FPT4File):MatchTask = {
+
+    val matchTask = MatchTask.newBuilder()
+    fpt4.logic03Recs.foreach { lp =>
+      matchTask.setMatchId(lp.cardId)
+      matchTask.setMatchType(NirvanaTypeDefinition.MatchType.FINGER_LT)
+      matchTask.setPriority(1)
+      matchTask.setObjectId(1)
+      matchTask.setScoreThreshold(50)
+      matchTask.setTopN(50)
+    }
+    matchTask.build()
+  }
 }
