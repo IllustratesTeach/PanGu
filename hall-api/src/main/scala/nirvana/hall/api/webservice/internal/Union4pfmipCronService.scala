@@ -114,7 +114,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
   def handlerLPCardData(fpt4:FPT4File): Unit ={
     val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
     val caseInfo = FPTConvertToProtoBuffer.FPT2CaseProtoBuffer(fpt4)
-    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
+    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
     lPCardService.addLPCard(lPCard)
     caseInfoService.addCaseInfo(caseInfo)
     queryService.sendQuery(matchTask)
