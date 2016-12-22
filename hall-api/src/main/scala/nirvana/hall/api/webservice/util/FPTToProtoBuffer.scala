@@ -17,6 +17,12 @@ import scala.util.Success
   */
 object FPTConvertToProtoBuffer {
   /**
+    * 定义一个常量
+    * 如果传入的int值为空，则给出9
+    */
+  val INTDEX = 9
+
+  /**
     * 根据接口获得的FPT文件,构建TPCard的ProtoBuffer的对象
     * 在构建过程中,需要解压图片获得原图，提取特征
     *
@@ -29,10 +35,10 @@ object FPTConvertToProtoBuffer {
     tpCard.setStrCardID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
-    textBuilder.setNSex(if (logic02Rec.gender == null) {
+    textBuilder.setNSex(if (logic02Rec.gender != null) {
       logic02Rec.gender.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrBirthDate(logic02Rec.birthday)
     textBuilder.setStrIdentityNum(logic02Rec.idCardNo)
@@ -53,24 +59,24 @@ object FPTConvertToProtoBuffer {
     textBuilder.setStrRace(logic02Rec.nativeplace)
     textBuilder.setStrCertifType(logic02Rec.certificateType)
     textBuilder.setStrCertifID(logic02Rec.certificateNo)
-    textBuilder.setBHasCriminalRecord(if (logic02Rec.isCriminal == 0) {
+    textBuilder.setBHasCriminalRecord(if (logic02Rec.isCriminal != 0) {
       logic02Rec.isCriminal == false
     } else {
       logic02Rec.isCriminal == true
     })
     textBuilder.setStrCriminalRecordDesc(logic02Rec.criminalInfo)
     textBuilder.setStrPremium(logic02Rec.assistUnitName)
-    textBuilder.setNXieChaFlag(if (logic02Rec.isAssist == null) {
+    textBuilder.setNXieChaFlag(if (logic02Rec.isAssist != null) {
       logic02Rec.isAssist.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrXieChaRequestUnitName(logic02Rec.assistUnitName)
     textBuilder.setStrXieChaRequestUnitCode(logic02Rec.assistUnitCode)
-    textBuilder.setNXieChaLevel(if (logic02Rec.assistLevel == null) {
+    textBuilder.setNXieChaLevel(if (logic02Rec.assistLevel != null) {
       logic02Rec.assistLevel.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrXieChaForWhat(logic02Rec.assistPurpose)
     textBuilder.setStrRelPersonNo(logic02Rec.relatedPersonId)
