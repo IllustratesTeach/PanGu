@@ -59,7 +59,7 @@ object FPTConvertToProtoBuffer {
     textBuilder.setStrRace(logic02Rec.nativeplace)
     textBuilder.setStrCertifType(logic02Rec.certificateType)
     textBuilder.setStrCertifID(logic02Rec.certificateNo)
-    textBuilder.setBHasCriminalRecord(if (logic02Rec.isCriminal != 0) {
+    textBuilder.setBHasCriminalRecord(if (logic02Rec.isCriminal == 0) {
       logic02Rec.isCriminal == false
     } else {
       logic02Rec.isCriminal == true
