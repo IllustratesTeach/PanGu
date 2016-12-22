@@ -120,6 +120,8 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     queryService.sendQuery(matchTask)
   }
 
+
+
   /**
     * 保存debug fpt
     * @param fpt4
@@ -144,9 +146,5 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
         e.printStackTrace()
     }
   }
-
-
-
-
 
 }
