@@ -31,7 +31,6 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 定时器，获取比对任务
-    *
     * @param periodicExecutor
     */
   @PostInjection
@@ -90,10 +89,8 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
       })
   }
 
-
   /**
     * 处理TPCard数据
-    *
     * @param fpt4
     */
   def handlerTPcardData(fpt4:FPT4File): Unit ={
@@ -108,7 +105,6 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 处理LPCard数据
-    *
     * @param fpt4
     */
   def handlerLPCardData(fpt4:FPT4File): Unit ={
@@ -119,8 +115,6 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     caseInfoService.addCaseInfo(caseInfo)
     queryService.sendQuery(matchTask)
   }
-
-
 
   /**
     * 保存debug fpt
