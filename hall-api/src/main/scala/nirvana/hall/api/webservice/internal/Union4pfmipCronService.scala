@@ -134,7 +134,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
       dir.mkdirs()
     }
     try{
-      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".txt")
+      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".fpt")
       val fpt4ByteArray :Array[Byte] = fpt4.toByteArray(AncientConstants.GBK_ENCODING)
       out.write(fpt4ByteArray)
       out.flush()
