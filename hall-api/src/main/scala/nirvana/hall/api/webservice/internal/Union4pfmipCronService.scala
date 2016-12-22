@@ -1,15 +1,19 @@
 package nirvana.hall.api.webservice.internal
 
 
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.util.Date
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.services.union4pfmip
-import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File}
-import nirvana.hall.c.services.gfpt4lib.{FPTFile}
+import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto._
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -27,6 +31,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 定时器，获取比对任务
+    *
     * @param periodicExecutor
     */
   @PostInjection
@@ -46,6 +51,8 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
             try{
               val taskFpt = FPTFile.parseFromInputStream(taskDataHandler.getInputStream)
               taskControlID = taskFpt.right.get.sid
+              //保存debug Fpt文件
+              saveFpt(taskFpt.right.get,taskControlID)
               info("fun:Union4pfmipCronService,taskControlID:{};time:{}",taskControlID,new Date)
               taskFpt match {
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
@@ -86,6 +93,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 处理TPCard数据
+    *
     * @param fpt4
     */
   def handlerTPcardData(fpt4:FPT4File): Unit ={
@@ -100,6 +108,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 处理LPCard数据
+    *
     * @param fpt4
     */
   def handlerLPCardData(fpt4:FPT4File): Unit ={
@@ -111,6 +120,30 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     queryService.sendQuery(matchTask)
   }
 
+  /**
+    * 保存debug fpt
+    * @param fpt4
+    */
+  def saveFpt(fpt4:FPT4File,taskId: String): Unit = {
+    val dirPath = "E:/debugTaskFpt"
+    val now = new Date()
+    val sdf:SimpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssSSS")
+    val nowStr = sdf.format(now)
+    var dir = new java.io.File(dirPath)
+    if(!dir.exists()){
+      dir.mkdirs()
+    }
+    try{
+      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".txt")
+      val fpt4ByteArray :Array[Byte] = fpt4.toByteArray(AncientConstants.GBK_ENCODING)
+      out.write(fpt4ByteArray)
+      out.flush()
+      out.close()
+    } catch {
+      case e:Exception=> error("saveFpt-error:" + e.getMessage)
+        e.printStackTrace()
+    }
+  }
 
 
 
