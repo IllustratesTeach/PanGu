@@ -122,16 +122,22 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
     */
   override def getLatent(userid: String, password: String, ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): DataHandler = {
+    info("fun:getLatent,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
     val fpt = new FPT4File
-    val logic03RecList = caseInfoService.getFPT4Logic03RecList(ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
-    if(logic03RecList.nonEmpty){
-      fpt.lpCount = logic03RecList.size.toString
-      fpt.logic03Recs = logic03RecList.toArray
+    if(ajnoParse(ajno).get._1) {
+      val logic03RecList = caseInfoService.getFPT4Logic03RecList(ajnoParse(ajno).get._2, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
+      if(logic03RecList.nonEmpty){
+        fpt.lpCount = logic03RecList.size.toString
+        fpt.logic03Recs = logic03RecList.toArray
+      }
+      val dataHandler = new DataHandler(new ByteArrayDataSource(fpt.toByteArray()))
+      //debug 保存fpt
+      saveFpt(dataHandler,"getLatent",ajno)
+      info("fun:getLatent,inputParam-userid:{};password:{};ajno:{},outtime{}:",userid,password,ajno,new Date)
+      dataHandler
+    }else{
+      new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
     }
-    var dataHandler = new DataHandler(new ByteArrayDataSource(fpt.toByteArray()))
-    //debug 保存fpt
-    saveFpt(dataHandler,"getLatent",ajno)
-    dataHandler
   }
 
 
@@ -150,9 +156,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     try{
       var caseId = ""
       val lpCardList = new mutable.ListBuffer[LPCard]
-      if(null != ajno && ajno.contains("A") && 23 == ajno.length){
-        val ss = ajno.split("A")
-        caseId = ss(1)
+      if(ajnoParse(ajno).get._1){
+        caseId = ajnoParse(ajno).get._2
         var dataHandler:DataHandler = null
         if(caseInfoService.isExist(caseId)){
           val caseInfo = caseInfoService.getCaseInfo(caseId)
@@ -202,5 +207,15 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     }
   }
 
+
+  private def ajnoParse(ajno:String): Option[(Boolean,String)] ={
+    var str = ""
+    if(null != ajno && ajno.contains("A") && 23 == ajno.length){
+      str = ajno.split("A")(1)
+      Some(true,str)
+    }else{
+      Some(false,str)
+    }
+  }
 
 }
