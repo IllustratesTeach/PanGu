@@ -20,9 +20,9 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.deletag, db.logic_db_pkid as logicDB " +
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode, t.recordMark, t.deletag, db.logic_db_pkid as logicDB " +
      " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where t.seq >= ? and t.seq <= ? order by t.seq"
-   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass", "logicDB")
+   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordMark", "logicDB")
    /**
     * 读取人员信息
     * @param syncDataResponse
