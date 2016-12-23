@@ -29,7 +29,7 @@ object FPTConvertToProtoBuffer {
     * @param fpt4
     * @return
     */
-  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File):TPCard ={
+  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File,imageDecompressUrl:String):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(logic02Rec.personId)
@@ -93,7 +93,7 @@ object FPTConvertToProtoBuffer {
       if (tData.imgData != null && tData.imgData.length > 0) {
         val tBuffer = FPTFileHandler.fingerDataToGafisImage(tData)
         //图像解压
-        val s = FPTFileHandler.callHallImageDecompressionImage(tBuffer)
+        val s = FPTFileHandler.callHallImageDecompressionImage(imageDecompressUrl,tBuffer)
         //提取特征
         val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(tData.fgp), ParseFeatureTypeEnum(fpt4.tpCount.toInt, fpt4.lpCount.toInt))
         val blobBuilder = tpCard.addBlobBuilder()

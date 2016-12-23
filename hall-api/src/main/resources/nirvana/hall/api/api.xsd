@@ -48,6 +48,11 @@
           <xs:documentation>配置Webservice服务器相关参数</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="imageDecompressUrlType" name="imagedecompressurl" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>解压压缩图像获得原图像的相关参数</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="syncConfigType">
@@ -98,6 +103,15 @@
       <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>密码</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="imageDecompressUrlType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>解压压缩图像获得原图像的URL</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>

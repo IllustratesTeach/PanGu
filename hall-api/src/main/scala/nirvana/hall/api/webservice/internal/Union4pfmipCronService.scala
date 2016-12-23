@@ -59,7 +59,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    handlerTPcardData(fpt4)
+                    handlerTPcardData(fpt4,hallApiConfig.imagedecompressurl.url)
                     info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else if(fpt4.logic03Recs.length>0){
                     handlerLPCardData(fpt4)
@@ -83,13 +83,13 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
 
   /**
     * 处理TPCard数据
-    *
     * @param fpt4
+    * @param imageDecompressUrl 用于解压返回原图的hall-image的服务的地址
     */
-  def handlerTPcardData(fpt4:FPT4File): Unit ={
+  def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Unit ={
     var tPCard:TPCard = null
     fpt4.logic02Recs.foreach( sLogic02Rec =>
-      tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4)
+      tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4,imageDecompressUrl)
     )
     tPCardService.addTPCard(tPCard)
     val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
