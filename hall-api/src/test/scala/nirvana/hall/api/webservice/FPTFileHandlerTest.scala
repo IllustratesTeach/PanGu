@@ -8,6 +8,7 @@ import javax.xml.namespace.QName
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer, FPTFileHandler}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
@@ -26,8 +27,9 @@ import org.junit.Test
 /**
   * Created by yuchen on 2016/12/7.
   */
-class FPTFileHandlerTest extends BaseV62TestCase with LoggerSupport{
+class FPTFileHandlerTest() extends BaseV62TestCase with LoggerSupport{
 
+  val hall_image_url = "http://192.168.1.215:80"
   /**
     * 处理TPCard数据
     */
@@ -43,7 +45,7 @@ class FPTFileHandlerTest extends BaseV62TestCase with LoggerSupport{
       case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
       case Right(fpt4) =>
         fpt4.logic02Recs.foreach( sLogic02Rec =>
-          tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4)
+          tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4,hall_image_url)
         )
         tPCardService.addTPCard(tPCard)
         val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
