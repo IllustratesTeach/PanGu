@@ -21,7 +21,9 @@ import org.apache.axis2.client.Options
 import org.apache.axis2.rpc.client.RPCServiceClient
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import javax.sql.DataSource
 
+import nirvana.hall.support.services.JdbcDatabase
 /**
   * 互查系统定时任务
   */
@@ -30,7 +32,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
                              queryService: QueryService,
-                             fetchQueryService: FetchQueryService) extends LoggerSupport{
+                             fetchQueryService: FetchQueryService,implicit val dataSource: DataSource) extends LoggerSupport{
 
   /**
     * 定时器，获取比对任务
@@ -54,15 +56,20 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
               saveFpt(taskDataHandler.getInputStream)
               val taskFpt = FPTFile.parseFromInputStream(taskDataHandler.getInputStream)
               taskControlID = taskFpt.right.get.sid
+              //保存debug Fpt文件
+              saveFpt(taskFpt.right.get,taskControlID)
               info("fun:Union4pfmipCronService,taskControlID:{};time:{}",taskControlID,new Date)
+              var orgSid:Long = -1
               taskFpt match {
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    handlerTPcardData(fpt4,hallApiConfig.imagedecompressurl.url)
+                    orgSid = handlerTPcardData(fpt4,hallApiConfig.imagedecompressurl.url)
+		                updateMatchResultStatus(orgSid, 0)
                     info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else if(fpt4.logic03Recs.length>0){
-                    handlerLPCardData(fpt4)
+                    orgSid = handlerLPCardData(fpt4)
+                    updateMatchResultStatus(orgSid, 0)
                     info("success:Union4pfmipCronService--logic03Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else{
                     info("success:Union4pfmipCronService:返回空FPT文件")
@@ -86,7 +93,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     * @param fpt4
     * @param imageDecompressUrl 用于解压返回原图的hall-image的服务的地址
     */
-  def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Unit ={
+  def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Long ={
     var tPCard:TPCard = null
     fpt4.logic02Recs.foreach( sLogic02Rec =>
       tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4,imageDecompressUrl)
@@ -101,7 +108,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     *
     * @param fpt4
     */
-  def handlerLPCardData(fpt4:FPT4File): Unit ={
+  def handlerLPCardData(fpt4:FPT4File): Long ={
     val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
     val caseInfo = FPTConvertToProtoBuffer.FPT2CaseProtoBuffer(fpt4)
     val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
@@ -110,6 +117,17 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     queryService.sendQuery(matchTask)
   }
 
+  /**
+    * 更新比对任务状态
+    * @param oraSid
+    */
+  def updateMatchResultStatus(oraSid:Long, seq:Long): Unit = {
+    val sql = "update normalquery_queryque set seq = '"+seq+"' where status >= '2' and ora_sid = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setLong(1, seq)
+      ps.setLong(2, oraSid)
+    }
+  }
 
   /**
     * 保存debug fpt
@@ -207,7 +225,5 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     val opAddEntry: QName = new QName(targetNamespace, functionName)
     Some(serviceClient,opAddEntry)
   }
-
-
 
 }
