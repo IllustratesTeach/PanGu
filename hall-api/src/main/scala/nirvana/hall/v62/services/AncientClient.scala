@@ -1,5 +1,6 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.v62.internal.NoneResponse
 import org.jboss.netty.buffer.ChannelBuffer
@@ -55,7 +56,7 @@ trait ChannelOperator{
     receive[R]()
   }
   def writeAncientData[T <:AncientData,R <: AncientData :ClassTag](target:T): R={
-    val bytes = target.toByteArray()
+    val bytes = target.toByteArray(AncientConstants.GBK_ENCODING)
     writeByteArray(bytes)
   }
   def writePromise(len:Int,promise:Promise[ChannelBuffer]): Unit ={
