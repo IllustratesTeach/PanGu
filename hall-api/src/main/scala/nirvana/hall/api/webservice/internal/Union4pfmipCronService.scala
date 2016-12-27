@@ -5,25 +5,22 @@ import java.io.{FileOutputStream, InputStream}
 import java.text.SimpleDateFormat
 import java.util.Date
 import javax.activation.DataHandler
+import javax.sql.DataSource
 import javax.xml.namespace.QName
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.support.services.JdbcDatabase
 import org.apache.axis2.addressing.EndpointReference
 import org.apache.axis2.client.Options
 import org.apache.axis2.rpc.client.RPCServiceClient
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import javax.sql.DataSource
-
-import nirvana.hall.support.services.JdbcDatabase
 /**
   * 互查系统定时任务
   */
@@ -32,7 +29,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
                              queryService: QueryService,
-                             fetchQueryService: FetchQueryService,implicit val dataSource: DataSource) extends LoggerSupport{
+                             implicit val dataSource: DataSource) extends LoggerSupport{
 
   /**
     * 定时器，获取比对任务
@@ -49,6 +46,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
           val userid = hallApiConfig.webservice.union4pfmip.user
           val password = hallApiConfig.webservice.union4pfmip.password
           var taskControlID = ""
+//          StarkWebServiceClient.createClient(classOf[union4pfmip], url, targetNamespace)
           val taskDataHandler = callGetSearchTask(userid,password,url,targetNamespace)
           try{
             if(null!= taskDataHandler){
@@ -94,11 +92,11 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     * @param imageDecompressUrl 用于解压返回原图的hall-image的服务的地址
     */
   def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Long ={
-    var tPCard:TPCard = null
-    fpt4.logic02Recs.foreach( sLogic02Rec =>
-      tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4,imageDecompressUrl)
-    )
-    tPCardService.addTPCard(tPCard)
+    fpt4.logic02Recs.foreach{ sLogic02Rec =>
+      val tpCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec, imageDecompressUrl)
+      tPCardService.addTPCard(tpCard)
+    }
+    //TODO 发查询的代码剥离出来
     val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
     queryService.sendQuery(matchTask)
   }

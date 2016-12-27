@@ -11,6 +11,7 @@ import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.apache.axiom.attachments.ByteArrayDataSource
 
@@ -52,14 +53,13 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     try{
       //1 根据查询条件查询捺印文字信息数据集合
       val logic02RecList :Seq[Logic02Rec] = tpCardService.getFPT4Logic02RecList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
-      logic02RecList.foreach{ logic02Rec =>
-        logic02Rec.head.dataType = "02"
-      }
       var dataHandler:DataHandler = null
       if(null != logic02RecList && logic02RecList.size > 0){
         //2 将捺印文字信息数据集合 封装成FPT
-        val FPT4File = FPTFileBuilder.buildTenprintRecordFpt(logic02RecList)
-        dataHandler = new DataHandler(new ByteArrayDataSource(FPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
+        val fPT4File = new FPT4File
+        fPT4File.logic02Recs = logic02RecList.toArray
+        FPTFile.buildFPT4File(fPT4File)
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.toByteArray(AncientConstants.GBK_ENCODING)))
       } else {
         dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray(AncientConstants.GBK_ENCODING)))
       }

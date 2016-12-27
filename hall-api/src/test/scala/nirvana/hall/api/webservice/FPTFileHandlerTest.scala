@@ -1,27 +1,12 @@
 package nirvana.hall.api.webservice
 
 
-import java.io.{FileInputStream, FileOutputStream}
-import java.util.Date
-import javax.activation.DataHandler
-import javax.xml.namespace.QName
-
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
-import nirvana.hall.api.webservice.util.{FPTConvertToProtoBuffer, FPTFileHandler}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
+import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, TPCard}
-import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.BaseV62TestCase
-import org.apache.axis2.addressing.EndpointReference
-import org.apache.axis2.client.Options
-import org.apache.axis2.rpc.client.RPCServiceClient
 import org.junit.Test
 
 /**
@@ -44,10 +29,11 @@ class FPTFileHandlerTest() extends BaseV62TestCase with LoggerSupport{
     taskFpt match {
       case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
       case Right(fpt4) =>
-        fpt4.logic02Recs.foreach( sLogic02Rec =>
-          tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec,fpt4,hall_image_url)
-        )
-        tPCardService.addTPCard(tPCard)
+        fpt4.logic02Recs.foreach{ sLogic02Rec =>
+          tPCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec, hall_image_url)
+          tPCardService.addTPCard(tPCard)
+        }
+        //TODO 如果一个fpt有多个捺印信息？？？
         val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
         queryService.sendQuery(matchTask)
     }

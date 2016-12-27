@@ -1,7 +1,6 @@
 package nirvana.hall.api.webservice.util
 
 import java.io.FileInputStream
-import java.nio.ByteOrder
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
@@ -13,9 +12,8 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
-import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
 import nirvana.hall.extractor.internal.{FPTLatentConverter, FeatureExtractorImpl}
-import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
+import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition

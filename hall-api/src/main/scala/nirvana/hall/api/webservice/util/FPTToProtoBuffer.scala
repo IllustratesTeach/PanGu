@@ -25,11 +25,10 @@ object FPTConvertToProtoBuffer {
   /**
     * 根据接口获得的FPT文件,构建TPCard的ProtoBuffer的对象
     * 在构建过程中,需要解压图片获得原图，提取特征
-    *
-    * @param fpt4
+    * @param logic02Rec
     * @return
     */
-  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File,imageDecompressUrl:String):TPCard ={
+  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec, imageDecompressUrl:String):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(logic02Rec.personId)
@@ -95,7 +94,7 @@ object FPTConvertToProtoBuffer {
         //图像解压
         val s = FPTFileHandler.callHallImageDecompressionImage(imageDecompressUrl,tBuffer)
         //提取特征
-        val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(tData.fgp), ParseFeatureTypeEnum(fpt4.tpCount.toInt, fpt4.lpCount.toInt))
+        val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(tData.fgp), FeatureType.FingerTemplate)
         val blobBuilder = tpCard.addBlobBuilder()
         blobBuilder.setStMntBytes(ByteString.copyFrom(mntAndBin.get._1.toByteArray()))
         blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
@@ -307,7 +306,6 @@ object FPTConvertToProtoBuffer {
       matchTask.setObjectId(1)
       matchTask.setScoreThreshold(50)
       matchTask.setTopN(50)
-      matchTask.setQueryid(fpt4.sid)
     }
     matchTask.build()
   }

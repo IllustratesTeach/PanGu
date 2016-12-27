@@ -241,19 +241,6 @@ object FPTFileBuilder {
   }
 
   /**
-    * 建造十指FPT文件
-    * @param  logic02RecList 十指数据集合
-    * @return FPT4File对象
-    */
-  def buildTenprintRecordFpt(logic02RecList :Seq[Logic02Rec]): FPT4File = {
-    val fpt4File =  FPTHead.getFPTTaskRecs()
-    fpt4File.tpCount = logic02RecList.size + ""
-    val arrLogic02Rec:Array[Logic02Rec] = logic02RecList.toArray
-    fpt4File.logic02Recs = arrLogic02Rec
-    fpt4File
-  }
-
-  /**
     * 建造案件FPT文件
     * @param  logic03RecList 案件数据集合
     * @return FPT4File对象
