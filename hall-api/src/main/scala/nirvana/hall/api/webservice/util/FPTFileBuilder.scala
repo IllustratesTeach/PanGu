@@ -1,11 +1,8 @@
 package nirvana.hall.api.webservice.util
 
-import javax.activation.DataHandler
-
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerLData, FingerTData, Logic02Rec, Logic03Rec}
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
-import org.apache.axiom.attachments.ByteArrayDataSource
-
 import scala.collection.mutable
 
 /**
@@ -13,12 +10,36 @@ import scala.collection.mutable
   */
 object FPTFileBuilder {
 
-
-  /**
-    * 空FPT
-    */
-  val emptyFPT = new DataHandler(new ByteArrayDataSource(new Array[Byte](0)))
-
+  object FPTHead{
+    def getFPTTaskRecs(tpCount:String ="0",lpCount:String ="0"): FPT4File ={
+      val fpt4File = new FPT4File
+      fpt4File.head.flag = "FPT"
+      fpt4File.head.majorVersion = "04"
+      fpt4File.head.minorVersion = "00"
+      fpt4File.fileLength = ""
+      fpt4File.tpCount = tpCount                          //十指指纹信息记录数量
+      fpt4File.lpCount = lpCount                          //现场指纹信息记录数量
+      fpt4File.tl_ltCount = "0"
+      fpt4File.ttCount = "0"
+      fpt4File.llCount = "0"
+      fpt4File.lpRequestCount = "0"
+      fpt4File.tpRequestCount = "0"
+      fpt4File.ltCandidateCount =  "0"
+      fpt4File.tlCandidateCount = "0"
+      fpt4File.ttCandidateCount = "0"
+      fpt4File.llCandidateCount = "0"
+      fpt4File.customCandidateCount = "0"
+      fpt4File.sendTime = ""
+      fpt4File.receiveUnitCode = ""
+      fpt4File.sendUnitCode = ""
+      fpt4File.sendUnitName = ""
+      fpt4File.sender = ""
+      fpt4File.sendUnitSystemType ="1900" //1900 东方金指
+      fpt4File.sid = ""
+      fpt4File.remark = ""
+      fpt4File
+    }
+  }
   /**
     * protobuffer转换为十指指纹FPT
     *
@@ -27,41 +48,16 @@ object FPTFileBuilder {
     * @return FPT4File对象
     */
   def convertProtoBuf2TPFPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
-    val fpt4File = new FPT4File
-    fpt4File.head.flag = "FPT"
-    fpt4File.head.majorVersion = "04"
-    fpt4File.head.minorVersion = "00"
-    fpt4File.fileLength = ""
-    fpt4File.tpCount = card.getBlobCount.toString
-    fpt4File.lpCount = "0"
-    fpt4File.tl_ltCount = "0"
-    fpt4File.ttCount = "0"
-    fpt4File.llCount = "0"
-    fpt4File.lpRequestCount = "0"
-    fpt4File.tpRequestCount = "0"
-    fpt4File.ltCandidateCount =  "0"
-    fpt4File.tlCandidateCount = "0"
-    fpt4File.ttCandidateCount = "0"
-    fpt4File.llCandidateCount = "0"
-    fpt4File.customCandidateCount = "0"
-    fpt4File.sendTime = ""
-    fpt4File.receiveUnitCode = ""
-    fpt4File.sendUnitCode = ""
-    fpt4File.sendUnitName = ""
-    fpt4File.sender = ""
-    fpt4File.sendUnitSystemType =""
-    fpt4File.sid = ""
-    fpt4File.remark = card.getText.getStrComment
 
-
+    val fpt4File =  FPTHead.getFPTTaskRecs("1","0")
     val arrLogic02Rec = new Array[Logic02Rec](logic02RecsNum)
-    for( i <- 0 to  logic02RecsNum-1){
 
+    for( i <- 0 to  logic02RecsNum-1){
       val logic02Rec = new Logic02Rec
       logic02Rec.head.fileLength = "0"
-      logic02Rec.head.dataType = "0"
+      logic02Rec.head.dataType = "02"
       logic02Rec.index = ""
-      logic02Rec.systemType = ""
+      logic02Rec.systemType = "1900" //1900 东方金指
       logic02Rec.personId = card.getStrPersonID
       logic02Rec.cardId = card.getStrCardID
       logic02Rec.personName = card.getText.getStrName
@@ -75,8 +71,8 @@ object FPTFileBuilder {
       logic02Rec.certificateNo = card.getText.getStrCertifID
       logic02Rec.door = card.getText.getStrHuKouPlaceCode
       logic02Rec.doorDetail = card.getText.getStrHuKouPlaceTail
-      logic02Rec.address = card.getText.getStrAddr
-      logic02Rec.addressDetail = card.getText.getStrAddrCode
+      logic02Rec.address = card.getText.getStrAddrCode
+      logic02Rec.addressDetail = card.getText.getStrAddr
       logic02Rec.category = card.getText.getStrPersonType
       logic02Rec.caseClass1Code = card.getText.getStrCaseType1
       logic02Rec.caseClass2Code = card.getText.getStrCaseType2
@@ -106,9 +102,9 @@ object FPTFileBuilder {
       logic02Rec.portraitData = new Array[Byte](0)
       val fingerCount = card.getBlobList.size()
       logic02Rec.sendFingerCount = fingerCount.toString
+      logic02Rec.head.fileLength = logic02Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
       arrLogic02Rec.update(i,logic02Rec)
       fpt4File.logic02Recs = arrLogic02Rec
-
 
       val arrFingers = new Array[FingerTData](fingerCount)
       for(j <- 0 to fingerCount-1) {
@@ -139,54 +135,26 @@ object FPTFileBuilder {
       }
       fpt4File.logic02Recs(i).fingers = arrFingers
     }
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
     fpt4File
-
   }
 
   /**
     * protobuffer转换为案件指纹FPT
-    *
-    * @param card 案件卡号
     * @param logic03RecsNum 逻辑记录类的数量
     * @author ssj
     * @return FPT4File对象
     */
-  def convertProtoBuf2LPFPT4File(card: LPCard,caseInfo: Case, logic03RecsNum: Int = 1): FPT4File = {
-    val fpt4File = new FPT4File
-    fpt4File.head.flag = "FPT"
-    fpt4File.head.majorVersion = "04"
-    fpt4File.head.minorVersion = "00"
-    fpt4File.fileLength = ""
-    fpt4File.tpCount = "0"
-    fpt4File.lpCount = "1"
-    fpt4File.tl_ltCount = "0"
-    fpt4File.ttCount = "0"
-    fpt4File.llCount = "0"
-    fpt4File.lpRequestCount = "0"
-    fpt4File.tpRequestCount = "0"
-    fpt4File.ltCandidateCount = "0"
-    fpt4File.tlCandidateCount = "0"
-    fpt4File.ttCandidateCount = "0"
-    fpt4File.llCandidateCount = "0"
-    fpt4File.customCandidateCount = "0"
-    fpt4File.sendTime = ""
-    fpt4File.receiveUnitCode = ""
-    fpt4File.sendUnitCode = ""
-    fpt4File.sendUnitName = ""
-    fpt4File.sender = ""
-    fpt4File.sendUnitSystemType = ""
-    fpt4File.sid = ""
-    fpt4File.remark = ""
-
-
+  def convertProtoBuf2LPFPT4File(lpCardList: mutable.ListBuffer[LPCard],caseInfo: Case, logic03RecsNum: Int = 1): FPT4File = {
+    val fpt4File =  FPTHead.getFPTTaskRecs("0","1")
     val arrLogic03Rec = new Array[Logic03Rec](logic03RecsNum)
     for (i <- 0 to logic03RecsNum - 1) {
 
       val logic03Rec = new Logic03Rec
       logic03Rec.head.fileLength = "0"
-      logic03Rec.head.dataType = "0"
+      logic03Rec.head.dataType = "03"
       logic03Rec.index = ""
-      logic03Rec.systemType = ""
+      logic03Rec.systemType = "1900"
       logic03Rec.caseId = if (22 == caseInfo.getStrCaseID.length) {
         "A".concat(caseInfo.getStrCaseID)
       } else {
@@ -220,49 +188,48 @@ object FPTFileBuilder {
       logic03Rec.fingerCount = caseInfo.getStrFingerIDCount.toString
       val fingerCount = caseInfo.getStrFingerIDCount
       logic03Rec.sendFingerCount = fingerCount.toString
+      logic03Rec.head.fileLength = logic03Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
       arrLogic03Rec.update(i, logic03Rec)
       fpt4File.logic03Recs = arrLogic03Rec
-
-
-
       val arrFingers = new Array[FingerLData](fingerCount)
-      for (j <- 0 to fingerCount - 1) {
-
+      val lpCardListLength = lpCardList.length
+      for(j <-0 to lpCardListLength-1){
         val fingerLData = new FingerLData
         fingerLData.dataLength = ""
         fingerLData.sendNo = "" //发送编号如何定义???
-        fingerLData.fingerNo = card.getText.getStrSeq
-        fingerLData.fingerId = card.getStrCardID
-        fingerLData.isCorpse = if (card.getText.getBDeadBody) "1" else "0"
-        fingerLData.corpseNo = card.getText.getStrDeadPersonNo
-        fingerLData.remainPlace = card.getText.getStrRemainPlace
+        fingerLData.fingerNo = lpCardList(j).getText.getStrSeq
+        fingerLData.fingerId = lpCardList(j).getText.getStrCaseId
+        fingerLData.isCorpse = if (lpCardList(j).getText.getBDeadBody) "1" else "0"
+        fingerLData.corpseNo = lpCardList(j).getText.getStrDeadPersonNo
+        fingerLData.remainPlace = lpCardList(j).getText.getStrRemainPlace
         fingerLData.fgp = ""
-        fingerLData.ridgeColor = card.getText.getStrRidgeColor
-        fingerLData.mittensBegNo = card.getText.getStrStart
-        fingerLData.mittensEndNo = card.getText.getStrEnd
-        fingerLData.isFingerAssist = card.getText.getNXieChaState.toString
-        fingerLData.matchStatus = card.getText.getNBiDuiState.toString
-        fingerLData.extractMethod = card.getText.getStrCaptureMethod
+        fingerLData.ridgeColor = lpCardList(j).getText.getStrRidgeColor
+        fingerLData.mittensBegNo = lpCardList(j).getText.getStrStart
+        fingerLData.mittensEndNo = lpCardList(j).getText.getStrEnd
+        fingerLData.isFingerAssist = lpCardList(j).getText.getNXieChaState.toString
+        fingerLData.matchStatus = lpCardList(j).getText.getNBiDuiState.toString
+        fingerLData.extractMethod = lpCardList(j).getText.getStrCaptureMethod
         fingerLData.pattern = ""
         fingerLData.fingerDirection = ""
         fingerLData.centerPoint = ""
         fingerLData.subCenterPoint = ""
         fingerLData.leftTriangle = ""
         fingerLData.rightTriangle = ""
-        fingerLData.featureCount = card.getBlob.getStMntBytes.size.toString //特征点个数
-        fingerLData.feature = card.getBlob.getStMnt
+        fingerLData.featureCount = lpCardList(j).getBlob.getStMntBytes.size.toString //特征点个数
+        fingerLData.feature = lpCardList(j).getBlob.getStMnt
         fingerLData.customInfoLength = ""
         fingerLData.customInfo = new Array[Byte](0)
         fingerLData.imgHorizontalLength = "512"
         fingerLData.imgVerticalLength = "512"
         fingerLData.dpi = "500"
         fingerLData.imgCompressMethod = ""
-        fingerLData.imgDataLength = card.getBlob.getStImageBytes.size.toString
-        fingerLData.imgData = card.getBlob.getStImageBytes.toByteArray
+        fingerLData.imgDataLength = lpCardList(j).getBlob.getStImageBytes.size.toString
+        fingerLData.imgData = lpCardList(j).getBlob.getStImageBytes.toByteArray
         arrFingers.update(j, fingerLData)
       }
       fpt4File.logic03Recs(i).fingers = arrFingers
     }
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
     fpt4File
   }
 
@@ -272,31 +239,8 @@ object FPTFileBuilder {
     * @return FPT4File对象
     */
   def buildTenprintRecordFpt(logic02RecList :Seq[Logic02Rec]): FPT4File = {
-    val fpt4File = new FPT4File
-    fpt4File.head.flag = "FPT"
-    fpt4File.head.majorVersion = "04"
-    fpt4File.head.minorVersion = "00"
-    fpt4File.fileLength = ""
+    val fpt4File =  FPTHead.getFPTTaskRecs()
     fpt4File.tpCount = logic02RecList.size + ""
-    fpt4File.lpCount = "0"
-    fpt4File.tl_ltCount = "0"
-    fpt4File.ttCount = "0"
-    fpt4File.llCount = "0"
-    fpt4File.lpRequestCount = "0"
-    fpt4File.tpRequestCount = "0"
-    fpt4File.ltCandidateCount =  "0"
-    fpt4File.tlCandidateCount = "0"
-    fpt4File.ttCandidateCount = "0"
-    fpt4File.llCandidateCount = "0"
-    fpt4File.customCandidateCount = "0"
-    fpt4File.sendTime = ""
-    fpt4File.receiveUnitCode = ""
-    fpt4File.sendUnitCode = ""
-    fpt4File.sendUnitName = ""
-    fpt4File.sender = ""
-    fpt4File.sendUnitSystemType =""
-    fpt4File.sid = ""
-    fpt4File.remark = ""
     val arrLogic02Rec:Array[Logic02Rec] = logic02RecList.toArray
     fpt4File.logic02Recs = arrLogic02Rec
     fpt4File
@@ -308,31 +252,8 @@ object FPTFileBuilder {
     * @return FPT4File对象
     */
   def buildLatentFpt(logic03RecList :Seq[Logic03Rec]): FPT4File = {
-    val fpt4File = new FPT4File
-    fpt4File.head.flag = "FPT"
-    fpt4File.head.majorVersion = "04"
-    fpt4File.head.minorVersion = "00"
-    fpt4File.fileLength = ""
-    fpt4File.tpCount = logic03RecList.size + ""
-    fpt4File.lpCount = "0"
-    fpt4File.tl_ltCount = "0"
-    fpt4File.ttCount = "0"
-    fpt4File.llCount = "0"
-    fpt4File.lpRequestCount = "0"
-    fpt4File.tpRequestCount = "0"
-    fpt4File.ltCandidateCount =  "0"
-    fpt4File.tlCandidateCount = "0"
-    fpt4File.ttCandidateCount = "0"
-    fpt4File.llCandidateCount = "0"
-    fpt4File.customCandidateCount = "0"
-    fpt4File.sendTime = ""
-    fpt4File.receiveUnitCode = ""
-    fpt4File.sendUnitCode = ""
-    fpt4File.sendUnitName = ""
-    fpt4File.sender = ""
-    fpt4File.sendUnitSystemType =""
-    fpt4File.sid = ""
-    fpt4File.remark = ""
+    val fpt4File =  FPTHead.getFPTTaskRecs()
+    fpt4File.lpCount = logic03RecList.size + ""
     val arrLogic03Rec:Array[Logic03Rec] = logic03RecList.toArray
     fpt4File.logic03Recs = arrLogic03Rec
     fpt4File

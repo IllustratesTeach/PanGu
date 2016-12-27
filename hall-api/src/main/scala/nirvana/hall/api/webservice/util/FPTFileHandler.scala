@@ -42,7 +42,7 @@ object FPTFileHandler {
   /**
     * 调用hall-image服务_解压图像
     */
-  def callHallImageDecompressionImage(compressedImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
+  def callHallImageDecompressionImage(imageDecompressUrl:String,compressedImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
 
     val registry = ExtensionRegistry.newInstance()
     FirmImageDecompressProto.registerAllExtensions(registry)
@@ -54,7 +54,7 @@ object FPTFileHandler {
     request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
 
 
-    val baseResponse = httpClient.call("http://192.168.1.214:9001", FirmImageDecompressRequest.cmd, request.build())
+    val baseResponse = httpClient.call(imageDecompressUrl, FirmImageDecompressRequest.cmd, request.build())
     baseResponse.getStatus match {
       case CommandStatus.OK =>
         if (baseResponse.hasExtension(FirmImageDecompressResponse.cmd)) {

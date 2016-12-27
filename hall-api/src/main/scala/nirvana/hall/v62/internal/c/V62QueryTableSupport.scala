@@ -58,9 +58,50 @@ trait V62QueryTableSupport {
       val count = stSelRes.nRecGot
       if(count > 0) {
         val buffer = ChannelBuffers.wrappedBuffer(stSelRes.pDataBuf_Data)
-        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer,AncientConstants.GBK_ENCODING)).toList
+        return Range(0, count).map(x => clazz.newInstance().fromStreamReader(buffer,AncientConstants.GB2312_ENCODING)).toList
       }
     }
     Nil
+  }
+}
+
+/**
+  * 6.2通用查询SQL工具类
+  */
+object V62SqlHelper{
+
+  /**
+    * 判断字符串不为空
+    * @param string
+    * @return true
+    */
+  def isNonBlank(string: String):Boolean = string != null && string.length >0
+
+  /**
+    * 拼接like 查询 后模糊
+    * @param column
+    * @param value
+    * @return
+    */
+  def likeSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s LIKE '%s%%')".format(column, value)
+    }else{
+      ""
+    }
+  }
+
+  /**
+    * 拼接and 查询
+    * @param column
+    * @param value
+    * @return
+    */
+  def andSQL(column: String, value: String): String ={
+    if(isNonBlank(value)){
+      " AND (%s = '%s')".format(column, value)
+    }else{
+      ""
+    }
   }
 }
