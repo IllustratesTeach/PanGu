@@ -3,6 +3,7 @@ package nirvana.hall.api.webservice.util
 import java.io.FileInputStream
 import java.nio.ByteOrder
 import java.util.concurrent.atomic.AtomicBoolean
+
 import com.google.protobuf.{ByteString, ExtensionRegistry}
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.AncientConstants
@@ -13,7 +14,7 @@ import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
-import nirvana.hall.extractor.internal.FeatureExtractorImpl
+import nirvana.hall.extractor.internal.{FPTLatentConverter, FeatureExtractorImpl}
 import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
@@ -120,16 +121,6 @@ object FPTFileHandler {
     if (!extractorDllLoaded)
       loadExtractorJNI()
 
-  }
-
-  object FPTLatentConverter {
-    def convert(mNTDISPSTRUCT: MNTDISPSTRUCT): FINGERLATMNTSTRUCT = {
-      val bytes = new FINGERLATMNTSTRUCT().toByteArray()
-      //此处结构传入到JNI层需要采用低字节序
-      val dispBytes = mNTDISPSTRUCT.toByteArray(byteOrder = ByteOrder.LITTLE_ENDIAN)
-      NativeExtractor.ConvertFPTLatentMNT2Std(dispBytes, bytes)
-      new FINGERLATMNTSTRUCT().fromByteArray(bytes)
-    }
   }
 
   def createImageLatentEvent(disp: MNTDISPSTRUCT): Array[Byte] = {
