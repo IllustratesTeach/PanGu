@@ -229,7 +229,7 @@ object FPTFileBuilder {
         fingerLData.imgHorizontalLength = "512"
         fingerLData.imgVerticalLength = "512"
         fingerLData.dpi = "500"
-        fingerLData.imgCompressMethod = ""
+        fingerLData.imgCompressMethod = "0000"
         fingerLData.imgDataLength = lpCardList(j).getBlob.getStImageBytes.size.toString
         fingerLData.imgData = lpCardList(j).getBlob.getStImageBytes.toByteArray
         arrFingers.update(j, fingerLData)
