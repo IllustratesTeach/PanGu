@@ -49,6 +49,7 @@ object gaqryqueConverter {
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
     queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
+    queryStruct.stSimpQry.nQueryID = matchTask.getQueryid.getBytes //远程查询ID
     //TODO 支持指定物理库查询，但不支持多个物理库查询
     val srcDB = new GADBIDSTRUCT  //特征来源数据库
     val destDB = new GADBIDSTRUCT //被查数据库
