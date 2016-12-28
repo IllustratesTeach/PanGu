@@ -1,14 +1,10 @@
 package nirvana.hall.api.webservice.util
 
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.annotations.Length
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
-import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
-import nirvana.hall.protocol.fpt.MatchRelationProto.MatchRelation
-import nirvana.hall.protocol.matcher.MatchResultProto
+import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
-import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.{MatchResultObject, MatchResultObjectOrBuilder}
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatchResultObject
 
 import scala.collection.mutable
 
@@ -54,7 +50,7 @@ object FPTFileBuilder {
     * @param logic02RecsNum 逻辑记录类的数量
     * @return FPT4File对象
     */
-  def convertProtoBuf2TPFPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
+  /*def convertProtoBuf2TPFPT4File(card: TPCard,logic02RecsNum: Int = 1): FPT4File = {
 
     val fpt4File =  FPTHead.getFPTTaskRecs("1","0")
     val arrLogic02Rec = new Array[Logic02Rec](logic02RecsNum)
@@ -144,7 +140,125 @@ object FPTFileBuilder {
     }
     fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
     fpt4File
+  }*/
+  /**
+    * TPCard转换为FPT4File
+    * @param card
+    * @return
+    */
+  def convertTPCard2FPT4File(card: TPCard): FPT4File= {
+    val fPT4File = new FPT4File
+    val logic02Rec = convertTPCard2Logic02Res(card)
+    fPT4File.logic02Recs = Array(logic02Rec)
+
+    fPT4File
   }
+
+  /**
+    * TPCard转换为十指指纹Logic02Rec
+    * @param card 人员卡号
+    * @return FPT4File对象
+    */
+  def convertTPCard2Logic02Res(card: TPCard): Logic02Rec = {
+    val logic02Rec = new Logic02Rec
+    logic02Rec.systemType = "1900" //1900 东方金指
+    logic02Rec.personId = card.getStrPersonID
+    logic02Rec.cardId = card.getStrCardID
+    logic02Rec.personName = card.getText.getStrName
+    logic02Rec.alias = card.getText.getStrAliasName
+    logic02Rec.gender = card.getText.getNSex.toString
+    logic02Rec.birthday = card.getText.getStrBirthDate
+    logic02Rec.nativeplace = card.getText.getStrNation
+    logic02Rec.nation = card.getText.getStrRace
+    logic02Rec.idCardNo = card.getText.getStrIdentityNum
+    logic02Rec.certificateType = card.getText.getStrCertifType
+    logic02Rec.certificateNo = card.getText.getStrCertifID
+    logic02Rec.door = card.getText.getStrHuKouPlaceCode
+    logic02Rec.doorDetail = card.getText.getStrHuKouPlaceTail
+    logic02Rec.address = card.getText.getStrAddrCode
+    logic02Rec.addressDetail = card.getText.getStrAddr
+    logic02Rec.category = card.getText.getStrPersonType
+    logic02Rec.caseClass1Code = card.getText.getStrCaseType1
+    logic02Rec.caseClass2Code = card.getText.getStrCaseType2
+    logic02Rec.caseClass3Code = card.getText.getStrCaseType3
+    logic02Rec.isCriminal = if(card.getText.getBHasCriminalRecord) "1" else "0"
+    logic02Rec.criminalInfo = card.getText.getStrCriminalRecordDesc
+    logic02Rec.gatherUnitCode = card.getText.getStrPrintUnitCode
+    logic02Rec.gatherUnitName = card.getText.getStrPrintUnitName
+    logic02Rec.gatherName = card.getText.getStrPrinter
+    logic02Rec.gatherDate = card.getText.getStrPrintDate
+    logic02Rec.assistLevel = card.getText.getNXieChaLevel.toString
+    logic02Rec.bonus = card.getText.getStrPremium
+    logic02Rec.assistPurpose = card.getText.getStrXieChaForWhat
+    logic02Rec.relatedPersonId = card.getText.getStrRelPersonNo
+    logic02Rec.relatedCaseId = card.getText.getStrRelCaseNo
+    logic02Rec.assistTimeLimit = card.getText.getStrXieChaTimeLimit
+    logic02Rec.assistAskingInfo = card.getText.getStrXieChaRequestComment
+    logic02Rec.assistUnitCode = card.getText.getStrXieChaRequestUnitCode
+    logic02Rec.assistUnitName = card.getText.getStrXieChaRequestUnitName
+    logic02Rec.assistDate = card.getText.getStrXieChaDate
+    logic02Rec.contact = card.getText.getStrXieChaContacter
+    logic02Rec.contactPhone  = card.getText.getStrXieChaTelNo
+    logic02Rec.approver = card.getText.getStrShenPiBy
+    logic02Rec.remark = card.getText.getStrComment
+    logic02Rec.isAssist = card.getText.getNXieChaFlag.toString
+    //人像数据初始化为0
+    logic02Rec.portraitDataLength = "0"
+
+    val iter = card.getBlobList.iterator()
+    var fingers = new mutable.ArrayBuffer[FingerTData]
+    var sendNo = 1 //指纹序号，从1开始计数
+    while (iter.hasNext){
+      val blob = iter.next()
+      blob.getType match {
+        //指纹
+        case ImageType.IMAGETYPE_FINGER =>
+          val fingerTData = new FingerTData
+          fingerTData.sendNo = sendNo.toString
+          sendNo += 1
+          fingerTData.fgp = blob.getFgp.getNumber.toString
+          fingerTData.extractMethod = blob.getStrMntExtractMethod
+          fingerTData.pattern1 = blob.getRp.getNumber.toString
+          fingerTData.pattern2 = blob.getVrp.getNumber.toString
+          fingerTData.fingerDirection = ""
+          fingerTData.centerPoint = ""
+          fingerTData.subCenterPoint = ""
+          fingerTData.leftTriangle = ""
+          fingerTData.rightTriangle = ""
+          //      fingerTData.featureCount = blob.getStMntBytes.size.toString //特征点个数
+          //      fingerTData.feature = blob.getStMnt
+          //TODO 特征格式转换
+          fingerTData.featureCount = "0"
+          fingerTData.feature = ""
+          fingerTData.customInfoLength = "0"
+          fingerTData.customInfo = new Array[Byte](0)
+          fingerTData.imgHorizontalLength = "640"
+          fingerTData.imgVerticalLength = "640"
+          fingerTData.dpi = "500"
+          fingerTData.imgCompressMethod = "1900"
+          fingerTData.imgDataLength = blob.getStImageBytes.size.toString
+          fingerTData.imgData = blob.getStImageBytes.toByteArray
+
+          fingerTData.dataLength = fingerTData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+
+          fingers += fingerTData
+        //人像
+        case ImageType.IMAGETYPE_FACE =>
+          //正面人像
+          if(blob.getFacefgp == FaceFgp.FACE_FRONT){
+            logic02Rec.portraitData = blob.getStImageBytes.toByteArray
+            logic02Rec.portraitDataLength = logic02Rec.portraitData.length.toString
+          }
+      }
+    }
+
+    logic02Rec.fingers = fingers.toArray
+    logic02Rec.sendFingerCount = fingers.length.toString
+    logic02Rec.head.fileLength = logic02Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+
+    logic02Rec
+  }
+
 
   /**
     * protobuffer转换为案件指纹FPT
