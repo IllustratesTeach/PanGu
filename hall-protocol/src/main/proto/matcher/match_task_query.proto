@@ -93,4 +93,6 @@ message MatchTask {
 
   //提交人
   optional string commit_user = 12;
+  //远程查询id
+  optional string queryid = 13;
 }

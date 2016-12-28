@@ -1,20 +1,18 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import java.io.{FileInputStream, File, InputStream}
+import java.io.{File, FileInputStream, InputStream}
 import java.nio.charset.Charset
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
+import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter, _}
 import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import org.apache.commons.io.IOUtils
 
 import scala.language.reflectiveCalls
 import scala.reflect._
-import nirvana.hall.c.services.AncientData._
-
 import scala.util.control.NonFatal
 
 /**
@@ -127,6 +125,37 @@ object FPTFile {
       this
     }
   }
+
+  private def getArrayLength[T](array: Array[T]): String ={
+    if(array != null){
+      array.length.toString
+    }else{
+      "0"
+    }
+  }
+  def buildFPT4File(fpt4File: FPT4File): FPT4File ={
+    fpt4File.head.flag = "FPT"
+    fpt4File.head.majorVersion = "04"
+    fpt4File.head.minorVersion = "00"
+    fpt4File.sendUnitSystemType ="1900" //1900 东方金指
+    fpt4File.fileLength = ""
+    //设置逻辑记录长度
+    fpt4File.tpCount = getArrayLength(fpt4File.logic02Recs)
+    fpt4File.lpCount = getArrayLength(fpt4File.logic03Recs)
+    fpt4File.tl_ltCount = getArrayLength(fpt4File.logic04Recs)
+    fpt4File.ttCount = getArrayLength(fpt4File.logic05Recs)
+    fpt4File.llCount = getArrayLength(fpt4File.logic06Recs)
+    fpt4File.lpRequestCount = getArrayLength(fpt4File.logic07Recs)
+    fpt4File.tpRequestCount = getArrayLength(fpt4File.logic09Recs)
+    fpt4File.ltCandidateCount =  getArrayLength(fpt4File.logic09Recs)
+    fpt4File.tlCandidateCount = getArrayLength(fpt4File.logic10Recs)
+    fpt4File.ttCandidateCount = getArrayLength(fpt4File.logic11Recs)
+    fpt4File.llCandidateCount = getArrayLength(fpt4File.logic12Recs)
+    fpt4File.customCandidateCount = getArrayLength(fpt4File.logic99Recs)
+
+    fpt4File
+  }
+
   def main(args:Array[String]): Unit ={
     val fis = new FileInputStream(new File(args(0)))
     try {

@@ -1,8 +1,15 @@
 package nirvana.hall.api.webservice.util
 
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, FingerLData, FingerTData, Logic02Rec, Logic03Rec}
+import nirvana.hall.c.annotations.Length
+import nirvana.hall.c.services.gfpt4lib.FPT4File._
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
+import nirvana.hall.protocol.fpt.MatchRelationProto.MatchRelation
+import nirvana.hall.protocol.matcher.MatchResultProto
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.{MatchResultObject, MatchResultObjectOrBuilder}
+
 import scala.collection.mutable
 
 /**
@@ -222,7 +229,7 @@ object FPTFileBuilder {
         fingerLData.imgHorizontalLength = "512"
         fingerLData.imgVerticalLength = "512"
         fingerLData.dpi = "500"
-        fingerLData.imgCompressMethod = ""
+        fingerLData.imgCompressMethod = "0000"
         fingerLData.imgDataLength = lpCardList(j).getBlob.getStImageBytes.size.toString
         fingerLData.imgData = lpCardList(j).getBlob.getStImageBytes.toByteArray
         arrFingers.update(j, fingerLData)
@@ -230,19 +237,6 @@ object FPTFileBuilder {
       fpt4File.logic03Recs(i).fingers = arrFingers
     }
     fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length + ""
-    fpt4File
-  }
-
-  /**
-    * 建造十指FPT文件
-    * @param  logic02RecList 十指数据集合
-    * @return FPT4File对象
-    */
-  def buildTenprintRecordFpt(logic02RecList :Seq[Logic02Rec]): FPT4File = {
-    val fpt4File =  FPTHead.getFPTTaskRecs()
-    fpt4File.tpCount = logic02RecList.size + ""
-    val arrLogic02Rec:Array[Logic02Rec] = logic02RecList.toArray
-    fpt4File.logic02Recs = arrLogic02Rec
     fpt4File
   }
 
@@ -259,6 +253,73 @@ object FPTFileBuilder {
     fpt4File
   }
 
+  /**
+    * 构建比对查重候选FPT
+    * @param  matchResult 比对结果集合
+    * @return FPT4File对象
+    */
+  def buildLogic11RecFpt(matchResult:MatchResult,queryId:Long): FPT4File = {
+    val fpt4File =  FPTHead.getFPTTaskRecs("0","0")
+    val resultCount = matchResult.getCandidateResultCount
+    fpt4File.ttCandidateCount = resultCount + ""
+    val logic11RecArray = new Array[Logic11Rec](resultCount)
+    for(i <-0 to resultCount-1){
+      val matchResultObject:MatchResultObject = matchResult.getCandidateResult(i)
+      val logic11Rec = new Logic11Rec
+      logic11Rec.head.fileLength = "0"                                //逻辑记录长度
+      logic11Rec.head.dataType = "11"                                 //逻辑记录类型
+      logic11Rec.index = ""                                           //序号
+      logic11Rec.matchMethod = ""                                     //比对方法代码
+      logic11Rec.matchUnitCode = "1900"                               //比对单位代码
+      logic11Rec.matchFinshDate = ""                                  //比对完成时间
+      logic11Rec.submitPersonId = ""                                  //送检指纹人员编号
+      logic11Rec.personCount = resultCount + ""                       //实际返回人员数
+      logic11Rec.candidatePlace = (i+1) + ""                          //侯选名次
+      logic11Rec.candidateScore = matchResultObject.getScore + ""     //侯选得分
+      logic11Rec.personId = matchResultObject.getObjectId + ""        //人员编号
+      logic11Rec.head.fileLength = logic11Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
+      logic11RecArray.update(i, logic11Rec)
+    }
+    fpt4File.logic11Recs = logic11RecArray
+    fpt4File
+  }
+
+  /**
+    * 构建比对正查候选FPT
+    * @param  matchResult 比对结果集合
+    * @param  ajid 案件ID
+    * @param  queryId sid
+    * @return FPT4File对象
+    */
+  def buildLogic09RecFpt(matchResult:MatchResult,ajid:String,queryId:Long): FPT4File = {
+    val fpt4File =  FPTHead.getFPTTaskRecs("0","0")
+    val resultCount = matchResult.getCandidateResultCount
+    fpt4File.sid = queryId  + ""
+    fpt4File.ltCandidateCount = resultCount + ""
+    val logic09RecArray = new Array[Logic09Rec](resultCount)
+    for(i <-0 to resultCount-1){
+      val matchResultObject:MatchResultObject = matchResult.getCandidateResult(i)
+      val logic09Rec = new Logic09Rec
+      logic09Rec.head.fileLength = "0"                                //逻辑记录长度
+      logic09Rec.head.dataType = "09"                                 //逻辑记录类型
+      logic09Rec.index = ""                                           //序号
+      logic09Rec.matchMethod = ""                                     //比对方法代码
+      logic09Rec.matchUnitCode = "1900"                               //提交结果单位代码
+      logic09Rec.matchFinshDate = ""                                  //比对完成时间
+      logic09Rec.authenticator = ""                                   //认证人姓名
+      logic09Rec.caseId = ajid                                        //送检指纹案件编号
+      logic09Rec.seqNo = ""                                           //送检指纹序号
+      logic09Rec.tpFingerCount = resultCount + ""                     //实际返回十指指纹数
+      logic09Rec.candidatePlace = (i+1) + ""                          //侯选名次
+      logic09Rec.candidateScore = matchResultObject.getScore + ""     //侯选得分
+      logic09Rec.personId = matchResultObject.getObjectId + ""        //人员编号
+      logic09Rec.fgp = matchResultObject.getPos + ""                  //指位
+      logic09Rec.head.fileLength = logic09Rec.toByteArray(AncientConstants.GBK_ENCODING).length + ""
+      logic09RecArray.update(i, logic09Rec)
+    }
+    fpt4File.logic09Recs = logic09RecArray
+    fpt4File
+  }
 
   /**
     * 获取数据
