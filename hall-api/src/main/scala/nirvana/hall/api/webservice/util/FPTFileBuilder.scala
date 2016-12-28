@@ -2,6 +2,7 @@ package nirvana.hall.api.webservice.util
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatchResultObject
@@ -151,7 +152,7 @@ object FPTFileBuilder {
     val logic02Rec = convertTPCard2Logic02Res(card)
     fPT4File.logic02Recs = Array(logic02Rec)
 
-    fPT4File
+    FPTFile.buildFPT4File(fPT4File)
   }
 
   /**

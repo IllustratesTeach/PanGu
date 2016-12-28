@@ -138,7 +138,6 @@ object FPTFile {
     fpt4File.head.majorVersion = "04"
     fpt4File.head.minorVersion = "00"
     fpt4File.sendUnitSystemType ="1900" //1900 东方金指
-    fpt4File.fileLength = ""
     //设置逻辑记录长度
     fpt4File.tpCount = getArrayLength(fpt4File.logic02Recs)
     fpt4File.lpCount = getArrayLength(fpt4File.logic03Recs)
@@ -153,6 +152,7 @@ object FPTFile {
     fpt4File.llCandidateCount = getArrayLength(fpt4File.logic12Recs)
     fpt4File.customCandidateCount = getArrayLength(fpt4File.logic99Recs)
 
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     fpt4File
   }
 

@@ -1,5 +1,9 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.nio.ByteOrder
+import java.nio.charset.Charset
+
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{Length, LengthRef, NotTrim}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
@@ -130,6 +134,10 @@ object FPT4File {
     @LengthRef("customCandidateCount")
     var logic99Recs: Array[Logic99Rec] = _
 
+    //fpt默认编码格式GBK
+    override def toByteArray(encoding:Charset=AncientConstants.GBK_ENCODING, byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN) = {
+      super.toByteArray(encoding, byteOrder)
+    }
   }
 
   /**
