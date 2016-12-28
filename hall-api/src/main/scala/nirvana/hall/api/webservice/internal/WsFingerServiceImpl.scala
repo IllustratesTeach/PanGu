@@ -55,10 +55,6 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       val logic02RecList :Seq[Logic02Rec] = tpCardService.getFPT4Logic02RecList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
       var dataHandler:DataHandler = null
       if(null != logic02RecList && logic02RecList.size > 0){
-        //2 将捺印文字信息数据集合 封装成FPT
-        logic02RecList.foreach{ logic02Rec =>
-          logic02Rec.head.dataType = "02"  //兼容V62保存数据类型
-        }
         val fPT4File = new FPT4File
         fPT4File.logic02Recs = logic02RecList.toArray
         FPTFile.buildFPT4File(fPT4File)

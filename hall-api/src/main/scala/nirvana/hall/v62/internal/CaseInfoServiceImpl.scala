@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.CaseInfoService
+import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
@@ -115,7 +116,11 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       statement += " AND (%s <= %s)".format(LCaseText.pszCaseOccurDate, endfadate.substring(0,8))
     }
 
-    facade.queryV62Table[Logic03Rec](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
+    val logic03RecList = facade.queryV62Table[Logic03Rec](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
+    //初始数据重新赋值
+    logic03RecList.foreach(_.head.dataType = FPT4File.LOGIC03REC_DATATYPE)
+
+    logic03RecList
   }
 
   /**
