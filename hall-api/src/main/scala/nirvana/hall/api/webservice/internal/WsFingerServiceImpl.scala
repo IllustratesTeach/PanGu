@@ -10,7 +10,6 @@ import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
-import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.apache.axiom.attachments.ByteArrayDataSource
 
@@ -56,7 +55,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       if(null != logic02RecList && logic02RecList.size > 0){
         val fPT4File = new FPT4File
         fPT4File.logic02Recs = logic02RecList.toArray
-        dataHandler = new DataHandler(new ByteArrayDataSource(FPTFile.buildFPT4File(fPT4File).toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       } else {
         dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
       }
@@ -133,8 +132,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
           val fpt4File = new FPT4File
           fpt4File.lpCount = logic03RecList.size.toString
           fpt4File.logic03Recs = logic03RecList.toArray
-          FPTFile.buildFPT4File(fpt4File)
-          dataHandler = new DataHandler(new ByteArrayDataSource(fpt4File.toByteArray()))
+          dataHandler = new DataHandler(new ByteArrayDataSource(fpt4File.build().toByteArray()))
           //debug 保存fpt
           saveFpt(dataHandler,"getLatent",ajno)
         } else {

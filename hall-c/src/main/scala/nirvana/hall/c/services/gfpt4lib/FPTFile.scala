@@ -74,6 +74,7 @@ object FPTFile {
     }
     seq.toArray
   }
+
   class FPTHead extends AncientData{
     @Length(3)
     var flag:String = _
@@ -82,7 +83,6 @@ object FPTFile {
     @Length(2)
     var minorVersion:String = _
   }
-
 
   trait DynamicFingerData extends AncientData{
     @IgnoreTransfer
@@ -102,7 +102,6 @@ object FPTFile {
         count += 1
       count
     }
-
 
     /**
      * serialize to channel buffer
@@ -124,36 +123,6 @@ object FPTFile {
       }
       this
     }
-  }
-
-  private def getArrayLength[T](array: Array[T]): String ={
-    if(array != null){
-      array.length.toString
-    }else{
-      "0"
-    }
-  }
-  def buildFPT4File(fpt4File: FPT4File): FPT4File ={
-    fpt4File.head.flag = "FPT"
-    fpt4File.head.majorVersion = "04"
-    fpt4File.head.minorVersion = "00"
-    fpt4File.sendUnitSystemType ="1900" //1900 东方金指
-    //设置逻辑记录长度
-    fpt4File.tpCount = getArrayLength(fpt4File.logic02Recs)
-    fpt4File.lpCount = getArrayLength(fpt4File.logic03Recs)
-    fpt4File.tl_ltCount = getArrayLength(fpt4File.logic04Recs)
-    fpt4File.ttCount = getArrayLength(fpt4File.logic05Recs)
-    fpt4File.llCount = getArrayLength(fpt4File.logic06Recs)
-    fpt4File.lpRequestCount = getArrayLength(fpt4File.logic07Recs)
-    fpt4File.tpRequestCount = getArrayLength(fpt4File.logic09Recs)
-    fpt4File.ltCandidateCount =  getArrayLength(fpt4File.logic09Recs)
-    fpt4File.tlCandidateCount = getArrayLength(fpt4File.logic10Recs)
-    fpt4File.ttCandidateCount = getArrayLength(fpt4File.logic11Recs)
-    fpt4File.llCandidateCount = getArrayLength(fpt4File.logic12Recs)
-    fpt4File.customCandidateCount = getArrayLength(fpt4File.logic99Recs)
-
-    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length.toString
-    fpt4File
   }
 
   def main(args:Array[String]): Unit ={

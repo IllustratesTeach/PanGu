@@ -138,6 +138,14 @@ object FPT4File {
     override def toByteArray(encoding:Charset=AncientConstants.GBK_ENCODING, byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN) = {
       super.toByteArray(encoding, byteOrder)
     }
+
+    /**
+      * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
+      * @return
+      */
+    def build(): FPT4File={
+      FPT4File.build(this)
+    }
   }
 
   /**
@@ -739,4 +747,40 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+    * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
+    * @param fpt4File
+    * @return
+    */
+  def build(fpt4File: FPT4File): FPT4File={
+    fpt4File.head.flag = "FPT"
+    fpt4File.head.majorVersion = "04"
+    fpt4File.head.minorVersion = "00"
+    fpt4File.sendUnitSystemType ="1900" //1900 东方金指
+    //设置逻辑记录长度
+    fpt4File.tpCount = getArrayLength(fpt4File.logic02Recs)
+    fpt4File.lpCount = getArrayLength(fpt4File.logic03Recs)
+    fpt4File.tl_ltCount = getArrayLength(fpt4File.logic04Recs)
+    fpt4File.ttCount = getArrayLength(fpt4File.logic05Recs)
+    fpt4File.llCount = getArrayLength(fpt4File.logic06Recs)
+    fpt4File.lpRequestCount = getArrayLength(fpt4File.logic07Recs)
+    fpt4File.tpRequestCount = getArrayLength(fpt4File.logic09Recs)
+    fpt4File.ltCandidateCount =  getArrayLength(fpt4File.logic09Recs)
+    fpt4File.tlCandidateCount = getArrayLength(fpt4File.logic10Recs)
+    fpt4File.ttCandidateCount = getArrayLength(fpt4File.logic11Recs)
+    fpt4File.llCandidateCount = getArrayLength(fpt4File.logic12Recs)
+    fpt4File.customCandidateCount = getArrayLength(fpt4File.logic99Recs)
+
+    //TODO 计算其他逻辑记录的fileLength, 使用反射设置LengthRef的长度
+    //计算fileLength
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+    fpt4File
+  }
+  private def getArrayLength[T](array: Array[T]): String ={
+    if(array != null){
+      array.length.toString
+    }else{
+      "0"
+    }
+  }
 }

@@ -152,7 +152,7 @@ object FPTFileBuilder {
     val logic02Rec = convertTPCard2Logic02Res(card)
     fPT4File.logic02Recs = Array(logic02Rec)
 
-    FPTFile.buildFPT4File(fPT4File)
+    fPT4File.build()
   }
 
   /**
