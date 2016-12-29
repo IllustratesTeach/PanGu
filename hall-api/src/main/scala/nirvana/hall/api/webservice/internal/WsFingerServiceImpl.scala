@@ -125,12 +125,8 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       if(ajnoParse(ajno).get._1){
         val logic03RecList :Seq[Logic03Rec] = caseInfoService.getFPT4Logic03RecList(ajnoParse(ajno).get._2, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
         if(null != logic03RecList && logic03RecList.size > 0){
-          logic03RecList.foreach{ logic03Rec =>
-            logic03Rec.head.dataType = "03"  //兼容V62保存数据类型
-          }
           //2 将现场文字信息数据集合 封装成FPT
           val fpt4File = new FPT4File
-          fpt4File.lpCount = logic03RecList.size.toString
           fpt4File.logic03Recs = logic03RecList.toArray
           dataHandler = new DataHandler(new ByteArrayDataSource(fpt4File.build().toByteArray()))
           //debug 保存fpt
@@ -175,7 +171,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
           for(i <-0 to fingerIdCount-1){
             lpCardList.append(lpCardService.getLPCard(caseInfo.getStrFingerID(i)))
           }
-          val fptObj = FPTFileBuilder.convertProtoBuf2LPFPT4File(lpCardList,caseInfo)
+          val fptObj = FPTFileBuilder.convertCaseAndLPCard2FPT4File(caseInfo, lpCardList)
           dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
         }else{
           dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
