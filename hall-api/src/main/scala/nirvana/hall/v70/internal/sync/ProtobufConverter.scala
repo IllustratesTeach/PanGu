@@ -639,7 +639,8 @@ object ProtobufConverter {
     gafisQuery.minscore = matchTask.getScoreThreshold
     gafisQuery.maxcandnum = matchTask.getTopN
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
-    gafisQuery.flag = 1.toShort //指纹
+    //gafisQuery.flag = 1.toShort //指纹
+    gafisQuery.flag = matchTask.getFlag.toShort //指纹或者掌纹
 
     //特征mic
     val matchType = matchTask.getMatchType.getNumber
