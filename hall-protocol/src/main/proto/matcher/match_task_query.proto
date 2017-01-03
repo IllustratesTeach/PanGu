@@ -93,6 +93,8 @@ message MatchTask {
 
   //提交人
   optional string commit_user = 12;
-  //远程查询id
+  //远程查询idT.I. - Castle Wall
   optional string queryid = 13;
+  //FLAG标志位
+  optional int32 flag = 14;
 }
