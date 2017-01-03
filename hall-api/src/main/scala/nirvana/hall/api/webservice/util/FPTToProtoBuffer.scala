@@ -306,6 +306,7 @@ object FPTConvertToProtoBuffer {
       matchTask.setObjectId(1)
       matchTask.setScoreThreshold(50)
       matchTask.setTopN(50)
+      matchTask.setQueryid(fpt4.sid)
     }
     matchTask.build()
   }

@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.TPCardService
+import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
@@ -175,7 +176,11 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       statement += " AND (%s <= %s)".format(TCardText.pszPrintDate, endnydate.substring(0,8))
     }
 
-    facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
+    val logic02RecList = facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
+    //初始数据丢失，重新赋值
+    logic02RecList.foreach(_.head.dataType = FPT4File.LOGIC02REC_DATATYPE)
+
+    logic02RecList
   }
 
   /**

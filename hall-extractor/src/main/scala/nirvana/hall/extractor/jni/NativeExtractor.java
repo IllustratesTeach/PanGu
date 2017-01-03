@@ -1,6 +1,7 @@
 package nirvana.hall.extractor.jni;
 
 
+
 /**
  * extractor
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -24,7 +25,29 @@ public class NativeExtractor{
                                              byte finger_pos,
                                              byte ExtractMode,
                                              byte belatent);
+
+	/**
+   * @deprecated use {@link #GAFIS_MntDispToMntStd}
+   * @param dispMnt
+   * @param stdMnt
+   */
+  @Deprecated
     public static native void ConvertFPTLatentMNT2Std(byte[] dispMnt, byte[] stdMnt);
+
+  /**
+   * 显示特征转换为标准的特征
+   * @param dispMnt 显示特征
+   * @param stdMnt 标准特征
+   */
+    public static native void GAFIS_MntDispToMntStd(byte[] dispMnt, byte[] stdMnt);
+	/**
+   *
+   * 标准特征转换为显示特征
+   * @param stdMnt  标准特征
+   * @param dispMnt 显示特征
+   * @param MinutiaON 细节点是否需要开启
+   */
+    public static native void GAFIS_MntStdToMntDisp(byte[] stdMnt, byte[] dispMnt, int MinutiaON);
 
     /**
      * 转换特征
