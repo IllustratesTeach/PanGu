@@ -7,7 +7,7 @@ import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
-import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
+import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
 import nirvana.hall.extractor.jni.NativeExtractor
 
 /**
@@ -97,11 +97,7 @@ object FPTMntConverter {
     * @return
     */
   def convertGafisMnt2FingerTData(gafisMnt: GAFISIMAGESTRUCT, fingerTData: FPT4File.FingerTData = new FPT4File.FingerTData): FPT4File.FingerTData={
-    //TODO 校验gafisMnt
-    //获取特征数据结构
-    val fingerMnt = new FINGERMNTSTRUCT
-    fingerMnt.fromByteArray(gafisMnt.bnData)
-    val fptMnt = convertFINGERMNTSTRUCT2FPTMnt(fingerMnt)
+    val fptMnt = convertGafisMnt2FPTMnt(gafisMnt)
     fingerTData.fgp = fptMnt.fgp
     fingerTData.pattern1 = fptMnt.pattern1
     fingerTData.pattern2 = fptMnt.pattern2
@@ -119,6 +115,24 @@ object FPTMntConverter {
 
     fingerTData
   }
+  def convertGafisMnt2FingerLData(gafisMnt: GAFISIMAGESTRUCT, fingerLData: FPT4File.FingerLData = new FPT4File.FingerLData): FPT4File.FingerLData={
+    val fptMnt = convertGafisMnt2FPTMnt(gafisMnt)
+    fingerLData.fgp = fptMnt.fgp
+    fingerLData.pattern = fptMnt.pattern1
+    fingerLData.fingerDirection = fptMnt.fingerDirection
+    fingerLData.centerPoint = fptMnt.centerPoint
+    fingerLData.subCenterPoint = fptMnt.subCenterPoint
+    fingerLData.leftTriangle = fptMnt.leftTriangle
+    fingerLData.rightTriangle = fptMnt.rightTriangle
+    fingerLData.featureCount = fptMnt.featureCount
+    fingerLData.feature = fptMnt.feature
+    fingerLData.imgCompressMethod = "M"
+    fingerLData.imgHorizontalLength = fptMnt.imgHorizontalLength
+    fingerLData.imgVerticalLength = fptMnt.imgVerticalLength
+    fingerLData.dpi = fptMnt.dpi
+
+    fingerLData
+  }
 
   /**
     * fpt现场特征转换为6.2xgw特征
@@ -131,7 +145,7 @@ object FPTMntConverter {
     val dispBytes = mntDisp.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     val bytes: Array[Byte] = new Array[Byte](640) //捺印现场特征长度都是640 等同于new FINGERMNTSTRUCT().toByteArray()
     //现场和捺印调用不同的jni
-    NativeExtractor.ConvertFPTLatentMNT2Std(dispBytes,bytes)
+    NativeExtractor.GAFIS_MntDispToMntStd(dispBytes,bytes)
 
     //构造GAFISIMAGESTRUCT
     val gafisImg = new GAFISIMAGESTRUCT
@@ -185,18 +199,19 @@ object FPTMntConverter {
   }
 
   /**
-    * FINGERMNTSTRUCT特征转换FPTMnt
-    * @param fingerMnt
+    * GAFISIMAGESTRUCT特征转换FPTMnt
+    * @param gafisMnt
     * @return
     */
-  def convertFINGERMNTSTRUCT2FPTMnt(fingerMnt: FINGERMNTSTRUCT): FPTMnt={
+  def convertGafisMnt2FPTMnt(gafisMnt: GAFISIMAGESTRUCT): FPTMnt={
+    //TODO 校验gafisMnt.bnData
     val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
-    NativeExtractor.GAFIS_MntStdToMntDisp(fingerMnt.toByteArray(), mntDispBytes, 1)//???
+    NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)//1???
 
     val mntDisp = new MNTDISPSTRUCT
     mntDisp.fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
 
-    convertMntDisp2FingerTDataMnt(mntDisp)
+    convertMntDisp2FPTMnt(mntDisp)
   }
 
   /**
@@ -275,11 +290,17 @@ object FPTMntConverter {
     * @param mntDisp
     * @return
     */
-  def convertMntDisp2FingerTDataMnt(mntDisp: MNTDISPSTRUCT): FPTMnt={
+  def convertMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT): FPTMnt={
     val fptMnt = new FPTMnt
-    fptMnt.fgp = mntDisp.stFg.FingerIdx.toString
-    fptMnt.pattern1 = mntDisp.stFg.rp.toString
-    fptMnt.pattern2 = mntDisp.stFg.vrp.toString
+    if(mntDisp.bIsLatent == 1){
+      //现场特征和纹型
+      fptMnt.fgp = mntDisp.stFg.FingerCode
+      fptMnt.pattern1 = UTIL_LatPattern_MntDisp2FPT(mntDisp.stFg.RpCode)
+    }else{
+      fptMnt.fgp = mntDisp.stFg.FingerIdx.toString
+      fptMnt.pattern1 = mntDisp.stFg.rp.toString
+      fptMnt.pattern2 = mntDisp.stFg.vrp.toString
+    }
     fptMnt.fingerDirection = UTIL_Direction_MntDisp2FPT(mntDisp)
     if(mntDisp.stFg.upcore.bIsExist > 0){
       fptMnt.centerPoint = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
@@ -288,7 +309,6 @@ object FPTMntConverter {
       var nCore: Short = 999
       var nzVarRange: Byte = 0
       val lowcore = mntDisp.stFg.lowcore
-//      fptMnt.subCenterPoint = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
       if(mntDisp.stFg.upcore.bIsExist > 0){
         nCore = mntDisp.stFg.upcore.z
         nzVarRange = mntDisp.stFg.upcore.nzVarRange

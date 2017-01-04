@@ -37,5 +37,13 @@ class FPTMntConverterTest extends BaseJniTest{
     println(fingerTData.featureCount)
     println(fingerTData.feature)
   }
+  @Test
+  def test_convertGafisMnt2FingerLData: Unit ={
+    val gafisMnt = new GAFISIMAGESTRUCT
+    gafisMnt.fromStreamReader(getClass.getResourceAsStream("/lf.mnt"))
+    val fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
+    println(fingerLData.featureCount)
+    println(fingerLData.feature)
+  }
 
 }

@@ -126,6 +126,18 @@ object fpt4util {
     */
     //ByteBuffer.wrap(bytes).getInt
   }
+  def UTIL_LatPattern_MntDisp2FPT(rpCode: Array[Byte]): String={
+    var pattern = ""
+    rpCode.foreach{nValue =>
+      if(nValue == 1){
+        pattern += "1"
+      }else{
+        pattern += "0"
+      }
+    }
+
+    pattern
+  }
 
   /**
     * 指纹方向转换
@@ -269,7 +281,7 @@ object fpt4util {
       else return 1
     }
   }
-  def UTIL_Reliability_MntDisp2FPT(nDisp: Int, nType: Int): Unit ={
+  def UTIL_Reliability_MntDisp2FPT(nDisp: Int, nType: Int): Int={
     if ( nType != UTIL_COREDELTA_TYPE_MINUTIA )
     {
       if ( nDisp == 0 ) return 1
@@ -321,9 +333,10 @@ object fpt4util {
 
   def UTIL_Minutia_MntDisp2FPT(pstMnt: Seq[AFISMNTPOINTSTRUCT], nmntCnt: Int): String={
     var pszFPTMnt = ""
-    pstMnt.foreach{mnt =>
-      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
-    }
+    (0 until nmntCnt).foreach(i => pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(pstMnt(i)))
+//    pstMnt.foreach{mnt =>
+//      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
+//    }
 
     //无有效值的数据用ASCII码空格（SP）填写, 总长度1800
     while (pszFPTMnt.length < 1800) pszFPTMnt += " "
