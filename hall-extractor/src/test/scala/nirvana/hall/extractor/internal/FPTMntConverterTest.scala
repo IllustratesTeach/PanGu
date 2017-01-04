@@ -27,7 +27,7 @@ class FPTMntConverterTest extends BaseJniTest{
 
     val fingerLatMnt = new FINGERLATMNTSTRUCT
     fingerLatMnt.fromByteArray(lpMnt.bnData)
-    Assert.assertNotNull(fingerLatMnt)
+    Assert.assertTrue(fingerLatMnt.resolution == 500)
   }
   @Test
   def test_convertGafisMnt2FingerTData: Unit ={
@@ -35,6 +35,7 @@ class FPTMntConverterTest extends BaseJniTest{
     gafisMnt.fromStreamReader(getClass.getResourceAsStream("/tp_1.mnt"))
     val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
     println(fingerTData.featureCount)
+    println(fingerTData.feature)
   }
 
 }

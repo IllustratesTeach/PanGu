@@ -7,6 +7,7 @@ import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.jni.NativeExtractor
 
 /**
@@ -96,7 +97,11 @@ object FPTMntConverter {
     * @return
     */
   def convertGafisMnt2FingerTData(gafisMnt: GAFISIMAGESTRUCT, fingerTData: FPT4File.FingerTData = new FPT4File.FingerTData): FPT4File.FingerTData={
-    val fptMnt = convertGafisMnt2FPTMnt(gafisMnt)
+    //TODO 校验gafisMnt
+    //获取特征数据结构
+    val fingerMnt = new FINGERMNTSTRUCT
+    fingerMnt.fromByteArray(gafisMnt.bnData)
+    val fptMnt = convertFINGERMNTSTRUCT2FPTMnt(fingerMnt)
     fingerTData.fgp = fptMnt.fgp
     fingerTData.pattern1 = fptMnt.pattern1
     fingerTData.pattern2 = fptMnt.pattern2
@@ -180,16 +185,16 @@ object FPTMntConverter {
   }
 
   /**
-    * gafisMnt特征转换FPTMnt
-    * @param gafisMnt
+    * FINGERMNTSTRUCT特征转换FPTMnt
+    * @param fingerMnt
     * @return
     */
-  def convertGafisMnt2FPTMnt(gafisMnt: GAFISIMAGESTRUCT): FPTMnt={
+  def convertFINGERMNTSTRUCT2FPTMnt(fingerMnt: FINGERMNTSTRUCT): FPTMnt={
     val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
-    NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)//???
+    NativeExtractor.GAFIS_MntStdToMntDisp(fingerMnt.toByteArray(), mntDispBytes, 1)//???
 
     val mntDisp = new MNTDISPSTRUCT
-    mntDisp.fromByteArray(mntDispBytes)
+    mntDisp.fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
 
     convertMntDisp2FingerTDataMnt(mntDisp)
   }
