@@ -2,6 +2,7 @@ package nirvana.hall.extractor.internal
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
 import nirvana.hall.extractor.jni.BaseJniTest
 import org.junit.{Assert, Test}
@@ -27,6 +28,13 @@ class FPTMntConverterTest extends BaseJniTest{
     val fingerLatMnt = new FINGERLATMNTSTRUCT
     fingerLatMnt.fromByteArray(lpMnt.bnData)
     Assert.assertNotNull(fingerLatMnt)
+  }
+  @Test
+  def test_convertGafisMnt2FingerTData: Unit ={
+    val gafisMnt = new GAFISIMAGESTRUCT
+    gafisMnt.fromStreamReader(getClass.getResourceAsStream("/tp_1.mnt"))
+    val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
+    println(fingerTData.featureCount)
   }
 
 }

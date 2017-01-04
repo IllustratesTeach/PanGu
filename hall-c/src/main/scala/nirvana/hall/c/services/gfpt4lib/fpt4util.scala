@@ -128,19 +128,6 @@ object fpt4util {
   }
 
   /**
-    * 纹型转换
-    * @param pattern
-    * @return
-    */
-  def UTIL_PatternType_FPT2MntDisp(pattern: String): Array[Byte]={
-
-    null
-  }
-  def UTIL_PatternType_MntDisp2FPT(mntDisp: MNTDISPSTRUCT): String ={
-    mntDisp.stFg.rp.toString
-  }
-
-  /**
     * 指纹方向转换
     * @param direction
     * @return
@@ -151,10 +138,14 @@ object fpt4util {
       return (UTIL_Angle_FPT2MntDisp(0),0)
 
     val fca = UTIL_Angle_FPT2MntDisp(direction.take(3).trim().toInt)
-
     val D_fca = direction.drop(3).trim().toInt
 
     (fca.toShort,D_fca.toShort)
+  }
+  def UTIL_Direction_MntDisp2FPT(mntDisp: MNTDISPSTRUCT): String ={
+    val nFPTAngle = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.fca)
+
+    "%03d%02d".format(nFPTAngle, mntDisp.stCm.D_fca)
   }
 
   /**
@@ -165,11 +156,18 @@ object fpt4util {
   def UTIL_Angle_FPT2MntDisp(p_nFPTAngle:Int):Short= // [0, 360) --> [-90, 270)
   {
     var nFPTAngle = p_nFPTAngle
-    nFPTAngle += 90;
-    while ( nFPTAngle >= 270 ) nFPTAngle -= 360;
-    while ( nFPTAngle < -90 ) nFPTAngle += 360;
+    nFPTAngle += 90
+    while ( nFPTAngle >= 270 ) nFPTAngle -= 360
+    while ( nFPTAngle < -90 ) nFPTAngle += 360
 
     nFPTAngle.toShort
+  }
+  def UTIL_Angle_MntDisp2FPT(fca: Short): Int ={
+    var nFPT = fca - 90
+    while (nFPT < 0) nFPT += 360
+    while (nFPT >= 360) nFPT -= 360
+
+    nFPT
   }
 
   /**
@@ -215,6 +213,41 @@ object fpt4util {
         stCoreDelta.nClass = mnt_checker_def.DELTACLASS_UNKNOWN.toByte
     }
   }
+  def UTIL_CoreDelta_MntDisp2FPT(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): String={
+    var szSP3 = "   " //3个空格SP
+    var szSP2 = "  " //2个空格SP
+    if ( nType == UTIL_COREDELTA_TYPE_UPCORE || UTIL_COREDELTA_TYPE_VICECORE == nType){
+      val nDir = UTIL_Angle_MntDisp2FPT(stCoreDelta.z)
+      val nScope = stCoreDelta.nzVarRange
+      szSP3 = "%03d".format(nDir)
+      szSP2 = "%02d".format(nScope)
+    }
+    val nReliability = UTIL_Reliability_MntDisp2FPT(stCoreDelta.nReliability, nType)
+
+    "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, stCoreDelta.nRadius, szSP3, szSP2, nReliability)
+  }
+
+  /**
+    * 副中心导出到FPT文件时特征方向和角度调整
+    * @param stViceCore
+    * @param nCore 中心的方向
+    * @param nzVarRange 中心的方向范围
+    */
+  def UTIL_ViceCoreMntDispCheckBefore2FPT(stViceCore: AFISCOREDELTASTRUCT, nCore: Short, nzVarRange: Byte) {
+    if(nCore == 999) {
+      stViceCore.z = 180.toShort
+      stViceCore.nzVarRange = 90
+      return 1
+    }
+    stViceCore.z = (nCore - 180).toShort
+    if(stViceCore.z < -90) {
+      stViceCore.z = (stViceCore.z + 360).toShort
+    }
+    if(nzVarRange < 45) stViceCore.nzVarRange = 45
+    else stViceCore.nzVarRange = nzVarRange
+
+    return 1
+  }
 
   /**
     * 可靠度转换
@@ -226,14 +259,27 @@ object fpt4util {
   {
     if ( nType != UTIL_COREDELTA_TYPE_MINUTIA )
     {
-      if ( nFPT < 1 ) return 2;
-      else if ( nFPT <= 2 ) return 0;
-      else return 1;
+      if ( nFPT < 1 ) return 2
+      else if ( nFPT <= 2 ) return 0
+      else return 1
     }
     else
     {
-      if ( ( nFPT < 1 ) || ( nFPT > 2 ) ) return 0;
-      else return 1;
+      if ( ( nFPT < 1 ) || ( nFPT > 2 ) ) return 0
+      else return 1
+    }
+  }
+  def UTIL_Reliability_MntDisp2FPT(nDisp: Int, nType: Int): Unit ={
+    if ( nType != UTIL_COREDELTA_TYPE_MINUTIA )
+    {
+      if ( nDisp == 0 ) return 1
+      else if ( nDisp == 1 ) return 3
+      else return 0
+    }
+    else
+    {
+      if ( nDisp == 0 ) return 3
+      else return 1
     }
   }
 
@@ -262,5 +308,26 @@ object fpt4util {
       stmnt.z = UTIL_Angle_FPT2MntDisp(zString.replace(" ","").toInt)
       stmnt.nReliability = 1
     }
+  }
+
+  /**
+    * 每个特征点用9个字节表示，x坐标、y坐标和方向各3位
+    * @param stmnt
+    * @return
+    */
+  def UTIL_Minutia_OneMntDisp2FPT(stmnt:AFISMNTPOINTSTRUCT): String ={
+    "%03d%03d%03d".format(stmnt.x, stmnt.y, UTIL_Angle_MntDisp2FPT(stmnt.z))
+  }
+
+  def UTIL_Minutia_MntDisp2FPT(pstMnt: Seq[AFISMNTPOINTSTRUCT], nmntCnt: Int): String={
+    var pszFPTMnt = ""
+    pstMnt.foreach{mnt =>
+      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
+    }
+
+    //无有效值的数据用ASCII码空格（SP）填写, 总长度1800
+    while (pszFPTMnt.length < 1800) pszFPTMnt += " "
+
+    pszFPTMnt
   }
 }

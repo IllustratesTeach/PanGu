@@ -6,10 +6,11 @@ import nirvana.hall.c.services.gfpt4lib.{FPT3File, FPT4File}
 import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
 import nirvana.hall.extractor.jni.NativeExtractor
 
 /**
+  * fpt特征转换工具类
   * Created by songpeng on 2016/12/31.
   */
 object FPTMntConverter {
@@ -18,9 +19,9 @@ object FPTMntConverter {
     * 定义FPT捺印特征结构，使用type同时支持fpt3和fpt4的ingerTData
     */
   type FingerTDataMnt ={
-    var pattern1: String   //指纹纹型分类,主纹型
-    var pattern2: String   //指纹纹型分类,副纹型 ???
     var fgp: String   //指位
+    var pattern1: String   //指纹纹型分类,主纹型
+    var pattern2: String   //指纹纹型分类,副纹型
     var fingerDirection: String   //指纹方向
     var centerPoint: String   //中心点
     var subCenterPoint: String    //副中心
@@ -37,8 +38,8 @@ object FPTMntConverter {
     * 定义FPT现场特征结构，使用type同时支持fpt3和fpt4的ingerTData
     */
   type FingerLDataMnt ={
-    var pattern: String   //指纹纹型分类
     var fgp: String   //指位
+    var pattern: String   //指纹纹型分类
     var fingerDirection: String   //指纹方向
     var centerPoint: String   //中心点
     var subCenterPoint: String    //副中心
@@ -49,6 +50,25 @@ object FPTMntConverter {
     var imgHorizontalLength: String   //图像水平方向长度
     var imgVerticalLength: String   //图像垂直方向长度
     var dpi: String   //图像分辨率
+  }
+
+  /**
+    * fpt特征
+    */
+  class FPTMnt {
+    var fgp: String = _  //指位, 现场可能指位
+    var pattern1: String = _  //指纹纹型分类, 现场可能纹型
+    var pattern2: String = _  //指纹纹型分类
+    var fingerDirection: String = _  //指纹方向
+    var centerPoint: String = _  //中心点
+    var subCenterPoint: String = _   //副中心
+    var leftTriangle: String = _   //左三角
+    var rightTriangle: String = _  //右三角
+    var featureCount: String = _   //特征点个数
+    var feature: String = _  //特征点
+    var imgHorizontalLength: String = _  //图像水平方向长度
+    var imgVerticalLength: String = _  //图像垂直方向长度
+    var dpi: String = _  //图像分辨率
   }
 
   /**
@@ -67,6 +87,32 @@ object FPTMntConverter {
   }
   def convertFingerLData2GafisMnt(fptMnt: FPT3File.FingerLData): GAFISIMAGESTRUCT={
     convertFingerLDataMnt2GafisMnt(fptMnt)
+  }
+
+  /**
+    * 捺印gafis特征转fpt4特征
+    * @param gafisMnt
+    * @param fingerTData
+    * @return
+    */
+  def convertGafisMnt2FingerTData(gafisMnt: GAFISIMAGESTRUCT, fingerTData: FPT4File.FingerTData = new FPT4File.FingerTData): FPT4File.FingerTData={
+    val fptMnt = convertGafisMnt2FPTMnt(gafisMnt)
+    fingerTData.fgp = fptMnt.fgp
+    fingerTData.pattern1 = fptMnt.pattern1
+    fingerTData.pattern2 = fptMnt.pattern2
+    fingerTData.fingerDirection = fptMnt.fingerDirection
+    fingerTData.centerPoint = fptMnt.centerPoint
+    fingerTData.subCenterPoint = fptMnt.subCenterPoint
+    fingerTData.leftTriangle = fptMnt.leftTriangle
+    fingerTData.rightTriangle = fptMnt.rightTriangle
+    fingerTData.featureCount = fptMnt.featureCount
+    fingerTData.feature = fptMnt.feature
+    fingerTData.imgCompressMethod = "A"
+    fingerTData.imgHorizontalLength = fptMnt.imgHorizontalLength
+    fingerTData.imgVerticalLength = fptMnt.imgVerticalLength
+    fingerTData.dpi = fptMnt.dpi
+
+    fingerTData
   }
 
   /**
@@ -133,6 +179,20 @@ object FPTMntConverter {
     gafisImg
   }
 
+  /**
+    * gafisMnt特征转换FPTMnt
+    * @param gafisMnt
+    * @return
+    */
+  def convertGafisMnt2FPTMnt(gafisMnt: GAFISIMAGESTRUCT): FPTMnt={
+    val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
+    NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)//???
+
+    val mntDisp = new MNTDISPSTRUCT
+    mntDisp.fromByteArray(mntDispBytes)
+
+    convertMntDisp2FingerTDataMnt(mntDisp)
+  }
 
   /**
     * fpt现场特征转换为MNTDISPSTRUCT
@@ -157,9 +217,9 @@ object FPTMntConverter {
     mntDisp.stCm.fca = fca._1
     mntDisp.stCm.D_fca = fca._2
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.centerPoint,mntDisp.stFg.upcore,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fptMnt.subCenterPoint,mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_UPCORE)
+    UTIL_CoreDelta_FPT2MntDisp(fptMnt.subCenterPoint,mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_VICECORE)
+    UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
+    UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
 
@@ -203,6 +263,50 @@ object FPTMntConverter {
     UTIL_Minutia_FPT2MntDisp(fptMnt.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
 
     mntDisp
+  }
+
+  /**
+    * 捺印MNTDISPSTRUCT转换FPT特征
+    * @param mntDisp
+    * @return
+    */
+  def convertMntDisp2FingerTDataMnt(mntDisp: MNTDISPSTRUCT): FPTMnt={
+    val fptMnt = new FPTMnt
+    fptMnt.fgp = mntDisp.stFg.FingerIdx.toString
+    fptMnt.pattern1 = mntDisp.stFg.rp.toString
+    fptMnt.pattern2 = mntDisp.stFg.vrp.toString
+    fptMnt.fingerDirection = UTIL_Direction_MntDisp2FPT(mntDisp)
+    if(mntDisp.stFg.upcore.bIsExist > 0){
+      fptMnt.centerPoint = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
+    }
+    if(mntDisp.stFg.lowcore.bIsExist > 0){
+      var nCore: Short = 999
+      var nzVarRange: Byte = 0
+      val lowcore = mntDisp.stFg.lowcore
+//      fptMnt.subCenterPoint = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
+      if(mntDisp.stFg.upcore.bIsExist > 0){
+        nCore = mntDisp.stFg.upcore.z
+        nzVarRange = mntDisp.stFg.upcore.nzVarRange
+      }
+      UTIL_ViceCoreMntDispCheckBefore2FPT(lowcore, nCore, nzVarRange)
+      fptMnt.subCenterPoint = UTIL_CoreDelta_MntDisp2FPT(lowcore, UTIL_COREDELTA_TYPE_VICECORE)
+    }
+    if(mntDisp.stFg.ldelta.bIsExist > 0){
+      fptMnt.leftTriangle = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.ldelta, UTIL_COREDELTA_TYPE_LDELTA)
+    }
+    if(mntDisp.stFg.rdelta.bIsExist > 0){
+      fptMnt.rightTriangle = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.rdelta, UTIL_COREDELTA_TYPE_RDELTA)
+    }
+
+    val nMaxMnt:Int = 1800/9
+    var ntemp:Int = mntDisp.stCm.nMntCnt
+    if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
+    if ( ntemp > 0 ) {
+      fptMnt.feature = UTIL_Minutia_MntDisp2FPT(mntDisp.stCm.mnt, ntemp)
+    }
+    fptMnt.featureCount = mntDisp.stCm.nMntCnt.toString
+
+    fptMnt
   }
 
 }
