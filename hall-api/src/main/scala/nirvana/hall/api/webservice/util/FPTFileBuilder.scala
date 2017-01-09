@@ -1,12 +1,15 @@
 package nirvana.hall.api.webservice.util
 
+import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
+import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatchResultObject
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -94,9 +97,16 @@ object FPTFileBuilder {
           fingerTData.extractMethod = "A"
           fingerTData.customInfoLength = "0"
           fingerTData.customInfo = new Array[Byte](0)
-          fingerTData.imgDataLength = blob.getStImageBytes.size.toString
-          fingerTData.imgData = blob.getStImageBytes.toByteArray
+
+          val imageData = blob.getStImageBytes.toByteArray
+          val gafisImage = new GAFISIMAGESTRUCT
+          gafisImage.fromByteArray(imageData)
+          val imageDataLength = imageData.length - 64
+          fingerTData.imgDataLength = imageData.length.toString
+          fingerTData.imgData = ByteString.copyFrom(imageData, 64, imageDataLength).toByteArray
+          fingerTData.imgDataLength = imageDataLength.toString
           fingerTData.dataLength = fingerTData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+          fingerTData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
 
           fingers += fingerTData
         //人像
@@ -160,9 +170,6 @@ object FPTFileBuilder {
     logic03Rec.sendFingerCount = lPCard.size.toString
 
     var sendNo = 1 //发送编号，从1开始计数
-    //var imageDataLong = 0
-    var imageData:Array[Byte] = null
-    var imageDataLength = 0
     lPCard.foreach{card =>
       val gafisMnt =  new GAFISIMAGESTRUCT
       gafisMnt.fromStreamReader(card.getBlob.getStMntBytes.newInput())
@@ -182,9 +189,12 @@ object FPTFileBuilder {
       fingerLData.extractMethod = "M"
       fingerLData.customInfoLength = "0"
       fingerLData.customInfo = new Array[Byte](0)
-      imageDataLength = card.getBlob.getStImageBytes.toByteArray.length-64
-      imageData = new Array[Byte](imageDataLength)
-      fingerLData.imgData = subBytes(card.getBlob.getStImageBytes.toByteArray,64,imageData,0,imageDataLength)
+      val imageData = card.getBlob.getStImageBytes.toByteArray
+      val gafisImage = new GAFISIMAGESTRUCT
+      gafisImage.fromByteArray(imageData)
+      fingerLData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+      val imageDataLength = imageData.length - 64
+      fingerLData.imgData = ByteString.copyFrom(imageData, 64, imageDataLength).toByteArray
       fingerLData.imgDataLength = imageDataLength.toString
       fingerLData.dataLength = fingerLData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
       fingerLDataList += fingerLData
@@ -271,27 +281,6 @@ object FPTFileBuilder {
     }
     fpt4File.logic09Recs = logic09RecArray
     fpt4File.build()
-  }
-
-  /**
-    * 获取数据
-    *
-    * @param map 数据集合
-    * @param key 数据属性
-    * @return data 数据
-    */
-  private def getData(map: mutable.HashMap[String,Any],key :String): String = {
-    var data = ""
-    if(map != null && map(key) != null){
-      data = map(key).toString()
-    }
-    data
-  }
-
-
-  private def  subBytes(src:Array[Byte],srcPos:Integer,dest:Array[Byte], destPos:Integer,length:Int):Array[Byte] ={
-      System.arraycopy(src,srcPos,dest,destPos,length)
-      dest
   }
 
 }
