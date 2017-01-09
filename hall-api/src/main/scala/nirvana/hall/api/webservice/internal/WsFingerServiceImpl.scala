@@ -84,7 +84,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
       if(tpCardService.isExist(ryno)){
         val tpCard = tpCardService.getTPCard(ryno)
         val fptObj = FPTFileBuilder.convertTPCard2FPT4File(tpCard)
-        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.build().toByteArray()))
       }else{
         dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }

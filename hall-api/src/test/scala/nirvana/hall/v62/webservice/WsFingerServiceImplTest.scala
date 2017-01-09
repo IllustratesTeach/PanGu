@@ -11,17 +11,24 @@ import org.junit.Test
   */
 class WsFingerServiceImplTest extends BaseV62TestCase{
 
+
+  @Test
+  def test_getTenprintRecord: Unit ={
+    val service = getService[WsFingerService]
+    val dataHandler = service.getTenprintRecord("","", "3702", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+    val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/getTenprintRecord.fpt")
+    dataHandler.writeTo(fileOutPutStream)
+    fileOutPutStream.flush()
+    fileOutPutStream.close()
+  }
   @Test
   def test_getTenprintFinger: Unit ={
     val service = getService[WsFingerService]
-    val obj = service.getTenprintFinger("", "", "44200322322242323427429")
-    val  fileOutPutStream = new FileOutputStream("E:\\44200322322242323427429.fpt")
+    val obj = service.getTenprintFinger("", "", "1234567890")
+    val  fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/1234567890.fpt")
     obj.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
-    println("文件写入完成")
-    assert(null!=obj,"测试出现错误"+obj)
-    println(obj)
   }
 
   @Test
@@ -29,7 +36,7 @@ class WsFingerServiceImplTest extends BaseV62TestCase{
     val service = getService[WsFingerService]
     val dataHandler = service.getLatent("", "", "0000", null, null, null, null, null, null, null)
     println(dataHandler)
-    val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/123456.fpt")
+    val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/getLatent.fpt")
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
@@ -38,7 +45,7 @@ class WsFingerServiceImplTest extends BaseV62TestCase{
   @Test
   def test_getLatentFinger: Unit ={
     val service = getService[WsFingerService]
-    val dataHandler = service.getLatentFinger("","","0000000000000000000001")//00000000000000000000001
+    val dataHandler = service.getLatentFinger("","","123456")
     val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/123456.fpt")
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
