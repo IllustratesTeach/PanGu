@@ -14,37 +14,6 @@ import scala.collection.mutable.ArrayBuffer
   * Created by yuchen on 2016/12/2.
   */
 object FPTFileBuilder {
-
-  object FPTHead{
-    def getFPTTaskRecs(tpCount:String ="0",lpCount:String ="0"): FPT4File ={
-      val fpt4File = new FPT4File
-      fpt4File.head.flag = "FPT"
-      fpt4File.head.majorVersion = "04"
-      fpt4File.head.minorVersion = "00"
-      fpt4File.fileLength = ""
-      fpt4File.tpCount = tpCount                          //十指指纹信息记录数量
-      fpt4File.lpCount = lpCount                          //现场指纹信息记录数量
-      fpt4File.tl_ltCount = "0"
-      fpt4File.ttCount = "0"
-      fpt4File.llCount = "0"
-      fpt4File.lpRequestCount = "0"
-      fpt4File.tpRequestCount = "0"
-      fpt4File.ltCandidateCount =  "0"
-      fpt4File.tlCandidateCount = "0"
-      fpt4File.ttCandidateCount = "0"
-      fpt4File.llCandidateCount = "0"
-      fpt4File.customCandidateCount = "0"
-      fpt4File.sendTime = ""
-      fpt4File.receiveUnitCode = ""
-      fpt4File.sendUnitCode = ""
-      fpt4File.sendUnitName = ""
-      fpt4File.sender = ""
-      fpt4File.sendUnitSystemType ="1900" //1900 东方金指
-      fpt4File.sid = ""
-      fpt4File.remark = ""
-      fpt4File
-    }
-  }
   /**
     * TPCard转换为FPT4File
     * @param card
@@ -242,7 +211,7 @@ object FPTFileBuilder {
     * @return FPT4File对象
     */
   def buildLogic11RecFpt(matchResult:MatchResult,queryId:Long): FPT4File = {
-    val fpt4File =  FPTHead.getFPTTaskRecs("0","0")
+    val fpt4File =  new FPT4File
     val resultCount = matchResult.getCandidateResultCount
     fpt4File.ttCandidateCount = resultCount + ""
     val logic11RecArray = new Array[Logic11Rec](resultCount)
@@ -264,7 +233,7 @@ object FPTFileBuilder {
       logic11RecArray.update(i, logic11Rec)
     }
     fpt4File.logic11Recs = logic11RecArray
-    fpt4File
+    fpt4File.build()
   }
 
   /**
@@ -275,7 +244,7 @@ object FPTFileBuilder {
     * @return FPT4File对象
     */
   def buildLogic09RecFpt(matchResult:MatchResult,ajid:String,queryId:Long): FPT4File = {
-    val fpt4File =  FPTHead.getFPTTaskRecs("0","0")
+    val fpt4File =  new FPT4File
     val resultCount = matchResult.getCandidateResultCount
     fpt4File.sid = queryId  + ""
     fpt4File.ltCandidateCount = resultCount + ""
@@ -301,7 +270,7 @@ object FPTFileBuilder {
       logic09RecArray.update(i, logic09Rec)
     }
     fpt4File.logic09Recs = logic09RecArray
-    fpt4File
+    fpt4File.build()
   }
 
   /**
