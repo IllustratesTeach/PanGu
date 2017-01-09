@@ -108,7 +108,7 @@ object FPTMntConverter {
     fingerTData.rightTriangle = fptMnt.rightTriangle
     fingerTData.featureCount = fptMnt.featureCount
     fingerTData.feature = fptMnt.feature
-    fingerTData.imgCompressMethod = "A"
+    fingerTData.extractMethod= "A"
     fingerTData.imgHorizontalLength = fptMnt.imgHorizontalLength
     fingerTData.imgVerticalLength = fptMnt.imgVerticalLength
     fingerTData.dpi = fptMnt.dpi
@@ -131,7 +131,7 @@ object FPTMntConverter {
     fingerLData.rightTriangle = fptMnt.rightTriangle
     fingerLData.featureCount = fptMnt.featureCount
     fingerLData.feature = fptMnt.feature
-    fingerLData.imgCompressMethod = "M"
+    fingerLData.extractMethod = "M"
     fingerLData.imgHorizontalLength = fptMnt.imgHorizontalLength
     fingerLData.imgVerticalLength = fptMnt.imgVerticalLength
     fingerLData.dpi = fptMnt.dpi
