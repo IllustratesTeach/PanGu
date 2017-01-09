@@ -309,6 +309,7 @@ object FPTMntConverter {
     //设置图像宽高
     fptMnt.imgVerticalLength = mntDisp.nHeight.toString
     fptMnt.imgHorizontalLength = mntDisp.nWidth.toString
+    fptMnt.dpi = mntDisp.nResolution.toString
     if(mntDisp.bIsLatent == 1){
       //现场特征和纹型
       fptMnt.fgp = mntDisp.stFg.FingerCode
