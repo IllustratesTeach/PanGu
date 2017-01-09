@@ -115,11 +115,6 @@ object FPTMntConverter {
 
     fingerTData
   }
-  def convertGafisMnt2FingerTData(gafisMntBytes: Array[Byte], fingerTData: FPT4File.FingerTData = new FPT4File.FingerTData): FPT4File.FingerTData={
-    val gafisMnt = new GAFISIMAGESTRUCT
-    gafisMnt.fromByteArray(gafisMntBytes)
-    convertGafisMnt2FingerTData(gafisMnt, fingerTData)
-  }
   def convertGafisMnt2FingerLData(gafisMnt: GAFISIMAGESTRUCT, fingerLData: FPT4File.FingerLData = new FPT4File.FingerLData): FPT4File.FingerLData={
     val fptMnt = convertGafisMnt2FPTMnt(gafisMnt)
     fingerLData.fgp = fptMnt.fgp
@@ -137,11 +132,6 @@ object FPTMntConverter {
     fingerLData.dpi = fptMnt.dpi
 
     fingerLData
-  }
-  def convertGafisMnt2FingerLData(gafisMntBytes: Array[Byte], fingerLData: FPT4File.FingerLData = new FPT4File.FingerLData): FPT4File.FingerLData={
-    val gafisMnt = new GAFISIMAGESTRUCT
-    gafisMnt.fromByteArray(gafisMntBytes)
-    convertGafisMnt2FingerLData(gafisMnt, fingerLData)
   }
 
   /**
