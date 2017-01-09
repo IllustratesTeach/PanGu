@@ -1,9 +1,8 @@
 package nirvana.hall.v62.webservice
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.FileOutputStream
 
 import nirvana.hall.api.webservice.services.WsFingerService
-import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.Test
 
@@ -28,19 +27,21 @@ class WsFingerServiceImplTest extends BaseV62TestCase{
   @Test
   def test_getLatent: Unit ={
     val service = getService[WsFingerService]
-    val dataHandler = service.getLatent("", "", "123456", null, null, null, null, null, null, null)
+    val dataHandler = service.getLatent("", "", "0000", null, null, null, null, null, null, null)
     println(dataHandler)
+    val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/123456.fpt")
+    dataHandler.writeTo(fileOutPutStream)
+    fileOutPutStream.flush()
+    fileOutPutStream.close()
   }
 
   @Test
   def test_getLatentFinger: Unit ={
     val service = getService[WsFingerService]
-    val dataHandler = service.getLatentFinger("","","A1200002018881996110040")
-    val  fileOutPutStream = new FileOutputStream("E:\\A1200002018881996110040.fpt")
+    val dataHandler = service.getLatentFinger("","","0000000000000000000001")//00000000000000000000001
+    val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/123456.fpt")
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
-    println("文件写入完成")
-    assert(null!=dataHandler,"测试出现错误"+dataHandler)
   }
 }

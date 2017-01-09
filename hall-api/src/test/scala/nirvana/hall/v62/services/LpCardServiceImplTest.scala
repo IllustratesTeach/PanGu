@@ -1,4 +1,4 @@
-package nirvana.hall.v62.internal.filter
+package nirvana.hall.v62.services
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.LPCardService
@@ -9,7 +9,7 @@ import org.junit.{Assert, Test}
 /**
  * Created by songpeng on 15/11/15.
  */
-class LPCardFilterTest extends BaseV62TestCase{
+class LpCardServiceImplTest extends BaseV62TestCase{
   @Test
   def test_add(): Unit ={
     val lpCard = LPCard.newBuilder()
