@@ -37,6 +37,13 @@ object fpt4code {
   //汉林信通
   final val GAIMG_CPRMETHOD_HLXT_CODE = "2900" // 广东测试提供的数据，SAGEM MORPHO
 
+  //提取特征方法
+  final val EXTRACT_METHOD_A = "A"  //自动提取
+  final val EXTRACT_METHOD_U = "U"  //自动提取且需要人工编辑
+  final val EXTRACT_METHOD_E = "E"  //自动提取且已经人工编辑
+  final val EXTRACT_METHOD_M = "M"  //人工抽取
+  final val EXTRACT_METHOD_O = "O"  //其它
+
   def gafisCprCodeToFPTCode(code:Int): String = {
     code match {
       case glocdef.GAIMG_CPRMETHOD_DEFAULT => // by xgw supplied method

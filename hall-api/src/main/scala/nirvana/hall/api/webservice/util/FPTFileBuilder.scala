@@ -94,7 +94,7 @@ object FPTFileBuilder {
           val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
           fingerTData.sendNo = sendNo.toString
           sendNo += 1
-          fingerTData.extractMethod = "A"
+          fingerTData.extractMethod = fpt4code.EXTRACT_METHOD_A
           fingerTData.customInfoLength = "0"
           fingerTData.customInfo = new Array[Byte](0)
 
@@ -186,7 +186,7 @@ object FPTFileBuilder {
       fingerLData.mittensEndNo = card.getText.getStrEnd
       fingerLData.isFingerAssist = card.getText.getNXieChaState.toString
       fingerLData.matchStatus = card.getText.getNBiDuiState.toString
-      fingerLData.extractMethod = "M"
+      fingerLData.extractMethod = fpt4code.EXTRACT_METHOD_M
       fingerLData.customInfoLength = "0"
       fingerLData.customInfo = new Array[Byte](0)
       val imageData = card.getBlob.getStImageBytes.toByteArray
