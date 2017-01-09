@@ -1,14 +1,14 @@
 package nirvana.hall.extractor.internal
 
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicBoolean
 
 import nirvana.hall.c.services.gfpt4lib.{FPT3File, FPT4File}
 import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
-import nirvana.hall.c.services.kernel.mnt_def.{FINGERLATMNTSTRUCT, FINGERMNTSTRUCT}
-import nirvana.hall.extractor.jni.NativeExtractor
+import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
+import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
 
 /**
   * fpt特征转换工具类
@@ -16,6 +16,17 @@ import nirvana.hall.extractor.jni.NativeExtractor
   */
 object FPTMntConverter {
 
+  private lazy val extractorInit = new AtomicBoolean(false)
+  @volatile
+  private var extractorDllLoaded = false
+  private def loadExtractorJNI() {
+    if(extractorInit.compareAndSet(false,true)) {
+      JniLoader.loadJniLibrary(".",null)
+      extractorDllLoaded = true
+    }
+    if(!extractorDllLoaded)
+      loadExtractorJNI()
+  }
   /**
     * 定义FPT捺印特征结构，使用type同时支持fpt3和fpt4的ingerTData
     */
@@ -144,6 +155,7 @@ object FPTMntConverter {
     //此处结构传入到JNI层需要采用低字节序
     val dispBytes = mntDisp.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     val bytes: Array[Byte] = new Array[Byte](640) //捺印现场特征长度都是640 等同于new FINGERMNTSTRUCT().toByteArray()
+    loadExtractorJNI()
     //现场和捺印调用不同的jni
     NativeExtractor.GAFIS_MntDispToMntStd(dispBytes,bytes)
 
@@ -177,6 +189,7 @@ object FPTMntConverter {
     //此处结构传入到JNI层需要采用低字节序
     val dispBytes = mntDisp.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     val bytes: Array[Byte] = new Array[Byte](640) //捺印现场特征长度都是640 等同于new FINGERMNTSTRUCT().toByteArray()
+    loadExtractorJNI()
     //现场和捺印调用不同的jni
     NativeExtractor.GAFIS_MntDispToMntStd(dispBytes,bytes)
 
@@ -206,6 +219,7 @@ object FPTMntConverter {
   def convertGafisMnt2FPTMnt(gafisMnt: GAFISIMAGESTRUCT): FPTMnt={
     //TODO 校验gafisMnt.bnData
     val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
+    loadExtractorJNI()
     NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)//1???
 
     val mntDisp = new MNTDISPSTRUCT
