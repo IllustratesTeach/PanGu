@@ -20,9 +20,9 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.deletag, db.logic_db_pkid as logicDB " +
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode, t.recordMark, t.deletag, db.logic_db_pkid as logicDB " +
      " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where t.seq >= ? and t.seq <= ? order by t.seq"
-   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass", "logicDB")
+   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordMark", "logicDB")
    /**
     * 读取人员信息
     * @param syncDataResponse
@@ -55,6 +55,37 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
                }
             }
          }
+
+        /*
+          * 将人员编号拆分为三部分
+          * 第一部分，单位编码12位(1, 13)，由于单位编码可能包含字母，转为36进制的Long值
+          * 第二部分，年月日6位(13,19)
+          * 第三部分，流水4位(19,23)
+          * */
+        var personId: String = rs.getString("personId")
+        textData.addColBuilder.setColName("personId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(personId.getBytes))
+        try {
+          //如果是字母开头截取第一位前缀
+          if (personId.matches("^[a-zA-Z]\\w*")) {
+            val pId_pre: String = personId.substring(0, 1)
+            textData.addColBuilder.setColName("pId_pre").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(pId_pre.getBytes))
+            personId = personId.substring(1)
+          }
+          if(personId.length == 22){
+            val pId_deptCode = java.lang.Long.parseLong(personId.substring(0, 12), 36)
+            val pId_date = java.lang.Long.parseLong(personId.substring(12, 18), 36)
+            val pId_serialNum = Integer.parseInt(personId.substring(18), 36)
+            textData.addColBuilder.setColName("pId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_deptCode)))
+            textData.addColBuilder.setColName("pId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(pId_date)))
+            textData.addColBuilder.setColName("pId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(pId_serialNum)))
+            info("personId:" + personId + ",pId_deptCode:" + ByteString.copyFrom(DataConverter.long2Bytes(pId_deptCode)) + ",pId_date" + ByteString.copyFrom(DataConverter.long2Bytes(pId_date)) + ",pId_serialNum" + ByteString.copyFrom(DataConverter.int2Bytes(pId_serialNum)))
+          }
+        }
+        catch {
+          case e: Exception => {
+            error("personId convert error：{}", personId)
+          }
+        }
 
          val birthdayst: Long = if (rs.getDate("birthday") != null) rs.getDate("birthday").getTime else 0
          if (birthdayst > 0) {

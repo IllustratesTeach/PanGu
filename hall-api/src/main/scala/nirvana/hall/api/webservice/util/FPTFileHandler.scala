@@ -1,8 +1,8 @@
 package nirvana.hall.api.webservice.util
 
 import java.io.FileInputStream
-import java.nio.ByteOrder
 import java.util.concurrent.atomic.AtomicBoolean
+
 import com.google.protobuf.{ByteString, ExtensionRegistry}
 import monad.rpc.protocol.CommandProto.CommandStatus
 import nirvana.hall.c.AncientConstants
@@ -12,9 +12,8 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
-import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
-import nirvana.hall.extractor.internal.FeatureExtractorImpl
-import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
+import nirvana.hall.extractor.internal.{FPTLatentConverter, FeatureExtractorImpl}
+import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
@@ -42,7 +41,7 @@ object FPTFileHandler {
   /**
     * 调用hall-image服务_解压图像
     */
-  def callHallImageDecompressionImage(compressedImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
+  def callHallImageDecompressionImage(imageDecompressUrl:String,compressedImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
 
     val registry = ExtensionRegistry.newInstance()
     FirmImageDecompressProto.registerAllExtensions(registry)
@@ -54,7 +53,7 @@ object FPTFileHandler {
     request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
 
 
-    val baseResponse = httpClient.call("http://192.168.1.214:9001", FirmImageDecompressRequest.cmd, request.build())
+    val baseResponse = httpClient.call(imageDecompressUrl, FirmImageDecompressRequest.cmd, request.build())
     baseResponse.getStatus match {
       case CommandStatus.OK =>
         if (baseResponse.hasExtension(FirmImageDecompressResponse.cmd)) {
@@ -120,16 +119,6 @@ object FPTFileHandler {
     if (!extractorDllLoaded)
       loadExtractorJNI()
 
-  }
-
-  object FPTLatentConverter {
-    def convert(mNTDISPSTRUCT: MNTDISPSTRUCT): FINGERLATMNTSTRUCT = {
-      val bytes = new FINGERLATMNTSTRUCT().toByteArray()
-      //此处结构传入到JNI层需要采用低字节序
-      val dispBytes = mNTDISPSTRUCT.toByteArray(byteOrder = ByteOrder.LITTLE_ENDIAN)
-      NativeExtractor.ConvertFPTLatentMNT2Std(dispBytes, bytes)
-      new FINGERLATMNTSTRUCT().fromByteArray(bytes)
-    }
   }
 
   def createImageLatentEvent(disp: MNTDISPSTRUCT): Array[Byte] = {

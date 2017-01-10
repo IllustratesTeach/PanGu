@@ -19,8 +19,8 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
   /** 获取比对任务  */
   override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
 
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "dataSources", "caseClass")
-  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus")
+  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "dataSources", "caseClass", "personType", "nationCode", "recordMark")
+  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource")
 
   /**
    * 获取捺印文本查询条件
@@ -53,12 +53,14 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //处理其他特殊的查询条件
-        //姓名
-        if(json.has("name")){
-          val keywordQuery = KeywordQuery.newBuilder()
-          keywordQuery.setValue(json.getString("name") + "*")
-          textQuery.addQueryBuilder().setName("name").setExtension(KeywordQuery.query, keywordQuery.build())
-
+        //模糊字段
+        val fuzzyColumn = Array("name", "idcardno")
+        fuzzyColumn.foreach{col =>
+          if (json.has(col)) {
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(json.getString(col) + "*")
+            textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
+          }
         }
         //出生日期
         if(json.has("birthdayST") && json.has("birthdayED")){
@@ -84,32 +86,16 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
           textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
         }
-        //人员编号模糊查询，由于人员编号没有规则，不能区间查询
-        if(json.has("personIdST1")){
-          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString("personIdST1"))
-          val sendKeyStr = json.getString("sendKey1Str")
-          val occur = sendKeyStr match {
-            case "yes" =>
-              Occur.MUST
-            case "no" =>
-              Occur.MUST_NOT
-            case other =>
-              Occur.SHOULD
+        //人员编号区间
+        if(json.has("personIdST1") || json.has("personIdED1")){
+          val groupQuery = GroupQuery.newBuilder()
+          if (json.has("personIdST1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("personId").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(occur)
-        }
-        if(json.has("personIdST2")){
-          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString("personIdST2"))
-          val sendKeyStr = json.getString("sendKey2Str")
-          val occur = sendKeyStr match {
-            case "yes" =>
-              Occur.MUST
-            case "no" =>
-              Occur.MUST_NOT
-            case other =>
-              Occur.SHOULD
+          if (json.has("personIdED1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("personId").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(occur)
+          textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
         }
         //逻辑库
         if(json.has("logicDBValues")){
@@ -145,8 +131,8 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         caseCols.foreach{col =>
           if(json.has(col)){
             val value = json.getString(col)
-            if(value.indexOf(",") > 0){
-              val values = value.split(",")
+            if(value.indexOf("|") > 0){
+              val values = value.split("|")
               val groupQuery = GroupQuery.newBuilder()
               values.foreach{value =>
                 val keywordQuery = KeywordQuery.newBuilder()

@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.TPCardService
+import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.TPCard
@@ -101,6 +102,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       g_stCN.stTcID.pszName -> "cardId",
       //NAME	姓名
       TCardText.pszName -> "personName",
+      //ALIAS 别名
+      TCardText.pszAlias -> "alias",
       //SEXCODE	性别
       TCardText.pszSexCode -> "gender",
       //BIRTHDATE	出生日期
@@ -119,11 +122,11 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       TCardText.pszHuKouPlaceCode -> "door",
       //HUKOUPLACETAIL	户口所在地
       TCardText.pszHuKouPlaceTail -> "doorDetail",
-      //ADDRESSTAIL	现住址
-      TCardText.pszAddressTail -> "address",
       //ADDRESSCODE	现住址代码
-      TCardText.pszAddressCode -> "addressDetail",
-      //PERSONCLASSCODE 人员类别代码 （未确定，有可能是人员类别描述）
+      TCardText.pszAddressCode -> "address",
+      //ADDRESSTAIL	现住址
+      TCardText.pszAddressTail -> "addressDetail",
+      //PERSONCLASSCODE 人员类别代码
       TCardText.pszPersonClassCode -> "category",
       //CASECLASS1CODE	案件类别1
       TCardText.pszCaseClass1Code -> "caseClass1Code",
@@ -173,7 +176,11 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
       statement += " AND (%s <= %s)".format(TCardText.pszPrintDate, endnydate.substring(0,8))
     }
 
-    facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
+    val logic02RecList = facade.queryV62Table[Logic02Rec](V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, mapper, Option(statement), 256)//最大返回256
+    //初始数据丢失，重新赋值
+    logic02RecList.foreach(_.head.dataType = FPT4File.LOGIC02REC_DATATYPE)
+
+    logic02RecList
   }
 
   /**

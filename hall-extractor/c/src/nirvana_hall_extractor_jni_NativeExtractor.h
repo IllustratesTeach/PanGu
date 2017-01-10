@@ -33,6 +33,22 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
 
 /*
  * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    GAFIS_MntDispToMntStd
+ * Signature: ([B[B)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1MntDispToMntStd
+  (JNIEnv *, jclass, jbyteArray, jbyteArray);
+
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    GAFIS_MntStdToMntDisp
+ * Signature: ([B[BI)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1MntStdToMntDisp
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jint);
+
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
  * Method:    ConvertMntOldToNew
  * Signature: ([B[B)V
  */

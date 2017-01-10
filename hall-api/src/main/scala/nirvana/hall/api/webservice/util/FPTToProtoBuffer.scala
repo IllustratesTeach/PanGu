@@ -17,22 +17,27 @@ import scala.util.Success
   */
 object FPTConvertToProtoBuffer {
   /**
+    * 定义一个常量
+    * 如果传入的int值为空，则给出9
+    */
+  val INTDEX = 9
+
+  /**
     * 根据接口获得的FPT文件,构建TPCard的ProtoBuffer的对象
     * 在构建过程中,需要解压图片获得原图，提取特征
-    *
-    * @param fpt4
+    * @param logic02Rec
     * @return
     */
-  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec,fpt4:FPT4File):TPCard ={
+  def TPFPT2ProtoBuffer(logic02Rec:Logic02Rec, imageDecompressUrl:String):TPCard ={
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
-    textBuilder.setNSex(if (logic02Rec.gender == null) {
+    textBuilder.setNSex(if (logic02Rec.gender != null) {
       logic02Rec.gender.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrBirthDate(logic02Rec.birthday)
     textBuilder.setStrIdentityNum(logic02Rec.idCardNo)
@@ -60,17 +65,17 @@ object FPTConvertToProtoBuffer {
     })
     textBuilder.setStrCriminalRecordDesc(logic02Rec.criminalInfo)
     textBuilder.setStrPremium(logic02Rec.assistUnitName)
-    textBuilder.setNXieChaFlag(if (logic02Rec.isAssist == null) {
+    textBuilder.setNXieChaFlag(if (logic02Rec.isAssist != null) {
       logic02Rec.isAssist.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrXieChaRequestUnitName(logic02Rec.assistUnitName)
     textBuilder.setStrXieChaRequestUnitCode(logic02Rec.assistUnitCode)
-    textBuilder.setNXieChaLevel(if (logic02Rec.assistLevel == null) {
+    textBuilder.setNXieChaLevel(if (logic02Rec.assistLevel != null) {
       logic02Rec.assistLevel.toInt
     } else {
-      9
+      INTDEX
     })
     textBuilder.setStrXieChaForWhat(logic02Rec.assistPurpose)
     textBuilder.setStrRelPersonNo(logic02Rec.relatedPersonId)
@@ -87,9 +92,9 @@ object FPTConvertToProtoBuffer {
       if (tData.imgData != null && tData.imgData.length > 0) {
         val tBuffer = FPTFileHandler.fingerDataToGafisImage(tData)
         //图像解压
-        val s = FPTFileHandler.callHallImageDecompressionImage(tBuffer)
+        val s = FPTFileHandler.callHallImageDecompressionImage(imageDecompressUrl,tBuffer)
         //提取特征
-        val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(tData.fgp), ParseFeatureTypeEnum(fpt4.tpCount.toInt, fpt4.lpCount.toInt))
+        val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(tData.fgp), FeatureType.FingerTemplate)
         val blobBuilder = tpCard.addBlobBuilder()
         blobBuilder.setStMntBytes(ByteString.copyFrom(mntAndBin.get._1.toByteArray()))
         blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
@@ -297,6 +302,28 @@ object FPTConvertToProtoBuffer {
     fpt4.logic02Recs.foreach { tp =>
       matchTask.setMatchId(tp.personId)
       matchTask.setMatchType(NirvanaTypeDefinition.MatchType.FINGER_TT)
+      matchTask.setPriority(1)
+      matchTask.setObjectId(1)
+      matchTask.setScoreThreshold(50)
+      matchTask.setTopN(50)
+      matchTask.setQueryid(fpt4.sid)
+    }
+    matchTask.build()
+  }
+
+  /**
+    * 根据接口获得的FPT文件构建matchtask Case protobuffer对象
+    * 在构建过程中,需要解压图片获得原图，提取特征
+    *
+    * @param fpt4
+    * @return
+    */
+  def FPT2MatchTaskCaseProtoBuffer(fpt4:FPT4File):MatchTask = {
+
+    val matchTask = MatchTask.newBuilder()
+    fpt4.logic03Recs.foreach { lp =>
+      matchTask.setMatchId(lp.cardId)
+      matchTask.setMatchType(NirvanaTypeDefinition.MatchType.FINGER_LT)
       matchTask.setPriority(1)
       matchTask.setObjectId(1)
       matchTask.setScoreThreshold(50)

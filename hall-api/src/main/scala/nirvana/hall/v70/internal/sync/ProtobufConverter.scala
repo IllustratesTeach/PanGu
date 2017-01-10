@@ -639,7 +639,8 @@ object ProtobufConverter {
     gafisQuery.minscore = matchTask.getScoreThreshold
     gafisQuery.maxcandnum = matchTask.getTopN
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
-    gafisQuery.flag = 1.toShort //指纹
+    //gafisQuery.flag = 1.toShort //指纹
+    gafisQuery.flag = matchTask.getFlag.toShort //指纹或者掌纹
 
     //特征mic
     val matchType = matchTask.getMatchType.getNumber
@@ -685,6 +686,7 @@ object ProtobufConverter {
     matchTask.setPriority(gafisQuery.priority.toInt)
     matchTask.setScoreThreshold(gafisQuery.minscore)
     matchTask.setTopN(gafisQuery.maxcandnum)
+    matchTask.setFlag(gafisQuery.flag.toInt)
 
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(gafisQuery.mic))
     mics.foreach{mic =>
@@ -706,6 +708,7 @@ object ProtobufConverter {
           case 2 =>
             //TODO 掌纹
             throw new UnsupportedOperationException
+           // tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemFlag)
         }
         if(mic.pstBin_Data != null){
           tdata.setRidge(ByteString.copyFrom(mic.pstBin_Data))

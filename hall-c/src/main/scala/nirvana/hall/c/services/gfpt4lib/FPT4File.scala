@@ -1,5 +1,9 @@
 package nirvana.hall.c.services.gfpt4lib
 
+import java.nio.ByteOrder
+import java.nio.charset.Charset
+
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{Length, LengthRef, NotTrim}
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
@@ -10,12 +14,31 @@ import nirvana.hall.c.services.gfpt4lib.FPTFile.{DynamicFingerData, FPTHead}
  * @since 2016-01-27
  */
 object FPT4File {
+  //逻辑记录类型
+  final val LOGIC01REC_DATATYPE = "01"
+  final val LOGIC02REC_DATATYPE = "02"
+  final val LOGIC03REC_DATATYPE = "03"
+  final val LOGIC04REC_DATATYPE = "04"
+  final val LOGIC05REC_DATATYPE = "05"
+  final val LOGIC06REC_DATATYPE = "06"
+  final val LOGIC07REC_DATATYPE = "07"
+  final val LOGIC08REC_DATATYPE = "08"
+  final val LOGIC09REC_DATATYPE = "09"
+  final val LOGIC10REC_DATATYPE = "10"
+  final val LOGIC11REC_DATATYPE = "11"
+  final val LOGIC12REC_DATATYPE = "12"
+  final val LOGIC99REC_DATATYPE = "99"
+
   private lazy val headSize = 10
   class LogicHeadV4 extends AncientData{
     @Length(8)
     var fileLength: String = _
     @Length(2)
     var dataType:String = _
+    def this(dataType: String){
+      this()
+      this.dataType = dataType
+    }
 
     /**
      * calculate data size and return.
@@ -30,7 +53,7 @@ object FPT4File {
     @Length(12)
     var fileLength: String = _
     @Length(2)
-    var dataType: String = "1"
+    var dataType: String = LOGIC01REC_DATATYPE
     @Length(6)
     var tpCount: String = _
     @Length(6)
@@ -111,13 +134,25 @@ object FPT4File {
     @LengthRef("customCandidateCount")
     var logic99Recs: Array[Logic99Rec] = _
 
+    //fpt默认编码格式GBK
+    override def toByteArray(encoding:Charset=AncientConstants.GBK_ENCODING, byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN) = {
+      super.toByteArray(encoding, byteOrder)
+    }
+
+    /**
+      * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
+      * @return
+      */
+    def build(): FPT4File={
+      FPT4File.build(this)
+    }
   }
 
   /**
    * 十指指纹信息记录结构
    */
   class Logic02Rec extends DynamicFingerData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC02REC_DATATYPE)
     @Length(6)
     var index: String = _
     @Length(4)
@@ -268,7 +303,7 @@ object FPT4File {
    * 现场指纹信息记录结构
    */
   class Logic03Rec extends DynamicFingerData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC03REC_DATATYPE)
     @Length(6)
     var index: String = _   //序号
     @Length(4)
@@ -408,7 +443,7 @@ object FPT4File {
    * 指纹正查和倒查比中信息记录结构
    */
   class Logic04Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC04REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -460,7 +495,7 @@ object FPT4File {
    * 指纹查重比中信息记录结构
    */
   class Logic05Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC05REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -504,7 +539,7 @@ object FPT4File {
    * 指纹串查比中信息记录结构
    */
   class Logic06Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC06REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -552,7 +587,7 @@ object FPT4File {
    * 现场指纹查询请求信息记录结构
    */
   class Logic07Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC07REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -570,7 +605,7 @@ object FPT4File {
    * 十指指纹查询请求信息记录结构
    */
   class Logic08Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC08REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -586,7 +621,7 @@ object FPT4File {
    * 正查比对结果候选信息记录结构
    */
   class Logic09Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC09REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -618,7 +653,7 @@ object FPT4File {
    * 倒查比对结果候选信息记录结构
    */
   class Logic10Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC10REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -648,7 +683,7 @@ object FPT4File {
    * 查重比对结果候选信息记录结构
    */
   class Logic11Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC11REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -674,7 +709,7 @@ object FPT4File {
    * 串查比对结果候选信息记录结构
    */
   class Logic12Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC12REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4)
@@ -704,7 +739,7 @@ object FPT4File {
    * 自定义逻辑记录结构
    */
   class Logic99Rec extends AncientData {
-    var head = new LogicHeadV4
+    var head = new LogicHeadV4(LOGIC99REC_DATATYPE)
     @Length(6) //序号
     var index: String = _
     @Length(4) //系统类型
@@ -712,4 +747,40 @@ object FPT4File {
     var fs: Byte = FPTFile.FS
   }
 
+  /**
+    * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
+    * @param fpt4File
+    * @return
+    */
+  def build(fpt4File: FPT4File): FPT4File={
+    fpt4File.head.flag = "FPT"
+    fpt4File.head.majorVersion = "04"
+    fpt4File.head.minorVersion = "00"
+    fpt4File.sendUnitSystemType ="1900" //1900 东方金指
+    //设置逻辑记录长度
+    fpt4File.tpCount = getArrayLength(fpt4File.logic02Recs)
+    fpt4File.lpCount = getArrayLength(fpt4File.logic03Recs)
+    fpt4File.tl_ltCount = getArrayLength(fpt4File.logic04Recs)
+    fpt4File.ttCount = getArrayLength(fpt4File.logic05Recs)
+    fpt4File.llCount = getArrayLength(fpt4File.logic06Recs)
+    fpt4File.lpRequestCount = getArrayLength(fpt4File.logic07Recs)
+    fpt4File.tpRequestCount = getArrayLength(fpt4File.logic09Recs)
+    fpt4File.ltCandidateCount =  getArrayLength(fpt4File.logic09Recs)
+    fpt4File.tlCandidateCount = getArrayLength(fpt4File.logic10Recs)
+    fpt4File.ttCandidateCount = getArrayLength(fpt4File.logic11Recs)
+    fpt4File.llCandidateCount = getArrayLength(fpt4File.logic12Recs)
+    fpt4File.customCandidateCount = getArrayLength(fpt4File.logic99Recs)
+
+    //TODO 计算其他逻辑记录的fileLength, 使用反射设置LengthRef的长度
+    //计算fileLength
+    fpt4File.fileLength = fpt4File.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+    fpt4File
+  }
+  private def getArrayLength[T](array: Array[T]): String ={
+    if(array != null){
+      array.length.toString
+    }else{
+      "0"
+    }
+  }
 }
