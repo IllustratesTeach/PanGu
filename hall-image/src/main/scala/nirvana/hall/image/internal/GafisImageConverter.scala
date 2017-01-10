@@ -2,19 +2,34 @@ package nirvana.hall.image.internal
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.imageio.ImageIO
 
 import nirvana.hall.c.annotations.Length
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
+import nirvana.hall.image.jni.JniLoader
 
 /**
   * Created by songpeng on 2017/1/10.
   * 处理GAFISIMAGESTRUCT，可将转换为BMP,JPG等图片格式
+  * 推荐使用GAFISImageReaderSpi
   */
+@deprecated
 object GafisImageConverter{
 
+  private lazy val jniInit = new AtomicBoolean(false)
+  @volatile
+  private var jniLoaded = false
+  private def loadJNI() {
+    if(jniInit.compareAndSet(false,true)) {
+      JniLoader.loadJniLibrary(".",null)
+      jniLoaded= true
+    }
+    if(!jniLoaded)
+      loadJNI()
+  }
   /**
     * GAFISIMAGESTRUCT转换为BMP图像数据
     * @param gafisImage
@@ -30,6 +45,7 @@ object GafisImageConverter{
     out.write(headerData)
 
     if(gafisImage.stHead.bIsCompressed > 0){
+      loadJNI()
       val decoder = new FirmDecoderImpl("support",new HallImageConfig)
       val decoderedImg = decoder.decode(gafisImage)
       out.write(decoderedImg.bnData)
