@@ -145,6 +145,13 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1Mn
 
     UCHAR *disp_mnt_bin = (UCHAR *) jenv->GetByteArrayElements(dispMnt, JNI_FALSE);
     UCHAR *mnt_data = (UCHAR *) jenv->GetByteArrayElements(stdMnt, JNI_FALSE);
+
+/*
+    FINGERMNTSTRUCT* std_mnt=(FINGERMNTSTRUCT*)mnt_data;
+    printf("std mnt count:%d \n",std_mnt->cm);
+    fflush(stdout);
+*/
+
     /*
     int n1=offsetof(MNTDISPSTRUCT,stPm);
     int n2=offsetof(MNTDISPSTRUCT,stFg);
@@ -164,8 +171,9 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1Mn
     fflush(stdout);
     */
     GAFIS_MntStdToMntDisp(mnt_data,disp_mnt_structure,MinutiaON);
-    jenv->ReleaseByteArrayElements(dispMnt, (jbyte *) disp_mnt_bin, JNI_ABORT);
-    jenv->ReleaseByteArrayElements(stdMnt, (jbyte *) mnt_data, 0);
+    //printf("disp mnt count:%d \n",disp_mnt_structure->stCm.nMntCnt);
+    jenv->ReleaseByteArrayElements(dispMnt, (jbyte *) disp_mnt_bin, 0);
+    jenv->ReleaseByteArrayElements(stdMnt, (jbyte *) mnt_data, JNI_ABORT);
   }
 }
 

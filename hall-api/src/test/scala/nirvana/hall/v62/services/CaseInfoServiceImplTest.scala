@@ -46,7 +46,8 @@ class CaseInfoServiceImplTest extends BaseV62TestCase{
     val caseInfo = Case.newBuilder()
     caseInfo.setStrCaseID("123456")
     caseInfo.setNCaseFingerCount(0)
-    caseInfo.setNSendFingerCount(0)
+    caseInfo.setNSendFingerCount(1)
+    caseInfo.addStrFingerID("12345601")
     val textBuilder = caseInfo.getTextBuilder
     textBuilder.setStrCaseOccurDate("20151111")
     textBuilder.setBPersonKilled(false)

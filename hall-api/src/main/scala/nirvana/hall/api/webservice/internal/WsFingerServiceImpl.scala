@@ -1,7 +1,5 @@
 package nirvana.hall.api.webservice.services.internal
 
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
 import java.util.Date
 import javax.activation.DataHandler
 
@@ -48,25 +46,24 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getTenprintRecord(userid: String, password: String, ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): DataHandler = {
     info("fun:getTenprintRecord,inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{}",userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate)
+    val fPT4File = new FPT4File
     try{
       //1 根据查询条件查询捺印文字信息数据集合
       val logic02RecList :Seq[Logic02Rec] = tpCardService.getFPT4Logic02RecList(ryno, xm, xb, idno, zjlb, zjhm, hjddm, xzzdm, rylb, ajlb, qkbs, xcjb, nydwdm, startnydate, endnydate)
       var dataHandler:DataHandler = null
       if(null != logic02RecList && logic02RecList.size > 0){
-        val fPT4File = new FPT4File
+
         fPT4File.logic02Recs = logic02RecList.toArray
         dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       } else {
-        dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
-      //debug 保存fpt
-      saveFpt(dataHandler,"getTenprintRecord",ryno)
       dataHandler
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ryno:{};xm:{};xb:{};idno:{};zjlb:{};zjhm:{};hjddm:{};xzzdm:{};rylb:{};ajlb:{};qkbs:{};xcjb:{};nydwdm:{};startnydate:{};endnydate:{},errormessage:{}"
         ,userid,password,ryno,xm,xb,idno,zjlb,zjhm,hjddm,xzzdm,rylb,ajlb,qkbs,xcjb,nydwdm,startnydate,endnydate,e.getMessage)
         e.printStackTrace()
-        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
     }
   }
 
@@ -81,23 +78,22 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getTenprintFinger(userid: String, password: String, ryno: String): DataHandler = {
     info("fun:getTenprintFinger,inputParam-userid:{};password:{};ryno:{};time:{}",userid,password,ryno,new Date)
+    val fPT4File = new FPT4File
     try{
       var dataHandler:DataHandler = null
       if(tpCardService.isExist(ryno)){
         val tpCard = tpCardService.getTPCard(ryno)
         val fptObj = FPTFileBuilder.convertTPCard2FPT4File(tpCard)
-        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.build().toByteArray()))
       }else{
-        dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
-      //debug 保存fpt
-      saveFpt(dataHandler,"getTenprintFinger",ryno)
       dataHandler
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" +
         ",inputParam-userid:{};password:{};ryno:{},errormessage:{},outtime:{}"
         ,userid,password,ryno,e.getMessage,new Date)
-        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
     }
   }
 
@@ -119,30 +115,23 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getLatent(userid: String, password: String, ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): DataHandler = {
     info("fun:getLatent,inputParam-userid:{};password:{};ajno:{};ajlb:{};fadddm:{};mabs:{};xcjb:{};xcdwdm:{};startfadate:{};endfadate:{}",userid,password, ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
+    val fPT4File = new FPT4File
     try{
       var dataHandler:DataHandler = null
-      //1 根据查询条件查询现场文字信息数据集合
-      if(ajnoParse(ajno).get._1){
-        val logic03RecList :Seq[Logic03Rec] = caseInfoService.getFPT4Logic03RecList(ajnoParse(ajno).get._2, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
-        if(null != logic03RecList && logic03RecList.size > 0){
-          //2 将现场文字信息数据集合 封装成FPT
-          val fpt4File = new FPT4File
-          fpt4File.logic03Recs = logic03RecList.toArray
-          dataHandler = new DataHandler(new ByteArrayDataSource(fpt4File.build().toByteArray()))
-          //debug 保存fpt
-          saveFpt(dataHandler,"getLatent",ajno)
-        } else {
-          dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
-        }
+      val logic03RecList :Seq[Logic03Rec] = caseInfoService.getFPT4Logic03RecList(ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate)
+      if(null != logic03RecList && logic03RecList.size > 0){
+        val fpt4File = new FPT4File
+        fpt4File.logic03Recs = logic03RecList.toArray
+        dataHandler = new DataHandler(new ByteArrayDataSource(fpt4File.build().toByteArray()))
       } else {
-        dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
       dataHandler
     }catch{
       case e : Exception => error("fun:getTenprintFinger Exception" + ",inputParam-userid:{};password:{};ajno:{};ajlb:{};fadddm:{};mabs:{};xcjb:{};xcdwdm:{};startfadate:{};endfadate:{},errormessage:{}"
         ,userid,password,userid,password, ajno, ajlb, fadddm, mabs, xcjb, xcdwdm, startfadate, endfadate, e.getMessage)
         e.printStackTrace()
-        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+        new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
     }
   }
 
@@ -159,68 +148,27 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     */
   override def getLatentFinger(userid: String, password: String, ajno: String): DataHandler = {
     info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
+    val fPT4File = new FPT4File
     try{
-      var caseId = ""
       val lpCardList = new mutable.ListBuffer[LPCard]
-      if(ajnoParse(ajno).get._1){
-        caseId = ajnoParse(ajno).get._2
-        var dataHandler:DataHandler = null
-        if(caseInfoService.isExist(caseId)){
-          val caseInfo = caseInfoService.getCaseInfo(caseId)
-          val fingerIdCount = caseInfo.getStrFingerIDList.size
-          for(i <-0 to fingerIdCount-1){
-            lpCardList.append(lpCardService.getLPCard(caseInfo.getStrFingerID(i)))
-          }
-          val fptObj = FPTFileBuilder.convertCaseAndLPCard2FPT4File(caseInfo, lpCardList)
-          dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
-        }else{
-          dataHandler = new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
+      var dataHandler:DataHandler = null
+      if(ajno != null && caseInfoService.isExist(ajno)){
+        val caseInfo = caseInfoService.getCaseInfo(ajno)
+        val fingerIdCount = caseInfo.getStrFingerIDList.size
+        for(i <-0 to fingerIdCount-1){
+          lpCardList.append(lpCardService.getLPCard(caseInfo.getStrFingerID(i)))
         }
-        //debug 保存fpt
-        saveFpt(dataHandler,"getLatentFinger",ajno)
-        dataHandler
+        val fptObj = FPTFileBuilder.buildLatentFpt(caseInfo, lpCardList)
+        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
       }else{
-        throw new Exception("传入的案件编号ajno:不符合要求")
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
+      dataHandler
     }catch{
       case e : Exception => error("fun:getLatentFinger Exception" +
         ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
         ,userid,password,ajno,e.getMessage,new Date)
-        new DataHandler(new ByteArrayDataSource(FPTFileBuilder.FPTHead.getFPTTaskRecs().toByteArray()))
-    }
-  }
-
-  /**
-    * 保存debug fpt文件
-    */
-  def saveFpt(dataHandler:DataHandler, stype:String, id:String = ""): Unit = {
-    var dirPath = "E:/"+stype
-    val now = new Date()
-    val sdf:SimpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssSSS")
-    val nowStr = sdf.format(now)
-    var dir = new java.io.File(dirPath)
-    if(!dir.exists()){
-      dir.mkdirs()
-    }
-    try{
-      var out = new FileOutputStream(dir+"/"+id+"_"+nowStr+".fpt")
-      dataHandler.writeTo(out)
-      out.flush()
-      out.close()
-    } catch {
-      case e:Exception=> error("saveFpt-error:" + e.getMessage)
-        e.printStackTrace()
-    }
-  }
-
-
-  private def ajnoParse(ajno:String): Option[(Boolean,String)] ={
-    var str = ""
-    if(null != ajno && ajno.contains("A") && 23 == ajno.length){
-      str = ajno.split("A")(1)
-      Some(true,str)
-    }else{
-      Some(false,str)
+        new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
     }
   }
 

@@ -42,9 +42,9 @@ object FPTLDataToMNTDISP {
     mntDisp.stCm.fca = fca._1
     mntDisp.stCm.D_fca = fca._2
     UTIL_CoreDelta_FPT2MntDisp(fingerLData.centerPoint,mntDisp.stFg.upcore,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fingerLData.subCenterPoint,mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fingerLData.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fingerLData.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_UPCORE)
+    UTIL_CoreDelta_FPT2MntDisp(fingerLData.subCenterPoint,mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_VICECORE)
+    UTIL_CoreDelta_FPT2MntDisp(fingerLData.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
+    UTIL_CoreDelta_FPT2MntDisp(fingerLData.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     mntDisp.stCm.nMntCnt = fingerLData.featureCount.toShort
 
