@@ -79,7 +79,13 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
 
-        NativeImageConverter.decodeByGFS(gafisImg.bnData,destImgBin)
+        try {
+          NativeImageConverter.decodeByGFS(gafisImg.bnData, destImgBin)
+        } catch {
+          case e:Throwable=>
+            gafisImg.stHead.nCompressMethod = "102".toByte
+            return decode(gafisImg)
+        }
         destImg.fromByteArray(destImgBin)
 
         destImg.stHead.bIsCompressed = 0
