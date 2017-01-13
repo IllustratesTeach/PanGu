@@ -196,7 +196,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE =>
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
-        val flag = new String(gafisImg.bnData,0,4)
         NativeImageConverter.GAFIS_DecompressIMG(gafisImg.toByteArray(),destImgBin)
 
         //为原图添加gafisHead
