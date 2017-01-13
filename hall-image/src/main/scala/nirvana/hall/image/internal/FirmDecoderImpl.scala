@@ -56,7 +56,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     destImg.stHead.nBits = 8
 
     firmCode match{
-      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
+      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE | fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
 
         /*val img = wsqDecoder.decode(gafisImg.bnData)
         destImg.stHead.nWidth = img.getWidth.toShort
@@ -197,11 +197,15 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
         //为原图添加gafisHead
         val destImg = new GAFISIMAGESTRUCT
+        destImg.fromByteArray(destImgBin)
         destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
         destImg.stHead.bIsCompressed = 0
         destImg.stHead.nCompressMethod = 0
         destImg.stHead.nBits = 8
-        destImg.fromByteArray(destImgBin)
+        if(destImg.stHead.nResolution == 0)
+          destImg.stHead.nResolution = 500 //default ppi
+        destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
+        destImg.stHead.nImgSize = destImg.bnData.length
 
         destImg
       case other => //如果是其他压缩代码
