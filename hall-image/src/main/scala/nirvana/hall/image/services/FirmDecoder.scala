@@ -13,4 +13,11 @@ trait FirmDecoder{
    * @return original image data
    */
   def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT
+
+  /**
+    * 解压gfs压缩图
+    * @param gafisImg, 6.2数据库存储的数据格式
+    * @return
+    */
+  def decodeByGFS(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT
 }
