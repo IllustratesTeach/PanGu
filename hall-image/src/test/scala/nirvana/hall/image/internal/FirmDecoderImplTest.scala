@@ -224,4 +224,15 @@ class FirmDecoderImplTest extends BaseJniTest{
     Assert.assertNotNull(dest.bnData)
 
   }
+  @Test
+  def test_decode{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+
+    val dest = decoder.decodeByGFS(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
+
+  }
 }

@@ -2,7 +2,6 @@ package nirvana.hall.image.internal
 
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
@@ -10,7 +9,7 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.ImageConfigSupport
-import nirvana.hall.image.jni.{JniLoader, NativeImageConverter}
+import nirvana.hall.image.jni.NativeImageConverter
 import nirvana.hall.image.services.FirmDecoder
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
@@ -193,7 +192,8 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
       case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE =>
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
-        NativeImageConverter.decodeByGFS(gafisImg.toByteArray(),destImgBin)
+        val flag = new String(gafisImg.bnData,0,4)
+        NativeImageConverter.decodeByGFS(gafisImg.toByteArray(),destImgBin,false)
 
         //为原图添加gafisHead
         val destImg = new GAFISIMAGESTRUCT

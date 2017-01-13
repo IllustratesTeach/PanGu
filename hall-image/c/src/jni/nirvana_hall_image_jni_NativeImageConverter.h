@@ -33,7 +33,7 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
   (JNIEnv *, jclass, jlong, jstring, jint, jbyteArray, jint);
 JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByGFS
-   (JNIEnv *, jclass, jbyteArray, jbyteArray);
+   (JNIEnv *, jclass, jbyteArray, jbyteArray,jboolean);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
