@@ -79,7 +79,11 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
 
-        NativeImageConverter.decodeByGFS(gafisImg.bnData,destImgBin)
+        //如果是金指的压缩,那么bnData实际上还是个GAFISIMAGESTRUCT结构体,这个当且仅当是解压缩FPT中的图像
+        val bnData = new GAFISIMAGESTRUCT().fromByteArray(gafisImg.bnData)
+        bnData.transformForFPT()
+
+        NativeImageConverter.GAFIS_DecompressIMG(bnData.toByteArray(),destImgBin)
         destImg.fromByteArray(destImgBin)
 
         destImg.stHead.bIsCompressed = 0
@@ -193,7 +197,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
         val flag = new String(gafisImg.bnData,0,4)
-        NativeImageConverter.decodeByGFS(gafisImg.toByteArray(),destImgBin,false)
+        NativeImageConverter.GAFIS_DecompressIMG(gafisImg.toByteArray(),destImgBin)
 
         //为原图添加gafisHead
         val destImg = new GAFISIMAGESTRUCT

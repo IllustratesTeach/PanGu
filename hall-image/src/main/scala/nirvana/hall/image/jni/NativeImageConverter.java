@@ -1,5 +1,7 @@
 package nirvana.hall.image.jni;
 
+import nirvana.hall.c.services.gloclib.glocdef;
+
 /**
  * image converter
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
@@ -29,22 +31,6 @@ public class NativeImageConverter {
      */
     public static native OriginalImage decodeByManufactory(long handle,String code,int cprMethod,byte[] cpr_data,int dest_img_size);
 
-	/**
-   * decode fpt image data
-   * @param cprData compressed image
-   * @param originData original data
-   */
-  public static void decodeByGFS(byte[] cprData,byte[] originData){
-      decodeByGFS(cprData,originData,true);
-    }
-
-  /**
-   * decode compressed image
-   * @param cprData compressed image data
-   * @param originData original image data
-   * @param isFptImg if true ,is fpt image
-	 */
-    public static native void decodeByGFS(byte[] cprData,byte[] originData,boolean isFptImg);
 
     /**
      * decode compressed data by WSQ
@@ -61,12 +47,12 @@ public class NativeImageConverter {
    * @param compress_ratio 	压缩倍率2...30
    * @return 1	......	成功, <0	......	失败,错误代码为KERROR_XXX
    */
-//  public static native int GAFIS_CompressIMG(byte[] pImage,byte[] cpr,int cprmethod,int compress_ratio);
+  public static native int GAFIS_CompressIMG(byte[] pImage,byte[] cpr,int cprmethod,int compress_ratio);
   /**
    * 解压缩图像数据
    * @param cpr GAFISIMAGESTRUCT 返回的压缩图象指针（单枚）
    * @param pImage GAFISIMAGESTRUCT 图象指针（单枚）
    * @return 1	......	成功, <0	......	失败,错误代码为KERROR_XXX
    */
-//  public static native int GAFIS_DecompressIMG(byte[] cpr,byte[] pImage);
+  public static native int GAFIS_DecompressIMG(byte[] cpr,byte[] pImage);
 }
