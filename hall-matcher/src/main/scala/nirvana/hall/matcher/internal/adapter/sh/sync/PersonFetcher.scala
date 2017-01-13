@@ -20,32 +20,31 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode," +
-     " t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType," +
-     " t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.idcardno," +
-     " t.person_type personType, t.nation_code nationCode, t.recordMark, t.deletag, db.logic_db_pkid as logicDB," +
-     " t.gather_org_code gatherOrgCode, t.nativeplace_code nativePlaceCode, t.foreign_name foreignName," +
-     " t.assist_level assistLevel, t.assist_ref_person assistRefPerson, t.assist_ref_case assistRefCase," +
-     " t.gatherdepartname gatherDepartName, t.gatherusername gatherUserName, t.contrcapture_code contrcaptureCode," +
-     " t.certificatetype certificateType, t.certificateid certificateId, t.process_no processNo, t.psis_no psisNo," +
-     " t.spellname spellName, t.usedname usedName, t.usedspell usedSpell, t.aliasname aliasName, t.aliasspell aliasSpell," +
-     " t.birth_code birthCode, t.birth_street birthStreet, t.birthdetail birthDetail, t.door_street doorStreet," +
-     " t.doordetail doorDetail, t.address_street addressStreet, t.addressdetail addressDetail, t.culture_code cultureCode," +
-     " t.faith_code faithCode, t.haveemployment haveEmployment, t.job_code jobCode, t.otherspecialty otherSpecialty," +
-     " t.specialidentity_code specialidentityCode, t.specialgroup_code specialgroupCode, t.gatherer_id gathererId," +
-     " t.fingerrepeatno fingerRepeatNo, t.inputpsn, t.inputtime, t.modifiedpsn, t.modifiedtime, t.person_category personCategory," +
-     " t.gather_finger_mode gatherFingerMode, t.case_name caseName, t.reason, t.gatherdepartcode gatherDepartCode," +
-     " t.gatheruserid gatherUserId, t.gather_finger_time gatherFingerTime, t.cardid, t.is_xjssmz isXjssmz" +
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
+     " t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherTypeId, t.gather_date gatherDate," +
+     " t.data_sources dataSources, t.case_classes caseClasses, t.idcardno, t.person_type personType, t.nation_code nationCode," +
+     " t.recordmark, t.deletag, db.logic_db_pkid as logicDB, t.gather_org_code gatherOrgCode, t.nativeplace_code nativeplaceCode," +
+     " t.foreign_name foreignName, t.assist_level assistLevel, t.assist_ref_person assistRefPerson, t.assist_ref_case assistRefCase," +
+     " t.gatherdepartname, t.gatherusername, t.contrcapture_code contrcaptureCode," +
+     " t.certificatetype, t.certificateid, t.process_no processNo, t.psis_no psisNo," +
+     " t.spellname, t.usedname, t.usedspell, t.aliasname, t.aliasspell, t.birth_code birthCode, t.birth_street birthStreet," +
+     " t.birthdetail, t.door_street doorStreet, t.doordetail, t.address_street addressStreet," +
+     " t.addressdetail, t.culture_code cultureCode, t.faith_code faithCode, t.haveemployment," +
+     " t.job_code jobCode, t.otherspecialty, t.specialidentity_code specialidentityCode," +
+     " t.specialgroup_code specialgroupCode, t.gatherer_id gathererId, t.fingerrepeatno, t.inputpsn," +
+     " t.inputtime, t.modifiedpsn, t.modifiedtime, t.person_category personCategory, t.gather_finger_mode gatherFingerMode," +
+     " t.case_name caseName, t.reason, t.gatherdepartcode, t.gatheruserid," +
+     " t.gather_finger_time gatherFingerTime, t.cardid, t.is_xjssmz isXjssmz" +
      " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid" +
      " where t.seq >= ? and t.seq <= ? order by t.seq"
-   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address",
-     "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordMark", "logicDB",
-     "gatherOrgCode", "nativePlaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase", "gatherDepartName",
-     "gatherUserName", "contrcaptureCode", "certificateType", "certificateId", "processNo", "psisNo", "spellName", "usedName",
-     "usedSpell", "aliasName", "aliasSpell", "birthCode", "birthStreet", "birthDetail", "doorStreet", "doorDetail",
-     "addressStreet", "addressDetail", "cultureCode", "faithCode", "haveEmployment", "jobCode", "otherSpecialty",
-     "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo", "inputpsn", "modifiedpsn", "personCategory",
-     "gatherFingerMode", "caseName", "reason", "gatherDepartCode", "gatherUserId", "cardid", "isXjssmz")
+   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherTypeId", "door", "address",
+     "sexCode", "name", "dataSources", "caseClasses", "idcardno", "personType", "nationCode", "recordmark", "logicDB",
+     "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase", "gatherdepartname",
+     "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail",
+     "addressStreet", "addressdetail", "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty",
+     "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno", "inputpsn", "modifiedpsn", "personCategory",
+     "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
    /**
     * 读取人员信息
     * @param syncDataResponse

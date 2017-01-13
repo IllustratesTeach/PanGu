@@ -19,12 +19,12 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
   /** 获取比对任务  */
   override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
 
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "dataSources", "caseClass",
-    "personType", "nationCode", "recordMark", "gatherOrgCode", "nativePlaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
-    "gatherDepartName", "gatherUserName", "contrcaptureCode", "certificateType", "certificateId", "processNo", "psisNo", "spellName", "usedName",
-    "usedSpell", "aliasName", "aliasSpell", "birthCode", "birthStreet", "birthDetail", "doorStreet", "doorDetail", "addressStreet", "addressDetail",
-    "cultureCode", "faithCode", "haveEmployment", "jobCode", "otherSpecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo",
-    "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherDepartCode", "gatherUserId", "cardid", "isXjssmz")
+  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
+    "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
+    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+    "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
+    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo",
+    "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
   private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource")
 
   /**
@@ -42,7 +42,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           if(json.has(col)){
             val value = json.getString(col)
             if(value.indexOf("|") > 0){
-              val values = value.split("|")
+              val values = value.split("\\|")
               val groupQuery = GroupQuery.newBuilder()
               values.foreach{value =>
                 val keywordQuery = KeywordQuery.newBuilder()
