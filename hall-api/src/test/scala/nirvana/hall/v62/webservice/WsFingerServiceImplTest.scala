@@ -2,6 +2,7 @@ package nirvana.hall.v62.webservice
 
 import java.io.FileOutputStream
 
+import nirvana.hall.api.internal.BaseJniLoader
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.Test
@@ -9,8 +10,7 @@ import org.junit.Test
 /**
   * Created by songpeng on 2016/12/5.
   */
-class WsFingerServiceImplTest extends BaseV62TestCase{
-
+class WsFingerServiceImplTest extends BaseV62TestCase with BaseJniLoader{
 
   @Test
   def test_getTenprintRecord: Unit ={
