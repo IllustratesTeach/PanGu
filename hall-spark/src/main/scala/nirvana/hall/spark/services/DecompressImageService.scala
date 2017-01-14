@@ -1,6 +1,5 @@
 package nirvana.hall.spark.services
 
-import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
 import com.google.protobuf.ByteString
@@ -8,11 +7,12 @@ import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.image.internal.{ImageEncoderImpl, FirmDecoderImpl}
+import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamError, StreamEvent}
+
 import scala.util.control.NonFatal
 
 /**
@@ -29,7 +29,7 @@ object DecompressImageService extends LoggerSupport{
   private lazy val imageServers = SysProperties.getPropertyOption("decompress.server").get
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
-  private lazy val wsqDecode = new ImageEncoderImpl
+  private lazy val wsqDecode = new ImageEncoderImpl(decoder)
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "D|"+message
   }
