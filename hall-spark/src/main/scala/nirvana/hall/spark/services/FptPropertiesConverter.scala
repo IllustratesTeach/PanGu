@@ -15,7 +15,7 @@ import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGE
   */
 object FptPropertiesConverter {
 
-  def fpt3ToPersonConvert(fpt3 : Logic3Rec, fptPath : String): PersonConvert ={
+  def fpt3ToPersonConvert(fpt3 : Logic3Rec, fptPath : String = ""): PersonConvert ={
     val person = new PersonConvert
     person.personId = fpt3.personId
     person.cardId = fpt3.cardId
@@ -289,9 +289,14 @@ object FptPropertiesConverter {
     var vicePattern : String = _
     var gatherData : Array[Byte] = _
     var path : String = _
+
+    //idCard finger info
+    var name : String = _
+    var idCardNO : String = _
+    var idCardID : String = _
   }
 
-  /***  LATENT TO DO ***/
+  /***  LATENT ***/
   class LatentCaseConvert extends Serializable{
     var caseId : String = _
     var cardId : String = _

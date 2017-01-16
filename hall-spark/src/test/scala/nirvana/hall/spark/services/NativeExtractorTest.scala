@@ -9,8 +9,9 @@ import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGE
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.jni.NativeExtractor
+import nirvana.hall.image.config.HallImageConfig
+import nirvana.hall.image.internal.FirmDecoderImpl
 import nirvana.hall.protocol.api.FPTProto.FingerFgp
-import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import org.apache.commons.io.{FileUtils, IOUtils}
@@ -61,6 +62,29 @@ class NativeExtractorTest extends BaseJniTest{
 
     val extractor = new FeatureExtractorImpl
     val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+    //val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+    //println(data.get._1.length)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt._1.bnData)
+
+    feature
+
+  }
+
+  @Test
+  def test_extract_wsq_tj: Unit ={
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\tjFPT\\crash\\2897_R_01_crash.img"))
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.fromByteArray(img)
+    /*gafisImg.stHead.nHeight = 640
+    gafisImg.stHead.nWidth= 640
+    gafisImg.stHead.nResolution = 500
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nImgSize = img.length
+    gafisImg.bnData = img*/
+
+    val extractor = new FeatureExtractorImpl
+    val mnt = extractor.extractByGAFISIMG(gafisImg,FingerPosition.FINGER_R_THUMB,FeatureType.FingerTemplate)
     //val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
     //println(data.get._1.length)
     val feature = new FINGERMNTSTRUCT

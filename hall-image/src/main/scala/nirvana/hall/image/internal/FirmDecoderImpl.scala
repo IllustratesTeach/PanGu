@@ -55,7 +55,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     destImg.stHead.nBits = 8
 
     firmCode match{
-      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
+      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE | fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
 
         /*val img = wsqDecoder.decode(gafisImg.bnData)
         destImg.stHead.nWidth = img.getWidth.toShort
@@ -79,13 +79,11 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
 
-        try {
-          NativeImageConverter.decodeByGFS(gafisImg.bnData, destImgBin)
-        } catch {
-          case e:Throwable=>
-            gafisImg.stHead.nCompressMethod = "102".toByte
-            return decode(gafisImg)
-        }
+        //如果是金指的压缩,那么bnData实际上还是个GAFISIMAGESTRUCT结构体,这个当且仅当是解压缩FPT中的图像
+        val bnData = new GAFISIMAGESTRUCT().fromByteArray(gafisImg.bnData)
+        bnData.transformForFPT()
+
+        NativeImageConverter.GAFIS_DecompressIMG(bnData.toByteArray(),destImgBin)
         destImg.fromByteArray(destImgBin)
 
         destImg.stHead.bIsCompressed = 0
@@ -180,6 +178,44 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     */
     destImg
   }
+
+  /**
+    * 解压gfs压缩图
+    * @param gafisImg
+    * @return
+    */
+  override def decodeByGFS(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
+    if(gafisImg.stHead.bIsCompressed == 0)//如果不是压缩图直接返回
+      return gafisImg
+
+    gafisImg.stHead.szName = "" //设置为空，否则如果是乱码在toByteArray报错
+
+    val cprMethod =gafisImg.stHead.nCompressMethod
+    val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
+    firmCode match {
+      case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE =>
+        val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
+        val destImgBin = new Array[Byte](64 + destImgSize)
+        NativeImageConverter.GAFIS_DecompressIMG(gafisImg.toByteArray(),destImgBin)
+
+        //为原图添加gafisHead
+        val destImg = new GAFISIMAGESTRUCT
+        destImg.fromByteArray(destImgBin)
+        destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
+        destImg.stHead.bIsCompressed = 0
+        destImg.stHead.nCompressMethod = 0
+        destImg.stHead.nBits = 8
+        if(destImg.stHead.nResolution == 0)
+          destImg.stHead.nResolution = 500 //default ppi
+        destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
+        destImg.stHead.nImgSize = destImg.bnData.length
+
+        destImg
+      case other => //如果是其他压缩代码
+        decode(gafisImg)
+    }
+  }
+
   private def Helper_GetBitsPerPixel(nBitsPerPixel:Int):Int={
     if ( nBitsPerPixel < 1 ) 8  else nBitsPerPixel
   }

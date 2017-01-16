@@ -22,7 +22,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
 
 class GafisDatabaseImageWJWProvider extends ImageProvider{
-  private lazy implicit val dataSource = GafisPartitionRecordsIdCardUpdate.dataSource
+  private lazy implicit val dataSource = GafisPartitionRecordsWJWUpdate.dataSource
   private lazy val extractorServer = SysProperties.getPropertyOption("extractor.server").get
   private lazy val directExtract = SysProperties.getBoolean("extractor.direct",defaultValue = false)
   private lazy val extractor = new FeatureExtractorImpl

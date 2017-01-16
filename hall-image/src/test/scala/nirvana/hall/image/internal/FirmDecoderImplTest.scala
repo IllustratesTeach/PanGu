@@ -210,14 +210,29 @@ class FirmDecoderImplTest extends BaseJniTest{
 
   }
 
+  /**
+    * 对比test_decode_gafisimg_1900
+    */
   @Test
-  def test_decodeWSQ: Unit ={
-    val decoder = new ImageEncoderImpl
-    val gafisImg = new GAFISIMAGESTRUCT
-    val cprData = FileUtils.readFileToByteArray(new File("D:\\img.img"))
-    gafisImg.fromByteArray(cprData)
-    val originalImg = decoder.encodeWSQ(gafisImg)
-    //FileUtils.writeByteArrayToFile(new File(""),originalImg.toByteArray())
-    println(originalImg.toByteArray().length)
+  def test_decodeByGFS_1900{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+
+    val dest = decoder.decodeByGFS(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
+
+  }
+  @Test
+  def test_decode{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+
+    val dest = decoder.decodeByGFS(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
+
   }
 }

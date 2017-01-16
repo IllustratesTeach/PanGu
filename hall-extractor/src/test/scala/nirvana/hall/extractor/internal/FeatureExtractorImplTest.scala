@@ -57,7 +57,7 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_bmp: Unit ={
-    val imgData = getClass.getResourceAsStream("/52022200000000000000000000009409.bmp")
+    val imgData = getClass.getResourceAsStream("/2897_R_01_crash_img.img.bmp")
 
     val extractor = new FeatureExtractorImpl
     val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
@@ -67,7 +67,9 @@ class FeatureExtractorImplTest extends BaseJniTest{
   }
   @Test
   def test_extract_wsq: Unit ={
-    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/testt.img"))
+    //val img = IOUtils.toByteArray(getClass.getResourceAsStream("/testt.img"))
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\tjFPT\\crash\\2809_L_06_crash_img.img"))
+
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.fromByteArray(img)
     /*gafisImg.stHead.nHeight = 640
@@ -174,6 +176,26 @@ class FeatureExtractorImplTest extends BaseJniTest{
     FileUtils.writeByteArrayToFile(new File("D:\\mnt.mnt"),mnt.toByteArray())
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
+  }
+
+  @Test
+  def test_extract_wsq_tj: Unit ={
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\tjFPT\\crash\\2897_R_01_crash"))
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.fromByteArray(img)
+    val extractor = new FeatureExtractorImpl
+    if (gafisImg.stHead.nCompressMethod.toInt>=10) {
+      val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+      println(data.get._1.length)
+    } else {
+      gafisImg.transformForFPT()
+      val gafisImg1 = new GAFISIMAGESTRUCT
+      gafisImg1.bnData = gafisImg.toByteArray()
+      gafisImg1.stHead = gafisImg.stHead
+      gafisImg1.stHead.nImgSize = gafisImg1.bnData.size
+      val data = extractor.extractByGAFISIMGBinary(ByteString.copyFrom(gafisImg1.toByteArray()).newInput(),FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate)
+      println(data.get._1.length)
+    }
   }
 
 }

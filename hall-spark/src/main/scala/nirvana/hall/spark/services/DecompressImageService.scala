@@ -29,7 +29,7 @@ object DecompressImageService extends LoggerSupport{
   private lazy val imageServers = SysProperties.getPropertyOption("decompress.server").get
 
   private lazy val decoder = new FirmDecoderImpl(".",null)
-  private lazy val wsqDecode = new ImageEncoderImpl
+  private lazy val wsqDecode = new ImageEncoderImpl(decoder)
   case class DecompressError(streamEvent:StreamEvent,message:String) extends StreamError(streamEvent) {
     override def getMessage: String = "D|"+message
   }

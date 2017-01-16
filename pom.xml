@@ -72,6 +72,11 @@
       </dependency>
       <dependency>
         <groupId>nirvana</groupId>
+        <artifactId>hall-image</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
       </dependency>
