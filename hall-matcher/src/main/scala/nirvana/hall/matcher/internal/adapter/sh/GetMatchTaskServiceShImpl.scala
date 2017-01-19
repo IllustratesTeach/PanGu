@@ -25,7 +25,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
     "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo",
     "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
-  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource")
+  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
 
   /**
    * 获取捺印文本查询条件
@@ -68,8 +68,8 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //时间段
-        val dateRange = Array("birthday", "gatherDate", "inputtime", "modifiedtime")
-        dateRange.foreach{col =>
+        val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime")
+        dateCols.foreach{col =>
           if (json.has(col + "ST") && json.has(col + "ED")) {
             val longQuery = LongRangeQuery.newBuilder()
             longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
@@ -133,7 +133,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           if(json.has(col)){
             val value = json.getString(col)
             if(value.indexOf("|") > 0){
-              val values = value.split("|")
+              val values = value.split("\\|")
               val groupQuery = GroupQuery.newBuilder()
               values.foreach{value =>
                 val keywordQuery = KeywordQuery.newBuilder()
@@ -148,11 +148,15 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             }
           }
         }
-        if (json.has("caseOccurDateBeg") && json.has("caseOccurDateBeg")) {
-          val longQuery = LongRangeQuery.newBuilder
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder.setExtension(LongRangeQuery.query, longQuery.build).setName("caseOccurDate")
+        //时间段
+        val dateCols = Array("caseOccurDate", "extractDate", "inputtime", "modifiedtime")
+        dateCols.foreach{col =>
+          if (json.has(col + "ST") && json.has(col + "ED")) {
+            val longQuery = LongRangeQuery.newBuilder()
+            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+            textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
+          }
         }
         //案件编号区间
         if (json.has("caseIdST") || json.has("caseIdED")) {
