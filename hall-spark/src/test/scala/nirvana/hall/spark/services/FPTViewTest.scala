@@ -8,11 +8,9 @@ class FPTViewTest {
 
   @Test
   def viewTest() : Unit = {
-    val fptPath = "D:\\ftp\\cc\\R9999912016100712431151.fpt"
-    FPTView.parseFPT(fptPath)
-    FPTView.viewFPT()
-    FPTView.toolFPT()
-    Thread.sleep(10000)
+    val fptPath = "D:\\ftp\\cc\\马江.FPT"
+    FPTView.main(Array(fptPath))
+    Thread.sleep(100000)
   }
 
 }

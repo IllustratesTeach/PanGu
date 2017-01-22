@@ -7,7 +7,7 @@ import java.io.Closeable
 import com.google.protobuf.ExtensionRegistry
 import com.google.protobuf.GeneratedMessage.GeneratedExtension
 import monad.rpc.protocol.CommandProto.BaseCommand
-import nirvana.hall.protocol.extract.ExtractProto
+import nirvana.hall.protocol.extract.{ExtractProto, FeatureDisplayProto}
 import nirvana.hall.protocol.image.FirmImageDecompressProto
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.support.services.RpcHttpClient
@@ -31,6 +31,7 @@ object SparkRpcClient extends RpcHttpClient{
     val registry = ExtensionRegistry.newInstance()
     FirmImageDecompressProto.registerAllExtensions(registry)
     ExtractProto.registerAllExtensions(registry)
+    FeatureDisplayProto.registerAllExtensions(registry)
     registry
   }
   private lazy val httpClient: CloseableHttpClient = createHttpClient
