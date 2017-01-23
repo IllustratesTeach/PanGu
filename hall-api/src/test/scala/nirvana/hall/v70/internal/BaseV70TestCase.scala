@@ -33,6 +33,7 @@ class BaseV70TestCase {
       "nirvana.hall.v70.LocalV70ServiceModule",
       "nirvana.hall.v70.LocalDataSourceModule",
       "nirvana.hall.api.LocalProtobufModule",
+      "nirvana.hall.api.LocalApiWebServiceModule",
       "nirvana.hall.v70.internal.TestV70Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)

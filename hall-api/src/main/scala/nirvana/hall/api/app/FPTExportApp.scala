@@ -4,6 +4,7 @@ import java.io.{File, FileOutputStream}
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ExtensionRegistry
+import joptsimple.{OptionException, OptionParser, OptionSet}
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
@@ -27,11 +28,11 @@ import scala.reflect._
 /**
   * Created by songpeng on 2017/1/14.
   * fpt 批量导出小程序
-  * 1.将需要导出的卡号列表写入到config/fpt_export_cardid_list.txt
-  * 2.配置config/hall-v70.xml或config/hall-v62.xml
-  * 3.加载so文件（ldconfig），windows系统将dll放到环境变量目录下
-  * 4.启动程序 bin/hall-api start
-  * 导出的fpt数据会在fpt目录下
+  * 配置动态库so or dll
+  * 配置config/hall-v62.xml or config/hall-v70.xml
+  * 修改bin/hall-api
+  *   SERVER_MAIN=nirvana.hall.api.app.FPTExportApp
+  *   SERVER_ARGS="-m=? -t=? -f=? -p=?"
   */
 object FPTExportApp extends JettyServerSupport
   with GlobalLoggerConfigurationSupport
@@ -42,44 +43,125 @@ object FPTExportApp extends JettyServerSupport
   protected def getService[T:ClassTag]:T={
     registry.getService(classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
-  def main(args: Array[String]): Unit = {
-    //TODO 支持v62, 支持案件导出，支持比中关系导出, 支持文件输入路径参数和fpt输出路径参数
-    val file = new File("support/config/fpt_export_cardid_list.txt")
-    if(!file.exists()){
-      println("fpt_export_cardid_list.txt not exist")
-      return
-    }
+  private val MODULE = "m"
+  private val CONFIG = "c"
+  private val FILE = "f"
+  private val PATH = "p"
+  private val TYPE = "t"
 
+  private val MODULE_V70 = "v70"
+  private val MODULE_V62 = "v62"
+  private val TYPE_TP = "tp"
+  private val TYPE_LP = "lp"
+
+  def main(args: Array[String]): Unit = {
     val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
     val logger = LoggerFactory getLogger getClass
     logger.info("starting export fpt server ....")
+
+    //joptsimple处理命令行参数
+    val parser = new OptionParser("m:c:f:t:p:")
+    parser.accepts(MODULE).withRequiredArg().describedAs("module: v62 or v70").required()
+//    parser.accepts(CONFIG).withRequiredArg().describedAs("config: hall-v62.xml or hall-v70.xml")
+    parser.accepts(FILE).withRequiredArg().describedAs("cardid list file").required()
+    parser.accepts(TYPE).withRequiredArg().describedAs("tp or lp").required()
+    parser.accepts(PATH).withRequiredArg().describedAs("output fpt file dir").required()
+
+    var options:OptionSet = null
+    try {
+      options = parser.parse(args:_ *)
+      if(options.has("?") || options.has("h")){//帮助信息
+        parser.printHelpOn(System.out)
+        return
+      }
+    }catch {
+      case e: OptionException =>
+        logger.error(e.getMessage)
+        parser.printHelpOn(System.out)
+        return
+    }
+    //读取参数
+    val module = options.valueOf(MODULE).asInstanceOf[String]
+//    val config = options.valueOf(CONFIG).asInstanceOf[String]
+    val filePath = options.valueOf(FILE).asInstanceOf[String]
+    val tpe = options.valueOf(TYPE).asInstanceOf[String]
+    val fptOutputPath = options.valueOf(PATH).asInstanceOf[String]
+
+    val modules = module match {
+      case MODULE_V70 =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.v70.LocalV70ServiceModule",
+          "nirvana.hall.v70.LocalDataSourceModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.api.LocalApiWebServiceModule",
+          "nirvana.hall.api.app.FPTExportV70Module"
+        )
+      case MODULE_V62 =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.v62.LocalV62ServiceModule",
+          "nirvana.hall.v62.LocalV62DataSourceModule",
+          "nirvana.hall.api.LocalApiWebServiceModule",
+          "nirvana.hall.api.app.FPTExportV62Module"
+        )
+      case other =>
+        return
+    }
+    //配置文件
+//    val configFile = new File(config)
+//    if(!configFile.exists()){
+//      logger.error("config: %s is not exist".format(config))
+//      return
+//    }
+    //读取文件信息
+    val file = new File(filePath)
+    if(!file.exists()){
+      logger.error("file: %s is not exist".format(filePath))
+      return
+    }
+    //fpt导出目录校验
+    val fptFilePath = new File(fptOutputPath)
+    if(!fptFilePath.exists() && !fptFilePath.isDirectory){
+      logger.error("fptOutputPath: %s is not dir".format(fptOutputPath))
+      return
+    }
+
     //加载jni
     loadJni()
+    //启动registry
+    setup(modules)
 
-    setup
-
+    //TODO 支持比中关系导出
     try{
-      //fpt导出目录，如果没有则创建
-      val filePath = new File("support/fpt")
-      if(!filePath.exists()){
-        filePath.mkdir()
-      }
-      val service = getService[WsFingerService]
-      //读取文件信息
+      //读入卡号列表
       val source = Source.fromFile(file)
-      val iter = source.getLines()
-      for(cardId <- iter){
-        logger.info("export fpt cardId: "+ cardId)
-        val fptDataHandle = service.getTenprintFinger("", "", cardId.toString)
-        //fpt数据写入文件
-        fptDataHandle.writeTo(new FileOutputStream("support/fpt/%s.fpt".format(cardId)))
+      val cardIdList= source.getLines()
+
+      val service = getService[WsFingerService]
+      //类型判断，捺印or现场
+      if(TYPE_TP.equals(tpe)){
+        for(cardId <- cardIdList){
+          logger.info("export fpt tp cardId: "+ cardId)
+          val fptDataHandle = service.getTenprintFinger("", "", cardId.toString)
+          //fpt数据写入文件
+          fptDataHandle.writeTo(new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)))
+        }
+      }else if(TYPE_LP.equals(tpe)){
+        for(cardId <- cardIdList){
+          logger.info("export fpt lp cardId: "+ cardId)
+          val fptDataHandle = service.getLatentFinger("", "", cardId.toString)
+          //fpt数据写入文件
+          fptDataHandle.writeTo(new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)))
+        }
+      }else{
+        logger.error("unknown type: %s".format(tpe))
+        return
       }
+
       source.close()
-
-      //文件重命名
-      file.renameTo(new File("support/config/fpt_export_cardid_list_sucess.txt"))
-
     }finally {
       down
     }
@@ -87,26 +169,10 @@ object FPTExportApp extends JettyServerSupport
   }
 
   //启动registry
-  def setup: Unit ={
+  def setup(modules: Seq[String]): Unit ={
     //v70
-    val modules = Seq[String](
-      "stark.activerecord.StarkActiveRecordModule",
-      "nirvana.hall.v70.LocalV70ServiceModule",
-      "nirvana.hall.v70.LocalDataSourceModule",
-      "nirvana.hall.api.LocalProtobufModule",
-      "nirvana.hall.api.LocalApiWebServiceModule",
-      "nirvana.hall.api.app.FPTExportV70Module"
-    ).map(Class.forName)
-    //v62
-/*    val modules = Seq[String](
-      "stark.activerecord.StarkActiveRecordModule",
-      "nirvana.hall.api.LocalProtobufModule",
-      "nirvana.hall.v62.LocalV62ServiceModule",
-      "nirvana.hall.v62.LocalV62DataSourceModule",
-      "nirvana.hall.api.LocalApiWebServiceModule",
-      "nirvana.hall.api.app.FPTExportV62Module"
-    ).map(Class.forName)*/
-    registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
+    val moduleClasses = modules.map(Class.forName)
+    registry = RegistryBuilder.buildAndStartupRegistry(moduleClasses: _*)
     //OpenSession In Thread
     val entityManagerFactory= getService[EntityManagerFactory]
     val emHolder= new EntityManagerHolder(entityManagerFactory.createEntityManager())
@@ -128,8 +194,8 @@ object FPTExportApp extends JettyServerSupport
       nirvana.hall.image.jni.JniLoader.loadJniLibrary("support", "stderr")
     }
     else{
-      nirvana.hall.extractor.jni.JniLoader.loadJniLibrary("../support", "stderr")
-      nirvana.hall.image.jni.JniLoader.loadJniLibrary("../support", "stderr")
+      nirvana.hall.extractor.jni.JniLoader.loadJniLibrary(".", "stderr")
+      nirvana.hall.image.jni.JniLoader.loadJniLibrary(".", "stderr")
     }
   }
 }
