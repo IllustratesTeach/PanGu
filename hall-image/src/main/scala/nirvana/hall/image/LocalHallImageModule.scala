@@ -66,7 +66,6 @@ object LocalHallImageModule {
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
     configuration.addInstance("FirmImageDecompressRequest", classOf[FirmImageDecompressRequestFilter])
     configuration.addInstance("ImageCompressRequestFilter", classOf[ImageCompressRequestFilter])
-    configuration.addInstance("ImageExportRequestFilter", classOf[ImageExportRequestFilter])
   }
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {
