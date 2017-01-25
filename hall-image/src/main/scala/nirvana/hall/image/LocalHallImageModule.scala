@@ -3,10 +3,10 @@ package nirvana.hall.image
 import com.google.protobuf.ExtensionRegistry
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, ProtobufExtensionRegistryConfiger, RpcServerMessageFilter, RpcServerMessageHandler}
-import nirvana.hall.image.internal.{ImageCompressRequestFilter, ImageEncoderImpl, FirmDecoderImpl, FirmImageDecompressRequestFilter}
-import nirvana.hall.image.services.{ImageEncoder, FirmDecoder}
-import nirvana.hall.protocol.image.{ImageCompressProto, FirmImageDecompressProto}
-import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId, Contribute}
+import nirvana.hall.image.internal._
+import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
+import nirvana.hall.protocol.image.{FirmImageDecompressProto, ImageCompressProto}
+import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.PipelineBuilder
 import org.apache.tapestry5.ioc.{Configuration, OrderedConfiguration, ServiceBinder}
 import org.slf4j.Logger
@@ -66,7 +66,7 @@ object LocalHallImageModule {
   def provideSegMatchRequestMessageHandler(configuration: OrderedConfiguration[RpcServerMessageFilter]) {
     configuration.addInstance("FirmImageDecompressRequest", classOf[FirmImageDecompressRequestFilter])
     configuration.addInstance("ImageCompressRequestFilter", classOf[ImageCompressRequestFilter])
-
+    configuration.addInstance("ImageExportRequestFilter", classOf[ImageExportRequestFilter])
   }
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger]) {
