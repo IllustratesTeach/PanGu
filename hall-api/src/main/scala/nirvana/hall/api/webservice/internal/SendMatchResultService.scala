@@ -8,10 +8,10 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.internal.fpt.FPTFileBuilder
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.services.union4pfmip
-import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import org.apache.axiom.attachments.ByteArrayDataSource

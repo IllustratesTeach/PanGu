@@ -1,7 +1,7 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.api.internal.BaseJniLoader
-import nirvana.hall.api.services.FPTService
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.{Assert, Test}
 

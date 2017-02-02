@@ -1,9 +1,9 @@
-package nirvana.hall.api.internal
+package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{CaseInfoService, FPTService, LPCardService, TPCardService}
-import nirvana.hall.api.webservice.util.FPTFileBuilder
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -65,5 +65,13 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     }else{
       null
     }
+  }
+
+  override def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
+
+  }
+
+  override def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
+
   }
 }

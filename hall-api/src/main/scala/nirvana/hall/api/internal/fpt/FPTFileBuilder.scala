@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal.fpt
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
@@ -15,6 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2016/12/2.
+  * 将proto转换为FPT4File
   */
 object FPTFileBuilder {
   /**

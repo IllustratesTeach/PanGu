@@ -1,8 +1,8 @@
 package nirvana.hall.api
 
-import nirvana.hall.api.internal.FPTServiceImpl
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
-import nirvana.hall.api.services.FPTService
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.webservice.internal.{SendMatchResultService, Union4pfmipCronService}
 import nirvana.hall.api.webservice.services.WsFingerService

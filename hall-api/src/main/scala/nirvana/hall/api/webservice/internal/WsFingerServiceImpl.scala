@@ -4,7 +4,8 @@ import java.util.Date
 import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{CaseInfoService, FPTService, LPCardService, TPCardService}
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
 import org.apache.axiom.attachments.ByteArrayDataSource

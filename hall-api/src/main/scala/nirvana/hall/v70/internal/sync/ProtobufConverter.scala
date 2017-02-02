@@ -2,7 +2,6 @@ package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.google.protobuf.ByteString
@@ -24,7 +23,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by songpeng on 16/1/28.
+ * Proto与po实体对象相互转换
  */
 object ProtobufConverter {
 
