@@ -3,6 +3,7 @@ package nirvana.hall.image.internal
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
+import nirvana.hall.image.services.RawImageDataType
 import org.apache.commons.io.IOUtils
 import org.junit.{Assert, Test}
 
@@ -17,7 +18,7 @@ class ImageEncoderImplTest extends BaseJniTest{
     val data = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.fromByteArray(data)
-    val originalImg = decoder.decodeByGFS(gafisImg)
+    val originalImg = decoder.decode(gafisImg, RawImageDataType)
     val encoder = new ImageEncoderImpl(decoder)
     val wsq = encoder.encodeWSQ(originalImg)
     Assert.assertNotNull(wsq.bnData)

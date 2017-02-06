@@ -3,7 +3,7 @@ package nirvana.hall.image.internal
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.NativeImageConverter
-import nirvana.hall.image.services.ImageEncoder
+import nirvana.hall.image.services.{ImageEncoder, RawImageDataType}
 import nirvana.hall.protocol.image.ImageCompressProto.ImageCompressRequest
 
 /**
@@ -29,7 +29,7 @@ class ImageEncoderImpl(firmDecoderImpl: FirmDecoderImpl) extends ImageEncoder{
     var image = gafisImage
     //如果数据是压缩图，先解压图像
     if(image.stHead.bIsCompressed > 0){
-      image = firmDecoderImpl.decodeByGFS(image)
+      image = firmDecoderImpl.decode(image, RawImageDataType)
     }
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(image.stHead.toByteArray())

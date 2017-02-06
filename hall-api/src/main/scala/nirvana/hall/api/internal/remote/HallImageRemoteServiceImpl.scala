@@ -37,10 +37,10 @@ class HallImageRemoteServiceImpl(hallApiConfig: HallApiConfig, rpcHttpClient: Rp
       case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE |
            fpt4code.GAIMG_CPRMETHOD_WSQ_CODE |
            fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
-        firmDecoder.decodeByGFS(gafisImage)
+        firmDecoder.decode(gafisImage)
       case other =>
         if(hallApiConfig.hallImageUrl == null || hallApiConfig.hallImageUrl.isEmpty){
-          firmDecoder.decodeByGFS(gafisImage)
+          firmDecoder.decode(gafisImage)
         }else{
           val request = FirmImageDecompressRequest.newBuilder()
           request.setCprData(ByteString.copyFrom(gafisImage.toByteArray(AncientConstants.GBK_ENCODING)))

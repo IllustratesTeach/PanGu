@@ -41,10 +41,9 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
   /**
     * decode compressed data using firm's algorithm
-    * (大库处理fpt数据转换为GAFISIMAGESTRUCT时统一都加了一个头信息，解压时统一去掉头信息再解压
-    * 由于GFS1900压缩算法的数据本身已经包含头信息,如果是数据库存储的数据,若使用该方法解压的GFS压缩数据时就需要多加一个头信息
-    * 这种情况推荐使用decodeByGFS)
-    *
+    * @param gafisImg
+    * @param imageDataType  FPTImageDataType: fpt图像数据转换为GAFISIMAGESTRUCT，统一都加了一个头信息，GFS1900压缩算法的数据本身已经包含头信息，而且进行了加密转换，需要先解密
+    *                       RawImageDataType: 数据库原始图像数据
     * @return original image data
     */
   override def decode(gafisImg: GAFISIMAGESTRUCT, imageDataType: ImageDataType): GAFISIMAGESTRUCT = {
@@ -179,17 +178,6 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
     destImg
   }
-
-  /**
-    * 解压gfs压缩图
- *
-    * @param gafisImg
-    * @return
-    */
-  override def decodeByGFS(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
-    decode(gafisImg,RawImageDataType)
-  }
-
 
   override def decodeFPTImage(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
     decode(gafisImg,FPTImageDataType)
