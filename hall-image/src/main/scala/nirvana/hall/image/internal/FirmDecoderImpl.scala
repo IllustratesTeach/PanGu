@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -50,13 +51,10 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     if(gafisImg.stHead.bIsCompressed == 0)
       return gafisImg
 
-    //TODO 如何保证中文能够顺利进行拷贝
-    gafisImg.stHead.szName = "" //设置为空，否则如果是乱码在toByteArray报错
-
     val cprMethod =gafisImg.stHead.nCompressMethod
     val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
     val destImg = new GAFISIMAGESTRUCT
-    destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
+    destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray(AncientConstants.GBK_ENCODING))
     destImg.stHead.bIsCompressed = 0
     destImg.stHead.nCompressMethod = 0
     destImg.stHead.nBits = 8
@@ -91,9 +89,9 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
             //如果是金指的压缩,那么bnData实际上还是个GAFISIMAGESTRUCT结构体,这个当且仅当是解压缩FPT中的图像
             val bnData = new GAFISIMAGESTRUCT().fromByteArray(gafisImg.bnData)
             bnData.transformForFPT()
-            bnData.toByteArray()
+            bnData.toByteArray(AncientConstants.GBK_ENCODING)
           case _ =>
-            gafisImg.toByteArray()
+            gafisImg.toByteArray(AncientConstants.GBK_ENCODING)
         }
 
         NativeImageConverter.GAFIS_DecompressIMG(imageData,destImgBin)
