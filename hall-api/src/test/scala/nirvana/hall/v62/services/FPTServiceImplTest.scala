@@ -25,4 +25,12 @@ class FPTServiceImplTest extends BaseV62TestCase with BaseJniLoader{
     val logic02Rec = fptFile.right.get.logic02Recs(0)
     service.addLogic02Res(logic02Rec)
   }
+
+  @Test
+  def test_addLogic03Rec: Unit ={
+    val service = getService[FPTService]
+    val fptFile = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/A3202050008882016050249.fpt"))
+    val logic03Rec = fptFile.right.get.logic03Recs(0)
+    service.addLogic03Res(logic03Rec)
+  }
 }

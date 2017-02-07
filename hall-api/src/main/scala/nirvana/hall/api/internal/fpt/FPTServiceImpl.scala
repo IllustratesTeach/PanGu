@@ -12,6 +12,7 @@ import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.protocol.api.FPTProto.{ImageType, LPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import org.springframework.transaction.annotation.Transactional
 
 /**
   * Created by songpeng on 2017/1/23.
@@ -72,6 +73,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     }
   }
 
+  @Transactional
   override def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
     val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
     //图像转换和特征提取
@@ -106,10 +108,22 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     tPCardService.addTPCard(tpCardBuilder.build())
   }
 
+  @Transactional
   override def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
     val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
-
-
+    caseInfoService.addCaseInfo(caseInfo)
+    val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
+    lPCardList.foreach{lPCard =>
+      val lpCardBuiler = lPCard.toBuilder
+      //图像解压
+      val blobBuilder = lpCardBuiler.getBlobBuilder
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
+      if(gafisImage.stHead.bIsCompressed > 0){
+        val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+        blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
+      }
+      lPCardService.addLPCard(lpCardBuiler.build())
+    }
   }
 
   private def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={

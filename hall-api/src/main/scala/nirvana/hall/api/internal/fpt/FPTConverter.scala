@@ -1,10 +1,14 @@
 package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
+import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto._
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by songpeng on 2017/1/26.
@@ -45,7 +49,7 @@ object FPTConverter {
     textBuilder.setStrRace(logic02Rec.nativeplace)
     textBuilder.setStrCertifType(logic02Rec.certificateType)
     textBuilder.setStrCertifID(logic02Rec.certificateNo)
-    textBuilder.setBHasCriminalRecord(logic02Rec.isCriminal.equals("1"))
+    textBuilder.setBHasCriminalRecord("1".equals(logic02Rec.isCriminal))
     textBuilder.setStrCriminalRecordDesc(logic02Rec.criminalInfo)
     textBuilder.setStrPremium(logic02Rec.assistUnitName)
     if(logic02Rec.isAssist != null && logic02Rec.isAssist.length > 0){
@@ -95,12 +99,88 @@ object FPTConverter {
   }
 
   def convertLogic03Res2Case(logic03Rec: Logic03Rec):Case ={
+    val caseInfo = Case.newBuilder()
+    val textBuilder = caseInfo.getTextBuilder
+    caseInfo.setStrCaseID(logic03Rec.caseId)
+    caseInfo.setNCaseFingerCount(logic03Rec.fingers.length)
+    logic03Rec.fingers.foreach(f => caseInfo.addStrFingerID(f.fingerId))
+    textBuilder.setStrCaseType1(logic03Rec.caseClass1Code) //案件类别
+    textBuilder.setStrCaseType2(logic03Rec.caseClass2Code)
+    textBuilder.setStrCaseType3(logic03Rec.caseClass3Code)
+    textBuilder.setStrSuspArea1Code(logic03Rec.suspiciousArea1Code) //可疑地区行政区划
+    textBuilder.setStrSuspArea2Code(logic03Rec.suspiciousArea2Code)
+    textBuilder.setStrSuspArea3Code(logic03Rec.suspiciousArea3Code)
+    textBuilder.setStrCaseOccurDate(logic03Rec.occurDate) //案发日期
+    textBuilder.setStrCaseOccurPlaceCode(logic03Rec.occurPlaceCode) //案发地点代码
+    textBuilder.setStrCaseOccurPlace(logic03Rec.occurPlace) //案发地址详情
 
-    null
+    textBuilder.setStrExtractUnitCode(logic03Rec.extractUnitCode) //提取单位代码
+    textBuilder.setStrExtractUnitName(logic03Rec.extractUnitName) //提取单位
+    textBuilder.setStrExtractor(logic03Rec.extractor) //提取人
+    textBuilder.setStrExtractDate(logic03Rec.extractDate) //提取时间
+    textBuilder.setStrMoneyLost(logic03Rec.amount) //涉案金额
+    textBuilder.setStrPremium(logic03Rec.bonus) //协查奖金
+    textBuilder.setBPersonKilled("1".equals(logic03Rec.isMurder)) //命案标识
+    textBuilder.setStrComment(logic03Rec.caseBriefDetail) //备注,简要案情
+    textBuilder.setStrXieChaDate(logic03Rec.assistDate) //协查日期
+    textBuilder.setStrXieChaRequestUnitName(logic03Rec.assistUnitName) //协查单位名称
+    textBuilder.setStrXieChaRequestUnitCode(logic03Rec.assistUnitCode) //协查单位代码
+
+    //隐式转换，字符串转数字
+    implicit def string2Int(str: String): Int= {
+      if(str != null && str.matches("[0-9]+"))
+        Integer.parseInt(str)
+      else 0
+    }
+    textBuilder.setNSuperviseLevel(logic03Rec.assistLevel) //协查级别
+    textBuilder.setNCaseState(logic03Rec.caseStatus) //案件状态
+    textBuilder.setNCaseState(logic03Rec.isCaseAssist) //协查状态
+    textBuilder.setNCancelFlag(logic03Rec.isRevoke) //撤销标识
+
+    caseInfo.build()
   }
   def convertLogic03Res2LPCard(logic03Rec: Logic03Rec):Seq[LPCard] ={
+    val lpCardList = new ArrayBuffer[LPCard]()
+    logic03Rec.fingers.foreach{finger =>
+      val lpCard = LPCard.newBuilder()
+      lpCard.setStrCardID(finger.fingerId)
+      val textBuilder = lpCard.getTextBuilder
+      textBuilder.setStrCaseId(logic03Rec.caseId)
+      textBuilder.setStrSeq(finger.fingerNo)
+      textBuilder.setStrRemainPlace(finger.remainPlace)     //遗留部位
+      textBuilder.setStrRidgeColor(finger.ridgeColor)      //乳突线颜色
+      textBuilder.setBDeadBody("1".equals(finger.ridgeColor))          //未知名尸体标识
+      textBuilder.setStrDeadPersonNo(finger.corpseNo)    //未知名尸体编号
+      textBuilder.setStrStart(finger.mittensBegNo)           //联指开始序号
+      textBuilder.setStrEnd(finger.mittensEndNo)             //联指结束序号
+      textBuilder.setStrCaptureMethod(finger.extractMethod)  //提取方式
 
-    null
+      if (finger.imgData != null && finger.imgData.length > 0) {
+        val blobBuilder = lpCard.getBlobBuilder
+        blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+        if (finger.fgp != null && finger.fgp.length > 0){
+          0.until(finger.fgp.length)
+            .filter("1" == finger.fgp.charAt(_))
+            .foreach(i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
+        }
+        val gafisImage = FPTImageConverter.convert2GafisImage(finger, true)
+        val gafisMnt = FPTMntConverter.convertFingerLData2GafisMnt(finger)
+        blobBuilder.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+        blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
+      }
+      //隐式转换，字符串转数字
+      implicit def string2Int(str: String): Int= {
+        if(str != null && str.matches("[0-9]+"))
+          Integer.parseInt(str)
+        else 0
+      }
+      textBuilder.setNXieChaState(finger.isFingerAssist)
+      textBuilder.setNBiDuiState(finger.matchStatus)
+
+      lpCardList += lpCard.build()
+    }
+
+    lpCardList
   }
 
 }
