@@ -20,6 +20,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
+    binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
 
   }
 
