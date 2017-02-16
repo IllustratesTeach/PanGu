@@ -54,17 +54,8 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       val caseInfo = caseInfoService.getCaseInfo(caseId)
       val fingerIdCount = caseInfo.getStrFingerIDList.size
       for (i <- 0 until fingerIdCount) {
-        val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i)).toBuilder
-        lPCard.getBlob.getType match {
-          case ImageType.IMAGETYPE_FINGER =>
-            val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lPCard.getBlob.getStImageBytes.toByteArray)
-            if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
-              val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-              lPCard.getBlobBuilder.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-            }
-          case other =>
-        }
-        lpCardList.append(lPCard.build())
+        val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
+        lpCardList.append(lPCard)
       }
 
       FPTFileBuilder.convertCaseAndLPCard2Logic03Rec(caseInfo, lpCardList)

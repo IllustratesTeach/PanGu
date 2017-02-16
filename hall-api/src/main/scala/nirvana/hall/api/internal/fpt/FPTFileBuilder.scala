@@ -188,15 +188,9 @@ object FPTFileBuilder {
       fingerLData.matchStatus = card.getText.getNBiDuiState.toString
       fingerLData.extractMethod = fpt4code.EXTRACT_METHOD_M
       val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(card.getBlob.getStImageBytes.toByteArray)
-      //如果是GFS压缩，保留头信息
-      if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS){
-        fingerLData.imgData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
-      }else{
-        fingerLData.imgData = gafisImage.bnData
-      }
+      fingerLData.imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE //现场指纹统一为原图
+      fingerLData.imgData = gafisImage.bnData
       fingerLData.imgDataLength = fingerLData.imgData.length.toString
-
-      fingerLData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
       fingerLData.dataLength = fingerLData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
       fingerLDataList += fingerLData
     }
