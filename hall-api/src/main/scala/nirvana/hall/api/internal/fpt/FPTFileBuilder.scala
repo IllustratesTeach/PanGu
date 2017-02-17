@@ -98,8 +98,9 @@ object FPTFileBuilder {
           fingerTData.extractMethod = fpt4code.EXTRACT_METHOD_A
 
           val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-          //如果是GFS压缩，保留头信息
+          //如果是GFS压缩，保留头信息并transformForFPT
           if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS){
+            gafisImage.transformForFPT()
             fingerTData.imgData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
           }else{
             fingerTData.imgData = gafisImage.bnData
