@@ -24,6 +24,8 @@ object fpt4code {
   final val GAIMG_CPRMETHOD_PKU_CODE = "1300"
   //WSQ压缩方法
   final val GAIMG_CPRMETHOD_WSQ_CODE = "1400"
+  //WSQ压缩方法
+  final val GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE = "1419"
   // 北京海鑫
   final val GAIMG_CPRMETHOD_COGENT_CODE = "1700"
   // 小日本NEC
@@ -64,7 +66,7 @@ object fpt4code {
       case glocdef.GAIMG_CPRMETHOD_COGENT => // cogent compress method
         fpt4code.GAIMG_CPRMETHOD_COGENT_CODE
       case glocdef.GAIMG_CPRMETHOD_WSQ => // was method
-        fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
+        fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
       case glocdef.GAIMG_CPRMETHOD_NEC => // nec compress method
         fpt4code.GAIMG_CPRMETHOD_NEC_CODE
       case glocdef.GAIMG_CPRMETHOD_TSINGHUA => // tsing hua

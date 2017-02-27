@@ -1,9 +1,9 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal.fpt
 
-import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
 import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.protocol.api.FPTProto._
@@ -15,6 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2016/12/2.
+  * 将proto转换为FPT4File
   */
 object FPTFileBuilder {
   /**
@@ -95,16 +96,16 @@ object FPTFileBuilder {
           fingerTData.sendNo = sendNo.toString
           sendNo += 1
           fingerTData.extractMethod = fpt4code.EXTRACT_METHOD_A
-          fingerTData.customInfoLength = "0"
-          fingerTData.customInfo = new Array[Byte](0)
 
-          val imageData = blob.getStImageBytes.toByteArray
-          val gafisImage = new GAFISIMAGESTRUCT
-          gafisImage.fromByteArray(imageData)
-          val imageDataLength = imageData.length - 64
-          fingerTData.imgDataLength = imageData.length.toString
-          fingerTData.imgData = ByteString.copyFrom(imageData, 64, imageDataLength).toByteArray
-          fingerTData.imgDataLength = imageDataLength.toString
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+          //如果是GFS压缩，保留头信息并transformForFPT
+          if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS){
+            gafisImage.transformForFPT()
+            fingerTData.imgData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
+          }else{
+            fingerTData.imgData = gafisImage.bnData
+          }
+          fingerTData.imgDataLength = fingerTData.imgData.length.toString
           fingerTData.dataLength = fingerTData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
           fingerTData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
 
@@ -187,15 +188,10 @@ object FPTFileBuilder {
       fingerLData.isFingerAssist = card.getText.getNXieChaState.toString
       fingerLData.matchStatus = card.getText.getNBiDuiState.toString
       fingerLData.extractMethod = fpt4code.EXTRACT_METHOD_M
-      fingerLData.customInfoLength = "0"
-      fingerLData.customInfo = new Array[Byte](0)
-      val imageData = card.getBlob.getStImageBytes.toByteArray
-      val gafisImage = new GAFISIMAGESTRUCT
-      gafisImage.fromByteArray(imageData)
-      fingerLData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-      val imageDataLength = imageData.length - 64
-      fingerLData.imgData = ByteString.copyFrom(imageData, 64, imageDataLength).toByteArray
-      fingerLData.imgDataLength = imageDataLength.toString
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(card.getBlob.getStImageBytes.toByteArray)
+      fingerLData.imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE //现场指纹统一为原图
+      fingerLData.imgData = gafisImage.bnData
+      fingerLData.imgDataLength = fingerLData.imgData.length.toString
       fingerLData.dataLength = fingerLData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
       fingerLDataList += fingerLData
     }

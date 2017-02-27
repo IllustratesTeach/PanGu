@@ -1,13 +1,15 @@
 package nirvana.hall.v62.internal
 
 import nirvana.hall.api.services.CaseInfoService
-import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.V62SqlHelper
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
+import nirvana.hall.v62.internal.c.vo.LPCase
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/26.
@@ -82,6 +84,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
 
     val mapper = Map(
       g_stCN.stLCsID.pszName -> "caseId",
+      g_stCN.stLFingerCount.pszName -> "fingerCount",
       LCaseText.pszCaseClass1Code -> "caseClass1Code",
       LCaseText.pszCaseClass2Code -> "caseClass2Code",
       LCaseText.pszCaseClass3Code -> "caseClass3Code",
@@ -116,9 +119,30 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
       statement += " AND (%s <= %s)".format(LCaseText.pszCaseOccurDate, endfadate.substring(0,8))
     }
 
-    val logic03RecList = facade.queryV62Table[Logic03Rec](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
-    //初始数据重新赋值
-    logic03RecList.foreach(_.head.dataType = FPT4File.LOGIC03REC_DATATYPE)
+    val lpCaseList = facade.queryV62Table[LPCase](V62Facade.DBID_LP_DEFAULT, V62Facade.TID_CASE, mapper, Option(statement), 256)//最多256
+    val logic03RecList = new ArrayBuffer[Logic03Rec]()
+    lpCaseList.foreach{lpCase =>
+      val logic03Rec = new Logic03Rec
+      logic03Rec.caseId = lpCase.caseId
+      logic03Rec.fingerCount = lpCase.fingerCount.toString
+      logic03Rec.caseClass1Code = lpCase.caseClass1Code
+      logic03Rec.caseClass2Code = lpCase.caseClass2Code
+      logic03Rec.caseClass3Code = lpCase.caseClass3Code
+      logic03Rec.occurPlaceCode = lpCase.occurPlaceCode
+      logic03Rec.occurDate = lpCase.occurDate
+      logic03Rec.assistLevel = lpCase.assistLevel
+      logic03Rec.caseStatus = lpCase.caseStatus
+      logic03Rec.extractor = lpCase.extractor
+      logic03Rec.extractDate = lpCase.extractDate
+      logic03Rec.extractUnitCode = lpCase.extractUnitCode
+      logic03Rec.extractUnitName = lpCase.extractUnitName
+      logic03Rec.amount = lpCase.amount
+      logic03Rec.bonus = lpCase.bonus
+      logic03Rec.suspiciousArea1Code = lpCase.suspiciousArea1Code
+      logic03Rec.suspiciousArea2Code = lpCase.suspiciousArea2Code
+      logic03Rec.suspiciousArea3Code = lpCase.suspiciousArea3Code
+      logic03RecList += logic03Rec
+    }
 
     logic03RecList
   }
