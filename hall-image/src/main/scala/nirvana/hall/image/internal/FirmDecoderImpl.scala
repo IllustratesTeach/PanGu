@@ -5,12 +5,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 
 import monad.core.MonadCoreSymbols
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.ImageConfigSupport
 import nirvana.hall.image.jni.NativeImageConverter
-import nirvana.hall.image.services.FirmDecoder
+import nirvana.hall.image.services.{FPTImageDataType, FirmDecoder, ImageDataType, RawImageDataType}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.AbstractFileFilter
 import org.apache.tapestry5.ioc.annotations.Symbol
@@ -37,25 +38,28 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
   private val lock = new ReentrantLock()
   private val wsqDecoder = new WsqDecoder
 
+
   /**
-   * decode compressed data using firm's algorithm
-    *
+    * decode compressed data using firm's algorithm
+    * @param gafisImg
+    * @param imageDataType  FPTImageDataType: fpt图像数据转换为GAFISIMAGESTRUCT，统一都加了一个头信息，GFS1900压缩算法的数据本身已经包含头信息，而且进行了加密转换，需要先解密
+    *                       RawImageDataType: 数据库原始图像数据
     * @return original image data
-   */
-  def decode(gafisImg:GAFISIMAGESTRUCT): GAFISIMAGESTRUCT={
+    */
+  override def decode(gafisImg: GAFISIMAGESTRUCT, imageDataType: ImageDataType): GAFISIMAGESTRUCT = {
     if(gafisImg.stHead.bIsCompressed == 0)
       return gafisImg
 
     val cprMethod =gafisImg.stHead.nCompressMethod
     val firmCode = fpt4code.gafisCprCodeToFPTCode(cprMethod)
     val destImg = new GAFISIMAGESTRUCT
-    destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray())
+    destImg.stHead.fromByteArray(gafisImg.stHead.toByteArray(AncientConstants.GBK_ENCODING))
     destImg.stHead.bIsCompressed = 0
     destImg.stHead.nCompressMethod = 0
     destImg.stHead.nBits = 8
 
     firmCode match{
-      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE=>
+      case fpt4code.GAIMG_CPRMETHOD_WSQ_CODE | fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
 
         /*val img = wsqDecoder.decode(gafisImg.bnData)
         destImg.stHead.nWidth = img.getWidth.toShort
@@ -79,15 +83,24 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
         val destImgSize = gafisImg.stHead.nWidth * gafisImg.stHead.nHeight
         val destImgBin = new Array[Byte](64 + destImgSize)
 
-        NativeImageConverter.decodeByGFS(gafisImg.bnData,destImgBin)
+        val imageData = imageDataType match{
+          case FPTImageDataType=>
+            //如果是金指的压缩,那么bnData实际上还是个GAFISIMAGESTRUCT结构体,这个当且仅当是解压缩FPT中的图像
+            val bnData = new GAFISIMAGESTRUCT().fromByteArray(gafisImg.bnData)
+            bnData.transformForFPT()
+            bnData.toByteArray(AncientConstants.GBK_ENCODING)
+          case _ =>
+            gafisImg.toByteArray(AncientConstants.GBK_ENCODING)
+        }
+
+        NativeImageConverter.GAFIS_DecompressIMG(imageData,destImgBin)
+
+        //为原图添加gafisHead
         destImg.fromByteArray(destImgBin)
 
-        destImg.stHead.bIsCompressed = 0
-        destImg.stHead.nCompressMethod = 0
         if(destImg.stHead.nBits <=0)
           destImg.stHead.nBits = 8
 
-        destImg.stHead.nResolution = gafisImg.stHead.nResolution
         if(destImg.stHead.nResolution == 0)
           destImg.stHead.nResolution = 500 //default ppi
 
@@ -163,17 +176,17 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
     destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
     destImg.stHead.nImgSize = destImg.bnData.length
 
-    /*
-    if(gafisImg.stHead.nFlag & glocdef.GAIMG_FLAG_WHITERIDGE == glocdef.GAIMG_FLAG_WHITERIDGE){
-      val bnData = destImg.bnData
-      val len = bnData.length
-      0 until len foreach{i=>
-        bnData(i) = ~bnData(i)
-      }
-    }
-    */
     destImg
   }
+
+  override def decodeFPTImage(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
+    decode(gafisImg,FPTImageDataType)
+  }
+
+  override def decodeRawImage(gafisImg: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
+    decode(gafisImg,RawImageDataType)
+  }
+
   private def Helper_GetBitsPerPixel(nBitsPerPixel:Int):Int={
     if ( nBitsPerPixel < 1 ) 8  else nBitsPerPixel
   }

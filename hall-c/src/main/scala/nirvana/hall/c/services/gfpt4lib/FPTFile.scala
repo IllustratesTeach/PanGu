@@ -38,7 +38,7 @@ object FPTFile {
    * @param encoding charset
    * @return FPT3File or FPT4File
    */
-  def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.UTF8_ENCODING): Either[FPT3File,FPT4File]= {
+  def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.GBK_ENCODING): Either[FPT3File,FPT4File]= {
     val streamReader:StreamReader = stream
     val head = new FPTHead
     if(stream.available() < head.getDataSize){

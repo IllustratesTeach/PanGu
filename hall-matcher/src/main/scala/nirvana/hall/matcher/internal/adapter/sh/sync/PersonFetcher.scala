@@ -20,9 +20,31 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
    override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
    override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
    /** 同步人员基本信息 */
-   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode, t.recordMark, t.deletag, db.logic_db_pkid as logicDB " +
-     " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where t.seq >= ? and t.seq <= ? order by t.seq"
-   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordMark", "logicDB")
+   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
+     " t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherTypeId, t.gather_date gatherDate," +
+     " t.data_sources dataSources, t.case_classes caseClasses, t.idcardno, t.person_type personType, t.nation_code nationCode," +
+     " t.recordmark, t.deletag, db.logic_db_pkid as logicDB, t.gather_org_code gatherOrgCode, t.nativeplace_code nativeplaceCode," +
+     " t.foreign_name foreignName, t.assist_level assistLevel, t.assist_ref_person assistRefPerson, t.assist_ref_case assistRefCase," +
+     " t.gatherdepartname, t.gatherusername, t.contrcapture_code contrcaptureCode," +
+     " t.certificatetype, t.certificateid, t.process_no processNo, t.psis_no psisNo," +
+     " t.spellname, t.usedname, t.usedspell, t.aliasname, t.aliasspell, t.birth_code birthCode, t.birth_street birthStreet," +
+     " t.birthdetail, t.door_street doorStreet, t.doordetail, t.address_street addressStreet," +
+     " t.addressdetail, t.culture_code cultureCode, t.faith_code faithCode, t.haveemployment," +
+     " t.job_code jobCode, t.otherspecialty, t.specialidentity_code specialidentityCode," +
+     " t.specialgroup_code specialgroupCode, t.gatherer_id gathererId, t.fingerrepeatno, t.inputpsn," +
+     " t.inputtime, t.modifiedpsn, t.modifiedtime, t.person_category personCategory, t.gather_finger_mode gatherFingerMode," +
+     " t.case_name caseName, t.reason, t.gatherdepartcode, t.gatheruserid," +
+     " t.gather_finger_time gatherFingerTime, t.cardid, t.is_xjssmz isXjssmz" +
+     " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid" +
+     " where t.seq >= ? and t.seq <= ? order by t.seq"
+   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherTypeId", "door", "address",
+     "sexCode", "name", "dataSources", "caseClasses", "idcardno", "personType", "nationCode", "recordmark", "logicDB",
+     "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase", "gatherdepartname",
+     "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail",
+     "addressStreet", "addressdetail", "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty",
+     "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno", "inputpsn", "modifiedpsn", "personCategory",
+     "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
    /**
     * 读取人员信息
     * @param syncDataResponse
@@ -86,15 +108,16 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
             error("personId convert error：{}", personId)
           }
         }
+        //日期类型
+        val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime", "gatherFingerTime")
+        for (col <- dateCols) {
+          val value = rs.getDate(col)
+          val time = if (value != null) value.getTime else 0
+          if (time > 0) {
+            textData.addColBuilder.setColName(col).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(time)))
+          }
+        }
 
-         val birthdayst: Long = if (rs.getDate("birthday") != null) rs.getDate("birthday").getTime else 0
-         if (birthdayst > 0) {
-            textData.addColBuilder.setColName("birthday").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(birthdayst)))
-         }
-         val gatherDate: Long = if (rs.getDate("gatherDate") != null) rs.getDate("gatherDate").getTime else 0
-         if (gatherDate > 0) {
-            textData.addColBuilder.setColName("gatherDate").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(gatherDate)))
-         }
          syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
          if (validSyncData(syncDataBuilder.build, false)) {
             syncDataResponse.addSyncData(syncDataBuilder.build)

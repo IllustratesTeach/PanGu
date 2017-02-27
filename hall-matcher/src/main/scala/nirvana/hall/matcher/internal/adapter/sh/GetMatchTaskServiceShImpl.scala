@@ -19,8 +19,13 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
   /** 获取比对任务  */
   override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
 
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "dataSources", "caseClass", "personType", "nationCode", "recordMark")
-  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource")
+  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
+    "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
+    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+    "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
+    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo",
+    "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
+  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
 
   /**
    * 获取捺印文本查询条件
@@ -37,7 +42,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           if(json.has(col)){
             val value = json.getString(col)
             if(value.indexOf("|") > 0){
-              val values = value.split("|")
+              val values = value.split("\\|")
               val groupQuery = GroupQuery.newBuilder()
               values.foreach{value =>
                 val keywordQuery = KeywordQuery.newBuilder()
@@ -62,19 +67,15 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
-        //出生日期
-        if(json.has("birthdayST") && json.has("birthdayED")){
-          val longQuery = LongRangeQuery.newBuilder()
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("birthdayST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("birthdayED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder().setName("birthday").setExtension(LongRangeQuery.query, longQuery.build())
-        }
-        //采集日期
-        if(json.has("gatherDateST") && json.has("gatherDateED")){
-          val longQuery = LongRangeQuery.newBuilder()
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("gatherDateST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("gatherDateED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder().setName("gatherDate").setExtension(LongRangeQuery.query, longQuery.build())
+        //时间段
+        val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime")
+        dateCols.foreach{col =>
+          if (json.has(col + "ST") && json.has(col + "ED")) {
+            val longQuery = LongRangeQuery.newBuilder()
+            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+            textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
+          }
         }
         //导入编号
         if(json.has("impKeys")){
@@ -132,7 +133,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           if(json.has(col)){
             val value = json.getString(col)
             if(value.indexOf("|") > 0){
-              val values = value.split("|")
+              val values = value.split("\\|")
               val groupQuery = GroupQuery.newBuilder()
               values.foreach{value =>
                 val keywordQuery = KeywordQuery.newBuilder()
@@ -147,11 +148,15 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             }
           }
         }
-        if (json.has("caseOccurDateBeg") && json.has("caseOccurDateBeg")) {
-          val longQuery = LongRangeQuery.newBuilder
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder.setExtension(LongRangeQuery.query, longQuery.build).setName("caseOccurDate")
+        //时间段
+        val dateCols = Array("caseOccurDate", "extractDate", "inputtime", "modifiedtime")
+        dateCols.foreach{col =>
+          if (json.has(col + "ST") && json.has(col + "ED")) {
+            val longQuery = LongRangeQuery.newBuilder()
+            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+            textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
+          }
         }
         //案件编号区间
         if (json.has("caseIdST") || json.has("caseIdED")) {

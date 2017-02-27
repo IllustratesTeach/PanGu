@@ -72,6 +72,11 @@
       </dependency>
       <dependency>
         <groupId>nirvana</groupId>
+        <artifactId>hall-image</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nirvana</groupId>
         <artifactId>hall-protocol</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -397,6 +402,11 @@
 		<artifactId>ejb3-persistence</artifactId>
 		<version>1.0.2.GA</version>
 	  </dependency>
+      <dependency>
+        <groupId>net.sf.jopt-simple</groupId>
+        <artifactId>jopt-simple</artifactId>
+        <version>5.0.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

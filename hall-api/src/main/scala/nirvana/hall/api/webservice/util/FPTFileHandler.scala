@@ -1,7 +1,6 @@
 package nirvana.hall.api.webservice.util
 
 import java.io.FileInputStream
-import java.util.concurrent.atomic.AtomicBoolean
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
 import monad.rpc.protocol.CommandProto.CommandStatus
@@ -13,7 +12,6 @@ import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.extractor.internal.{FPTLatentConverter, FeatureExtractorImpl}
-import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
@@ -27,6 +25,7 @@ import nirvana.hall.support.internal.RpcHttpClientImpl
   */
 object FPTFileHandler {
 
+  private lazy val extractor = new FeatureExtractorImpl
   /**
     * FPT文件解析
     *
@@ -88,15 +87,11 @@ object FPTFileHandler {
     * @return
     */
   def extractorFeature(img: GAFISIMAGESTRUCT,fingerPos: FingerPosition, featureType: FeatureType): Option[(GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {
-    loadExtractorJNI
     val (mnt, bin) = extractor.extractByGAFISIMG(img, fingerPos, featureType)
     Some(mnt,bin)
   }
 
-
-
   def createImageLatentEvent(caseId: String, sendNo: String, cardId: String, disp: MNTDISPSTRUCT): GAFISIMAGESTRUCT = {
-    loadExtractorJNI
     val latentFeature = FPTLatentConverter.convert(disp)
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.nImgSize = latentFeature.toByteArray().length
@@ -104,25 +99,7 @@ object FPTFileHandler {
     gafisImg
   }
 
-
-  private lazy val extractorInit = new AtomicBoolean(false)
-  private lazy val extractor = new FeatureExtractorImpl
-
-  @volatile
-  private var extractorDllLoaded = false
-
-  def loadExtractorJNI(): Unit = {
-    if (extractorInit.compareAndSet(false, true)) {
-      JniLoader.loadJniLibrary(".", null)
-      extractorDllLoaded = true
-    }
-    if (!extractorDllLoaded)
-      loadExtractorJNI()
-
-  }
-
   def createImageLatentEvent(disp: MNTDISPSTRUCT): Array[Byte] = {
-    loadExtractorJNI
     val latentFeature = FPTLatentConverter.convert(disp)
     latentFeature.toByteArray()
   }

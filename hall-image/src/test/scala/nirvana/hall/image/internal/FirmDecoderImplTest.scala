@@ -7,6 +7,7 @@ import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef
@@ -14,6 +15,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
+import nirvana.hall.image.services.RawImageDataType
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
@@ -210,14 +212,29 @@ class FirmDecoderImplTest extends BaseJniTest{
 
   }
 
+  /**
+    * 对比test_decode_gafisimg_1900
+    */
   @Test
-  def test_decodeWSQ: Unit ={
-    val decoder = new ImageEncoderImpl
-    val gafisImg = new GAFISIMAGESTRUCT
-    val cprData = FileUtils.readFileToByteArray(new File("D:\\img.img"))
-    gafisImg.fromByteArray(cprData)
-    val originalImg = decoder.encodeWSQ(gafisImg)
-    //FileUtils.writeByteArrayToFile(new File(""),originalImg.toByteArray())
-    println(originalImg.toByteArray().length)
+  def test_decodeByGFS_1900{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+    gafisImg.transformForFPT()
+    val dest = decoder.decode(gafisImg, RawImageDataType)
+
+    Assert.assertNotNull(dest.bnData)
+
+  }
+  @Test
+  def test_decode{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+
+    val dest = decoder.decode(gafisImg, RawImageDataType)
+
+    Assert.assertNotNull(dest.bnData)
+
   }
 }
