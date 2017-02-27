@@ -3,11 +3,15 @@ package nirvana.hall.extractor.internal
 import java.awt.image.BufferedImage
 import java.awt.{BasicStroke, Color, Graphics2D, RenderingHints}
 import java.io.{ByteArrayOutputStream, InputStream}
+import java.nio.ByteOrder
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
+import nirvana.hall.extractor.jni.NativeExtractor
 import nirvana.hall.support.services.GAFISImageReaderSpi
+import org.apache.commons.io.IOUtils
 
 /**
   * Created by wangjue on 2017/1/22.
@@ -16,9 +20,15 @@ object FeatureDisplay {
   val iioRegistry = IIORegistry.getDefaultInstance
   iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
-  def display(decompressImageIn : InputStream, mntDispIn : InputStream) : Array[Byte] = {
+  def display(decompressImageIn : InputStream, extractFeatureIn : InputStream) : Array[Byte] = {
     val image = ImageIO.read(decompressImageIn)
-    val mntDisp = new MNTDISPSTRUCT().fromStreamReader(mntDispIn)
+    /**获取真实特征**/
+    val fingerMnt = new GAFISIMAGESTRUCT().fromByteArray(IOUtils.toByteArray(extractFeatureIn)).bnData
+    val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
+    NativeExtractor.GAFIS_MntStdToMntDisp(fingerMnt, mntDispBytes, 1)
+    val mntDisp = new MNTDISPSTRUCT
+    mntDisp.fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
+
     val baseImg = new BufferedImage(mntDisp.nWidth,mntDisp.nHeight,BufferedImage.TYPE_INT_RGB)
     val graphics = baseImg.createGraphics()
     graphics.drawImage(image,0,0,mntDisp.nWidth,mntDisp.nHeight,null)
