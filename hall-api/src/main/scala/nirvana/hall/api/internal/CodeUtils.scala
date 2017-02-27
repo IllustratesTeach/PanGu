@@ -13,8 +13,6 @@ object CodeUtils {
   /* 协查级别 其他 */
   final val XCJB_QT_7 = "9"
 
-
-
   /* 协查级别 A级 */
   final val XCJB_AJ_6 = "1"
   /* 协查级别 B级普通 */
@@ -26,24 +24,10 @@ object CodeUtils {
   /* 协查级别 未知 */
   final val XCJB_WZ_6 = "0"
 
-  /* 证件类型 护照 */
-  final val XJLX_HZ_6 = "1"
-  /* 证件类型 军官证 */
-  final val XJLX_JGZ_6 = "2"
-  /* 证件类型 其他 */
-  final val XJLX_QT_6 = "9"
-
-  /* 证件类型 护照 */
-  final val XJLX_HZ_7 = "34"
-  /* 证件类型 军官证 */
-  final val XJLX_JGZ_7 = "22"
-  /* 证件类型 其他 */
-  final val XJLX_QT_7 = "99"
-
 
   /**
-  * 获取协查 6 to 7 转换码值
-  */
+    * 获取协查 6 to 7 转换码值
+    */
   def convertCode6To7(code :String): String = {
     code match {
       case XCJB_AJ_6 => XCJB_AJ_7
@@ -65,30 +49,6 @@ object CodeUtils {
       case XCJB_BJJJ_7 => XCJB_BJJJ_6
       case XCJB_CJ_7 => XCJB_CJ_6
       case XCJB_QT_7 => XCJB_WZ_6
-      case _ => ""
-    }
-  }
-
-  /**
-    * 获取证件类型 6 to 7 转换码值
-    */
-  def convertCode6To7_ZJLX(code :String): String = {
-    code match {
-      case XJLX_HZ_6 => XJLX_HZ_7
-      case XJLX_JGZ_6 => XJLX_JGZ_7
-      case XJLX_QT_6=> XJLX_QT_7
-      case _ => ""
-    }
-  }
-
-  /**
-    * 获取证件类型 7 to 6 转换码值
-    */
-  def convertCode7To6_ZJLX(code :String): String = {
-    code match {
-      case XJLX_HZ_7 => XJLX_HZ_6
-      case XJLX_JGZ_7 => XJLX_JGZ_6
-      case XJLX_QT_7=> XJLX_QT_6
       case _ => ""
     }
   }
