@@ -81,6 +81,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       logicDbFingerprint.save()
       //保存指纹
       val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
       fingerList.foreach{finger =>
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = new Date()
