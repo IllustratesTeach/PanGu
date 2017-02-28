@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
 import nirvana.hall.v62.internal.AncientClientSupport
@@ -14,6 +14,7 @@ import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpC
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
 import nirvana.hall.v62.proxy.LocalServiceFinder
 
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext
 
 /**
@@ -105,7 +106,6 @@ trait grmtsvr {
       case OP_TPLIB_EXIST=>
         //获取编号,去除后边的空字符
         val cardId = new String(pReq.bnData, "GB2312").trim
-        println(cardId)
 
         val n = if(findTPCardService.isExist(cardId)) 1 else 0
         NETANS_SetRetVal(pAns,n)
@@ -142,9 +142,11 @@ trait grmtsvr {
     val nTableID = NETREQ_GetTableID(pReq);
     val nOption	 = NETREQ_GetOption(pReq);
     val nRmtOpt	 = NETREQ_GetRetVal(pReq);
+//    val nRmtOptOp = GetRmtOptOperate(nRmtOpt)
 
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
+        //6.2代码有很多业务逻辑，这里暂时不做处理，只保存查询任务
         val stQuery = GAFIS_PKG_GetQuery(pstRecvPkg)
         //nAddRet为成功发送查询ID
         var nAddRet = 0
@@ -164,15 +166,19 @@ trait grmtsvr {
       case 	grmtcode.OP_RMTLIB_QUERY_GETRESULT=>
         val stQuery = new GAQUERYSTRUCT
         stQuery.stSimpQry.nQueryID = pReq.bnData
-//        val oraSid = new String(pReq.bnData, "GB2312").trim
-//        val request = QueryGetRequest.newBuilder()
-//        request.setOraSid(oraSid.toLong)
-//        val response = findQueryService.getQuery(request.build())
-//        if(response.getIsComplete){
-//          val candList = response.getMatchResult.getCandidateResultList
-//        }
-
+        val oraSid = new String(pReq.bnData, "GB2312").trim
         //TODO 利用得到的SID进行查询候选队列
+        val matchResultOpt = findQueryService.getMatchResult(oraSid.toLong, Option(nDBID.toString))
+        val candListBuffer = new ArrayBuffer[GAQUERYCANDSTRUCT]()
+        matchResultOpt.foreach{matchResult =>
+          val iter = matchResult.getCandidateResultList.iterator()
+          while (iter.hasNext){
+            val matchResultObject = iter.next()
+            candListBuffer += gaqryqueConverter.convertMatchResultObject2GAQUERYCANDSTRUCT(matchResultObject)
+          }
+          stQuery.pstCand_Data = candListBuffer.toArray
+        }
+
         val nRet = 1 //如果有候选队列
 
 

@@ -85,12 +85,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @return 查询任务号
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
-    val key = matchTask.getMatchId.getBytes()
-    val pstKey = new GADB_KEYARRAY
-    pstKey.nKeyCount = 1
-    pstKey.nKeySize = key.size.asInstanceOf[Short]
-    pstKey.pKey_Data = key
-
     val dbId = if(queryDBConfig.dbId == None){
       config.queryTable.dbId.toShort
     }else{

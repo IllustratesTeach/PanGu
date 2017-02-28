@@ -79,8 +79,8 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       val queryQue = queryQueOpt.get
       if(queryQue.status >= 2){
         if(queryQue.candlist != null){
-          val matchResultObj = gaqryqueConverter.convertCandList2GAQUERYCANDSTRUCT(queryQue.candlist)
-          matchResultObj.foreach{cand=>
+          val candResultObj = gaqryqueConverter.convertCandList2MatchResultObject(queryQue.candlist)
+          candResultObj.foreach{cand=>
             matchResult.addCandidateResult(cand)
           }
         }
