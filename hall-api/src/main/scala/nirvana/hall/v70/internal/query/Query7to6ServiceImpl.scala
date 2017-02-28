@@ -63,11 +63,43 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
     val matchTask = MatchTask.newBuilder()
     matchTask.setMatchId(query.keyid)
     matchTask.setMatchType(MatchType.valueOf(query.querytype+1))
+//    val isPalm = query.flag == 2 || query.flag == 22
+//
+//    //2016/12/25 比对类型判断
+//    if (isPalm) {
+//      val queryType = MatchType.valueOf(query.querytype+5)
+//      queryType match {
+//        case MatchType.PALM_TT =>
+//          matchTask.setMatchType(MatchType.PALM_TT)
+//        case MatchType.PALM_TL =>
+//          matchTask.setMatchType(MatchType.PALM_TL)
+//        case MatchType.PALM_LT =>
+//          matchTask.setMatchType(MatchType.PALM_LT)
+//        case MatchType.PALM_LL =>
+//          matchTask.setMatchType(MatchType.PALM_LL)
+//      }
+//    } else {
+//      val queryType = MatchType.valueOf(query.querytype+1)
+//      queryType match {
+//        case MatchType.FINGER_TT =>
+//          matchTask.setMatchType(MatchType.FINGER_TT)
+//        case MatchType.FINGER_TL =>
+//          matchTask.setMatchType(MatchType.FINGER_TL)
+//        case MatchType.FINGER_LT =>
+//          matchTask.setMatchType(MatchType.FINGER_LT)
+//        case MatchType.FINGER_LL =>
+//          matchTask.setMatchType(MatchType.FINGER_LL)
+//      }
+//    }
+
     matchTask.setObjectId(query.oraSid)//必填项，现在用于存放oraSid
     matchTask.setPriority(query.priority.toInt)
     matchTask.setScoreThreshold(query.minscore)
     matchTask.setTopN(query.maxcandnum)
     matchTask.setCommitUser(query.username)
+    // 2016/12/25 比对类型判断 提交机器Ip 和提交用户单位代码
+    matchTask.setComputerIp(query.computerip)
+    matchTask.setUserUnitCode(query.userunitcode)
     //解析特征数据
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
     mics.foreach{mic =>
