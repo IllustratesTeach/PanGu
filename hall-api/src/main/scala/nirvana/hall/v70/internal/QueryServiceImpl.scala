@@ -4,6 +4,7 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.config.QueryDBConfig
+import nirvana.hall.api.internal.DateUtil
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
@@ -13,7 +14,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{SysUser, GafisNormalqueryQueryque}
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, SysUser}
 
 /**
  * Created by songpeng on 16/1/26.
@@ -35,7 +36,11 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gafisQuery.userid = Gafis70Constants.INPUTPSN
     gafisQuery.username = sysUser.trueName
     gafisQuery.userunitcode = sysUser.departCode
-    gafisQuery.createtime = new Date()
+    //gafisQuery.createtime = new Date()
+
+//      gafisQuery.createtime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matchTask.getOraCreatetime)
+      gafisQuery.createtime = DateUtil.strToDate(matchTask.getOraCreatetime)
+
     gafisQuery.deletag = Gafis70Constants.DELETAG_USE
     gafisQuery.save()
 
