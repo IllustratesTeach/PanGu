@@ -1,7 +1,5 @@
 package nirvana.hall.api.services
 
-import java.util.UUID
-
 
 /**
   * Created by yuchen on 2017/2/6.
@@ -27,9 +25,12 @@ trait SyncInfoLogManageService {
 
   /**
     * 数据同步过程中若出现异常，则调用该方法
-    *
+    * @param uUID 全局唯一id
     * @param card_Id 卡号
-    * @param exceptionContent 异常内容
+    * @param seq 序列
+    * @param content  异常内容
+    * @param log_type 日志类型 1-消息 2-错误
+    * @param msg 日志信息
     */
-    def recordSyncDataExceptionLog(card_Id:String,exceptionContent:String): Unit
+    def  recordSyncDataLog(uUID: String,card_Id:String,seq: String,content: String, log_type:Int, msg: String): Unit
 }
