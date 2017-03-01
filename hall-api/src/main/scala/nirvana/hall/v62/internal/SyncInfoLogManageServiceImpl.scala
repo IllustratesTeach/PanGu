@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal
 
 import java.util.UUID
 import javax.sql.DataSource
+
 import nirvana.hall.api.services.SyncInfoLogManageService
 import nirvana.hall.support.services.JdbcDatabase
 
@@ -38,17 +39,22 @@ class SyncInfoLogManageServiceImpl(implicit val dataSource: DataSource) extends 
 
   /**
     * 数据同步过程中若出现异常，则调用该方法
-    *
-    * @param card_Id          卡号
-    * @param exceptionContent 异常内容
+    * @param uUID 全局唯一id
+    * @param card_Id 卡号
+    * @param seq 序列
+    * @param content  异常内容
+    * @param log_type 日志类型 1-消息 2-错误
+    * @param msg 日志信息
     */
-  override def recordSyncDataExceptionLog(card_Id: String, exceptionContent: String): Unit = {
-
-    val sql = "INSERT INTO ABNORMAL_AFIS(uuid,card_id,Insert_Date,ABN_CONTENT) VALUES (?,?,sysdate,?)"
+  override def recordSyncDataLog(uUID: String,card_Id: String, seq: String, content: String, log_type:Int, msg: String): Unit = {
+    val sql = "INSERT INTO HALL_SYS_LOG(uuid,card_id,seq,Insert_Date,content,log_type,msg) VALUES (?,?,?,sysdate,?,?,?)"
     JdbcDatabase.update(sql) { ps =>
-      ps.setString(1,UUID.randomUUID.toString)
+      ps.setString(1,uUID)
       ps.setString(2,card_Id)
-      ps.setString(3,exceptionContent)
+      ps.setString(3,seq)
+      ps.setString(4,content)
+      ps.setInt(5,log_type)
+      ps.setString(6,msg)
     }
   }
 }
