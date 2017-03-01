@@ -1,6 +1,6 @@
 package nirvana.hall.v70.jpa
 
-import javax.persistence.{Column, TemporalType, _}
+import javax.persistence.{Column, _}
 
 import stark.activerecord.services.{ActiveRecord, ActiveRecordInstance}
 
@@ -14,21 +14,7 @@ object RecordAfis extends ActiveRecordInstance[RecordAfis]
 )
 class RecordAfis extends ActiveRecord {
 
-  /**
-    * ID	N	INTEGER	N			自增id
-      UUID	N	VARCHAR2(34)	N			主键，唯一键
-      CARD_ID	N	VARCHAR2(34)	Y			卡号
-      TYPE	N	VARCHAR2(3)	Y			类型
-      IP_SOURCE	N	VARCHAR2(15)	Y			源ip
-      INSERT_DATE	N	DATE	Y			插入时间
-      STATUS	N	VARCHAR2(1)	Y			结果状态
-      IS_SEND	N	VARCHAR2(1)	Y			是否是发送端
-    */
   @Id
-  @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="SEQ_ID_RECORD_AFIS")
-  @SequenceGenerator(name="SEQ_ID_RECORD_AFIS", sequenceName="SEQ_ID_RECORD_AFIS")
-  @Column(name = "ID", unique = true, nullable = false)
-  var Id: java.lang.Integer = _
   @Column(name = "UUID")
   var uuid: java.lang.String = _
   @Column(name = "CARD_ID")
