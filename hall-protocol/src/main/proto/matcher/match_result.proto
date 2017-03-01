@@ -45,4 +45,7 @@ message MatchResult {
   optional uint64 record_num_matched = 7;
   //最大候选数量
   optional uint64 maxcandnum = 8;
+
+   // 比中概率 2017/01/18
+   optional uint32  HITPOSSIBILITY = 9;
 }
