@@ -687,6 +687,7 @@ object ProtobufConverter {
     matchTask.setScoreThreshold(gafisQuery.minscore)
     matchTask.setTopN(gafisQuery.maxcandnum)
     matchTask.setFlag(gafisQuery.flag.toInt)
+    matchTask.setOraCreatetime(DateUtil.dateToStr(gafisQuery.createtime)) //7.0任务创建时间以该任务6.0创建时间为准
 
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(gafisQuery.mic))
     mics.foreach{mic =>
