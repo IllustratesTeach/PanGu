@@ -44,6 +44,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
     info("addLPCard cardId:{}", lpCard.getStrCardID)
   }
@@ -93,6 +94,7 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
     info("updateLPCard cardId:{}", lpCard.getStrCardID)
   }
@@ -104,8 +106,13 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
-    GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === cardId).execute
-    GafisCaseFinger.find(cardId).delete
+//    GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === cardId).execute
+//    GafisCaseFinger.find(cardId).delete
+    val gafisCaseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === cardId).headOption.get
+    gafisCaseFingerMnt.deletag = Gafis70Constants.DELETAG_DEL
+    gafisCaseFingerMnt.save()
+    GafisCaseFinger.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
+    GafisCaseFinger.update
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {

@@ -306,7 +306,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
    */
   def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
-    info("fetchMatchTask name:{} seq:{}", fetchConfig.name)
+    info("fetchMatchTask name:{}", fetchConfig.name)
     val request = SyncMatchTaskRequest.newBuilder()
     request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
     request.setDbid(fetchConfig.dbid)
@@ -348,14 +348,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param fetchConfig
    */
   def  fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-
-
       val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
       try{
         while(sidIter.hasNext){
           val tmp=sidIter.next
           //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
-          info("fetchMatchTask name:{} seq:{}", fetchConfig.name, tmp)
+          info("fetchMatchTask name:{} ora_sid:{}", fetchConfig.name, tmp)
           val request = SyncMatchResultRequest.newBuilder()
           request.setSid(tmp)
           request.setDbid(fetchConfig.dbid)

@@ -209,14 +209,13 @@ object gaqryqueConverter {
    */
   def convertGAQUERYSTRUCT2MatchTask(gaQueryStruct: GAQUERYSTRUCT): MatchTask ={
     val matchTask = MatchTask.newBuilder()
-    //ora_sid
-    matchTask.setMatchId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID).toString)
+    matchTask.setMatchId(gaQueryStruct.stSimpQry.szKeyID)
     //优先级
     matchTask.setPriority(gaQueryStruct.stSimpQry.nPriority)
     //查询类型 TODO 掌纹查询类型?
     matchTask.setMatchType(MatchType.valueOf(gaQueryStruct.stSimpQry.nQueryType + 1))
-    //任务本身的sid
-    matchTask.setObjectId(1)
+    //ora_sid
+    matchTask.setObjectId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID))
     matchTask.setScoreThreshold(gaQueryStruct.stSimpQry.nMinScore)
     matchTask.setTopN(gaQueryStruct.stSimpQry.nMaxCandidateNum)
     gaQueryStruct.pstMIC_Data.foreach{micStruct =>
@@ -297,7 +296,7 @@ object gaqryqueConverter {
    * @param candList
    * @return
    */
-  def convertCandList2GAQUERYCANDSTRUCT(candList: Array[Byte]): Seq[MatchResultObject]={
+  def convertCandList2MatchResultObject(candList: Array[Byte]): Seq[MatchResultObject]={
     if(candList != null && candList.size > 0){
       val buffer = ChannelBuffers.wrappedBuffer(candList)
       val result = mutable.Buffer[MatchResultObject]()
@@ -315,6 +314,21 @@ object gaqryqueConverter {
     }else{
       Seq()
     }
+  }
+
+  /**
+    * protobuf候选转换为GAQUERYCANDSTRUCT
+    * @param matchResultObject
+    * @return
+    */
+  def convertMatchResultObject2GAQUERYCANDSTRUCT(matchResultObject: MatchResultObject): GAQUERYCANDSTRUCT={
+    val gCand = new GAQUERYCANDSTRUCT
+    gCand.szKey = matchResultObject.getObjectId
+    gCand.nIndex = matchResultObject.getPos.toByte
+    gCand.nScore = matchResultObject.getScore
+    gCand.nDBID = matchResultObject.getDbid.toShort
+
+    gCand
   }
 
 }
