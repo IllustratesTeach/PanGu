@@ -189,9 +189,10 @@ object galoctpConverter extends LoggerSupport{
   def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT): TPCard = {
     val card = TPCard.newBuilder()
     card.setStrCardID(data.szCardID)
-    if(data.stAdmData.szMISPersonID!= null)
-      card.setStrPersonID(data.stAdmData.szMISPersonID)
-
+    card.setStrPersonID(data.stAdmData.szMISPersonID)
+    if(data.stAdmData.szPersonID!= null){ //赋值重卡号
+      card.setStrMisPersonID(data.stAdmData.szPersonID)
+    }
     val text = card.getTextBuilder
     data.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
