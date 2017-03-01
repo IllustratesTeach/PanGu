@@ -97,4 +97,14 @@ message MatchTask {
   optional string queryid = 13;
   //FLAG标志位
   optional int32 flag = 14;
+
+  // 提交机器IP
+  optional string computer_ip = 15 ;
+
+  //提交者单位代码
+  optional string user_unit_code = 16 ;
+
+  //6.2发起任务的创建时间
+  optional string  ora_createtime = 17;
+
 }
