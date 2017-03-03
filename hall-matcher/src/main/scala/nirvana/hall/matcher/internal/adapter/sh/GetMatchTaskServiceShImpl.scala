@@ -88,13 +88,13 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
         }
         //人员编号区间
-        if(json.has("personIdST1") || json.has("personIdED1")){
+        if(json.has("startKey1") || json.has("endKey1")){
           val groupQuery = GroupQuery.newBuilder()
-          if (json.has("personIdST1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
+          if (json.has("startKey1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("startKey1"))).setOccur(Occur.SHOULD)
           }
-          if (json.has("personIdED1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
+          if (json.has("endKey1")) {
+            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("endKey1"))).setOccur(Occur.SHOULD)
           }
           textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
         }
