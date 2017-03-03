@@ -7,7 +7,7 @@ import com.google.protobuf.ByteString
 import net.sf.json.JSONObject
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
-import nirvana.protocol.TextQueryProto.TextQueryData.{LongRangeQuery, LongQuery, KeywordQuery, GroupQuery}
+import nirvana.protocol.TextQueryProto.TextQueryData._
 
 /**
  * Created by songpeng on 16/3/21.
@@ -193,9 +193,9 @@ object DataConverter {
               pid_serialnum_beg += "0"
               pid_serialnum_end += "z"
             }
-            groupQuery.addClauseQueryBuilder.setName("pId_serialNum").setExtension(LongRangeQuery.query,
-              LongRangeQuery.newBuilder.setMin(java.lang.Long.parseLong(pid_serialnum_beg, 36)).setMinInclusive(true)
-                .setMax(java.lang.Long.parseLong(pid_serialnum_end, 36)).setMaxInclusive(true).build)
+            groupQuery.addClauseQueryBuilder.setName("pId_serialNum").setExtension(IntRangeQuery.query,
+              IntRangeQuery.newBuilder.setMin(java.lang.Integer.parseInt(pid_serialnum_beg, 36)).setMinInclusive(true)
+                .setMax(java.lang.Integer.parseInt(pid_serialnum_end, 36)).setMaxInclusive(true).build)
           }
         }
         else {
