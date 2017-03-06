@@ -3,7 +3,7 @@
   <host>127.0.0.1</host>
   <app_name>spark-idCard</app_name>
   <master_server>local[1]</master_server>
-  <kafka_server>10.1.7.204:9092</kafka_server>
+  <kafka_server>192.168.56.128:9092</kafka_server>
   <kafka_topic_name>IDCARD</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
   <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseImageIdCardProvider</image_provider_class>

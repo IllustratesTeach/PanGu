@@ -27,8 +27,8 @@ object FPTView extends JFrame{
     frame.setVisible(true)
   }
 
-  def parseFPT(fptPath : String) : Unit = {
-    val(listTemplate,listCase) = new FPTParse().parse(fptPath)
+  def parseFPT(fptPath : String, url : String) : Unit = {
+    val(listTemplate,listCase) = new FPTParse().parse(fptPath,url)
     if (listTemplate.size>0) {
       var rollMap = Map[Int,Array[Byte]]()
       var flatMap = Map[Int,Array[Byte]]()
@@ -89,9 +89,10 @@ object FPTView extends JFrame{
 
 
   def main(args : Array[String]) : Unit = {
-    val fptPath = "D:\\ftp\\cc\\R0000000000000000012563.fpt"
+    val url = "http://127.0.0.1:8001/extractor"
+    val fptPath = "C:\\Users\\wangjue\\Desktop\\fail_FPT\\20170220\\R9999912016112221298178.FPT"
     //val fptPath = args(0)
-    parseFPT(fptPath)
+    parseFPT(fptPath,url)
     viewFPT()
     //toolFPT()
   }

@@ -6,8 +6,10 @@ import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.rpc.protocol.CommandProto.CommandStatus
+import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
+import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.{ExtractRequest, ExtractResponse, FingerPosition}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
@@ -26,7 +28,12 @@ class GafisDatabaseImageIdCardProvider extends ImageProvider{
   private lazy val extractorServer = SysProperties.getPropertyOption("extractor.server").get
   private lazy val directExtract = SysProperties.getBoolean("extractor.direct",defaultValue = false)
   private lazy val extractor = new FeatureExtractorImpl
-  val querySql = "select t.gather_data,t.fgp,t.idcardinfo_id,c.idcardno,c.name from GUIZHOU_IDCARDFINGERINFO t LEFT JOIN GUIZHOU_IDCARDINFO c ON t.idcardinfo_id = c.pk_id WHERE t.pk_id = ?"
+  private lazy val wsqDecode = new ImageEncoderImpl(new FirmDecoderImpl("support",null))
+  private val querySql = "select t.gather_data,t.fgp,t.idcardinfo_id,c.idcardno,c.name from GUIZHOU_IDCARDFINGERINFO t LEFT JOIN GUIZHOU_IDCARDINFO c ON t.idcardinfo_id = c.pk_id WHERE t.pk_id = ?"
+
+  private val FILL_WIDTH = 512
+  private val FILL_HEIGHT = 512
+
 
   def requestImage(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]().toSeq}
 
@@ -86,6 +93,14 @@ class GafisDatabaseImageIdCardProvider extends ImageProvider{
         templateFinger.idCardNO = idCardNO
         templateFinger.name = name
         val mntData = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(templateFinger.gatherData), FingerPosition.FINGER_L_THUMB, event.featureType, featureTryVersion)
+
+        val img = extractor.readByteArrayAsGAFISIMAGE(new ByteArrayInputStream(templateFinger.gatherData))
+        SparkFunctions.loadImageJNI()
+        val wsqImg = wsqDecode.encodeWSQ(img)
+        //TODO 定义图像类型，次处最好在压缩WSQ时判断类型再赋值
+        wsqImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte //图像类型 1：指纹
+
+        templateFinger.gatherData = wsqImg.toByteArray()
         (event, templateFinger, new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1), new GAFISIMAGESTRUCT())
       } else {
         val templateFinger = new TemplateFingerConvert()
@@ -126,8 +141,8 @@ class GafisDatabaseImageIdCardProvider extends ImageProvider{
         var result = e.getMessage
         if (result ==null) result = ""
         else {
-          if (result.length > 80)
-            result = result.substring(0,80)
+          if (result.length > 60)
+            result = result.substring(0,60)
         }
         val updateResult = GafisPartitionRecordsIdCardUpdate.updateExtractLogInfo(pkId, "2", result)
         if (updateResult == 0)
@@ -139,7 +154,7 @@ class GafisDatabaseImageIdCardProvider extends ImageProvider{
 
 
   /**
-    * 填充图像，图片写入位置从0，0开始，写入中心将导致提取特征坐标偏移
+    * 填充图像，从FILL_WIDTH, FILL_HEIGHT写入图片
     * @param parameter
     * @param imgData
     * @param idCardID
@@ -152,18 +167,21 @@ class GafisDatabaseImageIdCardProvider extends ImageProvider{
   def imagePadding(parameter:NirvanaSparkConfig, imgData : Array[Byte], idCardID : String, idCardNO : String, name : String, fgp : Integer, pkId : String) : Array[Byte] = {
     try {
       val image = ImageIO.read(new ByteArrayInputStream(imgData))
-      val paddingImage = new BufferedImage(640, 640, BufferedImage.TYPE_BYTE_GRAY)
+      val paddingImage = new BufferedImage(FILL_WIDTH, FILL_HEIGHT, BufferedImage.TYPE_BYTE_GRAY)
       val g = paddingImage.createGraphics()
-      g.fillRect(0, 0, 640, 640)
-      g.drawImage(image, 0, 0, image.getWidth, image.getHeight, null)
+      g.fillRect(0, 0, FILL_WIDTH, FILL_HEIGHT)
+      val width = (FILL_WIDTH-image.getWidth)/2
+      val height = (FILL_HEIGHT-image.getHeight)/2
+      g.drawImage(image, width, height, image.getWidth, image.getHeight, null)
       g.dispose()
       val paddingImageByteArray = new ByteArrayOutputStream()
-      ImageIO.write(paddingImage, "jpg", paddingImageByteArray)
+      ImageIO.write(paddingImage, "bmp", paddingImageByteArray)
       val updateResult = GafisPartitionRecordsIdCardUpdate.updateRestoreLogInfo(pkId, "1", "")
       if (updateResult == 0)
         GafisPartitionRecordsIdCardUpdate.addRestoreLogInfo(pkId, idCardNO, name, "1", "")
 
       paddingImageByteArray.toByteArray
+
     } catch {
       case e: Throwable =>
         //e.printStackTrace()
