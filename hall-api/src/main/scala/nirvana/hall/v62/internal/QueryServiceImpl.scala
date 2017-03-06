@@ -109,6 +109,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult] = {
     val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(oraSid)
     val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(getDBID(dbId), V62Facade.TID_QUERYQUE, pstQry)
+    var hitPossibility=gaQueryStruct.stSimpQry.nHitPossibility
     if(gaQueryStruct.stSimpQry.nStatus >= 2){//比对完成
       return Option(gaqryqueConverter.convertGAQUERYSTRUCT2MatchResult(gaQueryStruct))
     }

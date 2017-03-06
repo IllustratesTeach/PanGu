@@ -7,6 +7,7 @@ import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef
@@ -14,6 +15,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
+import nirvana.hall.image.services.RawImageDataType
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
@@ -218,8 +220,8 @@ class FirmDecoderImplTest extends BaseJniTest{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
-
-    val dest = decoder.decodeByGFS(gafisImg)
+    gafisImg.transformForFPT()
+    val dest = decoder.decode(gafisImg, RawImageDataType)
 
     Assert.assertNotNull(dest.bnData)
 
@@ -230,7 +232,7 @@ class FirmDecoderImplTest extends BaseJniTest{
     val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
 
-    val dest = decoder.decodeByGFS(gafisImg)
+    val dest = decoder.decode(gafisImg, RawImageDataType)
 
     Assert.assertNotNull(dest.bnData)
 

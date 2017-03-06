@@ -62,7 +62,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    orgSid = handlerTPcardData(fpt4,hallApiConfig.imagedecompressurl.url)
+                    orgSid = handlerTPcardData(fpt4,hallApiConfig.hallImageUrl)
 		                updateMatchResultStatus(orgSid, 0)
                     info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else if(fpt4.logic03Recs.length>0){

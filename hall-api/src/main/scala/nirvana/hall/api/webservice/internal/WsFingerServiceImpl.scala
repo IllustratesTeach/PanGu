@@ -4,20 +4,17 @@ import java.util.Date
 import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
-import nirvana.hall.api.webservice.util.FPTFileBuilder
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
-import nirvana.hall.protocol.api.FPTProto.LPCard
 import org.apache.axiom.attachments.ByteArrayDataSource
-
-import scala.collection.mutable
 
 
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService) extends WsFingerService with LoggerSupport
+class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService, fptService: FPTService) extends WsFingerService with LoggerSupport
 {
 
   /**
@@ -81,10 +78,10 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     val fPT4File = new FPT4File
     try{
       var dataHandler:DataHandler = null
-      if(tpCardService.isExist(ryno)){
-        val tpCard = tpCardService.getTPCard(ryno)
-        val fptObj = FPTFileBuilder.convertTPCard2FPT4File(tpCard)
-        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.build().toByteArray()))
+      val logic02Rec = fptService.getLogic02Rec(ryno)
+      if(logic02Rec != null){
+        fPT4File.logic02Recs = Array(logic02Rec)
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }else{
         dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
@@ -150,16 +147,11 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     info("fun:getLatentFinger,inputParam-userid:{};password:{};ajno:{},time{}:",userid,password,ajno,new Date)
     val fPT4File = new FPT4File
     try{
-      val lpCardList = new mutable.ListBuffer[LPCard]
       var dataHandler:DataHandler = null
-      if(ajno != null && caseInfoService.isExist(ajno)){
-        val caseInfo = caseInfoService.getCaseInfo(ajno)
-        val fingerIdCount = caseInfo.getStrFingerIDList.size
-        for(i <-0 to fingerIdCount-1){
-          lpCardList.append(lpCardService.getLPCard(caseInfo.getStrFingerID(i)))
-        }
-        val fptObj = FPTFileBuilder.buildLatentFpt(caseInfo, lpCardList)
-        dataHandler = new DataHandler(new ByteArrayDataSource(fptObj.toByteArray()))
+      val logic03Rec = fptService.getLogic03Rec(ajno)
+      if(logic03Rec != null){
+        fPT4File.logic03Recs = Array(logic03Rec)
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.toByteArray()))
       }else{
         dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }

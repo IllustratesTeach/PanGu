@@ -26,8 +26,8 @@ class HallApiConfig
     var sync: SyncConfig = new SyncConfig
     @XmlElement(name = "webservice")
     var webservice = new WebserviceConfig
-    @XmlElement(name = "imagedecompressurl")
-    var imagedecompressurl = new ImageDecompressUrl
+    @XmlElement(name = "hall_image_url")
+    var hallImageUrl: String = _
 
 }
 
@@ -61,12 +61,3 @@ class Union4pfmipConfig{
     @XmlElement(name = "password")
     var password: String = _
 }
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ImageDecompressUrl")
-class ImageDecompressUrl{
-    @XmlElement(name = "url")
-    var url: String = _
-}
-
-

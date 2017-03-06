@@ -31,6 +31,8 @@
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>hall-image</include>
+        <include>hall-image.cmd</include>
+        <include>hall-env.cmd</include>
       </includes>
       <fileMode>755</fileMode>
     </fileSet>

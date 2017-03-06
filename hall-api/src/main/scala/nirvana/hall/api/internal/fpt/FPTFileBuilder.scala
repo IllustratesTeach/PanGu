@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal.fpt
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
@@ -6,8 +6,6 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
-import nirvana.hall.image.config.HallImageConfig
-import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatchResultObject
@@ -17,10 +15,9 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2016/12/2.
+  * 将proto转换为FPT4File
   */
 object FPTFileBuilder {
-  val firmDecoder = new FirmDecoderImpl("support",new HallImageConfig)
-  val imageEncoder = new ImageEncoderImpl(firmDecoder)
   /**
     * TPCard转换为FPT4File
     * @param card
@@ -100,14 +97,15 @@ object FPTFileBuilder {
           sendNo += 1
           fingerTData.extractMethod = fpt4code.EXTRACT_METHOD_A
 
-          //将图像数据转为wsq格式
-          //TODO 图像解压临时处理
-          var gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-          if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
-            gafisImage = imageEncoder.encodeWSQ(gafisImage)
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+          //如果是GFS压缩，保留头信息并transformForFPT
+          if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS){
+            gafisImage.transformForFPT()
+            fingerTData.imgData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
+          }else{
+            fingerTData.imgData = gafisImage.bnData
           }
-          fingerTData.imgData = gafisImage.bnData
-          fingerTData.imgDataLength = gafisImage.bnData.length.toString
+          fingerTData.imgDataLength = fingerTData.imgData.length.toString
           fingerTData.dataLength = fingerTData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
           fingerTData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
 
@@ -190,16 +188,10 @@ object FPTFileBuilder {
       fingerLData.isFingerAssist = card.getText.getNXieChaState.toString
       fingerLData.matchStatus = card.getText.getNBiDuiState.toString
       fingerLData.extractMethod = fpt4code.EXTRACT_METHOD_M
-      //将图像数据转为wsq格式
-      //TODO 图像解压临时处理
-      var gafisImage = new GAFISIMAGESTRUCT().fromByteArray(card.getBlob.getStImageBytes.toByteArray)
-      if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
-        gafisImage = imageEncoder.encodeWSQ(gafisImage)
-      }
-
-      fingerLData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(card.getBlob.getStImageBytes.toByteArray)
+      fingerLData.imgCompressMethod = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE //现场指纹统一为原图
       fingerLData.imgData = gafisImage.bnData
-      fingerLData.imgDataLength = gafisImage.bnData.length.toString
+      fingerLData.imgDataLength = fingerLData.imgData.length.toString
       fingerLData.dataLength = fingerLData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
       fingerLDataList += fingerLData
     }

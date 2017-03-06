@@ -45,6 +45,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
+    casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
     info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
@@ -90,6 +91,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     GafisCasePalmMnt.delete.where(GafisCasePalmMnt.palmId === casePalm.palmId).execute
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
+    casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
     info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
@@ -101,8 +103,14 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
-    GafisCasePalmMnt.delete.where(GafisCasePalmMnt.palmId === cardId).execute
-    GafisCasePalm.find(cardId).delete
+
+    val gafisCasePalmMnt = GafisCasePalmMnt.where(GafisCasePalmMnt.palmId === cardId).headOption.get
+    gafisCasePalmMnt.deletag = Gafis70Constants.DELETAG_DEL
+    gafisCasePalmMnt.save()
+    GafisCasePalm.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
+    GafisCasePalm.update
+
+
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {

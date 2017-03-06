@@ -2,11 +2,10 @@ package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.DateConverter
+import nirvana.hall.api.internal.{CodeUtils, DateConverter, DateUtil}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -24,7 +23,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by songpeng on 16/1/28.
+ * Proto与po实体对象相互转换
  */
 object ProtobufConverter {
 
@@ -42,7 +41,7 @@ object ProtobufConverter {
     gafisCase.caseOccurDate = text.getStrCaseOccurDate
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
     gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
-    gafisCase.assistLevel = text.getNSuperviseLevel.toString
+    gafisCase.assistLevel = CodeUtils.convertCode6To7(text.getNSuperviseLevel.toString)
     gafisCase.extractUnitCode = text.getStrExtractUnitCode
     gafisCase.extractUnitName = text.getStrExtractUnitName
     gafisCase.extractor = text.getStrExtractor
@@ -402,6 +401,7 @@ object ProtobufConverter {
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
     person.personid = tpCard.getStrCardID
     person.cardid = tpCard.getStrPersonID
+    person.fingerrepeatno = tpCard.getStrMisPersonID
     val text = tpCard.getText
     person.name = text.getStrName
     person.aliasname = text.getStrAliasName

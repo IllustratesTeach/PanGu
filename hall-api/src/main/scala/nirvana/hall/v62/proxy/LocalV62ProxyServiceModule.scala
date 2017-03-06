@@ -6,7 +6,7 @@ import monad.support.services.XmlLoader
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.config.ProxyServerConfig
-import nirvana.hall.v62.proxy.filter.{GAFIS_RMTLIB_LPSVR_ServerFilter, GAFIS_RMTLIB_TPSVR_ServerFilter}
+import nirvana.hall.v62.proxy.filter.{GAFIS_RMTLIB_LPSVR_ServerFilter, GAFIS_RMTLIB_QUERYSVR_ServerFilter, GAFIS_RMTLIB_TPSVR_ServerFilter}
 import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId, Startup, Symbol}
 import org.apache.tapestry5.ioc.services.{PipelineBuilder, RegistryShutdownHub}
 import org.apache.tapestry5.ioc.{OrderedConfiguration, ServiceBinder}
@@ -45,6 +45,7 @@ object LocalV62ProxyServiceModule {
 //    configuration.addInstance("GAFIS_PARAMADM_ServerFilter", classOf[GAFIS_PARAMADM_ServerFilter])
 //    configuration.addInstance("GAFIS_RMTLIB_DBSYS_ServerFilter", classOf[GAFIS_RMTLIB_DBSYS_ServerFilter])
     configuration.addInstance("GAFIS_RMTLIB_LPSVR_ServerFilter", classOf[GAFIS_RMTLIB_LPSVR_ServerFilter])
+    configuration.addInstance("GAFIS_RMTLIB_QUERYSVR_ServerFilter", classOf[GAFIS_RMTLIB_QUERYSVR_ServerFilter])
 
 
 

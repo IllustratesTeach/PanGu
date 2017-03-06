@@ -46,14 +46,15 @@ class GafisCasePalmMnt extends ActiveRecord {
   var palmMntNosqlId: java.lang.String = _
   @Column(name = "PALM_RIDGE_NOSQL_ID", length = 10)
   var palmRidgeNosqlId: java.lang.String = _
-
+  @Column(name = "DELETAG", length = 1)
+  var deletag: java.lang.String = _
 
   def this(pkId: java.lang.String) {
     this()
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: Array[Byte], palmRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String) {
+  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: Array[Byte], palmRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String, deletag:java.lang.String) {
     this()
     this.pkId = pkId
     this.palmId = palmId
@@ -67,6 +68,7 @@ class GafisCasePalmMnt extends ActiveRecord {
     this.inputpsn = inputpsn
     this.palmMntNosqlId = palmMntNosqlId
     this.palmRidgeNosqlId = palmRidgeNosqlId
+    this.deletag = deletag
   }
 
 
