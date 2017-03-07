@@ -13,7 +13,6 @@ import nirvana.hall.api.services.sync._
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
-import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import org.slf4j.LoggerFactory
 
@@ -30,21 +29,24 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                      lPCardService: LPCardService,
                      lPPalmService: LPPalmService,
                      caseInfoService: CaseInfoService,
-                     syncInfoLogManageService: SyncInfoLogManageService) extends RpcServerMessageFilter with LoggerSupport {
-  override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
-    if (commandRequest.hasExtension(SyncTPCardRequest.cmd)) {
-      var card_id = "" //卡号
+                     syncInfoLogManageService: SyncInfoLogManageService) extends RpcServerMessageFilter with LoggerSupport{
+  override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean ={
+    if(commandRequest.hasExtension(SyncTPCardRequest.cmd)) {
+      var card_id="" //卡号
       val request = commandRequest.getExtension(SyncTPCardRequest.cmd)
       val uuid = request.getUuid
-      var typ_add = ""
-      try {
+      var typ_add=""
+      var count = 0 //数据数量
+      var status=0 //SEQ状态更新结果
+      try{
         val responseBuilder = SyncTPCardResponse.newBuilder()
-        val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_TPCARD, request.getDbid, "1").headOption
-        if (hallReadConfigOpt.nonEmpty) {
+        if(hallReadConfigOpt.nonEmpty) {
           val cardIdList = fetchTPCardService.fetchCardId(request.getSeq, request.getSize, dbId)
+          count = cardIdList.length
           cardIdList.foreach { cardId =>
             responseBuilder.setSeq(cardId._2)
             if (tPCardService.isExist(cardId._1, dbId)) {
@@ -55,82 +57,98 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                 syncTPCard.setTpCard(tpCard)
                 syncTPCard.setSeq(cardId._2)
                 syncTPCard.setOperationType(OperationType.PUT)
-                typ_add = "_PUT"
+                typ_add="_PUT"
               }
             } else {
               //如果卡号不存在，删除
               val syncTPCard = responseBuilder.addSyncTPCardBuilder()
               val tpCard = TPCard.newBuilder().setStrCardID(cardId._1)
-              card_id = cardId._1
+              card_id=cardId._1
               syncTPCard.setTpCard(tpCard.build())
               syncTPCard.setOperationType(OperationType.DEL)
               syncTPCard.setSeq(cardId._2)
-              typ_add = "_DEL"
+              typ_add="_DEL"
             }
           }
           hallReadConfigOpt.get.seq = request.getSeq
-          updateSeq(hallReadConfigOpt.get)
+          status=updateSeq(hallReadConfigOpt.get)
+        }
+        if(count>0 && status >0){
+          syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_TPCARD+typ_add, ip, "1", "1")
+        }
+        if(status <=0){
+          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
         }
         commandResponse.writeMessage(commandRequest, SyncTPCardResponse.cmd, responseBuilder.build())
-        syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_TPCARD + typ_add, ip, "1", "1")
       } catch {
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("TP-ResponseData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}", uuid, card_id, eInfo, e.getMessage)
+          error("TP-ResponseData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_TPCARD)
       }
       true
-    } else if (commandRequest.hasExtension(SyncLPCardRequest.cmd)) {
+    }else if(commandRequest.hasExtension(SyncLPCardRequest.cmd)){
       val request = commandRequest.getExtension(SyncLPCardRequest.cmd)
       val uuid = request.getUuid
-      var card_id = "" //卡号
-      var typ_add = ""
-      try {
+      var card_id="" //卡号
+      var typ_add=""
+      var count = 0 //数据数量
+      var status=0 //SEQ状态更新结果
+      try{
         val responseBuilder = SyncLPCardResponse.newBuilder()
-        val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPCARD, request.getDbid, "1").headOption
-        if (hallReadConfigOpt.nonEmpty) {
+        if(hallReadConfigOpt.nonEmpty){
           val cardIdList = fetchLPCardService.fetchCardId(request.getSeq, request.getSize, dbId)
-          cardIdList.foreach { cardId =>
+          count=cardIdList.length
+          cardIdList.foreach{cardId =>
             responseBuilder.setSeq(cardId._2)
-            if (lPCardService.isExist(cardId._1, dbId)) {
+            if(lPCardService.isExist(cardId._1, dbId)){
               val lPCard = lPCardService.getLPCard(cardId._1, dbId)
-              card_id = lPCard.getStrCardID
-              if (fetchLPCardService.validateByReadStrategy(lPCard, hallReadConfigOpt.get.readStrategy)) {
+              card_id=lPCard.getStrCardID
+              if(fetchLPCardService.validateByReadStrategy(lPCard, hallReadConfigOpt.get.readStrategy)){
                 val syncLPCard = responseBuilder.addSyncLPCardBuilder()
                 syncLPCard.setLpCard(lPCard)
                 syncLPCard.setOperationType(OperationType.PUT)
                 syncLPCard.setSeq(cardId._2)
-                typ_add = "_PUT"
+                typ_add="_PUT"
               }
-            } else {
+            }else{
               val syncLPCard = responseBuilder.addSyncLPCardBuilder()
               val lPCard = LPCard.newBuilder().setStrCardID(cardId._1)
+              card_id=cardId._1
               syncLPCard.setLpCard(lPCard)
               syncLPCard.setOperationType(OperationType.DEL)
               syncLPCard.setSeq(cardId._2)
-              typ_add = "_DEL"
+              typ_add="_DEL"
             }
           }
           hallReadConfigOpt.get.seq = request.getSeq
-          updateSeq(hallReadConfigOpt.get)
+          status=updateSeq(hallReadConfigOpt.get)
+        }
+        if(count>0 && status >0){
+          syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,card_id,HallApiConstants.SYNC_TYPE_LPCARD+typ_add,ip,"1","1")
+        }
+        if(status <=0){
+          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPCard_SEQ_FAIL+"cardId:{} "+card_id)
         }
         commandResponse.writeMessage(commandRequest, SyncLPCardResponse.cmd, responseBuilder.build())
-        syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPCARD + typ_add, ip, "1", "1")
       } catch {
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}", uuid, eInfo, e.getMessage)
+          error("LP-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,eInfo,e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPCARD)
       }
       true
-    } else if (commandRequest.hasExtension(SyncLPPalmRequest.cmd)) {
+    }else if(commandRequest.hasExtension(SyncLPPalmRequest.cmd)) {
       val request = commandRequest.getExtension(SyncLPPalmRequest.cmd)
       val uuid = request.getUuid
       var card_id = "" //卡号
-      var typ_add = ""
+      var typ_add=""
+      var count = 0 //数据数量
+      var status=0 //SEQ状态更新结果
       try {
         val responseBuilder = SyncLPPalmResponse.newBuilder()
         val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
@@ -139,6 +157,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_LPPALM, request.getDbid, "1").headOption
         if (hallReadConfigOpt.nonEmpty) {
           val cardIdList = fetchLPPalmService.fetchCardId(request.getSeq, request.getSize, dbId)
+          count=cardIdList.length
           cardIdList.foreach { cardId =>
             responseBuilder.setSeq(cardId._2)
             if (lPPalmService.isExist(cardId._1, dbId)) {
@@ -149,114 +168,128 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                 syncLPCard.setLpCard(lPCard)
                 syncLPCard.setOperationType(OperationType.PUT)
                 syncLPCard.setSeq(cardId._2)
-                typ_add = "_PUT"
+                typ_add="_PUT"
               }
             } else {
               val syncLPCard = responseBuilder.addSyncLPCardBuilder()
               val lPCard = LPCard.newBuilder().setStrCardID(cardId._1)
+              card_id=cardId._1
               syncLPCard.setLpCard(lPCard)
               syncLPCard.setOperationType(OperationType.DEL)
               syncLPCard.setSeq(cardId._2)
-              typ_add = "_DEL"
+              typ_add="_DEL"
             }
           }
           hallReadConfigOpt.get.seq = request.getSeq
-          updateSeq(hallReadConfigOpt.get)
+          status=updateSeq(hallReadConfigOpt.get)
+        }
+        if(count>0 && status >0){
+          syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPPALM+typ_add, ip, "1", "1")
+        }
+        if(status <=0){
+          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPalm_SEQ_FAIL+"cardId:{} "+card_id)
         }
         commandResponse.writeMessage(commandRequest, SyncLPPalmResponse.cmd, responseBuilder.build())
-        syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPPALM + typ_add, ip, "1", "1")
       } catch {
-        case e: Exception =>
+        case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-Plam-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}", uuid, card_id, eInfo, e.getMessage)
+          error("LP-Plam-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPPALM)
       }
       true
-    } else if (commandRequest.hasExtension(SyncCaseRequest.cmd)) {
+    }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)) {
       val request = commandRequest.getExtension(SyncCaseRequest.cmd)
       val responseBuilder = SyncCaseResponse.newBuilder()
-      var card_id = "" //卡号
+      var card_id= "" //卡号
       val uuid = request.getUuid
-      var typ_add = ""
-      try {
-        val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
+      var typ_add=""
+      var count = 0 //数据数量
+      var status=0 //SEQ状态更新结果
+      try{
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_CASEINFO, request.getDbid, "1").headOption
         if (hallReadConfigOpt.nonEmpty) {
           val caseIdList = fetchCaseInfoService.fetchCaseId(request.getSeq, request.getSize, dbId)
+          count=caseIdList.length
           caseIdList.foreach { caseId =>
             if (caseInfoService.isExist(caseId._1, dbId)) {
               val caseInfo = caseInfoService.getCaseInfo(caseId._1, dbId)
-              card_id = caseInfo.getStrCaseID
+              card_id=caseInfo.getStrCaseID
               if (fetchCaseInfoService.validateByReadStrategy(caseInfo, hallReadConfigOpt.get.readStrategy)) {
                 val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
                 syncCaseInfo.setCaseInfo(caseInfo)
                 syncCaseInfo.setOperationType(OperationType.PUT)
                 syncCaseInfo.setSeq(caseId._2)
-                typ_add = "_PUT"
+                typ_add="_PUT"
               }
             } else {
               val syncCaseInfo = responseBuilder.addSyncCaseBuilder()
               val caseInfo = Case.newBuilder().setStrCaseID(caseId._1)
+              card_id=caseId._1
               syncCaseInfo.setCaseInfo(caseInfo)
               syncCaseInfo.setOperationType(OperationType.DEL)
               syncCaseInfo.setSeq(caseId._2)
-              typ_add = "_DEL"
+              typ_add="_DEL"
             }
           }
           hallReadConfigOpt.get.seq = request.getSeq
-          updateSeq(hallReadConfigOpt.get)
+          status=updateSeq(hallReadConfigOpt.get)
+        }
+        if(count>0 && status >0){
+          syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid,card_id,HallApiConstants.SYNC_TYPE_CASEINFO+typ_add,ip,"1","1")
+        }
+        if(status <=0){
+          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_CASEInfo_SEQ_FAIL +"cardId:{} "+card_id)
         }
         commandResponse.writeMessage(commandRequest, SyncCaseResponse.cmd, responseBuilder.build())
-        syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_CASEINFO + typ_add, ip, "1", "1")
       } catch {
-        case e: Exception =>
+        case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("CASE-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}", uuid, card_id, eInfo, e.getMessage)
+          error("CASE-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_CASEINFO)
       }
       true
-    } else if (commandRequest.hasExtension(SyncMatchTaskRequest.cmd)) {
+    }else if(commandRequest.hasExtension(SyncMatchTaskRequest.cmd)){
       val request = commandRequest.getExtension(SyncMatchTaskRequest.cmd)
       val uuid = request.getUuid
-      var match_task_orasid = ""
-      var typ_add = ""
-      try {
+      var match_task_orasid=""
+      var typ_add=""
+      try{
         val responseBuilder = SyncMatchTaskResponse.newBuilder()
-        val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_TASK, request.getDbid, "1").headOption
 
         var matchTaskList: Seq[MatchTask] = null
-        if (hallReadConfigOpt.nonEmpty) {
+        if(hallReadConfigOpt.nonEmpty){
           matchTaskList = fetchQueryService.fetchMatchTask(request.getSize, dbId)
-          matchTaskList.foreach { matchTask =>
-            match_task_orasid = matchTask.getMatchId
+          matchTaskList.foreach{matchTask=>
+            match_task_orasid=matchTask.getMatchId
             responseBuilder.addMatchTask(matchTask)
-            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, match_task_orasid, HallApiConstants.SYNC_TYPE_MATCH_TASK + "-PUT", ip, "1", "1")
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,match_task_orasid,HallApiConstants.SYNC_TYPE_MATCH_TASK+"-PUT",ip,"1","1")
           }
           //hallReadConfigOpt.get.seq = request.getSeq
           //updateSeq(hallReadConfigOpt.get)
         }
         commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
-
         /**
           * sjr 2016/11/29
           * 更新状态
           */
-        if (matchTaskList != null && matchTaskList.size > 0) {
+        if(matchTaskList!=null&&matchTaskList.size>0) {
           matchTaskList.foreach { matchTask =>
             fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq 第一阶段不需要更新状态
-            fetchQueryService.saveFetchRecord(fetchQueryService.getOraUUID(matchTask.getObjectId).headOption.get) //按照Ora_sid查询比对任务表中的ora_UUID保存到记录表中
+            //fetchQueryService.saveFetchRecord(fetchQueryService.getOraUUID(matchTask.getObjectId).headOption.get) //按照Ora_sid查询比对任务表中的ora_UUID保存到记录表中
           }
         }
       } catch {
-        case e: Exception =>
+        case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("MatchTask-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}", uuid, match_task_orasid, eInfo, e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+          error("MatchTask-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
       true
     } else if (commandRequest.hasExtension(SyncMatchResultRequest.cmd)) {
@@ -291,7 +324,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid.toString, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
       }
       true
-    } else {
+    }else{
       handler.handle(commandRequest, commandResponse)
     }
   }
@@ -301,7 +334,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     *
     * @param readConfig
     */
-  private def updateSeq(readConfig: HallReadConfig): Unit = {
+  private def updateSeq(readConfig: HallReadConfig): Int ={
     HallReadConfig.update.set(seq = readConfig.seq).where(HallReadConfig.pkId === readConfig.pkId).execute
   }
 
