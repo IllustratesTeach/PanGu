@@ -7,15 +7,15 @@ import monad.rpc.config.RpcBindSupport
 import monad.support.services.WebServerConfigSupport
 
 /**
- * hall api configuration
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
- * @since 2015-04-02
- */
+  * hall api configuration
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  * @since 2015-04-02
+  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HallApiServerConfig")
 @XmlRootElement(name = "hall_api")
 class HallApiConfig
-    extends LogFileSupport
+  extends LogFileSupport
     with RpcBindSupport
     with WebServerConfigSupport
     with LocalStoreConfigSupport
@@ -36,8 +36,10 @@ class HallApiConfig
 class SyncConfig {
     @XmlElement(name = "batch_size")
     var batchSize: Int = 1
-    @XmlElement(name = "sync_cron")
-    var syncCron: String = _
+    @XmlElement(name = "sync_cron1")
+    var syncCron1: String = _
+    @XmlElement(name = "sync_cron2")
+    var syncCron2: String = _
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
