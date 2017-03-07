@@ -27,8 +27,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by songpeng on 16/8/18.
- */
+  * Created by songpeng on 16/8/18.
+  */
 class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           rpcHttpClient: RpcHttpClient,
                           tpCardService: TPCardService,
@@ -44,16 +44,18 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   final val SYNC_BATCH_SIZE = 1
   final val SYNC_MATCH_TASK_BATCH_SIZE = 5          //一批抓取的比对任务数
+
+
   /**
-   * 定时器，同步数据
+    * 定时器，同步数据
     *
     * @param periodicExecutor
-   * @param syncCronService
-   */
+    * @param syncCronService
+    */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, syncCronService: SyncCronService): Unit = {
-    if(apiConfig.sync.syncCron != null){
-      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron), "sync-cron", new Runnable {
+    if(apiConfig.sync.syncCron1 != null){
+      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron1), "sync-cron", new Runnable {
         override def run(): Unit = {
           info("begin sync-cron")
           try{
@@ -69,8 +71,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 定时任务调用方法
-   */
+    * 定时任务调用方法
+    */
   override def doWork(): Unit = {
     HallFetchConfig.find_by_deletag("1").toSeq.foreach{ fetchConfig=>
       val strategy = new JSONObject(fetchConfig.writeStrategy)
@@ -83,10 +85,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         case HallApiConstants.SYNC_TYPE_CASEINFO =>
         case HallApiConstants.SYNC_TYPE_LPPALM =>
           fetchLPPalm(fetchConfig, update)
-        case HallApiConstants.SYNC_TYPE_MATCH_TASK =>
-          fetchMatchTask(fetchConfig, update)
-        case HallApiConstants.SYNC_TYPE_MATCH_RESULT =>
-          fetchMatchResult(fetchConfig, update)
+
         case other =>
           warn("unsupport fetch type:{}", other)
       }
@@ -94,10 +93,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 执行抓取数据
+    * 执行抓取数据
     *
     * @param fetchConfig
-   */
+    */
   def fetchTPCard(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("syncTPCard name:{} timestamp:{}", fetchConfig.name, fetchConfig.seq)
     val uuid = UUID.randomUUID().toString
@@ -118,68 +117,68 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         val destDBID = Option(fetchConfig.destDbid)
         val iter = response.getSyncTPCardList.iterator()
         var exception_type=0 //异常类型判断
-          while (iter.hasNext) {
-            val syncTPCard = iter.next()
-            val tpCard = syncTPCard.getTpCard
-            cardId = tpCard.getStrCardID
-            if (syncTPCard.getOperationType == OperationType.PUT &&
-              validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
-              //验证本地是否存在
-              if (tpCardService.isExist(cardId, destDBID)) {
-                if (update) {//更新
-                  tpCardService.updateTPCard(tpCard, destDBID)
-                  info("update TPCard:{}", cardId)
-                  typ_add="-UPDATE"
-                }
-              } else {
-                tpCardService.addTPCard(tpCard, destDBID)
-                info("add TPCard:{}", cardId)
-                typ_add="-PUT"
+        while (iter.hasNext) {
+          val syncTPCard = iter.next()
+          val tpCard = syncTPCard.getTpCard
+          cardId = tpCard.getStrCardID
+          if (syncTPCard.getOperationType == OperationType.PUT &&
+            validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
+            //验证本地是否存在
+            if (tpCardService.isExist(cardId, destDBID)) {
+              if (update) {//更新
+                tpCardService.updateTPCard(tpCard, destDBID)
+                info("update TPCard:{}", cardId)
+                typ_add="-UPDATE"
               }
+            } else {
+              tpCardService.addTPCard(tpCard, destDBID)
+              info("add TPCard:{}", cardId)
+              typ_add="-PUT"
+            }
 
-            } else if(syncTPCard.getOperationType == OperationType.DEL) {
-              if(tpCardService.isExist(cardId, destDBID)){
-                tpCardService.delTPCard(cardId, destDBID)
-                info("delete TPCard:{}", cardId)
-                typ_add="-DEL"
-              }
-            }
-            seq = syncTPCard.getSeq
-            info("TP-RequestData success,cardId:{}",cardId)
-            if (!typ_add.equals("")) {
-              syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
-                , "0", "1")
+          } else if(syncTPCard.getOperationType == OperationType.DEL) {
+            if(tpCardService.isExist(cardId, destDBID)){
+              tpCardService.delTPCard(cardId, destDBID)
+              info("delete TPCard:{}", cardId)
+              typ_add="-DEL"
             }
           }
-          seq = response.getSeq
-          //如果获取到数据递归获取
-          if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
-            //更新配置seq
-            fetchConfig.seq = seq
-            updateSeq(fetchConfig)
-            fetchTPCard(fetchConfig, update)
+          seq = syncTPCard.getSeq
+          info("TP-RequestData success,cardId:{}",cardId)
+          if (!typ_add.equals("")) {
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
+              , "0", "1")
           }
-        } else {
-         syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_TPCARD)
         }
-      } catch {
-        case e: nirvana.hall.support.internal.CallRpcException =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_TPCARD)
-        case e: Exception =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_TPCARD)
+        seq = response.getSeq
+        //如果获取到数据递归获取
+        if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
+          //更新配置seq
+          fetchConfig.seq = seq
+          updateSeq(fetchConfig)
+          fetchTPCard(fetchConfig, update)
+        }
+      } else {
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_TPCARD)
       }
+    } catch {
+      case e: nirvana.hall.support.internal.CallRpcException =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_TPCARD)
+      case e: Exception =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_TPCARD)
+    }
   }
 
   /**
-   * 抓取现场指纹
+    * 抓取现场指纹
     *
     * @param fetchConfig
-   * @param update
-   */
+    * @param update
+    */
   def fetchLPCard(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("syncLPCard name:{} timestamp:{}", fetchConfig.name, fetchConfig.seq)
     var cardId = ""
@@ -198,87 +197,87 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
         val destDBID = Option(fetchConfig.destDbid)
         val iter = response.getSyncLPCardList.iterator()
-          while (iter.hasNext) {
-            val syncLPCard = iter.next()
-            var lpCard = syncLPCard.getLpCard
-            cardId = lpCard.getStrCardID
-            if (syncLPCard.getOperationType == OperationType.PUT &&
-              validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
-              //如果没有案件编号，截掉指纹编号后两位作为案件编号
-              var caseId = lpCard.getText.getStrCaseId
-              if(caseId.trim.length == 0){
-                caseId = cardId.substring(0, cardId.length - 2)
-                val lPCardBuilder = lpCard.toBuilder
-                lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
-                lpCard = lPCardBuilder.build()
+        while (iter.hasNext) {
+          val syncLPCard = iter.next()
+          var lpCard = syncLPCard.getLpCard
+          cardId = lpCard.getStrCardID
+          if (syncLPCard.getOperationType == OperationType.PUT &&
+            validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
+            //如果没有案件编号，截掉指纹编号后两位作为案件编号
+            var caseId = lpCard.getText.getStrCaseId
+            if(caseId.trim.length == 0){
+              caseId = cardId.substring(0, cardId.length - 2)
+              val lPCardBuilder = lpCard.toBuilder
+              lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
+              lpCard = lPCardBuilder.build()
+            }
+            //验证本地是否存在
+            if (lPCardService.isExist(cardId, destDBID)) {
+              if (update) {//更新
+                lPCardService.updateLPCard(lpCard, destDBID)
+                info("update LPCard:{}", cardId)
+                typ_add="-UPDATE"
               }
-              //验证本地是否存在
-              if (lPCardService.isExist(cardId, destDBID)) {
-                if (update) {//更新
-                  lPCardService.updateLPCard(lpCard, destDBID)
-                  info("update LPCard:{}", cardId)
-                  typ_add="-UPDATE"
-                }
               if(caseInfoService.isExist(caseId,destDBID)){
                 fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
-              } else {
-                //如果没有案件信息获取案件
+            } else {
+              //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
                 fetchCaseInfo(caseId, fetchConfig.url, false,Option(fetchConfig.dbid), destDBID)
               }else{
                 fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
-                lPCardService.addLPCard(lpCard, destDBID)
-                info("add LPCard:{}", cardId)
-                typ_add="-PUT"
-              }
+              lPCardService.addLPCard(lpCard, destDBID)
+              info("add LPCard:{}", cardId)
+              typ_add="-PUT"
+            }
 
-            } else if (syncLPCard.getOperationType == OperationType.DEL){
-              if(lPCardService.isExist(cardId, destDBID)){
-                lPCardService.delLPCard(cardId, destDBID)
-                info("delete LPCard:{}", cardId)
-                typ_add="-DEL"
-              }
-            }
-            seq = syncLPCard.getSeq
-            info("LP-RequestData success,cardId:{}",cardId)
-            if (!typ_add.equals("")) {
-              syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
-                , "0", "1")
+          } else if (syncLPCard.getOperationType == OperationType.DEL){
+            if(lPCardService.isExist(cardId, destDBID)){
+              lPCardService.delLPCard(cardId, destDBID)
+              info("delete LPCard:{}", cardId)
+              typ_add="-DEL"
             }
           }
-          seq = response.getSeq
-          //如果获取到数据递归获取
-          if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
-            //更新配置seq
-            fetchConfig.seq = seq
-            updateSeq(fetchConfig)
-            fetchLPCard(fetchConfig, update)
+          seq = syncLPCard.getSeq
+          info("LP-RequestData success,cardId:{}",cardId)
+          if (!typ_add.equals("")) {
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
+              , "0", "1")
           }
-          info("LP-RequestData success,seq:{};BatchSyncCompleted",seq)
-        } else {
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_LPCARD)
         }
-      }catch{
-        case e: nirvana.hall.support.internal.CallRpcException =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_LPCARD)
-        case e:Exception =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_LPCARD)
+        seq = response.getSeq
+        //如果获取到数据递归获取
+        if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
+          //更新配置seq
+          fetchConfig.seq = seq
+          updateSeq(fetchConfig)
+          fetchLPCard(fetchConfig, update)
+        }
+        info("LP-RequestData success,seq:{};BatchSyncCompleted",seq)
+      } else {
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_LPCARD)
       }
+    }catch{
+      case e: nirvana.hall.support.internal.CallRpcException =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("LP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_LPCARD)
+      case e:Exception =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("LP-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_LPCARD)
+    }
   }
 
   /**
-   * 根据案件编号同步案件信息
-   * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
-   * 如果没有案件信息不同步案件信息，6.2存在只有现场没有案件的情况
+    * 根据案件编号同步案件信息
+    * 由于只有案件编号没有物理配置信息，多物理库同步的dbid使用现场的dbid，tableid=4
+    * 如果没有案件信息不同步案件信息，6.2存在只有现场没有案件的情况
     *
     * @param caseId
-   */
+    */
   def fetchCaseInfo(caseId: String, url: String,isExist:Boolean,dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
     if(caseInfoRemoteService.isExist(caseId, url, dbId.get)){
@@ -300,11 +299,11 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 抓取现场掌纹
+    * 抓取现场掌纹
     *
     * @param fetchConfig
-   * @param update
-   */
+    * @param update
+    */
   def fetchLPPalm(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("syncLPPalm name:{} timestamp:{}", fetchConfig.name, fetchConfig.seq)
     var cardId = ""
@@ -319,31 +318,31 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       request.setUuid(uuid)
       val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncLPPalmRequest.cmd, request.build())
       if(baseResponse.getStatus == CommandStatus.OK) {
-          info("LP-Plam-RequestData start")
-          val response = baseResponse.getExtension(SyncLPPalmResponse.cmd)
-          val destDBID = Option(fetchConfig.destDbid)
-          val iter = response.getSyncLPCardList.iterator()
-          while (iter.hasNext) {
-            val syncLPCard = iter.next()
-            var lpCard = syncLPCard.getLpCard
-            cardId = lpCard.getStrCardID
-            if (syncLPCard.getOperationType == OperationType.PUT &&
-              validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
-              //如果没有案件编号，截掉指纹编号后两位作为案件编号
-              var caseId = lpCard.getText.getStrCaseId
-              if (caseId.trim.length == 0) {
-                caseId = cardId.substring(0, cardId.length - 2)
-                val lPCardBuilder = lpCard.toBuilder
-                lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
-                lpCard = lPCardBuilder.build()
+        info("LP-Plam-RequestData start")
+        val response = baseResponse.getExtension(SyncLPPalmResponse.cmd)
+        val destDBID = Option(fetchConfig.destDbid)
+        val iter = response.getSyncLPCardList.iterator()
+        while (iter.hasNext) {
+          val syncLPCard = iter.next()
+          var lpCard = syncLPCard.getLpCard
+          cardId = lpCard.getStrCardID
+          if (syncLPCard.getOperationType == OperationType.PUT &&
+            validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
+            //如果没有案件编号，截掉指纹编号后两位作为案件编号
+            var caseId = lpCard.getText.getStrCaseId
+            if (caseId.trim.length == 0) {
+              caseId = cardId.substring(0, cardId.length - 2)
+              val lPCardBuilder = lpCard.toBuilder
+              lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
+              lpCard = lPCardBuilder.build()
+            }
+            //验证本地是否存在
+            if (lPPalmService.isExist(cardId, destDBID)) {
+              if (update) {//更新
+                lPPalmService.updateLPCard(lpCard, destDBID)
+                info("update LPPalm:{}", cardId)
+                typ_add="-UPDATE"
               }
-              //验证本地是否存在
-              if (lPPalmService.isExist(cardId, destDBID)) {
-                if (update) {//更新
-                  lPPalmService.updateLPCard(lpCard, destDBID)
-                  info("update LPPalm:{}", cardId)
-                  typ_add="-UPDATE"
-                }
               if(caseInfoService.isExist(caseId, destDBID)){
                 fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
@@ -354,157 +353,56 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               }else{
                 fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
-                lPPalmService.addLPCard(lpCard, destDBID)
-                info("add LPPalm:{}", cardId)
-                typ_add="-PUT"
-              }
+              lPPalmService.addLPCard(lpCard, destDBID)
+              info("add LPPalm:{}", cardId)
+              typ_add="-PUT"
+            }
 
-            } else if (syncLPCard.getOperationType == OperationType.DEL) {
-              if (lPPalmService.isExist(cardId, destDBID)) {
-                lPPalmService.delLPCard(cardId, destDBID)
-                info("delete LPPalm:{}", cardId)
-                typ_add="-DEL"
-              }
-            }
-            seq = syncLPCard.getSeq
-            info("LP-Plam-RequestData success,cardId:{}", cardId)
-            if (!typ_add.equals("")) {
-              syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
-                , "0", "1")
+          } else if (syncLPCard.getOperationType == OperationType.DEL) {
+            if (lPPalmService.isExist(cardId, destDBID)) {
+              lPPalmService.delLPCard(cardId, destDBID)
+              info("delete LPPalm:{}", cardId)
+              typ_add="-DEL"
             }
           }
-          seq = response.getSeq
-          //如果获取到数据递归获取
-          if (response.getSyncLPCardCount > 0 && fetchConfig.seq != seq) {
-            //更新配置seq
-            fetchConfig.seq = seq
-            updateSeq(fetchConfig)
-            fetchLPPalm(fetchConfig, update)
+          seq = syncLPCard.getSeq
+          info("LP-Plam-RequestData success,cardId:{}", cardId)
+          if (!typ_add.equals("")) {
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7, fetchConfig.url.length - 5)
+              , "0", "1")
           }
-          info("LP-Plam-RequestData success,seq:{};BatchSyncCompleted", seq)
-        } else {
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_LPPALM)
         }
-      } catch {
-        case e: nirvana.hall.support.internal.CallRpcException =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-Plam-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_LPPALM)
-        case e: Exception =>
-          val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("LP-Plam-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_LPPALM)
+        seq = response.getSeq
+        //如果获取到数据递归获取
+        if (response.getSyncLPCardCount > 0 && fetchConfig.seq != seq) {
+          //更新配置seq
+          fetchConfig.seq = seq
+          updateSeq(fetchConfig)
+          fetchLPPalm(fetchConfig, update)
+        }
+        info("LP-Plam-RequestData success,seq:{};BatchSyncCompleted", seq)
+      } else {
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_LPPALM)
       }
+    } catch {
+      case e: nirvana.hall.support.internal.CallRpcException =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("LP-Plam-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_LPPALM)
+      case e: Exception =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("LP-Plam-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_LPPALM)
+    }
   }
 
   /**
-   * 抓取比对任务
+    * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
+    * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
+    * 解决方法需要候选信息增加dbid信息
     *
-    * @param fetchConfig
-   * @param update
-   */
-  def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
-    info("fetchMatchTask name:{} ", fetchConfig.name)
-    val uuid = UUID.randomUUID().toString
-    var taskId = ""
-    try {
-      val request = SyncMatchTaskRequest.newBuilder()
-      request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
-      request.setDbid(fetchConfig.dbid)
-      //request.setSeq(fetchConfig.seq)
-      request.setUuid(uuid)
-      val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchTaskRequest.cmd, request.build())
-         if(baseResponse.getStatus == CommandStatus.OK) {
-            val response = baseResponse.getExtension(SyncMatchTaskResponse.cmd)
-            //var seq = fetchConfig.seq
-            val iter = response.getMatchTaskList.iterator()
-            while (iter.hasNext) {
-              val matchTask = iter.next()
-              taskId = matchTask.getMatchId
-              if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)) {
-                //TODO queryDBConfig 添加是否更新校验
-                queryService.addMatchTask(matchTask)
-                info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType)
-                //seq = matchTask.getObjectId
-                syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, fetchConfig.typ, fetchConfig.url.substring(7,fetchConfig.url.length-5) ,"0","1")
-              }
-            }
-           info("MatchTask-RequestData success,taskId:{};BatchSyncCompleted",taskId)
-         } else {
-           syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_MATCH_TASK)
-         }
-        } catch {
-          case e: nirvana.hall.support.internal.CallRpcException =>
-            val eInfo = ExceptionUtil.getStackTraceInfo(e)
-            error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-            syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_TASK)
-          case e: Exception =>
-            val eInfo = ExceptionUtil.getStackTraceInfo(e)
-            error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-            syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
-        }
-      //如果获取到数据递归获取
- /*     if(response.getMatchTaskCount  > 0 && fetchConfig.seq != seq){
-        //更新配置seq
-        fetchConfig.seq = seq
-        updateSeq(fetchConfig)
-        fetchMatchTask(fetchConfig, update)
-      }*/
-  }
-
-  /**
-   * 抓取比对结果候选列表
-   * TODO 先查询比对状态是正在比对的任务sid，然后再根据sid获取比对结果
-    *
-    * @param fetchConfig
-   */
-  def  fetchMatchResult(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-
-
-      val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
-      try{
-        while(sidIter.hasNext){
-          val tmp=sidIter.next
-          //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
-          info("fetchMatchTask name:{} ", fetchConfig.name, tmp)
-          val request = SyncMatchResultRequest.newBuilder()
-          request.setSid(tmp)
-          request.setDbid(fetchConfig.dbid)
-
-          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
-          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
-
-          val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
-          if(baseResponse.getStatus == CommandStatus.OK){
-
-            val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
-            val matchStatus = response.getMatchStatus
-            if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
-            val matchResult = response.getMatchResult
-              if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-                //获取候选信息
-                val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-		            val configMap = fetchQueryService.getAfisinitConfig()
-                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
-                info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
-              }
-            }
-          }
-        }
-      } catch {
-        case e: Exception => error("抓取比对结果时异常:" + e.getMessage)
-      }
-}
-
-
-/**
-  * 循环候选列表，如果本地没有，远程获取候选数据保存到默认库
-  * TODO 1,候选应该只存对应指位的信息，不存文本，存到远程库
-  * 解决方法需要候选信息增加dbid信息
-  *
-  * @param matchResult
-  */
+    * @param matchResult
+    */
   private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
     val candDBIDMap = mutable.HashMap[String, Short]()
     val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
@@ -515,26 +413,26 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val cardId = cand.getObjectId
       val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-        val dbId = getTPDBIDByCardId(cardId, dbidList)
+      val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         } else {
           val tpCardOpt = tPCardRemoteService.getTPCard(cardId, fetchConfig.url, candDbId)
-        /*
-          捺印卡在6.2保存时先进行判断 若已存在执行更新捺印卡信息 不存在添加捺印卡信息  2016/12/7
-           */
+          /*
+            捺印卡在6.2保存时先进行判断 若已存在执行更新捺印卡信息 不存在添加捺印卡信息  2016/12/7
+             */
           if(tpCardService.isExist(cardId)){
             tpCardOpt.foreach(tpCardService.updateTPCard(_))
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }else{
-              tpCardOpt.foreach(tpCardService.addTPCard(_))
-              candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
+            tpCardOpt.foreach(tpCardService.addTPCard(_))
+            candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
 
           }
 
         }
       }else{//候选是现场
-        val dbId = getLPDBIDByCardId(cardId, dbidList)
+      val dbId = getLPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         }else{
@@ -556,12 +454,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 根据捺印卡号查找所在DBID
+    * 根据捺印卡号查找所在DBID
     *
     * @param cardId
-   * @param dbidList
-   * @return
-   */
+    * @param dbidList
+    * @return
+    */
   private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
     dbidList.foreach{dbid =>
       if(tpCardService.isExist(cardId, Option(dbid))){
@@ -572,12 +470,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 根据现场卡号查找所在DBID
+    * 根据现场卡号查找所在DBID
     *
     * @param cardId
-   * @param dbidList
-   * @return
-   */
+    * @param dbidList
+    * @return
+    */
   private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
     dbidList.foreach{dbid =>
       if(lPCardService.isExist(cardId, Option(dbid))){
@@ -588,12 +486,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 获取DBID列表
+    * 获取DBID列表
     *
     * @param fetchConfig
-   * @param queryType
-   * @return
-   */
+    * @param queryType
+    * @return
+    */
   private def getDBIDList(fetchConfig: HallFetchConfig, queryType: Int): Seq[String]={
     val dbidList = new ArrayBuffer[String]()
     if(fetchConfig.config != null){
@@ -623,10 +521,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-   * 更新同步HallFetchConfig.seq 的值, 因为直接调用save方法，session问题,程序调用insert而不是update
+    * 更新同步HallFetchConfig.seq 的值, 因为直接调用save方法，session问题,程序调用insert而不是update
     *
     * @param fetchConfig
-   */
+    */
   private def updateSeq(fetchConfig: HallFetchConfig): Unit ={
     HallFetchConfig.update.set(seq = fetchConfig.seq).where(HallFetchConfig.pkId === fetchConfig.pkId).execute
   }
