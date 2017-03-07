@@ -36,10 +36,10 @@ class HallApiConfig
 class SyncConfig {
     @XmlElement(name = "batch_size")
     var batchSize: Int = 1
-    @XmlElement(name = "sync_cron1")
-    var syncCron1: String = _
-    @XmlElement(name = "sync_cron2")
-    var syncCron2: String = _
+    @XmlElement(name = "sync_cron")
+    var syncCron: String = _
+    @XmlElement(name = "sync_cron_task")
+    var syncCronTask: String = _
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
