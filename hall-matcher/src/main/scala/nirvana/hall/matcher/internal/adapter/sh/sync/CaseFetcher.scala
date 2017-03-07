@@ -7,7 +7,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.DataConverter
+import nirvana.hall.matcher.internal.{DataConverter, TextQueryUtil}
 import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
@@ -74,6 +74,11 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
             }
           }
         }
+      }
+      //案件编号
+      val caseId = rs.getString("caseId")
+      if(caseId != null){
+        TextQueryUtil.getColDataByPersonid(caseId).foreach(textData.addCol(_))
       }
 
       //日期类型
