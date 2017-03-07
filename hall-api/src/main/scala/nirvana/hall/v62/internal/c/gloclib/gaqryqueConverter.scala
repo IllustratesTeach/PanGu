@@ -1,9 +1,11 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import java.nio.ByteBuffer
+import java.util.Calendar
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.config.QueryDBConfig
+import nirvana.hall.c.services.gbaselib.gbasedef.{GAFIS_DATE, GAFIS_TIME}
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
@@ -218,6 +220,9 @@ object gaqryqueConverter {
     matchTask.setObjectId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID))
     matchTask.setScoreThreshold(gaQueryStruct.stSimpQry.nMinScore)
     matchTask.setTopN(gaQueryStruct.stSimpQry.nMaxCandidateNum)
+    //添加6.2任务的创建时间
+    matchTask.setOraCreatetime(convertAFISDateTimeToString(gaQueryStruct.stSimpQry.tSubmitTime.tTime
+      ,gaQueryStruct.stSimpQry.tSubmitTime.tDate))
     gaQueryStruct.pstMIC_Data.foreach{micStruct =>
       if(micStruct.bIsLatent == 1){
         val ldata = matchTask.getLDataBuilder
@@ -329,6 +334,22 @@ object gaqryqueConverter {
     gCand.nDBID = matchResultObject.getDbid.toShort
 
     gCand
+  }
+
+  /**
+    * 把AFISDateTime转换成String类型时间
+    * @param tTime
+    * @param tDate
+    * @return
+    */
+  def convertAFISDateTimeToString(tTime:GAFIS_TIME,tDate:GAFIS_DATE):String = {
+    val  year = tDate.convertAsJavaYear()
+    val  day = tDate.tDay.toInt
+    val  month = tDate.tMonth.toShort.toInt+1
+    val  milliSec = scala.math.abs(tTime.convertAsJavaSecs())
+    val  min = tTime.tMin.toInt
+    val  hour = tTime.tHour.toInt
+    year+"-"+month+"-"+day+" "+hour+":"+min+":"+milliSec
   }
 
 }

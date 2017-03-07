@@ -157,6 +157,8 @@ message SyncMatchResultRequest{
     optional string dbid = 2;
     optional string pkid = 3; //捺印卡号
     optional string typ = 4; //查询类型
+    //记录exception
+    optional string uuid = 5;
 }
 message SyncMatchResultResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -166,4 +168,5 @@ message SyncMatchResultResponse{
     required MatchStatus match_status = 1;
     //比对候选
     optional matcher.MatchResult match_result = 2;
+
 }
