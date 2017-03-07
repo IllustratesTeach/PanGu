@@ -57,7 +57,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       }
       //人员编号
       val personId: String = rs.getString("personId")
-      TextQueryUtil.getColDataByPersonid(personId).foreach(textData.addCol(_))
+      TextQueryUtil.getColDataById(personId).foreach(textData.addCol(_))
 
       val birthdayst: Long = if (rs.getDate("birthday") != null) rs.getDate("birthday").getTime else 0
       if (birthdayst > 0) {

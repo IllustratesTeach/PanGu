@@ -82,7 +82,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
 
       //人员编号
       val personId: String = rs.getString("personId")
-      TextQueryUtil.getColDataByPersonid(personId).foreach(textData.addCol(_))
+      TextQueryUtil.getColDataById(personId).foreach(textData.addCol(_))
 
       //日期类型
       val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime", "gatherFingerTime")

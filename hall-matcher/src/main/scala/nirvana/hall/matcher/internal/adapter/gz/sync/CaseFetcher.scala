@@ -74,7 +74,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       //案件编号
       val caseId = rs.getString("caseId")
       if(caseId != null){
-        TextQueryUtil.getColDataByCaseid(caseId).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataById(caseId).foreach(textData.addCol(_))
       }
 
       val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0

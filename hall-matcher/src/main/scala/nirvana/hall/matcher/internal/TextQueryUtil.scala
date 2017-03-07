@@ -12,30 +12,20 @@ import scala.collection.mutable.ArrayBuffer
   * 文本查询工具类
   */
 object TextQueryUtil {
-  //TODO 人员和案件 PRE,DEPT,DATE 可以使用一组COL_NAME
   //人员编号
   val COL_NAME_PERSONID = "personId"
-  val COL_NAME_PID_PRE = "pId_pre"
-  val COL_NAME_PID_DEPT = "pId_deptCode"
-  val COL_NAME_PID_DATE = "pId_date"
   //案件编号
   val COL_NAME_CASEID = "caseId"
-  val COL_NAME_CID_PRE = "cId_pre"
-  val COL_NAME_CID_DEPT = "cId_deptCode"
-  val COL_NAME_CID_DATE = "cId_date"
 
-  def getColDataByPersonid(personid: String): Seq[ColData] ={
-    getColDataById(personid, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
-  }
-  def getColDataByCaseid(caseid: String): Seq[ColData] ={
-    getColDataById(caseid, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
-  }
+  val COL_NAME_ID_PRE = "id_pre"
+  val COL_NAME_ID_DEPT = "id_dept"
+  val COL_NAME_ID_DATE = "id_date"
 
   def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
-    getGroupQuery(personidBeg, personidEnd, false)
+    getGroupQuery(personidBeg, personidEnd)
   }
   def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
-    getGroupQuery(caseidBeg, caseidEnd, true)
+    getGroupQuery(caseidBeg, caseidEnd)
   }
   def getPersonidGroupQueryByJSONObject(json: JSONObject): GroupQuery={
     getCardidGroupQueryByJSONObject(json, false)
@@ -129,33 +119,33 @@ object TextQueryUtil {
     * @param cardid
     * @return
     */
-  def getColDataById(cardid: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
+  def getColDataById(cardid: String): Seq[ColData] ={
     val colDataArr = new ArrayBuffer[ColData]()
     var id = cardid
     //人员编号前缀
     if (id.matches("^[a-zA-Z]\\w*")) {
       val colData = ColData.newBuilder()
       val idPre: String = id.substring(0, 1)
-      colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
+      colData.setColName(COL_NAME_ID_PRE).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
       id = id.substring(1)
       colDataArr += colData.build()
     }
     val len = id.length
     if(len >= 12){
       val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+      colDataArr += ColData.newBuilder().setColName(COL_NAME_ID_DEPT).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
 
       for (i <- len until 22){
         id += "0"
       }
       val id_date = java.lang.Long.parseLong(id.substring(12), 36)
-      colDataArr += ColData.newBuilder().setColName(dateColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
+      colDataArr += ColData.newBuilder().setColName(COL_NAME_ID_DATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
     }else{
       for (i <- len until 12){
         id += "0"
       }
       val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+      colDataArr += ColData.newBuilder().setColName(COL_NAME_ID_DEPT).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
     }
 
     colDataArr
@@ -166,19 +156,9 @@ object TextQueryUtil {
     * 由于编号分两部分dept,data, 每一部分如果长度不够都需要补0，然后转为Long
     * @param cardidBeg
     * @param cardidEnd
-    * @param isLatent true:现场
     * @return
     */
-  def getGroupQuery(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
-    var preColName = COL_NAME_PID_PRE
-    var deptColName = COL_NAME_PID_DEPT
-    var dateColName = COL_NAME_PID_DATE
-    if(isLatent){
-      preColName = COL_NAME_CID_PRE
-      deptColName = COL_NAME_CID_DEPT
-      dateColName = COL_NAME_CID_DATE
-    }
-
+  def getGroupQuery(cardidBeg: String, cardidEnd: String): GroupQuery={
     val groupQuery = GroupQuery.newBuilder()
     //前缀
     var idBeg = cardidBeg
@@ -186,13 +166,13 @@ object TextQueryUtil {
     if (idBeg.matches("^[a-zA-Z]\\w*")) {
       val idPre = idBeg.substring(0,1)
       val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_PRE).setExtension(KeywordQuery.query, keywordQuery.build())
       idBeg = idBeg.substring(1)
     }
     if (idEnd.matches("^[a-zA-Z]\\w*")) {
       val idPre = idEnd.substring(0,1)
       val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_PRE).setExtension(KeywordQuery.query, keywordQuery.build())
       idEnd = idEnd.substring(1)
     }
     /*
@@ -218,35 +198,35 @@ object TextQueryUtil {
     val dateEnd = end._2
 
     if(deptBeg == deptEnd){//如果部门编号相同，对部门编号使用LongQuery，对日期使用LongRangeQuery
-      groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+      groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_DEPT).setExtension(LongQuery.query,
         LongQuery.newBuilder().setValue(deptBeg).build())
 
-      groupQuery.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+      groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_DATE).setExtension(LongRangeQuery.query,
         LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).setMax(dateEnd).setMaxInclusive(true).build())
     }else{
       //由于deptBeg默认为0,所有这里只判断deptEnd
       if(deptEnd > 0){
-        groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
+        groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_DEPT).setExtension(LongRangeQuery.query,
           LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build()).setOccur(Occur.SHOULD)
       }else{
-        groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
+        groupQuery.addClauseQueryBuilder().setName(COL_NAME_ID_DEPT).setExtension(LongRangeQuery.query,
           LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build()).setOccur(Occur.SHOULD)
       }
       //日期判断
       if(dateBeg > 0){
         val groupQuery2 = GroupQuery.newBuilder()
-        groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+        groupQuery2.addClauseQueryBuilder().setName(COL_NAME_ID_DEPT).setExtension(LongQuery.query,
           LongQuery.newBuilder().setValue(deptBeg).build())
-        groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+        groupQuery2.addClauseQueryBuilder().setName(COL_NAME_ID_DATE).setExtension(LongRangeQuery.query,
           LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).build())
 
         groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
       }
       if(dateEnd > 0){
         val groupQuery2 = GroupQuery.newBuilder()
-        groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+        groupQuery2.addClauseQueryBuilder().setName(COL_NAME_ID_DEPT).setExtension(LongQuery.query,
           LongQuery.newBuilder().setValue(deptEnd).build())
-        groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+        groupQuery2.addClauseQueryBuilder().setName(COL_NAME_ID_DATE).setExtension(LongRangeQuery.query,
           LongRangeQuery.newBuilder().setMax(dateEnd).setMaxInclusive(true).build())
 
         groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)

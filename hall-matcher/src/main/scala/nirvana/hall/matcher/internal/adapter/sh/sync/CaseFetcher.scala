@@ -78,7 +78,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       //案件编号
       val caseId = rs.getString("caseId")
       if(caseId != null){
-        TextQueryUtil.getColDataByPersonid(caseId).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataById(caseId).foreach(textData.addCol(_))
       }
 
       //日期类型
