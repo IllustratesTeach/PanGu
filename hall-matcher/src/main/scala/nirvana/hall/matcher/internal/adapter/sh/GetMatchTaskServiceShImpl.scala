@@ -7,7 +7,7 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
-import nirvana.hall.matcher.internal.{DataConverter, DateConverter}
+import nirvana.hall.matcher.internal.{DateConverter, TextQueryUtil}
 import nirvana.protocol.TextQueryProto
 import nirvana.protocol.TextQueryProto.TextQueryData
 import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, LongRangeQuery, Occur}
@@ -88,15 +88,9 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
         }
         //人员编号区间
-        if(json.has("personIdST1") || json.has("personIdED1")){
-          val groupQuery = GroupQuery.newBuilder()
-          if (json.has("personIdST1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdST1"))).setOccur(Occur.SHOULD)
-          }
-          if (json.has("personIdED1")) {
-            groupQuery.addClauseQueryBuilder.setName("personId").setExtension(GroupQuery.query, DataConverter.getPersonIdGroupQuery(json.getString("personIdED1"))).setOccur(Occur.SHOULD)
-          }
-          textQuery.addQueryBuilder.setName("personId").setExtension(GroupQuery.query, groupQuery.build)
+        val personidGroupQuery = TextQueryUtil.getPersonidGroupQueryByJSONObject(json)
+        if(personidGroupQuery != null){
+          textQuery.addQueryBuilder().setName("personid").setExtension(GroupQuery.query, personidGroupQuery)
         }
         //逻辑库
         if(json.has("logicDBValues")){
@@ -159,15 +153,9 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //案件编号区间
-        if (json.has("caseIdST") || json.has("caseIdED")) {
-          val groupQuery = GroupQuery.newBuilder
-          if (json.has("caseIdST")) {
-            groupQuery.addClauseQueryBuilder.setName("caseId").setExtension(GroupQuery.query, DataConverter.getCaseIdGroupQuery(json.getString("caseIdST"))).setOccur(Occur.SHOULD)
-          }
-          if (json.has("caseIdED")) {
-            groupQuery.addClauseQueryBuilder.setName("caseId").setExtension(GroupQuery.query, DataConverter.getCaseIdGroupQuery(json.getString("caseIdED"))).setOccur(Occur.SHOULD)
-          }
-          textQuery.addQueryBuilder.setName("caseId").setExtension(GroupQuery.query, groupQuery.build)
+        val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
+        if (caseidGroupQuery != null) {
+          textQuery.addQueryBuilder().setName("caseid").setExtension(GroupQuery.query, caseidGroupQuery)
         }
       }catch {
         case e: Exception =>
