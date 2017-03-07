@@ -52,8 +52,8 @@ class SyncTaskCronServiceImpl(apiConfig: HallApiConfig,
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, syncTaskCronService: SyncTaskCronService): Unit = {
-    if(apiConfig.sync.syncCron2 != null){
-      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron2), "sync-cron", new Runnable {
+    if(apiConfig.sync.syncCronTask != null){
+      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCronTask), "sync-cron", new Runnable {
         override def run(): Unit = {
           info("begin sync-cron")
           try{
