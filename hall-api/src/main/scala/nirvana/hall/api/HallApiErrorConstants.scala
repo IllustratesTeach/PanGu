@@ -29,4 +29,9 @@ object HallApiErrorConstants {
   final val SYNC_FETCH = "抓取数据通讯异常"
   final val SYNC_RETURN_FAIL = "抓取数据返回失败"
 
+  final val SYNC_UPDATE_CASEInfo_SEQ_FAIL = "更新CaseInfo的SEQ失败"
+  final val SYNC_UPDATE_TPCard_SEQ_FAIL = "更新TPCard的SEQ失败"
+  final val SYNC_UPDATE_LPCard_SEQ_FAIL = "更新LPCard的SEQ失败"
+  final val SYNC_UPDATE_LPalm_SEQ_FAIL = "更新LPalm的SEQ失败"
+
 }
