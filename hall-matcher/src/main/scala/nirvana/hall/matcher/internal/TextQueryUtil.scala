@@ -21,12 +21,6 @@ object TextQueryUtil {
   val COL_NAME_ID_DEPT = "id_dept"
   val COL_NAME_ID_DATE = "id_date"
 
-  def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
-    getGroupQuery(personidBeg, personidEnd)
-  }
-  def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
-    getGroupQuery(caseidBeg, caseidEnd)
-  }
   def getPersonidGroupQueryByJSONObject(json: JSONObject): GroupQuery={
     getCardidGroupQueryByJSONObject(json, false)
   }
@@ -51,8 +45,8 @@ object TextQueryUtil {
       begKey2 = TextQueryConstants.CASEID_BEG2
       endKey2 = TextQueryConstants.CASEID_END2
     }
-    val groupQuery1 = getGroupQueryByJSONObject(json, begKey1, endKey1, isLatent)
-    val groupQuery2 = getGroupQueryByJSONObject(json, begKey2, endKey2, isLatent)
+    val groupQuery1 = getGroupQueryByJSONObject(json, begKey1, endKey1)
+    val groupQuery2 = getGroupQueryByJSONObject(json, begKey2, endKey2)
     //两个区间，需要放到一个组查询里, 默认occur=should
     if(groupQuery1 != null || groupQuery2 != null){
       val groupQuery = GroupQuery.newBuilder()
@@ -87,10 +81,9 @@ object TextQueryUtil {
     * @param json
     * @param begKey
     * @param endKey
-    * @param isLatent true=现场
     * @return
     */
-  def getGroupQueryByJSONObject(json: JSONObject, begKey: String, endKey: String, isLatent: Boolean): GroupQuery={
+  def getGroupQueryByJSONObject(json: JSONObject, begKey: String, endKey: String): GroupQuery={
     if(json.has(begKey) || json.has(endKey)){
       var beg = ""
       var end = ""
@@ -101,11 +94,7 @@ object TextQueryUtil {
         end = json.getString(endKey)
       }
       if(beg.nonEmpty || end.nonEmpty){//如果有人员编号区间
-        if(isLatent){
-          return getCaseidGroupQuery(beg, end)
-        }else{
-          return getPersonidGroupQuery(beg, end)
-        }
+        getCardidGroupQuery(beg,end)
       }
     }
     null
@@ -158,7 +147,7 @@ object TextQueryUtil {
     * @param cardidEnd
     * @return
     */
-  def getGroupQuery(cardidBeg: String, cardidEnd: String): GroupQuery={
+  def getCardidGroupQuery(cardidBeg: String, cardidEnd: String): GroupQuery={
     val groupQuery = GroupQuery.newBuilder()
     //前缀
     var idBeg = cardidBeg
