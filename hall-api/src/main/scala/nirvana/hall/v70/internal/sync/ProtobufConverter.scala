@@ -721,11 +721,14 @@ object ProtobufConverter {
   def convertMatchResult2GafisNormalqueryQueryque(matchResult: MatchResult, gafisQuery: GafisNormalqueryQueryque = new GafisNormalqueryQueryque()): GafisNormalqueryQueryque ={
     gafisQuery.curcandnum = matchResult.getCandidateNum
     gafisQuery.recordNumMatched = matchResult.getRecordNumMatched
-    if(gafisQuery.querytype != 0){//如果不是TT查询，查中概率=最大分数/10
+    /*if(gafisQuery.querytype != 0){//如果不是TT查询，查中概率=最大分数/10
       gafisQuery.hitpossibility = (matchResult.getMaxScore /10).toShort
     }else{
       gafisQuery.hitpossibility = matchResult.getMaxScore.toShort
-    }
+    }*/
+
+    gafisQuery.hitpossibility = matchResult.getHITPOSSIBILITY.toShort
+
     //如果有候选队列，处理状态为待处理0,比中状态0;否则已处理1,没有比中1
     if(matchResult.getCandidateNum > 0){
       gafisQuery.verifyresult = 0.toShort
