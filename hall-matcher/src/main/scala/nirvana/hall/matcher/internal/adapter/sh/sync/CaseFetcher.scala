@@ -15,6 +15,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
  * Created by songpeng on 16/4/8.
@@ -78,7 +79,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       //案件编号
       val caseId = rs.getString("caseId")
       if(caseId != null){
-        TextQueryUtil.getColDataById(caseId).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
       }
 
       //日期类型

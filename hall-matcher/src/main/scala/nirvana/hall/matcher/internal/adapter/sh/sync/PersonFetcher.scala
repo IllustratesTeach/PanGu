@@ -12,6 +12,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
   * Created by songpeng on 16/3/29.
@@ -82,7 +83,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
 
       //人员编号
       val personId: String = rs.getString("personId")
-      TextQueryUtil.getColDataById(personId).foreach(textData.addCol(_))
+      TextQueryUtil.getColDataById(personId, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE).foreach(textData.addCol(_))
 
       //日期类型
       val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime", "gatherFingerTime")

@@ -15,6 +15,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
  * Created by songpeng on 16/4/8.
@@ -26,7 +27,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     " from (select f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm   from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm   from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
     " left join gafis_case c on t.case_id = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String]("cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm")
+  private val caseCols: Array[String] = Array[String](COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE, COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST, COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG, COL_NAME_ISPALM)
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -74,7 +75,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       //案件编号
       val caseId = rs.getString("caseId")
       if(caseId != null){
-        TextQueryUtil.getColDataById(caseId).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
       }
 
       val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0
