@@ -4,7 +4,7 @@
   <app_name>spark-wjw</app_name>
   <master_server>local[1]</master_server>
   <kafka_server>192.168.56.128:9092</kafka_server>
-  <kafka_topic_name>IDCARD</kafka_topic_name>
+  <kafka_topic_name>WJW</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
   <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseImageWJWProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
