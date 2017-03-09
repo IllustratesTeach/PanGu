@@ -8,7 +8,7 @@ import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.c.services.gbaselib.gbasedef.{GAFIS_DATE, GAFIS_TIME}
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO,GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
@@ -49,6 +49,19 @@ object gaqryqueConverter {
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+
+    queryStruct.pstInfo_Data = new GAFIS_QUERYINFO
+    val ips=matchTask.getComputerIp.split('.') //机器IP
+    val new_ip=new Array[Byte](4)
+    val hex_size=16 //16进制位数
+    for( i <- 0 until ips.length){
+      new_ip(i)=Integer.parseInt(Integer.toHexString(Integer.parseInt(ips(i))),hex_size).toByte // 由于存储需要16进制数，将String转成10进制数后再转成16进制字符串最后转成16进制数
+    }
+
+    queryStruct.pstInfo_Data.bnIP = new_ip
+    queryStruct.pstInfo_Data.szUserUnitCode= matchTask.getUserUnitCode  //提交用户单位代码
+    queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
+
     queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     if(matchTask.getQueryid.nonEmpty){
@@ -200,6 +213,9 @@ object gaqryqueConverter {
 
     matchResult.setMaxScore(maxScore)
     matchResult.setStatus(MatcherStatus.newBuilder().setMsg("success").setCode(0))
+
+    //比中概率
+    matchResult.setHITPOSSIBILITY(gaQueryStruct.stSimpQry.nHitPossibility)
 
     matchResult.build()
   }

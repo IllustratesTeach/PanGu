@@ -72,13 +72,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           }
           hallReadConfigOpt.get.seq = request.getSeq
           status=updateSeq(hallReadConfigOpt.get)
+          if(count>0 && status >0){
+            syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_TPCARD+typ_add, ip, "1", "1")
+          }
+          if(status <=0){
+            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
+          }
         }
-        if(count>0 && status >0){
-          syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_TPCARD+typ_add, ip, "1", "1")
-        }
-        if(status <=0){
-          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
-        }
+
         commandResponse.writeMessage(commandRequest, SyncTPCardResponse.cmd, responseBuilder.build())
       } catch {
         case e: Exception =>
@@ -127,13 +128,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           }
           hallReadConfigOpt.get.seq = request.getSeq
           status=updateSeq(hallReadConfigOpt.get)
+          if(count>0 && status >0){
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,card_id,HallApiConstants.SYNC_TYPE_LPCARD+typ_add,ip,"1","1")
+          }
+          if(status <=0){
+            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPCard_SEQ_FAIL+"cardId:{} "+card_id)
+          }
         }
-        if(count>0 && status >0){
-          syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,card_id,HallApiConstants.SYNC_TYPE_LPCARD+typ_add,ip,"1","1")
-        }
-        if(status <=0){
-          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPCard_SEQ_FAIL+"cardId:{} "+card_id)
-        }
+
         commandResponse.writeMessage(commandRequest, SyncLPCardResponse.cmd, responseBuilder.build())
       } catch {
         case e: Exception =>
@@ -182,13 +184,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           }
           hallReadConfigOpt.get.seq = request.getSeq
           status=updateSeq(hallReadConfigOpt.get)
+          if(count>0 && status >0){
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPPALM+typ_add, ip, "1", "1")
+          }
+          if(status <=0){
+            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPalm_SEQ_FAIL+"cardId:{} "+card_id)
+          }
         }
-        if(count>0 && status >0){
-          syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPPALM+typ_add, ip, "1", "1")
-        }
-        if(status <=0){
-          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPalm_SEQ_FAIL+"cardId:{} "+card_id)
-        }
+
         commandResponse.writeMessage(commandRequest, SyncLPPalmResponse.cmd, responseBuilder.build())
       } catch {
         case e:Exception =>
@@ -236,13 +239,14 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           }
           hallReadConfigOpt.get.seq = request.getSeq
           status=updateSeq(hallReadConfigOpt.get)
+          if(count>0 && status >0){
+            syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid,card_id,HallApiConstants.SYNC_TYPE_CASEINFO+typ_add,ip,"1","1")
+          }
+          if(status <=0){
+            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_CASEInfo_SEQ_FAIL +"cardId:{} "+card_id)
+          }
         }
-        if(count>0 && status >0){
-          syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid,card_id,HallApiConstants.SYNC_TYPE_CASEINFO+typ_add,ip,"1","1")
-        }
-        if(status <=0){
-          throw new Exception(HallApiErrorConstants.SYNC_UPDATE_CASEInfo_SEQ_FAIL +"cardId:{} "+card_id)
-        }
+
         commandResponse.writeMessage(commandRequest, SyncCaseResponse.cmd, responseBuilder.build())
       } catch {
         case e:Exception =>

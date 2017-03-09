@@ -8,7 +8,7 @@ import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
-import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
+import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService, SyncTaskCronService}
 import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
@@ -83,7 +83,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         case HallApiConstants.SYNC_TYPE_CASEINFO =>
         case HallApiConstants.SYNC_TYPE_LPPALM =>
           fetchLPPalm(fetchConfig, update)
-        case x if(x.equals(HallApiConstants.SYNC_TYPE_MATCH_TASK) || x.equals(HallApiConstants.SYNC_TYPE_MATCH_RESULT)) =>
+        case HallApiConstants.SYNC_TYPE_MATCH_TASK |
+             HallApiConstants.SYNC_TYPE_MATCH_RESULT =>
         case other =>
           warn("unsupport fetch type:{}", other)
       }

@@ -12,6 +12,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
   * Created by songpeng on 16/3/29.
@@ -21,7 +22,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
   override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday, t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate, t.data_sources dataSources, t.case_classes caseClass, t.deletag  from gafis_person t  where t.seq > ? and t.seq <= ? order by t.seq"
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherType", "door", "address", "sexCode", "name", "dataSources", "caseClass")
+  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS)
   /**
     * 读取人员信息
     * @param syncDataResponse
@@ -56,16 +57,16 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
         }
       }
       //人员编号
-      val personId: String = rs.getString("personId")
-      TextQueryUtil.getColDataById(personId).foreach(textData.addCol(_))
+      val personId: String = rs.getString(COL_NAME_PERSONID)
+      TextQueryUtil.getColDataById(personId, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE).foreach(textData.addCol(_))
 
-      val birthdayst: Long = if (rs.getDate("birthday") != null) rs.getDate("birthday").getTime else 0
+      val birthdayst: Long = if (rs.getDate(COL_NAME_BIRTHDAY) != null) rs.getDate(COL_NAME_BIRTHDAY).getTime else 0
       if (birthdayst > 0) {
-        textData.addColBuilder.setColName("birthday").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(birthdayst)))
+        textData.addColBuilder.setColName(COL_NAME_BIRTHDAY).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(birthdayst)))
       }
-      val gatherDate: Long = if (rs.getDate("gatherDate") != null) rs.getDate("gatherDate").getTime else 0
+      val gatherDate: Long = if (rs.getDate(COL_NAME_GATHERDATE) != null) rs.getDate(COL_NAME_GATHERDATE).getTime else 0
       if (gatherDate > 0) {
-        textData.addColBuilder.setColName("gatherDate").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(gatherDate)))
+        textData.addColBuilder.setColName(COL_NAME_GATHERDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(gatherDate)))
       }
 
       syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
