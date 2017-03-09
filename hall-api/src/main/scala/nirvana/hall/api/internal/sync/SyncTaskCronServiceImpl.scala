@@ -80,7 +80,10 @@ class SyncTaskCronServiceImpl(apiConfig: HallApiConfig,
           fetchMatchTask(fetchConfig, update)
         case HallApiConstants.SYNC_TYPE_MATCH_RESULT =>
           fetchMatchResult(fetchConfig, update)
-        case x if(x.equals(HallApiConstants.SYNC_TYPE_TPCARD) || x.equals(HallApiConstants.SYNC_TYPE_LPCARD) || x.equals(HallApiConstants.SYNC_TYPE_CASEINFO) || x.equals(HallApiConstants.SYNC_TYPE_LPPALM)) =>
+        case HallApiConstants.SYNC_TYPE_TPCARD |
+             HallApiConstants.SYNC_TYPE_LPCARD |
+             HallApiConstants.SYNC_TYPE_CASEINFO |
+             HallApiConstants.SYNC_TYPE_LPPALM =>
         case other =>
           warn("unsupport fetch type:{}", other)
       }
