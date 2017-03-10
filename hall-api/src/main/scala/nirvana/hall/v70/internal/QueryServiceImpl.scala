@@ -1,6 +1,5 @@
 package nirvana.hall.v70.internal
 
-import java.util.Date
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.config.QueryDBConfig
@@ -97,5 +96,20 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     */
   override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long = {
     throw new UnsupportedOperationException
+  }
+
+  /**
+    * 根据任务号sid获取比对状态
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = {
+    val status = GafisNormalqueryQueryque.select(GafisNormalqueryQueryque.status[java.lang.Short]).where(GafisNormalqueryQueryque.oraSid === oraSid)
+    if(status.nonEmpty){
+      status.toList(0).asInstanceOf[Short].toInt
+    }else{
+      0
+    }
   }
 }

@@ -17,4 +17,11 @@ class QueryServiceImplTest extends BaseV70TestCase{
 
   }
 
+  @Test
+  def test_getStatusBySid: Unit ={
+    val service = getService[QueryService]
+    val status = service.getStatusBySid(210)
+    assert(status == 2)
+  }
+
 }

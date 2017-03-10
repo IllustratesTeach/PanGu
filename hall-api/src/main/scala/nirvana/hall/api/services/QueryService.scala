@@ -46,4 +46,12 @@ trait QueryService {
     * @return 任务号
     */
   def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
+
+  /**
+    * 根据任务号sid获取比对状态
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  def getStatusBySid(oraSid: Long, dbId: Option[String] = None): Int
 }

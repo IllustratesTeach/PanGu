@@ -85,12 +85,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @return 查询任务号
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
-    val key = matchTask.getMatchId.getBytes()
-    val pstKey = new GADB_KEYARRAY
-    pstKey.nKeyCount = 1
-    pstKey.nKeySize = key.size.asInstanceOf[Short]
-    pstKey.pKey_Data = key
-
     val dbId = if(queryDBConfig.dbId == None){
       config.queryTable.dbId.toShort
     }else{
@@ -109,7 +103,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult] = {
     val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(oraSid)
     val gaQueryStruct = facade.NET_GAFIS_QUERY_Get(getDBID(dbId), V62Facade.TID_QUERYQUE, pstQry)
-    var hitPossibility=gaQueryStruct.stSimpQry.nHitPossibility
     if(gaQueryStruct.stSimpQry.nStatus >= 2){//比对完成
       return Option(gaqryqueConverter.convertGAQUERYSTRUCT2MatchResult(gaQueryStruct))
     }
@@ -152,6 +145,15 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
     0
   }
+
+  /**
+    * 根据任务号sid获取比对状态
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = ???
+
   /**
    * 获取DBID
    * @param dbId

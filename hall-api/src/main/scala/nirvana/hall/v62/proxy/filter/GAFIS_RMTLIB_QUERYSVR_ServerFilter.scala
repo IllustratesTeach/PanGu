@@ -28,7 +28,9 @@ class GAFIS_RMTLIB_QUERYSVR_ServerFilter(queryService: QueryService) extends Bas
             grmtcode.OP_RMTLIB_QUERY_GETESTIMATEFINTIME |
             grmtcode.OP_RMTLIB_QUERY_GETRESULT =>
          GAFIS_RMTLIB_QUERY_Server(request, pkg)
-       case other => false
+         false
+       case other =>
+         GAFIS_RMTLIB_REMOTE_Server(request, pkg)
      })
 
      executed || handler.handle(request,pkg)
