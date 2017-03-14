@@ -5,6 +5,7 @@ import javax.persistence.EntityManager
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.internal.DateUtil
 import nirvana.hall.api.services.QueryService
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -14,6 +15,9 @@ import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, SysUser}
+import org.jboss.netty.buffer.ChannelBuffers
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/26.
@@ -111,5 +115,49 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     }else{
       0
     }
+  }
+
+  /**
+    * 获取查询信息GAQUERYSTRUCT
+    *
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String]): GAQUERYSTRUCT = {
+    val gafisNormalqueryQueryque = GafisNormalqueryQueryque.find_by_oraSid(oraSid).head
+
+    convertGafisNormalqueryQueryque2GAQUERYSTRUCT(gafisNormalqueryQueryque)
+  }
+
+  def convertGafisNormalqueryQueryque2GAQUERYSTRUCT(gafisNormalqueryQueryque: GafisNormalqueryQueryque): GAQUERYSTRUCT ={
+    val gaQuery = new GAQUERYSTRUCT
+    val stSimpQry = gaQuery.stSimpQry
+    stSimpQry.szKeyID = gafisNormalqueryQueryque.keyid
+    stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(gafisNormalqueryQueryque.oraSid)
+    stSimpQry.nPriority = gafisNormalqueryQueryque.priority.toByte
+    stSimpQry.nStatus = gafisNormalqueryQueryque.status.toByte
+    stSimpQry.nCurCandidateNum = gafisNormalqueryQueryque.curcandnum
+    stSimpQry.nMaxCandidateNum = gafisNormalqueryQueryque.maxcandnum
+    stSimpQry.nFlag = gafisNormalqueryQueryque.flag.toByte
+    stSimpQry.nQueryType = gafisNormalqueryQueryque.querytype.toByte
+    stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+//    stSimpQry.stSrcDB = srcDB
+//    stSimpQry.stDestDB = Array(destDB)
+    val candListData = gafisNormalqueryQueryque.candlist
+    val candList = new ArrayBuffer[GAQUERYCANDSTRUCT]()
+    if(candListData != null && candListData.size > 0){
+      val buffer = ChannelBuffers.wrappedBuffer(candListData)
+      val gaCand = new GAQUERYCANDSTRUCT
+      while(buffer.readableBytes() >= gaCand.getDataSize) {
+        gaCand.fromStreamReader(buffer)
+        candList += gaCand
+      }
+      gaQuery.pstCand_Data = candList.toArray
+    }
+    //mic
+//    val mic = gafisNormalqueryQueryque.mic
+//    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
+    gaQuery
   }
 }

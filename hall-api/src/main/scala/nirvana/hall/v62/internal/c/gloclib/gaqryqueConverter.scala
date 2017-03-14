@@ -1,7 +1,6 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import java.nio.ByteBuffer
-import java.util.Calendar
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.config.QueryDBConfig

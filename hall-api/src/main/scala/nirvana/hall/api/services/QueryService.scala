@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.api.config.QueryDBConfig
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -54,4 +55,12 @@ trait QueryService {
     * @return
     */
   def getStatusBySid(oraSid: Long, dbId: Option[String] = None): Int
+
+  /**
+    * 获取查询信息GAQUERYSTRUCT
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String] = None): GAQUERYSTRUCT
 }

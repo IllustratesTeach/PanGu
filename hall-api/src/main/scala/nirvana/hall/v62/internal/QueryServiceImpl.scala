@@ -3,7 +3,7 @@ package nirvana.hall.v62.internal
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -153,6 +153,17 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @return
     */
   override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = ???
+
+  /**
+    * 获取查询信息GAQUERYSTRUCT
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String]): GAQUERYSTRUCT = {
+    val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(oraSid)
+    facade.NET_GAFIS_QUERY_Get(getDBID(dbId), V62Facade.TID_QUERYQUE, pstQry)
+  }
 
   /**
    * 获取DBID
