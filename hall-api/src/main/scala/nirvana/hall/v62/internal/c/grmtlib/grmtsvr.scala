@@ -65,14 +65,9 @@ trait grmtsvr {
          * 3. 返回结果
          */
         val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
-        //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
-        //saveStTPCardToV70.....
         //n 为保存成功的个数
         var n = 0
         stTPCardOpt.map{tpCard=>
-          //测试使用，本机上报本机
-//          println("================>>>>>>> "+tpCard.szCardID)
-//          tpCard.szCardID=testSeq.incrementAndGet()+"-"+tpCard.szCardID
           galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
         }.foreach{ card =>
             findTPCardService.addTPCard(card)
@@ -96,7 +91,7 @@ trait grmtsvr {
           n += 1
         }
 
-        NETANS_SetRetVal(pAns,0)
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
@@ -142,7 +137,6 @@ trait grmtsvr {
     val nTableID = NETREQ_GetTableID(pReq);
     val nOption	 = NETREQ_GetOption(pReq);
     val nRmtOpt	 = NETREQ_GetRetVal(pReq);
-//    val nRmtOptOp = GetRmtOptOperate(nRmtOpt)
 
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
@@ -157,18 +151,19 @@ trait grmtsvr {
           nAddRet = oraSid.toInt
         }
 
-        NETANS_SetRetVal(pAns,nAddRet);
+        NETANS_SetLongRetVal(pAns, nAddRet)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
         true
       case grmtcode.OP_RMTLIB_QUERY_GET =>
-        val oraSid = gaqryqueConverter.convertSixByteArrayToLong(pReq.bnData)
-        val stQuery = new GAQUERYSTRUCT
-        val matchResult = findQueryService.getMatchResult(oraSid)
-        //TODO 构建stQuery
         var n = 0
+        val oraSid = gaqryqueConverter.convertSixByteArrayToLong(pReq.bnData)
+        val stQuery = findQueryService.getGAQUERYSTRUCT(oraSid)
+        if(stQuery != null){
+          n = 1
+        }
         NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
 
@@ -367,8 +362,6 @@ trait grmtsvr {
     val nTableID = NETREQ_GetTableID(pReq);
     val nOption	 = NETREQ_GetOption(pReq);
     val nRmtOpt	 = NETREQ_GetRetVal(pReq);
-    val nZipMethod = pReq.bnData(48);
-    val nZipRatio  = pReq.bnData(49);
 
     nOpCode match {
       case grmtcode.OP_RMTLIB_QRYANDDATACTRL_GET =>

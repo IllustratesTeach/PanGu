@@ -42,15 +42,13 @@ class GBASE_ITEMPKG_OPSTRUCTHandler(handler: GbaseItemPkgHandler) extends Simple
             * 非direct的模式，且被捕获
             * 在6.2中direct模式就是代理模式，所以直接进行转发
             */
-          val outbound = attachment.outboundChannel
           if (!attachment.directRequest && hanleInExceptionCaught(request, pkg)) {
             debug("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
             attachment.status = RequestHandled
-            //如果被hall进行处理,则关掉代理的通讯服务器连接
-            TxProxyInboundHandler.closeOnFlush(outbound)
           } else {
             debug("[{}] <-- username:{} opClass {} opCode:{},direct:{} --> [{}] not handled",ctx.getChannel.getRemoteAddress,request.szUserName,opClass,opCode,attachment.directRequest,attachment.outboundChannel.getRemoteAddress)
             attachment.status = RequestNotHandled
+            val outbound = attachment.outboundChannel
             if (attachment.directRequest) {
               outbound.write(request)
             } else {

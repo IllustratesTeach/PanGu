@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gloclib
 
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.c.services.gloclib.glocndef.GNETREQUESTHEADOBJECT
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.grmtlib.grmtpkg
 import org.apache.commons.io.IOUtils
@@ -43,5 +44,17 @@ class galocpkgTest {
     val galocpkg = new galocpkg with gitempkg with galoctp
     val items = galocpkg.GAFIS_PKG_GetQuery(itemPkg)
     Assert.assertEquals(1,items.length)
+  }
+  @Test
+  def test_OP_RMTLIB_GETINT1VALUEBYCOLNAME: Unit ={
+    val pReq = new GNETREQUESTHEADOBJECT
+    pReq.fromStreamReader(getClass.getResourceAsStream("/OP_RMTLIB_GETINT1VALUEBYCOLNAME.dat"))
+    val sidArr = new Array[Byte](6)
+    System.arraycopy(pReq.bnData, 40, sidArr, 0, 6)
+    val colArr = new Array[Byte](32)
+    System.arraycopy(pReq.bnData, 0, colArr, 0, 32)
+    println(new String(colArr, "gbk").trim)
+    val oraSid = gaqryqueConverter.convertSixByteArrayToLong(sidArr)
+    println(oraSid)
   }
 }
