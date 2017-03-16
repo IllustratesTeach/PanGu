@@ -34,7 +34,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
-    val logicDb:GafisLogicDb = if(dbId == None){
+    val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     }else{
       GafisLogicDb.find(dbId.get)
@@ -71,6 +71,15 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
+
+    //删除原来的逻辑库
+    GafisLogicDbCase.find_by_casePkid(gafisCase.caseId).foreach(_.delete())
+    //保存逻辑库
+    val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
+      GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+    }else{
+      GafisLogicDb.find(dbId.get)
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.v62.internal.AncientClientSupport
+import nirvana.hall.v62.internal.{AncientClientSupport, V62Facade}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpConverter, gaqryqueConverter}
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
@@ -65,14 +65,9 @@ trait grmtsvr {
          * 3. 返回结果
          */
         val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
-        //TODO 通过拿到的stTPCard来保存到v70数据库或者转发v62的通信服务器
-        //saveStTPCardToV70.....
         //n 为保存成功的个数
         var n = 0
         stTPCardOpt.map{tpCard=>
-          //测试使用，本机上报本机
-//          println("================>>>>>>> "+tpCard.szCardID)
-//          tpCard.szCardID=testSeq.incrementAndGet()+"-"+tpCard.szCardID
           galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
         }.foreach{ card =>
             findTPCardService.addTPCard(card)
@@ -96,7 +91,7 @@ trait grmtsvr {
           n += 1
         }
 
-        NETANS_SetRetVal(pAns,0)
+        NETANS_SetRetVal(pAns,n)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
@@ -142,7 +137,6 @@ trait grmtsvr {
     val nTableID = NETREQ_GetTableID(pReq);
     val nOption	 = NETREQ_GetOption(pReq);
     val nRmtOpt	 = NETREQ_GetRetVal(pReq);
-//    val nRmtOptOp = GetRmtOptOperate(nRmtOpt)
 
     nOpCode match{
       case grmtcode.OP_RMTLIB_QUERY_ADD=>
@@ -157,18 +151,34 @@ trait grmtsvr {
           nAddRet = oraSid.toInt
         }
 
-        NETANS_SetRetVal(pAns,nAddRet);
+        NETANS_SetLongRetVal(pAns, nAddRet)
         val stSendPkg = GBASE_ITEMPKG_New
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
         true
+      case grmtcode.OP_RMTLIB_QUERY_GET =>
+        var n = 0
+        val oraSid = gaqryqueConverter.convertSixByteArrayToLong(pReq.bnData)
+        val stQuery = findQueryService.getGAQUERYSTRUCT(oraSid)
+        if(stQuery != null){
+          n = 1
+        }
+        NETANS_SetRetVal(pAns,n)
+        val stSendPkg = GBASE_ITEMPKG_New
+
+        GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+        if(n > 0 )
+          GAFIS_PKG_Query2Pkg(stQuery,stSendPkg)
+        GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+        false
       case 	grmtcode.OP_RMTLIB_QUERY_GETRESULT=>
+        val oraSid = gaqryqueConverter.convertSixByteArrayToLong(pReq.bnData)
         val stQuery = new GAQUERYSTRUCT
         stQuery.stSimpQry.nQueryID = pReq.bnData
-        val oraSid = new String(pReq.bnData, "GB2312").trim
         //TODO 利用得到的SID进行查询候选队列
-        val matchResultOpt = findQueryService.getMatchResult(oraSid.toLong, Option(nDBID.toString))
+        val matchResultOpt = findQueryService.getMatchResult(oraSid, Option(nDBID.toString))
         val candListBuffer = new ArrayBuffer[GAQUERYCANDSTRUCT]()
         matchResultOpt.foreach{matchResult =>
           val iter = matchResult.getCandidateResultList.iterator()
@@ -331,6 +341,63 @@ trait grmtsvr {
         GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
         true
+      case other =>
+        false
+    }
+  }
+
+  /**
+    * 处理其他远程服务
+    * @param pReq
+    * @param pstRecvPkg
+    * @return
+    */
+  def GAFIS_RMTLIB_REMOTE_Server(pReq:GNETREQUESTHEADOBJECT,
+                                 pstRecvPkg:GBASE_ITEMPKG_OPSTRUCT): Boolean={
+
+    val pAns = new GNETANSWERHEADOBJECT
+    val nOpClass = NETREQ_GetOpClass(pReq);
+    val nOpCode = NETREQ_GetOpCode(pReq);
+    val nDBID	 = NETREQ_GetDBID(pReq);
+    val nTableID = NETREQ_GetTableID(pReq);
+    val nOption	 = NETREQ_GetOption(pReq);
+    val nRmtOpt	 = NETREQ_GetRetVal(pReq);
+
+    nOpCode match {
+      case grmtcode.OP_RMTLIB_QRYANDDATACTRL_GET =>
+        false
+      case grmtcode.OP_RMTLIB_RETRFINISHEDQRY =>
+        false
+      case grmtcode.OP_RMTLIB_GETINT1VALUEBYCOLNAME =>
+        /*
+        接口功能:根据DBID，TID，通过sid和colName查询字段值
+        6.2通讯服务器通过该接口查询任务状态，然后根据状态判断是否查询比对信息
+         */
+        //SID
+        val sidArr = new Array[Byte](6)
+        System.arraycopy(pReq.bnData, 40, sidArr, 0, sidArr.length)
+        val oraSid = gaqryqueConverter.convertSixByteArrayToLong(sidArr)
+        //COL_NAME
+        val colArr = new Array[Byte](32)
+        System.arraycopy(pReq.bnData, 0, colArr, 0, 32)
+        val colName = new String(colArr).trim
+        //如果是获取查询状态，交给queryService处理
+        if(nDBID == V62Facade.DBID_QRY_DEFAULT && "Status".equals(colName)){
+          val n = 1
+          val status = findQueryService.getStatusBySid(oraSid, Option(nDBID.toString))
+
+          pAns.bnData = new Array[Byte](64)
+          pAns.bnData(0) = status.toByte
+
+          NETANS_SetRetVal(pAns,n)
+          val stSendPkg = GBASE_ITEMPKG_New
+          GAFIS_PKG_AddRmtAnswer(stSendPkg,pAns)
+          GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
+
+          true
+        }else{
+          false
+        }
       case other =>
         false
     }

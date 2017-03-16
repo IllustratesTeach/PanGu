@@ -17,7 +17,6 @@ class GAFIS_RMTLIB_QUERYSVR_ServerFilter(queryService: QueryService) extends Bas
    override def handle(request: GNETREQUESTHEADOBJECT, pkg: GBASE_ITEMPKG_OPSTRUCT, handler: GbaseItemPkgHandler): Boolean = {
      val nOpClass = NETREQ_GetOpClass(request)
      val nOpCode = NETREQ_GetOpCode(request);
-//     val executed = nOpClass == gnopcode.OP_CLASS_QUERY &&  GAFIS_RMTLIB_QUERY_Server(request,pkg)
      val executed = nOpClass == grmtcode.OP_CLASS_RMTLIB &&
      ( nOpCode match {
        case grmtcode.OP_RMTLIB_QUERY_ADD |
@@ -28,7 +27,8 @@ class GAFIS_RMTLIB_QUERYSVR_ServerFilter(queryService: QueryService) extends Bas
             grmtcode.OP_RMTLIB_QUERY_GETESTIMATEFINTIME |
             grmtcode.OP_RMTLIB_QUERY_GETRESULT =>
          GAFIS_RMTLIB_QUERY_Server(request, pkg)
-       case other => false
+       case other =>
+         GAFIS_RMTLIB_REMOTE_Server(request, pkg)
      })
 
      executed || handler.handle(request,pkg)

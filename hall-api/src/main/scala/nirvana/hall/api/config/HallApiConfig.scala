@@ -38,8 +38,6 @@ class SyncConfig {
     var batchSize: Int = 1
     @XmlElement(name = "sync_cron")
     var syncCron: String = _
-    @XmlElement(name = "sync_cron_task")
-    var syncCronTask: String = _
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)

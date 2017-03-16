@@ -13,6 +13,6 @@ import org.apache.tapestry5.services.{HttpServletRequestFilter, HttpServletReque
 object LocalProtobufWebModule {
   @Contribute(classOf[HttpServletRequestHandler])
   def provideProtobufFilter(configuration: OrderedConfiguration[HttpServletRequestFilter]): Unit = {
-    configuration.addInstance("ProtobufRpcServerMessageServletFilter", classOf[ProtobufRpcServerMessageServletFilter], "after:GZIP")
+    configuration.addInstance("protobuf", classOf[ProtobufRpcServerMessageServletFilter], "after:GZIP")
   }
 }
