@@ -2,6 +2,7 @@ package nirvana.hall.matcher.internal
 
 import java.io.ByteArrayOutputStream
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.galoctp.GADB_MICSTREAMNAMESTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
@@ -119,7 +120,7 @@ object GafisConverter {
         gCand.nIndex = fgp.toByte
         gCand.tFinishTime = new AFISDateTime
         gCand.nStepOneRank = index
-        result.write(gCand.toByteArray())
+        result.write(gCand.toByteArray(AncientConstants.GBK_ENCODING))//这里使用GBK编码，防止keyId是中文的时候报错
       }
       /*  result.write(new Array[Byte](4))
           result.write(DataConverter.int2Bytes(cand.getScore))
