@@ -20,7 +20,7 @@ class CaseInfoRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends CaseInfoRe
     info("remote get caseInfo [caseId:{},url:{}]", caseId, url)
     val request = CaseGetRequest.newBuilder().setCaseId(caseId)
     request.setDbid(dbId)
-    val response = rpcHttpClient.call(url, CaseGetRequest.cmd, request.build())
+    val response = rpcHttpClient.call(url, CaseGetRequest.cmd, request.build(),headerMap)
     Option(response.getExtension(CaseGetResponse.cmd).getCase)
   }
 
