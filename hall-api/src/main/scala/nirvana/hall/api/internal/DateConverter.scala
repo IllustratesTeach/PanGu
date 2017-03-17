@@ -52,12 +52,12 @@ object DateConverter extends LoggerSupport{
    * @return
    */
   def convertAFISDateTime2String(dateTime: GAFIS_DATETIME): String = {
-    val year = switchShortEndian(dateTime.tDate.tYear)
+    val year = DataConverter.switchShortEndian(dateTime.tDate.tYear)
     val month = dateTime.tDate.tMonth + 1
     val day = dateTime.tDate.tDay
     val hour = dateTime.tTime.tHour
     val min = dateTime.tTime.tMin
-    val sec = Math.abs(switchShortEndian(dateTime.tTime.tMilliSec) / 1000)
+    val sec = dateTime.tTime.convertAsJavaSecs()
 
     "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
   }
@@ -71,7 +71,7 @@ object DateConverter extends LoggerSupport{
     if(str.length == 14){
       val date = convertString2Date(str, "yyyyMMddHHmmss")
       val dateTime = new GAFIS_DATETIME
-      dateTime.tDate.setJavaYear(date.getYear)
+      dateTime.tDate.setJavaYear(date.getYear + 1900)
       dateTime.tDate.tMonth = date.getMonth.toByte
       dateTime.tDate.tDay = date.getDate.toByte
       dateTime.tTime.tHour = date.getHours.toByte
@@ -85,11 +85,19 @@ object DateConverter extends LoggerSupport{
   }
 
   /**
-   * short高地位转换
-   * @param short
-   * @return
-   */
-  private def switchShortEndian(short: Short): Short = {
-    (((short >>> 8) & 0xff) | (short << 8)).toShort
+    * 将java.util.Date转换为GAFIS_DATETIME
+    * @param date
+    * @return
+    */
+  def convertDate2AFISDateTime(date: Date): GAFIS_DATETIME ={
+    val dateTime = new GAFIS_DATETIME
+    dateTime.tDate.setJavaYear(date.getYear + 1900)
+    dateTime.tDate.tMonth = date.getMonth.toByte
+    dateTime.tDate.tDay = date.getDate.toByte
+    dateTime.tTime.tHour = date.getHours.toByte
+    dateTime.tTime.tMin = date.getMinutes.toByte
+    dateTime.tTime.setJavaSecs(date.getSeconds)
+
+    dateTime
   }
 }

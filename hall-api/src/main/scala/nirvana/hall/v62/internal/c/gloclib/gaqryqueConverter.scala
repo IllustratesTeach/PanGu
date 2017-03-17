@@ -361,7 +361,7 @@ object gaqryqueConverter {
     val  year = tDate.convertAsJavaYear()
     val  day = tDate.tDay.toInt
     val  month = tDate.tMonth.toShort.toInt+1
-    val  milliSec = scala.math.abs(tTime.convertAsJavaSecs())
+    val  milliSec = tTime.convertAsJavaSecs()
     val  min = tTime.tMin.toInt
     val  hour = tTime.tHour.toInt
     year+"-"+month+"-"+day+" "+hour+":"+min+":"+milliSec
