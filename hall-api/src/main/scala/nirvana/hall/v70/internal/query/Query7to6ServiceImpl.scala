@@ -3,21 +3,16 @@ package nirvana.hall.v70.internal.query
 import java.util.Date
 import javax.persistence.EntityManager
 
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
+import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.jboss.netty.buffer.ChannelBuffers
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -55,66 +50,6 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   }
 
   /**
-    * 转换比对任务类型GafisNormalqueryQueryque-->MatchTask
-    * @param query
-    * @return
-    */
-  private def convertGafisNormalqueryQueryque2MatchTask(query: GafisNormalqueryQueryque): MatchTask = {
-    val matchTask = MatchTask.newBuilder()
-    matchTask.setMatchId(query.keyid)
-    matchTask.setMatchType(MatchType.valueOf(query.querytype+1))
-//    val isPalm = query.flag == 2 || query.flag == 22
-//
-//    //2016/12/25 比对类型判断
-//    if (isPalm) {
-//      val queryType = MatchType.valueOf(query.querytype+5)
-//      queryType match {
-//        case MatchType.PALM_TT =>
-//          matchTask.setMatchType(MatchType.PALM_TT)
-//        case MatchType.PALM_TL =>
-//          matchTask.setMatchType(MatchType.PALM_TL)
-//        case MatchType.PALM_LT =>
-//          matchTask.setMatchType(MatchType.PALM_LT)
-//        case MatchType.PALM_LL =>
-//          matchTask.setMatchType(MatchType.PALM_LL)
-//      }
-//    } else {
-//      val queryType = MatchType.valueOf(query.querytype+1)
-//      queryType match {
-//        case MatchType.FINGER_TT =>
-//          matchTask.setMatchType(MatchType.FINGER_TT)
-//        case MatchType.FINGER_TL =>
-//          matchTask.setMatchType(MatchType.FINGER_TL)
-//        case MatchType.FINGER_LT =>
-//          matchTask.setMatchType(MatchType.FINGER_LT)
-//        case MatchType.FINGER_LL =>
-//          matchTask.setMatchType(MatchType.FINGER_LL)
-//      }
-//    }
-
-    matchTask.setObjectId(query.oraSid)//必填项，现在用于存放oraSid
-    matchTask.setPriority(query.priority.toInt)
-    matchTask.setScoreThreshold(query.minscore)
-    matchTask.setTopN(query.maxcandnum)
-    matchTask.setCommitUser(query.username)
-    // 2016/12/25 比对类型判断 提交机器Ip 和提交用户单位代码
-    matchTask.setComputerIp(query.computerip)
-    matchTask.setUserUnitCode(query.userunitcode)
-    //解析特征数据
-    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
-    mics.foreach{mic =>
-      if(mic.bIsLatent == 1){
-        val ldata = LatentMatchData.newBuilder()
-        ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
-        matchTask.setLData(ldata)
-      }else{
-        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
-      }
-    }
-    matchTask.build()
-  }
-
-  /**
    * 发送比对任务
    * @param gafisQuery
    * @return
@@ -122,7 +57,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   @Transactional
   override def sendQuery(gafisQuery: GafisNormalqueryQueryque): Unit = {
     try {
-      val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
+      val matchTask = ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
       val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
       //获取远程查询配置
       val queryConfig = RemoteQueryConfig.find(gafisQuery.syncTargetSid)

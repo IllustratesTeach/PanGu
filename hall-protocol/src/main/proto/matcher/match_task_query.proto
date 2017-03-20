@@ -81,7 +81,7 @@ message MatchTask {
   optional MatchConfig config = 7;
   //优先级,优先级越高，数越大
   required int32 priority = 8 [default = 0];
-  //指纹或者掌纹的ID
+  //任务号oraSid
   required int64 object_id = 9;
 
   //指位信息

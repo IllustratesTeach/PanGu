@@ -43,4 +43,8 @@ object Gafis70Constants {
   val PALM_THUMB_L_UP   = 8: Short  //左掌拇指上部区域
   val PALM_RIGHT_SIDE   = 17: Short //右侧掌纹
   val PALM_LEFT_SIDE    = 18: Short //左侧掌纹
+
+  val FACE_FRONT = "1"  //人像正面
+  val FACE_RIGHT = "2"  //右侧
+  val FACE_LEFT = "3"   //左侧
 }
