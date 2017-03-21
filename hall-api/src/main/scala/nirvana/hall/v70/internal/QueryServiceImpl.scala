@@ -3,15 +3,16 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.config.QueryDBConfig
-import nirvana.hall.api.internal.DateUtil
+import nirvana.hall.api.internal.{DateConverter, DateUtil}
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
-import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
+import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, SysUser}
@@ -141,9 +142,17 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     stSimpQry.nMaxCandidateNum = gafisNormalqueryQueryque.maxcandnum
     stSimpQry.nFlag = gafisNormalqueryQueryque.flag.toByte
     stSimpQry.nQueryType = gafisNormalqueryQueryque.querytype.toByte
-    stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
-//    stSimpQry.stSrcDB = srcDB
-//    stSimpQry.stDestDB = Array(destDB)
+//    stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+//    stSimpQry.stSrcDB = new GADBIDSTRUCT
+//    sttSimpQry.stDestDB = Array(destDB)
+    stSimpQry.nVerifyResult = gafisNormalqueryQueryque.verifyresult.toByte
+    stSimpQry.szUserName = gafisNormalqueryQueryque.username
+    if(gafisNormalqueryQueryque.createtime != null){
+      stSimpQry.tSubmitTime = DateConverter.convertDate2AFISDateTime(gafisNormalqueryQueryque.createtime)
+    }
+    if(gafisNormalqueryQueryque.finishtime != null){
+      stSimpQry.tFinishTime = DateConverter.convertDate2AFISDateTime(gafisNormalqueryQueryque.finishtime)
+    }
     val candListData = gafisNormalqueryQueryque.candlist
     val candList = new ArrayBuffer[GAQUERYCANDSTRUCT]()
     if(candListData != null && candListData.size > 0){
@@ -154,10 +163,28 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
         candList += gaCand
       }
       gaQuery.pstCand_Data = candList.toArray
+
+      val candHead = new GAQUERYCANDHEADSTRUCT
+      if(gafisNormalqueryQueryque.candhead != null){
+        candHead.fromByteArray(gafisNormalqueryQueryque.candhead, AncientConstants.GBK_ENCODING)
+      }else{
+        candHead.szKey = gafisNormalqueryQueryque.keyid
+        candHead.bIsPalm = if (gafisNormalqueryQueryque.flag == 22) 1 else 0
+        val queryType = gafisNormalqueryQueryque.querytype
+        candHead.nQueryType = queryType.toByte
+        candHead.nSrcDBID = if (queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_TL) 1 else 2
+        candHead.nTableID = 2
+        candHead.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(gafisNormalqueryQueryque.oraSid)
+        candHead.nCandidateNum = gafisNormalqueryQueryque.curcandnum
+        candHead.tFinishTime = DateConverter.convertDate2AFISDateTime(gafisNormalqueryQueryque.finishtime)
+      }
+      gaQuery.pstCandHead_Data = candHead
     }
     //mic
-//    val mic = gafisNormalqueryQueryque.mic
-//    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
+    val mic = gafisNormalqueryQueryque.mic
+    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
+    gaQuery.pstMIC_Data = mics.toArray
+
     gaQuery
   }
 }
