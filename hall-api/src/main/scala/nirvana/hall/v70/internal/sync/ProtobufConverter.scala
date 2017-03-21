@@ -6,7 +6,7 @@ import java.util.Date
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.{CodeUtils, DateConverter}
+import nirvana.hall.api.internal.{CodeUtils, DateConverter, DateUtil}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -705,6 +705,7 @@ object ProtobufConverter extends LoggerSupport{
     matchTask.setCommitUser(gafisQuery.username)
     matchTask.setComputerIp(gafisQuery.computerip)
     matchTask.setUserUnitCode(gafisQuery.userunitcode)
+    matchTask.setOraCreatetime(DateUtil.dateToStr(gafisQuery.createtime)) //7.0 任务发起时间以6.2端为准
 //    matchTask.setFlag(gafisQuery.flag.toInt)
     val flag = gafisQuery.flag
     val isPalm = flag == QueryConstants.FLAG_PALM || flag == QueryConstants.FLAG_PALM_TEXT

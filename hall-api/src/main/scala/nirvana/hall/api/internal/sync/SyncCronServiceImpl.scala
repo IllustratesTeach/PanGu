@@ -475,13 +475,14 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     val  sidIter = fetchQueryService.getSidByStatusMatching(SYNC_BATCH_SIZE).iterator
     try{
       while(sidIter.hasNext){
+        val uuid = UUID.randomUUID().toString
         val tmp=sidIter.next
         //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
         info("fetchMatchTask name:{} ", fetchConfig.name, tmp)
         val request = SyncMatchResultRequest.newBuilder()
         request.setSid(tmp)
         request.setDbid(fetchConfig.dbid)
-
+        request.setUuid(uuid)
         request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
         request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
 

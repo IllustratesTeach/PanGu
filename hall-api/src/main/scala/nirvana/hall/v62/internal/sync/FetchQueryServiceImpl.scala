@@ -39,7 +39,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
               +"( select t.ora_uuid,t.ora_sid,t.keyid,t.minscore,t.querytype,t.priority,t.maxcandnum,t.mic from NORMALQUERY_QUERYQUE  t where  t.status<=2"
               +"and not exists (select h.ora_uuid from Hall_Fetch_Record_7to6 h where h.ora_uuid=t.ora_uuid) ) t1 )"
               +"where  rownum <=?") //取消seq作为查询条件*/
-   val sql = "select * from (select t.ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where  t.status=0 ) tt where rownum <=?" //取消seq作为查询条件 第二阶段
+   val sql = "select * from (select t.ora_createtime,t.ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where  t.status=0 ) tt where rownum <=?" //取消seq作为查询条件 第二阶段
 
     JdbcDatabase.queryWithPsSetter(sql) {ps =>
       //ps.setLong(1, seq)
@@ -55,6 +55,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       gaQuery.maxcandnum = rs.getInt("maxcandnum")
       gaQuery.flag = rs.getShort("flag") //测试6.2flag字段
       gaQuery.mic = rs.getBytes("mic")
+      gaQuery.createtime = rs.getTimestamp("ora_createtime") //仅限第一阶段
       matchTaskList += ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gaQuery)
     }
 

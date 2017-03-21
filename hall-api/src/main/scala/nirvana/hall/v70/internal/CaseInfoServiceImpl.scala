@@ -80,6 +80,12 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     }else{
       GafisLogicDb.find(dbId.get)
     }
+    //逻辑库
+    val logicDbCase = new GafisLogicDbCase()
+    logicDbCase.pkId = CommonUtils.getUUID()
+    logicDbCase.logicDbPkid = logicDb.pkId
+    logicDbCase.casePkid = gafisCase.caseId
+    logicDbCase.save()
   }
 
   /**
