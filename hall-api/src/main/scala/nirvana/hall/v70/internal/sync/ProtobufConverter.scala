@@ -641,6 +641,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisQuery.minscore = matchTask.getScoreThreshold
     gafisQuery.maxcandnum = matchTask.getTopN
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
+    gafisQuery.status = QueryConstants.STATUS_WAIT
 
     matchTask.getMatchType match {
       case MatchType.FINGER_LL |
