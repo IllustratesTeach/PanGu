@@ -189,6 +189,10 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     gaQuery.pstMIC_Data = mics.toArray
 
+    gaQuery.nCandHeadLen = gaQuery.pstCandHead_Data.getDataSize
+    gaQuery.nCandLen = gaQuery.pstCand_Data.length * new GAQUERYCANDSTRUCT().getDataSize
+    gaQuery.nMICCount = gaQuery.pstMIC_Data.length
+
     gaQuery
   }
 }

@@ -8,10 +8,10 @@ import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.c.services.grmtlib.grmtcode
-import nirvana.hall.v62.internal.{AncientClientSupport, V62Facade}
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galoclpConverter, galocpkg, galoctpConverter, gaqryqueConverter}
 import nirvana.hall.v62.internal.c.gnetlib.reqansop
+import nirvana.hall.v62.internal.{AncientClientSupport, V62Facade}
 import nirvana.hall.v62.proxy.LocalServiceFinder
 
 import scala.collection.mutable.ArrayBuffer
@@ -172,7 +172,7 @@ trait grmtsvr {
           GAFIS_PKG_Query2Pkg(stQuery,stSendPkg)
         GAFIS_RMTLIB_SendPkgInServer(stSendPkg)
 
-        false
+        true
       case 	grmtcode.OP_RMTLIB_QUERY_GETRESULT=>
         val oraSid = gaqryqueConverter.convertSixByteArrayToLong(pReq.bnData)
         val stQuery = new GAQUERYSTRUCT
