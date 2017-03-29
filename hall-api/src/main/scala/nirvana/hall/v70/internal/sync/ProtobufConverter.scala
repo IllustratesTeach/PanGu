@@ -669,7 +669,7 @@ object ProtobufConverter extends LoggerSupport{
     }
     if (gafisQuery.flag == QueryConstants.FLAG_PALM) {
       gafisQuery.querytype = (matchTask.getMatchType.getNumber - 5).toShort
-    } else if (matchTask.getIsPalm == 0) {
+    } else {
       gafisQuery.querytype = (matchTask.getMatchType.getNumber - 1).toShort
     }
     val ga = new galocpkg with gitempkg with galoctp{}
@@ -705,7 +705,11 @@ object ProtobufConverter extends LoggerSupport{
           mic.nMntLen = mic.pstMnt_Data.length
           mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
           mic.nItemData =  md.getPos.toByte
-          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+          if (gafisQuery.flag == QueryConstants.FLAG_PALM) {
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+          } else {
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+          }
           mics += mic
         }
         val micBuf = ChannelBuffers.buffer(ga.GAFIS_MIC_MicStreamLen(mics.toArray))
