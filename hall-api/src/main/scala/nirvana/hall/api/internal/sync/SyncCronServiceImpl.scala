@@ -7,7 +7,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService,LPPalmRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
 import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
@@ -39,6 +39,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           fetchQueryService: FetchQueryService,
                           tPCardRemoteService: TPCardRemoteService,
                           lPCardRemoteService: LPCardRemoteService,
+                          lPPalmRemoteService: LPPalmRemoteService,
                           syncInfoLogManageService: SyncInfoLogManageService,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
@@ -518,6 +519,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
     val candDBIDMap = mutable.HashMap[String, Short]()
     val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
+    val isPalm = queryQue.isPalm //指掌纹标识
     val dbidList = getDBIDList(fetchConfig, queryQue.queryType)
     val candIter = matchResult.getCandidateResultList.iterator()
     while (candIter.hasNext){
@@ -539,23 +541,37 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }else{
             tpCardOpt.foreach(tpCardService.addTPCard(_))
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
-
           }
-
         }
       }else{//候选是现场
-      val dbId = getLPDBIDByCardId(cardId, dbidList)
+      val dbId = getLPDBIDByCardId(cardId, dbidList,isPalm)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
-        }else{
+        }else {
+          if(!isPalm){
           val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
-          lPCardOpt.foreach{ lpCard =>
+          lPCardOpt.foreach { lpCard =>
             lPCardService.addLPCard(lpCard)
             val caseId = lpCard.getText.getStrCaseId
-            if(!caseInfoService.isExist(caseId, Option(candDbId))){//获取案件
-              fetchCaseInfo(caseId, fetchConfig.url, false,Option(fetchConfig.dbid))
+            if (!caseInfoService.isExist(caseId, Option(candDbId))) {
+              //获取案件
+              fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
             }
             candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
+          }
+          }
+          else{
+            val lPPalmOpt = lPPalmRemoteService.getLPPalm(cardId, fetchConfig.url, candDbId)
+            lPPalmOpt.foreach { lpCard =>
+              lPPalmService.addLPCard(lpCard)
+              val caseId = lpCard.getText.getStrCaseId
+              if (!caseInfoService.isExist(caseId, Option(candDbId))) {
+                //获取案件
+                fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+              }
+              candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
+            }
+
           }
         }
       }
@@ -588,10 +604,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param dbidList
     * @return
     */
-  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm: Boolean): Option[String]={
     dbidList.foreach{dbid =>
-      if(lPCardService.isExist(cardId, Option(dbid))){
-        return Option(dbid)
+      if(!isPalm) {
+        if (lPCardService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
+      }
+      else{
+        if (lPPalmService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
       }
     }
     None
