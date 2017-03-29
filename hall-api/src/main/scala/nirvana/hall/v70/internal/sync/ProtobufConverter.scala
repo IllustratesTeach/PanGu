@@ -6,7 +6,7 @@ import java.util.Date
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.{CodeUtils, DateConverter, DateUtil}
+import nirvana.hall.api.internal.{DateConverter, DateUtil}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -16,6 +16,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchDa
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
+import nirvana.hall.v62.services.DictCode6Map7
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.jpa._
@@ -44,7 +45,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseOccurDate = text.getStrCaseOccurDate
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
     gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
-    gafisCase.assistLevel = CodeUtils.convertCode6To7(text.getNSuperviseLevel.toString)
+    gafisCase.assistLevel = DictCode6Map7.assistLevel.get(text.getNSuperviseLevel)
     gafisCase.extractUnitCode = text.getStrExtractUnitCode
     gafisCase.extractUnitName = text.getStrExtractUnitName
     gafisCase.extractor = text.getStrExtractor
