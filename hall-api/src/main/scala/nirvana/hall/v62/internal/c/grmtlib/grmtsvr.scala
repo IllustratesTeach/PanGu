@@ -187,6 +187,7 @@ trait grmtsvr {
             candListBuffer += gaqryqueConverter.convertMatchResultObject2GAQUERYCANDSTRUCT(matchResultObject)
           }
           stQuery.pstCand_Data = candListBuffer.toArray
+          stQuery.nCandLen = stQuery.pstCand_Data.length * new GAQUERYCANDSTRUCT().getDataSize
         }
 
         val nRet = 1 //如果有候选队列
