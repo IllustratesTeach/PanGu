@@ -668,7 +668,7 @@ object ProtobufConverter extends LoggerSupport{
     }
     if (gafisQuery.flag == QueryConstants.FLAG_PALM) {
       gafisQuery.querytype = (matchTask.getMatchType.getNumber - 5).toShort
-    } else if (matchTask.getIsPalm == 0) {
+    } else {
       gafisQuery.querytype = (matchTask.getMatchType.getNumber - 1).toShort
     }
     val ga = new galocpkg with gitempkg with galoctp{}
