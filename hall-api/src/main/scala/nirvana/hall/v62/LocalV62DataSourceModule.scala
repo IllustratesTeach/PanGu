@@ -5,9 +5,9 @@ import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
-import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, TPCardRemoteServiceImpl}
+import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, TPCardRemoteServiceImpl,LPPalmRemoteServiceImpl}
 import nirvana.hall.api.internal.sync.SyncCronServiceImpl
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService,LPPalmRemoteService}
 import nirvana.hall.api.services.sync._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.sync._
@@ -77,6 +77,7 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
     binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
+    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.api.jpa")
