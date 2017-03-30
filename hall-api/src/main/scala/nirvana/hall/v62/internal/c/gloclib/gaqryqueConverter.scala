@@ -44,12 +44,30 @@ object gaqryqueConverter extends LoggerSupport{
    */
   def convertProtoBuf2GAQUERYSTRUCT(matchTask: MatchTask, queryDBConfig: QueryDBConfig)(implicit v62Config: HallV62Config): GAQUERYSTRUCT = {
     val queryStruct = new GAQUERYSTRUCT
-    queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().asInstanceOf[Byte]
     queryStruct.stSimpQry.nPriority = matchTask.getPriority.toByte
-    queryStruct.stSimpQry.nFlag = (gaqryque.GAQRY_FLAG_USEFINGER).asInstanceOf[Byte]
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+
+    //flag
+    matchTask.getMatchType match {
+      case MatchType.FINGER_LL |
+           MatchType.FINGER_LT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_TT =>
+        queryStruct.stSimpQry.nFlag = gaqryque.GAQRY_FLAG_USEFINGER.toByte
+      case MatchType.PALM_LL |
+           MatchType.PALM_LT |
+           MatchType.PALM_TL |
+           MatchType.PALM_TT =>
+        queryStruct.stSimpQry.nFlag = gaqryque.GAQRY_FLAG_USEPALM.toByte
+    }
+    //如果是掌纹，查询类型-4
+    if ((queryStruct.stSimpQry.nFlag & gaqryque.GAQRY_FLAG_USEPALM) > 0) {
+      queryStruct.stSimpQry.nQueryType = (matchTask.getMatchType.ordinal() - 4).toByte
+    } else {
+      queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().toByte
+    }
 
     queryStruct.pstInfo_Data = new GAFIS_QUERYINFO
     val ips=matchTask.getComputerIp.split('.') //机器IP

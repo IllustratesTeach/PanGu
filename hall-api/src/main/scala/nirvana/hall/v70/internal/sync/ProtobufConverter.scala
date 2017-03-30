@@ -6,7 +6,7 @@ import java.util.Date
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.{DateConverter, DateUtil}
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.protocol.api.FPTProto._
@@ -668,9 +668,9 @@ object ProtobufConverter extends LoggerSupport{
         gafisQuery.flag = QueryConstants.FLAG_PALM
     }
     if (gafisQuery.flag == QueryConstants.FLAG_PALM) {
-      gafisQuery.querytype = (matchTask.getMatchType.getNumber - 5).toShort
+      gafisQuery.querytype = (matchTask.getMatchType.ordinal() - 4).toShort
     } else {
-      gafisQuery.querytype = (matchTask.getMatchType.getNumber - 1).toShort
+      gafisQuery.querytype = matchTask.getMatchType.ordinal().toShort
     }
     val ga = new galocpkg with gitempkg with galoctp{}
     //特征mic，现场只有一枚指纹或者掌纹，捺印有多枚指纹或掌纹
