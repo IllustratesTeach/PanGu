@@ -3,8 +3,8 @@ package nirvana.hall.v70.internal.query
 import java.util.Date
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, QueryRemoteService, TPCardRemoteService}
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.remote._
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -21,9 +21,11 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                               queryRemoteService: QueryRemoteService,
                               tPCardRemoteService: TPCardRemoteService,
                               lPCardRemoteService: LPCardRemoteService,
+                              lPPalmRemoteService: LPPalmRemoteService,
                               caseInfoRemoteService: CaseInfoRemoteService,
                               tpCardService:TPCardService,
                               lpCardService: LPCardService,
+                              lpPalmService: LPPalmService,
                               caseInfoService: CaseInfoService)
   extends QueryGet7to6Service with LoggerSupport{
 
@@ -89,7 +91,26 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                 tpCardService.addTPCard(tpCard)
               }
             }
-          }else{
+          }else if(queryque.flag == QueryConstants.FLAG_PALM || queryque.flag == QueryConstants.FLAG_PALM_TEXT){
+            //获取现场信息
+            val cardId = cand.getObjectId
+            if(GafisCasePalm.findOption(cardId).isEmpty){
+              val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
+              val lPPalm = lPPalmRemoteService.getLPPalm(cardId, url, dbId, headerMap)
+              lPPalm.foreach{lpPalm=>
+                val caseId = lpPalm.getText.getStrCaseId
+                if(caseId != null && caseId.length >0){
+                  //如果本地没有对应的案件信息，先远程验证是否存在案件信息,远程获取案件到本地
+                  if(GafisCase.findOption(caseId).isEmpty){
+                    caseInfoRemoteService.isExist(caseId, url, dbId)
+                    val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId, headerMap)
+                    caseInfoOpt.foreach(caseInfoService.addCaseInfo(_))
+                  }
+                }
+                lpPalmService.addLPCard(lpPalm)
+              }
+            }
+          } else {
             //获取现场信息
             val cardId = cand.getObjectId
             if(GafisCaseFinger.findOption(cardId).isEmpty){
