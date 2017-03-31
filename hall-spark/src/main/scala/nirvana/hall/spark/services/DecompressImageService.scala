@@ -91,37 +91,50 @@ object DecompressImageService extends LoggerSupport{
   }
 
   private def directDecode(parameter: NirvanaSparkConfig, event: StreamEvent, finger : TemplateFingerConvert, compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
-    try {
-      val result = decoder.decode(compressedImg)
-      val fingerImg = finger
-      if (parameter.isImageSave) {
-        val wsqImg = wsqDecode.encodeWSQ(result)
-        fingerImg.gatherData = wsqImg.toByteArray()
-        Some((event, result, fingerImg))
-      } else {
-        fingerImg.gatherData = null
-        Some((event, result, fingerImg))
+
+    def decode(isWsq : Boolean = false): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
+      try {
+        if (isWsq) compressedImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
+        val result = decoder.decode(compressedImg)
+        val fingerImg = finger
+        if (parameter.isImageSave) {
+          val wsqImg = wsqDecode.encodeWSQ(result)
+          fingerImg.gatherData = wsqImg.toByteArray()
+          Some((event, result, fingerImg))
+        } else {
+          fingerImg.gatherData = null
+          Some((event, result, fingerImg))
+        }
+      } catch {
+        case NonFatal(e) =>
+          if (!isWsq) decode(true)
+          else doReportException(parameter, event,
+                new scala.RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + " " + e.toString, e))
       }
-    } catch {
-      case NonFatal(e) =>
-        doReportException(parameter, event,
-          new scala.RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + " " + e.toString, e))
     }
+    decode()
   }
 
-  def doReportException(parameter:NirvanaSparkConfig, event:StreamEvent, e: Throwable) = {
+  def doReportException(parameter:NirvanaSparkConfig, event:StreamEvent, e: Throwable,remark : String = "") = {
     error(e.getMessage, e)
-    SparkFunctions.reportError(parameter, DecompressError(event, e.toString))
+    SparkFunctions.reportError(parameter, DecompressError(event, e.toString+"-"+remark))
     None
   }
 
   private def decompressWithHttpService(parameter: NirvanaSparkConfig, event: StreamEvent, finger: TemplateFingerConvert , compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
     val rpcHttpClient = SparkFunctions.httpClient
     val request = FirmImageDecompressRequest.newBuilder()
-    request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
     //    @tailrec
-    def doDecompress(seq: Int): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
+    def doDecompress(seq: Int,compressMethod : String = glocdef.GAIMG_CPRMETHOD_WSQ.toString): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
       try {
+        //第一次用WSQ解压，失败后转为自身压缩
+        compressedImg.stHead.nCompressMethod = compressMethod.toByte
+        request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
+        if (compressedImg.stHead.nWidth != 640 && compressedImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
+          doReportException(parameter, event,new IllegalAccessException("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight +" fpt path is  "+event.path))
+          //gafisImg.stHead.nWidth = 640
+          //gafisImg.stHead.nHeight = 640
+        }
         val baseResponse = rpcHttpClient.call(serverRandom(), FirmImageDecompressRequest.cmd, request.build())
         baseResponse.getStatus match {
           case CommandStatus.OK =>
@@ -131,12 +144,6 @@ object DecompressImageService extends LoggerSupport{
               val gafisImg = new GAFISIMAGESTRUCT
               val is = imgData.newInput()
               gafisImg.fromStreamReader(is)
-              if (gafisImg.stHead.nWidth != 640 || gafisImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
-                doReportException(parameter, event,new IllegalAccessException("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight +" fpt path is  "+event.path))
-                //println("width or height is not 640,actual width is "+ gafisImg.stHead.nWidth + " height is "+ gafisImg.stHead.nHeight +" fpt path is  "+event.path)
-                //gafisImg.stHead.nWidth = 640
-                //gafisImg.stHead.nHeight = 640
-              }
               val fingerImg = finger
               if (parameter.isImageSave) {
                 val wsqImg = wsqDecode.encodeWSQ(gafisImg)
@@ -154,9 +161,9 @@ object DecompressImageService extends LoggerSupport{
         }
       } catch {
         case e: CallRpcException =>
-          if (seq == 4) doReportException(parameter,event,e) else doDecompress(seq + 1)
+          if (seq == 4) doReportException(parameter,event,e) else doDecompress(seq + 1,"CallRpcException,"+seq)
         case NonFatal(e) =>
-          doReportException(parameter,event,e)
+          if (seq == 4) doReportException(parameter,event,e,compressedImg.stHead.nCompressMethod.toString+","+seq) else doDecompress(seq + 1,compressedImg.stHead.nCompressMethod.toString)
       }
     }
     doDecompress(1)

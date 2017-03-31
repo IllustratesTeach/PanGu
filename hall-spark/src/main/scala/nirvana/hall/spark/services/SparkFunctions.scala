@@ -67,7 +67,7 @@ object SparkFunctions{
     val event = streamError.event
     var message: KeyedMessage[String, String] = null
     //分类待完善
-    if (!event.path.isEmpty()&&event.path.indexOf("脱密案件") != -1) {//latent
+    if (!event.caseId.isEmpty()) {//latent
       message = new KeyedMessage("ERROR", event.path,
         "%s|%s|%s|%s|%s".format(event.path, event.caseId, event.cardId, streamError.getMessage,"latent"))
 
