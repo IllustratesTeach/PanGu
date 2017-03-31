@@ -64,4 +64,11 @@ class QueryServiceImplTest extends BaseV62TestCase{
     val matchResult = service.getMatchResult(1)
     Assert.assertNotNull(matchResult)
   }
+
+  @Test
+  def test_getGAQUERYSTRUCT: Unit ={
+    val service = getService[QueryService]
+    val query = service.getGAQUERYSTRUCT(1)
+    Assert.assertNotNull(query)
+  }
 }

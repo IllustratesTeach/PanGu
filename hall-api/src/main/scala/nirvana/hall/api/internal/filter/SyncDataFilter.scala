@@ -324,7 +324,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       } catch {
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("MatchTask-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}", uuid, match_task_orasid, eInfo, e.getMessage)
+          error("MatchResult-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}", uuid, match_task_orasid, eInfo, e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid.toString, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
       }
       true

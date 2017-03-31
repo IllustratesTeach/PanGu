@@ -1,9 +1,10 @@
 package nirvana.hall.v70.internal
 
+import java.util.Date
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.config.QueryDBConfig
-import nirvana.hall.api.internal.{DateConverter, DateUtil}
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
@@ -40,10 +41,12 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gafisQuery.userid = Gafis70Constants.INPUTPSN
     gafisQuery.username = sysUser.trueName
     gafisQuery.userunitcode = sysUser.departCode
-    //gafisQuery.createtime = new Date()
 
-//      gafisQuery.createtime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matchTask.getOraCreatetime)
-      gafisQuery.createtime = DateUtil.strToDate(matchTask.getOraCreatetime)
+    if(matchTask.getOraCreatetime.nonEmpty){
+      gafisQuery.createtime = DateConverter.convertString2Date(matchTask.getOraCreatetime, "yyyy-MM-dd HH:mm:ss")
+    }else{
+      gafisQuery.createtime = new Date()
+    }
 
     gafisQuery.deletag = Gafis70Constants.DELETAG_USE
     gafisQuery.save()
@@ -57,9 +60,9 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
    * @return
    */
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult]= {
-    val matchResult = MatchResult.newBuilder()
     val queryQue = GafisNormalqueryQueryque.find_by_oraSid(oraSid).head
     if(queryQue.status == QueryConstants.STATUS_SUCCESS){
+      val matchResult = MatchResult.newBuilder()
       val matchResultObj = gaqryqueConverter.convertCandList2MatchResultObject(queryQue.candlist)
       matchResultObj.foreach{cand=>
         matchResult.addCandidateResult(cand)
@@ -70,9 +73,10 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
       matchResult.setRecordNumMatched(queryQue.recordNumMatched)
       matchResult.setMaxScore(queryQue.hitpossibility.toInt)
       matchResult.setStatus(MatcherStatus.newBuilder().setCode(0))
+      Option(matchResult.build())
+    }else{
+      None
     }
-
-    Option(matchResult.build())
   }
 
   /**
@@ -184,6 +188,10 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     val mic = gafisNormalqueryQueryque.mic
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     gaQuery.pstMIC_Data = mics.toArray
+
+    gaQuery.nCandHeadLen = gaQuery.pstCandHead_Data.getDataSize
+    gaQuery.nCandLen = gaQuery.pstCand_Data.length * new GAQUERYCANDSTRUCT().getDataSize
+    gaQuery.nMICCount = gaQuery.pstMIC_Data.length
 
     gaQuery
   }
