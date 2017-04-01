@@ -6,6 +6,7 @@ import net.sf.json.JSONObject
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.internal.TextQueryConstants._
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
 import nirvana.hall.matcher.internal.{DateConverter, TextQueryUtil}
 import nirvana.protocol.TextQueryProto
@@ -23,7 +24,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
     "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
     "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
-    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerRepeatNo",
+    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno",
     "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
   private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
 
@@ -143,7 +144,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //时间段
-        val dateCols = Array("caseOccurDate", "extractDate", "inputtime", "modifiedtime")
+        val dateCols = Array("extractDate", "inputtime", "modifiedtime")
         dateCols.foreach{col =>
           if (json.has(col + "ST") && json.has(col + "ED")) {
             val longQuery = LongRangeQuery.newBuilder()
@@ -152,10 +153,29 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
           }
         }
+        //发案时间
+        if (json.has("caseOccurDateBeg") && json.has("caseOccurDateEnd")) {
+          val longQuery = LongRangeQuery.newBuilder
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder.setName("caseOccurDate").setExtension(LongRangeQuery.query, longQuery.build)
+        }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
         if (caseidGroupQuery != null) {
           textQuery.addQueryBuilder().setName("caseid").setExtension(GroupQuery.query, caseidGroupQuery)
+        }
+        //逻辑库
+        if(json.has("logicDBValues")){
+          val logicDB = json.getString("logicDBValues")
+          val values = logicDB.split("\\|")
+          val groupQuery = GroupQuery.newBuilder()
+          values.foreach{value =>
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            groupQuery.addClauseQueryBuilder().setName("logicDB").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+          }
+          textQuery.addQueryBuilder().setName("logicDB").setExtension(GroupQuery.query, groupQuery.build())
         }
       }catch {
         case e: Exception =>

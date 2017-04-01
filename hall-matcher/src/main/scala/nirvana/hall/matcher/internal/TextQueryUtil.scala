@@ -146,7 +146,7 @@ object TextQueryUtil {
     if(len >= 12){
       val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
       colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
-
+      //长度不足22位之后补0
       for (i <- len until 22){
         id += "0"
       }
