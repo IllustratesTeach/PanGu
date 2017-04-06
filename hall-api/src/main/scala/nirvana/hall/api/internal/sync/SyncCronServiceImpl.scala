@@ -22,6 +22,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.v70.internal.LogicDBJudge
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -116,7 +117,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncTPCardRequest.cmd, request.build())
       if(baseResponse.getStatus == CommandStatus.OK){
         val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
-        val destDBID = Option(fetchConfig.destDbid)
+        var destDBID = Option(fetchConfig.destDbid)
         val iter = response.getSyncTPCardList.iterator()
         var exception_type=0 //异常类型判断
         while (iter.hasNext) {
@@ -125,6 +126,9 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           cardId = tpCard.getStrCardID
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
+            //逻辑分库处理
+            val logicDBJudge = new LogicDBJudge()
+            destDBID = logicDBJudge.logicTJudge(tpCard)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
@@ -201,7 +205,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       if(baseResponse.getStatus == CommandStatus.OK){
         info("LP-RequestData start")
         val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
-        val destDBID = Option(fetchConfig.destDbid)
+        var destDBID = Option(fetchConfig.destDbid)
         val iter = response.getSyncLPCardList.iterator()
         while (iter.hasNext) {
           val syncLPCard = iter.next()
@@ -217,6 +221,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               lPCardBuilder.getTextBuilder.setStrCaseId(caseId)
               lpCard = lPCardBuilder.build()
             }
+            //逻辑分库处理
+            //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
+            val logicDBJudge = new LogicDBJudge()
+            destDBID = logicDBJudge.logicLJudge(caseId)
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
