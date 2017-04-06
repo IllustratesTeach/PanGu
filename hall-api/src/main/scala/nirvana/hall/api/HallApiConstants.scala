@@ -31,4 +31,10 @@ object HallApiConstants {
   final val SYNC_TYPE_CASEINFO = "CaseInfo"
   final val SYNC_TYPE_MATCH_TASK = "MatchTask"
   final val SYNC_TYPE_MATCH_RESULT = "MatchResult"
+
+  final val REMOTE_TYPE_MATCH_TASK = "RemoteMatchTask"
+  final val REMOTE_TYPE_MATCH_RESULT = "RemoteMatchResult"
+  final val REMOTE_TYPE_MATCH_RESULT_LPCARD = "RemoteMatchResult_LPCard"
+  final val REMOTE_TYPE_MATCH_RESULT_LPPALM = "RemoteMatchResult_LPPalm"
+  final val REMOTE_TYPE_MATCH_RESULT_TPCARD = "RemoteMatchResult_TPCard"
 }

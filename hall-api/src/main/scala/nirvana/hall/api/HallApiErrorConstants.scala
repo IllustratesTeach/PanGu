@@ -34,4 +34,10 @@ object HallApiErrorConstants {
   final val SYNC_UPDATE_LPCard_SEQ_FAIL = "更新LPCard的SEQ失败"
   final val SYNC_UPDATE_LPalm_SEQ_FAIL = "更新LPalm的SEQ失败"
 
+  final val SEND_REMOTE_TASK_FAIL = "Hall7.0 向Hall6.2发送远程比对任务失败"
+  final val GET_REMOTE_RESULT_FAIL = "Hall7.0 向Hall6.2请求远程比对结果失败"
+
+  final val SEND_REMOTE_REQUEST_UNKNOWN = "远程任务请求方未知异常"
+  final val SEND_REMOTE_RESPONSE_UNKNOWN = "远程任务响应方未知异常"
+
 }
