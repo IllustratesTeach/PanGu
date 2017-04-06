@@ -1,6 +1,7 @@
 package nirvana.hall.matcher.internal
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
 import nirvana.protocol.TextQueryProto.TextData.{ColData, ColType}
 import nirvana.protocol.TextQueryProto.TextQueryData._
@@ -13,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by songpeng on 2017/3/5.
   * 文本查询工具类
   */
-object TextQueryUtil {
+object TextQueryUtil extends LoggerSupport{
 
   def getColDataByPersonid(personid: String): Seq[ColData] ={
     getColDataById(personid, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
@@ -134,30 +135,49 @@ object TextQueryUtil {
   def getColDataById(cardid: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
     val colDataArr = new ArrayBuffer[ColData]()
     var id = cardid
-    //人员编号前缀
-    if (id.matches("^[a-zA-Z]\\w*")) {
-      val colData = ColData.newBuilder()
-      val idPre: String = id.substring(0, 1)
-      colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
-      id = id.substring(1)
-      colDataArr += colData.build()
-    }
-    val len = id.length
-    if(len >= 12){
-      val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
-      //长度不足22位之后补0
-      for (i <- len until 22){
-        id += "0"
+    try{
+      //人员编号前缀,一般都是一个字母开头，贵州多为R,P开头
+      //青岛社会人员库： 捺印卡号以BA，JLRY，XCRY开头
+      if(id.toUpperCase.matches("^(BA)\\w*")){
+        val colData = ColData.newBuilder()
+        val idPre: String = id.substring(0, 2)
+        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
+        id = id.substring(2)
+        colDataArr += colData.build()
+      }else if(id.toUpperCase().matches("^(JLRY)|(XCRY)\\w*")){
+        val colData = ColData.newBuilder()
+        val idPre: String = id.substring(0, 4)
+        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
+        id = id.substring(4)
+        colDataArr += colData.build()
+      }else
+      if (id.matches("^[a-zA-Z]\\w*")) {
+        val colData = ColData.newBuilder()
+        val idPre: String = id.substring(0, 1)
+        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
+        id = id.substring(1)
+        colDataArr += colData.build()
       }
-      val id_date = java.lang.Long.parseLong(id.substring(12), 36)
-      colDataArr += ColData.newBuilder().setColName(dateColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
-    }else{
-      for (i <- len until 12){
-        id += "0"
+      val len = id.length
+      if(len >= 12){
+        val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
+        colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+        //长度不足22位之后补0
+        for (i <- len until 22){
+          id += "0"
+        }
+        val id_date = java.lang.Long.parseLong(id.substring(12), 36)
+        colDataArr += ColData.newBuilder().setColName(dateColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
+      }else{
+        for (i <- len until 12){
+          id += "0"
+        }
+        val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
+        colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
       }
-      val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+    } catch {
+      case e: Exception =>
+        error("illegal cardid:{}", id)
     }
 
     colDataArr
