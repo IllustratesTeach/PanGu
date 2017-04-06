@@ -136,27 +136,12 @@ object TextQueryUtil extends LoggerSupport{
     val colDataArr = new ArrayBuffer[ColData]()
     var id = cardid
     try{
-      //人员编号前缀,一般都是一个字母开头，贵州多为R,P开头
-      //青岛社会人员库： 捺印卡号以BA，JLRY，XCRY开头
-      if(id.toUpperCase.matches("^(BA)\\w*")){
-        val colData = ColData.newBuilder()
-        val idPre: String = id.substring(0, 2)
-        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
-        id = id.substring(2)
-        colDataArr += colData.build()
-      }else if(id.toUpperCase().matches("^(JLRY)|(XCRY)\\w*")){
-        val colData = ColData.newBuilder()
-        val idPre: String = id.substring(0, 4)
-        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
-        id = id.substring(4)
-        colDataArr += colData.build()
-      }else
       if (id.matches("^[a-zA-Z]\\w*")) {
+        val id_ = splitCardidByPre(id)
         val colData = ColData.newBuilder()
-        val idPre: String = id.substring(0, 1)
-        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
-        id = id.substring(1)
+        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(id_._1.getBytes()))
         colDataArr += colData.build()
+        id = id_._2
       }
       val len = id.length
       if(len >= 12){
@@ -206,16 +191,16 @@ object TextQueryUtil extends LoggerSupport{
     var idBeg = cardidBeg
     var idEnd = cardidEnd
     if (idBeg.matches("^[a-zA-Z]\\w*")) {
-      val idPre = idBeg.substring(0,1)
-      val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
+      val id_ = splitCardidByPre(idBeg)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
       groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
-      idBeg = idBeg.substring(1)
+      idBeg = id_._2
     }
     if (idEnd.matches("^[a-zA-Z]\\w*")) {
-      val idPre = idEnd.substring(0,1)
-      val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
+      val id_ = splitCardidByPre(idEnd)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
       groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
-      idEnd = idEnd.substring(1)
+      idEnd = id_._2
     }
     /*
     人员编号一分为二，dept, date A1=deptBeg A2=dateBeg B1=deptEnd B2=dateEnd
@@ -304,6 +289,30 @@ object TextQueryUtil extends LoggerSupport{
       dept = java.lang.Long.parseLong(deptStr, 36)
 
       (dept, 0)
+    }
+  }
+
+  /**
+    * 将人员编号的前缀拆分开
+    * 人员编号前缀,一般都是一个字母开头，贵州多为R,P开头
+    * 青岛社会人员库： 捺印卡号以BA，JLRY，XCRY开头
+    * @param id
+    * @return (前缀，无前缀编号)
+    */
+  private def splitCardidByPre(id: String): (String, String) = {
+    var idPre = ""
+    if(id.toUpperCase.matches("^(BA)\\w*")){
+      idPre = id.substring(0, 2)
+      (idPre, id.substring(2))
+    }else if(id.toUpperCase().matches("^(JLRY)|(XCRY)\\w*")){
+      idPre = id.substring(0, 4)
+      (idPre, id.substring(4))
+    }else
+    if (id.matches("^[a-zA-Z]\\w*")) {
+      idPre = id.substring(0, 1)
+      (idPre, id.substring(1))
+    }else{
+      (idPre, id)
     }
   }
 
