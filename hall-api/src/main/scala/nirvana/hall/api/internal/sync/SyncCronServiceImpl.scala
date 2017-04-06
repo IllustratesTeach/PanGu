@@ -486,30 +486,41 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       while(sidIter.hasNext){
         val uuid = UUID.randomUUID().toString
         val tmp=sidIter.next
-        //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
-        info("fetchMatchTask name:{} ", fetchConfig.name, tmp)
-        val request = SyncMatchResultRequest.newBuilder()
-        request.setSid(tmp)
-        request.setDbid(fetchConfig.dbid)
-        request.setUuid(uuid)
-        request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
-        request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
+        try{
+          //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, sidIter.next)
+          info("fetchMatchTask name:{} ", fetchConfig.name, tmp)
+          val request = SyncMatchResultRequest.newBuilder()
+          request.setSid(tmp)
+          request.setDbid(fetchConfig.dbid)
+          request.setUuid(uuid)
+          request.setPkid(fetchQueryService.getKeyIdArrByOraSid(tmp).headOption.get) //6.2比对任务的捺印卡号
+          request.setTyp(fetchQueryService.getQueryTypeArrByOraSid(tmp).headOption.get) //6.2比对任务的查询类型
 
-        val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
-        if(baseResponse.getStatus == CommandStatus.OK){
+          val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchResultRequest.cmd, request.build())
+          if(baseResponse.getStatus == CommandStatus.OK){
 
-          val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
-          val matchStatus = response.getMatchStatus
-          if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
-          val matchResult = response.getMatchResult
-            if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-              //获取候选信息
-              val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-              val configMap = fetchQueryService.getAfisinitConfig()
-              fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
-              info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+            val response = baseResponse.getExtension(SyncMatchResultResponse.cmd)
+            val matchStatus = response.getMatchStatus
+            if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
+            val matchResult = response.getMatchResult
+              if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
+                //获取候选信息
+                val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+                val configMap = fetchQueryService.getAfisinitConfig()
+                fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
+                info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
+              }
             }
           }
+        } catch {
+          case e: nirvana.hall.support.internal.CallRpcException =>
+            val eInfo = ExceptionUtil.getStackTraceInfo(e)
+            error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,tmp,eInfo,e.getMessage)
+            syncInfoLogManageService.recordSyncDataLog(uuid, tmp+"", null, eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+          case e: Exception =>
+            val eInfo = ExceptionUtil.getStackTraceInfo(e)
+            error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,tmp,eInfo,e.getMessage)
+            syncInfoLogManageService.recordSyncDataLog(uuid, tmp+"", null, eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
         }
       }
     } catch {
