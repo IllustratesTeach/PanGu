@@ -48,7 +48,9 @@ object HallApiApp
       Class.forName("monad.rpc.LocalRpcServerModule"),
       Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      //webservice
 //      Class.forName("nirvana.hall.api.LocalApiWebServiceModule"),
+//      Class.forName("stark.webservice.StarkWebServiceModule"),
 
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
       Class.forName("nirvana.hall.api.HallApiModule")
