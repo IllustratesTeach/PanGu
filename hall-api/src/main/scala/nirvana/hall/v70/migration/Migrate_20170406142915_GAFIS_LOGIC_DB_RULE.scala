@@ -23,6 +23,7 @@ class Migrate_20170406142915_GAFIS_LOGIC_DB_RULE
       t.column("LOGIC_REMARK",VarcharType,Limit(300),Nullable,Comment("备注"))
       t.column("LOGIC_RULE",VarcharType,Limit(300),Nullable,Comment("逻辑库匹配规则"))
     }
+    execute("alter table record_afis modify(type varchar2(50))")
 //    execute(Source.fromInputStream(getClass.getResourceAsStream("Migration_20170406150000_LogicDBRule.sql"),"UTF-8").mkString)
   }
 
