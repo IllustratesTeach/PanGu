@@ -287,7 +287,7 @@ object galoclpConverter extends LoggerSupport{
     caseInfo.setNCaseFingerCount(gCase.nFingerCount)
     caseInfo.setStrCaseID(gCase.szCaseID)
     val text = caseInfo.getTextBuilder
-    text.setBPersonKilled(gCase.bHasPersonKilled == 48)
+    text.setBPersonKilled(gCase.bHasPersonKilled == 49)
     text.setNCancelFlag(gCase.pstText_Data.length)
     gCase.pstText_Data.foreach{ item=>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
