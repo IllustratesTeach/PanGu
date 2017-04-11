@@ -53,13 +53,13 @@ class HallDatasource (_serviceid : String, _distServiceid :String,_ipSource: Str
   var remark: java.lang.String = _
 
   def this(_serviceid : String, _distServiceid :String,_ipSource: String,
-           updateServiceType: Integer, updateOperationType: Integer
+           _updateServiceType: Integer, _updateOperationType: Integer
           ) {
-    this(serviceid, distServiceid, ipSource, updateServiceType, updateOperationType, null, null)
+    this(_serviceid, _distServiceid, _ipSource, _updateServiceType, _updateOperationType, null, null)
   }
 
   def this() {
-    this(_,_,_,_,_,_,_)
+    this(null,null,null,null,null,null,null)
   }
 
 }
