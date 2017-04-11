@@ -28,6 +28,7 @@ object HallDatasource {
 
   final val OPERATION_TYPE_ADD = 1
   final val OPERATION_TYPE_MODIFY = 2
+  final val OPERATION_TYPE_DEL = 3
 
   final val SIGN =  "1"
 }
