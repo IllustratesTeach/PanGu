@@ -36,6 +36,8 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
+    binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
+
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])

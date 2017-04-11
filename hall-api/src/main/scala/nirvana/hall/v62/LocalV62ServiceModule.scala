@@ -21,6 +21,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
+    binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
 
   }
 
