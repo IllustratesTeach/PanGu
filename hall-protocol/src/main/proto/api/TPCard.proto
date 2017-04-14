@@ -57,7 +57,7 @@ message TPCardGetResponse{
     extend monad.rpc.protocol.BaseCommand{
         optional TPCardGetResponse cmd = 10107;
     }
-    required TPCard card = 1;
+    optional TPCard card = 1;
     optional string dbid = 2;
 }
 //验证卡号是否已存在

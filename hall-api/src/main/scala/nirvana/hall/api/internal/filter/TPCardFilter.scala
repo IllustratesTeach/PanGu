@@ -25,26 +25,36 @@ class TPCardFilter(httpServletRequest: HttpServletRequest, tpCardService: TPCard
     }//删除
     else if(commandRequest.hasExtension(TPCardDelRequest.cmd)){
       val request = commandRequest.getExtension(TPCardDelRequest.cmd)
+      val cardId = request.getCardId
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      tpCardService.delTPCard(request.getCardId, dbId)
+      if(tpCardService.isExist(cardId, dbId)){
+        tpCardService.delTPCard(cardId, dbId)
+      }
       val response = TPCardDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardDelResponse.cmd, response)
       true
     }//修改
     else if(commandRequest.hasExtension(TPCardUpdateRequest.cmd)){
       val request = commandRequest.getExtension(TPCardUpdateRequest.cmd)
+      val cardId = request.getCard.getStrCardID
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      tpCardService.updateTPCard(request.getCard, dbId)
+      if(tpCardService.isExist(cardId, dbId)){
+        tpCardService.updateTPCard(request.getCard, dbId)
+      }
       val response = TPCardUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, TPCardUpdateResponse.cmd, response)
       true
     }//查询
     else if(commandRequest.hasExtension(TPCardGetRequest.cmd)) {
       val request = commandRequest.getExtension(TPCardGetRequest.cmd)
+      val response = TPCardGetResponse.newBuilder()
+      val cardId = request.getCardId
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      val tpCard = tpCardService.getTPCard(request.getCardId, dbId)
-      val response = TPCardGetResponse.newBuilder().setCard(tpCard).build()
-      commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response)
+      if(tpCardService.isExist(cardId, dbId)){
+        val tpCard = tpCardService.getTPCard(cardId, dbId)
+        response.setCard(tpCard)
+      }
+      commandResponse.writeMessage(commandRequest, TPCardGetResponse.cmd, response.build())
       true
     }//是否已存在
     else if(commandRequest.hasExtension(TPCardIsExistRequest.cmd)){

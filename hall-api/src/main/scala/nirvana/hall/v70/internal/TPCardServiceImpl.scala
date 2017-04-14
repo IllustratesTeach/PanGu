@@ -22,7 +22,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
-
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
