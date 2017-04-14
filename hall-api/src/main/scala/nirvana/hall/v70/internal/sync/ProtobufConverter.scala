@@ -531,6 +531,7 @@ object ProtobufConverter extends LoggerSupport{
           bin.personId = personId
           bin.gatherData = binData.toByteArray
           bin.fgp = blob.getFgp.getNumber.toShort
+          bin.fgpCase = if(blob.getBPlain) "1" else "0"
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
 
