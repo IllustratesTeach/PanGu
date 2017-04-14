@@ -371,6 +371,12 @@ object galoclpConverter extends LoggerSupport{
     val admData = caseInfo.getAdmDataBuilder
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
+    //原始创建人信息
+    val extractInfo = gCase.pstExtraInfo_Data
+    if(extractInfo != null){
+      admData.setCreator(extractInfo.szOrgScanner)
+      admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
+    }
 
     //数据校验
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
