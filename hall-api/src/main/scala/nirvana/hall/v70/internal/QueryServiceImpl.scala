@@ -161,8 +161,8 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     val candList = new ArrayBuffer[GAQUERYCANDSTRUCT]()
     if(candListData != null && candListData.size > 0){
       val buffer = ChannelBuffers.wrappedBuffer(candListData)
-      val gaCand = new GAQUERYCANDSTRUCT
-      while(buffer.readableBytes() >= gaCand.getDataSize) {
+      while(buffer.readableBytes() >= 96) {
+        val gaCand = new GAQUERYCANDSTRUCT
         gaCand.fromStreamReader(buffer)
         candList += gaCand
       }
@@ -183,14 +183,17 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
         candHead.tFinishTime = DateConverter.convertDate2AFISDateTime(gafisNormalqueryQueryque.finishtime)
       }
       gaQuery.pstCandHead_Data = candHead
+      gaQuery.nCandHeadLen = gaQuery.pstCandHead_Data.getDataSize
+      gaQuery.nCandLen = gaQuery.pstCand_Data.length * new GAQUERYCANDSTRUCT().getDataSize
+    } else {
+      gaQuery.nCandHeadLen = 0
+      gaQuery.nCandLen = 0
     }
     //mic
     val mic = gafisNormalqueryQueryque.mic
     val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     gaQuery.pstMIC_Data = mics.toArray
 
-    gaQuery.nCandHeadLen = gaQuery.pstCandHead_Data.getDataSize
-    gaQuery.nCandLen = gaQuery.pstCand_Data.length * new GAQUERYCANDSTRUCT().getDataSize
     gaQuery.nMICCount = gaQuery.pstMIC_Data.length
 
     gaQuery
