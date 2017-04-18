@@ -362,17 +362,24 @@ object ProtobufConverter extends LoggerSupport{
 
     //指纹数据
     val mntMap = fingerList.filter(_.groupId == 0).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
-    fingerList.filter(_.groupId == 1).foreach { finger =>
+    //纹线特征数据
+    val binMap = fingerList.filter(_.groupId == 4).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
+    fingerList.filter(_.groupId == 1).foreach {finger =>
       val blobBuilder = tpCard.addBlobBuilder()
       val mnt = mntMap.get((finger.fgpCase, finger.fgp))
+      val bin = binMap.get((finger.fgpCase, finger.fgp))
       mnt.foreach { blob =>
         blobBuilder.setStMntBytes(ByteString.copyFrom(blob))
+      }
+      bin.foreach{
+        blob => blobBuilder.setStBinBytes(ByteString.copyFrom(blob))
       }
       blobBuilder.setStImageBytes(ByteString.copyFrom(finger.gatherData))
       blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
       blobBuilder.setBPlain("1".equals(finger.fgpCase))
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
+
     //人像数据
     photoList.foreach{ photo =>
       val blobBuilder = tpCard.addBlobBuilder()
