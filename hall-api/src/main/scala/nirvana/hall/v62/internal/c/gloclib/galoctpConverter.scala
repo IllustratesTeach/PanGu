@@ -118,6 +118,11 @@ object galoctpConverter extends LoggerSupport{
       }
 
       //TODO 纹线数据？
+      if(blob.hasStBin){
+          mic.pstBin_Data = blob.getStBinBytes.toByteArray
+          mic.nBinLen = mic.pstBin_Data.length
+          flag |= glocdef.GAMIC_ITEMFLAG_BIN
+      }
       mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte] //指位信息
 
       mic.nItemFlag = flag.asInstanceOf[Byte] //传送的特征类型 ,特征+图像 , 1 2 4 8
