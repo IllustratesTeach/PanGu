@@ -1,5 +1,6 @@
 package nirvana.hall.v70.internal
 
+import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbFingerprint, GafisLogicDbRule}
 import org.junit.Test
@@ -11,7 +12,7 @@ class LogicDBJudgeTest extends BaseV70TestCase {
   @Test
   def test:Unit = {
     //逻辑分库处理
-    val logicDBJudge = new LogicDBJudge()
+    val logicDBJudge = new LogicDBJudgeServiceImpl
     //val logicDb: GafisLogicDb = logicDBJudge.logicTJudge(tpCard)
 
     val logicDbFingerprint = new GafisLogicDbFingerprint()
