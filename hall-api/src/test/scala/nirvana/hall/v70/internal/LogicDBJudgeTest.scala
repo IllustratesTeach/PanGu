@@ -1,6 +1,5 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbFingerprint, GafisLogicDbRule}
 import org.junit.Test
