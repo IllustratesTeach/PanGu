@@ -52,6 +52,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
+    binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
 
     //定时服务
 //    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
