@@ -1,14 +1,15 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.protocol.api.FPTProto.{Case, TPCard}
+import nirvana.hall.api.services.sync.LogicDBJudgeService
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbRule}
 import org.apache.tapestry5.json.JSONObject
 
 /**
-  * Created by Administrator on 2017/3/31.
+  * Created by zhangjinqi on 2017/3/31.
   */
-class LogicDBJudge {
+class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
 
   def logicTJudge(tpCard:TPCard): Option[String] = {
     //逻辑分库处理

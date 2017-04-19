@@ -7,14 +7,14 @@ import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.{HttpHeaderUtils, LogicDBJudge}
+import nirvana.hall.v70.internal.{HttpHeaderUtils}
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.apache.tapestry5.validator.None
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -30,6 +30,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
                               lpCardService: LPCardService,
                               lpPalmService: LPPalmService,
                               syncInfoLogManageService: SyncInfoLogManageService,
+                              logicDBJudgeService: LogicDBJudgeService,
                               caseInfoService: CaseInfoService)
   extends QueryGet7to6Service with LoggerSupport{
 
@@ -77,7 +78,6 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
         val matchResult = queryRemoteService.getQuery(gafisQuery7to6.get.queryId, url, headerMap, uuid)
         //逻辑分库处理
         val remoteIP = headerMap.get("X-V62-HOST")
-        val logicDBJudge = new LogicDBJudge()
         var dbid:Option[String] = Some("")
 
         if (matchResult != null) {
@@ -94,7 +94,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
             val cand = candIter.next()
             if (queryque.querytype == QueryConstants.QUERY_TYPE_TT || queryque.querytype == QueryConstants.QUERY_TYPE_LT) {
               //获取捺印信息
-              dbid = logicDBJudge logicRemoteJudge(remoteIP, queryque.querytype)
+              dbid = logicDBJudgeService.logicRemoteJudge(remoteIP, queryque.querytype)
               if (GafisPerson.findOption(cand.getObjectId).isEmpty) {
                 val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_TPLIB)
                 val tPCard = tPCardRemoteService.getTPCard(cand.getObjectId, url, dbId, headerMap)
@@ -106,7 +106,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
               syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, HallApiConstants.REMOTE_TYPE_MATCH_RESULT_TPCARD, headerMap.get("X-V62-HOST").get,"0","1")
             } else if (queryque.flag == QueryConstants.FLAG_PALM || queryque.flag == QueryConstants.FLAG_PALM_TEXT) {
               //获取现场信息
-              dbid = logicDBJudge logicRemoteJudge(remoteIP, queryque.querytype)
+              dbid = logicDBJudgeService.logicRemoteJudge(remoteIP, queryque.querytype)
               val cardId = cand.getObjectId
               if (GafisCasePalm.findOption(cardId).isEmpty) {
                 val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
@@ -128,7 +128,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
               syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, HallApiConstants.REMOTE_TYPE_MATCH_RESULT_LPPALM, headerMap.get("X-V62-HOST").get,"0","1")
             } else {
               //获取现场信息
-              dbid = logicDBJudge logicRemoteJudge(remoteIP, queryque.querytype)
+              dbid = logicDBJudgeService.logicRemoteJudge(remoteIP, queryque.querytype)
               val cardId = cand.getObjectId
               if (GafisCaseFinger.findOption(cardId).isEmpty) {
                 val dbId = HttpHeaderUtils.getDBIDBySyncTagert(queryConfig.config, HttpHeaderUtils.DB_KEY_LPLIB)
