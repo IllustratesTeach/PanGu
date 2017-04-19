@@ -7,8 +7,8 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.jpa.HallFetchConfig
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService,LPPalmRemoteService}
-import nirvana.hall.api.services.sync.{FetchQueryService, SyncCronService}
+import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, LPPalmRemoteService, TPCardRemoteService}
+import nirvana.hall.api.services.sync.{FetchQueryService, LogicDBJudgeService, SyncCronService}
 import nirvana.hall.api.services._
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
@@ -22,7 +22,6 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.v70.internal.LogicDBJudge
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -42,6 +41,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           lPCardRemoteService: LPCardRemoteService,
                           lPPalmRemoteService: LPPalmRemoteService,
                           syncInfoLogManageService: SyncInfoLogManageService,
+                          logicDBJudgeService: LogicDBJudgeService,
                           caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
@@ -127,8 +127,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //逻辑分库处理
-            val logicDBJudge = new LogicDBJudge()
-            destDBID = logicDBJudge.logicTJudge(tpCard)
+            destDBID = logicDBJudgeService.logicTJudge(tpCard)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
@@ -223,8 +222,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
             //逻辑分库处理
             //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
-            val logicDBJudge = new LogicDBJudge()
-            destDBID = logicDBJudge.logicLJudge(caseId)
+            destDBID = logicDBJudgeService.logicLJudge(caseId)
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
