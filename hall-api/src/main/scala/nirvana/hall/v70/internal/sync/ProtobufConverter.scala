@@ -76,7 +76,7 @@ object ProtobufConverter extends LoggerSupport{
 
     gafisCase
   }
-  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String] = null): Case = {
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
 
