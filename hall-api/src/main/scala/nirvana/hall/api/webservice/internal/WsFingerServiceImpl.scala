@@ -5,16 +5,20 @@ import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, MatchRelationService, TPCardService}
 import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
+import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
+import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger}
 import org.apache.axiom.attachments.ByteArrayDataSource
+
+import scala.collection.mutable.ArrayBuffer
 
 
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService, fptService: FPTService) extends WsFingerService with LoggerSupport
+class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService, fptService: FPTService, matchRelationService: MatchRelationService) extends WsFingerService with LoggerSupport
 {
 
   /**
@@ -164,4 +168,74 @@ class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardServ
     }
   }
 
+  /**
+    * 通过查询参数返回指定返回相应案件的全部信息（包含文字信息和图像信息）
+    *
+    * @param userid   用户名
+    * @param password 密码
+    * @param pkid   比中关系编号
+    * @return 返回的FPT文件信息需用soap的附件形式存储，只返回相应文字信息，不包含图像信息（FPT文件中132项“发送现场指纹个数”应为0）
+    *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
+    */
+  override def getMatchRelation(userid: String, password: String, pkid: String): DataHandler = {
+
+    val fPT4File = new FPT4File
+    try{
+      var dataHandler:DataHandler = null
+      val gafisCheckinInfo = GafisCheckinInfo.find_by_pkId(pkid)
+      if(gafisCheckinInfo.nonEmpty){
+        val gafisCaseFingerSource = GafisCaseFinger.find_by_fingerId(gafisCheckinInfo.headOption.get.code)
+        val gafisCaseFingerDest = GafisCaseFinger.find_by_fingerId(gafisCheckinInfo.headOption.get.tcode)
+        val gafisGatherFingerSource = GafisGatherFinger.find_by_personId(gafisCheckinInfo.headOption.get.code)
+        val gafisGatherFingerDest = GafisGatherFinger.find_by_personId(gafisCheckinInfo.headOption.get.tcode)
+        if(gafisCaseFingerSource.nonEmpty || gafisCaseFingerDest.nonEmpty || gafisGatherFingerSource.nonEmpty || gafisGatherFingerDest.nonEmpty){
+
+          gafisCheckinInfo.headOption.get.querytype.toString match {
+            case "0" =>
+              val logic02RecSource = fptService.getLogic02Rec(gafisGatherFingerSource.head.personId)
+              val logic02RecDest = fptService.getLogic02Rec(gafisGatherFingerDest.head.personId)
+              val logic05Rec = fptService.getLogic05Rec(gafisCheckinInfo.headOption.get)
+              val logic02List = new ArrayBuffer[Logic02Rec]()
+              logic02List += logic02RecSource
+              logic02List += logic02RecDest
+              fPT4File.logic02Recs = logic02List.toArray
+              fPT4File.logic05Recs = Array(logic05Rec)
+            case "1"=>
+              val logic03Rec = fptService.getLogic03Rec(gafisCaseFingerSource.head.caseId)
+              val logic02Rec = fptService.getLogic02Rec(gafisGatherFingerDest.head.personId)
+              val logic04Rec = fptService.getLogic04Rec(gafisCheckinInfo.headOption.get)
+              fPT4File.logic03Recs = Array(logic03Rec)
+              fPT4File.logic02Recs = Array(logic02Rec)
+              fPT4File.logic04Recs = Array(logic04Rec)
+            case "2"=>
+              val logic02Rec = fptService.getLogic02Rec(gafisGatherFingerSource.head.personId)
+              val logic03Rec = fptService.getLogic03Rec(gafisCaseFingerDest.head.caseId)
+              val logic04Rec = fptService.getLogic04Rec(gafisCheckinInfo.headOption.get)
+              fPT4File.logic02Recs = Array(logic02Rec)
+              fPT4File.logic03Recs = Array(logic03Rec)
+              fPT4File.logic04Recs = Array(logic04Rec)
+            case "3" =>
+              val logic03RecSource = fptService.getLogic03Rec(gafisCaseFingerSource.head.caseId)
+              val logic03RecDest = fptService.getLogic03Rec(gafisCaseFingerDest.head.caseId)
+              val logic06Rec = fptService.getLogic06Rec(gafisCheckinInfo.headOption.get)
+              val logic03List = new ArrayBuffer[Logic03Rec]()
+              logic03List += logic03RecSource
+              logic03List += logic03RecDest
+              fPT4File.logic03Recs = logic03List.toArray
+              fPT4File.logic06Recs = Array(logic06Rec)
+            case _ =>
+              throw new Exception("queryType error:" + gafisCheckinInfo.headOption.get.querytype)
+          }
+        }
+
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+      }
+      dataHandler
+    }catch{
+        case e : Exception => error("fun:getMatchRelation Exception" +
+          ",inputParam-userid:{};password:{};cardId:{},errormessage:{},outtime:{}"
+          ,userid,password,pkid,e.getMessage,new Date)
+          new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+      }
+    }
 }
