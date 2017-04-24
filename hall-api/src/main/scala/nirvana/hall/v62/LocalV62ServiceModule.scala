@@ -1,6 +1,7 @@
 package nirvana.hall.v62
 
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal._
@@ -22,6 +23,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
+    binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
 
   }
 
