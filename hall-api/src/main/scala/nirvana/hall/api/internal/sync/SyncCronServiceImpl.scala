@@ -127,7 +127,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //逻辑分库处理
-            destDBID = logicDBJudgeService.logicTJudge(tpCard)
+            destDBID = logicDBJudgeService.logicTJudge(cardId)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
