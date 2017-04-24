@@ -17,7 +17,7 @@ class LogicDBJudgeTest extends BaseV70TestCase {
     val logicDbFingerprint = new GafisLogicDbFingerprint()
     val tpcard = TPCard.newBuilder()
     tpcard.setStrCardID("JLRY370233333333333333")
-    var destDBT = logicDBJudge.logicTJudge(tpcard.build())
+    var destDBT = logicDBJudge.logicTJudge("JLRY370233333333333333")
     var destDBL = logicDBJudge.logicLJudge("370133333333333333")
    // subcase2("370133333333333333")
   }
