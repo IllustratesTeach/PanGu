@@ -8,9 +8,9 @@ import nirvana.hall.protocol.api.FPTProto.TPCard
 trait LogicDBJudgeService {
   /**
     * 获取捺印逻辑库
-    * @param tpCard
+    * @param cardId
     */
-  def logicTJudge(tpCard:TPCard): Option[String]
+  def logicTJudge(cardId: String): Option[String]
 
   /**
     * 获取案件逻辑库

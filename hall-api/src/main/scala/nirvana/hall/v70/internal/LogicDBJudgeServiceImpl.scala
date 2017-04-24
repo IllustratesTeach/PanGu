@@ -11,7 +11,7 @@ import org.apache.tapestry5.json.JSONObject
   */
 class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
 
-  def logicTJudge(tpCard:TPCard): Option[String] = {
+  def logicTJudge(cardId: String): Option[String] = {
     //逻辑分库处理
     var logicDbPkid = ""
     //获取所有比对规则list
@@ -21,7 +21,6 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
     if (logicDbRule != None) {
       logicDbPkid = logicDbRule.get.pkId
     }
-    val cardid = tpCard.getStrCardID
     var head = "tmp"
     var exclusive = "tmp"
     val list = logicDbRules.toList
@@ -33,7 +32,7 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
       if(json.has("exclusive")){
         exclusive = json.getString("exclusive")
       }
-      if (cardid.startsWith(head) && !cardid.startsWith(exclusive)) {
+      if (cardId.startsWith(head) && !cardId.startsWith(exclusive)) {
         val logicDbRule = GafisLogicDbRule.where(GafisLogicDbRule.logicRule === list(i) and GafisLogicDbRule.logicCategory === "0").headOption
         logicDbPkid = logicDbRule.get.pkId
       }

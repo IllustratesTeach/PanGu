@@ -10,9 +10,9 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
   /**
     * 获取捺印逻辑库
     *
-    * @param tpCard
+    * @param cardId
     */
-  override def logicTJudge(tpCard: TPCard): Option[String] = ???
+  override def logicTJudge(cardId: String): Option[String] = ???
 
   /**
     * 获取案件逻辑库
