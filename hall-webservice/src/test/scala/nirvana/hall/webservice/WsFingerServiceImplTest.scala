@@ -1,18 +1,11 @@
-package nirvana.hall.v62.webservice
-
-import java.io.FileOutputStream
-
-import nirvana.hall.api.internal.BaseJniLoader
-import nirvana.hall.api.webservice.services.WsFingerService
-import nirvana.hall.v62.BaseV62TestCase
-import org.junit.Test
+package nirvana.hall.webservice
 
 /**
   * Created by songpeng on 2016/12/5.
   */
-class WsFingerServiceImplTest extends BaseV62TestCase with BaseJniLoader{
+class WsFingerServiceImplTest {
 
-  @Test
+  /*@Test
   def test_getTenprintRecord: Unit ={
     val service = getService[WsFingerService]
     val dataHandler = service.getTenprintRecord("","", "3702", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
@@ -50,5 +43,5 @@ class WsFingerServiceImplTest extends BaseV62TestCase with BaseJniLoader{
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
-  }
+  }*/
 }

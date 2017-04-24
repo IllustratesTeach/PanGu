@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.internal
+package nirvana.hall.webservice.internal.bjwcsy
 
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -7,15 +7,15 @@ import javax.activation.DataHandler
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.fpt.FPTFileBuilder
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
-import nirvana.hall.api.webservice.services.union4pfmip
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
-import org.apache.axiom.attachments.ByteArrayDataSource
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.services.bjwcsy.union4pfmip
+import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
@@ -23,12 +23,12 @@ import stark.webservice.services.StarkWebServiceClient
 /**
   * 互查系统返回比对结果定时任务
   */
-class SendMatchResultService(hallApiConfig: HallApiConfig,
+class SendMatchResultService(hallWebserviceConfig: HallWebserviceConfig,
                              tPCardService: TPCardService,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
                              queryService: QueryService,
-                             fetchQueryService: FetchQueryService,implicit val dataSource: DataSource) extends LoggerSupport{
+                             fetchQueryService: FetchQueryService, implicit val dataSource: DataSource) extends LoggerSupport{
 
   /**
     * 互查系统返回比对结果
@@ -41,13 +41,13 @@ class SendMatchResultService(hallApiConfig: HallApiConfig,
     //2. 数据转FPT
     //3. 调用webservice上报比对结果数据
     //4. 发送成功后更新任务状态 （ seq = 2 ）
-    if(hallApiConfig.webservice.union4pfmip.cron != null)
-      periodicExecutor.addJob(new CronSchedule(hallApiConfig.webservice.union4pfmip.cron), "sendMatchResult-cron", new Runnable {
+    if(hallWebserviceConfig.union4pfmip.cron != null)
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sendMatchResult-cron", new Runnable {
         override def run(): Unit = {
-          val url = hallApiConfig.webservice.union4pfmip.url
-          val targetNamespace = hallApiConfig.webservice.union4pfmip.targetNamespace
-          val userid = hallApiConfig.webservice.union4pfmip.user
-          val password = hallApiConfig.webservice.union4pfmip.password
+          val url = hallWebserviceConfig.union4pfmip.url
+          val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
+          val userid = hallWebserviceConfig.union4pfmip.user
+          val password = hallWebserviceConfig.union4pfmip.password
           try{
             var resultMap = findMatchTask()
             if(resultMap.size > 0) {

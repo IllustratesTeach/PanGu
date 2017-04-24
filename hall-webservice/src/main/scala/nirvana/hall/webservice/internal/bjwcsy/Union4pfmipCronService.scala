@@ -1,5 +1,4 @@
-package nirvana.hall.api.webservice.internal
-
+package nirvana.hall.webservice.internal.bjwcsy
 
 import java.io.{FileOutputStream, InputStream}
 import java.text.SimpleDateFormat
@@ -9,22 +8,23 @@ import javax.sql.DataSource
 import javax.xml.namespace.QName
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.webservice.config.HallWebserviceConfig
 import org.apache.axis2.addressing.EndpointReference
 import org.apache.axis2.client.Options
 import org.apache.axis2.rpc.client.RPCServiceClient
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+
 /**
   * 互查系统定时任务
   */
-class Union4pfmipCronService(hallApiConfig: HallApiConfig,
+class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
                              tPCardService: TPCardService,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
@@ -37,14 +37,14 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    if(hallApiConfig.webservice.union4pfmip.cron != null)
-      periodicExecutor.addJob(new CronSchedule(hallApiConfig.webservice.union4pfmip.cron), "union4pfmip-cron", new Runnable {
+    if(hallWebserviceConfig.union4pfmip.cron != null)
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "union4pfmip-cron", new Runnable {
         override def run(): Unit = {
           //发送请求获取任务
-          val url = hallApiConfig.webservice.union4pfmip.url
-          val targetNamespace = hallApiConfig.webservice.union4pfmip.targetNamespace
-          val userid = hallApiConfig.webservice.union4pfmip.user
-          val password = hallApiConfig.webservice.union4pfmip.password
+          val url = hallWebserviceConfig.union4pfmip.url
+          val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
+          val userid = hallWebserviceConfig.union4pfmip.user
+          val password = hallWebserviceConfig.union4pfmip.password
           var taskControlID = ""
 //          StarkWebServiceClient.createClient(classOf[union4pfmip], url, targetNamespace)
           val taskDataHandler = callGetSearchTask(userid,password,url,targetNamespace)
@@ -62,7 +62,7 @@ class Union4pfmipCronService(hallApiConfig: HallApiConfig,
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    orgSid = handlerTPcardData(fpt4,hallApiConfig.hallImageUrl)
+                    orgSid = handlerTPcardData(fpt4,hallWebserviceConfig.hallImageUrl)
 		                updateMatchResultStatus(orgSid, 0)
                     info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else if(fpt4.logic03Recs.length>0){

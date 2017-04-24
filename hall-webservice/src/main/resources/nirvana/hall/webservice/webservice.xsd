@@ -23,6 +23,45 @@
                     <xs:documentation>配置Web服务器相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="union4pfmipType" name="union4pfmip" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>无锡互查系统webservice</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="hall_image_url" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>配置hall-image服务器地址</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="union4pfmipType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获取比对任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>URL配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="target_namespace" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>targetNamespace配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="user" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>用户名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>密码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

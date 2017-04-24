@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.services.internal
+package nirvana.hall.webservice.internal.bjwcsy
 
 import java.util.Date
 import javax.activation.DataHandler
@@ -6,10 +6,9 @@ import javax.activation.DataHandler
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, MatchRelationService, TPCardService}
-import nirvana.hall.api.webservice.services.WsFingerService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
-import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger}
+import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 import scala.collection.mutable.ArrayBuffer
@@ -18,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * 互查系统webservice实现类
   */
-class WsFingerServiceImpl(tpCardService: TPCardService,lpCardService: LPCardService, caseInfoService: CaseInfoService, fptService: FPTService, matchRelationService: MatchRelationService) extends WsFingerService with LoggerSupport
+class WsFingerServiceImpl(tpCardService: TPCardService, lpCardService: LPCardService, caseInfoService: CaseInfoService, fptService: FPTService, matchRelationService: MatchRelationService) extends WsFingerService with LoggerSupport
 {
 
   /**

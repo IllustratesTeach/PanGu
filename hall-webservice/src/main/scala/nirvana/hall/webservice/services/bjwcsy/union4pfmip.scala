@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.services
+package nirvana.hall.webservice.services.bjwcsy
 
 import javax.activation.DataHandler
 import javax.jws.{WebMethod, WebService}

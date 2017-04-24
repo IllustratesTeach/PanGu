@@ -13,7 +13,9 @@ import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport, Xml
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.AuthServiceImpl
 import nirvana.hall.api.services.AuthService
-import nirvana.hall.api.webservice.services.WsFingerService
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, Symbol}
@@ -140,21 +142,25 @@ object FPTExportApp extends JettyServerSupport
       val source = Source.fromFile(file)
       val cardIdList= source.getLines()
 
-      val service = getService[WsFingerService]
+      val service = getService[FPTService]
       //类型判断，捺印or现场
       if(TYPE_TP.equals(tpe)){
         for(cardId <- cardIdList){
           logger.info("export fpt tp cardId: "+ cardId)
-          val fptDataHandle = service.getTenprintFinger("", "", cardId.toString)
+          val logic02Rec = service.getLogic02Rec(cardId.toString)
+          val fpt4File = new FPT4File
+          fpt4File.logic02Recs = Array(logic02Rec)
           //fpt数据写入文件
-          fptDataHandle.writeTo(new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)))
+          new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)).write(fpt4File.build().toByteArray(AncientConstants.GBK_ENCODING))
         }
       }else if(TYPE_LP.equals(tpe)){
         for(cardId <- cardIdList){
           logger.info("export fpt lp cardId: "+ cardId)
-          val fptDataHandle = service.getLatentFinger("", "", cardId.toString)
+          val logic03Rec = service.getLogic03Rec(cardId.toString)
+          val fpt4File = new FPT4File
+          fpt4File.logic03Recs = Array(logic03Rec)
           //fpt数据写入文件
-          fptDataHandle.writeTo(new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)))
+          new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)).write(fpt4File.build().toByteArray(AncientConstants.GBK_ENCODING))
         }
       }else{
         logger.error("unknown type: %s".format(tpe))

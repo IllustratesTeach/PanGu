@@ -1,7 +1,6 @@
 package nirvana.hall.v70
 
 import nirvana.hall.api.internal.remote._
-import nirvana.hall.api.internal.sync.SyncCronServiceImpl
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync._
@@ -46,7 +45,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
 
     //同步
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
