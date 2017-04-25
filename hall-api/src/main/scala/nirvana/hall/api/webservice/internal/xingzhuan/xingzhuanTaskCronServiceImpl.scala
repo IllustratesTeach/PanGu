@@ -6,9 +6,9 @@ import javax.sql.DataSource
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
+import nirvana.hall.api.services._
 import nirvana.hall.api.webservice.services.xingzhuan.xingzhuanTaskCronService
-import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
+import nirvana.hall.api.webservice.util.{AFISConstant, FPTConvertToProtoBuffer}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import org.apache.commons.io.{FileUtils, IOUtils}
@@ -23,6 +23,7 @@ class xingzhuanTaskCronServiceImpl(hallApiConfig: HallApiConfig,
                                    lPCardService: LPCardService,
                                    caseInfoService: CaseInfoService,
                                    queryService: QueryService,
+                                   assistCheckRecordService: AssistCheckRecordService,
                                    implicit val dataSource: DataSource)extends xingzhuanTaskCronService with LoggerSupport{
 
   /**
@@ -63,13 +64,15 @@ class xingzhuanTaskCronServiceImpl(hallApiConfig: HallApiConfig,
             throw new Exception("Not support FPT V3.0")
         case Right(fpt4)=>
           val taskId = fpt4.sid
-          if(fpt4.logic02Recs.length>0){
+          var oraSid = 0L
+            if(fpt4.logic02Recs.length>0){
             fpt4.logic02Recs.foreach{ sLogic02Rec =>
               val tpCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec, hallApiConfig.hallImageUrl)
               tPCardService.addTPCard(tpCard)
             }
             val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
-            queryService.sendQuery(matchTask)
+            oraSid = queryService.sendQuery(matchTask)
+            assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,"",matchTask.getMatchId,AFISConstant.XINGZHUAN)
             return
           }else if(fpt4.logic03Recs.length>0){
             val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
@@ -77,7 +80,8 @@ class xingzhuanTaskCronServiceImpl(hallApiConfig: HallApiConfig,
             val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
             lPCardService.addLPCard(lPCard)
             caseInfoService.addCaseInfo(caseInfo)
-            queryService.sendQuery(matchTask)
+              oraSid = queryService.sendQuery(matchTask)
+            assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,caseInfo.getStrCaseID,"",AFISConstant.XINGZHUAN)
             return
           }else{
             info("success:xingzhuanTaskCronServiceImpl:返回空FPT文件")

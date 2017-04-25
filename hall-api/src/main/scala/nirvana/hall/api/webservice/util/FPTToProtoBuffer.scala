@@ -99,7 +99,7 @@ object FPTConvertToProtoBuffer {
         blobBuilder.setStMntBytes(ByteString.copyFrom(mntAndBin.get._1.toByteArray()))
         blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
         blobBuilder.setFgp(fgpParesProtoBuffer(tData.fgp))
-        blobBuilder.setStImageBytes(ByteString.copyFrom(s.toByteArray()))
+        blobBuilder.setStImageBytes(ByteString.copyFrom(tBuffer.toByteArray()))
         blobBuilder.setStBinBytes(ByteString.copyFrom(mntAndBin.get._2.toByteArray()))
       }
     }
