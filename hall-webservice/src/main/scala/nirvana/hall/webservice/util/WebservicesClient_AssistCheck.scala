@@ -9,7 +9,7 @@ import org.apache.axis2.rpc.client.RPCServiceClient
 /**
   * Created by sjr on 2017/4/24.
   */
-class WebServicesClient_AssistCheck {
+object WebServicesClient_AssistCheck {
 
    def callHallWebService(opAddEntryArgs: Array[AnyRef], methodName:String): Int ={
      val classes: Array[java.lang.Class[_]] = Array[java.lang.Class[_]](classOf[Int])
