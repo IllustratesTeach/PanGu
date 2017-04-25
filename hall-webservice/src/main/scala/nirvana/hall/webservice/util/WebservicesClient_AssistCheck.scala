@@ -1,7 +1,9 @@
 package nirvana.hall.webservice.util
 
+import javax.activation.DataHandler
 import javax.xml.namespace.QName
 
+import nirvana.hall.webservice.config.HallWebserviceConfig
 import org.apache.axis2.addressing.EndpointReference
 import org.apache.axis2.client.Options
 import org.apache.axis2.rpc.client.RPCServiceClient
@@ -11,12 +13,20 @@ import org.apache.axis2.rpc.client.RPCServiceClient
   */
 object WebServicesClient_AssistCheck {
 
-   def callHallWebService(opAddEntryArgs: Array[AnyRef], methodName:String): Int ={
+   def callHallWebServiceTypeOfInt(opAddEntryArgs: Array[AnyRef], methodName:String): Int ={
      val classes: Array[java.lang.Class[_]] = Array[java.lang.Class[_]](classOf[Int])
-    val serviceClientAndSetTaskStatus = createClient("http://127.0.0.1:8081" + "/ws/collectionSysPorts?wsdl"
-      ,"http://www.egfit.com/",methodName)
+    val serviceClientAndSetTaskStatus = createClient(opAddEntryArgs(0).toString
+      ,opAddEntryArgs(1).toString,methodName)
     val flag = serviceClientAndSetTaskStatus.get._1.invokeBlocking(serviceClientAndSetTaskStatus.get._2, opAddEntryArgs, classes)(0).asInstanceOf[Int]
     flag
+  }
+
+
+  def callHallWebServiceTypeOfDataHandler(opAddEntryArgs: Array[AnyRef], methodName:String): DataHandler ={
+    val classes: Array[java.lang.Class[_]] = Array[java.lang.Class[_]](classOf[DataHandler])
+    val serviceClientAndSetTaskStatus = createClient(opAddEntryArgs(0).toString
+      ,opAddEntryArgs(1).toString,methodName)
+    serviceClientAndSetTaskStatus.get._1.invokeBlocking(serviceClientAndSetTaskStatus.get._2, opAddEntryArgs, classes)(0).asInstanceOf[DataHandler]
   }
 
   private def createClient(url:String,targetNamespace:String,functionName:String): Option[(RPCServiceClient,QName)] ={
