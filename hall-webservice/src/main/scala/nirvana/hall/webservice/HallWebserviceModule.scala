@@ -4,7 +4,9 @@ import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.v70.internal.AssistCheckRecordServiceImpl
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
@@ -27,5 +29,6 @@ object HallWebserviceModule {
 
     binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
     binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()
+    binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
   }
 }
