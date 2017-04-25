@@ -62,6 +62,26 @@
                     <xs:documentation>密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="taskPath" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>任务文件路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="dateLimit" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>上报数据年限</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="TenPrintPrex" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>十指指纹前缀(区分本地数据与外省数据）</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="LatentPrex" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>本地现场指纹案件号前缀(区分本地数据与外省数据）</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

@@ -35,4 +35,12 @@ class Union4pfmipConfig{
   var user: String = _
   @XmlElement(name = "password")
   var password: String = _
+  @XmlElement(name = "taskPath")
+  var taskPath: String = _
+  @XmlElement(name = "dateLimit")
+  var dateLimit: String = _
+  @XmlElement(name = "TenPrintPrex")
+  var TenPrintPrex: String = _
+  @XmlElement(name = "LatentPrex")
+  var LatentPrex: String = _
 }
