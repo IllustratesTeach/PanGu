@@ -24,6 +24,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
     binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
+    binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
 
   }
 

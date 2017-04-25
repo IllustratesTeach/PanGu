@@ -152,7 +152,14 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @param dbId
     * @return
     */
-  override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = ???
+  override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = {
+    var status = 0
+    val querySimpleStruts = findSimpleQuery(getDBID(dbId), Some("(ORA_SID='%s')".format(oraSid)),1)
+    if(querySimpleStruts.nonEmpty){
+      status = querySimpleStruts.headOption.get.nStatus
+    }
+    status
+  }
 
   /**
     * 获取查询信息GAQUERYSTRUCT

@@ -71,4 +71,11 @@ class QueryServiceImplTest extends BaseV62TestCase{
     val query = service.getGAQUERYSTRUCT(1)
     Assert.assertNotNull(query)
   }
+
+  @Test
+  def test_getStatusBySid: Unit ={
+    val service = getService[QueryService]
+    val statusId = service.getStatusBySid(5)
+    Assert.assertEquals(7,statusId)
+  }
 }
