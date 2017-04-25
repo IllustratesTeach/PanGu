@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hall_v62>
+    <app_server>
+        <host>127.0.0.1</host>
+        <port>6898</port>
+        <user>afisadmin</user>
+        <password>helloafis</password>
+    </app_server>
+    <template_finger_table>
+        <database_id>1</database_id>
+        <table_id>2</table_id>
+    </template_finger_table>
+    <latent_finger_table>
+        <database_id>2</database_id>
+        <table_id>2</table_id>
+    </latent_finger_table>
+    <case_table>
+        <database_id>2</database_id>
+        <table_id>4</table_id>
+    </case_table>
+    <query_table>
+        <database_id>20</database_id>
+        <table_id>2</table_id>
+    </query_table>
+    <database>
+        <driver>oracle.jdbc.driver.OracleDriver</driver>
+        <user>afis</user>
+        <password>helloafis</password>
+        <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+    </database>
+</hall_v62>

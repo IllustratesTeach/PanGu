@@ -1,11 +1,16 @@
 package nirvana.hall.webservice
 
+import java.io.FileOutputStream
+
+import nirvana.hall.webservice.services.bjwcsy.WsFingerService
+import org.junit.Test
+
 /**
   * Created by songpeng on 2016/12/5.
   */
-class WsFingerServiceImplTest {
+class WsFingerServiceImplTest extends BaseTestCase{
 
-  /*@Test
+  @Test
   def test_getTenprintRecord: Unit ={
     val service = getService[WsFingerService]
     val dataHandler = service.getTenprintRecord("","", "3702", null, null, null, null, null, null, null, null, null, null, null, null, null, null)
@@ -28,7 +33,6 @@ class WsFingerServiceImplTest {
   def test_getLatent: Unit ={
     val service = getService[WsFingerService]
     val dataHandler = service.getLatent("", "", "0000", null, null, null, null, null, null, null)
-    println(dataHandler)
     val fileOutPutStream = new FileOutputStream("/Users/songpeng/win7共享/getLatent.fpt")
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
@@ -43,5 +47,5 @@ class WsFingerServiceImplTest {
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
-  }*/
+  }
 }

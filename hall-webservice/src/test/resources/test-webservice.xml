@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2012,2015 the original author or authors. All rights reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_webservice>
+    <log_file>${server.home}/log/hall.webservice.log</log_file>
+    <local_store_dir>${server.home}/config/local.webservice</local_store_dir>
+    <web>
+        <bind>0.0.0.0:8080</bind>
+    </web>
+</hall_webservice>
