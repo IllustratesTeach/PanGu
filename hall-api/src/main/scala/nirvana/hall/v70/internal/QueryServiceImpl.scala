@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal
 import java.util.Date
 import javax.persistence.EntityManager
 
+import com.google.protobuf.ByteString
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.QueryService
@@ -13,12 +14,14 @@ import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, SysUser}
+import nirvana.hall.v70.jpa.{GafisCaseFingerMnt, GafisGatherFinger, GafisNormalqueryQueryque, SysUser}
 import org.jboss.netty.buffer.ChannelBuffers
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -99,12 +102,58 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 根据卡号信息发送查询, 不需要特征信息
+    * 根据卡号和查询类型从数据库查询特征数据，并放入matchTask，然后调用addMatchTask
     * @param matchTask 只有查询信息不需要特征信息
     * @param queryDBConfig
     * @return 任务号
     */
   override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long = {
-    throw new UnsupportedOperationException
+    val matchTaskBuilder = matchTask.toBuilder
+    val cardId = matchTask.getMatchId
+    import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
+    matchTask.getMatchType match {
+      case MatchType.FINGER_TT | MatchType.FINGER_TL =>
+        val fingerList = GafisGatherFinger.find_by_personId_and_lobtype(cardId, Gafis70Constants.LOBTYPE_MNT)
+        val mntMap = mutable.Map[String, GafisGatherFinger]()
+        val binMap = mutable.Map[String, GafisGatherFinger]()
+        fingerList.filter(_.groupId == Gafis70Constants.GROUP_ID_MNT).map{finger=>
+          mntMap += (finger.fgpCase +"-"+finger.fgp -> finger)
+        }
+        fingerList.filter(_.groupId == Gafis70Constants.GROUP_ID_BIN).foreach{finger=>
+          binMap += (finger.fgpCase +"-"+finger.fgp -> finger)
+        }
+        mntMap.foreach{fingerMnt=>
+          val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+          var pos:Int = fingerMnt._2.fgp
+          //平面指位+10
+          if(fingerMnt._2.fgpCase == Gafis70Constants.FGP_CASE_PLAIN){
+            pos = fingerMnt._2.fgp + 10
+          }
+          tdata.setMinutia(ByteString.copyFrom(fingerMnt._2.gatherData)).setPos(pos)
+          //纹线数据
+          val fingerBin = binMap.get(fingerMnt._1)
+          if(fingerBin.nonEmpty){
+            tdata.setRidge(ByteString.copyFrom(fingerBin.get.gatherData)).setPos(pos)
+          }
+        }
+        if(fingerList.isEmpty){
+          throw new IllegalArgumentException("特征数据不存在cardId:"+ cardId)
+        }
+      case MatchType.FINGER_LT | MatchType.FINGER_LL =>
+        val fingerList = GafisCaseFingerMnt.find_by_fingerId(cardId)
+        fingerList.foreach{finger=>
+          val ldata = LatentMatchData.newBuilder()
+          ldata.setMinutia(ByteString.copyFrom(finger.fingerMnt))
+          if(finger.fingerRidge != null){
+            ldata.setRidge(ByteString.copyFrom(finger.fingerRidge))
+          }
+          matchTaskBuilder.setLData(ldata.build())
+        }
+        if(fingerList.isEmpty){
+          throw new IllegalArgumentException("特征数据不存在cardId:"+ cardId)
+        }
+    }
+    addMatchTask(matchTaskBuilder.build())
   }
 
   /**
