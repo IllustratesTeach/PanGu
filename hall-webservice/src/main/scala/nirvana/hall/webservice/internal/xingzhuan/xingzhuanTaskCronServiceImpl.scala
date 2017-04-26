@@ -18,11 +18,12 @@ class xingzhuanTaskCronServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
                                    taskHandlerService:TaskHandlerService) extends xingzhuanTaskCronService with LoggerSupport{
 
 
-  val opAddEntryArgs: Array[AnyRef] = new Array[AnyRef](4)
-  opAddEntryArgs(0) = hallWebserviceConfig.union4pfmip.url
-  opAddEntryArgs(1) = hallWebserviceConfig.union4pfmip.targetNamespace
-  opAddEntryArgs(2) = hallWebserviceConfig.union4pfmip.user
-  opAddEntryArgs(3) = hallWebserviceConfig.union4pfmip.password
+
+  val url = hallWebserviceConfig.union4pfmip.url
+  val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
+  val opAddEntryArgs: Array[AnyRef] = new Array[AnyRef](2)
+  opAddEntryArgs(0) = hallWebserviceConfig.union4pfmip.user
+  opAddEntryArgs(1) = hallWebserviceConfig.union4pfmip.password
   /**
     * 定时器，获取比对任务
     * @param periodicExecutor
@@ -53,7 +54,7 @@ class xingzhuanTaskCronServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
   override def callGetXCTask(): Unit = {
     val methodName = "getXCTask"
     Try{
-      val dataHandler = WebServicesClient_AssistCheck.callHallWebServiceTypeOfDataHandler(opAddEntryArgs,methodName)
+      val dataHandler = WebServicesClient_AssistCheck.callHallWebServiceTypeOfDataHandler(url,targetNamespace,opAddEntryArgs,methodName)
       if(null != dataHandler){
         taskHandlerService.queryTaskHandler(dataHandler,AFISConstant.XINGZHUAN)
       }
@@ -71,7 +72,7 @@ class xingzhuanTaskCronServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
 
     val methodName = "getTenprintRecord"
     Try{
-      val dataHandler = WebServicesClient_AssistCheck.callHallWebServiceTypeOfDataHandler(opAddEntryArgs,methodName)
+      val dataHandler = WebServicesClient_AssistCheck.callHallWebServiceTypeOfDataHandler(url,targetNamespace,opAddEntryArgs,methodName)
       if(null != dataHandler){
         taskHandlerService.queryTaskHandler(dataHandler,AFISConstant.XINGZHUAN)
       }

@@ -3,8 +3,6 @@ package nirvana.hall.webservice
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
-import nirvana.hall.api.internal.fpt.FPTServiceImpl
-import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.TaskHandlerServiceImpl
 import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
