@@ -58,8 +58,8 @@ class xingzhuanTaskCronServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
         taskHandlerService.queryTaskHandler(dataHandler,AFISConstant.XINGZHUAN)
       }
     }match {
-      case Success(r) => info("call success:methodName:{};",methodName)
-      case Failure(ex) => error("call fail:methodName:{};message:{}",methodName,s"${ex.getMessage}")
+      case Success(r) => info("call success:methodName:{};Time:{}",methodName,AFISConstant.SERVER_TIME)
+      case Failure(ex) => error("call fail:methodName:{};message:{};Time:{}",methodName,s"${ex.getMessage}",AFISConstant.SERVER_TIME)
     }
   }
 
@@ -76,8 +76,8 @@ class xingzhuanTaskCronServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
         taskHandlerService.queryTaskHandler(dataHandler,AFISConstant.XINGZHUAN)
       }
     }match{
-      case Success(r) => info("call success:methodName:{};",methodName)
-      case Failure(ex) => error("call fail:methodName:{};message:{}",methodName,s"${ex.getMessage}")
+      case Success(r) => info("call success:methodName:{};Time:{}",methodName,AFISConstant.SERVER_TIME)
+      case Failure(ex) => error("call fail:methodName:{};message:{};Time:{}",methodName,s"${ex.getMessage}",AFISConstant.SERVER_TIME)
     }
 
   }
