@@ -30,7 +30,6 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    println(config.union4pfmip.uploadCheckinCron)
     if(config.union4pfmip.uploadCheckinCron != null)
       periodicExecutor.addJob(new CronSchedule(config.union4pfmip.uploadCheckinCron), "uploadCheckin-cron", new Runnable {
         override def run(): Unit = {
