@@ -34,6 +34,5 @@ object HallWebserviceModule {
     binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl]).eagerLoad()
     binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl]).eagerLoad()
 
-
   }
 }
