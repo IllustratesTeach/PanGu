@@ -3,6 +3,8 @@ package nirvana.hall.webservice
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.TaskHandlerServiceImpl
 import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
@@ -24,12 +26,14 @@ object HallWebserviceModule {
 
   def bind(binder: ServiceBinder) {
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
+    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
 //    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
 //    binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()
     binder.bind(classOf[xingzhuanTaskCronService],classOf[xingzhuanTaskCronServiceImpl]).eagerLoad()
     binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl]).eagerLoad()
     binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl]).eagerLoad()
+
 
   }
 }
