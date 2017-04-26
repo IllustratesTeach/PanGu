@@ -15,7 +15,7 @@
     <fileSet>
       <directory>../support/config</directory>
       <includes>
-        <include>hall-api.xml.example</include>
+        <include>hall-webservice.xml.example</include>
       </includes>
       <outputDirectory>config</outputDirectory>
     </fileSet>
@@ -34,9 +34,9 @@
       <outputDirectory>config</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/resources/hall/api</directory>
+      <directory>src/main/resources/hall/webservice</directory>
       <includes>
-        <include>api.xsd</include>
+        <include>webservice.xsd</include>
       </includes>
       <outputDirectory>doc/xsd</outputDirectory>
     </fileSet>
@@ -55,18 +55,11 @@
       <outputDirectory>doc/xsd</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/resources/hall/v62/proxy</directory>
-      <includes>
-        <include>proxy.xsd</include>
-      </includes>
-      <outputDirectory>doc/xsd</outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>../support/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>hall-api</include>
-        <include>hall-api.cmd</include>
+        <include>hall-webservice</include>
+        <include>hall-webservice.cmd</include>
         <include>hall-env.cmd</include>
       </includes>
       <fileMode>755</fileMode>
@@ -80,7 +73,7 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>../hall-api</directory>
+      <directory>../hall-webservice</directory>
       <outputDirectory>doc/thirdparty</outputDirectory>
       <includes>
         <include>LICENSE*.txt</include>
