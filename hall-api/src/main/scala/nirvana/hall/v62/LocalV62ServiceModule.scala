@@ -9,7 +9,7 @@ import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal._
 import nirvana.hall.v62.services.GetPKIDServiceImpl
 import nirvana.hall.v62.services.service.GetPKIDService
-import nirvana.hall.v70.internal.AssistCheckRecordServiceImpl
+import nirvana.hall.v62.internal.AssistCheckRecordServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**

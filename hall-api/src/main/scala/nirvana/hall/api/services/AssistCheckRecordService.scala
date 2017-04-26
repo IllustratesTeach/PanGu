@@ -1,5 +1,7 @@
 package nirvana.hall.api.services
 
+import scala.collection.mutable.{HashMap, ListBuffer}
+
 
 /**
   * Created by yuchen on 2017/4/21.
@@ -8,4 +10,12 @@ package nirvana.hall.api.services
 trait AssistCheckRecordService {
 
   def recordAssistCheck(queryId:String,oraSid:String,caseId:String,personId:String,source:String):Unit
+
+  def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]]
+
+  def updateAssistcheckStatus(status:String, id:String): Unit
+
+  def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]]
+
+  def saveXcReport(serviceid:String, msg:String): Unit
 }

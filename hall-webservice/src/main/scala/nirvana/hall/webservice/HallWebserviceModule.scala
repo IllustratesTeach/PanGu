@@ -6,10 +6,10 @@ import monad.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.TaskHandlerServiceImpl
 import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
-import nirvana.hall.webservice.internal.xingzhuan.xingzhuanTaskCronServiceImpl
+import nirvana.hall.webservice.internal.xingzhuan.{SendCheckinServiceImpl, UploadCheckinServiceImpl, xingzhuanTaskCronServiceImpl}
 import nirvana.hall.webservice.services.TaskHandlerService
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
-import nirvana.hall.webservice.services.xingzhuan.xingzhuanTaskCronService
+import nirvana.hall.webservice.services.xingzhuan.{SendCheckinService, UploadCheckinService, xingzhuanTaskCronService}
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.Symbol
 
@@ -25,9 +25,11 @@ object HallWebserviceModule {
   def bind(binder: ServiceBinder) {
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
-    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
-    binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()
+//    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
+//    binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()
     binder.bind(classOf[xingzhuanTaskCronService],classOf[xingzhuanTaskCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl]).eagerLoad()
+    binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl]).eagerLoad()
 
   }
 }
