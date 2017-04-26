@@ -41,4 +41,8 @@ class Union4pfmipConfig{
   var TenPrintPrex: String = _
   @XmlElement(name = "LatentPrex")
   var LatentPrex: String = _
+  @XmlElement(name = "send_checkin_cron")
+  var sendCheckinCron: String = _
+  @XmlElement(name = "upload_checkin_cron")
+  var uploadCheckinCron: String = _
 }

@@ -78,6 +78,16 @@
             <xs:documentation>本地现场指纹案件号前缀(区分本地数据与外省数据）</xs:documentation>
             </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="send_checkin_cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获取协查比对关系任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="upload_checkin_cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获取上报比对关系任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
