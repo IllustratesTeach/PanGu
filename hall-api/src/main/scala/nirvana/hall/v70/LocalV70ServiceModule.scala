@@ -1,9 +1,7 @@
 package nirvana.hall.v70
 
-import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote._
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync._
 import nirvana.hall.support.internal.RpcHttpClientImpl
@@ -43,7 +41,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
 
-    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])

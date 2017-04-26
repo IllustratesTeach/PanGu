@@ -1,9 +1,7 @@
 package nirvana.hall.v62
 
-import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.support.internal.RpcHttpClientImpl
@@ -33,8 +31,6 @@ object LocalV62ServiceModule {
     binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
-
-    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
 
 

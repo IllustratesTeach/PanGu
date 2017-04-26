@@ -6,8 +6,10 @@ import monad.rpc.services.{RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.ZookeeperTemplate
 import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.filter._
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.sync.SyncCronServiceImpl
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.sync.SyncCronService
 import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
@@ -26,7 +28,7 @@ object LocalApiServiceModule {
     binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
     binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
-
+    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
   }
 
