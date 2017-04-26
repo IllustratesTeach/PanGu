@@ -1,5 +1,8 @@
 package nirvana.hall.webservice.util
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 /**
   * Created by yuchen on 2017/4/21.
   */
@@ -16,6 +19,11 @@ object AFISConstant{
     */
   val NO_REPORTED = "0"
   val REPORTED = "1"
+
+
+  val EMPTY = ""
+
+  val SERVER_TIME = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())
 
 
 }

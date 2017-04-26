@@ -38,7 +38,7 @@
     </xs:complexType>
     <xs:complexType name="union4pfmipType">
         <xs:sequence>
-            <xs:element type="xs:string" name="cron" minOccurs="0" maxOccurs="1">
+            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>获取比对任务定时计划</xs:documentation>
                 </xs:annotation>

@@ -9,7 +9,7 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.TaskHandlerService
-import nirvana.hall.webservice.util.FPTConvertToProtoBuffer
+import nirvana.hall.webservice.util.{AFISConstant, FPTConvertToProtoBuffer}
 
 /**
   * Created by yuchen on 2017/4/25.
@@ -36,7 +36,7 @@ class TaskHandlerServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
           }
           val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
           oraSid = queryService.sendQuery(matchTask)
-          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,"",matchTask.getMatchId,source)
+          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,AFISConstant.EMPTY,matchTask.getMatchId,source)
           return
         }else if(fpt4.logic03Recs.length>0){
           val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
@@ -45,7 +45,7 @@ class TaskHandlerServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
           lPCardService.addLPCard(lPCard)
           caseInfoService.addCaseInfo(caseInfo)
           oraSid = queryService.sendQuery(matchTask)
-          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,caseInfo.getStrCaseID,"",source)
+          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,caseInfo.getStrCaseID,AFISConstant.EMPTY,source)
           return
         }else{
           info("success:xingzhuanTaskCronServiceImpl:返回空FPT文件")

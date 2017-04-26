@@ -514,7 +514,7 @@ object ProtobufConverter extends LoggerSupport{
           finger.personId = personId
           finger.gatherData = imageData.toByteArray
           finger.fgp = blob.getFgp.getNumber.toShort
-          finger.fgpCase = if(blob.getBPlain) "1" else "0"
+          finger.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           finger.groupId = Gafis70Constants.GROUP_ID_CPR
           finger.lobtype = Gafis70Constants.LOBTYPE_DATA
           fingerList += finger
@@ -526,7 +526,7 @@ object ProtobufConverter extends LoggerSupport{
           mnt.personId = personId
           mnt.gatherData = mntData.toByteArray
           mnt.fgp = blob.getFgp.getNumber.toShort
-          mnt.fgpCase = if(blob.getBPlain) "1" else "0"
+          mnt.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           mnt.groupId = Gafis70Constants.GROUP_ID_MNT
           mnt.lobtype = Gafis70Constants.LOBTYPE_MNT
           fingerList += mnt
@@ -538,7 +538,7 @@ object ProtobufConverter extends LoggerSupport{
           bin.personId = personId
           bin.gatherData = binData.toByteArray
           bin.fgp = blob.getFgp.getNumber.toShort
-          bin.fgpCase = if(blob.getBPlain) "1" else "0"
+          bin.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
 
