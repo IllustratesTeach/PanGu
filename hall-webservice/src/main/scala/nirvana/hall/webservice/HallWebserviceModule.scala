@@ -25,7 +25,6 @@ object HallWebserviceModule {
   }
 
   def bind(binder: ServiceBinder) {
-    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
     binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
