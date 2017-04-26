@@ -99,15 +99,4 @@ trait WsFingerService {
   @WebMethod def getLatentFinger(@WebParam(name="userid") userid: String,
                                  @WebParam(name="password") password: String,
                                  @WebParam(name="ajno") ajno: String): DataHandler
-  /**
-    * 通过查询参数返回指定返回相应案件的全部信息（包含文字信息和图像信息）
-    * @param userid 用户名
-    * @param password 密码
-    * @param pkid 比中关系编号
-    * @return 返回的FPT文件信息需用soap的附件形式存储，只返回相应文字信息，不包含图像信息（FPT文件中132项“发送现场指纹个数”应为0）
-    *         若没有查询出数据，则返回一个空FPT文件，即只有第一类记录
-    */
-  @WebMethod def getMatchRelation(@WebParam(name="userid") userid: String,
-                                  @WebParam(name="password") password: String,
-                                  @WebParam(name="pkid") pkid: String): DataHandler
 }

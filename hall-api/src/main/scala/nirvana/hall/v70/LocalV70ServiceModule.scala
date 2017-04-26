@@ -1,7 +1,9 @@
 package nirvana.hall.v70
 
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote._
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync._
 import nirvana.hall.support.internal.RpcHttpClientImpl
@@ -11,7 +13,9 @@ import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6Servic
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync._
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
+import nirvana.hall.v70.services.GetPKIDServiceImpl
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
+import nirvana.hall.v70.services.service.GetPKIDService
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sys.{DictService, UserService}
 import org.apache.tapestry5.ioc.ServiceBinder
@@ -37,6 +41,10 @@ object LocalV70ServiceModule {
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
+    binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
+
+    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
+    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])

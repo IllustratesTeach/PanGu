@@ -1,12 +1,11 @@
 package nirvana.hall.api.internal.fpt
 
-import java.text.SimpleDateFormat
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, MatchRelationService, TPCardService}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -16,7 +15,6 @@ import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.protocol.api.FPTProto.{ImageType, LPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.v70.jpa._
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -26,6 +24,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      tPCardService: TPCardService,
                      caseInfoService: CaseInfoService,
                      lPCardService: LPCardService,
+                     matchRelationService: MatchRelationService,
                      implicit val dataSource: DataSource) extends FPTService{
   private lazy val extractor = new FeatureExtractorImpl
 
@@ -137,25 +136,26 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     }
   }
 
-  override def getLogic04Rec(gafisCheckinInfo: GafisCheckinInfo, dbId: Option[String]): Logic04Rec = {
+  override def getLogic04Rec(pkid: String, dbId: Option[String]): Logic04Rec = {
 
+    val gafisMatchInfo = matchRelationService.getSearchMatchRelation(pkid)
     val logic04Rec = new Logic04Rec
     logic04Rec.systemType = "1900"
-    logic04Rec.caseId = gafisCheckinInfo.code.substring(0,gafisCheckinInfo.code.length-2)
-    logic04Rec.seqNo = gafisCheckinInfo.code.substring(gafisCheckinInfo.code.length-2)
-    logic04Rec.personId = gafisCheckinInfo.code
-    logic04Rec.fgp = gafisCheckinInfo.fgp
+    logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
+    logic04Rec.personId = gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length-2)
+    logic04Rec.fgp = gafisMatchInfo.fgp
     logic04Rec.capture = "0" //7.0web项目直接写的是0,有待确认
     //比中类型(捺印查重(TT):0;  捺印倒查(TL):1;  现场查案(LT):2;  现场串查(LL):3)
-    logic04Rec.matchMethod = gafisCheckinInfo.querytype.toString match {
+    logic04Rec.matchMethod = gafisMatchInfo.querytype match {
       case "2" => "1"
       case "1" => "2"
       case other => "9"
     }
-    logic04Rec.matchUnitCode = gafisCheckinInfo.registerOrg
-    logic04Rec.matchName = SysDepart.find_by_code(gafisCheckinInfo.registerOrg).headOption.getOrElse(gafisCheckinInfo.registerOrg).toString
-    logic04Rec.matcher = gafisCheckinInfo.registerUser
-    logic04Rec.matchDate = new SimpleDateFormat("yyyyMMdd").format(gafisCheckinInfo.registerTime)
+    logic04Rec.matchUnitCode = gafisMatchInfo.registerOrg
+    logic04Rec.matchName = gafisMatchInfo.matchName
+    logic04Rec.matcher = gafisMatchInfo.registerUser
+    logic04Rec.matchDate = gafisMatchInfo.registerTime
     logic04Rec.head.fileLength = logic04Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     //-----------------以下内容FPT上报时可空---------------------//
     //      logic04Rec.remark = ""
@@ -172,32 +172,35 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
   }
 
 
-  override def getLogic05Rec(gafisCheckinInfo: GafisCheckinInfo, dbId: Option[String]): Logic05Rec = {
+  override def getLogic05Rec(pkid: String, dbId: Option[String]): Logic05Rec = {
+
+    val gafisMatchInfo = matchRelationService.getSearchMatchRelation(pkid)
 
     val logic05Rec = new Logic05Rec
     logic05Rec.systemType = "1900"
-    logic05Rec.personId1 = gafisCheckinInfo.code
-    logic05Rec.personId2 = gafisCheckinInfo.tcode
-    logic05Rec.matchUnitCode = gafisCheckinInfo.registerOrg
-    logic05Rec.matchName = SysDepart.find_by_code(gafisCheckinInfo.registerOrg).headOption.getOrElse(gafisCheckinInfo.registerOrg).toString
-    logic05Rec.matcher = gafisCheckinInfo.registerUser
-    logic05Rec.matchDate = new SimpleDateFormat("yyyyMMdd").format(gafisCheckinInfo.registerTime)
+    logic05Rec.personId1 = gafisMatchInfo.code
+    logic05Rec.personId2 = gafisMatchInfo.tcode
+    logic05Rec.matchUnitCode = gafisMatchInfo.registerOrg
+    logic05Rec.matchName = gafisMatchInfo.matchName
+    logic05Rec.matcher = gafisMatchInfo.registerUser
+    logic05Rec.matchDate = gafisMatchInfo.registerTime
     logic05Rec.head.fileLength = logic05Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     logic05Rec
   }
 
-  override def getLogic06Rec(gafisCheckinInfo: GafisCheckinInfo, dbId: Option[String]): Logic06Rec = {
+  override def getLogic06Rec(pkid: String, dbId: Option[String]): Logic06Rec = {
 
+    val gafisMatchInfo = matchRelationService.getSearchMatchRelation(pkid)
     val logic06Rec = new Logic06Rec
     logic06Rec.systemType = "1900"
-    logic06Rec.caseId1 = GafisCaseFinger.find_by_fingerId(gafisCheckinInfo.code).head.caseId
-    logic06Rec.seqNo1 = gafisCheckinInfo.code.substring(gafisCheckinInfo.code.length - 2)
-    logic06Rec.caseId2 = GafisCaseFinger.find_by_fingerId(gafisCheckinInfo.tcode).head.caseId
-    logic06Rec.seqNo2 = gafisCheckinInfo.tcode.substring(gafisCheckinInfo.tcode.length - 2)
-    logic06Rec.matchUnitCode = gafisCheckinInfo.registerOrg
-    logic06Rec.matchName = SysDepart.find_by_code(gafisCheckinInfo.registerOrg).headOption.getOrElse(gafisCheckinInfo.registerOrg).toString
-    logic06Rec.matcher = gafisCheckinInfo.registerUser
-    logic06Rec.matchDate = new SimpleDateFormat("yyyyMMdd").format(gafisCheckinInfo.registerTime)
+    logic06Rec.caseId1 = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    logic06Rec.seqNo1 = gafisMatchInfo.code.substring(gafisMatchInfo.code.length - 2)
+    logic06Rec.caseId2 = gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    logic06Rec.seqNo2 = gafisMatchInfo.tcode.substring(gafisMatchInfo.tcode.length - 2)
+    logic06Rec.matchUnitCode = gafisMatchInfo.registerOrg
+    logic06Rec.matchName = gafisMatchInfo.matchName
+    logic06Rec.matcher = gafisMatchInfo.registerUser
+    logic06Rec.matchDate = gafisMatchInfo.registerTime
     logic06Rec.head.fileLength = logic06Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     logic06Rec
   }

@@ -21,4 +21,13 @@ class MatchRelationServiceImplTest extends BaseV62TestCase{
     println(relation.getMatchStatus)
 
   }
+  @Test
+  def test_exportMatchRelation(): Unit ={
+
+    val service = getService[MatchRelationService]
+    val relation = service.exportMatchRelation("0","453")
+    println("asa")
+
+  }
+
 }

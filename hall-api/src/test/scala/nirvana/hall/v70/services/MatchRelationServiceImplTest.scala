@@ -1,5 +1,7 @@
 package nirvana.hall.v70.services
 
+import java.io.FileOutputStream
+
 import junit.framework.Assert
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
@@ -44,5 +46,19 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
     val matchRelation = service.getMatchRelation(requestBuilder.build())
     Assert.assertNotNull(matchRelation)
     println(matchRelation)
+  }
+
+
+  @Test
+  def test_exportMatchRelation(): Unit ={
+
+    val service = getService[MatchRelationService]
+    val relation = service.exportMatchRelation("123","9536") //9536 tt //11017 tl //10816 lt //6322 ll
+
+    val fileOutPutStream = new FileOutputStream("D://123.fpt")
+    relation.writeTo(fileOutPutStream)
+    fileOutPutStream.flush()
+    fileOutPutStream.close()
+
   }
 }
