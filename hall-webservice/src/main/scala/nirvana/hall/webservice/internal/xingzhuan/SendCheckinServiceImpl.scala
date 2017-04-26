@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import javax.activation.DataHandler
 import javax.sql.DataSource
-import javax.xml.namespace.QName
-
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.{AssistCheckRecordService, MatchRelationService}
@@ -14,9 +12,6 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.SendCheckinService
 import nirvana.hall.webservice.util.WebServicesClient_AssistCheck
-import org.apache.axis2.addressing.EndpointReference
-import org.apache.axis2.client.Options
-import org.apache.axis2.rpc.client.RPCServiceClient
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
