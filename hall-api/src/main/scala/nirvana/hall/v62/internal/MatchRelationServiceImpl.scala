@@ -94,20 +94,22 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
             val tableId: Short = 3
             facade.NET_GAFIS_PERSON_Get(dbId, tableId, m_stPersonInfo)
             m_stPersonInfo.pstID_Data.foreach{personInfo =>
-              val tt = MatchRelationTT.newBuilder()
-              tt.setPersonId1(cardId)
-              tt.setPersonId2(personInfo.szCardID)
-              //TT没有单位信息
-              val matchSysInfo = MatchSysInfo.newBuilder()
-              matchSysInfo.setMatchUnitCode("")
-              matchSysInfo.setMatchUnitName("")
-              matchSysInfo.setMatcher(personInfo.szUserName)
-              matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
-              val matchRelation = MatchRelation.newBuilder()
-              matchRelation.setMatchSysInfo(matchSysInfo)
-              matchRelation.setExtension(MatchRelationTT.data, tt.build())
+              if(!cardId.equals(personInfo.szCardID)){//排除自己
+                val tt = MatchRelationTT.newBuilder()
+                tt.setPersonId1(cardId)
+                tt.setPersonId2(personInfo.szCardID)
+                //TT没有单位信息
+                val matchSysInfo = MatchSysInfo.newBuilder()
+                matchSysInfo.setMatchUnitCode("")
+                matchSysInfo.setMatchUnitName("")
+                matchSysInfo.setMatcher(personInfo.szUserName)
+                matchSysInfo.setMatchDate(DateConverter.convertAFISDateTime2String(personInfo.tCheckTime).substring(0, 8))
+                val matchRelation = MatchRelation.newBuilder()
+                matchRelation.setMatchSysInfo(matchSysInfo)
+                matchRelation.setExtension(MatchRelationTT.data, tt.build())
 
-              response.addMatchRelation(matchRelation.build())
+                response.addMatchRelation(matchRelation.build())
+              }
             }
           }
         }
