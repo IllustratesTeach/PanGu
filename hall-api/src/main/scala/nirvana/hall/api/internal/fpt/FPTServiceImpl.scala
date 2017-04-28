@@ -11,7 +11,7 @@ import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.extractor.internal.FeatureExtractorImpl
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.api.FPTProto.{ImageType, LPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
@@ -25,8 +25,8 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      caseInfoService: CaseInfoService,
                      lPCardService: LPCardService,
                      matchRelationService: MatchRelationService,
+                     extractor: FeatureExtractor,
                      implicit val dataSource: DataSource) extends FPTService{
-  private lazy val extractor = new FeatureExtractorImpl
 
   override def getLogic02Rec(cardId: String, dbId: Option[String]): Logic02Rec = {
     if(tPCardService.isExist(cardId)){

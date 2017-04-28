@@ -1,8 +1,6 @@
 package nirvana.hall.v70
 
-import nirvana.hall.api.internal.remote._
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
@@ -40,14 +38,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
-
-    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
-    //远程服务类
-    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
-    binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])
-    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
-    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
-    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
 
     //同步
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
