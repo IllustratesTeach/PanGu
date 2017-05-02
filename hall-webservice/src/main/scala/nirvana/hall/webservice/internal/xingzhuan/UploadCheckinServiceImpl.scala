@@ -117,7 +117,6 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
       }
     }catch{
       case e:Exception=> error("uploadCheckin-error:" + ExceptionUtil.getStackTraceInfo(e))
-        e.printStackTrace()
     }
   }
 

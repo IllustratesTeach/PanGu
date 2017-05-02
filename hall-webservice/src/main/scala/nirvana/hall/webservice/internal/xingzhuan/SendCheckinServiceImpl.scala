@@ -103,8 +103,8 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
               updateAssistcheckStatus(status, id)
             }
           } catch {
-            case e:Exception=> error("sendCheckinCron-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
-              e.printStackTrace()
+            case e:Exception=>
+              error("sendCheckinCron-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
           }
         }
       }
@@ -137,7 +137,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
       dir.mkdirs()
     }
     try{
-      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+"_return.fpt")
+      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".fpt")
       var byteArray = new Array[Byte](1024)
       var count:Int = -1
       count = in.read(byteArray)

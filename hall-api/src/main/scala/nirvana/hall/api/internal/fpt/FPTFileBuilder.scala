@@ -117,6 +117,7 @@ object FPTFileBuilder {
             logic02Rec.portraitData = blob.getStImageBytes.toByteArray
             logic02Rec.portraitDataLength = logic02Rec.portraitData.length.toString
           }
+        case _ =>
       }
     }
 
