@@ -21,6 +21,14 @@ class HallWebserviceConfig
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
   @XmlElement(name = "hall_image_url")
   var hallImageUrl: String = _
+  @XmlElement(name = "local_tenprint_path")
+  var localTenprintPath:String = _
+  @XmlElement(name = "local_latent_path")
+  var localLatentPath:String = _
+  @XmlElement(name = "local_hit_result_path")
+  var localHitResultPath:String = _
+  @XmlElement(name = "xc_hit_result_path")
+  var xcHitResultPath:String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")
