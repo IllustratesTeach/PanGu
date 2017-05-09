@@ -12,7 +12,7 @@ REM set extra_module v70:nirvana.hall.v70.LocalV70Module,nirvana.hall.v70.LocalV
 set EXTRA_MODULE=nirvana.hall.v62.LocalV62Module,nirvana.hall.v62.LocalV62ServiceModule,stark.activerecord.StarkActiveRecordModule,nirvana.hall.v62.LocalV62DataSourceModule
 
 REM set java options
-SET JAVA_OPTIONS=%JAVA_OPTIONS% -Dserver.port=%SERVER_PORT%  -Dserver.home=%SERVER_HOME% -Dapi.extra.module=%EXTRA_MODULE% -Dfile.encoding=utf-8
+SET JAVA_OPTIONS=%JAVA_OPTIONS% -Dserver.port=%SERVER_PORT%  -Dserver.home=%SERVER_HOME% -Dextra.module=%EXTRA_MODULE% -Dfile.encoding=utf-8
 
 echo on
 call %JAVA% -cp "%CLASSPATH%" %JAVA_OPTIONS% %HALLMAIN%  %*
