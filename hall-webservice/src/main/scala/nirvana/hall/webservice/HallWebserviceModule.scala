@@ -6,12 +6,12 @@ import monad.support.services.XmlLoader
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.TaskHandlerServiceImpl
+import nirvana.hall.webservice.internal.{TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
 import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
-import nirvana.hall.webservice.internal.xingzhuan.{SendCheckinServiceImpl, UploadCheckinServiceImpl, xingzhuanTaskCronServiceImpl}
-import nirvana.hall.webservice.services.TaskHandlerService
+import nirvana.hall.webservice.internal.xingzhuan.{SendCheckinServiceImpl, TenPrinterCronServiceImpl, UploadCheckinServiceImpl, xingzhuanTaskCronServiceImpl}
+import nirvana.hall.webservice.services.{TaskHandlerService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
-import nirvana.hall.webservice.services.xingzhuan.{SendCheckinService, UploadCheckinService, xingzhuanTaskCronService}
+import nirvana.hall.webservice.services.xingzhuan.{SendCheckinService, TenPrinterCronService, UploadCheckinService, xingzhuanTaskCronService}
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.Symbol
 
@@ -28,11 +28,14 @@ object HallWebserviceModule {
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
-//    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
+    binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
+
+    //    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
 //    binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()
-    binder.bind(classOf[xingzhuanTaskCronService],classOf[xingzhuanTaskCronServiceImpl]).eagerLoad()
-    binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl]).eagerLoad()
-    binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl]).eagerLoad()
+    binder.bind(classOf[xingzhuanTaskCronService],classOf[xingzhuanTaskCronServiceImpl])//.eagerLoad()
+    binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl])//.eagerLoad()
+    binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl])//.eagerLoad()
+    binder.bind(classOf[TenPrinterCronService],classOf[TenPrinterCronServiceImpl]).eagerLoad()
 
   }
 }
