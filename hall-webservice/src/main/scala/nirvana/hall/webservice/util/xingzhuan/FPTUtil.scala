@@ -1,4 +1,4 @@
-package nirvana.hall.webservice.util.xinghuan
+package nirvana.hall.webservice.util.xingzhuan
 
 import java.io.{FileOutputStream, InputStream}
 import java.text.SimpleDateFormat
