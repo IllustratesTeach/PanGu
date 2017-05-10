@@ -3,7 +3,7 @@ package nirvana.hall.image.internal
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.jni.NativeImageConverter
-import nirvana.hall.image.services.{ImageEncoder, RawImageDataType}
+import nirvana.hall.image.services.{FirmDecoder, ImageEncoder, RawImageDataType}
 import nirvana.hall.protocol.image.ImageCompressProto.ImageCompressRequest
 
 /**
@@ -11,7 +11,7 @@ import nirvana.hall.protocol.image.ImageCompressProto.ImageCompressRequest
   * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
   * @since 2016-04-15
   */
-class ImageEncoderImpl(firmDecoderImpl: FirmDecoderImpl) extends ImageEncoder{
+class ImageEncoderImpl(firmDecoder: FirmDecoder) extends ImageEncoder{
   override def encode(imageCompressRequest: ImageCompressRequest): GAFISIMAGESTRUCT = {
     val method = imageCompressRequest.getCompressMethod
     val imageData = imageCompressRequest.getOriginalData.toByteArray
@@ -29,7 +29,7 @@ class ImageEncoderImpl(firmDecoderImpl: FirmDecoderImpl) extends ImageEncoder{
     var image = gafisImage
     //如果数据是压缩图，先解压图像
     if(image.stHead.bIsCompressed > 0){
-      image = firmDecoderImpl.decode(image, RawImageDataType)
+      image = firmDecoder.decode(image, RawImageDataType)
     }
     val destImg = new GAFISIMAGESTRUCT
     destImg.stHead.fromByteArray(image.stHead.toByteArray())
@@ -42,7 +42,7 @@ class ImageEncoderImpl(firmDecoderImpl: FirmDecoderImpl) extends ImageEncoder{
           10)
     destImg.bnData = cpr
     destImg.stHead.nImgSize = destImg.bnData.length
-    destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ
+    destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
     destImg
   }
 }
