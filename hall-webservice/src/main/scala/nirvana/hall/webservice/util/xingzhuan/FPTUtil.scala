@@ -66,4 +66,18 @@ object FPTUtil extends LoggerSupport{
       ps.setString(3,id)
     }
   }
+
+  /**
+    * 获取表名
+    * @param dbId
+    * @param tableId
+    * @return
+    */
+  def getTableName(implicit dataSource: DataSource,dbId: Short, tableId: Short): String={
+    val sql = "select t.TABLENAME from TABLECATLOG t where t.DBID =? and t.TABLEID =?"
+    JdbcDatabase.queryFirst(sql){ps=>
+      ps.setInt(1, dbId)
+      ps.setInt(2, tableId)
+    }{_.getString(1)}.get
+  }
 }
