@@ -24,7 +24,7 @@ object FPTUtil extends LoggerSupport{
         case HallWebserviceConstants.LocalLatent => path = config.localLatentPath
         case HallWebserviceConstants.LocalHitResult => path = config.localHitResultPath
         case HallWebserviceConstants.XCHitResult => path = config.xcHitResultPath
-        case _ => warn("Unkown operation type",_)
+        case other => warn("Unkown operation type",other)
       }
       finalPath = saveFpt(in,id,path)
       updateAssistcheckStatus(dataSource,status,id,finalPath)
