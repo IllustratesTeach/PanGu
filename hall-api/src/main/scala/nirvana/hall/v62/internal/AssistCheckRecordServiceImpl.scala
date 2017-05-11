@@ -4,8 +4,8 @@ package nirvana.hall.v62.internal
 import java.util.UUID
 import javax.sql.DataSource
 
+import nirvana.hall.api.internal.AssistCheckConstant
 import nirvana.hall.api.services.AssistCheckRecordService
-import nirvana.hall.api.webservice.util.AFISConstant
 import nirvana.hall.support.services.JdbcDatabase
 
 import scala.collection.mutable.{HashMap, ListBuffer}
@@ -24,7 +24,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(4,caseId)
       ps.setString(5,personId)
       ps.setString(6,source)
-      ps.setString(7,AFISConstant.NO_REPORTED)
+      ps.setString(7,AssistCheckConstant.NO_REPORTED)
     }
   }
 

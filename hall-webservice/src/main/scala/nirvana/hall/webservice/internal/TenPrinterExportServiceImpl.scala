@@ -1,6 +1,5 @@
 package nirvana.hall.webservice.internal
 
-import java.util.UUID
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
@@ -80,7 +79,7 @@ class TenPrinterExportServiceImpl( implicit dataSource: DataSource
       s"FROM HALL_XC_REPORT p " +
       s"WHERE p.typ='TenprintRecord' AND p.serviceid = t.cardid) " +
       s" AND t.createtime>= to_date('${dateLimit}-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss') and rownum<= ?"
-    val cardIdBuffer: ArrayBuffer[(String)] = null
+    val cardIdBuffer = new ArrayBuffer[String]()
     JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
       ps.setInt(1, size)
     }{rs=>

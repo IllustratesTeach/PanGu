@@ -2,9 +2,11 @@ package nirvana.hall.v70.internal
 
 import java.util.UUID
 import javax.persistence.EntityManager
+
+import nirvana.hall.api.internal.AssistCheckConstant
 import nirvana.hall.api.services.AssistCheckRecordService
-import nirvana.hall.api.webservice.util.AFISConstant
 import nirvana.hall.v70.jpa.HallAssistCheck
+
 import scala.collection.mutable.{HashMap, ListBuffer}
 import scala.collection.JavaConverters._
 
@@ -13,7 +15,7 @@ import scala.collection.JavaConverters._
   */
 class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistCheckRecordService{
   override def recordAssistCheck(queryId: String, oraSid: String, caseId: String, personId: String, source: String): Unit = {
-    new HallAssistCheck(UUID.randomUUID.toString.replace("-",""),queryId,oraSid,caseId,personId,source,AFISConstant.NO_REPORTED).save
+    new HallAssistCheck(UUID.randomUUID.toString.replace("-",""),queryId,oraSid,caseId,personId,source,AssistCheckConstant.NO_REPORTED).save
   }
 
   override def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]] = {

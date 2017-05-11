@@ -8,8 +8,8 @@ import javax.sql.DataSource
 import javax.xml.namespace.QName
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.fpt.FPTConvertToProtoBuffer
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
-import nirvana.hall.api.webservice.util.FPTConvertToProtoBuffer
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile

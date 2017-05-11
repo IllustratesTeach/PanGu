@@ -7,7 +7,9 @@ import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.AuthServiceImpl
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.services.AuthService
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.services.V62ServerAddress
@@ -38,8 +40,8 @@ class BaseV62TestCase {
       "nirvana.hall.v62.LocalV62ServiceModule",
       "nirvana.hall.v62.LocalV62DataSourceModule",
       //LiaoNing
-      "nirvana.hall.v62.LocalV62LiaoNingServiceModule",
-      "nirvana.hall.api.LocalApiWebServiceModule",
+//      "nirvana.hall.v62.LocalV62LiaoNingServiceModule",
+//      "nirvana.hall.api.LocalApiWebServiceModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
@@ -93,6 +95,7 @@ object TestV62Module {
   }
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
   }
   def buildHallApiConfig={
     new HallApiConfig

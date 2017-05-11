@@ -1,9 +1,10 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal
 
 /**
   * Created by yuchen on 2017/4/21.
+  * 协查常量类
   */
-object AFISConstant{
+object AssistCheckConstant{
 
   /**
     * AFIS 分类

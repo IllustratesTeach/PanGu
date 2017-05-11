@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
 import nirvana.hall.extractor.internal.FPTMntConverter

@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal.fpt
 
 import java.io.FileInputStream
 

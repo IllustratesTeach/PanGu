@@ -1,4 +1,4 @@
-package nirvana.hall.api.webservice.util
+package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}

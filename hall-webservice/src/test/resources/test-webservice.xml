@@ -5,9 +5,22 @@
 -->
 
 <hall_webservice>
-    <log_file>${server.home}/log/hall.webservice.log</log_file>
-    <local_store_dir>${server.home}/config/local.webservice</local_store_dir>
+    <log_file>support/log/hall.webservice.log</log_file>
+    <local_store_dir>support/config/local.webservice</local_store_dir>
     <web>
         <bind>0.0.0.0:8080</bind>
     </web>
+    <union4pfmip>
+        <cron>0/1 * * * * ? *</cron>
+        <url>http://127.0.0.1:8081/ws/collectionSysPorts?wsdl</url>
+        <target_namespace>http://www.egfit.com/</target_namespace>
+        <user>370</user>
+        <password>370</password>
+        <dateLimit>2016</dateLimit>
+        <TenPrintPrex>37</TenPrintPrex>
+        <LatentPrex>37</LatentPrex>
+    </union4pfmip>
+    <hall_image_url>http://192.168.1.214:9001</hall_image_url>
+    <local_tenprint_path>suport/fpt</local_tenprint_path>
+    <local_latent_path>suport/fpt</local_latent_path>
 </hall_webservice>

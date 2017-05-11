@@ -1,12 +1,15 @@
 package nirvana.hall.v62.services
 
 import nirvana.hall.api.services.QueryService
+import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_ITEMSTRUCT
+import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition
 import nirvana.hall.v62.BaseV62TestCase
 import nirvana.hall.v62.internal.QueryServiceImpl
+import org.jboss.netty.buffer.ChannelBuffers
 import org.junit.{Assert, Test}
 
 /**
@@ -68,8 +71,20 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_getGAQUERYSTRUCT: Unit ={
     val service = getService[QueryService]
-    val query = service.getGAQUERYSTRUCT(1)
+    val query = service.getGAQUERYSTRUCT(2)
     Assert.assertNotNull(query)
+    val param = new GAFIS_QRYPARAM()
+    val item = new GBASE_ITEMPKG_ITEMSTRUCT()
+    val qryCondData = query.pstQryCond_Data
+    val arr = new Array[Byte](qryCondData.length - 64)
+    System.arraycopy(qryCondData, 64, arr, 0, qryCondData.length -64)
+    println(qryCondData.length)
+    val buffer = ChannelBuffers.buffer(qryCondData.length)
+    buffer.writeBytes(qryCondData)
+    param.fromStreamReader(buffer)
+    item.fromByteArray(arr)
+    println(item.stHead.nItemLen)
+    println(new String(item.bnRes))
   }
 
   @Test
