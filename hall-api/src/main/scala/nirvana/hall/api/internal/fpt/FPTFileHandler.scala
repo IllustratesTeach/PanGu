@@ -4,6 +4,7 @@ import java.io.FileInputStream
 
 import com.google.protobuf.{ByteString, ExtensionRegistry}
 import monad.rpc.protocol.CommandProto.CommandStatus
+import nirvana.hall.api.internal.FeatureExtractorImpl
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
@@ -11,7 +12,7 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
-import nirvana.hall.extractor.internal.{FPTLatentConverter, FeatureExtractorImpl}
+import nirvana.hall.extractor.internal.FPTLatentConverter
 import nirvana.hall.protocol.extract.ExtractProto
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition

@@ -3,7 +3,6 @@ package nirvana.hall.webservice.util
 import javax.activation.DataHandler
 import javax.xml.namespace.QName
 
-import nirvana.hall.webservice.config.HallWebserviceConfig
 import org.apache.axis2.addressing.EndpointReference
 import org.apache.axis2.client.Options
 import org.apache.axis2.rpc.client.RPCServiceClient

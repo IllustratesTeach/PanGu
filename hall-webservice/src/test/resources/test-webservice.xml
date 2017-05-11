@@ -21,6 +21,6 @@
         <LatentPrex>37</LatentPrex>
     </union4pfmip>
     <hall_image_url>http://192.168.1.214:9001</hall_image_url>
-    <local_tenprint_path>suport/fpt</local_tenprint_path>
-    <local_latent_path>suport/fpt</local_latent_path>
+    <local_tenprint_path>support/fpt</local_tenprint_path>
+    <local_latent_path>support/fpt</local_latent_path>
 </hall_webservice>

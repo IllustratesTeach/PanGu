@@ -4,12 +4,13 @@ import javax.activation.DataHandler
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.fpt.FPTConvertToProtoBuffer
 import nirvana.hall.api.services._
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.TaskHandlerService
-import nirvana.hall.webservice.util.{AFISConstant, FPTConvertToProtoBuffer}
+import nirvana.hall.webservice.util.AFISConstant
 
 /**
   * Created by yuchen on 2017/4/25.
