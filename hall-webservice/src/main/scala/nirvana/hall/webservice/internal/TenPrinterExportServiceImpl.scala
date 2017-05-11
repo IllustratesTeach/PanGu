@@ -3,6 +3,7 @@ package nirvana.hall.webservice.internal
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
+import java.util.UUID
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.support.services.JdbcDatabase

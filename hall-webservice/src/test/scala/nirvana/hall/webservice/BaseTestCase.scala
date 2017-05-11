@@ -3,12 +3,20 @@ package nirvana.hall.webservice
 import javax.persistence.EntityManagerFactory
 
 import monad.support.services.XmlLoader
+import nirvana.hall.api.internal.FeatureExtractorImpl
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
+import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.TenPrinterExportServiceImpl
 import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
+import nirvana.hall.webservice.services.TenPrinterExportService
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
@@ -38,6 +46,7 @@ class BaseTestCase {
 //      "nirvana.hall.v70.LocalV70ServiceModule",
 //      "nirvana.hall.v70.LocalDataSourceModule",
 
+      "nirvana.hall.api.LocalProtobufModule",
       "nirvana.hall.webservice.TestWebserviceModule",
       "stark.activerecord.StarkActiveRecordModule"
     ).map(Class.forName)
@@ -61,8 +70,14 @@ object TestWebserviceModule{
     XmlLoader.parseXML[HallWebserviceConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/webservice/webservice.xsd")))
   }
   def bind(binder: ServiceBinder): Unit = {
+    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
+    binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+    binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
+    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
+
+    binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
   }
 }
 object TestV62Module{

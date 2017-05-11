@@ -16,6 +16,7 @@ import monad.support.services.WebServerConfigSupport
 @XmlRootElement(name = "hall_api")
 class HallApiConfig
   extends LogFileSupport
+    with HallImageRemoteConfigSupport
     with RpcBindSupport
     with WebServerConfigSupport
     with LocalStoreConfigSupport
@@ -24,9 +25,6 @@ class HallApiConfig
 
     @XmlElement(name = "sync")
     var sync: SyncConfig = new SyncConfig
-    @XmlElement(name = "hall_image_url")
-    var hallImageUrl: String = _
-
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -36,4 +34,12 @@ class SyncConfig {
     var batchSize: Int = 1
     @XmlElement(name = "sync_cron")
     var syncCron: String = _
+}
+
+/**
+  * hall_image_url配置
+  */
+trait HallImageRemoteConfigSupport{
+    @XmlElement(name = "hall_image_url")
+    var hallImageUrl: String = _
 }

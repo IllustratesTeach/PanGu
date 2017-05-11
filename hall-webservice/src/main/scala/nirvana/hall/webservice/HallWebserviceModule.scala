@@ -3,11 +3,17 @@ package nirvana.hall.webservice
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.support.services.XmlLoader
+import nirvana.hall.api.internal.FeatureExtractorImpl
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
+import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.{TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
-import nirvana.hall.webservice.internal.bjwcsy.{SendMatchResultService, Union4pfmipCronService, WsFingerServiceImpl}
+import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
 import nirvana.hall.webservice.internal.xingzhuan.{SendCheckinServiceImpl, TenPrinterCronServiceImpl, UploadCheckinServiceImpl, xingzhuanTaskCronServiceImpl}
 import nirvana.hall.webservice.services.{TaskHandlerService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
@@ -25,10 +31,15 @@ object HallWebserviceModule {
   }
 
   def bind(binder: ServiceBinder) {
-    binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
+    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
+    binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+    binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
+    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
+
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
+    binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
 
     //    binder.bind(classOf[Union4pfmipCronService], classOf[Union4pfmipCronService]).eagerLoad()
 //    binder.bind(classOf[SendMatchResultService], classOf[SendMatchResultService]).eagerLoad()

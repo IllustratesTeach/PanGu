@@ -4,6 +4,7 @@ import javax.xml.bind.annotation._
 
 import monad.core.config.{HeartbeatConfigSupport, LocalStoreConfigSupport, LogFileSupport}
 import monad.support.services.WebServerConfigSupport
+import nirvana.hall.api.config.HallImageRemoteConfigSupport
 
 /**
   * Created by songpeng on 2017/4/24.
@@ -13,14 +14,13 @@ import monad.support.services.WebServerConfigSupport
 @XmlRootElement(name = "hall_webservice")
 class HallWebserviceConfig
   extends LogFileSupport
+  with HallImageRemoteConfigSupport
   with WebServerConfigSupport
   with LocalStoreConfigSupport
   with HeartbeatConfigSupport{
 
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
-  @XmlElement(name = "hall_image_url")
-  var hallImageUrl: String = _
   @XmlElement(name = "local_tenprint_path")
   var localTenprintPath:String = _
   @XmlElement(name = "local_latent_path")
