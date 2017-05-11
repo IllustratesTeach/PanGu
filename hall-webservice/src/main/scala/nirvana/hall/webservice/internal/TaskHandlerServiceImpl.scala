@@ -4,18 +4,18 @@ import javax.activation.DataHandler
 import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.fpt.FPTConvertToProtoBuffer
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.TaskHandlerService
-import nirvana.hall.webservice.util.AFISConstant
 
 /**
   * Created by yuchen on 2017/4/25.
   */
 class TaskHandlerServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
+                           fptService: FPTService,
                            tPCardService: TPCardService,
                            lPCardService: LPCardService,
                            caseInfoService: CaseInfoService,
@@ -31,22 +31,20 @@ class TaskHandlerServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
         val taskId = fpt4.sid
         var oraSid = 0L
         if(fpt4.logic02Recs.length>0){
-          fpt4.logic02Recs.foreach{ sLogic02Rec =>
-            val tpCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec, hallWebserviceConfig.hallImageUrl)
-            tPCardService.addTPCard(tpCard)
+          //TODO 同Union4pfmipCronService.handlerTPcardData
+          fpt4.logic02Recs.foreach{ logic02Rec =>
+            fptService.addLogic02Res(logic02Rec)
           }
-          val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
-          oraSid = queryService.sendQuery(matchTask)
-          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,AFISConstant.EMPTY,matchTask.getMatchId,source)
+//          val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
+//          oraSid = queryService.sendQuery(matchTask)
+//          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,AFISConstant.EMPTY,matchTask.getMatchId,source)
           return
         }else if(fpt4.logic03Recs.length>0){
-          val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
-          val caseInfo = FPTConvertToProtoBuffer.FPT2CaseProtoBuffer(fpt4)
-          val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
-          lPCardService.addLPCard(lPCard)
-          caseInfoService.addCaseInfo(caseInfo)
-          oraSid = queryService.sendQuery(matchTask)
-          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,caseInfo.getStrCaseID,AFISConstant.EMPTY,source)
+          //TODO 同Union4pfmipCronService.handlerLPCardData
+          fpt4.logic03Recs.foreach(fptService.addLogic03Res(_))
+//          val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
+//          oraSid = queryService.sendQuery(matchTask)
+//          assistCheckRecordService.recordAssistCheck(taskId,oraSid.toString,caseInfo.getStrCaseID,AFISConstant.EMPTY,source)
           return
         }else{
           info("success:xingzhuanTaskCronServiceImpl:返回空FPT文件")

@@ -8,7 +8,7 @@ import javax.sql.DataSource
 import javax.xml.namespace.QName
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.fpt.FPTConvertToProtoBuffer
+import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
@@ -25,6 +25,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
   * 互查系统定时任务
   */
 class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
+                             fptService: FPTService,
                              tPCardService: TPCardService,
                              lPCardService: LPCardService,
                              caseInfoService: CaseInfoService,
@@ -92,13 +93,13 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
     * @param imageDecompressUrl 用于解压返回原图的hall-image的服务的地址
     */
   def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Long ={
-    fpt4.logic02Recs.foreach{ sLogic02Rec =>
-      val tpCard = FPTConvertToProtoBuffer.TPFPT2ProtoBuffer(sLogic02Rec, imageDecompressUrl)
-      tPCardService.addTPCard(tpCard)
+    fpt4.logic02Recs.foreach{ logic02Rec =>
+      fptService.addLogic02Res(logic02Rec)
     }
     //TODO 发查询的代码剥离出来
-    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
-    queryService.sendQuery(matchTask)
+//    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
+//    queryService.sendQuery(matchTask)
+    0
   }
 
   /**
@@ -107,12 +108,15 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
     * @param fpt4
     */
   def handlerLPCardData(fpt4:FPT4File): Long ={
-    val lPCard = FPTConvertToProtoBuffer.FPT2LPProtoBuffer(fpt4)
-    val caseInfo = FPTConvertToProtoBuffer.FPT2CaseProtoBuffer(fpt4)
-    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
-    lPCardService.addLPCard(lPCard)
-    caseInfoService.addCaseInfo(caseInfo)
-    queryService.sendQuery(matchTask)
+    //TODO 发查询的代码剥离出来
+    fpt4.logic03Recs.foreach{ logic03Res =>
+      fptService.addLogic03Res(_)
+//      val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
+//      lPCardService.addLPCard(lPCard)
+//      caseInfoService.addCaseInfo(caseInfo)
+//      queryService.sendQuery(matchTask)
+    }
+    0
   }
 
   /**

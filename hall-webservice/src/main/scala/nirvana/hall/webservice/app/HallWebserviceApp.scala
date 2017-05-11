@@ -3,6 +3,7 @@ package nirvana.hall.webservice.app
 import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
+import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.support.HallSupportConstants
 import nirvana.hall.webservice.{HallWebserviceConstants, HallWebserviceModule}
 import org.slf4j.LoggerFactory
@@ -21,6 +22,8 @@ object HallWebserviceApp
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
     val config = HallWebserviceModule.buildHallWebserviceConfig(serverHome)
     configLogger(config.logFile, "webservice", "egf", "nirvana.hall")
+    //加载提取特征JNI
+    JniLoader.loadJniLibrary(serverHome,config.logFile)
 
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall webservice server ....")

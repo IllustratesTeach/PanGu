@@ -3,7 +3,6 @@ package nirvana.hall.webservice.internal
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
-import java.util.UUID
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.support.services.JdbcDatabase
@@ -45,7 +44,7 @@ class TenPrinterExportServiceImpl( implicit dataSource: DataSource
           ,1L
           ,hallWebserviceConfig
           ,dataSource)
-        saveResult(UUID.randomUUID().toString.replace("-",""),cardId,"TenprintRecord",-1,"")
+//        saveResult(UUID.randomUUID().toString.replace("-",""),cardId,"TenprintRecord",-1,"")
     }
   }
 
