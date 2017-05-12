@@ -18,7 +18,7 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisCaseFingerMnt, GafisGatherFinger, GafisNormalqueryQueryque, SysUser}
+import nirvana.hall.v70.jpa._
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
@@ -110,7 +110,6 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long = {
     val matchTaskBuilder = matchTask.toBuilder
     val cardId = matchTask.getMatchId
-    import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
     matchTask.getMatchType match {
       case MatchType.FINGER_TT | MatchType.FINGER_TL =>
         val fingerList = GafisGatherFinger.find_by_personId_and_lobtype(cardId, Gafis70Constants.LOBTYPE_MNT)
@@ -154,6 +153,47 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
         }
     }
     addMatchTask(matchTaskBuilder.build())
+  }
+
+  /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @param queryDBConfig
+    * @return
+    */
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig): Long = {
+    val matchTask = MatchTask.newBuilder
+    matchType match {
+      case MatchType.FINGER_TT | MatchType.FINGER_TL =>
+        //根据卡号查询sid
+        val sid = GafisPerson.select(GafisPerson.sid).where(GafisPerson.personid === cardId)
+        if(sid.isEmpty){
+          throw new RuntimeException("GafisPerson:" + cardId + " not exist")
+        }
+        val objectId = sid.toList(0).asInstanceOf[Long]
+        matchTask.setObjectId(objectId)
+        matchTask.setMatchType(matchType)
+      case MatchType.FINGER_LL | MatchType.FINGER_LT =>
+        //根据卡号查询sid
+        val sid = GafisCaseFinger.select(GafisCaseFinger.sid).where(GafisCaseFinger.fingerId === cardId)
+        if(sid.isEmpty){
+          throw new RuntimeException("GafisCaseFinger:" + cardId + " not exist")
+        }
+        val objectId = sid.toList(0).asInstanceOf[Long]
+        matchTask.setObjectId(objectId)
+        matchTask.setMatchType(matchType)
+      case other =>
+        throw new IllegalArgumentException("unsupport MatchType:" + matchType)
+    }
+    matchTask.setMatchId(cardId)
+    matchTask.setTopN(50)
+    matchTask.setObjectId(0)
+    matchTask.setPriority(2)
+    matchTask.setScoreThreshold(60)
+
+    sendQuery(matchTask.build(), queryDBConfig)
   }
 
   /**

@@ -147,6 +147,16 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   }
 
   /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @param queryDBConfig
+    * @return
+    */
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig): Long = ???
+
+  /**
     * 根据任务号sid获取比对状态
     * @param oraSid
     * @param dbId
