@@ -7,9 +7,10 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
+import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger, SysDepart}
 import nirvana.hall.v70.services.service.GetPKIDService

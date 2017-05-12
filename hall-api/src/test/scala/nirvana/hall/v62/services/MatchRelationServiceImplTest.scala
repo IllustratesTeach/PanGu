@@ -2,7 +2,7 @@ package nirvana.hall.v62.services
 
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
 import org.junit.Test
 

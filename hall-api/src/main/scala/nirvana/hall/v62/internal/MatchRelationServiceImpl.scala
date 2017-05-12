@@ -10,9 +10,10 @@ import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03R
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
+import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 import nirvana.hall.v62.services.service.GetPKIDService

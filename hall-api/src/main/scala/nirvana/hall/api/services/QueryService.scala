@@ -3,9 +3,9 @@ package nirvana.hall.api.services
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 
 /**
   * Created by songpeng on 16/1/26.

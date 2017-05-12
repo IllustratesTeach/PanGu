@@ -10,11 +10,11 @@ import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter

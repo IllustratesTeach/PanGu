@@ -4,9 +4,9 @@ import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_ITEMSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
 import nirvana.hall.v62.internal.QueryServiceImpl
 import org.jboss.netty.buffer.ChannelBuffers

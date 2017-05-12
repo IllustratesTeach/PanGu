@@ -5,9 +5,9 @@ import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
 

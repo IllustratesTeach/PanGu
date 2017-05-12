@@ -5,7 +5,7 @@ import java.io.FileOutputStream
 import junit.framework.Assert
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.Test
 
