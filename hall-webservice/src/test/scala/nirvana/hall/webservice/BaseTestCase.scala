@@ -46,6 +46,7 @@ class BaseTestCase {
 //      "nirvana.hall.v70.LocalV70ServiceModule",
 //      "nirvana.hall.v70.LocalDataSourceModule",
 
+      "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
       "nirvana.hall.webservice.TestWebserviceModule",
       "stark.activerecord.StarkActiveRecordModule"

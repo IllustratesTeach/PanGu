@@ -5,7 +5,7 @@ import monad.rpc.protocol.CommandProto.{BaseCommand, CommandStatus}
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
 import nirvana.hall.api.services.{ProtobufRequestFilter, ProtobufRequestHandler}
 import org.apache.tapestry5.ioc.Configuration
-import org.apache.tapestry5.ioc.annotations.{Contribute, EagerLoad, ServiceId}
+import org.apache.tapestry5.ioc.annotations.{Contribute, ServiceId}
 import org.apache.tapestry5.ioc.services.{ClassNameLocator, PipelineBuilder}
 import org.slf4j.Logger
 
@@ -28,6 +28,7 @@ object LocalProtobufModule {
     }
     pipelineBuilder.build(logger, classOf[ProtobufRequestHandler], classOf[ProtobufRequestFilter], configuration, terminator)
   }
+/*//has already been defined by monad.rpc.LocalRpcModule.buildProtobufRegistroy
   @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
     val registry = ExtensionRegistry.newInstance()
@@ -36,7 +37,7 @@ object LocalProtobufModule {
       it.next().config(registry)
 
     registry
-  }
+  }*/
   @Contribute(classOf[ExtensionRegistry])
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger], classNameLocator: ClassNameLocator, logger: Logger) {
     configuration.add(new ProtobufExtensionRegistryConfiger {

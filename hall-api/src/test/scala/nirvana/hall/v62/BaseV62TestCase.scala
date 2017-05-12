@@ -44,6 +44,7 @@ class BaseV62TestCase {
       //LiaoNing
 //      "nirvana.hall.v62.LocalV62LiaoNingServiceModule",
 //      "nirvana.hall.api.LocalApiWebServiceModule",
+      "monad.rpc.LocalRpcModule",
       "nirvana.hall.v62.TestV62Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)

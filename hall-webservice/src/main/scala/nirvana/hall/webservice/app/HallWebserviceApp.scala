@@ -40,6 +40,7 @@ object HallWebserviceApp
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
 
+      Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("stark.webservice.StarkWebServiceModule"),
       Class.forName("nirvana.hall.webservice.HallWebserviceModule")
