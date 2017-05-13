@@ -29,8 +29,8 @@ public class Upload {
 	
 	/* 已接收 */
 	public static final byte UPLOAD_STATUS_RECEIVED = 0;
-	/* fpt已生成 */
-	public static final byte UPLOAD_STATUS_CREATED = 1;
+	/* fpt已过滤 */
+	public static final byte UPLOAD_STATUS_FILTERED= 1;
 	/* fpt已发送 */
 	public static final byte UPLOAD_STATUS_SENT = 2;
 	/* 上报成功 */
@@ -41,6 +41,8 @@ public class Upload {
 	public static final byte UPLOAD_STATUS_LOCAL_UNDO_SUCCESS = 5;
 	/* 外省撤销 */
 	public static final byte UPLOAD_STATUS_REMOTE_CANCEL = 6;
+	/* fpt已生成 */
+	public static final byte UPLOAD_STATUS_CREATED = 9;
 	
 	/* id */
 	private  String id;   			    
