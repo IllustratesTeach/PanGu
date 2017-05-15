@@ -14,10 +14,10 @@ import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.{TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
 import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
-import nirvana.hall.webservice.internal.xingzhuan.{SendCheckinServiceImpl, TenPrinterCronServiceImpl, UploadCheckinServiceImpl, xingzhuanTaskCronServiceImpl}
+import nirvana.hall.webservice.internal.xingzhuan._
 import nirvana.hall.webservice.services.{TaskHandlerService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
-import nirvana.hall.webservice.services.xingzhuan.{SendCheckinService, TenPrinterCronService, UploadCheckinService, xingzhuanTaskCronService}
+import nirvana.hall.webservice.services.xingzhuan._
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.Symbol
 
@@ -47,6 +47,7 @@ object HallWebserviceModule {
     binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl])//.eagerLoad()
     binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl])//.eagerLoad()
     binder.bind(classOf[TenPrinterCronService],classOf[TenPrinterCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[AssistcheckService],classOf[AssistcheckServiceImpl]).eagerLoad()
 
   }
 }

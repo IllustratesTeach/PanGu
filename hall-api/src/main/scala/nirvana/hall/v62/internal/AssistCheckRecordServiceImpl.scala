@@ -35,7 +35,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     var resultList = new ListBuffer[HashMap[String,Any]]
     val sql = "select a.id, a.queryid, a.orasid, a.caseid, a.personid, q.querytype, q.keyid " +
               "from hall_assistcheck a, normalquery_queryque q " +
-              "where a.queryid = q.queryid and a.orasid = q.ora_sid and a.status = '0' and ((q.querytype = 0 and q.status = 7) or (q.querytype = 2 and q.status = 11)) " +
+              "where a.queryid = q.queryid and a.orasid = q.ora_sid and a.status = '7' and ((q.querytype = 0 and q.status = 7) or (q.querytype = 2 and q.status = 11)) " +
               "and rownum <= ?"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setString(1,size)
@@ -58,10 +58,10 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     * @param status
     * @param id
     */
-  override def updateAssistcheckStatus(status:String, id:String): Unit = {
-    val sql = "update hall_assistcheck set status = ? where id = ? "
+  override def updateAssistcheckStatus(status:Long, id:String): Unit = {
+    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate where id = ? "
     JdbcDatabase.update(sql) { ps =>
-      ps.setString(1, status)
+      ps.setLong(1, status)
       ps.setString(2, id)
     }
   }

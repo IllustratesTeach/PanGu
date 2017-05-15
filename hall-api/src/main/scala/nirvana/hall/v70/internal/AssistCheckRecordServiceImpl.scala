@@ -2,11 +2,8 @@ package nirvana.hall.v70.internal
 
 import java.util.UUID
 import javax.persistence.EntityManager
-
-import nirvana.hall.api.internal.AssistCheckConstant
 import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.v70.jpa.HallAssistCheck
-
 import scala.collection.mutable.{HashMap, ListBuffer}
 import scala.collection.JavaConverters._
 
@@ -15,7 +12,7 @@ import scala.collection.JavaConverters._
   */
 class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistCheckRecordService{
   override def recordAssistCheck(queryId: String, oraSid: String, caseId: String, personId: String, source: String): Unit = {
-    new HallAssistCheck(UUID.randomUUID.toString.replace("-",""),queryId,oraSid,caseId,personId,source,AssistCheckConstant.NO_REPORTED).save
+    new HallAssistCheck(UUID.randomUUID.toString.replace("-",""),queryId,oraSid,caseId,personId,source,0).save
   }
 
   override def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]] = {
@@ -48,8 +45,8 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
     _resultList
   }
 
-  override def updateAssistcheckStatus(status:String, id:String): Unit = {
-    HallAssistCheck.update.set(status = status).where(HallAssistCheck.id === id).execute
+  override def updateAssistcheckStatus(status:Long, id:String): Unit = {
+    HallAssistCheck.update.set(status = Integer.valueOf(status+"")).where(HallAssistCheck.id === id).execute
   }
 
   override def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]] = {

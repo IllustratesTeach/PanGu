@@ -13,7 +13,7 @@ trait AssistCheckRecordService {
 
   def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]]
 
-  def updateAssistcheckStatus(status:String, id:String): Unit
+  def updateAssistcheckStatus(status:Long, id:String): Unit
 
   def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]]
 

@@ -30,11 +30,11 @@ class HallAssistCheck extends ActiveRecord {
   @Column(name = "SOURCE",length = 4)
   var source: java.lang.String = _
   @Column(name = "STATUS")
-  var status: java.lang.String = _
+  var status: java.lang.Integer = _
 
   def this(id: java.lang.String, query_id: java.lang.String
            , ora_sid: java.lang.String, case_id: java.lang.String
-           , person_id: java.lang.String, source: java.lang.String, status:java.lang.String) {
+           , person_id: java.lang.String, source: java.lang.String, status:java.lang.Integer) {
     this()
     this.id = id
     this.queryid = query_id
