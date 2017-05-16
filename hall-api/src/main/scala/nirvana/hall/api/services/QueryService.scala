@@ -49,16 +49,6 @@ trait QueryService {
   def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
 
   /**
-    * 根据编号和查询类型发送查询
-    * 最大候选50，优先级2，最小分数60
-    * @param cardId
-    * @param matchType
-    * @param queryDBConfig
-    * @return
-    */
-  def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
-
-  /**
     * 根据任务号sid获取比对状态
     * @param oraSid
     * @param dbId

@@ -1,7 +1,5 @@
 package nirvana.hall.webservice.internal.bjwcsy
 
-import java.io.{FileOutputStream, InputStream}
-import java.text.SimpleDateFormat
 import java.util.Date
 import javax.activation.DataHandler
 import javax.sql.DataSource
@@ -10,9 +8,9 @@ import javax.xml.namespace.QName
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
+import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import org.apache.axis2.addressing.EndpointReference
@@ -51,31 +49,36 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
           val taskDataHandler = callGetSearchTask(userid,password,url,targetNamespace)
           try{
             if(null!= taskDataHandler){
-              //保存debug Fpt文件
-              saveFpt(taskDataHandler.getInputStream)
               val taskFpt = FPTFile.parseFromInputStream(taskDataHandler.getInputStream)
               taskControlID = taskFpt.right.get.sid
-              //保存debug Fpt文件
-              saveFpt(taskFpt.right.get,taskControlID)
               info("fun:Union4pfmipCronService,taskControlID:{};time:{}",taskControlID,new Date)
-              var orgSid:Long = -1
               taskFpt match {
                 case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
                 case Right(fpt4) =>
                   if(fpt4.logic02Recs.length>0){
-                    orgSid = handlerTPcardData(fpt4,hallWebserviceConfig.hallImageUrl)
-		                updateMatchResultStatus(orgSid, 0)
+                    fpt4.logic02Recs.foreach{ logic02Rec =>
+                      fptService.addLogic02Res(logic02Rec)//保存数据
+                      val queryId = sendQueryByCardIdAndMatchType(logic02Rec.cardId, MatchType.FINGER_TT)//发送TT查询
+                      updateMatchResultStatus(queryId, 0)//更新状态
+                      info("addLogic02Res:{} and sendQuery TT", logic02Rec.cardId)
+                    }
                     info("success:Union4pfmipCronService--logic02Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else if(fpt4.logic03Recs.length>0){
-                    orgSid = handlerLPCardData(fpt4)
-                    updateMatchResultStatus(orgSid, 0)
+                    fpt4.logic03Recs.foreach{ logic03Res =>
+                      fptService.addLogic03Res(_)
+                      logic03Res.fingers.foreach{ finger=>
+                        val queryId = sendQueryByCardIdAndMatchType(finger.fingerId, MatchType.FINGER_LT)//发送LT查询
+                        updateMatchResultStatus(queryId, 0)//更新状态
+                        info("addLogic03Res:fingerId:{} and sendQuery TT", finger.fingerId)
+                      }
+                    }
                     info("success:Union4pfmipCronService--logic03Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
                   }else{
                     info("success:Union4pfmipCronService:返回空FPT文件")
                     return
                   }
               }
-              setSearchTaskStatus(userid,password,taskControlID,true,url,targetNamespace)
+              (userid,password,taskControlID,true,url,targetNamespace)
             }
 
           }catch{
@@ -86,37 +89,32 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
       })
   }
 
-
   /**
-    * 处理TPCard数据
-    * @param fpt4
-    * @param imageDecompressUrl 用于解压返回原图的hall-image的服务的地址
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @return
     */
-  def handlerTPcardData(fpt4:FPT4File,imageDecompressUrl:String): Long ={
-    fpt4.logic02Recs.foreach{ logic02Rec =>
-      fptService.addLogic02Res(logic02Rec)
+  private def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType): Long={
+    val matchTask = MatchTask.newBuilder
+    matchType match {
+      case MatchType.FINGER_TT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_LL |
+           MatchType.FINGER_LT =>
+        matchTask.setMatchType(matchType)
+      case other =>
+        throw new IllegalArgumentException("unsupport MatchType:" + matchType)
     }
-    //TODO 发查询的代码剥离出来
-//    val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskProtoBuffer(fpt4)
-//    queryService.sendQuery(matchTask)
-    0
-  }
+    matchTask.setObjectId(0)//这里设置为0也不会比中自己
+    matchTask.setMatchId(cardId)
+    matchTask.setTopN(50)
+    matchTask.setObjectId(0)
+    matchTask.setPriority(2)
+    matchTask.setScoreThreshold(60)
 
-  /**
-    * 处理LPCard数据
-    *
-    * @param fpt4
-    */
-  def handlerLPCardData(fpt4:FPT4File): Long ={
-    //TODO 发查询的代码剥离出来
-    fpt4.logic03Recs.foreach{ logic03Res =>
-      fptService.addLogic03Res(_)
-//      val matchTask = FPTConvertToProtoBuffer.FPT2MatchTaskCaseProtoBuffer(fpt4)
-//      lPCardService.addLPCard(lPCard)
-//      caseInfoService.addCaseInfo(caseInfo)
-//      queryService.sendQuery(matchTask)
-    }
-    0
+    queryService.sendQuery(matchTask.build())
   }
 
   /**
@@ -131,63 +129,8 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
     }
   }
 
-  /**
-    * 保存debug fpt
-    */
-  private def saveFpt(fpt4Stream: InputStream,taskId: String = ""): Unit = {
-    val dirPath = "E:/debugTaskFpt"
-    val now = new Date()
-    val sdf:SimpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssSSS")
-    val nowStr = sdf.format(now)
-    var dir = new java.io.File(dirPath)
-    if(!dir.exists()){
-      dir.mkdirs()
-    }
-    try{
-      var in = fpt4Stream
-      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".txt")
-      var temp = -1
-      while((temp = in.read()) != -1 && temp != -1){
-        out.write(temp)
-      }
-      out.flush()
-      out.close()
-      in.close()
-    } catch {
-      case e:Exception=> error("saveFpt-error:" + e.getMessage)
-        e.printStackTrace()
-    }
-  }
-
-  /**
-    * 保存debug fpt
-    * @param fpt4
-    */
-  private def saveFpt(fpt4:FPT4File,taskId: String): Unit = {
-    val dirPath = "E:/debugTaskFpt"
-    val now = new Date()
-    val sdf:SimpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssSSS")
-    val nowStr = sdf.format(now)
-    var dir = new java.io.File(dirPath)
-    if(!dir.exists()){
-      dir.mkdirs()
-    }
-    try{
-      var out = new FileOutputStream(dir+"/"+taskId+"_"+nowStr+".txt")
-      val fpt4ByteArray :Array[Byte] = fpt4.toByteArray(AncientConstants.GBK_ENCODING)
-      out.write(fpt4ByteArray)
-      out.flush()
-      out.close()
-    } catch {
-      case e:Exception=> error("saveFpt-error:" + e.getMessage)
-        e.printStackTrace()
-    }
-  }
-
-
   def setSearchTaskStatus(userid:String,password:String,taskControlID:String,bstr:Boolean,url:String,targetNamespace:String): Unit ={
     try{
-
       val flag:Int = callSetTaskStatus(userid,password,taskControlID,bstr,url,targetNamespace)
       if(flag!=1){
         error("call setSearchTaskStatus faild!inputParam:"+ bstr + " returnVal:" + flag)
