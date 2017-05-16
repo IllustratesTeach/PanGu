@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, MatchRelationService}
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.UploadCheckinService
 import nirvana.hall.webservice.util.WebServicesClient_AssistCheck
@@ -76,6 +76,7 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
             oraUuid = resultMap("oraUuid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
+            val typ:String = getType(queryType)
             var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
             if(dataHandler != null) {
               //debug保存 fpt
@@ -91,13 +92,13 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
               if (resultCode == 1) {
                 status = 1
                 info("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
-                assistCheckRecordService.saveXcReport(oraUuid,status+"")
+                assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
                 info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
                 //重复数据
               } else if (resultCode == 0) {
                 status = 0
                 error("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                assistCheckRecordService.saveXcReport(oraUuid,status+"")
+                assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
                 info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
               } else {
                 status = -1
@@ -106,7 +107,7 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
             } else {
               //未比中
               status = 3
-              assistCheckRecordService.saveXcReport(oraUuid, status+"")
+              assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
               info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
             }
           } catch {
@@ -118,6 +119,18 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
     }catch{
       case e:Exception=> error("uploadCheckin-error:" + ExceptionUtil.getStackTraceInfo(e))
     }
+  }
+
+  def getType(queryType:Long): String ={
+    var typ = ""
+    queryType match {
+      case 0 => typ = "3"
+      case 1 => typ = "4"
+      case 2 => typ = "5"
+      case 3 => typ = "6"
+      case _ =>
+    }
+    typ
   }
 
   def saveFpt(in: InputStream,taskId: String): Unit = {

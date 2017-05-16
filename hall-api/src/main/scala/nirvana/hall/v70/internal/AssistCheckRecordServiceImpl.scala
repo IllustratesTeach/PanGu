@@ -82,14 +82,15 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
         _resultList
   }
 
-  override def saveXcReport(serviceid:String, msg:String): Unit = {
+  override def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit = {
     val uuid = UUID.randomUUID().toString.replace("-","")
-    var sql = "insert into hall_xc_report(id,serviceid,typ,msg) values(?,?,?,?)"
+    val sql = "insert into hall_xc_report(id,serviceid,typ,status,fpt_path,create_time,update_time) values(?,?,?,?,?,sysdate,sysdate) "
     entityManager.createNativeQuery(sql)
                  .setParameter(1, uuid)
                  .setParameter(2, serviceid)
-                 .setParameter(3, "checkin")
-                 .setParameter(4, msg)
+                 .setParameter(3, typ)
+                 .setParameter(4, status)
+                 .setParameter(5, fptPath)
                  .executeUpdate
   }
 
