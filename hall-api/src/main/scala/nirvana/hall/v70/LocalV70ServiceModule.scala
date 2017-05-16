@@ -38,7 +38,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
-
+    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
     //同步
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
