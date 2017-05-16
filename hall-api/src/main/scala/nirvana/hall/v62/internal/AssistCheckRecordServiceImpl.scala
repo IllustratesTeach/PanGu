@@ -24,7 +24,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(4,caseId)
       ps.setString(5,personId)
       ps.setString(6,source)
-      ps.setString(7,AssistCheckConstant.NO_REPORTED)
+      ps.setLong(7,0)
     }
   }
 
@@ -73,8 +73,8 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     var resultList = new ListBuffer[HashMap[String,Any]]
     val sql = "select q.queryid, q.ora_uuid, q.ora_sid, q.querytype,q.keyid from normalquery_queryque q " +
               "where not exists (select serviceid from hall_xc_report where serviceid = q.ora_uuid) " +
-              "and ((q.querytype = 0 and q.status = 7) or (q.querytype = 2 and q.status = 11)) and queryid = 0 " +
-              "and to_char(q.ora_createtime,'yyyy') = ? and rownum <= ? "
+              "and ((q.querytype = 0 and q.status = 7) or (q.querytype = 2 and q.status = 11) or (q.querytype = 1 and q.status = 11) or (q.querytype = 3 and q.status = 7)) and queryid = 0 " +
+              "and to_char(q.ora_createtime,'yyyy') = ? and rownum <= ? and q.ora_sid = '16'"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
       ps.setString(1,uploadTime)
       ps.setString(2,size)
