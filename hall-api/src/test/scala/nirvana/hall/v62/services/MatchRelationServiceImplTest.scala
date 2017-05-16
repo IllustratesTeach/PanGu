@@ -1,6 +1,6 @@
 package nirvana.hall.v62.services
 
-import nirvana.hall.api.services.MatchRelationService
+import nirvana.hall.api.services.{ExceptRelationService, MatchRelationService}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.BaseV62TestCase
@@ -24,7 +24,7 @@ class MatchRelationServiceImplTest extends BaseV62TestCase{
   @Test
   def test_exportMatchRelation(): Unit ={
 
-    val service = getService[MatchRelationService]
+    val service = getService[ExceptRelationService]
     val relation = service.exportMatchRelation("0","453")
     println("asa")
 
