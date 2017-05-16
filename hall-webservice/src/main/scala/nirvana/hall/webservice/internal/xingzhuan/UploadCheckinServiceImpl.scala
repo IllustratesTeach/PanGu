@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{AssistCheckRecordService, MatchRelationService}
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, MatchRelationService}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.UploadCheckinService
 import nirvana.hall.webservice.util.WebServicesClient_AssistCheck
@@ -20,7 +20,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
   */
 class UploadCheckinServiceImpl(config: HallWebserviceConfig,
                                assistCheckRecordService: AssistCheckRecordService,
-                               matchRelationService: MatchRelationService,
+                               exceptRelationService: ExceptRelationService,
                                implicit val dataSource: DataSource) extends UploadCheckinService with LoggerSupport{
 
   /**
@@ -76,7 +76,7 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
             oraUuid = resultMap("oraUuid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            var dataHandler:DataHandler = matchRelationService.exportMatchRelation(queryId,oraSid)
+            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
             if(dataHandler != null) {
               //debug保存 fpt
               if(isDeubg != null && isDeubg == "true") {

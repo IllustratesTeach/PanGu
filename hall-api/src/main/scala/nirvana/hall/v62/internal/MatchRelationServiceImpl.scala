@@ -1,32 +1,23 @@
 package nirvana.hall.v62.internal
 
-import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
-import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
-import org.apache.axiom.attachments.ByteArrayDataSource
-import org.jboss.netty.buffer.ChannelBuffers
-
-import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/6/21.
  */
-class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService,getPKIDService: GetPKIDService,fptService: FPTService) extends MatchRelationService with LoggerSupport{
+class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService with LoggerSupport{
   /**
    * 获取比对关系
     *
@@ -167,108 +158,5 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
       mapper,
       statementOpt,
       limit)
-  }
-
-  /**
-    * 导出比对关系
-    *
-    * @param code
-    * @return
-    */
-  override def exportMatchRelation(queryid:String,ora_sid:String): DataHandler = {
-    val fPT4File = new FPT4File
-    var dataHandler:DataHandler = null
-    val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
-    for (i <- 0 to pkidlist.size - 1)
-    {
-      if(pkidlist(i).get("candlist").size>0){
-        val byteVal = pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]]
-        val buffer = ChannelBuffers.wrappedBuffer(byteVal)
-        while(buffer.readableBytes() >= 96) {
-          val gaCand = new GAQUERYCANDSTRUCT
-          gaCand.fromStreamReader(buffer)
-          exportImplMRELATION(fPT4File,pkidlist(i).get("keyid").get.asInstanceOf[String],pkidlist(i).get("querytype").get.asInstanceOf[String],gaCand.szKey,pkidlist(i).get("ora_uuid").get.asInstanceOf[String])
-        }
-      }
-    dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
-    }
-    dataHandler
-  }
-
-  /**
-    * 实现导出比对关系
-    * @param fPT4File
-    * @param code
-    * @param querytype
-    * @param tcode
-    * @param uuid
-    */
-  def exportImplMRELATION(fPT4File:FPT4File,code:String,querytype:String,tcode:String,uuid:String):Unit={
-
-    querytype match{
-      case MatchRelationService.querytypeTT =>
-        val logic02RecSource = fptService.getLogic02Rec(code)
-        val logic02RecDest = fptService.getLogic02Rec(tcode)
-        val logic05Rec = fptService.getLogic05Rec(uuid)
-        val logic02List = new ArrayBuffer[Logic02Rec]()
-        logic02List += logic02RecSource
-        logic02List += logic02RecDest
-        fPT4File.logic02Recs = logic02List.toArray
-        fPT4File.logic05Recs = Array(logic05Rec)
-      case MatchRelationService.querytypeTL=>
-        val logic03Rec = fptService.getLogic03Rec(code)
-        val logic02Rec = fptService.getLogic02Rec(tcode)
-        val logic04Rec = fptService.getLogic04Rec(uuid)
-        fPT4File.logic03Recs = Array(logic03Rec)
-        fPT4File.logic02Recs = Array(logic02Rec)
-        fPT4File.logic04Recs = Array(logic04Rec)
-      case MatchRelationService.querytypeLT=>
-        val logic02Rec = fptService.getLogic02Rec(code)
-        val logic03Rec = fptService.getLogic03Rec(tcode)
-        val logic04Rec = fptService.getLogic04Rec(uuid)
-        fPT4File.logic02Recs = Array(logic02Rec)
-        fPT4File.logic03Recs = Array(logic03Rec)
-        fPT4File.logic04Recs = Array(logic04Rec)
-      case MatchRelationService.querytypeLL =>
-        val logic03RecSource = fptService.getLogic03Rec(code)
-        val logic03RecDest = fptService.getLogic03Rec(tcode)
-        val logic06Rec = fptService.getLogic06Rec(uuid)
-        val logic03List = new ArrayBuffer[Logic03Rec]()
-        logic03List += logic03RecSource
-        logic03List += logic03RecDest
-        fPT4File.logic03Recs = logic03List.toArray
-        fPT4File.logic06Recs = Array(logic06Rec)
-      case _ =>
-        throw new Exception("queryType error:" + querytype)
-    }
-  }
-
-  /**
-    * 获取查询的比对关系
-    *
-    * @param pkid
-    * @return
-    */
-  override def getSearchMatchRelation(pkid: String): GafisMatchInfo = {
-    val gafisMatchInfo = new GafisMatchInfo
-    val pkidlist = getPKIDService.getDatabyPKIDInfo(pkid)
-    for (i <- 0 to pkidlist.size - 1)
-    {
-      gafisMatchInfo.code = pkidlist(0).get("keyid").get.asInstanceOf[String]
-      gafisMatchInfo.registerOrg = pkidlist(0).get("checkerunitcode").get.asInstanceOf[String]
-      gafisMatchInfo.registerUser = pkidlist(0).get("checkusername").get.asInstanceOf[String]
-      gafisMatchInfo.registerTime = pkidlist(0).get("checktime").get.toString
-      gafisMatchInfo.querytype = pkidlist(0).get("querytype").get.asInstanceOf[String]
-
-      val byteVal = pkidlist(0).get("candlist").get.asInstanceOf[Array[Byte]]
-      val buffer = ChannelBuffers.wrappedBuffer(byteVal)
-      while(buffer.readableBytes() >= 96) {
-        val gaCand = new GAQUERYCANDSTRUCT
-        gaCand.fromStreamReader(buffer)
-        gafisMatchInfo.tcode = gaCand.szKey
-        gafisMatchInfo.fgp = gaCand.nIndex.toString
-      }
-    }
-    gafisMatchInfo
   }
 }

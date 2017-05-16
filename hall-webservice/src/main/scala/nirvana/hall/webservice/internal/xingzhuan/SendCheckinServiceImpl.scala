@@ -5,9 +5,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import javax.activation.DataHandler
 import javax.sql.DataSource
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{AssistCheckRecordService, MatchRelationService}
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, MatchRelationService}
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.SendCheckinService
@@ -20,7 +21,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
   */
 class SendCheckinServiceImpl(config: HallWebserviceConfig,
                               assistCheckRecordService: AssistCheckRecordService,
-                              matchRelationService: MatchRelationService,
+                              exceptRelationService: ExceptRelationService,
                               implicit val dataSource: DataSource) extends SendCheckinService with LoggerSupport{
 
   @PostInjection
@@ -70,7 +71,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            var dataHandler:DataHandler = matchRelationService.exportMatchRelation(queryId,oraSid)
+            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
             if(dataHandler != null){
               //debug保存 fpt
               if(isDeubg != null && isDeubg == "true") {

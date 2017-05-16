@@ -12,11 +12,11 @@ trait FPTService {
 
   def getLogic03Rec(cardId: String, dbId: Option[String] = None): Logic03Rec
 
-  def getLogic04Rec(pkid: String, dbId: Option[String] = None): Logic04Rec
+  def getLogic04Rec(pkid: String,num:Int, dbId: Option[String] = None): Logic04Rec
 
-  def getLogic05Rec(pkid: String, dbId: Option[String] = None): Logic05Rec
+  def getLogic05Rec(pkid: String,num:Int, dbId: Option[String] = None): Logic05Rec
 
-  def getLogic06Rec(pkid: String, dbId: Option[String] = None): Logic06Rec
+  def getLogic06Rec(pkid: String,num:Int, dbId: Option[String] = None): Logic06Rec
 
   def addLogic02Res(logic02Rec: Logic02Rec)
 

@@ -5,7 +5,7 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{AssistCheckRecordService, MatchRelationService}
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService}
 import nirvana.hall.webservice.HallWebserviceConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.{AssistcheckService}
@@ -18,7 +18,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
   */
 class AssistcheckServiceImpl(config: HallWebserviceConfig,
                              assistCheckRecordService: AssistCheckRecordService,
-                             matchRelationService: MatchRelationService,
+                             exceptRelationService: ExceptRelationService,
                              implicit val dataSource: DataSource) extends AssistcheckService with LoggerSupport{
 
   @PostInjection
@@ -64,7 +64,7 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            var dataHandler:DataHandler = matchRelationService.exportMatchRelation(queryId,oraSid)
+            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
             if(dataHandler != null) {
               //保存fpt更新状态
               status = 1
