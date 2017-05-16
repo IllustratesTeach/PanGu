@@ -93,14 +93,15 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
   /**
     * 保存上报记录
     */
-  override def saveXcReport(serviceid:String, msg:String): Unit = {
+  override def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit = {
     val uuid = UUID.randomUUID().toString.replace("-","")
-    val sql = "insert into hall_xc_report(id,serviceid,typ,msg) values(?,?,?,?) "
+    val sql = "insert into hall_xc_report(id,serviceid,typ,status,fpt_path,create_time,update_time) values(?,?,?,?,?,sysdate,sysdate) "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, uuid)
       ps.setString(2, serviceid)
-      ps.setString(3, "checkin")
-      ps.setString(4, msg)
+      ps.setString(3, typ)
+      ps.setLong(4, status)
+      ps.setString(5, fptPath)
     }
   }
 

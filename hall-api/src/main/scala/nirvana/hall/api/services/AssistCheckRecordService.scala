@@ -17,5 +17,5 @@ trait AssistCheckRecordService {
 
   def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]]
 
-  def saveXcReport(serviceid:String, msg:String): Unit
+  def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit
 }

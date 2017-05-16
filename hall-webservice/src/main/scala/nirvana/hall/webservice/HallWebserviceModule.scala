@@ -48,6 +48,7 @@ object HallWebserviceModule {
     binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl])//.eagerLoad()
     binder.bind(classOf[TenPrinterCronService],classOf[TenPrinterCronServiceImpl]).eagerLoad()
     binder.bind(classOf[AssistcheckService],classOf[AssistcheckServiceImpl]).eagerLoad()
+    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl]).eagerLoad()
 
   }
 }
