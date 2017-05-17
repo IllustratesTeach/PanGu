@@ -40,8 +40,8 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
             val tcode = new Array[Byte](32)
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+8,tcode,0,32)
             val code = bytes2String(tcode)
-
-            exportImplMRELATION(fPT4File,pkidlist(i).get("keyid").get.asInstanceOf[String],pkidlist(i).get("querytype").get.asInstanceOf[String],
+            val source = pkidlist(i).get("keyid").get.asInstanceOf[String].substring(0,pkidlist(i).get("keyid").get.asInstanceOf[String].length - 2)
+            exportImplMRELATION(fPT4File,source,pkidlist(i).get("querytype").get.asInstanceOf[String],
               code,pkidlist(i).get("ora_uuid").get.asInstanceOf[String],ii)
           }
           }
@@ -119,9 +119,9 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
       Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(num-1)+8,tcode,0,32)
       val tfgp = new Array[Byte](1)
       Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(num-1)+65,tfgp,0,1)
-      val code = bytes2String(tcode)
+      val codes = bytes2String(tcode)
       val fgp = bytes2String(tfgp)
-      gafisMatchInfo.tcode = code
+      gafisMatchInfo.tcode = codes
       gafisMatchInfo.fgp = fgp
     }
     gafisMatchInfo
