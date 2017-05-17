@@ -46,7 +46,7 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
   }
 
   override def updateAssistcheckStatus(status:Long, id:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate where id = ? "
+    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate where id = ? "
     entityManager.createNativeQuery(sql)
                  .setParameter(1, Integer.valueOf(status+""))
                  .setParameter(2, id)
@@ -54,7 +54,7 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
   }
 
   override def updateAssistcheck(status:Long, id:String, fptPath:String): Unit= {
-    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate, fpt_path = ?  where id = ? "
+    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate, fpt_path = ?  where id = ? "
     entityManager.createNativeQuery(sql)
                  .setParameter(1, Integer.valueOf(status+""))
                  .setParameter(2, fptPath)

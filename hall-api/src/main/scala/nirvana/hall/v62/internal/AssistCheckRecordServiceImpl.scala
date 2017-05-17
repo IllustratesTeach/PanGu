@@ -59,7 +59,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     * @param id
     */
   override def updateAssistcheckStatus(status:Long, id:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate where id = ? "
+    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate where id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setLong(1, status)
       ps.setString(2, id)
@@ -73,7 +73,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     * @param fptPath
     */
   override def updateAssistcheck(status:Long, id:String, fptPath:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate, fpt_path = ?  where id = ? "
+    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate, fpt_path = ?  where id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setLong(1, status)
       ps.setString(2, fptPath)
