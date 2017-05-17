@@ -110,7 +110,6 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     val pkidlist = getPKIDService.getDatabyPKIDInfo(pkid)
     for (i <- 0 to pkidlist.size - 1)
     {
-      gafisMatchInfo.code = pkidlist(0).get("keyid").get.asInstanceOf[String]
       gafisMatchInfo.registerOrg = pkidlist(0).get("checkerunitcode").get.asInstanceOf[String]
       gafisMatchInfo.registerUser = pkidlist(0).get("checkusername").get.asInstanceOf[String]
       gafisMatchInfo.registerTime = pkidlist(0).get("checktime").get.toString
@@ -123,6 +122,10 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
       val fgp = bytes2String(tfgp)
       gafisMatchInfo.tcode = codes
       gafisMatchInfo.fgp = fgp
+      if(gafisMatchInfo.querytype.equals(MatchRelationService.querytypeTL)){
+        gafisMatchInfo.code = codes
+        gafisMatchInfo.tcode = pkidlist(0).get("keyid").get.asInstanceOf[String]
+      }
     }
     gafisMatchInfo
   }
