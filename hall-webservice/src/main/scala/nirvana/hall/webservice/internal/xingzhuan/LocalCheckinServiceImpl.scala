@@ -83,7 +83,6 @@ class LocalCheckinServiceImpl(config: HallWebserviceConfig,
             }
           } catch {
             case e:Exception=> error("localCheckin-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
-              e.printStackTrace()
           }
         }
       }
@@ -109,7 +108,7 @@ class LocalCheckinServiceImpl(config: HallWebserviceConfig,
     val sdf:SimpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssSSS")
     val nowStr = sdf.format(now)
     var dir = new java.io.File(dirPath)
-    val finalPath = dir+"/"+id+"_"+nowStr+".fpt"
+    val finalPath = dir+"\\"+id+"_"+nowStr+".fpt"
     var out:FileOutputStream = null
     if(!dir.exists()){
       dir.mkdirs()
