@@ -147,7 +147,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     logic04Rec.systemType = "1900"
     logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
     logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
-    logic04Rec.personId = gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length-2)
+    logic04Rec.personId = gafisMatchInfo.tcode
     logic04Rec.fgp = gafisMatchInfo.fgp
     logic04Rec.capture = "0" //7.0web项目直接写的是0,有待确认
     //比中类型(捺印查重(TT):0;  捺印倒查(TL):1;  现场查案(LT):2;  现场串查(LL):3)
