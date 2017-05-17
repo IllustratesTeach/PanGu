@@ -28,6 +28,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
   override def exportMatchRelation(queryid:String,ora_sid:String): DataHandler = {
     val fPT4File = new FPT4File
     var dataHandler:DataHandler = null
+    var ishit = false
     val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
     for (i <- 0 to pkidlist.size - 1)
     {
@@ -43,10 +44,13 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
             val source = pkidlist(i).get("keyid").get.asInstanceOf[String].substring(0,pkidlist(i).get("keyid").get.asInstanceOf[String].length - 2)
             exportImplMRELATION(fPT4File,source,pkidlist(i).get("querytype").get.asInstanceOf[String],
               code,pkidlist(i).get("ora_uuid").get.asInstanceOf[String],ii)
+            ishit = true
           }
-          }
+        }
       }
-    dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+      if(ishit){
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+      }
     }
     dataHandler
   }
