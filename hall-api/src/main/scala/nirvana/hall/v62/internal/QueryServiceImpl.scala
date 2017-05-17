@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
@@ -130,7 +132,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @return 任务号
     */
   override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
-    val key = matchTask.getMatchId.getBytes()
+    //key长度32，用来获取特征数据
+    val key = ByteBuffer.allocate(32).put(matchTask.getMatchId.getBytes()).array()
     val pstKey = new GADB_KEYARRAY
     pstKey.nKeyCount = 1
     pstKey.nKeySize = key.size.asInstanceOf[Short]

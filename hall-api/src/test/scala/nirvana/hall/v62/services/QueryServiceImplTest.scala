@@ -50,15 +50,22 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_sendQuery: Unit ={
     val matchTask = MatchTask.newBuilder()
-    matchTask.setMatchId("P3702000000002015129996")
+    matchTask.setMatchId("1234567890")
     matchTask.setMatchType(NirvanaTypeDefinition.MatchType.FINGER_TT)
     matchTask.setPriority(1)
     matchTask.setScoreThreshold(50)
     matchTask.setObjectId(1)
 
     val service = getService[QueryService]
-    val response = service.sendQuery(matchTask.build())
-    Assert.assertNotNull(response)
+    val oraSid = service.sendQuery(matchTask.build())
+    Assert.assertTrue(oraSid > 0)
+  }
+
+  @Test
+  def sendQueryByCardIdAndMatchType: Unit ={
+    val service = getService[QueryService]
+    val oraSid = service.sendQueryByCardIdAndMatchType("1234567890", MatchType.FINGER_TT)
+    Assert.assertTrue(oraSid > 0)
   }
 
   @Test
