@@ -147,6 +147,34 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   }
 
   /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @return
+    */
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long={
+    val matchTask = MatchTask.newBuilder
+    matchType match {
+      case MatchType.FINGER_TT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_LL |
+           MatchType.FINGER_LT =>
+        matchTask.setMatchType(matchType)
+      case other =>
+        throw new IllegalArgumentException("unsupport MatchType:" + matchType)
+    }
+    matchTask.setObjectId(0)//这里设置为0也不会比中自己
+    matchTask.setMatchId(cardId)
+    matchTask.setTopN(50)
+    matchTask.setObjectId(0)
+    matchTask.setPriority(2)
+    matchTask.setScoreThreshold(60)
+
+    sendQuery(matchTask.build())
+  }
+
+  /**
     * 根据任务号sid获取比对状态
     * @param oraSid
     * @param dbId
