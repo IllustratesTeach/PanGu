@@ -14,7 +14,8 @@ trait QueryService {
 
   /**
    * 发送查询任务
-   * @param matchTask
+    *
+    * @param matchTask
    * @return 任务号
    */
   def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
@@ -55,6 +56,15 @@ trait QueryService {
     * @return
     */
   def getStatusBySid(oraSid: Long, dbId: Option[String] = None): Int
+
+  /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @return
+    */
+  def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long
 
   /**
     * 获取查询信息GAQUERYSTRUCT
