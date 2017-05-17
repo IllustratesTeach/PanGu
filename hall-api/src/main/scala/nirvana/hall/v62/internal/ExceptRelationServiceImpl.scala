@@ -29,14 +29,20 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     val fPT4File = new FPT4File
     var dataHandler:DataHandler = null
     var ishit = false
+    var tscnt = new Array[Byte](1)
+    var flag:Byte= {0}
     val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
     for (i <- 0 to pkidlist.size - 1)
     {
       if(pkidlist(i).get("candlist").size>0){
         for (ii<- 1 to pkidlist(i).get("num").get.asInstanceOf[Int]){
-          val tscnt = new Array[Byte](1)
-          Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+56,tscnt,0,1)
-          val flag:Byte = {7}
+          if(pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeTT)||pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeLL)){
+            Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+57,tscnt,0,1)
+            flag = {6}
+          }else{
+            Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+56,tscnt,0,1)
+            flag = {7}
+          }
           if(tscnt(0).equals(flag)){
             val tcode = new Array[Byte](32)
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+8,tcode,0,32)
