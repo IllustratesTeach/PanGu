@@ -16,7 +16,7 @@ class GetPKIDServiceImpl(implicit val dataSource: DataSource) extends GetPKIDSer
 
     val sql = "select rawtohex(t.ora_uuid) ora_uuid,t.keyid,t.candlist,t.checkerunitcode,t.checkusername,t.checktime,t.querytype,length(t.candlist)/96 num " +
       "from NORMALQUERY_QUERYQUE t where ((t.status =7 and t.querytype =0) or (t.status=11 and t.querytype=2) " +
-      "or (t.status=11 and t.querytype=3) or (t.status=11 and t.querytype=1)) " +
+      "or (t.status=7 and t.querytype=3) or (t.status=11 and t.querytype=1)) " +
       "and t.queryid=? and ora_sid=?"
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
