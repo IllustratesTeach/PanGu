@@ -9,7 +9,6 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, QueryService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
@@ -58,7 +57,7 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
                   if(fpt4.logic02Recs.length>0){
                     fpt4.logic02Recs.foreach{ logic02Rec =>
                       fptService.addLogic02Res(logic02Rec)//保存数据
-                      val queryId = sendQueryByCardIdAndMatchType(logic02Rec.cardId, MatchType.FINGER_TT)//发送TT查询
+                      val queryId = queryService.sendQueryByCardIdAndMatchType(logic02Rec.cardId, MatchType.FINGER_TT)//发送TT查询
                       updateMatchResultStatus(queryId, 0)//更新状态
                       info("addLogic02Res:{} and sendQuery TT", logic02Rec.cardId)
                     }
@@ -67,9 +66,9 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
                     fpt4.logic03Recs.foreach{ logic03Res =>
                       fptService.addLogic03Res(_)
                       logic03Res.fingers.foreach{ finger=>
-                        val queryId = sendQueryByCardIdAndMatchType(finger.fingerId, MatchType.FINGER_LT)//发送LT查询
+                        val queryId = queryService.sendQueryByCardIdAndMatchType(finger.fingerId, MatchType.FINGER_LT)//发送LT查询
                         updateMatchResultStatus(queryId, 0)//更新状态
-                        info("addLogic03Res:fingerId:{} and sendQuery TT", finger.fingerId)
+                        info("addLogic03Res:fingerId:{} and sendQuery LT", finger.fingerId)
                       }
                     }
                     info("success:Union4pfmipCronService--logic03Recs,taskControlID:{};outtime:{}",taskControlID,new Date)
@@ -87,34 +86,6 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
           }
         }
       })
-  }
-
-  /**
-    * 根据编号和查询类型发送查询
-    * 最大候选50，优先级2，最小分数60
-    * @param cardId
-    * @param matchType
-    * @return
-    */
-  private def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType): Long={
-    val matchTask = MatchTask.newBuilder
-    matchType match {
-      case MatchType.FINGER_TT |
-           MatchType.FINGER_TL |
-           MatchType.FINGER_LL |
-           MatchType.FINGER_LT =>
-        matchTask.setMatchType(matchType)
-      case other =>
-        throw new IllegalArgumentException("unsupport MatchType:" + matchType)
-    }
-    matchTask.setObjectId(0)//这里设置为0也不会比中自己
-    matchTask.setMatchId(cardId)
-    matchTask.setTopN(50)
-    matchTask.setObjectId(0)
-    matchTask.setPriority(2)
-    matchTask.setScoreThreshold(60)
-
-    queryService.sendQuery(matchTask.build())
   }
 
   /**

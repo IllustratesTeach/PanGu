@@ -166,27 +166,15 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long = {
     val matchTask = MatchTask.newBuilder
     matchType match {
-      case MatchType.FINGER_TT | MatchType.FINGER_TL =>
-        //根据卡号查询sid
-        val sid = GafisPerson.select(GafisPerson.sid).where(GafisPerson.personid === cardId)
-        if(sid.isEmpty){
-          throw new RuntimeException("GafisPerson:" + cardId + " not exist")
-        }
-        val objectId = sid.toList(0).asInstanceOf[Long]
-        matchTask.setObjectId(objectId)
-        matchTask.setMatchType(matchType)
-      case MatchType.FINGER_LL | MatchType.FINGER_LT =>
-        //根据卡号查询sid
-        val sid = GafisCaseFinger.select(GafisCaseFinger.sid).where(GafisCaseFinger.fingerId === cardId)
-        if(sid.isEmpty){
-          throw new RuntimeException("GafisCaseFinger:" + cardId + " not exist")
-        }
-        val objectId = sid.toList(0).asInstanceOf[Long]
-        matchTask.setObjectId(objectId)
+      case MatchType.FINGER_TT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_LL |
+           MatchType.FINGER_LT =>
         matchTask.setMatchType(matchType)
       case other =>
         throw new IllegalArgumentException("unsupport MatchType:" + matchType)
     }
+    matchTask.setObjectId(0)//这里设置为0也不会比中自己
     matchTask.setMatchId(cardId)
     matchTask.setTopN(50)
     matchTask.setObjectId(0)
