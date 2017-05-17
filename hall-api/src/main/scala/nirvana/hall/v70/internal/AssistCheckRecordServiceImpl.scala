@@ -46,7 +46,20 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
   }
 
   override def updateAssistcheckStatus(status:Long, id:String): Unit = {
-    HallAssistCheck.update.set(status = Integer.valueOf(status+"")).where(HallAssistCheck.id === id).execute
+    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate where id = ? "
+    entityManager.createNativeQuery(sql)
+                 .setParameter(1, Integer.valueOf(status+""))
+                 .setParameter(2, id)
+                 .executeUpdate
+  }
+
+  override def updateAssistcheck(status:Long, id:String, fptPath:String): Unit= {
+    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate, fpt_path = ?  where id = ? "
+    entityManager.createNativeQuery(sql)
+                 .setParameter(1, Integer.valueOf(status+""))
+                 .setParameter(2, fptPath)
+                 .setParameter(3, id)
+                 .executeUpdate
   }
 
   override def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]] = {

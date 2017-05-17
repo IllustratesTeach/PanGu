@@ -27,7 +27,7 @@ object FPTUtil extends LoggerSupport{
         case other => warn("Unkown operation type",other)
       }
       finalPath = saveFpt(in,id,path)
-      updateAssistcheckStatus(dataSource,status,id,finalPath)
+//      updateAssistcheckStatus(dataSource,status,id,finalPath)
     }
     finalPath
   }

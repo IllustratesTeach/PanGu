@@ -27,10 +27,14 @@ class HallAssistCheck extends ActiveRecord {
   var personid: java.lang.String = _
   @Column(name = "CREATETIME")
   var createtime: java.util.Date = _
+  @Column(name = "UPDATETIME")
+  var updatetime: java.util.Date = _
   @Column(name = "SOURCE",length = 4)
   var source: java.lang.String = _
   @Column(name = "STATUS")
   var status: java.lang.Integer = _
+  @Column(name = "FPT_PATH")
+  var fptPath: java.lang.String = _
 
   def this(id: java.lang.String, query_id: java.lang.String
            , ora_sid: java.lang.String, case_id: java.lang.String

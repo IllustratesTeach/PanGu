@@ -68,7 +68,8 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
             if(dataHandler != null) {
               //保存fpt更新状态
               status = 1
-              FPTUtil.saveFPTAndUpdateStatus(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
+              val fptPath:String = FPTUtil.saveFPTAndUpdateStatus(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
+              assistCheckRecordService.updateAssistcheck(status, id, fptPath)
             } else {
               //比对完成无比对关系
               status = 8

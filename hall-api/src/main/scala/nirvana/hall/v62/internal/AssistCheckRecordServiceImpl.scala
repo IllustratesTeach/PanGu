@@ -67,6 +67,21 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
   }
 
   /**
+    * 更新协查任务
+    * @param status
+    * @param id
+    * @param fptPath
+    */
+  override def updateAssistcheck(status:Long, id:String, fptPath:String): Unit = {
+    val sql = "update hall_assistcheck set status = ?, upatetime = sysdate, fpt_path = ?  where id = ? "
+    JdbcDatabase.update(sql) { ps =>
+      ps.setLong(1, status)
+      ps.setString(2, fptPath)
+      ps.setString(3, id)
+    }
+  }
+
+  /**
     * 查询未上报正查查重比对关系
     */
   override def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]] = {

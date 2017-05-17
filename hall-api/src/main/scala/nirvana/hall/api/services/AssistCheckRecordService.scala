@@ -15,6 +15,8 @@ trait AssistCheckRecordService {
 
   def updateAssistcheckStatus(status:Long, id:String): Unit
 
+  def updateAssistcheck(status:Long, id:String, ftpPath:String): Unit
+
   def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]]
 
   def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit
