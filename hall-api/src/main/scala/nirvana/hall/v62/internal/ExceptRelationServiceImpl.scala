@@ -47,7 +47,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
             val tcode = new Array[Byte](32)
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+8,tcode,0,32)
             val code = bytes2String(tcode)
-            val source = pkidlist(i).get("keyid").get.asInstanceOf[String].substring(0,pkidlist(i).get("keyid").get.asInstanceOf[String].length - 2)
+            val source = pkidlist(i).get("keyid").get.asInstanceOf[String]
             exportImplMRELATION(fPT4File,source,pkidlist(i).get("querytype").get.asInstanceOf[String],
               code,pkidlist(i).get("ora_uuid").get.asInstanceOf[String],ii)
             ishit = true
@@ -82,7 +82,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
         fPT4File.logic02Recs = logic02List.toArray
         fPT4File.logic05Recs = Array(logic05Rec)
       case MatchRelationService.querytypeTL=>
-        val logic03Rec = fptService.getLogic03Rec(tcode)
+        val logic03Rec = fptService.getLogic03Rec(tcode.substring(0,code.length-2))
         val logic02Rec = fptService.getLogic02Rec(code)
         val logic04Rec = fptService.getLogic04Rec(uuid,num)
         fPT4File.logic03Recs = Array(logic03Rec)
@@ -90,14 +90,14 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
         fPT4File.logic04Recs = Array(logic04Rec)
       case MatchRelationService.querytypeLT=>
         val logic02Rec = fptService.getLogic02Rec(tcode)
-        val logic03Rec = fptService.getLogic03Rec(code)
+        val logic03Rec = fptService.getLogic03Rec(code.substring(0,code.length-2))
         val logic04Rec = fptService.getLogic04Rec(uuid,num)
         fPT4File.logic02Recs = Array(logic02Rec)
         fPT4File.logic03Recs = Array(logic03Rec)
         fPT4File.logic04Recs = Array(logic04Rec)
       case MatchRelationService.querytypeLL =>
-        val logic03RecSource = fptService.getLogic03Rec(code)
-        val logic03RecDest = fptService.getLogic03Rec(tcode)
+        val logic03RecSource = fptService.getLogic03Rec(code.substring(0,code.length-2))
+        val logic03RecDest = fptService.getLogic03Rec(tcode.substring(0,code.length-2))
         val logic06Rec = fptService.getLogic06Rec(uuid,num)
         val logic03List = new ArrayBuffer[Logic03Rec]()
         logic03List += logic03RecSource
