@@ -2,11 +2,11 @@ package nirvana.hall.api
 
 object HallDatasource {
 
-  final val TABLE_V62_TPCARD = "normaltp_tpcardinfo"
-  final val TABLE_V62_CASE = "normallp_case"
-  final val TABLE_V62_LATFINGER= "normallp_latfinger"
-  final val TABLE_V62_LATPALM = "normallp_latpalm"
-  final val TABLE_V62_QUERY = "normalquery_queryque"
+  final val TABLE_V62_TPCARD = "hall_datasource_tpcardinfo"
+  final val TABLE_V62_CASE = "hall_datasource_case"
+  final val TABLE_V62_LATFINGER= "hall_datasource_latfinger"
+  final val TABLE_V62_LATPALM = "hall_datasource_latpalm"
+  final val TABLE_V62_QUERY = "hall_datasource_queryque"
 
   final val TABLE_V70_PERSON = "hall_ds_person"
   final val TABLE_V70_PERSON_FINGER = "hall_ds_gather_finger"
