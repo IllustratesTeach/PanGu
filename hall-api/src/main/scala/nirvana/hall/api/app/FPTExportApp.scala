@@ -4,18 +4,23 @@ import java.io.{File, FileOutputStream}
 import javax.persistence.EntityManagerFactory
 
 import com.google.protobuf.ExtensionRegistry
-import joptsimple.{OptionException, OptionParser, OptionSet}
 import monad.core.MonadCoreSymbols
 import monad.core.internal.MonadConfigFileUtils
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.rpc.services.ProtobufExtensionRegistryConfiger
-import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport, XmlLoader}
+import monad.support.services.{JettyServerSupport, LoggerSupport, SystemEnvDetectorSupport, XmlLoader}
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.internal.AuthServiceImpl
+import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
+import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
 import nirvana.hall.api.services.AuthService
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
+import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v70.config.HallV70Config
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, Symbol}
@@ -39,7 +44,7 @@ import scala.reflect._
 object FPTExportApp extends JettyServerSupport
   with GlobalLoggerConfigurationSupport
   with SystemEnvDetectorSupport
-  with BootstrapTextSupport {
+  with BootstrapTextSupport with LoggerSupport{
 
   private var registry:Registry = _
   protected def getService[T:ClassTag]:T={
@@ -52,6 +57,7 @@ object FPTExportApp extends JettyServerSupport
   private val TYPE = "t"
 
   private val MODULE_V70 = "v70"
+  private val MODULE_GZ = "gz"
   private val MODULE_V62 = "v62"
   private val TYPE_TP = "tp"
   private val TYPE_LP = "lp"
@@ -59,12 +65,14 @@ object FPTExportApp extends JettyServerSupport
   def main(args: Array[String]): Unit = {
     val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
+    configLogger(serverHome+"/log/hall.FPTExport.log", "API", "egf", "nirvana.hall.api")
     val logger = LoggerFactory getLogger getClass
     logger.info("starting export fpt server ....")
 
     //joptsimple处理命令行参数
+    /*
     val parser = new OptionParser("m:c:f:t:p:")
-    parser.accepts(MODULE).withRequiredArg().describedAs("module: v62 or v70").required()
+    parser.accepts(MODULE).withRequiredArg().describedAs("module: v62, v70, gz").required()
 //    parser.accepts(CONFIG).withRequiredArg().describedAs("config: hall-v62.xml or hall-v70.xml")
     parser.accepts(FILE).withRequiredArg().describedAs("cardid list file").required()
     parser.accepts(TYPE).withRequiredArg().describedAs("tp or lp").required()
@@ -97,16 +105,23 @@ object FPTExportApp extends JettyServerSupport
           "nirvana.hall.v70.LocalV70ServiceModule",
           "nirvana.hall.v70.LocalDataSourceModule",
           "nirvana.hall.api.LocalProtobufModule",
-          "nirvana.hall.api.LocalApiWebServiceModule",
           "nirvana.hall.api.app.FPTExportV70Module"
         )
+      case MODULE_GZ =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.v70.gz.LocalV70ServiceModule",
+          "nirvana.hall.v70.LocalDataSourceModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.api.app.FPTExportV70Module"
+        )
+
       case MODULE_V62 =>
         Seq[String](
           "stark.activerecord.StarkActiveRecordModule",
           "nirvana.hall.api.LocalProtobufModule",
           "nirvana.hall.v62.LocalV62ServiceModule",
           "nirvana.hall.v62.LocalV62DataSourceModule",
-          "nirvana.hall.api.LocalApiWebServiceModule",
           "nirvana.hall.api.app.FPTExportV62Module"
         )
       case other =>
@@ -129,6 +144,30 @@ object FPTExportApp extends JettyServerSupport
     if(!fptFilePath.exists() && !fptFilePath.isDirectory){
       logger.error("fptOutputPath: %s is not dir".format(fptOutputPath))
       return
+    }*/
+
+    /*暂时不使用命令行参数，使用hall-api相同的运行方式，
+      fpt文件放在./fpt路径下
+      捺印卡号输入文件./config/TPCardId.txt
+     */
+    val filePath = serverHome + "/config"
+    val file = new File(filePath+"/TPCardId.txt")
+    if(!file.exists()){
+      file.createNewFile()
+    }
+    val modules = Seq[String](
+      "stark.activerecord.StarkActiveRecordModule",
+      "nirvana.hall.v70.gz.LocalV70ServiceModule",
+      "nirvana.hall.v70.LocalDataSourceModule",
+      "nirvana.hall.api.LocalProtobufModule",
+      "nirvana.hall.api.app.FPTExportV70Module"
+    )
+    val tpe = TYPE_TP
+    val fptOutputPath = serverHome+"/fpt"
+
+    val fptFilePath = new File(fptOutputPath)
+    if(!fptFilePath.exists()) {
+      fptFilePath.mkdir()
     }
 
     //加载jni
@@ -147,11 +186,20 @@ object FPTExportApp extends JettyServerSupport
       if(TYPE_TP.equals(tpe)){
         for(cardId <- cardIdList){
           logger.info("export fpt tp cardId: "+ cardId)
-          val logic02Rec = service.getLogic02Rec(cardId.toString)
-          val fpt4File = new FPT4File
-          fpt4File.logic02Recs = Array(logic02Rec)
-          //fpt数据写入文件
-          new FileOutputStream(fptOutputPath+"/%s.fpt".format(cardId)).write(fpt4File.build().toByteArray(AncientConstants.GBK_ENCODING))
+          try {
+            val logic02Rec = service.getLogic02Rec(cardId.toString)
+            if(logic02Rec != null){
+              val fpt4File = new FPT4File
+              fpt4File.logic02Recs = Array(logic02Rec)
+              //fpt数据写入文件
+              new FileOutputStream(fptOutputPath + "/%s.fpt".format(cardId)).write(fpt4File.build().toByteArray(AncientConstants.GBK_ENCODING))
+            }else{
+              logger.warn("cardId:{}", cardId)
+            }
+          } catch {
+            case e:Exception =>
+              logger.error("cardId:{}", cardId)
+          }
         }
       }else if(TYPE_LP.equals(tpe)){
         for(cardId <- cardIdList){
@@ -216,10 +264,18 @@ object FPTExportV70Module{
   }
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
+
+    //FPT导出依赖的service
+    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
+    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
+    binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
+    binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
+    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.v70.jpa")
-    configuration.add("nirvana.hall.api.jpa")
+//    configuration.add("nirvana.hall.v70.jpa")
+    configuration.add("nirvana.hall.v70.gz.jpa")//贵州数据库
+//    configuration.add("nirvana.hall.api.jpa")
   }
   @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
@@ -243,7 +299,7 @@ object FPTExportV62Module{
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
+//    configuration.add("nirvana.hall.api.jpa")
   }
   @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
