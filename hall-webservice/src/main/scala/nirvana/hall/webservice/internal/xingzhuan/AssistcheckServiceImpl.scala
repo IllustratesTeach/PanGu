@@ -48,7 +48,7 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
     }
     val size = "20"
     try{
-      var resultList = assistCheckRecordService.findAssistcheck(size)
+      var resultList = assistCheckRecordService.findAssisttask(size)
       if(resultList.size > 0){
         resultList.foreach{ resultMap =>
           var id:String = ""
@@ -69,11 +69,13 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
               //保存fpt更新状态
               status = 1
               val fptPath:String = FPTUtil.saveFPTAndUpdateStatus(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
-              assistCheckRecordService.updateAssistcheck(status, id, fptPath)
+              assistCheckRecordService.updateAssisttaskStatus(10, id)
+              assistCheckRecordService.saveAssistcheck(status, id, fptPath)
             } else {
               //比对完成无比对关系
               status = 8
-              assistCheckRecordService.updateAssistcheckStatus(status, id)
+              assistCheckRecordService.updateAssisttaskStatus(10, id)
+              assistCheckRecordService.saveAssistcheck(status, id, null)
             }
           } catch {
             case e:Exception=>

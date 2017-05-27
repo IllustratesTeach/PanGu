@@ -31,10 +31,10 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
   /**
     * 查询协查任务
     */
-  override def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]] = {
+  override def findAssisttask(size: String): ListBuffer[HashMap[String,Any]] = {
     var resultList = new ListBuffer[HashMap[String,Any]]
     val sql = "select a.id, a.queryid, a.orasid, a.caseid, a.personid, q.querytype, q.keyid " +
-              "from hall_assistcheck a, normalquery_queryque q " +
+              "from hall_assisttask a, normalquery_queryque q " +
               "where a.queryid = q.queryid and a.orasid = q.ora_sid and a.status = '7' and ((q.querytype = 0 and q.status = 7) or (q.querytype = 2 and q.status = 11)) " +
               "and rownum <= ?"
     JdbcDatabase.queryWithPsSetter(sql){ps=>
@@ -58,8 +58,8 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     * @param status
     * @param id
     */
-  override def updateAssistcheckStatus(status:Long, id:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate where id = ? "
+  override def updateAssisttaskStatus(status:Long, id:String): Unit = {
+    val sql = "update hall_assisttask set status = ?, updatetime = sysdate where id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setLong(1, status)
       ps.setString(2, id)
@@ -73,7 +73,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     * @param fptPath
     */
   override def updateAssistcheck(status:Long, id:String, fptPath:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate, fpt_path = ?  where id = ? "
+    val sql = "update hall_assisttask set status = ?, updatetime = sysdate, fpt_path = ?  where id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setLong(1, status)
       ps.setString(2, fptPath)
@@ -117,6 +117,23 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(3, typ)
       ps.setLong(4, status)
       ps.setString(5, fptPath)
+    }
+  }
+
+  /**
+    * 保存比对关系记录
+    * @param status
+    * @param id
+    */
+  override def saveAssistcheck(status:Long, id:String, fptPath:String): Unit = {
+    val uuid = UUID.randomUUID().toString.replace("-","")
+    val sql = "insert into hall_assistcheck(id, queryid, orasid, caseid, personid, status, ora_uuid, service_type, fingerid, fpt_path, createtime, updatetime) " +
+              "(select ?, queryid, orasid, caseid, personid, ?, ora_uuid, service_type, fingerid, ?, sysdate,sysdate from hall_assisttask where id = ?) "
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1, uuid)
+      ps.setLong(2, status)
+      ps.setString(3, fptPath)
+      ps.setString(4, id)
     }
   }
 

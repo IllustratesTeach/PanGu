@@ -11,13 +11,15 @@ trait AssistCheckRecordService {
 
   def recordAssistCheck(queryId:String,oraSid:String,caseId:String,personId:String,source:String):Unit
 
-  def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]]
+  def findAssisttask(size: String): ListBuffer[HashMap[String,Any]]
 
-  def updateAssistcheckStatus(status:Long, id:String): Unit
+  def updateAssisttaskStatus(status:Long, id:String): Unit
 
   def updateAssistcheck(status:Long, id:String, ftpPath:String): Unit
 
   def findUploadCheckin(uploadTime:String, size: String): ListBuffer[HashMap[String,Any]]
 
   def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit
+
+  def saveAssistcheck(status:Long, id:String, fptPath:String): Unit
 }

@@ -55,7 +55,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
     val password = config.union4pfmip.password
     val size = "20"
     try{
-      var resultList = assistCheckRecordService.findAssistcheck(size)
+      var resultList = assistCheckRecordService.findAssisttask(size)
       if(resultList.size > 0){
         resultList.foreach{ resultMap =>
           var id:String = ""
@@ -86,13 +86,13 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
               if (resultCode == 1) {
                 status = 1
                 info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
-                updateAssistcheckStatus(status, id)
+                assistCheckRecordService.saveAssistcheck(status, id, null)
                 info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
                 //重复数据
               } else if (resultCode == 0) {
                 status = 2
                 info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                updateAssistcheckStatus(status, id)
+                assistCheckRecordService.saveAssistcheck(status, id, null)
                 info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
               } else {
                 status = -1
@@ -101,7 +101,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
             } else {
               //比对完成无比对关系
               status = 3
-              updateAssistcheckStatus(status, id)
+              assistCheckRecordService.saveAssistcheck(status, id, null)
             }
           } catch {
             case e:Exception=>
@@ -111,7 +111,6 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
       }
     }catch{
       case e:Exception=> error("sendCheckinCron-error:" + ExceptionUtil.getStackTraceInfo(e))
-        e.printStackTrace()
     }
   }
 

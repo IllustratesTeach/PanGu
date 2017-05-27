@@ -15,10 +15,10 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
     new HallAssistCheck(UUID.randomUUID.toString.replace("-",""),queryId,oraSid,caseId,personId,source,0).save
   }
 
-  override def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]] = {
+  override def findAssisttask(size: String): ListBuffer[HashMap[String,Any]] = {
     var sql = "select * from " +
               "(select a.id, a.queryid, a.orasid,a.caseid, a.personid, q.querytype, q.keyid  " +
-              "from hall_assistcheck a, gafis_normalquery_queryque q " +
+              "from hall_assisttask a, gafis_normalquery_queryque q " +
               "where a.orasid = q.ora_sid and a.status = '0' and q.querytype = 0 and q.status = 2 " +
               "union all " +
               "select distinct a.id, a.queryid, a.orasid, a.caseid, a.personid, q.querytype, q.keyid  " +
@@ -45,8 +45,8 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
     _resultList
   }
 
-  override def updateAssistcheckStatus(status:Long, id:String): Unit = {
-    val sql = "update hall_assistcheck set status = ?, updatetime = sysdate where id = ? "
+  override def updateAssisttaskStatus(status:Long, id:String): Unit = {
+    val sql = "update hall_assisttask set status = ?, updatetime = sysdate where id = ? "
     entityManager.createNativeQuery(sql)
                  .setParameter(1, Integer.valueOf(status+""))
                  .setParameter(2, id)
@@ -104,6 +104,23 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
                  .setParameter(3, typ)
                  .setParameter(4, status)
                  .setParameter(5, fptPath)
+                 .executeUpdate
+  }
+
+  /**
+    * 保存比对关系记录
+    * @param status
+    * @param id
+    */
+  override def saveAssistcheck(status:Long, id:String, fptPath:String): Unit = {
+    val uuid = UUID.randomUUID().toString.replace("-","")
+    val sql = "insert into hall_assistcheck(id, queryid, orasid, caseid, personid, status, ora_uuid, service_type, fingerid, fpt_path, createtime, updatetime) " +
+              "(select ?, queryid, orasid, caseid, personid, ?, ora_uuid, service_type, fingerid, ?, sysdate,sysdate from hall_assisttask where id = ?) "
+    entityManager.createNativeQuery(sql)
+                 .setParameter(1, uuid)
+                 .setParameter(2, status)
+                 .setParameter(3, fptPath)
+                 .setParameter(4, id)
                  .executeUpdate
   }
 
