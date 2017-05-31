@@ -15,7 +15,7 @@
       <password>gafis</password>
       <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
     </database>
-    <!--贵州:gz; 上海和青岛:sh; gafis6.2:gafis6; 大库:daku; -->
+    <!--贵州:gz; 上海和青岛:sh; gafis6.2:gafis6; 大库:daku; 南京:nj-->
     <module>gz</module>
     <mnt>
       <header_size>64</header_size>
