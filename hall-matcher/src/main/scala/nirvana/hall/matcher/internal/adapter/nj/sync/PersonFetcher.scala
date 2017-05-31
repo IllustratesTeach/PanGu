@@ -8,7 +8,7 @@ import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.TextQueryConstants._
 import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
-import nirvana.hall.matcher.internal.{DataConverter, TextQueryUtil}
+import nirvana.hall.matcher.internal.{DataConverter, PinyinConverter, TextQueryUtil}
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.TextQueryProto.TextData
@@ -21,7 +21,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
-  override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.spellname, t.sex_code sexCode, t.birthdayst birthday," +
+  override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
     " t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate," +
     " t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode," +
     " t.recordmark, t.deletag, db.logic_db_pkid as logicDB, t.gather_org_code gatherOrgCode, t.nativeplace_code nativeplaceCode," +
@@ -93,6 +93,13 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
         if (time > 0) {
           textData.addColBuilder.setColName(col).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(time)))
         }
+      }
+
+      //姓名拼音,由于数据库数据不规范，这里不使用数据库spellname,这里通过转换汉字得到拼音
+      val name= rs.getString("name")
+      if(name != null){
+        val spellName = PinyinConverter.convert2Pinyin(name)
+        textData.addColBuilder.setColName(COL_NAME_SPELLNAME).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(spellName.getBytes("UTF-8")))
       }
 
       syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))

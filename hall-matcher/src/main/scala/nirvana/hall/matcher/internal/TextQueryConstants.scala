@@ -87,4 +87,7 @@ object TextQueryConstants {
   val COL_NAME_UPDATORUNITCODE = "updatorUnitCode"
   val COL_NAME_INPUTPSN = "inputpsn"
   val COL_NAME_MODIFIEDPSN = "modifiedpsn"
+
+  //南京
+  val COL_NAME_SPELLNAME = "spellName"
 }
