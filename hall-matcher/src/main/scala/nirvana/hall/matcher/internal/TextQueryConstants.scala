@@ -37,6 +37,8 @@ object TextQueryConstants {
   val PERSON_NAME = "name"
   val CASEOCCURDATE_BEG = "caseOccurDateBeg"
   val CASEOCCURDATE_END = "caseOccurDateEnd"
+  val IDCARDNO = "idcardno"  //身份证
+  val IS_HOMONYM = "isHomonym" //姓名是否同音
 
   //案件
   //贵州
@@ -87,7 +89,5 @@ object TextQueryConstants {
   val COL_NAME_UPDATORUNITCODE = "updatorUnitCode"
   val COL_NAME_INPUTPSN = "inputpsn"
   val COL_NAME_MODIFIEDPSN = "modifiedpsn"
-
-  //南京
-  val COL_NAME_SPELLNAME = "spellName"
+  val COL_NAME_SPELLNAME = "spellName" //姓名拼音
 }

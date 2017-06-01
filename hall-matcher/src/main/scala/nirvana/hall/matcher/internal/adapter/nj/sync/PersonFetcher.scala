@@ -28,7 +28,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     " t.foreign_name foreignName, t.assist_level assistLevel, t.assist_ref_person assistRefPerson, t.assist_ref_case assistRefCase," +
     " t.gatherdepartname, t.gatherusername, t.contrcapture_code contrcaptureCode," +
     " t.certificatetype, t.certificateid, t.process_no processNo, t.psis_no psisNo," +
-    " t.spellname, t.usedname, t.usedspell, t.aliasname, t.aliasspell, t.birth_code birthCode, t.birth_street birthStreet," +
+    " t.usedname, t.usedspell, t.aliasname, t.aliasspell, t.birth_code birthCode, t.birth_street birthStreet," +
     " t.birthdetail, t.door_street doorStreet, t.doordetail, t.address_street addressStreet," +
     " t.addressdetail, t.culture_code cultureCode, t.faith_code faithCode, t.haveemployment," +
     " t.job_code jobCode, t.otherspecialty, t.specialidentity_code specialidentityCode," +
@@ -41,7 +41,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address",
     "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordmark", "logicDB",
     "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase", "gatherdepartname",
-    "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+    "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "usedname",
     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail",
     "addressStreet", "addressdetail", "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty",
     "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno", "inputpsn", "modifiedpsn", "personCategory",

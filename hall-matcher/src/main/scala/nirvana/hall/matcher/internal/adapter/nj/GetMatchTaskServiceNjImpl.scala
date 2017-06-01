@@ -7,10 +7,11 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
-import nirvana.hall.matcher.internal.{DateConverter, TextQueryUtil}
+import nirvana.hall.matcher.internal.{DateConverter, PinyinConverter, TextQueryUtil}
 import nirvana.protocol.TextQueryProto
 import nirvana.protocol.TextQueryProto.TextQueryData
 import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, LongRangeQuery, Occur}
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
   * Created by songpeng on 16/4/8.
@@ -21,7 +22,7 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
 
   private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
     "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
-    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
+    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "usedname",
     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
     "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno",
     "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
@@ -59,12 +60,25 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
         //处理其他特殊的查询条件
         //模糊字段
-        val fuzzyColumn = Array("name", "idcardno")
+        val fuzzyColumn = Array(IDCARDNO)
         fuzzyColumn.foreach{col =>
           if (json.has(col)) {
             val keywordQuery = KeywordQuery.newBuilder()
             keywordQuery.setValue(json.getString(col) + "*")
             textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
+          }
+        }
+        //姓名,如果是同音字查询根据spellname查询
+        if(json.has(PERSON_NAME)){
+          if(json.has(IS_HOMONYM) && "1".equals(json.getString(IS_HOMONYM))){
+            val keywordQuery = KeywordQuery.newBuilder()
+            val spellName = PinyinConverter.convert2Pinyin(json.getString(PERSON_NAME))
+            keywordQuery.setValue(spellName)
+            textQuery.addQueryBuilder().setName(COL_NAME_SPELLNAME).setExtension(KeywordQuery.query, keywordQuery.build())
+          }else{
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(json.getString(PERSON_NAME) + "*")
+            textQuery.addQueryBuilder().setName(COL_NAME_NAME).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
         //时间段
