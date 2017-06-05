@@ -1,6 +1,8 @@
 package nirvana.hall.matcher
 
+import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_KEYLISTSTRUCT
 import nirvana.hall.matcher.internal.GafisConverter
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
@@ -23,6 +25,18 @@ class GafisConverterTest {
         val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
         Assert.assertEquals(bin.stHead.nImgSize, bin.bnData.length)
       }
+    }
+  }
+
+  @Test
+  def test_qrycondition = {
+    val qrycondition = IOUtils.toByteArray(getClass.getResourceAsStream("/qrycondition.dat"))
+    val item = new GBASE_ITEMPKG_OPSTRUCT
+    item.fromByteArray(qrycondition)
+    val keylist = new GAFIS_KEYLISTSTRUCT().fromByteArray(item.items(0).bnRes)
+    Assert.assertEquals(keylist.stKey.length, 3)
+    keylist.stKey.foreach{key =>
+      println(key.szKey)
     }
   }
 }
