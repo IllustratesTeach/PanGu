@@ -195,10 +195,10 @@ object FPTLDataToMNTDISP {
   def UTIL_Minutia_OneFPT2MntDisp(pszFPTMnt:String, stmnt:AFISMNTPOINTSTRUCT)
   {
     if (pszFPTMnt.replace(" ","").length> 0) {
-      stmnt.x = pszFPTMnt.substring(0, 3).replace(" ","").toShort
-      stmnt.y = pszFPTMnt.substring(3, 6).replace(" ","").toShort
-      val zString = pszFPTMnt.substring(6, 9)
-      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.replace(" ","").toInt)
+      stmnt.x = pszFPTMnt.substring(0, 3).replace("\u0000","").replace(" ","").toShort
+      stmnt.y = pszFPTMnt.substring(3, 6).replace("\u0000","").replace(" ","").toShort
+      val zString = pszFPTMnt.substring(6, 9).replace("\u0000","").replace(" ","")
+      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.toInt)
       stmnt.nReliability = 1
     }
   }
