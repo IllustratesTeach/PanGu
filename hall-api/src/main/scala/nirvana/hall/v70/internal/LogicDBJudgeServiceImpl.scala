@@ -11,7 +11,7 @@ import org.apache.tapestry5.json.JSONObject
   */
 class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
 
-  def logicTJudge(cardId: String): Option[String] = {
+  def logicTJudge(cardId: String,dbid :Option[String]): Option[String] = {
     //逻辑分库处理
     var logicDbPkid = ""
     //获取所有比对规则list
@@ -42,7 +42,7 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
     Option(logicDbPkid)
   }
 
-  def logicLJudge(caseId: String): Option[String] = {
+  def logicLJudge(caseId: String,dbid :Option[String]): Option[String] = {
     //逻辑分库处理
     var logicDbPkid = ""
     //获取所有比对规则list
