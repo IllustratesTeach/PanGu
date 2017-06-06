@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.TPCardService
+import nirvana.hall.api.HallDatasource
+import nirvana.hall.api.services.{HallDatasourceService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
@@ -13,8 +14,8 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 /**
  * Created by songpeng on 16/1/26.
  */
-class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardService{
-  /**
+class TPCardServiceImpl(facade:V62Facade,config:HallV62Config,hallDatasourceService:HallDatasourceService) extends TPCardService{
+  var ip_source=""  /**
    * 新增捺印卡片
    * @param tPCard
    * @return
@@ -24,6 +25,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     facade.NET_GAFIS_FLIB_Add(getDBID(dbId),
       V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID,tpCard)
+    val tpCard_HallDatasource=new HallDatasource(tpCard.szCardID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
+    hallDatasourceService.save(tpCard_HallDatasource,HallDatasource.TABLE_V62_TPCARD)
   }
 
   /**
@@ -32,6 +35,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   def delTPCard(cardId: String, dbId: Option[String]): Unit ={
+    val tpCard_HallDatasource=new HallDatasource(cardId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
+    hallDatasourceService.save(tpCard_HallDatasource,HallDatasource.TABLE_V62_TPCARD)
     facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, cardId)
   }
 
@@ -44,6 +49,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
     facade.NET_GAFIS_FLIB_Update(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID, tpCard)
+    val tpCard_HallDatasource=new HallDatasource(tpCard.szCardID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
+    hallDatasourceService.save(tpCard_HallDatasource,HallDatasource.TABLE_V62_TPCARD)
   }
 
   /**
@@ -194,5 +201,14 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     }else{
       dbId.get.toShort
     }
+  }
+
+  /**
+    * 赋值来源url
+    *
+    * @param url
+    */
+  override def cutIP(url: String): Unit = {
+    ip_source=url.split(":", -1)(1).substring(2)
   }
 }
