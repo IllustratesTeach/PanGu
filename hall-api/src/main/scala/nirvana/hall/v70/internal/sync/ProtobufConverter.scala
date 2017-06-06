@@ -76,7 +76,7 @@ object ProtobufConverter extends LoggerSupport{
 
     gafisCase
   }
-  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String] = null): Case = {
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
 
@@ -362,17 +362,24 @@ object ProtobufConverter extends LoggerSupport{
 
     //指纹数据
     val mntMap = fingerList.filter(_.groupId == 0).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
-    fingerList.filter(_.groupId == 1).foreach { finger =>
+    //纹线特征数据
+    val binMap = fingerList.filter(_.groupId == 4).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
+    fingerList.filter(_.groupId == 1).foreach {finger =>
       val blobBuilder = tpCard.addBlobBuilder()
       val mnt = mntMap.get((finger.fgpCase, finger.fgp))
+      val bin = binMap.get((finger.fgpCase, finger.fgp))
       mnt.foreach { blob =>
         blobBuilder.setStMntBytes(ByteString.copyFrom(blob))
+      }
+      bin.foreach{
+        blob => blobBuilder.setStBinBytes(ByteString.copyFrom(blob))
       }
       blobBuilder.setStImageBytes(ByteString.copyFrom(finger.gatherData))
       blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
       blobBuilder.setBPlain("1".equals(finger.fgpCase))
       blobBuilder.setFgp(FingerFgp.valueOf(finger.fgp))
     }
+
     //人像数据
     photoList.foreach{ photo =>
       val blobBuilder = tpCard.addBlobBuilder()
@@ -507,7 +514,7 @@ object ProtobufConverter extends LoggerSupport{
           finger.personId = personId
           finger.gatherData = imageData.toByteArray
           finger.fgp = blob.getFgp.getNumber.toShort
-          finger.fgpCase = if(blob.getBPlain) "1" else "0"
+          finger.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           finger.groupId = Gafis70Constants.GROUP_ID_CPR
           finger.lobtype = Gafis70Constants.LOBTYPE_DATA
           fingerList += finger
@@ -519,7 +526,7 @@ object ProtobufConverter extends LoggerSupport{
           mnt.personId = personId
           mnt.gatherData = mntData.toByteArray
           mnt.fgp = blob.getFgp.getNumber.toShort
-          mnt.fgpCase = if(blob.getBPlain) "1" else "0"
+          mnt.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           mnt.groupId = Gafis70Constants.GROUP_ID_MNT
           mnt.lobtype = Gafis70Constants.LOBTYPE_MNT
           fingerList += mnt
@@ -531,6 +538,7 @@ object ProtobufConverter extends LoggerSupport{
           bin.personId = personId
           bin.gatherData = binData.toByteArray
           bin.fgp = blob.getFgp.getNumber.toShort
+          bin.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
 

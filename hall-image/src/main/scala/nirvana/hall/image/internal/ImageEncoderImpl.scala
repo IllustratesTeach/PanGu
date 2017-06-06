@@ -42,7 +42,7 @@ class ImageEncoderImpl(firmDecoder: FirmDecoder) extends ImageEncoder{
           10)
     destImg.bnData = cpr
     destImg.stHead.nImgSize = destImg.bnData.length
-    destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ
+    destImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
     destImg
   }
 }

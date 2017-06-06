@@ -70,18 +70,21 @@ object gaqryqueConverter extends LoggerSupport{
     }
 
     queryStruct.pstInfo_Data = new GAFIS_QUERYINFO
-    val ips=matchTask.getComputerIp.split('.') //机器IP
-    val new_ip=new Array[Byte](4)
-    val hex_size=16 //16进制位数
-    for( i <- 0 until ips.length){
-      new_ip(i)=Integer.parseInt(Integer.toHexString(Integer.parseInt(ips(i))),hex_size).toByte // 由于存储需要16进制数，将String转成10进制数后再转成16进制字符串最后转成16进制数
+
+    if(matchTask.getComputerIp.nonEmpty){
+      val ips=matchTask.getComputerIp.split('.') //机器IP
+      val new_ip=new Array[Byte](4)
+      val hex_size=16 //16进制位数
+      for( i <- 0 until ips.length){
+        new_ip(i)=Integer.parseInt(Integer.toHexString(Integer.parseInt(ips(i))),hex_size).toByte // 由于存储需要16进制数，将String转成10进制数后再转成16进制字符串最后转成16进制数
+      }
+      queryStruct.pstInfo_Data.bnIP = new_ip
     }
 
-    queryStruct.pstInfo_Data.bnIP = new_ip
     queryStruct.pstInfo_Data.szUserUnitCode= matchTask.getUserUnitCode  //提交用户单位代码
     queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
 
-    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
+    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_LOCAL.toByte //本地查询
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     if(matchTask.getQueryid.nonEmpty){
       queryStruct.stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(matchTask.getQueryid.toLong) //远程查询ID
@@ -141,14 +144,21 @@ object gaqryqueConverter extends LoggerSupport{
     //设置比对参数
     val item = new GAFIS_QRYPARAM
     item.stXgw.bFullMatchOn = matchTask.getConfig.getFullMatchOn.toByte
+//    item.stXgw.nMntMatchType = 4
 
     val itemDataLength = item.getDataSize
     val itemHead = new GBASE_ITEMPKG_ITEMHEADSTRUCT
-    itemHead.szItemName = GAFIS_TEXTSQL_GetName
+    itemHead.szItemName = GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
+    //TODO 文本查询条件
+    val xmlData = "".getBytes
+    val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
+    itemHead2.szItemName = GAFIS_TEXTSQL_GetName
+    itemHead2.nItemLen = xmlData.length
+
     val itemPackage = new GBASE_ITEMPKG_PKGHEADSTRUCT
-    itemPackage.nDataLen = itemPackage.getDataSize + itemHead.getDataSize + itemHead.nItemLen
+    itemPackage.nDataLen = itemPackage.getDataSize + itemHead.getDataSize + itemHead.nItemLen + itemHead2.getDataSize + itemHead2.nItemLen
     itemPackage.nBufSize = itemPackage.nDataLen
 
     val buffer = ChannelBuffers.buffer(itemPackage.nDataLen)
@@ -166,13 +176,15 @@ object gaqryqueConverter extends LoggerSupport{
     //特征数据
     matchTask.getMatchType match {
       case MatchType.FINGER_LL | MatchType.FINGER_LT =>
-        val mic = new GAFISMICSTRUCT
-        mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
-        mic.nMntLen = mic.pstMnt_Data.length
-        mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
-        mic.nItemData = 0
-        mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.toByte
-        queryStruct.pstMIC_Data = Array(mic)
+        if(matchTask.getLData.getMinutia.nonEmpty){
+          val mic = new GAFISMICSTRUCT
+          mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
+          mic.nMntLen = mic.pstMnt_Data.length
+          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+          mic.nItemData = 0
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.toByte
+          queryStruct.pstMIC_Data = Array(mic)
+        }
       case MatchType.FINGER_TT | MatchType.FINGER_TL =>
         queryStruct.pstMIC_Data =
           matchTask.getTData.getMinutiaDataList.map{md=>
@@ -191,14 +203,15 @@ object gaqryqueConverter extends LoggerSupport{
             mic
           }.toArray
       case MatchType.PALM_LL | MatchType.PALM_LT =>
-        val mic = new GAFISMICSTRUCT
-        mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
-        mic.nMntLen = mic.pstMnt_Data.length
-        mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
-        mic.nItemData = 0
-        mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.toByte
-        queryStruct.pstMIC_Data = Array(mic)
-
+        if(matchTask.getLData.getMinutia.nonEmpty){
+          val mic = new GAFISMICSTRUCT
+          mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
+          mic.nMntLen = mic.pstMnt_Data.length
+          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+          mic.nItemData = 0
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.toByte
+          queryStruct.pstMIC_Data = Array(mic)
+        }
       case MatchType.PALM_TT | MatchType.PALM_TL =>
         queryStruct.pstMIC_Data =
           matchTask.getTData.getMinutiaDataList.map{md=>
@@ -213,7 +226,9 @@ object gaqryqueConverter extends LoggerSupport{
           }.toArray
 
     }
-    queryStruct.nMICCount = queryStruct.pstMIC_Data.length
+    if(queryStruct.pstMIC_Data != null){
+      queryStruct.nMICCount = queryStruct.pstMIC_Data.length
+    }
     queryStruct
   }
 

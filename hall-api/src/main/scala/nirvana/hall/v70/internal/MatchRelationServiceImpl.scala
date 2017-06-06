@@ -2,20 +2,23 @@ package nirvana.hall.v70.internal
 
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.MatchRelationService
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.{FingerFgp, MatchType}
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.jpa.GafisCheckinInfo
 
 /**
  * Created by songpeng on 16/9/21.
  */
-class MatchRelationServiceImpl extends MatchRelationService{
+class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationService{
   /**
    * 获取比对关系
    * 查询比中关系表获取比中关系信息
-   * @param request
+    *
+    * @param request
    * @return
    */
   override def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse = {

@@ -2,7 +2,7 @@ package nirvana.hall.api.internal.remote
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.config.HallImageRemoteConfigSupport
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -19,7 +19,7 @@ import nirvana.hall.support.services.RpcHttpClient
   * Created by songpeng on 2017/1/23.
   * gafisImage图像处理service, 调用远程接口imagedecompressurl处理数据，如过没有配置imagedecompressurl，本地处理
   */
-class HallImageRemoteServiceImpl(hallApiConfig: HallApiConfig, rpcHttpClient: RpcHttpClient) extends HallImageRemoteService with LoggerSupport{
+class HallImageRemoteServiceImpl(hallImageUrl: HallImageRemoteConfigSupport, rpcHttpClient: RpcHttpClient) extends HallImageRemoteService with LoggerSupport{
   val firmDecoder = new FirmDecoderImpl("support",new HallImageConfig)
   val imageEncoder = new ImageEncoderImpl(firmDecoder)
   /**
@@ -39,12 +39,12 @@ class HallImageRemoteServiceImpl(hallApiConfig: HallApiConfig, rpcHttpClient: Rp
            fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
         firmDecoder.decode(gafisImage)
       case other =>
-        if(hallApiConfig.hallImageUrl == null || hallApiConfig.hallImageUrl.isEmpty){
+        if(hallImageUrl.hallImageUrl == null || hallImageUrl.hallImageUrl.isEmpty){
           firmDecoder.decode(gafisImage)
         }else{
           val request = FirmImageDecompressRequest.newBuilder()
           request.setCprData(ByteString.copyFrom(gafisImage.toByteArray(AncientConstants.GBK_ENCODING)))
-          val response = rpcHttpClient.call(hallApiConfig.hallImageUrl, FirmImageDecompressRequest.cmd, request.build())
+          val response = rpcHttpClient.call(hallImageUrl.hallImageUrl, FirmImageDecompressRequest.cmd, request.build())
           val firmImageDecompressResponse = response.getExtension(FirmImageDecompressResponse.cmd)
 
           new GAFISIMAGESTRUCT().fromByteArray(firmImageDecompressResponse.getOriginalData.toByteArray)
@@ -68,13 +68,13 @@ override def encodeGafisImage2Wsq(gafisImage: GAFISIMAGESTRUCT): GAFISIMAGESTRUC
          fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
       imageEncoder.encodeWSQ(gafisImage)
     case other =>
-      if(hallApiConfig.hallImageUrl == null || hallApiConfig.hallImageUrl.isEmpty){
+      if(hallImageUrl.hallImageUrl == null || hallImageUrl.hallImageUrl.isEmpty){
         imageEncoder.encodeWSQ(gafisImage)
       }else{
         val request = ImageCompressRequest.newBuilder()
         request.setOriginalData(ByteString.copyFrom(gafisImage.toByteArray(AncientConstants.GBK_ENCODING)))
         request.setCompressMethod(CompressMethod.WSQ)
-        val response = rpcHttpClient.call(hallApiConfig.hallImageUrl, ImageCompressRequest.cmd, request.build())
+        val response = rpcHttpClient.call(hallImageUrl.hallImageUrl, ImageCompressRequest.cmd, request.build())
         val imageCompressResponse= response.getExtension(ImageCompressResponse.cmd)
 
         new GAFISIMAGESTRUCT().fromByteArray(imageCompressResponse.getCprData.toByteArray)

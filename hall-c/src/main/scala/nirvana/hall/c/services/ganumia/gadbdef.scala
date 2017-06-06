@@ -99,8 +99,9 @@ object gadbdef {
   var bKeyCanBeFree:Byte = _ ;	//
   @Length(1)
   var bnRes0:Array[Byte] = _ ;
-    var pKey_Ptr:Int = _ //using 4 byte as pointer
-  @IgnoreTransfer
+//    var pKey_Ptr:Int = _ //using 4 byte as pointer
+//  @IgnoreTransfer
+  @Length(32)
   var pKey_Data:Array[Byte] = _ // for pKey pointer ,struct:UCHAR;			// pointer to key
   @Length(4)
   var bnRes_Pointer:Array[Byte] = _ ;

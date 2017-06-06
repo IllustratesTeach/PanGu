@@ -4,7 +4,7 @@ import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisCase, GafisLogicDb, GafisLogicDbCase, SysUser}
+import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -95,10 +95,11 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
    */
   override def getCaseInfo(caseId: String, dbId: Option[String]): Case= {
     val gafisCase = GafisCase.findOption(caseId)
+    val fingers = GafisCaseFinger.select(GafisCaseFinger.fingerId).where(GafisCaseFinger.caseId === caseId).toList.asInstanceOf[List[String]]
     if(gafisCase.isEmpty){
       throw new RuntimeException("记录不存在!");
     }
-    ProtobufConverter.convertGafisCase2Case(gafisCase.get)
+    ProtobufConverter.convertGafisCase2Case(gafisCase.get,fingers)
   }
 
   /**

@@ -1,9 +1,6 @@
 package nirvana.hall.v70
 
-import nirvana.hall.api.internal.remote._
-import nirvana.hall.api.internal.sync.SyncCronServiceImpl
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
@@ -12,7 +9,9 @@ import nirvana.hall.v70.internal.query.{Query7to6ServiceImpl, QueryGet7to6Servic
 import nirvana.hall.v70.internal.stamp.{GatherFingerPalmServiceImpl, GatherPersonServiceImpl, GatherPortraitServiceImpl}
 import nirvana.hall.v70.internal.sync._
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
+import nirvana.hall.v70.services.GetPKIDServiceImpl
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
+import nirvana.hall.v70.services.service.GetPKIDService
 import nirvana.hall.v70.services.stamp.{GatherFingerPalmService, GatherPersonService, GatherPortraitService}
 import nirvana.hall.v70.services.sys.{DictService, UserService}
 import org.apache.tapestry5.ioc.ServiceBinder
@@ -36,20 +35,17 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
-    //远程服务类
-    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
-    binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])
-    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
-    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
-    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
-
+    binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
+    binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
+    binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
+    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
     //同步
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
+    binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
 
     //定时服务
 //    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()

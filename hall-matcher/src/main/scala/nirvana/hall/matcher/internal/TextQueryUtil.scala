@@ -1,6 +1,7 @@
 package nirvana.hall.matcher.internal
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
 import nirvana.protocol.TextQueryProto.TextData.{ColData, ColType}
 import nirvana.protocol.TextQueryProto.TextQueryData._
@@ -13,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by songpeng on 2017/3/5.
   * 文本查询工具类
   */
-object TextQueryUtil {
+object TextQueryUtil extends LoggerSupport{
 
   def getColDataByPersonid(personid: String): Seq[ColData] ={
     getColDataById(personid, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
@@ -134,30 +135,34 @@ object TextQueryUtil {
   def getColDataById(cardid: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
     val colDataArr = new ArrayBuffer[ColData]()
     var id = cardid
-    //人员编号前缀
-    if (id.matches("^[a-zA-Z]\\w*")) {
-      val colData = ColData.newBuilder()
-      val idPre: String = id.substring(0, 1)
-      colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(idPre.getBytes()))
-      id = id.substring(1)
-      colDataArr += colData.build()
-    }
-    val len = id.length
-    if(len >= 12){
-      val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
-
-      for (i <- len until 22){
-        id += "0"
+    try{
+      if (id.matches("^[a-zA-Z]\\w*")) {
+        val id_ = splitCardidByPre(id)
+        val colData = ColData.newBuilder()
+        colData.setColName(preColName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(id_._1.getBytes()))
+        colDataArr += colData.build()
+        id = id_._2
       }
-      val id_date = java.lang.Long.parseLong(id.substring(12), 36)
-      colDataArr += ColData.newBuilder().setColName(dateColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
-    }else{
-      for (i <- len until 12){
-        id += "0"
+      val len = id.length
+      if(len >= 12){
+        val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
+        colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+        //长度不足22位之后补0
+        for (i <- len until 22){
+          id += "0"
+        }
+        val id_date = java.lang.Long.parseLong(id.substring(12), 36)
+        colDataArr += ColData.newBuilder().setColName(dateColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_date))).build()
+      }else{
+        for (i <- len until 12){
+          id += "0"
+        }
+        val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
+        colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
       }
-      val id_dept = java.lang.Long.parseLong(id.substring(0, 12), 36)
-      colDataArr += ColData.newBuilder().setColName(deptColName).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(id_dept))).build()
+    } catch {
+      case e: Exception =>
+        error("illegal cardid:{}", id)
     }
 
     colDataArr
@@ -186,16 +191,16 @@ object TextQueryUtil {
     var idBeg = cardidBeg
     var idEnd = cardidEnd
     if (idBeg.matches("^[a-zA-Z]\\w*")) {
-      val idPre = idBeg.substring(0,1)
-      val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
+      val id_ = splitCardidByPre(idBeg)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
       groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
-      idBeg = idBeg.substring(1)
+      idBeg = id_._2
     }
     if (idEnd.matches("^[a-zA-Z]\\w*")) {
-      val idPre = idEnd.substring(0,1)
-      val keywordQuery = KeywordQuery.newBuilder().setValue(idPre)
+      val id_ = splitCardidByPre(idEnd)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
       groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
-      idEnd = idEnd.substring(1)
+      idEnd = id_._2
     }
     /*
     人员编号一分为二，dept, date A1=deptBeg A2=dateBeg B1=deptEnd B2=dateEnd
@@ -284,6 +289,30 @@ object TextQueryUtil {
       dept = java.lang.Long.parseLong(deptStr, 36)
 
       (dept, 0)
+    }
+  }
+
+  /**
+    * 将人员编号的前缀拆分开
+    * 人员编号前缀,一般都是一个字母开头，贵州多为R,P开头
+    * 青岛社会人员库： 捺印卡号以BA，JLRY，XCRY开头
+    * @param id
+    * @return (前缀，无前缀编号)
+    */
+  private def splitCardidByPre(id: String): (String, String) = {
+    var idPre = ""
+    if(id.toUpperCase.matches("^(BA)\\w*")){
+      idPre = id.substring(0, 2)
+      (idPre, id.substring(2))
+    }else if(id.toUpperCase().matches("^(JLRY)|(XCRY)\\w*")){
+      idPre = id.substring(0, 4)
+      (idPre, id.substring(4))
+    }else
+    if (id.matches("^[a-zA-Z]\\w*")) {
+      idPre = id.substring(0, 1)
+      (idPre, id.substring(1))
+    }else{
+      (idPre, id)
     }
   }
 

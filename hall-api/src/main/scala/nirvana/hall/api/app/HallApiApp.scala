@@ -6,7 +6,6 @@ import monad.core.MonadCoreSymbols
 import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSupport}
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
 import nirvana.hall.api.{HallApiConstants, HallApiModule, HallApiSymbols}
-import nirvana.hall.extractor.jni.JniLoader
 import org.slf4j.LoggerFactory
 
 /**
@@ -25,8 +24,6 @@ object HallApiApp
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
     val config = HallApiModule.buildHallApiConfig(serverHome)
     configLogger(config.logFile, "API", "egf", "nirvana.hall")
-
-    JniLoader.loadJniLibrary(serverHome,config.logFile)
 
     val logger = LoggerFactory getLogger getClass
     logger.info("starting hall api server ....")
@@ -48,7 +45,9 @@ object HallApiApp
       Class.forName("monad.rpc.LocalRpcServerModule"),
       Class.forName("nirvana.hall.support.LocalProtobufWebModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      //webservice
 //      Class.forName("nirvana.hall.api.LocalApiWebServiceModule"),
+//      Class.forName("stark.webservice.StarkWebServiceModule"),
 
       Class.forName("nirvana.hall.api.LocalApiServiceModule"),
       Class.forName("nirvana.hall.api.HallApiModule")

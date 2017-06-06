@@ -18,9 +18,9 @@ object TextQueryConstants {
   //文本查询json KEY
   val PERSONID_BEG1 = "personIdST1"
   val PERSONID_END1 = "personIdED1"
-  val PERSONID_OCCUR1 = "sendKey1Str"
   val PERSONID_BEG2 = "personIdST2"
   val PERSONID_END2 = "personIdED2"
+  val PERSONID_OCCUR1 = "sendKey1Str"
   val PERSONID_OCCUR2 = "sendKey2Str"
   val BIRTHDAY_BEG = "birthdayST"
   val BIRTHDAY_END = "birthdayED"
@@ -30,14 +30,15 @@ object TextQueryConstants {
 
   val CASEID_BEG1 = "caseIdST1"
   val CASEID_END1 = "caseIdED1"
-  val CASEID_OCCUR1 = "sendKey1Str"
   val CASEID_BEG2 = "caseIdST2"
   val CASEID_END2 = "caseIdED2"
+  val CASEID_OCCUR1 = "sendKey1Str"
   val CASEID_OCCUR2 = "sendKey2Str"
   val PERSON_NAME = "name"
   val CASEOCCURDATE_BEG = "caseOccurDateBeg"
   val CASEOCCURDATE_END = "caseOccurDateEnd"
-
+  val IDCARDNO = "idcardno"  //身份证
+  val IS_HOMONYM = "isHomonym" //姓名是否同音
 
   //案件
   //贵州
@@ -88,4 +89,5 @@ object TextQueryConstants {
   val COL_NAME_UPDATORUNITCODE = "updatorUnitCode"
   val COL_NAME_INPUTPSN = "inputpsn"
   val COL_NAME_MODIFIEDPSN = "modifiedpsn"
+  val COL_NAME_SPELLNAME = "spellName" //姓名拼音
 }

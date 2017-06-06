@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 
 /**
@@ -9,8 +10,10 @@ trait MatchRelationService {
 
   /**
    * 获取比对关系
-   * @param request
+    *
+    * @param request
    * @return
    */
   def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse
+
 }

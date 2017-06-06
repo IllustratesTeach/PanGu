@@ -1,9 +1,12 @@
 package nirvana.hall.v62
 
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v62.internal._
+import nirvana.hall.v62.internal.{AssistCheckRecordServiceImpl, _}
+import nirvana.hall.v62.services.GetPKIDServiceImpl
+import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
@@ -21,7 +24,11 @@ object LocalV62ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
-
+    binder.bind(classOf[HallDatasourceService], classOf[HallDatasourceServiceImpl])
+    binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
+    binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
+    binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
+    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
   }
 
 }

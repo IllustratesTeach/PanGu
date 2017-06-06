@@ -22,26 +22,36 @@ class LPPalmFilter(httpServletRequest: HttpServletRequest, lPPalmService: LPPalm
     }//删除现场
     else if(commandRequest.hasExtension(LPPalmDelRequest.cmd)) {
       val request = commandRequest.getExtension(LPPalmDelRequest.cmd)
+      val cardId = request.getCardId
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      lPPalmService.delLPCard(request.getCardId, dbId)
+      if(lPPalmService.isExist(cardId, dbId)){
+        lPPalmService.delLPCard(cardId, dbId)
+      }
       val response = LPPalmDelResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPPalmDelResponse.cmd, response)
       true
     }//更新现场
     else if(commandRequest.hasExtension(LPPalmUpdateRequest.cmd)) {
       val request = commandRequest.getExtension(LPPalmUpdateRequest.cmd)
+      val cardId = request.getCard.getStrCardID
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      lPPalmService.updateLPCard(request.getCard, dbId)
+      if(lPPalmService.isExist(cardId, dbId)){
+        lPPalmService.updateLPCard(request.getCard, dbId)
+      }
       val response = LPPalmUpdateResponse.newBuilder().build()
       commandResponse.writeMessage(commandRequest, LPPalmUpdateResponse.cmd, response)
       true
     }//查询现场
     else if(commandRequest.hasExtension(LPPalmGetRequest.cmd)){
       val request = commandRequest.getExtension(LPPalmGetRequest.cmd)
+      val response = LPPalmGetResponse.newBuilder()
+      val cardId = request.getCardId
       val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
-      val LPPalm = lPPalmService.getLPCard(request.getCardId, dbId)
-      val response = LPPalmGetResponse.newBuilder().setCard(LPPalm).build()
-      commandResponse.writeMessage(commandRequest, LPPalmGetResponse.cmd, response)
+      if(lPPalmService.isExist(cardId, dbId)){
+        val lPPalm = lPPalmService.getLPCard(cardId, dbId)
+        response.setCard(lPPalm)
+      }
+      commandResponse.writeMessage(commandRequest, LPPalmGetResponse.cmd, response.build())
       true
     }//是否已存在
     else if(commandRequest.hasExtension(LPPalmIsExistRequest.cmd)){

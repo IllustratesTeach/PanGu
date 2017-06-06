@@ -28,7 +28,8 @@ object LocalProtobufModule {
     }
     pipelineBuilder.build(logger, classOf[ProtobufRequestHandler], classOf[ProtobufRequestFilter], configuration, terminator)
   }
-/*  @EagerLoad
+/*//has already been defined by monad.rpc.LocalRpcModule.buildProtobufRegistroy
+  @EagerLoad
   def buildProtobufRegistroy(configruation: java.util.Collection[ProtobufExtensionRegistryConfiger]) = {
     val registry = ExtensionRegistry.newInstance()
     val it = configruation.iterator()
@@ -41,7 +42,10 @@ object LocalProtobufModule {
   def provideProtobufCommand(configuration: Configuration[ProtobufExtensionRegistryConfiger], classNameLocator: ClassNameLocator, logger: Logger) {
     configuration.add(new ProtobufExtensionRegistryConfiger {
       override def config(registry: ExtensionRegistry): Unit = {
-        val packages = Seq("nirvana.hall.protocol.sys", "nirvana.hall.protocol.api")
+        val packages = Seq("nirvana.hall.protocol.sys",
+          "nirvana.hall.protocol.api",
+          "nirvana.hall.protocol.image",
+          "nirvana.hall.protocol.extractor")
         val contextClassLoader = Thread.currentThread().getContextClassLoader
         packages.foreach { packageName =>
           val it = classNameLocator.locateClassNames(packageName).iterator()

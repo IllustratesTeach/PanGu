@@ -4,7 +4,7 @@ import com.google.protobuf.ExtensionRegistry
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 import nirvana.hall.protocol.api.{HallMatchRelationProto, QueryProto, TPCardProto}
 import nirvana.hall.protocol.fpt.MatchRelationProto
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.protocol.matcher.{MatchResultProto, MatchTaskQueryProto}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.v62.internal.V62Facade

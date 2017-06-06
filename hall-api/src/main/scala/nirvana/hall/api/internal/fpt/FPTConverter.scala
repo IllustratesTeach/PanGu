@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.webservice.util.FPTFileHandler
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
 import nirvana.hall.extractor.internal.FPTMntConverter
@@ -21,13 +20,13 @@ object FPTConverter {
     * @param logic02Rec
     * @return
     */
-  def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard ={
+  def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard = {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
-    if(logic02Rec.gender != null && logic02Rec.gender.length >0){
+    if (logic02Rec.gender != null && logic02Rec.gender.length > 0) {
       textBuilder.setNSex(logic02Rec.gender.toInt)
     }
     textBuilder.setStrBirthDate(logic02Rec.birthday)
@@ -52,12 +51,12 @@ object FPTConverter {
     textBuilder.setBHasCriminalRecord("1".equals(logic02Rec.isCriminal))
     textBuilder.setStrCriminalRecordDesc(logic02Rec.criminalInfo)
     textBuilder.setStrPremium(logic02Rec.assistUnitName)
-    if(logic02Rec.isAssist != null && logic02Rec.isAssist.length > 0){
+    if (logic02Rec.isAssist != null && logic02Rec.isAssist.length > 0) {
       textBuilder.setNXieChaFlag(logic02Rec.isAssist.toInt)
     }
     textBuilder.setStrXieChaRequestUnitName(logic02Rec.assistUnitName)
     textBuilder.setStrXieChaRequestUnitCode(logic02Rec.assistUnitCode)
-    if(logic02Rec.assistLevel != null && logic02Rec.assistLevel.length > 0){
+    if (logic02Rec.assistLevel != null && logic02Rec.assistLevel.length > 0) {
       textBuilder.setNXieChaFlag(logic02Rec.isAssist.toInt)
     }
     textBuilder.setStrXieChaForWhat(logic02Rec.assistPurpose)
@@ -71,15 +70,15 @@ object FPTConverter {
     textBuilder.setStrShenPiBy(logic02Rec.approver)
 
 
-    logic02Rec.fingers.foreach { finger=>
+    logic02Rec.fingers.foreach { finger =>
       if (finger.imgData != null && finger.imgData.length > 0) {
         val blobBuilder = tpCard.addBlobBuilder()
         blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
         val fgp = finger.fgp.toInt
-        if(fgp > 10){
+        if (fgp > 10) {
           blobBuilder.setFgp(FingerFgp.valueOf(fgp - 10))
           blobBuilder.setBPlain(true)
-        }else{
+        } else {
           blobBuilder.setFgp(FingerFgp.valueOf(fgp))
           blobBuilder.setBPlain(false)
         }
@@ -89,7 +88,7 @@ object FPTConverter {
       }
     }
     //人像
-    if(logic02Rec.portraitData != null && logic02Rec.portraitData.length > 0){
+    if (logic02Rec.portraitData != null && logic02Rec.portraitData.length > 0) {
       val blobBuilder = tpCard.addBlobBuilder()
       blobBuilder.setType(ImageType.IMAGETYPE_FACE)
       blobBuilder.setStImageBytes(ByteString.copyFrom(logic02Rec.portraitData))
@@ -98,7 +97,7 @@ object FPTConverter {
     tpCard.build()
   }
 
-  def convertLogic03Res2Case(logic03Rec: Logic03Rec):Case ={
+  def convertLogic03Res2Case(logic03Rec: Logic03Rec): Case = {
     val caseInfo = Case.newBuilder()
     val textBuilder = caseInfo.getTextBuilder
     caseInfo.setStrCaseID(logic03Rec.caseId)
@@ -127,8 +126,8 @@ object FPTConverter {
     textBuilder.setStrXieChaRequestUnitCode(logic03Rec.assistUnitCode) //协查单位代码
 
     //隐式转换，字符串转数字
-    implicit def string2Int(str: String): Int= {
-      if(str != null && str.matches("[0-9]+"))
+    implicit def string2Int(str: String): Int = {
+      if (str != null && str.matches("[0-9]+"))
         Integer.parseInt(str)
       else 0
     }
@@ -139,26 +138,27 @@ object FPTConverter {
 
     caseInfo.build()
   }
-  def convertLogic03Res2LPCard(logic03Rec: Logic03Rec):Seq[LPCard] ={
+
+  def convertLogic03Res2LPCard(logic03Rec: Logic03Rec): Seq[LPCard] = {
     val lpCardList = new ArrayBuffer[LPCard]()
-    logic03Rec.fingers.foreach{finger =>
+    logic03Rec.fingers.foreach { finger =>
       val lpCard = LPCard.newBuilder()
       lpCard.setStrCardID(finger.fingerId)
       val textBuilder = lpCard.getTextBuilder
       textBuilder.setStrCaseId(logic03Rec.caseId)
       textBuilder.setStrSeq(finger.fingerNo)
-      textBuilder.setStrRemainPlace(finger.remainPlace)     //遗留部位
-      textBuilder.setStrRidgeColor(finger.ridgeColor)      //乳突线颜色
-      textBuilder.setBDeadBody("1".equals(finger.ridgeColor))          //未知名尸体标识
-      textBuilder.setStrDeadPersonNo(finger.corpseNo)    //未知名尸体编号
-      textBuilder.setStrStart(finger.mittensBegNo)           //联指开始序号
-      textBuilder.setStrEnd(finger.mittensEndNo)             //联指结束序号
-      textBuilder.setStrCaptureMethod(finger.extractMethod)  //提取方式
+      textBuilder.setStrRemainPlace(finger.remainPlace) //遗留部位
+      textBuilder.setStrRidgeColor(finger.ridgeColor) //乳突线颜色
+      textBuilder.setBDeadBody("1".equals(finger.ridgeColor)) //未知名尸体标识
+      textBuilder.setStrDeadPersonNo(finger.corpseNo) //未知名尸体编号
+      textBuilder.setStrStart(finger.mittensBegNo) //联指开始序号
+      textBuilder.setStrEnd(finger.mittensEndNo) //联指结束序号
+      textBuilder.setStrCaptureMethod(finger.extractMethod) //提取方式
 
       if (finger.imgData != null && finger.imgData.length > 0) {
         val blobBuilder = lpCard.getBlobBuilder
         blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-        if (finger.fgp != null && finger.fgp.length > 0){
+        if (finger.fgp != null && finger.fgp.length > 0) {
           0.until(finger.fgp.length)
             .filter("1" == finger.fgp.charAt(_))
             .foreach(i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
@@ -169,8 +169,8 @@ object FPTConverter {
         blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
       }
       //隐式转换，字符串转数字
-      implicit def string2Int(str: String): Int= {
-        if(str != null && str.matches("[0-9]+"))
+      implicit def string2Int(str: String): Int = {
+        if (str != null && str.matches("[0-9]+"))
           Integer.parseInt(str)
         else 0
       }

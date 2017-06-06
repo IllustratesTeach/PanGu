@@ -13,6 +13,10 @@ message QuerySendRequest {
         optional QuerySendRequest cmd = 10500;
     }
     required matcher.MatchTask matchTask = 1;
+    //记录exception
+    optional string uuid = 2;
+    //传送远程接收端IP，用于存日志表
+    optional string ip = 3;
 }
 message QuerySendResponse {
     extend monad.rpc.protocol.BaseCommand{
@@ -27,6 +31,10 @@ message QueryGetRequest {
         optional QueryGetRequest cmd = 10502;
     }
     required int64 ora_sid = 1;
+    //记录exception
+    optional string uuid = 2;
+    //传送远程接收端IP，用于存日志表
+    optional string ip = 3;
 }
 message QueryGetResponse {
     extend monad.rpc.protocol.BaseCommand{

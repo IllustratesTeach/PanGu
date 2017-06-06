@@ -48,9 +48,16 @@
       <outputDirectory>doc/xsd</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/resources/hall/api</directory>
+      <directory>src/main/resources/hall/v62</directory>
       <includes>
-        <include>api.xsd</include>
+        <include>v62.xsd</include>
+      </includes>
+      <outputDirectory>doc/xsd</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/hall/v62/proxy</directory>
+      <includes>
+        <include>proxy.xsd</include>
       </includes>
       <outputDirectory>doc/xsd</outputDirectory>
     </fileSet>

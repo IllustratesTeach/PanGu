@@ -1,6 +1,6 @@
 package nirvana.hall.v62.services
 
-import nirvana.hall.api.internal.BaseJniLoader
+import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.v62.BaseV62TestCase
@@ -9,8 +9,8 @@ import org.junit.{Assert, Test}
 /**
   * Created by songpeng on 2017/1/24.
   */
-class FPTServiceImplTest extends BaseV62TestCase with BaseJniLoader{
-
+class FPTServiceImplTest extends BaseV62TestCase{
+  JniLoaderUtil.loadExtractorJNI()
   @Test
   def test_getLogic02Rec: Unit ={
     val service = getService[FPTService]

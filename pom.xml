@@ -9,6 +9,7 @@
   <description>Nirvana Hall Application Server</description>
   <modules>
     <module>hall-api</module>
+    <module>hall-webservice</module>
     <module>hall-c</module>
     <module>hall-extractor</module>
     <module>hall-image</module>
@@ -66,6 +67,11 @@
         <version>${stark-release-version}</version>
       </dependency>
       <dependency>
+        <groupId>com.ganshane.stark</groupId>
+        <artifactId>stark-activerecord-generator_2.11</artifactId>
+        <version>${stark-release-version}</version>
+      </dependency>
+      <dependency>
           <groupId>nirvana</groupId>
           <artifactId>hall-extractor</artifactId>
           <version>${project.version}</version>
@@ -85,11 +91,6 @@
         <artifactId>hall-support</artifactId>
         <version>${project.version}</version>
       </dependency>
-<!--      <dependency>
-        <groupId>com.ganshane.monad</groupId>
-        <artifactId>monad-migration</artifactId>
-        <version>${monad-release-version}</version>
-      </dependency>-->
       <dependency>
         <groupId>com.ganshane.monad</groupId>
         <artifactId>monad-support</artifactId>
@@ -406,6 +407,11 @@
         <groupId>net.sf.jopt-simple</groupId>
         <artifactId>jopt-simple</artifactId>
         <version>5.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>com.belerweb</groupId>
+        <artifactId>pinyin4j</artifactId>
+        <version>2.5.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

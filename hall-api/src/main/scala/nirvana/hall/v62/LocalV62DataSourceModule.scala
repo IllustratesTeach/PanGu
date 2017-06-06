@@ -5,15 +5,12 @@ import javax.sql.DataSource
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
-import nirvana.hall.api.internal.remote.{CaseInfoRemoteServiceImpl, LPCardRemoteServiceImpl, TPCardRemoteServiceImpl,LPPalmRemoteServiceImpl}
-import nirvana.hall.api.internal.sync.SyncCronServiceImpl
-import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, TPCardRemoteService,LPPalmRemoteService}
 import nirvana.hall.api.services.sync._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.sync._
-import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
+import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
 import org.slf4j.Logger
 import stark.migration.{DatabaseAdapter, InstallAllMigrations, Migrator, Vendor}
 
@@ -71,13 +68,7 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
 
-    //远程服务类
-    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
-    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
-    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
-    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.api.jpa")

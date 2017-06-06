@@ -101,9 +101,11 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
 JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1MntDispToMntStd
     (JNIEnv *jenv, jclass, jbyteArray dispMnt, jbyteArray stdMnt){
   int length = jenv->GetArrayLength(dispMnt);
-  if(length != sizeof(MNTDISPSTRUCT))
-    SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, -100);
-  else{
+  if(length != sizeof(MNTDISPSTRUCT)){
+    char msg[100];
+    sprintf("dispMnt length %d != struct size %",length,sizeof(MNTDISPSTRUCT));
+    SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, msg);
+  }else{
 
     UCHAR* disp_mnt_bin= (UCHAR*)jenv->GetByteArrayElements(dispMnt,JNI_FALSE);
     UCHAR* mnt_data = (UCHAR*)jenv->GetByteArrayElements(stdMnt,JNI_FALSE);
