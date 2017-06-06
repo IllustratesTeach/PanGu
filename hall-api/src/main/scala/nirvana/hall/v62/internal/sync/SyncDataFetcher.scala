@@ -15,7 +15,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * 卡号(tablecatlog.keyname),用来查询数据信息
    */
   val KEY_NAME: String
-  val FETCH_BATCH_SIZE = 100
+  val FETCH_BATCH_SIZE = 10
 
   def doFetcher(cardIdBuffer: ArrayBuffer[(String, Long)], seq: Long, size: Int, tableName: String): Unit ={
     val from = getMinSeq(seq, tableName)
@@ -58,7 +58,8 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMinSeq(from: Long, tableName: String): Long = {
-    val sql = s"select min(seq) from hall_${tableName} t where seq > ${from}"
+    val source = tableName.split("_", -1)
+    val sql = s"select  min(t.seq) from hall_${tableName} t where t.sid not in (select t1.serviceid from hall_datasource_${source(1)} t1 where  t1.status != '0') and t.seq > ${from}"
     getSeqBySql(sql)
   }
 
@@ -67,7 +68,8 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   }
 
   def getSyncSql(tableName: String, cardId: String): String ={
-    s"select sid, seq from hall_${tableName} t where seq >=? and seq <=? order by seq"
+    val source = tableName.split("_", -1)
+    s"select t.seq,t.sid from hall_${tableName} t where t.sid not in (select t1.serviceid from hall_datasource_${source(1)} t1 where  t1.status != '0') and t.seq >=? and t.seq<=?"
   }
 
   /**
