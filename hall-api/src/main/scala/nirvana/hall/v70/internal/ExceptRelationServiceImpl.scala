@@ -23,9 +23,10 @@ class ExceptRelationServiceImpl(fptService: FPTService, getPKIDService: GetPKIDS
     * @param ora_sid
     * @return
     */
-  override def exportMatchRelation(queryid:String,ora_sid:String): DataHandler = {
+  override def exportMatchRelation(queryid:String,ora_sid:String): ArrayBuffer[DataHandler] = {
     val fPT4File = new FPT4File
     var dataHandler:DataHandler = null
+    var dataHandlers:ArrayBuffer[DataHandler]=null
     val num = 0
     val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
     for (i <- 0 to pkidlist.size - 1)
@@ -76,8 +77,9 @@ class ExceptRelationServiceImpl(fptService: FPTService, getPKIDService: GetPKIDS
         }
     }
       dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+      dataHandlers+=dataHandler
     }
-    dataHandler
+    dataHandlers
   }
 
   /**

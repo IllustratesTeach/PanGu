@@ -11,9 +11,9 @@ trait AssistCheckRecordService {
 
   def recordAssistCheck(queryId:String,oraSid:String,caseId:String,personId:String,source:String):Unit
 
-  def findAssisttask(size: String): ListBuffer[HashMap[String,Any]]
+  def findAssistcheck(size: String): ListBuffer[HashMap[String,Any]]
 
-  def updateAssisttaskStatus(status:Long, id:String): Unit
+  def updateAssistcheckStatus(status:Long, id:String): Unit
 
   def updateAssistcheck(status:Long, id:String, ftpPath:String): Unit
 
@@ -21,5 +21,11 @@ trait AssistCheckRecordService {
 
   def saveXcReport(serviceid:String, typ:String, status:Long, fptPath:String): Unit
 
-  def saveAssistcheck(status:Long, id:String, fptPath:String): Unit
+  def saveErrorReport(serviceid:String, typ:String, status:Long, msg:String): Unit
+
+  def updateAssistcheckLT(queryId:String,oraSid:String,caseId:String, id:String): Unit
+
+  def updateAssistcheckTT(queryId:String,oraSid:String,personId:String, id:String): Unit
+
+
 }

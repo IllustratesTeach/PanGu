@@ -145,10 +145,8 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
     val logic04Rec = new Logic04Rec
     logic04Rec.systemType = "1900"
-    if(gafisMatchInfo.querytype.equals("1")){
-      logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
-      logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
-    }
+    logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
     logic04Rec.personId = gafisMatchInfo.tcode
     logic04Rec.fgp = gafisMatchInfo.fgp
     logic04Rec.capture = "0" //7.0web项目直接写的是0,有待确认

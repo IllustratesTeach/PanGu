@@ -15,7 +15,7 @@ import org.junit.{Assert, Test}
  * @since 2015-11-04
  */
 class TPCardFilterTest extends BaseV70TestCase{
-  val url = "http://127.0.0.1:8080"
+  val url = "http://192.168.1.12:10002"
   val registry = ExtensionRegistry.newInstance()
   TPCardProto.registerAllExtensions(registry)
   val httpClient = new RpcHttpClientImpl(registry)
@@ -24,7 +24,7 @@ class TPCardFilterTest extends BaseV70TestCase{
   def test_add: Unit ={
     //新建
     val tpCard = TPCard.newBuilder()
-    tpCard.setStrCardID("1234567890")
+    tpCard.setStrCardID("1243908874223689")
     val blobBuilder = tpCard.addBlobBuilder()
     blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.mnt")))
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
@@ -32,8 +32,8 @@ class TPCardFilterTest extends BaseV70TestCase{
     blobBuilder.setFgp(FingerFgp.FINGER_R_THUMB)
 
     val textBuilder = tpCard.getTextBuilder
-    textBuilder.setStrName ("蔡Sir")
-    textBuilder.setStrAliasName ("大刀蔡")
+    textBuilder.setStrName ("NellyLiu")
+    textBuilder.setStrAliasName ("韩明名")
     textBuilder.setNSex (1)
     textBuilder.setStrBirthDate ("19800911")
     textBuilder.setStrIdentityNum ("123123")
@@ -77,12 +77,12 @@ class TPCardFilterTest extends BaseV70TestCase{
   @Test
   def test_del: Unit ={
     val requestBuilder = TPCardDelRequest.newBuilder()
-    requestBuilder.setCardId("1234567890")
+    requestBuilder.setCardId("1243908874223689")
   }
   @Test
   def test_update: Unit ={
     val tpCard = TPCard.newBuilder()
-    tpCard.setStrCardID("1234567890")
+    tpCard.setStrCardID("1243908874223689")
     val blobBuilder = tpCard.addBlobBuilder()
     blobBuilder.setStMntBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.mnt")))
     blobBuilder.setStImageBytes(ByteString.readFrom(getClass.getResourceAsStream("/t.cpr")))
@@ -136,7 +136,8 @@ class TPCardFilterTest extends BaseV70TestCase{
   @Test
   def test_get: Unit ={
     val requestBuilder = TPCardGetRequest.newBuilder()
-    requestBuilder.setCardId("1234567890")
+    requestBuilder.setCardId("R3702020100002016000200")
+    requestBuilder.setDbid("1")
 
     val response = httpClient.call(url, TPCardGetRequest.cmd, requestBuilder.build())
     val tPCard = response.getExtension(TPCardGetResponse.cmd)

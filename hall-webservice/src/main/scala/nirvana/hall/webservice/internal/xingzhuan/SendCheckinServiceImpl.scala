@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, MatchRelationService}
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService}
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xingzhuan.SendCheckinService
@@ -16,20 +16,22 @@ import nirvana.hall.webservice.util.WebServicesClient_AssistCheck
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * 返回协查比对关系
   */
 class SendCheckinServiceImpl(config: HallWebserviceConfig,
-                              assistCheckRecordService: AssistCheckRecordService,
-                              exceptRelationService: ExceptRelationService,
-                              implicit val dataSource: DataSource) extends SendCheckinService with LoggerSupport{
+                             assistCheckRecordService: AssistCheckRecordService,
+                             exceptRelationService: ExceptRelationService,
+                             implicit val dataSource: DataSource) extends SendCheckinService with LoggerSupport{
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
     if(config.union4pfmip.sendCheckinCron != null)
       periodicExecutor.addJob(new CronSchedule(config.union4pfmip.sendCheckinCron), "sendCheckin-cron", new Runnable {
         override def run(): Unit = {
-         doWork
+          doWork
         }
       })
   }
@@ -55,7 +57,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
     val password = config.union4pfmip.password
     val size = "20"
     try{
-      var resultList = assistCheckRecordService.findAssisttask(size)
+      var resultList = assistCheckRecordService.findAssistcheck(size)
       if(resultList.size > 0){
         resultList.foreach{ resultMap =>
           var id:String = ""
@@ -71,37 +73,40 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            if(dataHandler != null){
-              //debug保存 fpt
-              if(isDeubg != null && isDeubg == "true") {
-                saveFpt(dataHandler.getInputStream,queryId)
-              }
-              val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
-              methodArgs(0) = username
-              methodArgs(1) = password
-              methodArgs(2) = dataHandler
-              val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setXCHitResult")
-              //入库成功
-              if (resultCode == 1) {
-                status = 1
-                info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
-                assistCheckRecordService.saveAssistcheck(status, id, null)
-                info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                //重复数据
-              } else if (resultCode == 0) {
-                status = 2
-                info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                assistCheckRecordService.saveAssistcheck(status, id, null)
-                info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            for(i <- 0 to dataHandlers.size - 1){
+              val dataHandler = dataHandlers(i)
+              if(dataHandler != null){
+                //debug保存 fpt
+                if(isDeubg != null && isDeubg == "true") {
+                  saveFpt(dataHandler.getInputStream,queryId)
+                }
+                val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
+                methodArgs(0) = username
+                methodArgs(1) = password
+                methodArgs(2) = dataHandler
+                val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setXCHitResult")
+                //入库成功
+                if (resultCode == 1) {
+                  status = 1
+                  info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
+                  updateAssistcheckStatus(status, id)
+                  info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                  //重复数据
+                } else if (resultCode == 0) {
+                  status = 2
+                  info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                  updateAssistcheckStatus(status, id)
+                  info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                } else {
+                  status = -1
+                  error("call setXCHitResult  faild! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                }
               } else {
-                status = -1
-                error("call setXCHitResult  faild! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                //比对完成无比对关系
+                status = 3
+                updateAssistcheckStatus(status, id)
               }
-            } else {
-              //比对完成无比对关系
-              status = 3
-              assistCheckRecordService.saveAssistcheck(status, id, null)
             }
           } catch {
             case e:Exception=>
@@ -111,6 +116,7 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
       }
     }catch{
       case e:Exception=> error("sendCheckinCron-error:" + ExceptionUtil.getStackTraceInfo(e))
+        e.printStackTrace()
     }
   }
 

@@ -64,6 +64,7 @@ class TPCardServiceImplTest extends BaseV62TestCase{
 
     val tpCardService = getService[TPCardService]
     tpCardService.addTPCard(tpCard.build())
+    println("XX")
   }
   @Test
   def test_del: Unit ={

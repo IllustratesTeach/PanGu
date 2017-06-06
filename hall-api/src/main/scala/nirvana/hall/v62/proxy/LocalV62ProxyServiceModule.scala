@@ -41,11 +41,11 @@ object LocalV62ProxyServiceModule {
   @Contribute(classOf[GbaseItemPkgHandler])
   def provideSegGbaseItemPkgMessageHandler(configuration: OrderedConfiguration[GbaseItemPkgFilter]) {
 //    configuration.addInstance("AncientUserFilter", classOf[AncientUserFilter])
-    configuration.addInstance("GAFIS_RMTLIB_TPSVR_ServerFilter", classOf[GAFIS_RMTLIB_TPSVR_ServerFilter])
+      configuration.addInstance("GAFIS_RMTLIB_TPSVR_ServerFilter", classOf[GAFIS_RMTLIB_TPSVR_ServerFilter])
 //    configuration.addInstance("GAFIS_PARAMADM_ServerFilter", classOf[GAFIS_PARAMADM_ServerFilter])
 //    configuration.addInstance("GAFIS_RMTLIB_DBSYS_ServerFilter", classOf[GAFIS_RMTLIB_DBSYS_ServerFilter])
-    configuration.addInstance("GAFIS_RMTLIB_LPSVR_ServerFilter", classOf[GAFIS_RMTLIB_LPSVR_ServerFilter])
-    configuration.addInstance("GAFIS_RMTLIB_QUERYSVR_ServerFilter", classOf[GAFIS_RMTLIB_QUERYSVR_ServerFilter])
+//    configuration.addInstance("GAFIS_RMTLIB_LPSVR_ServerFilter", classOf[GAFIS_RMTLIB_LPSVR_ServerFilter])
+      configuration.addInstance("GAFIS_RMTLIB_QUERYSVR_ServerFilter", classOf[GAFIS_RMTLIB_QUERYSVR_ServerFilter])
 
 
 

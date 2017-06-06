@@ -29,6 +29,8 @@ object LocalV62ServiceModule {
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
     binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+
+    binder.bind(classOf[FPTFilterService],classOf[FPTFilterServiceImpl])
   }
 
 }

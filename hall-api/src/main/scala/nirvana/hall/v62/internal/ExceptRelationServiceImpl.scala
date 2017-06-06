@@ -10,12 +10,13 @@ import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03R
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.axiom.attachments.ByteArrayDataSource
+import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by songpeng on 16/6/21.
- */
+  * Created by songpeng on 16/6/21.
+  */
 class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService, getPKIDService: GetPKIDService, fptService: FPTService) extends ExceptRelationService with LoggerSupport{
 
   /**
@@ -25,12 +26,13 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     * @param  ora_sid
     * @return
     */
-  override def exportMatchRelation(queryid:String,ora_sid:String): DataHandler = {
+  override def exportMatchRelation(queryid:String,ora_sid:String): ArrayBuffer[DataHandler] = {
     val fPT4File = new FPT4File
     var dataHandler:DataHandler = null
-    var ishit = false
+    var dataHandlers = new ArrayBuffer[DataHandler]()
     var tscnt = new Array[Byte](1)
     var flag:Byte= {0}
+    var tflag:Byte= {0}
     val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
     for (i <- 0 to pkidlist.size - 1)
     {
@@ -39,26 +41,30 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
           if(pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeTT)||pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeLL)){
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+57,tscnt,0,1)
             flag = {6}
+            tflag = {4}
           }else{
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+56,tscnt,0,1)
             flag = {7}
+            tflag = {7}
           }
-          if(tscnt(0).equals(flag)){
+          if(tscnt(0).equals(flag)||tscnt(0).equals(tflag)){
             val tcode = new Array[Byte](32)
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+8,tcode,0,32)
             val code = bytes2String(tcode)
-            val source = pkidlist(i).get("keyid").get.asInstanceOf[String]
+            var source =pkidlist(i).get("keyid").get.asInstanceOf[String].toString
+            if(MatchRelationService.querytypeLT.equals(pkidlist(i).get("querytype").get.asInstanceOf[String])
+              ||MatchRelationService.querytypeLL.equals(pkidlist(i).get("querytype").get.asInstanceOf[String])){
+              source = pkidlist(i).get("keyid").get.asInstanceOf[String].substring(0,pkidlist(i).get("keyid").get.asInstanceOf[String].length - 2)
+            }
             exportImplMRELATION(fPT4File,source,pkidlist(i).get("querytype").get.asInstanceOf[String],
               code,pkidlist(i).get("ora_uuid").get.asInstanceOf[String],ii)
-            ishit = true
+            dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
+            dataHandlers += dataHandler
           }
         }
       }
-      if(ishit){
-        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
-      }
     }
-    dataHandler
+    dataHandlers
   }
 
   /**
@@ -82,7 +88,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
         fPT4File.logic02Recs = logic02List.toArray
         fPT4File.logic05Recs = Array(logic05Rec)
       case MatchRelationService.querytypeTL=>
-        val logic03Rec = fptService.getLogic03Rec(tcode.substring(0,code.length-2))
+        val logic03Rec = fptService.getLogic03Rec(tcode)
         val logic02Rec = fptService.getLogic02Rec(code)
         val logic04Rec = fptService.getLogic04Rec(uuid,num)
         fPT4File.logic03Recs = Array(logic03Rec)
@@ -90,14 +96,14 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
         fPT4File.logic04Recs = Array(logic04Rec)
       case MatchRelationService.querytypeLT=>
         val logic02Rec = fptService.getLogic02Rec(tcode)
-        val logic03Rec = fptService.getLogic03Rec(code.substring(0,code.length-2))
+        val logic03Rec = fptService.getLogic03Rec(code)
         val logic04Rec = fptService.getLogic04Rec(uuid,num)
         fPT4File.logic02Recs = Array(logic02Rec)
         fPT4File.logic03Recs = Array(logic03Rec)
         fPT4File.logic04Recs = Array(logic04Rec)
       case MatchRelationService.querytypeLL =>
-        val logic03RecSource = fptService.getLogic03Rec(code.substring(0,code.length-2))
-        val logic03RecDest = fptService.getLogic03Rec(tcode.substring(0,code.length-2))
+        val logic03RecSource = fptService.getLogic03Rec(code)
+        val logic03RecDest = fptService.getLogic03Rec(tcode)
         val logic06Rec = fptService.getLogic06Rec(uuid,num)
         val logic03List = new ArrayBuffer[Logic03Rec]()
         logic03List += logic03RecSource
@@ -120,8 +126,9 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     val pkidlist = getPKIDService.getDatabyPKIDInfo(pkid)
     for (i <- 0 to pkidlist.size - 1)
     {
+      gafisMatchInfo.code = pkidlist(0).get("keyid").get.asInstanceOf[String]
       gafisMatchInfo.registerOrg = pkidlist(0).get("checkerunitcode").get.asInstanceOf[String]
-      gafisMatchInfo.registerUser = pkidlist(0).get("checkusername").get.asInstanceOf[String]
+      val registerUser = pkidlist(0).get("checkusername").get.asInstanceOf[String]
       gafisMatchInfo.registerTime = pkidlist(0).get("checktime").get.toString
       gafisMatchInfo.querytype = pkidlist(0).get("querytype").get.asInstanceOf[String]
       val tcode = new Array[Byte](32)
@@ -131,11 +138,18 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
       val codes = bytes2String(tcode)
       val fgp = bytes2String(tfgp)
       gafisMatchInfo.tcode = codes
-      gafisMatchInfo.fgp = fgp
       if(gafisMatchInfo.querytype.equals(MatchRelationService.querytypeTL)){
         gafisMatchInfo.code = codes
         gafisMatchInfo.tcode = pkidlist(0).get("keyid").get.asInstanceOf[String]
       }
+      //过滤
+      if(StringUtils.isEmpty(fgp)||StringUtils.isBlank(fgp)){
+        gafisMatchInfo.fgp = "00"
+      }
+      if(StringUtils.isEmpty(registerUser)||StringUtils.isBlank(registerUser)){
+        gafisMatchInfo.registerOrg = "未知"
+      }
+      gafisMatchInfo.matchName = "未知"
     }
     gafisMatchInfo
   }

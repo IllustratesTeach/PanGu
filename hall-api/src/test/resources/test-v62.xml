@@ -6,8 +6,8 @@
 
 <hall_v62>
    <app_server>
-      <host>192.168.1.253</host>
-      <port>6798</port>
+      <host>192.168.1.125</host>
+      <port>6898</port>
       <user>afisadmin</user>
       <password>helloafis</password>
    </app_server>
@@ -31,6 +31,6 @@
       <driver>oracle.jdbc.driver.OracleDriver</driver>
       <user>afis</user>
       <password>helloafis</password>
-      <url>jdbc:oracle:thin:@192.168.1.253:1521:oragafis</url>
+      <url>jdbc:oracle:thin:@192.168.1.17:1521:oragafis6</url>
    </database>
 </hall_v62>

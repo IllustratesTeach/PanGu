@@ -95,6 +95,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     val queryStruct = gaqryqueConverter.convertProtoBuf2GAQUERYSTRUCT(matchTask, queryDBConfig)(config)
 
     facade.NET_GAFIS_QUERY_Add(dbId, V62Facade.TID_QUERYQUE, queryStruct)
+
   }
 
   /**

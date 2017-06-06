@@ -14,6 +14,8 @@ import nirvana.hall.webservice.services.xingzhuan.LocalCheckinService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * 上报协查比对关系
   */
@@ -71,18 +73,19 @@ class LocalCheckinServiceImpl(config: HallWebserviceConfig,
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
             val typ:String = getType(queryType)
-            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            if(dataHandler != null) {
-              status = 1
-              val fptPath:String = saveFpt(dataHandler.getInputStream,keyId,config.localHitResultPath)
-              assistCheckRecordService.saveXcReport(oraUuid,typ,status, fptPath)
-            } else {
-              //未比中
-              status = 8
-              assistCheckRecordService.saveXcReport(oraUuid,typ,status, null)
+            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            for(i <- 0 to dataHandlers.size - 1){
+              val dataHandler = dataHandlers(i)
+              if(dataHandler != null) {
+                status = 1
+                val fptPath:String = saveFpt(dataHandler.getInputStream,keyId,config.localHitResultPath)
+                assistCheckRecordService.saveXcReport(oraUuid,typ,status, fptPath)
+              }
             }
           } catch {
             case e:Exception=> error("localCheckin-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
+              val status = 8
+              assistCheckRecordService.saveErrorReport(oraUuid,getType(queryType),status, ExceptionUtil.getStackTraceInfo(e))
           }
         }
       }

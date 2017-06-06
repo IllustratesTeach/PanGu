@@ -19,4 +19,13 @@ class Query7to6ServiceImplTest extends BaseV70TestCase{
     service.sendQuery(task.get);
 
   }
+//  def test_sendQuery2():Unit = {
+//    val service = getService[Query7to6Service]
+//
+//    service.getGafisNormalqueryQueryqueWait.foreach()
+//
+//    Assert.assertNotNull(task)
+//
+//    service.sendQuery(task.get);
+  //}
 }

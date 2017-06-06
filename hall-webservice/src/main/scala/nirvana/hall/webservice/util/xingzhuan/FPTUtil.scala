@@ -14,8 +14,12 @@ import nirvana.hall.webservice.config.HallWebserviceConfig
   * Created by T430 on 5/5/2017.
   */
 object FPTUtil extends LoggerSupport{
+
+  val TenprintRecord = "1"
+  val Latent = "2"
+
   @throws(classOf[Exception])
-  def saveFPTAndUpdateStatus(operationtype: String, in: InputStream, id: String, status: Long,config: HallWebserviceConfig,dataSource: DataSource): String = {
+  def saveFPTPath(operationtype: String, in: InputStream, id: String, status: Long,config: HallWebserviceConfig,dataSource: DataSource): String = {
     var path = ""
     var finalPath = ""
     try{
@@ -27,7 +31,6 @@ object FPTUtil extends LoggerSupport{
         case other => warn("Unkown operation type",other)
       }
       finalPath = saveFpt(in,id,path)
-//      updateAssistcheckStatus(dataSource,status,id,finalPath)
     }
     finalPath
   }
