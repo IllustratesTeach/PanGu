@@ -33,6 +33,9 @@ object Gafis70Constants {
   //特征
   val LOBTYPE_MNT = 2: Short
 
+  val FGP_CASE_PLAIN = 1: Short //平面
+  val FGP_CASE_ROLL = 0: Short  //滚动
+
   val PALM_RIGHT        = 11: Short //右掌
   val PALM_LEFT         = 12: Short //左掌
   val PALM_FINGER_R     = 3: Short  //右手指尖
@@ -43,4 +46,8 @@ object Gafis70Constants {
   val PALM_THUMB_L_UP   = 8: Short  //左掌拇指上部区域
   val PALM_RIGHT_SIDE   = 17: Short //右侧掌纹
   val PALM_LEFT_SIDE    = 18: Short //左侧掌纹
+
+  val FACE_FRONT = "1"  //人像正面
+  val FACE_RIGHT = "2"  //右侧
+  val FACE_LEFT = "3"   //左侧
 }

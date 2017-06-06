@@ -8,6 +8,7 @@
 #include "../../../hall-image/c/src/jni/jni_helper.h"
 
 extern "C" void GAFIS_MntDispToMntStd(MNTDISPSTRUCT *pmnt, void *mnt);
+extern "C" void GAFIS_MntStdToMntDisp(void *mnt, MNTDISPSTRUCT *pmnt, int MinutiaON);
 
 
 
@@ -92,6 +93,93 @@ JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_ConvertFP
     jenv->ReleaseByteArrayElements(stdMnt,(jbyte*)mnt_data,0);
   }
 }
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    GAFIS_MntDispToMntStd
+ * Signature: ([B[B)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1MntDispToMntStd
+    (JNIEnv *jenv, jclass, jbyteArray dispMnt, jbyteArray stdMnt){
+  int length = jenv->GetArrayLength(dispMnt);
+  if(length != sizeof(MNTDISPSTRUCT)){
+    char msg[100];
+    sprintf("dispMnt length %d != struct size %",length,sizeof(MNTDISPSTRUCT));
+    SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, msg);
+  }else{
+
+    UCHAR* disp_mnt_bin= (UCHAR*)jenv->GetByteArrayElements(dispMnt,JNI_FALSE);
+    UCHAR* mnt_data = (UCHAR*)jenv->GetByteArrayElements(stdMnt,JNI_FALSE);
+    /*
+    int n1=offsetof(MNTDISPSTRUCT,stPm);
+    int n2=offsetof(MNTDISPSTRUCT,stFg);
+    int n3=offsetof(MNTDISPSTRUCT,stCm);
+    int n4=offsetof(MNTDISPSTRUCT,stdReserve);
+    int n5=offsetof(MNTDISPSTRUCT,stInnerData);
+    printf("disp mnt length:%d %d %d %d %d %d\n",jenv->GetArrayLength(dispMnt),n1,n2,n3,n4,n5);
+    fflush(stdout);
+    */
+    MNTDISPSTRUCT * disp_mnt_structure;
+    disp_mnt_structure=(MNTDISPSTRUCT*)disp_mnt_bin;
+    /*
+    uint2 width = disp_mnt_structure->nWidth;
+    uint2 height = disp_mnt_structure->nHeight;
+    printf("w:%"PRIu16 " h:%u \n",width,height);
+    printf("size:%u  \n",disp_mnt_structure->nSize);
+    fflush(stdout);
+    */
+    GAFIS_MntDispToMntStd(disp_mnt_structure,mnt_data);
+    jenv->ReleaseByteArrayElements(dispMnt,(jbyte*)disp_mnt_bin,JNI_ABORT);
+    jenv->ReleaseByteArrayElements(stdMnt,(jbyte*)mnt_data,0);
+  }
+}
+
+/*
+ * Class:     nirvana_hall_extractor_jni_NativeExtractor
+ * Method:    GAFIS_MntStdToMntDisp
+ * Signature: ([B[BI)V
+ */
+JNIEXPORT void JNICALL Java_nirvana_hall_extractor_jni_NativeExtractor_GAFIS_1MntStdToMntDisp
+    (JNIEnv * jenv, jclass, jbyteArray stdMnt, jbyteArray dispMnt, jint MinutiaON) {
+  int length = jenv->GetArrayLength(dispMnt);
+  if (length != sizeof(MNTDISPSTRUCT))
+    SWIG_JavaThrowExceptionByCode(jenv, SWIG_JavaArithmeticException, -100);
+  else {
+
+    UCHAR *disp_mnt_bin = (UCHAR *) jenv->GetByteArrayElements(dispMnt, JNI_FALSE);
+    UCHAR *mnt_data = (UCHAR *) jenv->GetByteArrayElements(stdMnt, JNI_FALSE);
+
+/*
+    FINGERMNTSTRUCT* std_mnt=(FINGERMNTSTRUCT*)mnt_data;
+    printf("std mnt count:%d \n",std_mnt->cm);
+    fflush(stdout);
+*/
+
+    /*
+    int n1=offsetof(MNTDISPSTRUCT,stPm);
+    int n2=offsetof(MNTDISPSTRUCT,stFg);
+    int n3=offsetof(MNTDISPSTRUCT,stCm);
+    int n4=offsetof(MNTDISPSTRUCT,stdReserve);
+    int n5=offsetof(MNTDISPSTRUCT,stInnerData);
+    printf("disp mnt length:%d %d %d %d %d %d\n",jenv->GetArrayLength(dispMnt),n1,n2,n3,n4,n5);
+    fflush(stdout);
+    */
+    MNTDISPSTRUCT *disp_mnt_structure;
+    disp_mnt_structure = (MNTDISPSTRUCT *) disp_mnt_bin;
+    /*
+    uint2 width = disp_mnt_structure->nWidth;
+    uint2 height = disp_mnt_structure->nHeight;
+    printf("w:%"PRIu16 " h:%u \n",width,height);
+    printf("size:%u  \n",disp_mnt_structure->nSize);
+    fflush(stdout);
+    */
+    GAFIS_MntStdToMntDisp(mnt_data,disp_mnt_structure,MinutiaON);
+    //printf("disp mnt count:%d \n",disp_mnt_structure->stCm.nMntCnt);
+    jenv->ReleaseByteArrayElements(dispMnt, (jbyte *) disp_mnt_bin, 0);
+    jenv->ReleaseByteArrayElements(stdMnt, (jbyte *) mnt_data, JNI_ABORT);
+  }
+}
+
+
 #ifdef LINUX
 //Linux下支持新的算法
 

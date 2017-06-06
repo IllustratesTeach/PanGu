@@ -61,17 +61,13 @@ trait gnetcsr {
 
     pAns.nReturnValue = 1
 
-    val bExtraInfoFirst = 0
-    /*
-    if ( UTIL_GNETLIB_IsNewClientVersion(pReq) )
-    {
-      strcpy((char *)pAns.bnData, "$version=002$");
+    var bExtraInfoFirst = 0
+    if (UTIL_GNETLIB_IsNewClientVersion(pAns)){
       bExtraInfoFirst = 1;
+    }else{
+      pAns.bnData = "$version=001$".getBytes
     }
-    else strcpy((char *)pAns.bnData, "$version=001$");
-    */
 
-    pAns.bnData = "$version=001$".getBytes
     channel.writeMessage[NoneResponse](pAns)
     if ( nfing>0 ) {
       pstCase.pstFingerID_Data = 0 until nfing map(i=>channel.receive[GAKEYSTRUCT]())  toArray
@@ -84,8 +80,8 @@ trait gnetcsr {
     }
 
     if ( bExtraInfoFirst >0 && ( nextrainfolen > 0 ) ) {
-      pstCase.pstExtraInfo_Data.cbSize = nextrainfolen
       pstCase.pstExtraInfo_Data =  GAFIS_CASE_EXTRAINFO_Recv(channel,pAns)
+      pstCase.pstExtraInfo_Data.cbSize = nextrainfolen
     }
 
     if(pstCase.pstText_Data.exists(x=>x.bIsPointer == 1 && x.nItemLen >0)){
@@ -175,8 +171,8 @@ trait gnetcsr {
   def GAFIS_CASE_EXTRAINFO_Recv(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT):GAFIS_CASE_EXTRAINFO= {
     val pstInfo = channel.receive[GAFIS_CASE_EXTRAINFO]()
     pAns.nReturnValue = 1
-    channel.writeMessage[NoneResponse](pAns)
-    pstInfo.pstItemEntry_Data = channel.receive[GAFIS_CASEITEMENTRY]()
+//    channel.writeMessage[NoneResponse](pAns)
+//    pstInfo.pstItemEntry_Data = channel.receive[GAFIS_CASEITEMENTRY]()
     pstInfo
   }
 
@@ -566,5 +562,14 @@ trait gnetcsr {
         }
       }
     }
+  }
+
+  /**
+    * 是否新版本验证, 这是使用pAns验证，免去了UTIL_GNETLIB_SetNewClientVersionFlag
+    * @param pAns
+    * @return
+    */
+  def UTIL_GNETLIB_IsNewClientVersion(pAns: GNETANSWERHEADOBJECT): Boolean ={
+    "$version=002$".equals(new String(pAns.bnData).trim)
   }
 }

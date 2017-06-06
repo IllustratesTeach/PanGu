@@ -126,6 +126,10 @@
             <artifactId>aopalliance</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>hall-matcher-${project.version}</finalName>

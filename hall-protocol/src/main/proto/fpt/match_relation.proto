@@ -1,5 +1,6 @@
 package fpt;
-import "fpt/type_definition.proto";
+import "api/FPTData.proto";
+import "matcher/type_definition.proto";
 
 option java_package = "nirvana.hall.protocol.fpt";
 option java_outer_classname = "MatchRelationProto";
@@ -49,6 +50,6 @@ message MatchRelationTLAndLT{
     required string case_id = 1; //案件编号
     required string seq_no = 2; //现场指纹序号
     required string person_id = 3; //人员编号
-    required FingerFgp fpg = 4; //十指指纹指位
+    required api.FingerFgp fpg = 4; //十指指纹指位
     required bool capture = 5; //是否抓获
 }

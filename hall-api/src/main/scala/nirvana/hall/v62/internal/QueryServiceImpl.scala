@@ -1,13 +1,15 @@
 package nirvana.hall.v62.internal
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSIMPSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
 
@@ -85,12 +87,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
    * @return 查询任务号
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
-    val key = matchTask.getMatchId.getBytes()
-    val pstKey = new GADB_KEYARRAY
-    pstKey.nKeyCount = 1
-    pstKey.nKeySize = key.size.asInstanceOf[Short]
-    pstKey.pKey_Data = key
-
     val dbId = if(queryDBConfig.dbId == None){
       config.queryTable.dbId.toShort
     }else{
@@ -136,7 +132,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     * @return 任务号
     */
   override def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
-    val key = matchTask.getMatchId.getBytes()
+    //key长度32，用来获取特征数据
+    val key = ByteBuffer.allocate(32).put(matchTask.getMatchId.getBytes()).array()
     val pstKey = new GADB_KEYARRAY
     pstKey.nKeyCount = 1
     pstKey.nKeySize = key.size.asInstanceOf[Short]
@@ -151,6 +148,61 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
     0
   }
+
+  /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @return
+    */
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long={
+    val matchTask = MatchTask.newBuilder
+    matchType match {
+      case MatchType.FINGER_TT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_LL |
+           MatchType.FINGER_LT =>
+        matchTask.setMatchType(matchType)
+      case other =>
+        throw new IllegalArgumentException("unsupport MatchType:" + matchType)
+    }
+    matchTask.setObjectId(0)//这里设置为0也不会比中自己
+    matchTask.setMatchId(cardId)
+    matchTask.setTopN(50)
+    matchTask.setObjectId(0)
+    matchTask.setPriority(2)
+    matchTask.setScoreThreshold(60)
+
+    sendQuery(matchTask.build())
+  }
+
+  /**
+    * 根据任务号sid获取比对状态
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getStatusBySid(oraSid: Long, dbId: Option[String]): Int = {
+    var status = 0
+    val querySimpleStruts = findSimpleQuery(getDBID(dbId), Some("(ORA_SID='%s')".format(oraSid)),1)
+    if(querySimpleStruts.nonEmpty){
+      status = querySimpleStruts.headOption.get.nStatus
+    }
+    status
+  }
+
+  /**
+    * 获取查询信息GAQUERYSTRUCT
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  override def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String]): GAQUERYSTRUCT = {
+    val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(oraSid)
+    facade.NET_GAFIS_QUERY_Get(getDBID(dbId), V62Facade.TID_QUERYQUE, pstQry)
+  }
+
   /**
    * 获取DBID
    * @param dbId

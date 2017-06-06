@@ -1,20 +1,18 @@
 package nirvana.hall.c.services.gfpt4lib
 
-import java.io.{FileInputStream, File, InputStream}
+import java.io.{File, FileInputStream, InputStream}
 import java.nio.charset.Charset
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
 import nirvana.hall.c.services.AncientData
-import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter}
+import nirvana.hall.c.services.AncientData.{StreamReader, StreamWriter, _}
 import nirvana.hall.c.services.gfpt4lib.FPT3File.FPT3File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import org.apache.commons.io.IOUtils
 
 import scala.language.reflectiveCalls
 import scala.reflect._
-import nirvana.hall.c.services.AncientData._
-
 import scala.util.control.NonFatal
 
 /**
@@ -40,7 +38,7 @@ object FPTFile {
    * @param encoding charset
    * @return FPT3File or FPT4File
    */
-  def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.UTF8_ENCODING): Either[FPT3File,FPT4File]= {
+  def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.GBK_ENCODING): Either[FPT3File,FPT4File]= {
     val streamReader:StreamReader = stream
     val head = new FPTHead
     if(stream.available() < head.getDataSize){
@@ -76,6 +74,7 @@ object FPTFile {
     }
     seq.toArray
   }
+
   class FPTHead extends AncientData{
     @Length(3)
     var flag:String = _
@@ -84,7 +83,6 @@ object FPTFile {
     @Length(2)
     var minorVersion:String = _
   }
-
 
   trait DynamicFingerData extends AncientData{
     @IgnoreTransfer
@@ -104,7 +102,6 @@ object FPTFile {
         count += 1
       count
     }
-
 
     /**
      * serialize to channel buffer
@@ -127,6 +124,7 @@ object FPTFile {
       this
     }
   }
+
   def main(args:Array[String]): Unit ={
     val fis = new FileInputStream(new File(args(0)))
     try {

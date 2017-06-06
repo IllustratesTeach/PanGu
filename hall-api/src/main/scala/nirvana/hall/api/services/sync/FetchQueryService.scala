@@ -72,7 +72,7 @@ trait FetchQueryService {
     candHead.nQueryType = queryType.toByte
     candHead.nSrcDBID = if (queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_TL) V62Facade.DBID_TP_DEFAULT else V62Facade.DBID_LP_DEFAULT
     candHead.nTableID = 2
-    candHead.nQueryID = DataConverter.longToSidArray(queryQue.oraSid)
+    candHead.nQueryID = DataConverter.convertLongAsSixByteArray(queryQue.oraSid)
     candHead.nCandidateNum = matchResult.getCandidateNum
     candHead.tFinishTime = new AFISDateTime
     return candHead.toByteArray()

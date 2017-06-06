@@ -1,29 +1,28 @@
 package nirvana.hall.v70.internal.query
 
-import java.util.Date
+import java.util.{Date, UUID}
 import javax.persistence.EntityManager
 
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.api.services.SyncInfoLogManageService
+import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
-import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v62.internal.c.gloclib.galoctp
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
+import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.jboss.netty.buffer.ChannelBuffers
+import org.apache.tapestry5.json.JSONObject
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Created by songpeng on 15/12/9.
  */
-class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient, entityManager: EntityManager)
+class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClient, entityManager: EntityManager, syncInfoLogManageService: SyncInfoLogManageService)
   extends Query7to6Service with LoggerSupport{
 
   @PostInjection
@@ -55,43 +54,20 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   }
 
   /**
-    * 转换比对任务类型GafisNormalqueryQueryque-->MatchTask
-    * @param query
-    * @return
-    */
-  private def convertGafisNormalqueryQueryque2MatchTask(query: GafisNormalqueryQueryque): MatchTask = {
-    val matchTask = MatchTask.newBuilder()
-    matchTask.setMatchId(query.keyid)
-    matchTask.setMatchType(MatchType.valueOf(query.querytype+1))
-    matchTask.setObjectId(query.oraSid)//必填项，现在用于存放oraSid
-    matchTask.setPriority(query.priority.toInt)
-    matchTask.setScoreThreshold(query.minscore)
-    matchTask.setTopN(query.maxcandnum)
-    matchTask.setCommitUser(query.username)
-    //解析特征数据
-    val mics = new galoctp{}.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(query.mic))
-    mics.foreach{mic =>
-      if(mic.bIsLatent == 1){
-        val ldata = LatentMatchData.newBuilder()
-        ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
-        matchTask.setLData(ldata)
-      }else{
-        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
-      }
-    }
-    matchTask.build()
-  }
-
-  /**
    * 发送比对任务
    * @param gafisQuery
    * @return
    */
   @Transactional
   override def sendQuery(gafisQuery: GafisNormalqueryQueryque): Unit = {
+    val uuid = UUID.randomUUID().toString
+    var taskId = ""
     try {
-      val matchTask = convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
+      val matchTask = ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
       val request = QuerySendRequest.newBuilder().setMatchTask(matchTask)
+      request.setUuid(uuid)
+      taskId = matchTask.getMatchId
+
       //获取远程查询配置
       val queryConfig = RemoteQueryConfig.find(gafisQuery.syncTargetSid)
       val headerMap = HttpHeaderUtils.getHeaderMapOfQueryConfig(queryConfig.config, matchTask.getMatchType)
@@ -102,12 +78,21 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
       new GafisQuery7to6(gafisQuery.oraSid, querySendResponse.getOraSid).save()
       //更新比对状态为正在比对
       GafisNormalqueryQueryque.update.set(status = QueryConstants.STATUS_MATCHING, begintime = new Date()).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
+      syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, HallApiConstants.REMOTE_TYPE_MATCH_TASK, headerMap.get("X-V62-HOST").get,"0","1")
     }
     catch {
+      case e: nirvana.hall.support.internal.CallRpcException =>
+        GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SEND_REMOTE_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_TASK)
       case e: Exception =>
         //发送比对异常，状态更新为失败
         GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
         error(e.getMessage, e)
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, "", eInfo, 2, HallApiErrorConstants.SEND_REMOTE_TASK_FAIL +
+          HallApiConstants.REMOTE_TYPE_MATCH_TASK)
     }
   }
 

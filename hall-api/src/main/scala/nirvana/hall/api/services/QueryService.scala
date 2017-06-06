@@ -1,10 +1,11 @@
 package nirvana.hall.api.services
 
 import nirvana.hall.api.config.QueryDBConfig
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
-import nirvana.hall.protocol.fpt.TypeDefinitionProto.MatchType
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 
 /**
   * Created by songpeng on 16/1/26.
@@ -13,7 +14,8 @@ trait QueryService {
 
   /**
    * 发送查询任务
-   * @param matchTask
+    *
+    * @param matchTask
    * @return 任务号
    */
   def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
@@ -46,4 +48,29 @@ trait QueryService {
     * @return 任务号
     */
   def sendQuery(matchTask: MatchTask, queryDBConfig: QueryDBConfig = QueryDBConfig(None, None, None)): Long
+
+  /**
+    * 根据任务号sid获取比对状态
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  def getStatusBySid(oraSid: Long, dbId: Option[String] = None): Int
+
+  /**
+    * 根据编号和查询类型发送查询
+    * 最大候选50，优先级2，最小分数60
+    * @param cardId
+    * @param matchType
+    * @return
+    */
+  def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long
+
+  /**
+    * 获取查询信息GAQUERYSTRUCT
+    * @param oraSid
+    * @param dbId
+    * @return
+    */
+  def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String] = None): GAQUERYSTRUCT
 }

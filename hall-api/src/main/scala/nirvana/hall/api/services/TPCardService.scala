@@ -1,5 +1,6 @@
 package nirvana.hall.api.services
 
+import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,7 +49,7 @@ trait TPCardService {
   def getTPCard(cardId: String, dbid: Option[String] = None): TPCard
 
   /**
-    * 查询捺印卡编号列表
+    * 查询捺印文本信息
     * @param ryno        人员编号
     * @param xm          姓名
     * @param xb          性别
@@ -64,7 +65,7 @@ trait TPCardService {
     * @param nydwdm      捺印单位代码
     * @param startnydate 开始时间（检索捺印时间，时间格式YYYYMMDDHHMM）
     * @param endnydate   结束时间（检索捺印时间，时间格式YYYYMMDDHHMM）
-    * @return
+    * @return Logic02Rec(fpt4捺印文本信息)
     */
-  def getCardIdList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[String]
+  def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec]
 }

@@ -25,7 +25,7 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     val responseBuilder = SyncDataResponse.newBuilder
     responseBuilder.setSyncDataType(syncDataRequest.getSyncDataType)
     val size = syncDataRequest.getSize
-    val timestamp = syncDataRequest.getTimestamp
+    val timestamp = syncDataRequest.getTimestamp //当前读到的seq
     val syncDataType = syncDataRequest.getSyncDataType
     info("fetching data {} timestamp:{} size:{}", syncDataType,timestamp,size)
     val fetcher = syncDataType match {
@@ -38,6 +38,7 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
       case other => null
     }
     if(fetcher != null)
+      //从数据库读数据
       fetcher.doFetch(responseBuilder, size, timestamp)
     //捺印指纹老特征转新特征
     if(hallMatcherConfig.mnt.isNewFeature && syncDataType == SyncDataType.TEMPLATE_FINGER){

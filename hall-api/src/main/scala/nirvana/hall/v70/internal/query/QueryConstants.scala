@@ -18,6 +18,10 @@ object QueryConstants {
   val QUERY_TYPE_LT = 2 //正查
   val QUERY_TYPE_LL = 3 //串查
 
+  val FLAG_PALM: Short = 2 //掌纹查询
+  val FLAG_PALM_TEXT: Short = 22 //掌纹带文本
+  val FLAG_FINGER: Short = 1 //指纹查询, 暂时不区分平面，滚动和文本
+
   val FETCH_CONFIG_TPDB = "TPDB"
   val FETCH_CONFIG_LPDB = "LPDB"
 

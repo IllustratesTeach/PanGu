@@ -287,7 +287,7 @@ object galoclpConverter extends LoggerSupport{
     caseInfo.setNCaseFingerCount(gCase.nFingerCount)
     caseInfo.setStrCaseID(gCase.szCaseID)
     val text = caseInfo.getTextBuilder
-    text.setBPersonKilled(gCase.bHasPersonKilled == 48)
+    text.setBPersonKilled(gCase.bHasPersonKilled == 49)
     text.setNCancelFlag(gCase.pstText_Data.length)
     gCase.pstText_Data.foreach{ item=>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
@@ -371,6 +371,12 @@ object galoclpConverter extends LoggerSupport{
     val admData = caseInfo.getAdmDataBuilder
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
+    //原始创建人信息
+    val extractInfo = gCase.pstExtraInfo_Data
+    if(extractInfo != null){
+      admData.setCreator(extractInfo.szOrgScanner)
+      admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
+    }
 
     //数据校验
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)

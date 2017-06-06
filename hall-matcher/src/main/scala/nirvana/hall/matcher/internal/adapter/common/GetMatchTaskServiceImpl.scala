@@ -5,6 +5,8 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
@@ -102,8 +104,10 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       if (micStruct.bIsLatent == 1) {
         val ldata = matchTaskBuilder.getLDataBuilder
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
-          ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
+          val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
+          ldata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
+        }
       } else {
         val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
@@ -114,8 +118,10 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
         }
         tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
         //纹线数据
-        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
-          tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
+          val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
+          tdata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
+        }
       }
     }
     //文本查询

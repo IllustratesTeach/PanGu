@@ -7,7 +7,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.DataConverter
+import nirvana.hall.matcher.internal.{DataConverter, TextQueryUtil}
 import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
@@ -15,6 +15,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
+import nirvana.hall.matcher.internal.TextQueryConstants._
 
 /**
  * Created by songpeng on 16/4/8.
@@ -26,7 +27,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     " from (select f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm   from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm   from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
     " left join gafis_case c on t.case_id = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String]("cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm")
+  private val caseCols: Array[String] = Array[String](COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE, COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST, COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG, COL_NAME_ISPALM)
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -71,35 +72,10 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
           }
         }
       }
-      /*
-       * 将案件编号拆分为三部分, 由于案件编号可能包含字母，转为36进制的Long值
-       * 第一部分，单位编码12位(1, 13)，
-       * 第二部分，年月日6位(13,19)
-       * 第三部分，流水4位(19,23)
-       * */
-      var caseId = rs.getString("caseId")
+      //案件编号
+      val caseId = rs.getString("caseId")
       if(caseId != null){
-        try {
-          textData.addColBuilder().setColName("caseId").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(caseId.getBytes()))
-          //如果是字母开头截取第一位前缀
-          if (caseId.matches("^[a-zA-Z]\\w*")) {
-            val cId_pre: String = caseId.substring(0, 1)
-            textData.addColBuilder.setColName("cId_pre").setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(cId_pre.getBytes))
-            caseId = caseId.substring(1)
-          }
-          if(caseId.length == 22){
-            val cId_deptCode = caseId.substring(0, 12)
-            val cId_date = caseId.substring(12,18)
-            val cId_serialNum = caseId.substring(18)
-            textData.addColBuilder().setColName("cId_deptCode").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_deptCode, 36))))
-            textData.addColBuilder().setColName("cId_date").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(java.lang.Long.parseLong(cId_date, 36))))
-            textData.addColBuilder().setColName("cId_serialNum").setColType(ColType.INT).setColValue(ByteString.copyFrom(DataConverter.int2Bytes(Integer.parseInt(cId_serialNum, 36))))
-          }
-        } catch {
-          case e: Exception =>{
-            error("caseId convert error：{}", caseId)
-          }
-        }
+        TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
       }
 
       val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0

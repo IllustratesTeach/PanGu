@@ -17,18 +17,27 @@ import scala.util.control.NonFatal
  * @since 2016-01-27
  */
 object FPT3File {
+  //逻辑记录类型
+  final val LOGIC1REC_DATATYPE = "1"
+  final val LOGIC2REC_DATATYPE = "2"
+  final val LOGIC3REC_DATATYPE = "3"
+
   class LogicHeadV3 extends AncientData{
     @Length(8)
     var fileLength: String = _
     @Length(1)
     var dataType:String = _
+    def this(dataType: String){
+      this()
+      this.dataType = dataType
+    }
   }
   class FPT3File extends AncientData {
     var head: FPTHead = new FPTHead
     @Length(12)
     var fileLength: String = _
     @Length(1)
-    var dataType: String = "1"
+    var dataType: String = LOGIC1REC_DATATYPE
     @Length(6)
     var lpCount: String = _
     @Length(6)
@@ -121,9 +130,7 @@ object FPT3File {
   }
 
   class Logic2Rec extends DynamicFingerData{
-    var head = new LogicHeadV3()
-    //head.dataType = "2"
-
+    var head = new LogicHeadV3(LOGIC2REC_DATATYPE)
     @Length(6)
     var index: String = _
     @Length(4)
@@ -200,7 +207,7 @@ object FPT3File {
     @Length(3)
     var featureCount: String = _
     @Length(1800)
-    var feature: Array[Byte] = _
+    var feature: String = _
     @Length(4)
     var customInfoLength: String = "0"
     @LengthRef("customInfoLength")
@@ -278,8 +285,7 @@ object FPT3File {
   }
 
   class Logic3Rec extends DynamicFingerData{
-    var head = new LogicHeadV3()
-    head.dataType = "3"
+    var head = new LogicHeadV3(LOGIC3REC_DATATYPE)
     @Length(6)
     var index: String = _
     @Length(4)

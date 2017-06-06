@@ -207,8 +207,8 @@ trait AncientData{
     }
     this
   }
-  def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING):this.type = {
-    fromStreamReader(ChannelBuffers.wrappedBuffer(data),encoding)
+  def fromByteArray(data: Array[Byte],encoding:Charset=AncientConstants.UTF8_ENCODING, byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN):this.type = {
+    fromStreamReader(ChannelBuffers.wrappedBuffer(byteOrder, data),encoding)
   }
   def toByteArray(encoding:Charset=AncientConstants.UTF8_ENCODING,byteOrder:ByteOrder=ByteOrder.BIG_ENDIAN):Array[Byte]={
     val data = ChannelBuffers.buffer(byteOrder,getDataSize)

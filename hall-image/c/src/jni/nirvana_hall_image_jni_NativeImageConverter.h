@@ -7,15 +7,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved);
-
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    loadLibrary
- * Signature: (Ljava/lang/String;I)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;II)J
  */
 JNIEXPORT jlong JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_loadLibrary
-  (JNIEnv *, jclass, jstring fileName,jstring funName,jint firmCode,jint nOption);
+  (JNIEnv *, jclass, jstring, jstring, jint, jint);
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -28,12 +26,11 @@ JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_freeLibr
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
  * Method:    decodeByManufactory
- * Signature: (JLjava/lang/String;Ljava/lang/String;[BI)[B
+ * Signature: (JLjava/lang/String;I[BI)Lnirvana/hall/image/jni/OriginalImage;
  */
 JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByManufactory
   (JNIEnv *, jclass, jlong, jstring, jint, jbyteArray, jint);
-JNIEXPORT void JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decodeByGFS
-   (JNIEnv *, jclass, jbyteArray, jbyteArray);
+
 
 /*
  * Class:     nirvana_hall_image_jni_NativeImageConverter
@@ -50,6 +47,22 @@ JNIEXPORT jobject JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_decod
  */
 JNIEXPORT jbyteArray JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_encodeByWSQ
   (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jint);
+
+/*
+ * Class:     nirvana_hall_image_jni_NativeImageConverter
+ * Method:    GAFIS_CompressIMG
+ * Signature: ([B[BII)I
+ */
+JNIEXPORT jint JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_GAFIS_1CompressIMG
+  (JNIEnv *, jclass, jbyteArray, jbyteArray, jint, jint);
+
+/*
+ * Class:     nirvana_hall_image_jni_NativeImageConverter
+ * Method:    GAFIS_DecompressIMG
+ * Signature: ([B[B)I
+ */
+JNIEXPORT jint JNICALL Java_nirvana_hall_image_jni_NativeImageConverter_GAFIS_1DecompressIMG
+  (JNIEnv *, jclass, jbyteArray, jbyteArray);
 
 #ifdef __cplusplus
 }

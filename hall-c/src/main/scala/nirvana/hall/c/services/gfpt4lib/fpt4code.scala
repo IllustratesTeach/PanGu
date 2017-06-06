@@ -24,6 +24,8 @@ object fpt4code {
   final val GAIMG_CPRMETHOD_PKU_CODE = "1300"
   //WSQ压缩方法
   final val GAIMG_CPRMETHOD_WSQ_CODE = "1400"
+  //WSQ压缩方法
+  final val GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE = "1419"
   // 北京海鑫
   final val GAIMG_CPRMETHOD_COGENT_CODE = "1700"
   // 小日本NEC
@@ -36,6 +38,13 @@ object fpt4code {
   final val GAIMG_CPRMETHOD_MORPHO_CODE = "2000" // 广东测试提供的数据，SAGEM MORPHO
   //汉林信通
   final val GAIMG_CPRMETHOD_HLXT_CODE = "2900" // 广东测试提供的数据，SAGEM MORPHO
+
+  //提取特征方法
+  final val EXTRACT_METHOD_A = "A"  //自动提取
+  final val EXTRACT_METHOD_U = "U"  //自动提取且需要人工编辑
+  final val EXTRACT_METHOD_E = "E"  //自动提取且已经人工编辑
+  final val EXTRACT_METHOD_M = "M"  //人工抽取
+  final val EXTRACT_METHOD_O = "O"  //其它
 
   def gafisCprCodeToFPTCode(code:Int): String = {
     code match {
@@ -57,7 +66,7 @@ object fpt4code {
       case glocdef.GAIMG_CPRMETHOD_COGENT => // cogent compress method
         fpt4code.GAIMG_CPRMETHOD_COGENT_CODE
       case glocdef.GAIMG_CPRMETHOD_WSQ => // was method
-        fpt4code.GAIMG_CPRMETHOD_WSQ_CODE
+        fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
       case glocdef.GAIMG_CPRMETHOD_NEC => // nec compress method
         fpt4code.GAIMG_CPRMETHOD_NEC_CODE
       case glocdef.GAIMG_CPRMETHOD_TSINGHUA => // tsing hua

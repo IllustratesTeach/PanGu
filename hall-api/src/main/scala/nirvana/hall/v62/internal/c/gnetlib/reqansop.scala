@@ -1,10 +1,12 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gbaselib.gafiserr.GAFISERRDATSTRUCT
 import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
-import nirvana.hall.v62.internal.{V62Facade, NoneResponse}
-import nirvana.hall.v62.services.{GafisException, ChannelOperator}
+import nirvana.hall.v62.internal.{NoneResponse, V62Facade}
+import nirvana.hall.v62.services.{ChannelOperator, GafisException}
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
@@ -54,7 +56,7 @@ trait reqansop {
 
   def NETANS_SetLongRetVal(pstAns:GNETANSWERHEADOBJECT, nRetval:Long)
   {
-    pstAns.nReturnValue = nRetval.toInt
+    pstAns.nReturnValueRes = ByteBuffer.allocate(4).putInt(nRetval.toInt).array()
   }
 
   def NETANS_GetLongRetVal(pstAns:GNETANSWERHEADOBJECT)= {

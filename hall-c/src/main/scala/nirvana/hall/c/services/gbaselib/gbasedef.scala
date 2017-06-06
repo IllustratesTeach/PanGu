@@ -1,5 +1,6 @@
 package nirvana.hall.c.services.gbaselib
 
+import java.nio.ByteBuffer
 import java.util.Calendar
 
 import nirvana.hall.c.annotations.{IgnoreTransfer, Length}
@@ -112,7 +113,8 @@ object gbasedef {
       tMilliSec = switchShortEndian(n.toShort)
     }
     def convertAsJavaSecs(): Int ={
-      switchShortEndian(tMilliSec) / 1000
+      //高地位转换之后，如果高位是1，toShort方法会转为负数，函数运行会失真。这里特意转为Int之后再做除以1000的运算
+      ByteBuffer.allocate(4).putShort(2, switchShortEndian(tMilliSec)).getInt() / 1000
     }
     // millisecond.	[0, 999]
     var tMin: Byte = calendar.get(Calendar.MINUTE).toByte;

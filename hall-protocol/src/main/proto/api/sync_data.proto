@@ -54,6 +54,8 @@ message SyncTPCardRequest{
     optional int32 size = 2 [default = 1];
     //物理库dbid
     optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
 }
 message SyncTPCardResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -72,6 +74,8 @@ message SyncLPCardRequest{
     //数据大小，一次传送的数据大小,默认为10
     optional int32 size = 2 [default = 1];
     optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
 }
 message SyncLPCardResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -91,6 +95,9 @@ message SyncCaseRequest{
     //数据大小，一次传送的数据大小,默认为1
     optional int32 size = 2 [default = 1];
     optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
+
 }
 message SyncCaseResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -110,6 +117,8 @@ message SyncLPPalmRequest{
     //数据大小，一次传送的数据大小,默认为1
     optional int32 size = 2 [default = 1];
     optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
 }
 message SyncLPPalmResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -128,6 +137,8 @@ message SyncMatchTaskRequest{
     //数据大小，一次传送的数据大小,默认为1
     optional int32 size = 1 [default = 1];
     optional string dbid = 2;
+    //记录exception
+    optional string uuid = 3;
 }
 message SyncMatchTaskResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -146,6 +157,8 @@ message SyncMatchResultRequest{
     optional string dbid = 2;
     optional string pkid = 3; //捺印卡号
     optional string typ = 4; //查询类型
+    //记录exception
+    optional string uuid = 5;
 }
 message SyncMatchResultResponse{
     extend monad.rpc.protocol.BaseCommand{
@@ -155,4 +168,5 @@ message SyncMatchResultResponse{
     required MatchStatus match_status = 1;
     //比对候选
     optional matcher.MatchResult match_result = 2;
+
 }

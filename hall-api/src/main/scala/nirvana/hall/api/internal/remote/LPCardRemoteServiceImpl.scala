@@ -20,7 +20,7 @@ class LPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPCardRemote
     info("remote get lpcard [cardId:{},url:{}]", cardId, url)
     val request = LPCardGetRequest.newBuilder().setCardId(cardId)
     request.setDbid(dbId)
-    val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build())
+    val response = rpcHttpClient.call(url, LPCardGetRequest.cmd, request.build(),headerMap)
     Option(response.getExtension(LPCardGetResponse.cmd).getCard)
   }
 

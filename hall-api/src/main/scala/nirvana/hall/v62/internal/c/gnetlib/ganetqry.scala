@@ -6,7 +6,7 @@ import nirvana.hall.c.services.GADB_RETVAL
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
 /**
@@ -68,7 +68,6 @@ trait ganetqry {
                               ):Array[GADB_RETVAL]= executeInChannel{channel=>
 
     val request = createRequestHeader
-
     request.nOption = nOption
     request.nDBID = nQryDBID
     request.nTableID = nQryTID

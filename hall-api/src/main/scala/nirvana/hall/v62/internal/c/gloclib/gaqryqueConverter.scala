@@ -3,10 +3,12 @@ package nirvana.hall.v62.internal.c.gloclib
 import java.nio.ByteBuffer
 
 import com.google.protobuf.ByteString
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.QueryDBConfig
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
@@ -17,6 +19,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v70.internal.sync.ProtobufConverter
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -26,7 +29,7 @@ import scala.collection.mutable
 /**
  * Created by songpeng on 15/12/9.
  */
-object gaqryqueConverter {
+object gaqryqueConverter extends LoggerSupport{
   final val GAFIS_KEYLIST_GetName = "KeyList"
   final val GAFIS_QRYPARAM_GetName = "QryParam"
   final val GAFIS_QRYFILTER_GetName = "QryFilter"
@@ -41,27 +44,60 @@ object gaqryqueConverter {
    */
   def convertProtoBuf2GAQUERYSTRUCT(matchTask: MatchTask, queryDBConfig: QueryDBConfig)(implicit v62Config: HallV62Config): GAQUERYSTRUCT = {
     val queryStruct = new GAQUERYSTRUCT
-    queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().asInstanceOf[Byte]
     queryStruct.stSimpQry.nPriority = matchTask.getPriority.toByte
-    queryStruct.stSimpQry.nFlag = (gaqryque.GAQRY_FLAG_USEFINGER).asInstanceOf[Byte]
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
-    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
+
+    //flag
+    matchTask.getMatchType match {
+      case MatchType.FINGER_LL |
+           MatchType.FINGER_LT |
+           MatchType.FINGER_TL |
+           MatchType.FINGER_TT =>
+        queryStruct.stSimpQry.nFlag = gaqryque.GAQRY_FLAG_USEFINGER.toByte
+      case MatchType.PALM_LL |
+           MatchType.PALM_LT |
+           MatchType.PALM_TL |
+           MatchType.PALM_TT =>
+        queryStruct.stSimpQry.nFlag = gaqryque.GAQRY_FLAG_USEPALM.toByte
+    }
+    //如果是掌纹，查询类型-4
+    if ((queryStruct.stSimpQry.nFlag & gaqryque.GAQRY_FLAG_USEPALM) > 0) {
+      queryStruct.stSimpQry.nQueryType = (matchTask.getMatchType.ordinal() - 4).toByte
+    } else {
+      queryStruct.stSimpQry.nQueryType = matchTask.getMatchType.ordinal().toByte
+    }
+
+    queryStruct.pstInfo_Data = new GAFIS_QUERYINFO
+
+    if(matchTask.getComputerIp.nonEmpty){
+      val ips=matchTask.getComputerIp.split('.') //机器IP
+      val new_ip=new Array[Byte](4)
+      val hex_size=16 //16进制位数
+      for( i <- 0 until ips.length){
+        new_ip(i)=Integer.parseInt(Integer.toHexString(Integer.parseInt(ips(i))),hex_size).toByte // 由于存储需要16进制数，将String转成10进制数后再转成16进制字符串最后转成16进制数
+      }
+      queryStruct.pstInfo_Data.bnIP = new_ip
+    }
+
+    queryStruct.pstInfo_Data.szUserUnitCode= matchTask.getUserUnitCode  //提交用户单位代码
+    queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
+
+    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_LOCAL.toByte //本地查询
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
+    if(matchTask.getQueryid.nonEmpty){
+      queryStruct.stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(matchTask.getQueryid.toLong) //远程查询ID
+    }
     //TODO 支持指定物理库查询，但不支持多个物理库查询
     val srcDB = new GADBIDSTRUCT  //特征来源数据库
     val destDB = new GADBIDSTRUCT //被查数据库
     //如果没有指定特征库来源，使用默认库
     if(queryDBConfig.srcDB == None){
       srcDB.nDBID = matchTask.getMatchType match {
-        case MatchType.FINGER_TT =>
+        case MatchType.FINGER_TT | MatchType.FINGER_TL | MatchType.PALM_TT | MatchType.PALM_TL =>
           v62Config.templateTable.dbId.toShort
-        case MatchType.FINGER_TL =>
-          v62Config.templateTable.dbId.toShort
-        case MatchType.FINGER_LT =>
-          v62Config.latentTable.dbId.toShort
-        case MatchType.FINGER_LL =>
+        case MatchType.FINGER_LT | MatchType.FINGER_LL | MatchType.PALM_LT | MatchType.PALM_LL =>
           v62Config.latentTable.dbId.toShort
       }
     }else{
@@ -70,13 +106,9 @@ object gaqryqueConverter {
     //如果没有指定被查库，使用默认库
     if(queryDBConfig.destDB == None){
       destDB.nDBID = matchTask.getMatchType match {
-        case MatchType.FINGER_TT =>
+        case MatchType.FINGER_TT | MatchType.FINGER_LT | MatchType.PALM_TT | MatchType.PALM_LT =>
           v62Config.templateTable.dbId.toShort
-        case MatchType.FINGER_TL =>
-          v62Config.latentTable.dbId.toShort
-        case MatchType.FINGER_LT =>
-          v62Config.templateTable.dbId.toShort
-        case MatchType.FINGER_LL =>
+        case MatchType.FINGER_TL | MatchType.FINGER_LL | MatchType.PALM_TL | MatchType.PALM_LL =>
           v62Config.latentTable.dbId.toShort
       }
     }else{
@@ -84,7 +116,7 @@ object gaqryqueConverter {
     }
     //根据比对类型，设置tableid
     matchTask.getMatchType match {
-      case MatchType.FINGER_TT =>
+      case MatchType.FINGER_TT | MatchType.PALM_TT =>
         srcDB.nTableID = V62Facade.TID_TPCARDINFO
         destDB.nTableID = V62Facade.TID_TPCARDINFO
       case MatchType.FINGER_TL =>
@@ -96,22 +128,37 @@ object gaqryqueConverter {
       case MatchType.FINGER_LL =>
         srcDB.nTableID = V62Facade.TID_LATFINGER
         destDB.nTableID = V62Facade.TID_LATFINGER
-      case other =>
+      case MatchType.PALM_TL =>
+        srcDB.nTableID = V62Facade.TID_TPCARDINFO
+        destDB.nTableID = V62Facade.TID_LATPALM
+      case MatchType.PALM_LT =>
+        srcDB.nTableID = V62Facade.TID_LATPALM
+        destDB.nTableID = V62Facade.TID_TPCARDINFO
+      case MatchType.PALM_LL =>
+        srcDB.nTableID = V62Facade.TID_LATPALM
+        destDB.nTableID = V62Facade.TID_LATPALM
     }
     queryStruct.stSimpQry.stSrcDB = srcDB
     queryStruct.stSimpQry.stDestDB = Array(destDB)
 
     //设置比对参数
     val item = new GAFIS_QRYPARAM
-    item.stXgw.bFullMatchOn = matchTask.getConfig.getFullMatchOn.asInstanceOf[Byte]
+    item.stXgw.bFullMatchOn = matchTask.getConfig.getFullMatchOn.toByte
+//    item.stXgw.nMntMatchType = 4
 
     val itemDataLength = item.getDataSize
     val itemHead = new GBASE_ITEMPKG_ITEMHEADSTRUCT
-    itemHead.szItemName = GAFIS_TEXTSQL_GetName
+    itemHead.szItemName = GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
+    //TODO 文本查询条件
+    val xmlData = "".getBytes
+    val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
+    itemHead2.szItemName = GAFIS_TEXTSQL_GetName
+    itemHead2.nItemLen = xmlData.length
+
     val itemPackage = new GBASE_ITEMPKG_PKGHEADSTRUCT
-    itemPackage.nDataLen = itemPackage.getDataSize + itemHead.getDataSize + itemHead.nItemLen
+    itemPackage.nDataLen = itemPackage.getDataSize + itemHead.getDataSize + itemHead.nItemLen + itemHead2.getDataSize + itemHead2.nItemLen
     itemPackage.nBufSize = itemPackage.nDataLen
 
     val buffer = ChannelBuffers.buffer(itemPackage.nDataLen)
@@ -124,38 +171,64 @@ object gaqryqueConverter {
     queryStruct.pstQryCond_Data = bytes
     queryStruct.nQryCondLen = queryStruct.pstQryCond_Data.length
 
-    queryStruct.nItemFlagA = gaqryque.GAIFA_FLAG.asInstanceOf[Byte]
+    queryStruct.nItemFlagA = gaqryque.GAIFA_FLAG.toByte
 
     //特征数据
-    val matchType = matchTask.getMatchType.getNumber
-    if (matchType == MatchType.FINGER_LL.getNumber || matchType == MatchType.FINGER_LT.getNumber){
-      val mic = new GAFISMICSTRUCT
-      mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
-      mic.nMntLen = mic.pstMnt_Data.length
-      mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
-      mic.nItemData = 1
-      mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
-      queryStruct.pstMIC_Data = Array(mic)
-    }else if(matchType == MatchType.FINGER_TT.getNumber || matchType == MatchType.FINGER_TL.getNumber){
-      queryStruct.pstMIC_Data =
-        matchTask.getTData.getMinutiaDataList.map{md=>
+    matchTask.getMatchType match {
+      case MatchType.FINGER_LL | MatchType.FINGER_LT =>
+        if(matchTask.getLData.getMinutia.nonEmpty){
           val mic = new GAFISMICSTRUCT
-          mic.pstMnt_Data = md.getMinutia.toByteArray
+          mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
           mic.nMntLen = mic.pstMnt_Data.length
-          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.asInstanceOf[Byte]
-          if(md.getPos > 10){//平面指纹
-            mic.nItemType = glocdef.GAMIC_ITEMTYPE_TPLAIN.asInstanceOf[Byte]
-            mic.nItemData = (md.getPos - 10).toByte
-          }else{
-            mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.asInstanceOf[Byte]
+          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+          mic.nItemData = 0
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.toByte
+          queryStruct.pstMIC_Data = Array(mic)
+        }
+      case MatchType.FINGER_TT | MatchType.FINGER_TL =>
+        queryStruct.pstMIC_Data =
+          matchTask.getTData.getMinutiaDataList.map{md=>
+            val mic = new GAFISMICSTRUCT
+            mic.pstMnt_Data = md.getMinutia.toByteArray
+            mic.nMntLen = mic.pstMnt_Data.length
+            mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+            if(md.getPos > 10){//平面指纹
+              mic.nItemType = glocdef.GAMIC_ITEMTYPE_TPLAIN.toByte
+              mic.nItemData = (md.getPos - 10).toByte
+            }else{
+              mic.nItemType = glocdef.GAMIC_ITEMTYPE_FINGER.toByte
+              mic.nItemData =  md.getPos.toByte
+            }
+
+            mic
+          }.toArray
+      case MatchType.PALM_LL | MatchType.PALM_LT =>
+        if(matchTask.getLData.getMinutia.nonEmpty){
+          val mic = new GAFISMICSTRUCT
+          mic.pstMnt_Data = matchTask.getLData.getMinutia.toByteArray
+          mic.nMntLen = mic.pstMnt_Data.length
+          mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+          mic.nItemData = 0
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.toByte
+          queryStruct.pstMIC_Data = Array(mic)
+        }
+      case MatchType.PALM_TT | MatchType.PALM_TL =>
+        queryStruct.pstMIC_Data =
+          matchTask.getTData.getMinutiaDataList.map{md=>
+            val mic = new GAFISMICSTRUCT
+            mic.pstMnt_Data = md.getMinutia.toByteArray
+            mic.nMntLen = mic.pstMnt_Data.length
+            mic.nItemFlag = glocdef.GAMIC_ITEMFLAG_MNT.toByte
+            mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.toByte
             mic.nItemData =  md.getPos.toByte
-          }
 
-          mic
+            mic
+          }.toArray
 
-        }.toArray
     }
-    queryStruct.nMICCount = queryStruct.pstMIC_Data.length
+    if(queryStruct.pstMIC_Data != null){
+      queryStruct.nMICCount = queryStruct.pstMIC_Data.length
+    }
     queryStruct
   }
 
@@ -196,6 +269,9 @@ object gaqryqueConverter {
     matchResult.setMaxScore(maxScore)
     matchResult.setStatus(MatcherStatus.newBuilder().setMsg("success").setCode(0))
 
+    //比中概率
+    matchResult.setHITPOSSIBILITY(gaQueryStruct.stSimpQry.nHitPossibility)
+
     matchResult.build()
   }
 
@@ -205,27 +281,45 @@ object gaqryqueConverter {
    * @return
    */
   def convertGAQUERYSTRUCT2MatchTask(gaQueryStruct: GAQUERYSTRUCT): MatchTask ={
+    val stSimpQry = gaQueryStruct.stSimpQry
     val matchTask = MatchTask.newBuilder()
-    //ora_sid
-    matchTask.setMatchId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID).toString)
+    matchTask.setMatchId(stSimpQry.szKeyID)
     //优先级
-    matchTask.setPriority(gaQueryStruct.stSimpQry.nPriority)
-    //查询类型 TODO 掌纹查询类型?
-    matchTask.setMatchType(MatchType.valueOf(gaQueryStruct.stSimpQry.nQueryType + 1))
-    //任务本身的sid
-    matchTask.setObjectId(1)
+    matchTask.setPriority(stSimpQry.nPriority)
+    //查询类型
+    val queryType = stSimpQry.nQueryType.toShort
+    val isPalm = (gaqryque.GAQRY_FLAG_USEPALM & stSimpQry.nFlag) > 0
+    val matchType = ProtobufConverter.convertQueryType2MatchType(queryType, isPalm)
+    matchTask.setMatchType(matchType)
+    //ora_sid
+    matchTask.setObjectId(convertSixByteArrayToLong(gaQueryStruct.stSimpQry.nQueryID))
     matchTask.setScoreThreshold(gaQueryStruct.stSimpQry.nMinScore)
     matchTask.setTopN(gaQueryStruct.stSimpQry.nMaxCandidateNum)
-    gaQueryStruct.pstMIC_Data.foreach{micStruct =>
-      if(micStruct.bIsLatent == 1){
+    //添加6.2任务的创建时间
+    matchTask.setOraCreatetime(DateConverter.convertAFISDateTime2String(gaQueryStruct.stSimpQry.tSubmitTime))
+    gaQueryStruct.pstMIC_Data.foreach{mic =>
+      if(mic.bIsLatent == 1){
         val ldata = matchTask.getLDataBuilder
-        ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-        if(micStruct.pstBin_Data.length > 0)
-          ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+        ldata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data))
+        if(mic.pstBin_Data.length > 0)
+          ldata.setRidge(ByteString.copyFrom(mic.pstBin_Data))
       }else{
-        //这里指位不做转换
-        val pos = micStruct.nItemData
-        matchTask.getTDataBuilder.addMinutiaDataBuilder().setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data)).setPos(pos)
+        val tdata = matchTask.getTDataBuilder.addMinutiaDataBuilder()
+        mic.nItemType match {
+          case glocdef.GAMIC_ITEMTYPE_FINGER =>
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
+          case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
+            //平面
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData+10)
+          case glocdef.GAMIC_ITEMTYPE_PALM =>
+            //掌纹
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemFlag)
+          case other =>
+            warn("unsupport itemType:", other)
+        }
+        if(mic.pstBin_Data != null){
+          tdata.setRidge(ByteString.copyFrom(mic.pstBin_Data))
+        }
       }
     }
     //TODO 文本查询,高级查询参数
@@ -294,20 +388,39 @@ object gaqryqueConverter {
    * @param candList
    * @return
    */
-  def convertCandList2GAQUERYCANDSTRUCT(candList: Array[Byte]): Seq[MatchResultObject]={
-    val buffer = ChannelBuffers.wrappedBuffer(candList)
-    val result = mutable.Buffer[MatchResultObject]()
-    while(buffer.readableBytes() >= 96) {
-      val gaCand = new GAQUERYCANDSTRUCT
-      gaCand.fromStreamReader(buffer)
-      val matchResultObject = MatchResultObject.newBuilder()
-      matchResultObject.setObjectId(gaCand.szKey)
-      matchResultObject.setPos(gaCand.nIndex)
-      matchResultObject.setScore(gaCand.nScore)
-      matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
-      result += matchResultObject.build()
+  def convertCandList2MatchResultObject(candList: Array[Byte]): Seq[MatchResultObject]={
+    if(candList != null && candList.size > 0){
+      val buffer = ChannelBuffers.wrappedBuffer(candList)
+      val result = mutable.Buffer[MatchResultObject]()
+      while(buffer.readableBytes() >= 96) {
+        val gaCand = new GAQUERYCANDSTRUCT
+        gaCand.fromStreamReader(buffer)
+        val matchResultObject = MatchResultObject.newBuilder()
+        matchResultObject.setObjectId(gaCand.szKey)
+        matchResultObject.setPos(gaCand.nIndex)
+        matchResultObject.setScore(gaCand.nScore)
+        matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
+        result += matchResultObject.build()
+      }
+      result
+    }else{
+      Seq()
     }
-    result.toSeq
+  }
+
+  /**
+    * protobuf候选转换为GAQUERYCANDSTRUCT
+    * @param matchResultObject
+    * @return
+    */
+  def convertMatchResultObject2GAQUERYCANDSTRUCT(matchResultObject: MatchResultObject): GAQUERYCANDSTRUCT={
+    val gCand = new GAQUERYCANDSTRUCT
+    gCand.szKey = matchResultObject.getObjectId
+    gCand.nIndex = matchResultObject.getPos.toByte
+    gCand.nScore = matchResultObject.getScore
+    gCand.nDBID = matchResultObject.getDbid.toShort
+
+    gCand
   }
 
 }
