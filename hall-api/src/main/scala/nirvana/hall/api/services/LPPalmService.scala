@@ -45,4 +45,12 @@ trait LPPalmService {
    * @return
    */
   def isExist(cardId: String, dbId: Option[String] = None): Boolean
+
+
+  /**
+    * 赋值来源url
+    *
+    * @param url
+    */
+  def cutIP(url: String): Unit
 }
