@@ -124,10 +124,11 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val syncTPCard = iter.next()
           val tpCard = syncTPCard.getTpCard
           cardId = tpCard.getStrCardID
+          tpCardService.cutIP(fetchConfig.url)
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //逻辑分库处理
-            destDBID = logicDBJudgeService.logicTJudge(cardId)
+            destDBID = logicDBJudgeService.logicTJudge(cardId,Option(fetchConfig.destDbid))
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
@@ -210,6 +211,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val syncLPCard = iter.next()
           var lpCard = syncLPCard.getLpCard
           cardId = lpCard.getStrCardID
+          lPCardService.cutIP(fetchConfig.url)
           if (syncLPCard.getOperationType == OperationType.PUT &&
             validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
             //如果没有案件编号，截掉指纹编号后两位作为案件编号
@@ -222,7 +224,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
             //逻辑分库处理
             //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
-            destDBID = logicDBJudgeService.logicLJudge(caseId)
+            destDBID = logicDBJudgeService.logicLJudge(caseId,Option(fetchConfig.destDbid))
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
@@ -298,6 +300,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     info("syncCaseInfo caseId:{}", caseId)
     if(caseInfoRemoteService.isExist(caseId, url, dbId.get)){
       val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId.get)
+      caseInfoService.cutIP(url)
       if(isExist){
         caseInfoOpt.foreach(caseInfoService.updateCaseInfo(_, destDbId))
       }else{
@@ -342,6 +345,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val syncLPCard = iter.next()
           var lpCard = syncLPCard.getLpCard
           cardId = lpCard.getStrCardID
+          lPPalmService.cutIP(fetchConfig.url)
           if (syncLPCard.getOperationType == OperationType.PUT &&
             validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
             //如果没有案件编号，截掉指纹编号后两位作为案件编号
@@ -441,6 +445,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         while (iter.hasNext) {
           val matchTask = iter.next()
           taskId = matchTask.getMatchId
+          queryService.cutIP(fetchConfig.url)
           if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)) {
             //TODO queryDBConfig 添加是否更新校验
             queryService.addMatchTask(matchTask)
