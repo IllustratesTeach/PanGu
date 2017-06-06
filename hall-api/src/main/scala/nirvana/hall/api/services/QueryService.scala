@@ -73,4 +73,11 @@ trait QueryService {
     * @return
     */
   def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String] = None): GAQUERYSTRUCT
+
+  /**
+    * 赋值来源url
+    *
+    * @param url
+    */
+  def cutIP(url: String): Unit
 }
