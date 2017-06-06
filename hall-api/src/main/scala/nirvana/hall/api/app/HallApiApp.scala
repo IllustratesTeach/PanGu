@@ -29,10 +29,10 @@ object HallApiApp
     logger.info("starting hall api server ....")
     val classes = List[Class[_]](
       //v70
-//      Class.forName("nirvana.hall.v70.LocalV70Module"),
-//      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
-//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-//      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
+      Class.forName("nirvana.hall.v70.LocalV70Module"),
+      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
+      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
       //v62
 //      Class.forName("nirvana.hall.v62.LocalV62Module"),
 //      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
@@ -53,7 +53,7 @@ object HallApiApp
       Class.forName("nirvana.hall.api.HallApiModule")
     )
 
-    /*
+    /*nirvana/hall/api/app/HallApiApp.scala:60
     load other module from system property.
     */
     val extraModules = System.getProperty(HallApiSymbols.API_EXTRA_MODULE_CLASS)

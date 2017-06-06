@@ -1,22 +1,25 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.services.CaseInfoService
+import nirvana.hall.api.HallDatasource
+import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.jpa.{GafisCaseBak, _}
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * Created by songpeng on 16/1/26.
- */
-class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
+  * Created by songpeng on 16/1/26.
+  */
+class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallDatasourceService) extends CaseInfoService{
+  var ip_source=""
+
   /**
-   * 新增案件信息
-   * @param caseInfo
-   * @return
-   */
+    * 新增案件信息
+    * @param caseInfo
+    * @return
+    */
   @Transactional
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
@@ -33,7 +36,11 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
+    val gafisCase_HallDatasource=new HallDatasource(gafisCase.caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
+    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     gafisCase.save()
+    val gafisCase_bak = new GafisCaseBak(gafisCase)
+    gafisCase_bak.save()
     val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     }else{
@@ -45,13 +52,15 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     logicDbCase.logicDbPkid = logicDb.pkId
     logicDbCase.casePkid = gafisCase.caseId
     logicDbCase.save()
+    val logicDbCase_bak = new GafisLogicDbCaseBak(logicDbCase)
+    logicDbCase_bak.save()
   }
 
   /**
-   * 更新案件信息
-   * @param caseInfo
-   * @return
-   */
+    * 更新案件信息
+    * @param caseInfo
+    * @return
+    */
   @Transactional
   override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
@@ -70,6 +79,8 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
+    val gafisCase_HallDatasource=new HallDatasource(gafisCase.caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
+    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     gafisCase.save()
 
     //删除原来的逻辑库
@@ -86,13 +97,21 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     logicDbCase.logicDbPkid = logicDb.pkId
     logicDbCase.casePkid = gafisCase.caseId
     logicDbCase.save()
+
+    //数据备份：数据更新
+    GafisCaseBak.find_by_caseId(gafisCase.caseId).foreach(_.delete())
+    val gafisCase_bak = new GafisCaseBak(gafisCase)
+    gafisCase_bak.save()
+    GafisLogicDbCaseBak.find_by_casePkid(gafisCase.caseId).foreach(_.delete())
+    val logicDbCase_bak = new GafisLogicDbCaseBak(logicDbCase)
+    logicDbCase_bak.save()
   }
 
   /**
-   * 获取案件信息
-   * @param caseId
-   * @return
-   */
+    * 获取案件信息
+    * @param caseId
+    * @return
+    */
   override def getCaseInfo(caseId: String, dbId: Option[String]): Case= {
     val gafisCase = GafisCase.findOption(caseId)
     val fingers = GafisCaseFinger.select(GafisCaseFinger.fingerId).where(GafisCaseFinger.caseId === caseId).toList.asInstanceOf[List[String]]
@@ -103,19 +122,27 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
   }
 
   /**
-   * 删除案件信息
-   * @param caseId
-   * @return
-   */
+    * 删除案件信息
+    * @param caseId
+    * @return
+    */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
+    val gafisCase_HallDatasource=new HallDatasource(caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
+    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     GafisCase.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCase.caseId === caseId).execute
+    if (GafisCaseBak.find(GafisCaseBak.caseId === caseId) != null) {
+      GafisCaseBak.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCaseBak.caseId === caseId).execute
+    } else {
+      val gafiscase_bak = new GafisCaseBak(GafisCase.find(caseId))
+      gafiscase_bak.save()
+    }
   }
 
   /**
-   * 验证案件编号是否已存在
-   * @param caseId
-   * @return
-   */
+    * 验证案件编号是否已存在
+    * @param caseId
+    * @return
+    */
   override def isExist(caseId: String, dbId: Option[String]): Boolean = {
     GafisCase.findOption(caseId).nonEmpty
   }
@@ -135,5 +162,14 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     */
   override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = {
     throw new UnsupportedOperationException
+  }
+
+  /**
+    * 赋值来源url
+    * @param url
+    */
+
+  override def cutIP(url: String): Unit = {
+    ip_source=url.split(":", -1)(1).substring(2)
   }
 }

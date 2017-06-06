@@ -18,8 +18,9 @@ import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.services.DictCode6Map7
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants, TransSpellName}
 import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.services.sys.DictService
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -114,6 +115,7 @@ object ProtobufConverter extends LoggerSupport{
   def convertLPCard2GafisCaseFinger(lpCard: LPCard, caseFinger: GafisCaseFinger = new GafisCaseFinger()): GafisCaseFinger = {
     caseFinger.fingerId = lpCard.getStrCardID
     val text = lpCard.getText
+    //caseFinger.ltOperator = "8a8187175138054e0151381149490003"
     caseFinger.seqNo = text.getStrSeq
     caseFinger.remainPlace = text.getStrRemainPlace
     caseFinger.ridgeColor = text.getStrRidgeColor
@@ -421,7 +423,9 @@ object ProtobufConverter extends LoggerSupport{
     person.cardid = tpCard.getStrPersonID
     person.fingerrepeatno = tpCard.getStrMisPersonID
     val text = tpCard.getText
+
     person.name = text.getStrName
+    person.spellname = TransSpellName.toHanyuPinyin(text.getStrName)
     person.aliasname = text.getStrAliasName
     person.sexCode = text.getNSex.toString
     person.birthdayst = text.getStrBirthDate

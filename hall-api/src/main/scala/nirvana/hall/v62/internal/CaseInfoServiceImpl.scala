@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.CaseInfoService
+import nirvana.hall.api.HallDatasource
+import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
@@ -14,7 +15,9 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/1/26.
  */
-class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInfoService{
+class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService:HallDatasourceService) extends CaseInfoService{
+  var ip_source=""
+
   /**
    * 新增案件信息
    * @param caseInfo
@@ -22,6 +25,8 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    val caseInfo_HallDatasource=new HallDatasource(gCase.szCaseID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
+    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Add(getDBID(dbId),
       V62Facade.TID_CASE, gCase)
   }
@@ -33,6 +38,8 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    */
   override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    val caseInfo_HallDatasource=new HallDatasource(gCase.szCaseID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
+    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Update(getDBID(dbId), V62Facade.TID_CASE, gCase)
   }
 
@@ -54,6 +61,8 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
+    val caseInfo_HallDatasource=new HallDatasource(caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
+    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Del(config.caseTable.dbId.toShort,
       V62Facade.TID_CASE, caseId)
   }
@@ -157,5 +166,14 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
     }else{
       dbId.get.toShort
     }
+  }
+
+  /**
+    * 赋值来源url
+    * @param url
+    */
+
+  override def cutIP(url: String): Unit = {
+    ip_source=url.split(":", -1)(1).substring(2)
   }
 }
