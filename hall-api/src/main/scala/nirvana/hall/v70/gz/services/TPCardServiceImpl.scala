@@ -14,6 +14,7 @@ import nirvana.hall.v70.gz.jpa.{GafisGatherFinger, GafisGatherPalm, GafisGatherP
   * Created by songpeng on 2017/5/26.
   */
 class TPCardServiceImpl extends TPCardService with LoggerSupport{
+  var ip_source=""
   /**
     * 新增捺印卡片
     *
@@ -179,4 +180,14 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @return Logic02Rec(fpt4捺印文本信息)
     */
   override def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec] = ???
+
+  /**
+    * 赋值来源url
+    *
+    * @param url
+    */
+  override def cutIP(url: String): Unit = {
+    ip_source=url.split(":", -1)(1).substring(2)
+  }
+
 }
