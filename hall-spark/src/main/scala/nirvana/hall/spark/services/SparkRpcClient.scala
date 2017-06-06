@@ -129,5 +129,7 @@ object SparkRpcClient extends RpcHttpClient{
     httpClient
   }
 }
-class CallRpcException(message:String) extends RuntimeException(message)
+class CallRpcException(message:String) extends RuntimeException(message) {
+  override def getMessage: String = "fetch fpt file error ,"
+}
 

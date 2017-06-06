@@ -17,7 +17,7 @@ class FPTParseTst {
   @Test
   def fpt (){
     val decoder = new FirmDecoderImpl(".",null)
-    val files = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\20170222"),Array[String]("fpt","FPT"),true)
+    val files = FileUtils.listFiles(new File("C:\\Users\\wangjue\\Desktop\\fail_FPT\\parse"),Array[String]("fpt","FPT"),true)
     val itt = files.iterator()
     while (itt.hasNext) {
       val fptFile = itt.next()

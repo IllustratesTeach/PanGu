@@ -72,7 +72,7 @@ object BigDataStream {
     }
     val content = Source.fromFile(new File(args(0)),MonadSupportConstants.UTF8_ENCODING).mkString
     val config = XmlLoader.parseXML[NirvanaSparkConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/spark/nirvana-spark.xsd")))
-    val checkpointDirectory = config.hdfsServer
+    val checkpointDirectory = config.hdfsServer+"/kafka_checkpoint"
     val ssc =
     if(checkpointDirectory == "None"){
       createStreamContext(None,config)

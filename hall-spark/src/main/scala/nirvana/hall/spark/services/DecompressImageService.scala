@@ -109,7 +109,7 @@ object DecompressImageService extends LoggerSupport{
         case NonFatal(e) =>
           if (!isWsq) decode(true)
           else doReportException(parameter, event,
-                new scala.RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + " " + e.toString, e))
+                new scala.RuntimeException("fail to decompress,code:" + compressedImg.stHead.nCompressMethod + "," + e.toString, e))
       }
     }
     decode()
@@ -117,13 +117,14 @@ object DecompressImageService extends LoggerSupport{
 
   def doReportException(parameter:NirvanaSparkConfig, event:StreamEvent, e: Throwable,remark : String = "") = {
     error(e.getMessage, e)
-    SparkFunctions.reportError(parameter, DecompressError(event, e.toString+"-"+remark))
+    SparkFunctions.reportError(parameter, DecompressError(event, e.toString+","+remark))
     None
   }
 
   private def decompressWithHttpService(parameter: NirvanaSparkConfig, event: StreamEvent, finger: TemplateFingerConvert , compressedImg: GAFISIMAGESTRUCT): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
     val rpcHttpClient = SparkFunctions.httpClient
     val request = FirmImageDecompressRequest.newBuilder()
+    val cMethod = compressedImg.stHead.nCompressMethod
     //    @tailrec
     def doDecompress(seq: Int,compressMethod : String = glocdef.GAIMG_CPRMETHOD_WSQ.toString): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
       try {
@@ -161,9 +162,9 @@ object DecompressImageService extends LoggerSupport{
         }
       } catch {
         case e: CallRpcException =>
-          if (seq == 4) doReportException(parameter,event,e) else doDecompress(seq + 1,"CallRpcException,"+seq)
+          if (seq == 4) doReportException(parameter,event,e) else doDecompress(seq + 1)
         case NonFatal(e) =>
-          if (seq == 4) doReportException(parameter,event,e,compressedImg.stHead.nCompressMethod.toString+","+seq) else doDecompress(seq + 1,compressedImg.stHead.nCompressMethod.toString)
+          if (seq == 4) doReportException(parameter,event,e,compressedImg.stHead.nCompressMethod.toString) else doDecompress(seq + 1,cMethod.toString)
       }
     }
     doDecompress(1)

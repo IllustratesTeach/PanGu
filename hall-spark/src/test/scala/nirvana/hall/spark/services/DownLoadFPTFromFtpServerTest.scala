@@ -31,7 +31,7 @@ class DownLoadFPTFromFtpServerTest {
           println("data length:" + data.length)
           println("times:" + i + "-ended|" + System.currentTimeMillis())
         }*/
-        val content = Source.fromFile(new File("src/test/resources/test_spark_ftp.xml"),MonadSupportConstants.UTF8_ENCODING).mkString
+        val content = Source.fromFile(new File("src/test/resources/test_spark_file.xml"),MonadSupportConstants.UTF8_ENCODING).mkString
         val config = XmlLoader.parseXML[NirvanaSparkConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/spark/nirvana-spark.xsd")))
         SysProperties.setConfig(config)
         val lines = FileUtils.readLines(new File("D:\\fpt_path\\1465188450594.txt")).iterator()

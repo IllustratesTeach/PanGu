@@ -4,7 +4,7 @@ import java.io.{File, InputStream}
 
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import org.apache.commons.io.IOUtils
-import org.apache.commons.net.ftp.FTPClient
+import org.apache.commons.net.ftp.{FTP, FTPClient}
 
 /**
  * Created by wangjue on 2016/6/5.
@@ -15,10 +15,6 @@ object SparkFTPClient {
   private lazy val ftpUserName = SysProperties.getPropertyOption("ftp.username").get
   private lazy val ftpPassword = SysProperties.getPropertyOption("fpt.password").get
   def downloadFPTFromFTPServer(parameter:NirvanaSparkConfig,filePath:String): Array[Byte] = {
-    /*val ftpPost = "127.0.0.1"
-    val ftpPort = 21
-    val ftpUserName = "fptuser"
-    val ftpPassword = "fpt@user07!"*/
     val client = new FTPClient
     var fptFile : InputStream = null
     try {
@@ -27,6 +23,7 @@ object SparkFTPClient {
       client.enterLocalActiveMode()
       client.connect(ftpPost,ftpPort.toInt)
       client.login(ftpUserName,ftpPassword)
+      client.setFileType(FTP.BINARY_FILE_TYPE)
       fptFile = client.retrieveFileStream(filePath)
       val data = IOUtils.toByteArray(fptFile)
       if (fptFile != null)

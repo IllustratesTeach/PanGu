@@ -195,17 +195,6 @@ object FptPropertiesConverter {
     latentFinger.mittensBegNo = lData.mittensBegNo
     latentFinger.mittensEndNo = lData.mittensEndNo
 
-    /*val image = new GAFISIMAGESTRUCT
-    image.stHead.nWidth = lData.imgHorizontalLength.toShort
-    image.stHead.nHeight = lData.imgVerticalLength.toShort
-    image.stHead.nBits = 8.toByte
-    image.stHead.nResolution = lData.dpi.toShort
-    image.stHead.bIsCompressed = 0.toByte
-    image.stHead.nCompressMethod = lData.imgCompressMethod.toByte
-    image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-    image.bnData = lData.imgData
-    image.stHead.nImgSize = image.bnData.length*/
-
     val image = fpt4code.FPTFingerLDataToGafisImage(lData)
     latentFinger.imgData = image.toByteArray()
 
@@ -387,7 +376,7 @@ object FptPropertiesConverter {
           e.printStackTrace()
       }
     }
-    val d = new sql.Date(date.getTime)
-    d
+    if (date == null) null
+    else new sql.Date(date.getTime)
   }
 }
