@@ -69,6 +69,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
       person.save()
+      val person_bak = new GafisPersonBak(person)
+      person_bak.save()
       //保存逻辑库
       val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
         //如果没有指定逻辑库，使用默认库
@@ -81,6 +83,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       logicDbFingerprint.fingerprintPkid = person.personid
       logicDbFingerprint.logicDbPkid = logicDb.pkId
       logicDbFingerprint.save()
+      val logicDbFingerprint_bak = new GafisLogicDbFingerprintBak(logicDbFingerprint)
+      logicDbFingerprint_bak.save()
       //保存指纹
       val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
       GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
@@ -91,6 +95,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         val finger_HallDatasource=new HallDatasource(finger.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(finger_HallDatasource,HallDatasource.TABLE_V70_PERSON_FINGER)
         finger.save()
+        val finger_bak = new GafisGatherFingerBak(finger)
+        finger_bak.save()
       }
       //掌纹
       val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
@@ -102,6 +108,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         val palm_HallDatasource=new HallDatasource(palm.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(palm_HallDatasource,HallDatasource.TABLE_V70_PERSON_PALM)
         palm.save()
+        val palm_bak = new GafisGatherPalmBak(palm)
+        palm_bak.save()
       }
       //保存人像
       val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
@@ -113,6 +121,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         val portrait_HallDatasource=new HallDatasource(portrait.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(portrait_HallDatasource,HallDatasource.TABLE_V70_PERSON_PORTRAIT)
         portrait.save()
+        val portrait_bak = new GafisGatherPortraitBak(portrait)
+        portrait_bak.save()
       }
     }
   }
@@ -129,6 +139,15 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     val person_HallDatasource=new HallDatasource(cardId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL)
     hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
     gafisPerson.save()
+    //数据备份：数据删除
+    var gafisPerson_bak = GafisPersonBak.find(cardId)
+    if (gafisPerson_bak != null) {
+      gafisPerson_bak.deletag = Gafis70Constants.DELETAG_DEL
+      gafisPerson_bak.save()
+    } else {
+      gafisPerson_bak = new GafisPersonBak(gafisPerson)
+      gafisPerson_bak.save()
+    }
     /*//删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除掌纹
@@ -170,7 +189,10 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY)
     hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
     person.save()
-
+    //GafisPersonBak.find(GafisPersonBak.personid === person.personid).delete()
+    GafisPersonBak.find_by_personid(person.personid).foreach(_.delete())
+    val person_bak = new GafisPersonBak(person)
+    person_bak.save()
     //删除原来的逻辑库
     GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
     //保存逻辑库
@@ -185,9 +207,13 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     logicDbFingerprint.fingerprintPkid = person.personid
     logicDbFingerprint.logicDbPkid = logicDb.pkId
     logicDbFingerprint.save()
+    GafisLogicDbFingerprintBak.find_by_fingerprintPkid(person.personid).foreach(_.delete())
+    val logicDbFingerprint_bak = new GafisLogicDbFingerprintBak(logicDbFingerprint)
+    logicDbFingerprint_bak.save()
     //指纹
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
     GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherFingerBak.find_by_personId(person.personid).foreach(f=>f.delete())
     fingerList.foreach{finger =>
       finger.pkId = CommonUtils.getUUID()
       finger.inputtime = new Date()
@@ -195,10 +221,13 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       val finger_HallDatasource=new HallDatasource(finger.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(finger_HallDatasource,HallDatasource.TABLE_V70_PERSON_FINGER)
       finger.save()
+      val finger_bak = new GafisGatherFingerBak(finger)
+      finger_bak.save()
     }
     //掌纹
     val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
     GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherPalmBak.find_by_personId(person.personid).foreach(f=>f.delete())
     palmList.foreach{palm=>
       palm.pkId = CommonUtils.getUUID()
       palm.inputtime = new Date()
@@ -206,11 +235,14 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       val palm_HallDatasource=new HallDatasource(palm.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(palm_HallDatasource,HallDatasource.TABLE_V70_PERSON_PALM)
       palm.save()
+      val palm_bak = new GafisGatherPalmBak(palm)
+      palm_bak.save()
     }
 
     //人像
     val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
     GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+    GafisGatherPortraitBak.find_by_personid(person.personid).foreach(f=>f.delete())
     portraitList.foreach{portrait=>
       portrait.pkId = CommonUtils.getUUID()
       portrait.inputtime = new Date()
@@ -219,6 +251,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       val portrait_HallDatasource=new HallDatasource(portrait.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(portrait_HallDatasource,HallDatasource.TABLE_V70_PERSON_PORTRAIT)
       portrait.save()
+      val portrait_bak = new GafisGatherPortraitBak(portrait)
+      portrait_bak.save()
     }
   }
 
@@ -229,6 +263,13 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisPerson.findOption(cardId).nonEmpty
+    var result=false
+    if(GafisPerson.findOption(cardId).nonEmpty){
+      val person=GafisPerson.findOption(cardId).get
+      if(person.deletag.equals("1"))
+        result=true
+    }
+    result
   }
 
   /**
