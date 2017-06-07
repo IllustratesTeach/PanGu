@@ -66,7 +66,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       person.isfingerrepeat = "0"
       person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
-      val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+      val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,tpCard.getStrCardID,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
       person.save()
       val person_bak = new GafisPersonBak(person)
@@ -92,7 +92,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = new Date()
         finger.inputpsn = Gafis70Constants.INPUTPSN
-        val finger_HallDatasource=new HallDatasource(finger.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+        val finger_HallDatasource=new HallDatasource(finger.pkId,finger.personId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(finger_HallDatasource,HallDatasource.TABLE_V70_PERSON_FINGER)
         finger.save()
         val finger_bak = new GafisGatherFingerBak(finger)
@@ -105,7 +105,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         palm.pkId = CommonUtils.getUUID()
         palm.inputtime = new Date()
         palm.inputpsn = Gafis70Constants.INPUTPSN
-        val palm_HallDatasource=new HallDatasource(palm.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+        val palm_HallDatasource=new HallDatasource(palm.pkId,palm.personId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(palm_HallDatasource,HallDatasource.TABLE_V70_PERSON_PALM)
         palm.save()
         val palm_bak = new GafisGatherPalmBak(palm)
@@ -118,7 +118,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
         portrait.inputpsn = Gafis70Constants.INPUTPSN
         portrait.inputtime = new Date()
         portrait.deletag = Gafis70Constants.DELETAG_USE
-        val portrait_HallDatasource=new HallDatasource(portrait.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+        val portrait_HallDatasource=new HallDatasource(portrait.pkId,portrait.personid,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(portrait_HallDatasource,HallDatasource.TABLE_V70_PERSON_PORTRAIT)
         portrait.save()
         val portrait_bak = new GafisGatherPortraitBak(portrait)
@@ -136,7 +136,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
   override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
     val gafisPerson = GafisPerson.find(cardId)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
-    val person_HallDatasource=new HallDatasource(cardId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL)
+    val person_HallDatasource=new HallDatasource(cardId,cardId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_DEL)
     hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
     gafisPerson.save()
     //数据备份：数据删除
@@ -186,7 +186,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     }
 
     person.deletag = Gafis70Constants.DELETAG_USE
-    val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY)
+    val person_HallDatasource=new HallDatasource(tpCard.getStrCardID,tpCard.getStrCardID,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_MODIFY)
     hallDatasourceService.save(person_HallDatasource,HallDatasource.TABLE_V70_PERSON)
     person.save()
     //GafisPersonBak.find(GafisPersonBak.personid === person.personid).delete()
@@ -218,7 +218,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       finger.pkId = CommonUtils.getUUID()
       finger.inputtime = new Date()
       finger.inputpsn = Gafis70Constants.INPUTPSN
-      val finger_HallDatasource=new HallDatasource(finger.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+      val finger_HallDatasource=new HallDatasource(finger.pkId,finger.personId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(finger_HallDatasource,HallDatasource.TABLE_V70_PERSON_FINGER)
       finger.save()
       val finger_bak = new GafisGatherFingerBak(finger)
@@ -232,7 +232,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       palm.pkId = CommonUtils.getUUID()
       palm.inputtime = new Date()
       palm.inputpsn = Gafis70Constants.INPUTPSN
-      val palm_HallDatasource=new HallDatasource(palm.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+      val palm_HallDatasource=new HallDatasource(palm.pkId,palm.personId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(palm_HallDatasource,HallDatasource.TABLE_V70_PERSON_PALM)
       palm.save()
       val palm_bak = new GafisGatherPalmBak(palm)
@@ -248,7 +248,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       portrait.inputtime = new Date()
       portrait.inputpsn = Gafis70Constants.INPUTPSN
       portrait.deletag = Gafis70Constants.DELETAG_USE
-      val portrait_HallDatasource=new HallDatasource(portrait.pkId,"",ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
+      val portrait_HallDatasource=new HallDatasource(portrait.pkId,portrait.personid,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
       hallDatasourceService.save(portrait_HallDatasource,HallDatasource.TABLE_V70_PERSON_PORTRAIT)
       portrait.save()
       val portrait_bak = new GafisGatherPortraitBak(portrait)
