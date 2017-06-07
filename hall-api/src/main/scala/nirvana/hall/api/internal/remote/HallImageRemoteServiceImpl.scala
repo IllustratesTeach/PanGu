@@ -30,7 +30,7 @@ class HallImageRemoteServiceImpl(hallImageUrl: HallImageRemoteConfigSupport, rpc
   override def decodeGafisImage(gafisImage: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
     info("remote decodeGafisImage compressMethod(%s)".format(gafisImage.stHead.nCompressMethod))
     if(gafisImage.stHead.bIsCompressed == 0){
-      gafisImage
+      return gafisImage
     }
     val fptCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
     fptCompressMethod match {
@@ -60,7 +60,7 @@ class HallImageRemoteServiceImpl(hallImageUrl: HallImageRemoteConfigSupport, rpc
 override def encodeGafisImage2Wsq(gafisImage: GAFISIMAGESTRUCT): GAFISIMAGESTRUCT = {
   info("remote encodeGafisImage2Wsq compressMethod(%s)".format(gafisImage.stHead.nCompressMethod))
   if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_WSQ){
-    gafisImage
+    return gafisImage
   }
   val fptCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
   fptCompressMethod match {
