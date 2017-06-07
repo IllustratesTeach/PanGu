@@ -1,6 +1,5 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.HallDatasource
 import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
@@ -25,8 +24,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceS
    */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
-    val caseInfo_HallDatasource=new HallDatasource(gCase.szCaseID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Add(getDBID(dbId),
       V62Facade.TID_CASE, gCase)
   }
@@ -38,8 +35,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceS
    */
   override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
-    val caseInfo_HallDatasource=new HallDatasource(gCase.szCaseID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Update(getDBID(dbId), V62Facade.TID_CASE, gCase)
   }
 
@@ -61,8 +56,6 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceS
    * @return
    */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
-    val caseInfo_HallDatasource=new HallDatasource(caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(caseInfo_HallDatasource,HallDatasource.TABLE_V62_CASE)
     facade.NET_GAFIS_CASE_Del(config.caseTable.dbId.toShort,
       V62Facade.TID_CASE, caseId)
   }
