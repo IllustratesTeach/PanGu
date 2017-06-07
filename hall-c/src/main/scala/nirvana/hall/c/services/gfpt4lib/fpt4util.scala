@@ -235,8 +235,12 @@ object fpt4util {
       szSP2 = "%02d".format(nScope)
     }
     val nReliability = UTIL_Reliability_MntDisp2FPT(stCoreDelta.nReliability, nType)
+    var nRadius = stCoreDelta.nRadius
+    //TODO 位置半径校验，暂时对不符合要求（两位整数）默认设置30
+    if(nRadius > 100 || nRadius < 0)
+      nRadius = 30
 
-    "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, stCoreDelta.nRadius, szSP3, szSP2, nReliability)
+    "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
   }
 
   /**
