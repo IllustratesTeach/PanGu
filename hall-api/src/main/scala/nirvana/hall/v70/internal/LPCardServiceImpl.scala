@@ -44,17 +44,11 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       caseFinger.modifiedpsn = ""
     }
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
-
-    val caseFinger_HallDatasource=new HallDatasource(caseFinger.fingerId,caseFinger.fingerId,ip_source,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(caseFinger_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER)
     caseFinger.save()
-
 
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
-    val caseFingerMnt_HallDatasource=new HallDatasource(caseFinger.inputpsn,caseFinger.fingerId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(caseFingerMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER_MNT)
     caseFingerMnt.save()
 
     val caseFinger_bak = new GafisCaseFingerBak(caseFinger)
@@ -102,8 +96,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       caseFinger.modifiedpsn = ""
     }
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
-    val caseFinger_HallDatasource=new HallDatasource(caseFinger.fingerId,caseFinger.fingerId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(caseFinger_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER)
     caseFinger.save()
 
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
@@ -112,8 +104,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     caseFingerMnt.pkId = CommonUtils.getUUID()
     caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
-    val caseFingerMnt_HallDatasource=new HallDatasource(caseFingerMnt.pkId,caseFinger.fingerId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(caseFingerMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER_MNT)
     caseFingerMnt.save()
     //数据备份：数据更新
     GafisCaseFingerBak.delete.where(GafisCaseFingerBak.fingerId === caseFinger.fingerId).execute
@@ -136,14 +126,9 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     //    GafisCaseFinger.find(cardId).delete
     val gafisCaseFingerMnt = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === cardId).headOption.get
     gafisCaseFingerMnt.deletag = Gafis70Constants.DELETAG_DEL
-    val caseFingerMnt_HallDatasource=new HallDatasource(cardId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(caseFingerMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER_MNT)
     gafisCaseFingerMnt.save()
     GafisCaseFinger.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
-    val caseFinger_HallDatasource=new HallDatasource(cardId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(caseFinger_HallDatasource,HallDatasource.TABLE_V70_CASE_FINGER)
     GafisCaseFinger.update
-
     //数据备份：标记删除
     var gafisCaseFingerMnt_bak = GafisCaseFingerMntBak.where(GafisCaseFingerMntBak.fingerId === cardId).headOption.get
     if (gafisCaseFingerMnt_bak != null) {
