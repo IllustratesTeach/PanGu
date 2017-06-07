@@ -36,8 +36,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
-    val gafisCase_HallDatasource=new HallDatasource(gafisCase.caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     gafisCase.save()
     val gafisCase_bak = new GafisCaseBak(gafisCase)
     gafisCase_bak.save()
@@ -79,8 +77,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
-    val gafisCase_HallDatasource=new HallDatasource(gafisCase.caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     gafisCase.save()
 
     //删除原来的逻辑库
@@ -127,8 +123,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     * @return
     */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
-    val gafisCase_HallDatasource=new HallDatasource(caseId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(gafisCase_HallDatasource,HallDatasource.TABLE_V70_CASE)
     GafisCase.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCase.caseId === caseId).execute
     if (GafisCaseBak.find(GafisCaseBak.caseId === caseId) != null) {
       GafisCaseBak.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCaseBak.caseId === caseId).execute
