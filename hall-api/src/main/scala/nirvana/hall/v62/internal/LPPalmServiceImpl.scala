@@ -21,8 +21,6 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceSer
   override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     //转换为c的结构
     val gLPCard= galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
-    val laPalm_HallDatasource=new HallDatasource(gLPCard.szCardID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(laPalm_HallDatasource,HallDatasource.TABLE_V62_LATPALM)
     //调用实现方法
     facade.NET_GAFIS_FLIB_Add(getDBID(dbId),
       V62Facade.TID_LATPALM,
@@ -48,8 +46,6 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceSer
    */
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
-    val laPalm_HallDatasource=new HallDatasource(gLPCard.szCardID,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(laPalm_HallDatasource,HallDatasource.TABLE_V62_LATPALM)
     facade.NET_GAFIS_FLIB_Update(getDBID(dbId),
       V62Facade.TID_LATPALM,
       lpCard.getStrCardID, gLPCard)
@@ -61,8 +57,6 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceSer
    * @return
    */
   override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
-    val laPalm_HallDatasource=new HallDatasource(cardId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(laPalm_HallDatasource,HallDatasource.TABLE_V62_LATPALM)
     facade.NET_GAFIS_FLIB_Del(getDBID(dbId), V62Facade.TID_LATPALM, cardId)
   }
 
