@@ -145,6 +145,13 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     */
   override def isExist(caseId: String, dbId: Option[String]): Boolean = {
     GafisCase.findOption(caseId).nonEmpty
+    var result=false
+    if(GafisCase.findOption(caseId).nonEmpty){
+      val caseinfo=GafisCase.findOption(caseId).get
+      if(caseinfo.deletag.equals("1"))
+        result=true
+    }
+    result
   }
 
   /**

@@ -44,7 +44,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
       casePalm.modifiedpsn = ""
     }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
-    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
+    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
     hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     casePalm.save()
     val casePalm_bak = new GafisCasePalmBak(casePalm)
@@ -54,7 +54,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
-    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
+    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
     hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     casePalmMnt.save()
     val casePalmMnt_bak = new GafisCasePalmMntBak(casePalmMnt)
@@ -98,7 +98,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
       casePalm.modifiedpsn = ""
     }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
-    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
+    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
     hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     casePalm.save()
 
@@ -108,7 +108,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
-    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
+    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
     hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     casePalmMnt.save()
 
@@ -133,11 +133,11 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
 
     val gafisCasePalmMnt = GafisCasePalmMnt.where(GafisCasePalmMnt.palmId === cardId).headOption.get
     gafisCasePalmMnt.deletag = Gafis70Constants.DELETAG_DEL
-    val casePalmMnt_HallDatasource=new HallDatasource(gafisCasePalmMnt.pkId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
+    val casePalmMnt_HallDatasource=new HallDatasource(gafisCasePalmMnt.pkId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
     hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     gafisCasePalmMnt.save()
     GafisCasePalm.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
-    val casePalm_HallDatasource=new HallDatasource(cardId,"",ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
+    val casePalm_HallDatasource=new HallDatasource(cardId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
     hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     GafisCasePalm.update
     //数据备份：标记删除
@@ -160,6 +160,13 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisCasePalm.findOption(cardId).nonEmpty
+    var result=false
+    if(GafisCasePalm.findOption(cardId).nonEmpty){
+      val palm=GafisCasePalm.findOption(cardId).get
+      if(palm.deletag.equals("1"))
+        result=true
+    }
+    result
   }
 
   /**
