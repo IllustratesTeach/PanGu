@@ -58,8 +58,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
    * @return
    */
   private def getMinSeq(from: Long, tableName: String): Long = {
-    val source = tableName.split("_", -1)
-    val sql = s"select  min(t.seq) from hall_${tableName} t where t.sid not in (select t1.serviceid from hall_datasource_${source(1)} t1 where  t1.status != '0') and t.seq > ${from}"
+    val sql = s"select min(seq) from hall_${tableName} t where seq > ${from}"
     getSeqBySql(sql)
   }
 
@@ -68,8 +67,7 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) extends LoggerSu
   }
 
   def getSyncSql(tableName: String, cardId: String): String ={
-    val source = tableName.split("_", -1)
-    s"select t.seq,t.sid from hall_${tableName} t where t.sid not in (select t1.serviceid from hall_datasource_${source(1)} t1 where  t1.status != '0') and t.seq >=? and t.seq<=?"
+    s"select sid, seq from hall_${tableName} t where seq >=? and seq <=? order by seq"
   }
 
   /**
