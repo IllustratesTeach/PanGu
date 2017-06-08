@@ -10,8 +10,8 @@ import scala.collection.mutable.ArrayBuffer
   * Created by songpeng on 16/8/22.
   */
 class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataFetcher with FetchLPCardService{
-  //override val SYNC_SQL: String = "select t.finger_id as sid, t.seq from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
-  override val SYNC_SQL: String = "select t.finger_id as sid, t.seq from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <= ? and t.finger_id not in (select h.serviceid from hall_ds_person h where h.status != '0')"
+  override val SYNC_SQL: String = "select t.finger_id as sid, t.seq from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
+  //override val SYNC_SQL: String = "select t.finger_id as sid, t.seq from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <= ? and t.finger_id not in (select h.serviceid from hall_ds_person h where h.status != '0')"
 
   /**
     * 获取最大的seq值
@@ -27,8 +27,8 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
     * @return
     */
   override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    //getSeqBySql(s"select min(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} ")
-    getSeqBySql(s"select min(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} and t.finger_id not in (select t1.serviceid from hall_ds_case_finger t1 where t1.status != '0')")
+    getSeqBySql(s"select min(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} ")
+    //getSeqBySql(s"select min(t.seq) from gafis_case_finger t left join gafis_logic_db_case db on t.case_id=db.case_pkid where db.logic_db_pkid='${dbId.get}' and t.seq > ${from} and t.finger_id not in (select t1.serviceid from hall_ds_case_finger t1 where t1.status != '0')")
   }
 
   /**
