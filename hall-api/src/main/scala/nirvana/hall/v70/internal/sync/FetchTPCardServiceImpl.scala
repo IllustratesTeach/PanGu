@@ -3,6 +3,8 @@ package nirvana.hall.v70.internal.sync
 import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchTPCardService
+import nirvana.hall.protocol.api.FPTProto.TPCard
+import org.apache.tapestry5.json.JSONObject
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -10,8 +12,8 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/8/18.
  */
 class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFetcher with FetchTPCardService{
-  //override val SYNC_SQL: String = "select t.personid as sid, t.seq from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
-  override val SYNC_SQL: String = "select t.personid as sid, t.seq from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=? and t.personid not in (select h.serviceid from HALL_DS_PERSON h where h.status != '0')"
+  override val SYNC_SQL: String = "select t.personid as sid, t.seq from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=?"
+  //override val SYNC_SQL: String = "select t.personid as sid, t.seq from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid =? and t.seq >=? and t.seq <=? and t.personid not in (select h.serviceid from HALL_DS_PERSON h where h.status != '0')"
 
 
   /**
@@ -40,7 +42,17 @@ class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
    * @return
    */
   override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: DataSource): Long = {
-    // getSeqBySql(s"select min(seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} ")
-    getSeqBySql(s"select min(t.seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} and t.personid not in (select t1.serviceid from hall_ds_person t1 where t1.status != '0')")
+     getSeqBySql(s"select min(seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} ")
+    //getSeqBySql(s"select min(t.seq) from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid where db.logic_db_pkid='${dbId.get}' and t.seq >${from} and t.personid not in (select t1.serviceid from hall_ds_person t1 where t1.status != '0')")
+  }
+
+  override def validateByReadStrategy(tpCard: TPCard, readStrategy: String): Boolean = {
+    val datasources=tpCard.getStrDataSource
+    val strategy = new JSONObject(readStrategy)
+    var isdatasource=if (strategy.has("dataSource")) true else false
+    if (isdatasource){
+      isdatasource=strategy.getString("dataSource").contains(datasources)
+    }
+    isdatasource
   }
 }
