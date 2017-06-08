@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal.sync
 import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchCaseInfoService
+import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
@@ -15,7 +16,8 @@ class FetchCaseInfoServiceImpl (implicit dataSource: DataSource) extends SyncDat
 
   /**
    * 获取案件列表
-   * @param seq
+    *
+    * @param seq
    * @param size
    * @param dbId
    */
@@ -25,4 +27,13 @@ class FetchCaseInfoServiceImpl (implicit dataSource: DataSource) extends SyncDat
     doFetcher(cardIdList, seq, size, tableName)
     cardIdList
   }
+
+  /**
+    * 验证读取策略
+    *
+    * @param caseInfo
+    * @param readStrategy
+    * @return
+    */
+  override def validateByReadStrategy(caseInfo: Case, readStrategy: String): Boolean = ???
 }

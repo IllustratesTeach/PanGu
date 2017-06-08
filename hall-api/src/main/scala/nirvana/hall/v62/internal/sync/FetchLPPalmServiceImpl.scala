@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal.sync
 import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchLPPalmService
+import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
@@ -14,7 +15,8 @@ class FetchLPPalmServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
    override val KEY_NAME: String = "palmid"
    /**
     * 获取案件列表
-    * @param seq
+     *
+     * @param seq
     * @param size
     * @param dbId
     */
@@ -25,4 +27,12 @@ class FetchLPPalmServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
      cardIdList
    }
 
- }
+  /**
+    * 验证读取策略
+    *
+    * @param lPCard
+    * @param readStrategy
+    * @return
+    */
+  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = ???
+}

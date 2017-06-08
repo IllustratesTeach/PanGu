@@ -3,6 +3,7 @@ package nirvana.hall.v62.internal.sync
 import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchTPCardService
+import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.internal.V62Facade
 
 import scala.collection.mutable.ArrayBuffer
@@ -19,4 +20,12 @@ class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
     cardIdList.toSeq
   }
 
+  /**
+    * 验证读取策略
+    *
+    * @param tpCard
+    * @param readStrategy
+    * @return
+    */
+  override def validateByReadStrategy(tpCard: TPCard, readStrategy: String): Boolean = ???
 }
