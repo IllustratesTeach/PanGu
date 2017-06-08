@@ -21,5 +21,5 @@ trait FetchCaseInfoService {
    * @param readStrategy
    * @return
    */
-  def validateByReadStrategy(caseInfo: Case, readStrategy: String): Boolean = true //TODO
+  def validateByReadStrategy(caseInfo: Case, readStrategy: String): Boolean
 }

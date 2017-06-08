@@ -21,5 +21,5 @@ trait FetchTPCardService {
    * @param readStrategy
    * @return
    */
-  def validateByReadStrategy(tpCard: TPCard, readStrategy: String): Boolean = true //TODO
+  def validateByReadStrategy(tpCard: TPCard, readStrategy: String): Boolean
 }

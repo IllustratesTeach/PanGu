@@ -20,5 +20,5 @@ trait FetchLPCardService {
    * @param readStrategy
    * @return
    */
-  def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = true //TODO
+  def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean
 }
