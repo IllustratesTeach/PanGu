@@ -1,11 +1,10 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.HallDatasource
 import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisCaseBak, _}
+import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,8 +36,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_GAFIS6.toString
     gafisCase.save()
-    val gafisCase_bak = new GafisCaseBak(gafisCase)
-    gafisCase_bak.save()
     val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
     }else{
@@ -50,8 +47,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     logicDbCase.logicDbPkid = logicDb.pkId
     logicDbCase.casePkid = gafisCase.caseId
     logicDbCase.save()
-    val logicDbCase_bak = new GafisLogicDbCaseBak(logicDbCase)
-    logicDbCase_bak.save()
   }
 
   /**
@@ -94,13 +89,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     logicDbCase.casePkid = gafisCase.caseId
     logicDbCase.save()
 
-    //数据备份：数据更新
-    GafisCaseBak.find_by_caseId(gafisCase.caseId).foreach(_.delete())
-    val gafisCase_bak = new GafisCaseBak(gafisCase)
-    gafisCase_bak.save()
-    GafisLogicDbCaseBak.find_by_casePkid(gafisCase.caseId).foreach(_.delete())
-    val logicDbCase_bak = new GafisLogicDbCaseBak(logicDbCase)
-    logicDbCase_bak.save()
   }
 
   /**
@@ -124,12 +112,6 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
     GafisCase.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCase.caseId === caseId).execute
-    if (GafisCaseBak.find(GafisCaseBak.caseId === caseId) != null) {
-      GafisCaseBak.update.set(deletag = Gafis70Constants.DELETAG_DEL).where(GafisCaseBak.caseId === caseId).execute
-    } else {
-      val gafiscase_bak = new GafisCaseBak(GafisCase.find(caseId))
-      gafiscase_bak.save()
-    }
   }
 
   /**

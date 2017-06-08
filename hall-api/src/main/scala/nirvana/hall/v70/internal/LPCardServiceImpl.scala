@@ -3,13 +3,11 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallDatasource
 import nirvana.hall.api.services.{HallDatasourceService, LPCardService}
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.sys.UserService
-import org.springframework.beans.BeanUtils
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -50,11 +48,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
-
-    val caseFinger_bak = new GafisCaseFingerBak(caseFinger)
-    caseFinger_bak.save()
-    val caseFingerMnt_bak = new GafisCaseFingerMntBak(caseFingerMnt)
-    caseFingerMnt_bak.save()
     info("addLPCard cardId:{}", lpCard.getStrCardID)
   }
 
@@ -105,13 +98,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
-    //数据备份：数据更新
-    GafisCaseFingerBak.delete.where(GafisCaseFingerBak.fingerId === caseFinger.fingerId).execute
-    val caseFinger_bak = new GafisCaseFingerBak(caseFinger)
-    caseFinger_bak.save()
-    GafisCaseFingerMntBak.delete.where(GafisCaseFingerMntBak.fingerId === caseFinger.fingerId).execute
-    val caseFingerMnt_bak = new GafisCaseFingerMntBak(caseFingerMnt)
-    caseFingerMnt_bak.save()
     info("updateLPCard cardId:{}", lpCard.getStrCardID)
   }
 
@@ -129,22 +115,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     gafisCaseFingerMnt.save()
     GafisCaseFinger.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
     GafisCaseFinger.update
-    //数据备份：标记删除
-    var gafisCaseFingerMnt_bak = GafisCaseFingerMntBak.where(GafisCaseFingerMntBak.fingerId === cardId).headOption.get
-    if (gafisCaseFingerMnt_bak != null) {
-      gafisCaseFingerMnt_bak.deletag = Gafis70Constants.DELETAG_DEL
-      gafisCaseFingerMnt_bak.save()
-    } else {
-      gafisCaseFingerMnt_bak = new GafisCaseFingerMntBak(gafisCaseFingerMnt)
-      gafisCaseFingerMnt_bak.save()
-    }
-    if (GafisCaseFingerBak.find(cardId) != null) {
-      GafisCaseFingerBak.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
-      GafisCaseFingerBak.update
-    } else {
-      val gafisCaseFinger_bak = new GafisCaseFingerBak(GafisCaseFinger.find(cardId))
-      gafisCaseFinger_bak.save()
-    }
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
