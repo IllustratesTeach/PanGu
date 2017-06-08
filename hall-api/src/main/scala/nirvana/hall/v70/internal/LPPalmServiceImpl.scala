@@ -3,7 +3,6 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallDatasource
 import nirvana.hall.api.services.{HallDatasourceService, LPPalmService}
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -44,21 +43,13 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
       casePalm.modifiedpsn = ""
     }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
-    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     casePalm.save()
-    val casePalm_bak = new GafisCasePalmBak(casePalm)
-    casePalm_bak.save()
 
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
-    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_ADD)
-    hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     casePalmMnt.save()
-    val casePalmMnt_bak = new GafisCasePalmMntBak(casePalmMnt)
-    casePalmMnt_bak.save()
     info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
 
@@ -98,8 +89,6 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
       casePalm.modifiedpsn = ""
     }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
-    val casePalm_HallDatasource=new HallDatasource(casePalm.palmId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     casePalm.save()
 
     val casePalmMnt = ProtobufConverter.convertLPCard2GafisCasePalmMnt(lpCard)
@@ -108,17 +97,8 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
     casePalmMnt.pkId = CommonUtils.getUUID()
     casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
-    val casePalmMnt_HallDatasource=new HallDatasource(casePalmMnt.pkId,casePalm.palmId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_MODIFY)
-    hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     casePalmMnt.save()
 
-    //数据备份：数据更新
-    GafisCasePalmBak.delete.where(GafisCasePalmBak.palmId === casePalm.palmId).execute
-    val casePalm_bak = new GafisCasePalmBak(casePalm)
-    casePalm_bak.save()
-    GafisCasePalmMntBak.delete.where(GafisCasePalmMntBak.palmId === casePalm.palmId).execute
-    val casePalmMnt_bak = new GafisCasePalmMntBak(casePalmMnt)
-    casePalmMnt_bak.save()
     info("addLPPalm cardId:{}", lpCard.getStrCardID)
   }
 
@@ -133,29 +113,9 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
 
     val gafisCasePalmMnt = GafisCasePalmMnt.where(GafisCasePalmMnt.palmId === cardId).headOption.get
     gafisCasePalmMnt.deletag = Gafis70Constants.DELETAG_DEL
-    val casePalmMnt_HallDatasource=new HallDatasource(gafisCasePalmMnt.pkId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(casePalmMnt_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM_MNT)
     gafisCasePalmMnt.save()
     GafisCasePalm.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
-    val casePalm_HallDatasource=new HallDatasource(cardId,cardId,ip_source,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL,HallDatasource.SERVICE_TYPE_SYNC,HallDatasource.OPERATION_TYPE_DEL)
-    hallDatasourceService.save(casePalm_HallDatasource,HallDatasource.TABLE_V70_CASE_PALM)
     GafisCasePalm.update
-    //数据备份：标记删除
-    var gafisCasePalmMnt_bak = GafisCasePalmMntBak.where(GafisCasePalmMntBak.palmId === cardId).headOption.get
-    if (gafisCasePalmMnt_bak != null) {
-      gafisCasePalmMnt_bak.deletag = Gafis70Constants.DELETAG_DEL
-      gafisCasePalmMnt_bak.save()
-    } else {
-      gafisCasePalmMnt_bak = new GafisCasePalmMntBak(gafisCasePalmMnt)
-      gafisCasePalmMnt_bak.save()
-    }
-    if (GafisCasePalmBak.find(cardId) != null) {
-      GafisCasePalmBak.find(cardId).deletag = Gafis70Constants.DELETAG_DEL
-      GafisCasePalmBak.update
-    } else {
-      val gafisCasePalm_bak = new GafisCasePalmBak(GafisCasePalm.find(cardId))
-      gafisCasePalm_bak.save()
-    }
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
