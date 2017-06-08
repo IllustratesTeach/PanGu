@@ -195,8 +195,10 @@ message	TPCard
 	optional string		strPersonID = 2;    //人员编号
 	optional TPCardText	text = 3;
 	repeated TPCardBlob	blob = 4;
-	optional AdminfoData admData = 5;	//操作信息
+	optional AdminfoData admData = 5;	 //操作信息
 	optional string strMisPersonID = 6;	 //重卡组号
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 7;   //数据来源类型
 
 }
 
@@ -238,6 +240,8 @@ message	Case
 
 	optional CaseText	text = 6;
 	optional AdminfoData admData = 7;		//操作信息
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 8;   //数据来源类型
 }
 
 message	LPCard
@@ -274,6 +278,8 @@ message	LPCard
 	optional LPCardText	text = 2;
 	optional LPCardBlob	blob = 3;
 	optional AdminfoData admData = 4;
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 5;   //数据来源类型
 }
 
 message	TLLTHitLog

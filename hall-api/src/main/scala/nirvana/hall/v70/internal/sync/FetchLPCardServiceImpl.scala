@@ -3,6 +3,8 @@ package nirvana.hall.v70.internal.sync
 import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchLPCardService
+import nirvana.hall.protocol.api.FPTProto.LPCard
+import org.apache.tapestry5.json.JSONObject
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -15,6 +17,7 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
 
   /**
     * 获取最大的seq值
+    *
     * @return
     */
   override def getMaxSeq(dbId: Option[String])(implicit dataSource: DataSource): Long = {
@@ -23,6 +26,7 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
 
   /**
     * 获取最小的seq值, 大于from
+    *
     * @param from
     * @return
     */
@@ -33,6 +37,7 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
 
   /**
     * 获取案件列表
+    *
     * @param seq
     * @param size
     * @param dbId
@@ -41,5 +46,22 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
     val cardIdList = new ArrayBuffer[(String, Long)]()
     doFetcher(cardIdList, seq, size, dbId)
     cardIdList
+  }
+
+  /**
+    * 验证读取策略
+    *
+    * @param lPCard
+    * @param readStrategy
+    * @return
+    */
+  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = {
+    val datasources=lPCard.getStrDataSource
+    val strategy = new JSONObject(readStrategy)
+    var isdatasource=if (strategy.has("dataSource")) true else false
+    if (isdatasource){
+      isdatasource=strategy.getString("dataSource").contains(datasources)
+    }
+    isdatasource
   }
 }

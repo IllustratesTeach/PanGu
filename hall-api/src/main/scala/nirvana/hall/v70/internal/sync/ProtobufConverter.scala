@@ -80,6 +80,7 @@ object ProtobufConverter extends LoggerSupport{
   def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
+    caseBuilder.setStrDataSource(caseInfo.caseSource)
 
     val textBuilder = caseBuilder.getTextBuilder
     magicSet(caseInfo.caseClassCode, textBuilder.setStrCaseType1)
@@ -319,6 +320,7 @@ object ProtobufConverter extends LoggerSupport{
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)
+    tpCard.setStrDataSource(person.dataSources.toString)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
