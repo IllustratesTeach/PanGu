@@ -163,13 +163,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
         }
         seq = response.getSeq
-        if(fetchConfig != response.getSeq){
+        if(seq > 0 && fetchConfig.seq != seq){
           //更新配置seq
           fetchConfig.seq = seq
           updateSeq(fetchConfig)
-        }
-        //如果获取到数据递归获取
-        if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
           fetchTPCard(fetchConfig, update)
         }
       } else {
