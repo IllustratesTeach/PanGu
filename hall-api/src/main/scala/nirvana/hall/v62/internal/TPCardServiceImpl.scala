@@ -14,7 +14,6 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames._
  * Created by songpeng on 16/1/26.
  */
 class TPCardServiceImpl(facade:V62Facade,config:HallV62Config,hallDatasourceService:HallDatasourceService) extends TPCardService{
-  var ip_source=""
   /**
    * 新增捺印卡片
    * @param tPCard
@@ -197,12 +196,4 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config,hallDatasourceServ
     }
   }
 
-  /**
-    * 赋值来源url
-    *
-    * @param url
-    */
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

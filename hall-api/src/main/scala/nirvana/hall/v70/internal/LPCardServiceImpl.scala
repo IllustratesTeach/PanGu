@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional
   * Created by songpeng on 16/1/26.
   */
 class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, hallDatasourceService: HallDatasourceService) extends LPCardService with LoggerSupport{
-  var ip_source=""
 
   /**
     * 新增现场卡片
@@ -128,11 +127,4 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     result
   }
 
-  /**
-    * 赋值来源url
-    * @param url
-    */
-  override def cutIP(url: String): Unit ={
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

@@ -10,7 +10,6 @@ import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
  * Created by songpeng on 16/1/26.
  */
 class LPCardServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService: HallDatasourceService) extends LPCardService{
-  var ip_source=""
 
   /**
    * 新增现场卡片
@@ -75,11 +74,4 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceSer
     }
   }
 
-  /**
-    * 赋值来源url
-    * @param url
-    */
-  override def cutIP(url: String): Unit ={
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

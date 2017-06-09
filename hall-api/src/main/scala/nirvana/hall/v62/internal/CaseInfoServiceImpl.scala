@@ -15,7 +15,6 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/1/26.
  */
 class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService:HallDatasourceService) extends CaseInfoService{
-  var ip_source=""
 
   /**
    * 新增案件信息
@@ -159,14 +158,5 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceS
     }else{
       dbId.get.toShort
     }
-  }
-
-  /**
-    * 赋值来源url
-    * @param url
-    */
-
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
   }
 }

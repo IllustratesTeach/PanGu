@@ -84,7 +84,7 @@ object gaqryqueConverter extends LoggerSupport{
     queryStruct.pstInfo_Data.szUserUnitCode= matchTask.getUserUnitCode  //提交用户单位代码
     queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
 
-    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_LOCAL.toByte //本地查询
+    queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     if(matchTask.getQueryid.nonEmpty){
       queryStruct.stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(matchTask.getQueryid.toLong) //远程查询ID
@@ -166,6 +166,9 @@ object gaqryqueConverter extends LoggerSupport{
 
     itemHead.writeToStreamWriter(buffer)
     item.writeToStreamWriter(buffer)
+
+    itemHead2.writeToStreamWriter(buffer)
+    buffer.writeBytes(xmlData)
 
     val bytes = buffer.array()
     queryStruct.pstQryCond_Data = bytes

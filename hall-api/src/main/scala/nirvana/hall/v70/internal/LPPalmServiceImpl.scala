@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional
   * 现场掌纹service实现
   */
 class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,hallDatasourceService: HallDatasourceService) extends LPPalmService with LoggerSupport{
-  var ip_source=""
 
   /**
     * 新增现场卡片
@@ -129,12 +128,4 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,h
     result
   }
 
-  /**
-    * 赋值来源url
-    *
-    * @param url
-    */
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

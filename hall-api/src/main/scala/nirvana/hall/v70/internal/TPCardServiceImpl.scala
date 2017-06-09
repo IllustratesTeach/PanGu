@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
  * Created by songpeng on 16/1/26.
  */
 class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, hallDatasourceService:HallDatasourceService) extends TPCardService with LoggerSupport{
-  var ip_source=""  /**
+  /**
    * 获取捺印卡信息
    * @param personId
    * @return
@@ -239,12 +239,4 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
     */
   override def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec] = ???
 
-  /**
-    * 赋值来源url
-    * @param url
-    */
-
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

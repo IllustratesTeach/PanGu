@@ -61,10 +61,4 @@ trait CaseInfoService {
     */
   def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec]
 
-  /**
-    * 赋值来源url
-    *
-    * @param url
-    */
-  def cutIP(url: String): Unit
 }

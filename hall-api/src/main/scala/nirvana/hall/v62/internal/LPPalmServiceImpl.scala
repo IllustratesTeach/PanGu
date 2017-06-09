@@ -1,6 +1,5 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.HallDatasource
 import nirvana.hall.api.services.{HallDatasourceService, LPPalmService}
 import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.LPCard
@@ -11,7 +10,6 @@ import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
  * 现场掌纹service实现
  */
 class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService:HallDatasourceService) extends LPPalmService{
-  var ip_source=""
 
   /**
    * 新增现场卡片
@@ -76,11 +74,4 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceSer
     }
   }
 
-  /**
-    * 赋值来源url
-    * @param url
-    */
-  override def cutIP(url: String): Unit ={
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

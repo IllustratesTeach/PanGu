@@ -28,7 +28,6 @@ import scala.collection.mutable.ArrayBuffer
  * Created by songpeng on 16/1/26.
  */
 class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
-  var ip_source=""
   /**
    * 发送查询任务
    * @param matchTask
@@ -277,12 +276,4 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gaQuery
   }
 
-  /**
-    * 赋值来源url
-    *
-    * @param url
-    */
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

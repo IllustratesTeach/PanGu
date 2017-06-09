@@ -43,10 +43,6 @@
       <groupId>com.ganshane.monad</groupId>
       <artifactId>monad-support</artifactId>
     </dependency>
-<!--    <dependency>
-      <groupId>com.ganshane.monad</groupId>
-      <artifactId>monad-migration</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>com.ganshane.stark</groupId>
       <artifactId>stark-migration_2.11</artifactId>
@@ -54,6 +50,10 @@
     <dependency>
       <groupId>com.ganshane.stark</groupId>
       <artifactId>stark-webservice_2.11</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.ganshane.stark</groupId>
+      <artifactId>stark-activerecord-generator_2.11</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ganshane.monad</groupId>

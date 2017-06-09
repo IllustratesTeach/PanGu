@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
   * Created by songpeng on 16/1/26.
   */
 class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallDatasourceService) extends CaseInfoService{
-  var ip_source=""
 
   /**
     * 新增案件信息
@@ -147,12 +146,4 @@ class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallD
     throw new UnsupportedOperationException
   }
 
-  /**
-    * 赋值来源url
-    * @param url
-    */
-
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }

@@ -17,7 +17,6 @@ import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
  * Created by songpeng on 16/1/26.
  */
 class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryService{
-  var ip_source=""
   /**
     * 通过卡号查找第一个的比中结果
     *
@@ -216,13 +215,4 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
   }
 
-
-  /**
-    * 赋值来源url
-    *
-    * @param url
-    */
-  override def cutIP(url: String): Unit = {
-    ip_source=url.split(":", -1)(1).substring(2)
-  }
 }
