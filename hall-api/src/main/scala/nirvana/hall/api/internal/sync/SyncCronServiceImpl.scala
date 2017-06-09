@@ -217,6 +217,13 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           cardId = lpCard.getStrCardID
           if (syncLPCard.getOperationType == OperationType.PUT &&
             validateLPCardByWriteStrategy(lpCard, fetchConfig.writeStrategy)) {
+
+            //读取策略信息,设置DataSource
+            val strategy = new JSONObject(fetchConfig.writeStrategy)
+            if(strategy.has("setdatasource")){
+              lpCard = lpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+            }
+
             //如果没有案件编号，截掉指纹编号后两位作为案件编号
             var caseId = lpCard.getText.getStrCaseId
             if(caseId.trim.length == 0){
@@ -266,8 +273,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
         }
         seq = response.getSeq
-        //如果获取到数据递归获取
-        if(response.getSyncLPCardCount > 0 && fetchConfig.seq != seq){
+        if(seq > 0 && fetchConfig.seq != seq){
           //更新配置seq
           fetchConfig.seq = seq
           updateSeq(fetchConfig)

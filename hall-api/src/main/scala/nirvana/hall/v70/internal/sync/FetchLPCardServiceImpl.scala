@@ -56,12 +56,35 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
     * @return
     */
   override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = {
-    val datasources=lPCard.getStrDataSource
+
     val strategy = new JSONObject(readStrategy)
-    var isdatasource=if (strategy.has("dataSource")) true else false
-    if (isdatasource){
-      isdatasource=strategy.getString("dataSource").contains(datasources)
+    if(strategy.has("datasource")){
+      val dataSourceStrategy = strategy.getString("datasource")
+      val dataSource = lPCard.getStrDataSource
+      if(dataSourceStrategy.startsWith("!")){
+        if(dataSource.equals(dataSourceStrategy.substring(1,dataSourceStrategy.length))){
+          return false
+        }
+      }else{
+        if(!dataSource.equals(dataSourceStrategy)){
+          return false
+        }
+      }
     }
-    isdatasource
+
+    if(strategy.has("cardid")){
+      val cardIdStrategy = strategy.getString("cardid")
+      val cardId = lPCard.getStrCardID
+      if(cardIdStrategy.startsWith("=")){
+        if(!cardId.startsWith(cardIdStrategy.substring(1,cardIdStrategy.length))){
+          return false
+        }
+      }else{
+        if(!cardId.startsWith(cardIdStrategy)){
+          return false
+        }
+      }
+    }
+    true
   }
 }

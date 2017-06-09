@@ -35,7 +35,20 @@ trait SyncCronService {
     flag
   }
 
-  def validateLPCardByWriteStrategy(lpCard: LPCard, writeStrategy: String): Boolean = true //TODO
+  def validateLPCardByWriteStrategy(lpCard: LPCard, writeStrategy: String): Boolean = {
+    var flag = true
+    val strategy = new JSONObject(writeStrategy)
+    if (strategy.has("cardid")){
+      val cardId = lpCard.getStrCardID
+      val cardStrategy = strategy.getString("cardid")
+      if(cardStrategy.startsWith("!")){
+        flag = !cardId.startsWith(cardStrategy.substring(1,cardStrategy.length))
+      }else{
+        flag = cardId.startsWith(cardStrategy)
+      }
+    }
+    flag
+  }
 
   def validateMatchTaskByWriteStrategy(matchTask: MatchTask, writeStrategy: String): Boolean = true //TODO
 
