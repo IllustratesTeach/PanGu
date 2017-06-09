@@ -122,10 +122,16 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         var exception_type=0 //异常类型判断
         while (iter.hasNext) {
           val syncTPCard = iter.next()
-          val tpCard = syncTPCard.getTpCard
+          var tpCard = syncTPCard.getTpCard
           cardId = tpCard.getStrCardID
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
+            //读取策略信息,设置DataSource
+            val strategy = new JSONObject(fetchConfig.writeStrategy)
+            if(strategy.has("setdatasource")){
+              tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+            }
+
             //逻辑分库处理
             destDBID = logicDBJudgeService.logicTJudge(cardId,Option(fetchConfig.destDbid))
             //验证本地是否存在
@@ -157,11 +163,13 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
         }
         seq = response.getSeq
-        //如果获取到数据递归获取
-        if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
+        if(fetchConfig != response.getSeq){
           //更新配置seq
           fetchConfig.seq = seq
           updateSeq(fetchConfig)
+        }
+        //如果获取到数据递归获取
+        if(response.getSyncTPCardCount > 0 && fetchConfig.seq != seq){
           fetchTPCard(fetchConfig, update)
         }
       } else {

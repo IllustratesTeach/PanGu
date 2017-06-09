@@ -62,7 +62,7 @@ message SyncTPCardResponse{
         optional SyncTPCardResponse cmd = 10601;
     }
     repeated SyncTPCard syncTPCard = 1;
-    optional int64 seq = 2;
+    required int64 seq = 2;
 }
 //同步LPCard
 message SyncLPCardRequest{
@@ -82,7 +82,7 @@ message SyncLPCardResponse{
         optional SyncLPCardResponse cmd = 10603;
     }
     repeated SyncLPCard syncLPCard = 1;
-    optional int64 seq = 2;
+    required int64 seq = 2;
 }
 
 //同步Case
@@ -104,7 +104,7 @@ message SyncCaseResponse{
         optional SyncCaseResponse cmd = 10605;
     }
     repeated SyncCase syncCase = 1;
-    optional int64 seq = 2;
+    required int64 seq = 2;
 }
 
 //同步LPPalm
@@ -125,7 +125,7 @@ message SyncLPPalmResponse{
         optional SyncLPPalmResponse cmd = 10607;
     }
     repeated SyncLPCard syncLPCard = 1;
-    optional int64 seq = 2;
+    required int64 seq = 2;
 }
 
 //同步比对任务

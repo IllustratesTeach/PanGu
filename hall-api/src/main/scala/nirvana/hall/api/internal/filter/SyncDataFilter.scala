@@ -40,6 +40,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       var status=0 //SEQ状态更新结果
       try{
         val responseBuilder = SyncTPCardResponse.newBuilder()
+        responseBuilder.setSeq(request.getSeq)
         val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
@@ -60,10 +61,9 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                 typ_add="_PUT"
               }
             } else {
-              //如果卡号不存在，删除
-              val syncTPCard = responseBuilder.addSyncTPCardBuilder()
               val tpCard = TPCard.newBuilder().setStrCardID(cardId._1)
               card_id=cardId._1
+              val syncTPCard = responseBuilder.addSyncTPCardBuilder()
               syncTPCard.setTpCard(tpCard.build())
               syncTPCard.setOperationType(OperationType.DEL)
               syncTPCard.setSeq(cardId._2)
@@ -78,7 +78,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           if(status <=0){
             throw new Exception(HallApiErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
           }
-        }
+      }
 
         commandResponse.writeMessage(commandRequest, SyncTPCardResponse.cmd, responseBuilder.build())
       } catch {
@@ -97,6 +97,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       var status=0 //SEQ状态更新结果
       try{
         val responseBuilder = SyncLPCardResponse.newBuilder()
+        responseBuilder.setSeq(request.getSeq)
         val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
@@ -153,6 +154,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       var status=0 //SEQ状态更新结果
       try {
         val responseBuilder = SyncLPPalmResponse.newBuilder()
+        responseBuilder.setSeq(request.getSeq)
         val dbId = if (request.getDbid.isEmpty) None else Option(request.getDbid)
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
@@ -203,6 +205,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)) {
       val request = commandRequest.getExtension(SyncCaseRequest.cmd)
       val responseBuilder = SyncCaseResponse.newBuilder()
+      responseBuilder.setSeq(request.getSeq)
       var card_id= "" //卡号
       val uuid = request.getUuid
       var typ_add=""
@@ -259,7 +262,6 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       val request = commandRequest.getExtension(SyncMatchTaskRequest.cmd)
       val uuid = request.getUuid
       var match_task_orasid=""
-      var typ_add=""
       try{
         val responseBuilder = SyncMatchTaskResponse.newBuilder()
         val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)

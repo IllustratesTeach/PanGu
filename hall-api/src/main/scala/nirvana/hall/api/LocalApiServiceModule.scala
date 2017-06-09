@@ -41,8 +41,8 @@ object LocalApiServiceModule {
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
 
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl])//.eagerLoad()
-    binder.bind(classOf[SyncCronFilterFPTService],classOf[SyncCronFilterFPTServiceImpl]).eagerLoad
+    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[SyncCronFilterFPTService],classOf[SyncCronFilterFPTServiceImpl])//.eagerLoad
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])

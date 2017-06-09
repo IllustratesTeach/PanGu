@@ -63,7 +63,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, 
       person.deletag = Gafis70Constants.DELETAG_USE
       person.fingershowStatus = 1.toShort
       person.isfingerrepeat = "0"
-      person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
+      //person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
+      person.dataSources = tpCard.getStrDataSource.toShort
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库

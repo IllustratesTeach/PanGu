@@ -47,12 +47,35 @@ class FetchTPCardServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
   }
 
   override def validateByReadStrategy(tpCard: TPCard, readStrategy: String): Boolean = {
-    val datasources=tpCard.getStrDataSource
+
     val strategy = new JSONObject(readStrategy)
-    var isdatasource=if (strategy.has("dataSource")) true else false
-    if (isdatasource){
-      isdatasource=strategy.getString("dataSource").contains(datasources)
+    if(strategy.has("datasource")){
+      val dataSourceStrategy = strategy.getString("datasource")
+      val dataSource = tpCard.getStrDataSource
+      if(dataSourceStrategy.startsWith("!")){
+        if(dataSource.equals(dataSourceStrategy.substring(1,dataSourceStrategy.length))){
+          return false
+        }
+      }else{
+        if(!dataSource.equals(dataSourceStrategy)){
+          return false
+        }
+      }
     }
-    isdatasource
+
+    if(strategy.has("cardid")){
+      val cardIdStrategy = strategy.getString("cardid")
+      val cardId = tpCard.getStrCardID
+      if(cardIdStrategy.startsWith("=")){
+        if(!cardId.startsWith(cardIdStrategy.substring(1,cardIdStrategy.length))){
+          return false
+        }
+      }else{
+        if(!cardId.startsWith(cardIdStrategy)){
+          return false
+        }
+      }
+    }
+    true
   }
 }
