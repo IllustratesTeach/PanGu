@@ -8,10 +8,12 @@ import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService}
 import nirvana.hall.webservice.HallWebserviceConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.xingzhuan.{AssistcheckService}
+import nirvana.hall.webservice.services.xingzhuan.AssistcheckService
 import nirvana.hall.webservice.util.xingzhuan.FPTUtil
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * 更新协查比对关系
@@ -26,7 +28,7 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
     if(config.union4pfmip.cron != null)
       periodicExecutor.addJob(new CronSchedule(config.union4pfmip.cron), "assistcheck-cron", new Runnable {
         override def run(): Unit = {
-         doWork
+          doWork
         }
       })
   }
@@ -48,7 +50,7 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
     }
     val size = "20"
     try{
-      var resultList = assistCheckRecordService.findAssisttask(size)
+      var resultList = assistCheckRecordService.findAssistcheck(size)
       if(resultList.size > 0){
         resultList.foreach{ resultMap =>
           var id:String = ""
@@ -64,22 +66,22 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            var dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            if(dataHandler != null) {
-              //保存fpt更新状态
-              status = 1
-              val fptPath:String = FPTUtil.saveFPTAndUpdateStatus(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
-              assistCheckRecordService.updateAssisttaskStatus(10, id)
-              assistCheckRecordService.saveAssistcheck(status, id, fptPath)
-            } else {
-              //比对完成无比对关系
-              status = 8
-              assistCheckRecordService.updateAssisttaskStatus(10, id)
-              assistCheckRecordService.saveAssistcheck(status, id, null)
+            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            for(i <- 0 to dataHandlers.size - 1){
+              val dataHandler = dataHandlers(i)
+              if(dataHandler != null) {
+                //保存fpt更新状态
+                status = 1
+                val fptPath:String = FPTUtil.saveFPTPath(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
+                assistCheckRecordService.updateAssistcheck(status, id, fptPath)
+              }
             }
+
           } catch {
             case e:Exception=>
               error("assistcheckCron-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
+              val status = 8
+              assistCheckRecordService.updateAssistcheckStatus(status, id)
           }
         }
       }
