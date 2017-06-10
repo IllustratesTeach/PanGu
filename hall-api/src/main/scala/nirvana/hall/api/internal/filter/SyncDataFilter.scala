@@ -58,7 +58,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                 syncTPCard.setTpCard(tpCard)
                 syncTPCard.setSeq(cardId._2)
                 syncTPCard.setOperationType(OperationType.PUT)
-                typ_add="_PUT"
+                typ_add = HallApiConstants.PUT
               }
             } else {
               val tpCard = TPCard.newBuilder().setStrCardID(cardId._1)
@@ -67,7 +67,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
               syncTPCard.setTpCard(tpCard.build())
               syncTPCard.setOperationType(OperationType.DEL)
               syncTPCard.setSeq(cardId._2)
-              typ_add="_DEL"
+              typ_add = HallApiConstants.DELETE
             }
           }
           hallReadConfigOpt.get.seq = request.getSeq

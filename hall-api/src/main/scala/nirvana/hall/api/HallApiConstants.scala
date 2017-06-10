@@ -37,4 +37,17 @@ object HallApiConstants {
   final val REMOTE_TYPE_MATCH_RESULT_LPCARD = "RemoteMatchResult_LPCard"
   final val REMOTE_TYPE_MATCH_RESULT_LPPALM = "RemoteMatchResult_LPPalm"
   final val REMOTE_TYPE_MATCH_RESULT_TPCARD = "RemoteMatchResult_TPCard"
+
+  //operatorType
+  final val PUT = "-PUT"
+  final val UPDATE = "-UPDATE"
+  final val DELETE = "-DELETE"
+
+  //use for Sync Log
+  final val MESSAGE_SEND = "0"
+  final val MESSAGE_RECEIVE = "1"
+  final val MESSAGE_RECEIVE_OR_SEND_FAIL = "0"
+  final val MESSAGE_RECEIVE_OR_SEND_SUCCESS = "1"
+  final val LOG_MESSAGE_TYPE = 1
+  final val LOG_ERROR_TYPE = 2
 }

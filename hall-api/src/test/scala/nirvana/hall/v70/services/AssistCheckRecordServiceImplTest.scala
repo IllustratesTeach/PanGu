@@ -12,7 +12,7 @@ class AssistCheckRecordServiceImplTest extends BaseV70TestCase{
   @Test
   def test_recordAssistCheck(): Unit ={
     val service = getService[AssistCheckRecordService]
-    val hallAssistCheck = service.recordAssistCheck("3","1","A123","R37001","2")
+    val hallAssistCheck = service.recordAssistCheck("4","1","A123","R37001","2")
 
   }
 
