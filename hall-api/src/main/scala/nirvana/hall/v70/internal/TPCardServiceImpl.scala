@@ -4,7 +4,7 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{HallDatasourceService, TPCardService}
+import nirvana.hall.api.services.{TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Created by songpeng on 16/1/26.
  */
-class TPCardServiceImpl(entityManager: EntityManager, userService: UserService, hallDatasourceService:HallDatasourceService) extends TPCardService with LoggerSupport{
+class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) extends TPCardService with LoggerSupport{
   /**
    * 获取捺印卡信息
    * @param personId

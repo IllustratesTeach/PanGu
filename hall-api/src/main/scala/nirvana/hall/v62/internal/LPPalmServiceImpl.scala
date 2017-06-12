@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.{HallDatasourceService, LPPalmService}
+import nirvana.hall.api.services.{LPPalmService}
 import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v62.config.HallV62Config
@@ -9,7 +9,7 @@ import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 /**
  * 现场掌纹service实现
  */
-class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService:HallDatasourceService) extends LPPalmService{
+class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config) extends LPPalmService{
 
   /**
    * 新增现场卡片

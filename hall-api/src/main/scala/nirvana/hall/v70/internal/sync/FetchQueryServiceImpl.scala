@@ -182,14 +182,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-    * 更新Status 不实现
-    *
-    * @param oraSid
-    * @param status
-    */
-  override def updateMatchStatus(oraSid: Long, status: Int): Unit = ???
-
-  /**
     * 根据orasid获取对应任务的捺印卡号 keyId
     *
     * @param oraSid
@@ -209,15 +201,8 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   override def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]  = ???
 
   /**
-    * 获得Ora_UUID 比对任务对应的唯一标识
-    * @return
-    */
-  override def getOraUUID(oraSid: Long): Seq[String]= ???
-
-  /**
     * 保存抓取记录
-    * @param ORA_UUID
-    * @return
+    * @param oraSid
     */
-  override def saveFetchRecord(ORA_UUID: String)= ???
+  override def saveFetchRecord(oraSid:String)= ???
 }

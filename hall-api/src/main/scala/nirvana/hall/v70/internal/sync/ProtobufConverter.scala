@@ -742,12 +742,10 @@ object ProtobufConverter extends LoggerSupport{
     matchTask.setPriority(gafisQuery.priority.toInt)
     matchTask.setScoreThreshold(gafisQuery.minscore)
     matchTask.setTopN(gafisQuery.maxcandnum)
-    matchTask.setCommitUser(gafisQuery.username)
+    if(null!=gafisQuery.username) matchTask.setCommitUser(gafisQuery.username)
     matchTask.setComputerIp(gafisQuery.computerip)
-    matchTask.setUserUnitCode(gafisQuery.userunitcode)
-    //matchTask.setOraCreatetime(DateUtil.dateToStr(gafisQuery.createtime)) //7.0 任务发起时间以6.2端为准
-    matchTask.setOraCreatetime(DateConverter.convertDate2String(gafisQuery.createtime, "yyyy-MM-dd HH:mm:ss")) //7.0 任务发起时间以6.2端为准
-//    matchTask.setFlag(gafisQuery.flag.toInt)
+    if(null!=gafisQuery.userunitcode) matchTask.setUserUnitCode(gafisQuery.userunitcode)
+    matchTask.setOraCreatetime(DateConverter.convertDate2String(gafisQuery.createtime, "yyyy-MM-dd HH:mm:ss"))
     val flag = gafisQuery.flag
     val isPalm = flag == QueryConstants.FLAG_PALM || flag == QueryConstants.FLAG_PALM_TEXT
     val matchType = convertQueryType2MatchType(gafisQuery.querytype, isPalm)

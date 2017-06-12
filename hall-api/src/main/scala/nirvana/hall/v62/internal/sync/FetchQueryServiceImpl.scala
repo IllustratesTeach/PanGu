@@ -33,30 +33,43 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @return
     */
   override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
-    val matchTaskList = new ArrayBuffer[MatchTask]
-   /* val sql = ("select ora_sid,keyid,minscore,querytype,priority,maxcandnum,mic from"
-              +"(select ora_sid,keyid,minscore,querytype,priority,maxcandnum,mic from"
-              +"( select t.ora_uuid,t.ora_sid,t.keyid,t.minscore,t.querytype,t.priority,t.maxcandnum,t.mic from NORMALQUERY_QUERYQUE  t where  t.status<=2"
-              +"and not exists (select h.ora_uuid from Hall_Fetch_Record_7to6 h where h.ora_uuid=t.ora_uuid) ) t1 )"
-              +"where  rownum <=?") //取消seq作为查询条件*/
-   val sql = "select * from (select t.username,t.computerip,t.userunitcode,t.ora_createtime,t.ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag from NORMALQUERY_QUERYQUE t where  t.status=0 and t.rmtflag=0) tt where rownum <=?" //取消seq作为查询条件 第二阶段
 
+    val matchTaskList = new ArrayBuffer[MatchTask]
+
+    val sql = s"SELECT * FROM (SELECT " +
+                                      s"t.username " +
+                                      s",t.computerip" +
+                                      s",t.userunitcode" +
+                                      s",t.ora_uuid" +
+                                      s",t.ora_sid" +
+                                      s",ora_createtime" +
+                                      s",t.keyid" +
+                                      s",t.minscore" +
+                                      s",t.querytype" +
+                                      s",t.priority" +
+                                      s",t.maxcandnum" +
+                                      s",t.mic" +
+                                      s",t.qrycondition" +
+                                      s",t.textsql" +
+                                      s",t.flag " +
+                              s"FROM NORMALQUERY_QUERYQUE  t " +
+                              s"WHERE  NOT EXISTS (SELECT 1 " +
+                                                  s"FROM HALL_READ_RECORD p " +
+                                                  s"WHERE p.orasid=t.ora_sid)) " +
+      s"WHERE  ROWNUM <=?"
     JdbcDatabase.queryWithPsSetter(sql) {ps =>
-      //ps.setLong(1, seq)
-      //ps.setLong(2, seq + size)
       ps.setLong(1, size)
     } { rs =>
       val gaQuery = new GafisNormalqueryQueryque()
-      gaQuery.oraSid = rs.getLong("ora_sid") //使用seq，查询任务被删除后oraSid会被重新使用
+      gaQuery.oraSid = rs.getLong("ora_sid")
       gaQuery.keyid = rs.getString("keyid")
       gaQuery.minscore = rs.getInt("minscore")
       gaQuery.querytype = rs.getShort("querytype")
       gaQuery.priority = rs.getShort("priority")
       gaQuery.maxcandnum = rs.getInt("maxcandnum")
-      gaQuery.flag = rs.getShort("flag") //测试6.2flag字段
+      gaQuery.flag = rs.getShort("flag")
       gaQuery.mic = rs.getBytes("mic")
-      gaQuery.createtime = rs.getTimestamp("ora_createtime") //仅限第一阶段
-
+      gaQuery.createtime = rs.getTimestamp("ora_createtime")
       gaQuery.username = rs.getString("username")
       gaQuery.computerip = rs.getString("computerip")
       gaQuery.userunitcode = rs.getString("userunitcode")
@@ -66,21 +79,9 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     matchTaskList.toSeq
   }
 
-  ///**
-  //  * 更新比对状态
-  //  * @param oraSid
-  //  * @param status
-  // */
-  /* private def updateMatchStatus(oraSid: Long, status: Int): Unit ={
-    val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.seq=?"
-    JdbcDatabase.update(sql){ps=>
-      ps.setInt(1, status)
-      ps.setLong(2, oraSid)
-    }
-  }*/
-
   /**
     * 根据远程查询queryid获取查询结果信息
+    *
     * @param queryId
     * @param pkId
     * @param typ
@@ -93,7 +94,8 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
     /**
     * 保存候选信息
-    * @param matchResult
+      *
+      * @param matchResult
     */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(), configMap : scala.collection.mutable.HashMap[String, String]) = {
     val oraSid = matchResult.getMatchId       //oraSid
@@ -282,6 +284,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
     * 根据queryid获取比对状态
+    *
     * @param queryId
     * @param pkId
     * @param typ
@@ -311,22 +314,8 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   }
 
   /**
-    * 更新Status比对状态
-    *
-    * @param oraSid
-    * @param status
-    */
-  override def updateMatchStatus(oraSid: Long, status: Int): Unit = {
-    //val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.seq=?"
-    val sql = "update NORMALQUERY_QUERYQUE t set t.status =? where t.ora_sid=?" //更新ora_sid对应的比对任务的状态
-    JdbcDatabase.update(sql) { ps =>
-      ps.setInt(1, status)
-      ps.setLong(2, oraSid)
-    }
-  }
-
-  /**
     *根据orasid获取对应任务的捺印卡号 keyId
+    *
     * @param oraSid
     * @return
     */
@@ -343,6 +332,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
     *根据orasid获取对应任务的查询类型 queryType
+    *
     * @param oraSid
     * @return
     */
@@ -375,31 +365,17 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   }
 
   /**
-    *获得Ora_UUID 比对任务对应的唯一标识
+    * 保存6.2已经给7.0抓取的任务的任务号
     * @param oraSid
     * @return
     */
-  def getOraUUID(oraSid: Long): Seq[String]={
-    val OraUUIDArr = ArrayBuffer[String]()
-    val sql = "select t.ora_uuid from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setLong(1, oraSid)
-    } { rs =>
-      OraUUIDArr += rs.getString("ora_uuid")
-    }
-    OraUUIDArr
-  }
-
-  /**
-    * 保存抓取记录
-    * @param ORA_UUID
-    */
-  def saveFetchRecord(ORA_UUID: String)={
-    val sql ="insert into HALL_FETCH_RECORD_7TO6 ORA_UUID  values(?)"
-    JdbcDatabase.update(sql) { ps =>
-      ps.setString(1, ORA_UUID)
+  override def saveFetchRecord(oraSid:String)={
+    val sql = s"INSERT INTO HALL_READ_RECORD (UUID,ORASID,Createtime) " +
+              s"VALUES (?,?,sysdate)"
+    JdbcDatabase.update(sql){ ps =>
+      ps.setString(1,java.util.UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,oraSid)
     }
   }
-
 }
 

@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
+import nirvana.hall.api.services.{CaseInfoService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v62.config.HallV62Config
@@ -14,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/1/26.
  */
-class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService:HallDatasourceService) extends CaseInfoService{
+class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInfoService{
 
   /**
    * 新增案件信息

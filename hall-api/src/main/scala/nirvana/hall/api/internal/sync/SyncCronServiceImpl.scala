@@ -22,6 +22,7 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.v70.jpa.GafisTask62Record
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -429,7 +430,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param update
     */
   def fetchMatchTask(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
-    //info("fetchMatchTask name:{} seq:{}", fetchConfig.name, fetchConfig.seq)
+
     info("fetchMatchTask name:{}", fetchConfig.name)
     val uuid = UUID.randomUUID().toString
     var taskId = ""
@@ -437,45 +438,35 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val request = SyncMatchTaskRequest.newBuilder()
       request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
       request.setDbid(fetchConfig.dbid)
-      //request.setSeq(fetchConfig.seq)
       request.setUuid(uuid)
       val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchTaskRequest.cmd, request.build())
       if(baseResponse.getStatus == CommandStatus.OK) {
         val response = baseResponse.getExtension(SyncMatchTaskResponse.cmd)
-        //var seq = fetchConfig.seq
-        val iter = response.getMatchTaskList.iterator()
-        while (iter.hasNext) {
-          val matchTask = iter.next()
+        val iterator = response.getMatchTaskList.iterator()
+        while (iterator.hasNext) {
+          val matchTask = iterator.next()
           taskId = matchTask.getMatchId
           if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)) {
-            //TODO queryDBConfig 添加是否更新校验
             queryService.addMatchTask(matchTask)
+            new GafisTask62Record(UUID.randomUUID().toString.replace("-",""),matchTask.getMatchId,matchTask.getObjectId.toString,"0").save
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType)
-            //seq = matchTask.getObjectId
-            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, fetchConfig.typ, fetchConfig.url.substring(7,fetchConfig.url.length-5) ,"0","1")
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, taskId, fetchConfig.typ, fetchConfig.url.substring(7,fetchConfig.url.length-5) ,HallApiConstants.MESSAGE_SEND,HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }
         }
         info("MatchTask-RequestData success,taskId:{};BatchSyncCompleted",taskId)
       } else {
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId,baseResponse.getMsg , baseResponse.getMsg, HallApiConstants.LOG_MESSAGE_TYPE, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
     }
-    //如果获取到数据递归获取
-    /*     if(response.getMatchTaskCount  > 0 && fetchConfig.seq != seq){
-           //更新配置seq
-           fetchConfig.seq = seq
-           updateSeq(fetchConfig)
-           fetchMatchTask(fetchConfig, update)
-         }*/
   }
 
   /**

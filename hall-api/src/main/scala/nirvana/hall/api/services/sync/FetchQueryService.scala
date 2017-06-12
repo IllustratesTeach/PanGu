@@ -84,14 +84,6 @@ trait FetchQueryService {
     * @return
     */
   def getQueryQue(oraSid: Int): QueryQue
-  /**
-    * 更新status
-    * sjr 2016/11/28
-    * @param oraSid
-    * @param status
-    */
-  def updateMatchStatus(oraSid: Long, status: Int)
-
 
   /**
     * 根据orasid获取对应任务的捺印卡号 keyId
@@ -111,18 +103,10 @@ trait FetchQueryService {
   def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
 
   /**
-    * 获得Ora_UUID 比对任务对应的唯一标识
-    * @param oraSid
-    * @return
-    */
-  def getOraUUID(oraSid: Long): Seq[String]
-
-  /**
     * 保存抓取记录
-    * @param ORA_UUID
-    * @return
+    * @param oraSid
     */
-  def saveFetchRecord(ORA_UUID: String)
+  def saveFetchRecord(oraSid:String)
 
 }
 

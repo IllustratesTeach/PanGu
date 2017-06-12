@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{HallDatasourceService, LPPalmService}
+import nirvana.hall.api.services.{LPPalmService}
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
   * 现场掌纹service实现
   */
-class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService,hallDatasourceService: HallDatasourceService) extends LPPalmService with LoggerSupport{
+class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) extends LPPalmService with LoggerSupport{
 
   /**
     * 新增现场卡片

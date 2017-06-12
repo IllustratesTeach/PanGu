@@ -1,6 +1,6 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.services.{CaseInfoService, HallDatasourceService}
+import nirvana.hall.api.services.{CaseInfoService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.internal.sync.ProtobufConverter
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
   * Created by songpeng on 16/1/26.
   */
-class CaseInfoServiceImpl(userService: UserService, hallDatasourceService: HallDatasourceService) extends CaseInfoService{
+class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
   /**
     * 新增案件信息

@@ -275,27 +275,22 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           matchTaskList.foreach{matchTask=>
             match_task_orasid=matchTask.getMatchId
             responseBuilder.addMatchTask(matchTask)
-            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,match_task_orasid,HallApiConstants.SYNC_TYPE_MATCH_TASK+"-PUT",ip,"1","1")
+            syncInfoLogManageService.recordSyncDataIdentifyLog(uuid
+                                            ,match_task_orasid
+              ,HallApiConstants.SYNC_TYPE_MATCH_TASK + HallApiConstants.PUT,ip,HallApiConstants.MESSAGE_RECEIVE
+              ,HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }
-          //hallReadConfigOpt.get.seq = request.getSeq
-          //updateSeq(hallReadConfigOpt.get)
+          matchTaskList.foreach{
+            t => fetchQueryService.saveFetchRecord(t.getObjectId.toString)
+          }
         }
         commandResponse.writeMessage(commandRequest, SyncMatchTaskResponse.cmd, responseBuilder.build())
-        /**
-          * sjr 2016/11/29
-          * 更新状态
-          */
-        if(matchTaskList!=null&&matchTaskList.size>0) {
-          matchTaskList.foreach { matchTask =>
-            fetchQueryService.updateMatchStatus(matchTask.getObjectId, 1) // matchTask.getObjectId 值存为seq 第一阶段不需要更新状态
-            //fetchQueryService.saveFetchRecord(fetchQueryService.getOraUUID(matchTask.getObjectId).headOption.get) //按照Ora_sid查询比对任务表中的ora_UUID保存到记录表中
-          }
-        }
+
       } catch {
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchTask-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
       true
     } else if (commandRequest.hasExtension(SyncMatchResultRequest.cmd)) {

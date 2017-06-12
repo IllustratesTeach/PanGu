@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{HallDatasourceService, LPCardService}
+import nirvana.hall.api.services.{LPCardService}
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 /**
   * Created by songpeng on 16/1/26.
   */
-class LPCardServiceImpl(entityManager: EntityManager, userService: UserService, hallDatasourceService: HallDatasourceService) extends LPCardService with LoggerSupport{
+class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) extends LPCardService with LoggerSupport{
 
   /**
     * 新增现场卡片

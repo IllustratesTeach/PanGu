@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.{HallDatasourceService, LPCardService}
+import nirvana.hall.api.services.{LPCardService}
 import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v62.config.HallV62Config
@@ -9,7 +9,7 @@ import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
 /**
  * Created by songpeng on 16/1/26.
  */
-class LPCardServiceImpl(facade:V62Facade,config:HallV62Config, hallDatasourceService: HallDatasourceService) extends LPCardService{
+class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardService{
 
   /**
    * 新增现场卡片

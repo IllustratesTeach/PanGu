@@ -1,6 +1,6 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.{HallDatasourceService, TPCardService}
+import nirvana.hall.api.services.{TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
@@ -13,7 +13,7 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 /**
  * Created by songpeng on 16/1/26.
  */
-class TPCardServiceImpl(facade:V62Facade,config:HallV62Config,hallDatasourceService:HallDatasourceService) extends TPCardService{
+class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardService{
   /**
    * 新增捺印卡片
    * @param tPCard
