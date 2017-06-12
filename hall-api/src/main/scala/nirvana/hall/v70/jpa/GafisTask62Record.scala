@@ -34,7 +34,7 @@ class GafisTask62Record extends ActiveRecord {
     this.id = id
     this.queryid = queryid
     this.orasid = orasid
-    this.createtime = new Date
     this.isSyncCandList = isSyncCandList
+    this.createtime = new Date
   }
 }

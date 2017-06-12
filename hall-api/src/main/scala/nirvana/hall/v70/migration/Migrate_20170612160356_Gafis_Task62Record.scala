@@ -14,10 +14,11 @@ class Migrate_20170612160356_Gafis_Task62Record extends Migration{
       t.column("ORASID",VarcharType,Limit(32),Nullable,Comment("本地生成的任务号"))
       t.column("ISSYNCCANDLIST",VarbinaryType,Limit(1),Nullable,Comment("是否已经同步了6.2系统生成的候选"))
       t.column("CREATETIME",TimestampType,Nullable,Comment("当前时间"))
+      t.column("UPDATETIME",TimestampType,Nullable,Comment("更新时间"))
     }
   }
 
   override def down(): Unit = {
-    dropTable("Gafis_Task62Record")
+
   }
 }
