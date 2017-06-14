@@ -11,6 +11,7 @@ import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
 import nirvana.hall.v62.services.DictCodeConverter
+import org.apache.commons.lang.StringUtils
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -116,8 +117,10 @@ object galoclpConverter extends LoggerSupport{
     val card = LPCard.newBuilder()
     card.setStrCardID(gCard.szCardID)
     val text = card.getTextBuilder
-    if(gCard.stAdmData.szCaseID != null){
+    if(StringUtils.isNotEmpty(gCard.stAdmData.szCaseID)||StringUtils.isNotBlank(gCard.stAdmData.szCaseID)){
       text.setStrCaseId(gCard.stAdmData.szCaseID)
+    }else{
+      text.setStrCaseId(gCard.szCardID.substring(0,gCard.szCardID.length-2))
     }
     gCard.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData

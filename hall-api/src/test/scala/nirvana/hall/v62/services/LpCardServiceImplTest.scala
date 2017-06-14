@@ -64,7 +64,7 @@ class LpCardServiceImplTest extends BaseV62TestCase{
   @Test
   def test_get(): Unit ={
     val lpCardService = getService[LPCardService]
-    val card = lpCardService.getLPCard("12345601")
+    val card = lpCardService.getLPCard("640000001999201009010001")
 
     Assert.assertNotNull(card)
   }

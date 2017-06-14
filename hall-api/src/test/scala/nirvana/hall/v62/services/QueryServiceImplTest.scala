@@ -43,7 +43,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_getMatchResult: Unit ={
     val service = getService[QueryService]
-    val matchResult = service.getMatchResult(1).get
+    val matchResult = service.getMatchResult(854).get
     Assert.assertTrue(matchResult.getCandidateNum > 0)
   }
 

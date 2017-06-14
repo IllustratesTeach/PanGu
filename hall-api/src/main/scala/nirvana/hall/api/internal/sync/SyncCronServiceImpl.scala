@@ -550,7 +550,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val cardId = cand.getObjectId
       val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-      val dbId = getTPDBIDByCardId(cardId, dbidList)
+      val dbId = getTPDBIDByCardId(cardId, dbidList,isPalm)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         } else {
@@ -567,36 +567,37 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
         }
       }else{//候选是现场
-      val dbId = getLPDBIDByCardId(cardId, dbidList,isPalm)
-        if(dbId.nonEmpty){
-          candDBIDMap.+=(cardId -> dbId.get.toShort)
-        }else {
-          if(!isPalm){
-          val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
-          lPCardOpt.foreach { lpCard =>
-            lPCardService.addLPCard(lpCard)
-            val caseId = lpCard.getText.getStrCaseId
-            if (!caseInfoService.isExist(caseId, Option(candDbId))) {
-              //获取案件
-              fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
-            }
-            candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
-          }
-          }
-          else{
-            val lPPalmOpt = lPPalmRemoteService.getLPPalm(cardId, fetchConfig.url, candDbId)
-            lPPalmOpt.foreach { lpCard =>
-              lPPalmService.addLPCard(lpCard)
-              val caseId = lpCard.getText.getStrCaseId
-              if (!caseInfoService.isExist(caseId, Option(candDbId))) {
-                //获取案件
-                fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+            val dbId = getLPDBIDByCardId(cardId, dbidList)
+            if(dbId.nonEmpty){
+              candDBIDMap.+=(cardId -> dbId.get.toShort)
+            }else {
+              if(!isPalm){
+                val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
+                lPCardOpt.foreach { lpCard =>
+                  if(!lPCardService.isExist(lpCard.getStrCardID)){
+                    lPCardService.addLPCard(lpCard)
+                  }
+                  val caseId = lpCard.getText.getStrCaseId
+                  if (!caseInfoService.isExist(caseId, Option(candDbId))) {
+                    //获取案件
+                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                  }
+                  candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
+                }
               }
-              candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
+              else{
+                val lPPalmOpt = lPPalmRemoteService.getLPPalm(cardId, fetchConfig.url, candDbId)
+                lPPalmOpt.foreach { lpCard =>
+                  lPPalmService.addLPCard(lpCard)
+                  val caseId = lpCard.getText.getStrCaseId
+                  if (!caseInfoService.isExist(caseId, Option(candDbId))) {
+                    //获取案件
+                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                  }
+                  candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
+                }
+              }
             }
-
-          }
-        }
       }
 
     }
@@ -611,10 +612,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param dbidList
     * @return
     */
-  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm:Boolean): Option[String]={
     dbidList.foreach{dbid =>
-      if(tpCardService.isExist(cardId, Option(dbid))){
-        return Option(dbid)
+      if(!isPalm) {
+        if (lPCardService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
+      }
+      else{
+        if (lPPalmService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
       }
     }
     None
@@ -627,17 +635,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param dbidList
     * @return
     */
-  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm: Boolean): Option[String]={
+  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
     dbidList.foreach{dbid =>
-      if(!isPalm) {
-        if (lPCardService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
-      }
-      else{
-        if (lPPalmService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
+      if (lPCardService.isExist(cardId, Option(dbid))) {
+        return Option(dbid)
       }
     }
     None
