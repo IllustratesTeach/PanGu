@@ -8,12 +8,13 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.api.jpa.HallReadConfig
-import nirvana.hall.api.services._
+import nirvana.hall.api.services.{QueryService, _}
 import nirvana.hall.api.services.sync._
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
+import nirvana.hall.v62.internal.QueryMatchStatusConstants
 import org.slf4j.LoggerFactory
 
 /**
@@ -25,6 +26,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                      fetchLPPalmService: FetchLPPalmService,
                      fetchCaseInfoService: FetchCaseInfoService,
                      fetchQueryService: FetchQueryService,
+                     queryService: QueryService,
                      tPCardService: TPCardService,
                      lPCardService: LPCardService,
                      lPPalmService: LPPalmService,
@@ -305,13 +307,11 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RESULT, request.getDbid, "1").headOption
         if (hallReadConfigOpt.nonEmpty) {
-          val status = fetchQueryService.getMatchStatusByQueryid(request.getSid, request.getPkid, request.getTyp.toShort)
-          responseBuilder.setMatchStatus(status)
-          val matchResultOpt = fetchQueryService.getMatchResultByQueryid(request.getSid, request.getPkid, request.getTyp.toShort, dbId)
+          val status = queryService.getStatusBySid(request.getSid)
+          responseBuilder.setMatchStatus(QueryMatchStatusConstants.matchStatusConvertProtoBuf(status))
+          val matchResultOpt = queryService.getMatchResult(request.getSid, dbId)
           if (matchResultOpt.nonEmpty) {
             responseBuilder.setMatchResult(matchResultOpt.get)
-            //hallReadConfigOpt.get.seq = request.getSid
-            //updateSeq(hallReadConfigOpt.get)
           }
         } else {
           responseBuilder.setMatchStatus(MatchStatus.UN_KNOWN)

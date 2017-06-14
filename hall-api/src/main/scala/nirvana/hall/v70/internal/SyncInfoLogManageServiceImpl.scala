@@ -23,8 +23,6 @@ class SyncInfoLogManageServiceImpl extends SyncInfoLogManageService{
     */
   override def recordSyncDataIdentifyLog(uUID: String,card_Id:String,business_type:String,ip_source:String
                                          ,is_send:String,status :String): Unit = {
- //   val formatter = new SimpleDateFormat("yyyy-MM-dd H:mm:ss")
-  //  val date = formatter.format(new Date)
     val recordAfis = new RecordAfis(uUID,card_Id
                                     ,business_type,ip_source
                                     ,new Date,status,is_send)

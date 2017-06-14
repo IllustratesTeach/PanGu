@@ -11,6 +11,9 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 /**
   * Created by songpeng on 16/8/31.
   */
@@ -49,16 +52,6 @@ trait FetchQueryService {
     * @return
     */
   def getSidByStatusMatching(size: Int, dbId: Option[String] = None): Seq[Long]
-
-  /**
-    * 根据queryid获取比对状态
-    * @param queryId
-    * @param pkId
-    * @param typ
-    * @return
-    */
-  def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus
-
   /**
     * 获取候选头结构信息
     * @param matchResult
@@ -84,18 +77,6 @@ trait FetchQueryService {
     * @return
     */
   def getQueryQue(oraSid: Int): QueryQue
-
-  /**
-    * 根据orasid获取对应任务的捺印卡号 keyId
-    * @param oraSid
-    */
-  def getKeyIdArrByOraSid(oraSid: Long):Seq[String]
-
-  /**
-    * 根据orasid获取对应任务的查询类型 queryType
-    * @param oraSid
-    */
-  def getQueryTypeArrByOraSid(oraSid: Long): Seq[String]
   
     /**
     * 获得配置信息
@@ -108,6 +89,15 @@ trait FetchQueryService {
     */
   def saveFetchRecord(oraSid:String)
 
+  /**
+    * 获得没有同步候选的比对任务的任务号
+    * @param size 单次请求数量
+    * @author yuchen
+    */
+  def getTaskNumWithNotSyncCandList(size:Int):ListBuffer[mutable.HashMap[String,Any]]
+
+
+  def updateStatusWithGafis_Task62Record(status:String,uuid:String):Unit
 }
 
 

@@ -27,14 +27,24 @@ class GafisTask62Record extends ActiveRecord {
   var createtime: java.util.Date = _
   @Column(name = "UPDATETIME")
   var updatetime: java.util.Date = _
+  @Column(name = "querytype")
+  var querytype: java.lang.String = _
+  @Column(name = "keyid")
+  var keyid: java.lang.String = _
+  @Column(name = "pkid")
+  var fetchConfigPkId: java.lang.String = _
 
   def this(id: java.lang.String, queryid: java.lang.String
-           , orasid: java.lang.String, isSyncCandList: java.lang.String) {
+           , orasid: java.lang.String, isSyncCandList: java.lang.String
+           ,querytype:java.lang.String,keyid:java.lang.String,pkid:java.lang.String) {
     this()
     this.id = id
     this.queryid = queryid
     this.orasid = orasid
     this.isSyncCandList = isSyncCandList
     this.createtime = new Date
+    this.querytype = querytype
+    this.keyid = keyid
+    this.fetchConfigPkId = pkid
   }
 }

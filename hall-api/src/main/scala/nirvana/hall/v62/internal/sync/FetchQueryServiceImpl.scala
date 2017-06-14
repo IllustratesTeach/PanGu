@@ -8,18 +8,21 @@ import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSIMPSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.internal.{QueryMatchStatusConstants, V62Facade}
+import nirvana.hall.v62.internal.c.V62SqlHelper
+import nirvana.hall.v62.internal.c.gloclib.gcolnames
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * Created by songpeng on 16/8/31.
@@ -283,18 +286,6 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   }
 
   /**
-    * 根据queryid获取比对状态
-    *
-    * @param queryId
-    * @param pkId
-    * @param typ
-    * @return
-    */
-  override def getMatchStatusByQueryid(queryId: Long, pkId: String, typ: Short): MatchStatus = {
-    throw new UnsupportedOperationException
-  }
-
-  /**
     * 获取比对状态正在比对任务SID
     *
     * @param size
@@ -311,40 +302,6 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       sidArr += rs.getLong("ora_sid")
     }
     sidArr
-  }
-
-  /**
-    *根据orasid获取对应任务的捺印卡号 keyId
-    *
-    * @param oraSid
-    * @return
-    */
-  override def getKeyIdArrByOraSid(oraSid: Long): Seq[String] = {
-    val keyIdArr = ArrayBuffer[String]()
-    val sql = "select t.keyid from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setLong(1, oraSid)
-    } { rs =>
-      keyIdArr += rs.getString("keyid")
-    }
-    keyIdArr
-  }
-
-  /**
-    *根据orasid获取对应任务的查询类型 queryType
-    *
-    * @param oraSid
-    * @return
-    */
-  override def getQueryTypeArrByOraSid(oraSid: Long): Seq[String] = {
-    val queryTypeArr = ArrayBuffer[String]()
-    val sql = "select t.querytype from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setLong(1, oraSid)
-    } { rs =>
-      queryTypeArr += rs.getShort("querytype").toString
-    }
-    queryTypeArr
   }
   
    /**
@@ -366,6 +323,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
 
   /**
     * 保存6.2已经给7.0抓取的任务的任务号
+    *
     * @param oraSid
     * @return
     */
@@ -377,5 +335,15 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       ps.setString(2,oraSid)
     }
   }
+
+  /**
+    * 获得没有同步候选的比对任务的任务号
+    *
+    * @param size 单次请求数量
+    * @author yuchen
+    */
+  override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = ???
+
+  override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = ???
 }
 

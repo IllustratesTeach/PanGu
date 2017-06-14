@@ -97,7 +97,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_getStatusBySid: Unit ={
     val service = getService[QueryService]
-    val statusId = service.getStatusBySid(5)
+    val statusId = service.getStatusBySid(327)
     Assert.assertEquals(7,statusId)
   }
 }

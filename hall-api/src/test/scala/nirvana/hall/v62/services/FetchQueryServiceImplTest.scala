@@ -23,6 +23,5 @@ class FetchQueryServiceImplTest extends BaseV62TestCase{
     val matchResult = getService[QueryService].getMatchResult(5).get
     val service = getService[FetchQueryService]
    /* service.saveMatchResult(matchResult, null)*/
-
   }
 }
