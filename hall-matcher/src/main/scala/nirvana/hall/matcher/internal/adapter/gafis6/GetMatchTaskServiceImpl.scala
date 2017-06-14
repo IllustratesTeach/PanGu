@@ -90,16 +90,25 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        }
      }
 
+     val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
+     val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()
      val mic = rs.getBytes("mic")
      val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
      mics.foreach{ micStruct =>
+       val index = micStruct.nIndex.toInt
        if(micStruct.bIsLatent == 1){
-         val ldata = matchTaskBuilder.getLDataBuilder
+         if(ldataBuilderMap.get(index).isEmpty){
+           ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
+         }
+         val ldata = ldataBuilderMap.get(index).get
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
          if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
-         val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+         if(tdataBuilderMap.get(index).isEmpty){
+           tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
+         }
+         val tdata = tdataBuilderMap.get(index).get.addMinutiaDataBuilder()
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
          val mnt = micStruct.pstMnt_Data
          tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)

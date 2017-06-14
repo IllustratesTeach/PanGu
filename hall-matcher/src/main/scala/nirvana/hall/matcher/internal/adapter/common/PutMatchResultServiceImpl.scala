@@ -11,6 +11,7 @@ import nirvana.protocol.MatchResult.MatchResultResponse.MatchResultResponseStatu
 import nirvana.protocol.MatchResult.{MatchResultRequest, MatchResultResponse}
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  * Created by songpeng on 16/4/9.
@@ -28,7 +29,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
     if (matchResultRequest.getStatus.getCode == 0) {
-      addMatchResult(matchResultRequest)
+      (matchResultRequest)
     } else {
       updateMatchStatusFail(matchResultRequest.getMatchId, matchResultRequest.getStatus)
     }
@@ -86,7 +87,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
-    var map: Map[Long, String] = Map()
+    val map = mutable.Map[Long, String]()
     var i = 0
     val batchSize = 100 //每100条执行一次sql
     matchResultRequest.getCandidateResultList.foreach {cand=>
@@ -107,13 +108,13 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         }
         JdbcDatabase.queryWithPsSetter(sql) { ps =>
         } { rs =>
-          map +=(rs.getLong("sid") -> rs.getString("cardid"))
+          map.put(rs.getLong("sid"), rs.getString("cardid"))
         }
         //清空sids
         sids = ""
       }
     }
-    map
+    map.toMap
   }
 
   private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {

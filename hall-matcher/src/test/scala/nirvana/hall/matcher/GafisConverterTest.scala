@@ -28,6 +28,20 @@ class GafisConverterTest {
     }
   }
 
+  /**
+    * 组查询mic，包含多个捺印卡指纹信息
+    */
+  @Test
+  def test_mic2: Unit ={
+    val mic = IOUtils.toByteArray(getClass.getResourceAsStream("/mic2.dat"))
+    val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
+    var nIndex = 0
+    mics.foreach { micStruct =>
+      nIndex = micStruct.nIndex
+    }
+    Assert.assertEquals(nIndex, 2)
+  }
+
   @Test
   def test_qrycondition = {
     val qrycondition = IOUtils.toByteArray(getClass.getResourceAsStream("/qrycondition.dat"))

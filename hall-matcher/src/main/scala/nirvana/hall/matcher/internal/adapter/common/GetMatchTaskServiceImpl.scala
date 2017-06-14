@@ -6,6 +6,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
@@ -31,6 +32,11 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
   val GET_SID_BY_CASE_FINGERID: String = "select t.sid as ora_sid from gafis_case_finger t where t.finger_id=?"
   val GET_SID_BY_CASE_PALMID: String = "select t.sid as ora_sid from gafis_case_palm t where t.palm_id=?"
 
+  final val GAFIS_KEYLIST_GetName = "KeyList"
+  final val GAFIS_QRYPARAM_GetName = "QryParam"
+  final val GAFIS_QRYFILTER_GetName = "QryFilter"
+  final val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
+  final val GAFIS_TEXTSQL_GetName = "TextSql"
   /**
    * 获取比对任务
    * @param matchTaskQueryRequest
@@ -98,18 +104,42 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       }
     }
 
+    //6.2文本查询条件和组查询卡号列表
+    var isGroupQry = false  //是否是组查询，通过qrycondition的keyList来判断
+    val qryCondition = rs.getBytes("qrycondition")
+    if(qryCondition != null && qryCondition.length > 0){
+      val itemPkg = new GBASE_ITEMPKG_OPSTRUCT().fromByteArray(qryCondition)
+      itemPkg.items.foreach{item =>
+        item.stHead.szItemName match {
+          case GAFIS_KEYLIST_GetName =>
+//            val keylist = new GAFIS_KEYLISTSTRUCT().fromByteArray(item.bnRes)
+            isGroupQry = true
+          case GAFIS_TEXTSQL_GetName=>
+        }
+      }
+    }
+
+    val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
+    val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()
     val mic = rs.getBytes("mic")
     val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     mics.foreach { micStruct =>
+      val index = micStruct.nIndex.toInt
       if (micStruct.bIsLatent == 1) {
-        val ldata = matchTaskBuilder.getLDataBuilder
+        if(ldataBuilderMap.get(index).isEmpty){
+          ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
+        }
+        val ldata = ldataBuilderMap.get(index).get
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
           val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
           ldata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
         }
       } else {
-        val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+        if(tdataBuilderMap.get(index).isEmpty){
+          tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
+        }
+        val tdata = tdataBuilderMap.get(index).get.addMinutiaDataBuilder()
         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
         var mnt = micStruct.pstMnt_Data
         //TT，TL查询老特征转新特征
@@ -128,13 +158,21 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     if (textSql != null) {
       queryType match {
         case HallMatcherConstants.QUERY_TYPE_TT =>
-          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          tdataBuilderMap.foreach { f =>
+            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          }
         case HallMatcherConstants.QUERY_TYPE_TL =>
-          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
+          tdataBuilderMap.foreach { f =>
+            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          }
         case HallMatcherConstants.QUERY_TYPE_LT =>
-          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          ldataBuilderMap.foreach{ f =>
+            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          }
         case HallMatcherConstants.QUERY_TYPE_LL =>
-          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
+          ldataBuilderMap.foreach{ f=>
+            f._2.setTextQuery(getTextQueryDataOfLatent(textSql))
+          }
       }
       //高级查询
       matchTaskBuilder.setConfig(DataConverter.getMatchConfig(textSql))
