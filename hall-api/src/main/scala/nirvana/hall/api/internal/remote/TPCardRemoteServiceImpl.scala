@@ -18,7 +18,13 @@ class TPCardRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends TPCardRemote
     info("remote get tpcard [personId:{},url:{}]", personId, url)
     val request = TPCardGetRequest.newBuilder().setCardId(personId).setDbid(dbId).build()
     val baseResponse = rpcHttpClient.call(url, TPCardGetRequest.cmd, request, headerMap)
-    Option(baseResponse.getExtension(TPCardGetResponse.cmd).getCard)
+    val card = baseResponse.getExtension(TPCardGetResponse.cmd).getCard
+
+    if(card.getStrCardID.nonEmpty){
+      Option(card)
+    }else{
+      None
+    }
   }
 
   /**

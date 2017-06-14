@@ -21,7 +21,13 @@ class LPPalmRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends LPPalmRemote
     val request = LPPalmGetRequest.newBuilder().setCardId(cardId)
     request.setDbid(dbId)
     val response = rpcHttpClient.call(url, LPPalmGetRequest.cmd, request.build(),headerMap)
-    Option(response.getExtension(LPPalmGetResponse.cmd).getCard)
+    val card = response.getExtension(LPPalmGetResponse.cmd).getCard
+
+    if(card.getStrCardID.nonEmpty){
+      Option(card)
+    }else{
+      None
+    }
   }
 
   /**

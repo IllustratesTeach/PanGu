@@ -18,6 +18,7 @@ class QueryRemoteServiceImpl(rpcHttpClient: RpcHttpClient) extends QueryRemoteSe
     val request = QueryGetRequest.newBuilder().setOraSid(oraSid).setUuid(uuid)
     val baseResponse = rpcHttpClient.call(url, QueryGetRequest.cmd, request.build(), headerMap)
     val queryGetResponse = baseResponse.getExtension(QueryGetResponse.cmd)
+
     if(queryGetResponse.getIsComplete){
       queryGetResponse.getMatchResult
     }else{
