@@ -13,7 +13,7 @@ class FetchQueryServiceImplTest extends BaseV62TestCase{
   @Test
   def test_fetchMatchTask: Unit ={
     val service = getService[FetchQueryService]
-    val matchTask = service.fetchMatchTask(10)
+    val matchTask = service.fetchMatchTask(10,"")
     matchTask.foreach{t => service.saveFetchRecord(t.getObjectId.toString)}
     Assert.assertNotNull(matchTask)
   }

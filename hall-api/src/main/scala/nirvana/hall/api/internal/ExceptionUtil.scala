@@ -15,9 +15,12 @@ object ExceptionUtil {
   def getStackTraceInfo(e: Exception): String = {
     var info = ""
     val writer = new StringWriter
-    val printWriter = new PrintWriter(writer)
+    val printWriter = new PrintWriter(writer,true)
       try{
+        e.printStackTrace(printWriter)
         info = writer.toString
+        printWriter.flush
+        writer.flush
       }
     catch {
       case exception: Exception => {

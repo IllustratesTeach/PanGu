@@ -4,22 +4,21 @@ import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
-import nirvana.hall.api.jpa.HallFetchConfig
+import nirvana.hall.api.jpa.{HallFetchConfig, HallReadConfig}
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSIMPSTRUCT}
-import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.{QueryMatchStatusConstants, V62Facade}
-import nirvana.hall.v62.internal.c.V62SqlHelper
-import nirvana.hall.v62.internal.c.gloclib.gcolnames
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
+import org.apache.commons.lang.StringUtils
+import org.apache.tapestry5.json.JSONObject
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -31,36 +30,42 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   /**
     * 获取比对任务, 使用ora_uuid字段及不在7.0抓取6.2记录表中，确保不被重复抓取
     *
+    * @author yuchen
     * @param size
+    * @param yearThreshold
     * @param dbId
     * @return
     */
-  override def fetchMatchTask(size: Int, dbId: Option[String]): Seq[MatchTask] = {
+  override def fetchMatchTask(size: Int, yearThreshold:String,dbId: Option[String]): Seq[MatchTask] = {
 
     val matchTaskList = new ArrayBuffer[MatchTask]
 
-    val sql = s"SELECT * FROM (SELECT " +
-                                      s"t.username " +
-                                      s",t.computerip" +
-                                      s",t.userunitcode" +
-                                      s",t.ora_uuid" +
-                                      s",t.ora_sid" +
-                                      s",ora_createtime" +
-                                      s",t.keyid" +
-                                      s",t.minscore" +
-                                      s",t.querytype" +
-                                      s",t.priority" +
-                                      s",t.maxcandnum" +
-                                      s",t.mic" +
-                                      s",t.qrycondition" +
-                                      s",t.textsql" +
-                                      s",t.flag " +
-                              s"FROM NORMALQUERY_QUERYQUE  t " +
-                              s"WHERE  NOT EXISTS (SELECT 1 " +
-                                                  s"FROM HALL_READ_RECORD p " +
-                                                  s"WHERE p.orasid=t.ora_sid)) " +
-      s"WHERE  ROWNUM <=?"
-    JdbcDatabase.queryWithPsSetter(sql) {ps =>
+    val sql = new StringBuilder;
+    sql ++= s"SELECT * FROM (SELECT " +
+                                s"t.username " +
+                                s",t.computerip" +
+                                s",t.userunitcode" +
+                                s",t.ora_uuid" +
+                                s",t.ora_sid" +
+                                s",ora_createtime" +
+                                s",t.keyid" +
+                                s",t.minscore" +
+                                s",t.querytype" +
+                                s",t.priority" +
+                                s",t.maxcandnum" +
+                                s",t.mic" +
+                                s",t.qrycondition" +
+                                s",t.textsql" +
+                                s",t.flag " +
+                                s"FROM NORMALQUERY_QUERYQUE  t " +
+                                s"WHERE  NOT EXISTS (SELECT 1 " +
+                                                    s"FROM HALL_READ_RECORD p " +
+                                                    s"WHERE p.orasid=t.ora_sid)"
+    if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
+      sql ++= s"  AND t.ora_createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
+    }
+    sql ++= s" ) WHERE  ROWNUM <=?"
+    JdbcDatabase.queryWithPsSetter(sql.toString) {ps =>
       ps.setLong(1, size)
     } { rs =>
       val gaQuery = new GafisNormalqueryQueryque()
@@ -100,7 +105,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       *
       * @param matchResult
     */
-  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(), configMap : scala.collection.mutable.HashMap[String, String]) = {
+  override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
     val oraSid = matchResult.getMatchId       //oraSid
     val candNum = matchResult.getCandidateNum //candidateNum
     val maxScore = matchResult.getMaxScore   //hitpossibility
@@ -111,7 +116,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     var isChecked:Boolean = false
     var isHaveCandidate:Boolean = false
     if(candNum > 0){
-      val resultMap = convertMatchResult2CandList(matchResult, queryQue.queryType, candDBIDMap, configMap)
+      val resultMap = convertMatchResult2CandList(matchResult, queryQue.queryType, candDBIDMap, getAfisinitConfig)
       candList = resultMap("candList").asInstanceOf[Array[Byte]]
       isChecked = resultMap("isChecked").asInstanceOf[Boolean]
       isHaveCandidate = resultMap("isHaveCandidate").asInstanceOf[Boolean]
@@ -261,53 +266,21 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @return
     */
   override def getQueryQue(orasid: Int): QueryQue = {
-    // val sql = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.seq =?"
     val sql = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid =?"
     JdbcDatabase.queryFirst(sql) { ps =>
-      //ps.setInt(1, seq)
       ps.setInt(1, orasid)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      //new QueryQue(keyId, seq, queryType, if(flag == 2 || flag == 22) true else false)
       new QueryQue(keyId, orasid, queryType, if (flag == 2 || flag == 22) true else false)
     }.get
   }
 
-  /**
-    * 根据卡号查找
-    *
-    * @param matchResult
-    * @param queryType
-    */
-  private def getCardIdDbidMap(matchResult: MatchResult, queryType: Int): Unit = {
-
-  }
-
-  /**
-    * 获取比对状态正在比对任务SID
-    *
-    * @param size
-    * @return
-    */
-  override def getSidByStatusMatching(size: Int, dbId: Option[String]): Seq[Long] = {
-    val sidArr = ArrayBuffer[Long]()
-    //val sql = "select t.seq from NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
-    val sql = "select t.ora_sid from NORMALQUERY_QUERYQUE t where t.status=1 and rownum <=?"
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setInt(1, size)
-    } { rs =>
-      //sidArr += rs.getLong("seq")
-      sidArr += rs.getLong("ora_sid")
-    }
-    sidArr
-  }
-  
    /**
     * 获得配置信息
     */
-  override def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String] = {
+  private def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String] = {
     val configMap = new scala.collection.mutable.HashMap[String, String]
     val sql = "select * from ADMIN_AFISINIT where key in (?,?) "
     JdbcDatabase.queryWithPsSetter(sql){ps=>
@@ -324,6 +297,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   /**
     * 保存6.2已经给7.0抓取的任务的任务号
     *
+    * @author yuchen
     * @param oraSid
     * @return
     */
@@ -339,8 +313,8 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   /**
     * 获得没有同步候选的比对任务的任务号
     *
-    * @param size 单次请求数量
     * @author yuchen
+    * @param size 单次请求数量
     */
   override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = ???
 

@@ -23,6 +23,7 @@ import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.v70.jpa.GafisTask62Record
+import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -513,12 +514,11 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val matchResult = response.getMatchResult
           if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
             val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-            val configMap = fetchQueryService.getAfisinitConfig()
-            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap, configMap)
+            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+            fetchQueryService.updateStatusWithGafis_Task62Record(matchStatus.getNumber.toString,uniqueId)
             info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
           }
         }
-        fetchQueryService.updateStatusWithGafis_Task62Record(matchStatus.getNumber.toString,uniqueId)
       }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
@@ -527,6 +527,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        e.printStackTrace
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
     }
@@ -550,7 +551,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val cardId = cand.getObjectId
       val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-      val dbId = getTPDBIDByCardId(cardId, dbidList,isPalm)
+        val dbId = getTPDBIDByCardId(cardId, dbidList,isPalm)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         } else {
@@ -573,21 +574,23 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }else {
               if(!isPalm){
                 val lPCardOpt = lPCardRemoteService.getLPCard(cardId, fetchConfig.url, candDbId)
-                lPCardOpt.foreach { lpCard =>
-                  if(!lPCardService.isExist(lpCard.getStrCardID)){
-                    lPCardService.addLPCard(lpCard)
+                if(!lPCardOpt.isEmpty){
+                  lPCardOpt.filter(_.getStrCardID.nonEmpty).foreach { lpCard =>
+                    if(!lPCardService.isExist(lpCard.getStrCardID)){
+                      lPCardService.addLPCard(lpCard)
+                    }
+                    val caseId = lpCard.getText.getStrCaseId
+                    if (!caseInfoService.isExist(caseId, Option(candDbId))) {
+                      //获取案件
+                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                    }
+                    candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                   }
-                  val caseId = lpCard.getText.getStrCaseId
-                  if (!caseInfoService.isExist(caseId, Option(candDbId))) {
-                    //获取案件
-                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
-                  }
-                  candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                 }
               }
               else{
                 val lPPalmOpt = lPPalmRemoteService.getLPPalm(cardId, fetchConfig.url, candDbId)
-                lPPalmOpt.foreach { lpCard =>
+                lPPalmOpt.filter(_.getStrCardID.nonEmpty).foreach { lpCard =>
                   lPPalmService.addLPCard(lpCard)
                   val caseId = lpCard.getText.getStrCaseId
                   if (!caseInfoService.isExist(caseId, Option(candDbId))) {

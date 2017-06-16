@@ -15,6 +15,7 @@ import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.QueryMatchStatusConstants
+import org.apache.tapestry5.json.JSONObject
 import org.slf4j.LoggerFactory
 
 /**
@@ -273,7 +274,13 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
 
         var matchTaskList: Seq[MatchTask] = null
         if(hallReadConfigOpt.nonEmpty){
-          matchTaskList = fetchQueryService.fetchMatchTask(request.getSize, dbId)
+
+          val strategy = new JSONObject(hallReadConfigOpt.get.readStrategy)
+          var yearThreshold = ""
+          if (strategy.has("taskyear")){
+            yearThreshold = strategy.getString("taskyear")
+          }
+          matchTaskList = fetchQueryService.fetchMatchTask(request.getSize,yearThreshold, dbId)
           matchTaskList.foreach{matchTask=>
             match_task_orasid=matchTask.getMatchId
             responseBuilder.addMatchTask(matchTask)

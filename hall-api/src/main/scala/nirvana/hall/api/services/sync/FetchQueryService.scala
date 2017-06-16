@@ -5,7 +5,6 @@ import nirvana.hall.api.internal.DataConverter
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDHEADSTRUCT
-import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.V62Facade
@@ -22,10 +21,11 @@ trait FetchQueryService {
   /**
     * 获取比对任务
     * @param size
+    * @param yearThreshold
     * @param dbId
     * @return
     */
-  def fetchMatchTask(size: Int, dbId: Option[String] = None): Seq[MatchTask]
+  def fetchMatchTask(size: Int, yearThreshold:String, dbId: Option[String] = None): Seq[MatchTask]
 
   /**
     * 保存候选信息
@@ -33,7 +33,7 @@ trait FetchQueryService {
     * @param fetchConfig 同步配置
     * @param candDBIDMap 候选卡号->dbid
     */
-  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map(),configMap : scala.collection.mutable.HashMap[String, String])
+  def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map())
 
   /**
     * 根据远程查询queryid获取查询结果信息
@@ -43,15 +43,8 @@ trait FetchQueryService {
     * @param dbId
     * @return
     */
-  //def getMatchResultByQueryid(queryid: Long, dbId: Option[String] = None): Option[MatchResult]
   def getMatchResultByQueryid(queryId: Long, pkId: String, typ: Short, dbId: Option[String] = None): Option[MatchResult]
 
-  /**
-    * 获取比对状态正在比对任务SID
-    * @param size
-    * @return
-    */
-  def getSidByStatusMatching(size: Int, dbId: Option[String] = None): Seq[Long]
   /**
     * 获取候选头结构信息
     * @param matchResult
@@ -77,11 +70,7 @@ trait FetchQueryService {
     * @return
     */
   def getQueryQue(oraSid: Int): QueryQue
-  
-    /**
-    * 获得配置信息
-    */
-  def getAfisinitConfig() : scala.collection.mutable.HashMap[String, String]
+
 
   /**
     * 保存抓取记录
