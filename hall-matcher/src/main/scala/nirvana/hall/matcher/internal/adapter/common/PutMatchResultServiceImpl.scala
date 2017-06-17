@@ -29,7 +29,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
     if (matchResultRequest.getStatus.getCode == 0) {
-      (matchResultRequest)
+      addMatchResult(matchResultRequest)
     } else {
       updateMatchStatusFail(matchResultRequest.getMatchId, matchResultRequest.getStatus)
     }
