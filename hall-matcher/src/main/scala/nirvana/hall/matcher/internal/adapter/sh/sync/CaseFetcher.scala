@@ -23,14 +23,41 @@ import nirvana.hall.matcher.internal.TextQueryConstants._
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
-  override val SYNC_SQL: String = "select c.case_id caseId, c.case_class_code caseClassCode, c.case_nature caseNature, c.case_occur_place_code caseOccurPlaceCode," +
-    " c.suspicious_area_code suspiciousAreaCode, c.is_murder isMurder, c.assist_level assistLevel, c.case_state caseState, c.case_occur_date caseOccurDate, c.is_checked isChecked," +
-    " c.case_source caseSource, c.case_occur_place_detail caseOccurPlaceDetail, c.extractor, c.extract_unit_code extractUnitCode, c.extract_unit_name extractUnitName, c.extract_date extractDate, c.broken_status brokenStatus," +
-    " t.sid sid, t.cardid cardId, t.is_assist isAssist, t.seq seq, t.deletag, t.is_palm isPalm, db.logic_db_pkid logicDB, t.lt_status  ltStatus, t.creator_unit_code creatorUnitCode, t.updator_unit_code updatorUnitCode, t.inputpsn, t.inputtime, t.modifiedpsn, t.modifiedtime " +
-    " from (select f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm, f.lt_status, f.creator_unit_code, f.updator_unit_code, f.inputpsn, f.inputtime, f.modifiedpsn, f.modifiedtime from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
-    " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
-    " left join gafis_case c on t.case_id = c.case_id " +
-    " left join gafis_logic_db_case db on db.case_pkid = c.case_id order by t.seq"
+  override val SYNC_SQL: String = s"select c.case_id caseId" +
+    s", c.case_class_code " + COL_NAME_CASECLASSCODE +
+    s", c.case_nature " + COL_NAME_CASENATURE +
+    s", c.case_occur_place_code " + COL_NAME_CASEOCCURPLACECODE +
+    s", c.suspicious_area_code " + COL_NAME_SUSPICIOUSAREACODE +
+    s", c.is_murder " + COL_NAME_ISMURDER +
+    s", c.assist_level " + COL_NAME_ASSISTLEVEL +
+    s", c.case_state " + COL_NAME_CASESTATE +
+    s", c.case_occur_date " + COL_NAME_CASEOCCURDATE +
+    s", c.is_checked " + COL_NAME_ISCHECKED +
+    s", c.case_source " + COL_NAME_CASESOURCE +
+    s", c.case_occur_place_detail " + COL_NAME_CASEOCCURPLACEDETAIL +
+    s", c.extractor" +
+    s", c.extract_unit_code " + COL_NAME_EXTRACTUNITCODE +
+    s", c.extract_unit_name " + COL_NAME_EXTRACTUNITNAME +
+    s", c.extract_date " + COL_NAME_EXTRACTDATE +
+    s", c.broken_status " + COL_NAME_BROKENSTATUS +
+    s", t.sid sid" +
+    s", t.cardid " + COL_NAME_CARDID +
+    s", t.is_assist " + COL_NAME_ISASSIST +
+    s", t.seq seq" +
+    s", t.deletag" +
+    s", t.is_palm " + COL_NAME_ISPALM +
+    s", db.logic_db_pkid " + COL_NAME_LOGICDB +
+    s", t.lt_status  " + COL_NAME_LTSTATUS +
+    s", t.creator_unit_code " + COL_NAME_CREATORUNITCODE +
+    s", t.updator_unit_code " + COL_NAME_UPDATORUNITCODE +
+    s", t.inputpsn" +
+    s", t.inputtime" +
+    s", t.modifiedpsn" +
+    s", t.modifiedtime " +
+    " FROM (SELECT f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm, f.lt_status, f.creator_unit_code, f.updator_unit_code, f.inputpsn, f.inputtime, f.modifiedpsn, f.modifiedtime from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
+    " UNION ALL SELECT p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
+    " LEFT JOIN gafis_case c ON t.case_id = c.case_id " +
+    " LEFT JOIN gafis_logic_db_case db ON db.case_pkid = c.case_id order by t.seq"
   private val caseCols: Array[String] = Array[String](COL_NAME_CASEID, COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE,
                                                       COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST,
                                                       COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG,COL_NAME_ISPALM, COL_NAME_LOGICDB,

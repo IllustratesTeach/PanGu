@@ -22,12 +22,12 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
   override val SYNC_SQL: String = "select t.sid, t.seq" +
-    ", t.personid" + COL_NAME_PERSONID
-    ", t.name" + COL_NAME_NAME
+    ", t.personid  " + COL_NAME_PERSONID
+    ", t.name  " + COL_NAME_NAME
     ", t.sex_code " + COL_NAME_SEXCODE
     ", t.birthdayst " + COL_NAME_BIRTHDAY
-    ", t.door" + COL_NAME_DOOR
-    ", t.address" + COL_NAME_ADDRESS
+    ", t.door  " + COL_NAME_DOOR
+    ", t.address  " + COL_NAME_ADDRESS
     ", t.gather_category " + COL_NAME_GATHERCATEGORY
     ", t.gather_type_id " + COL_NAME_GATHERTYPEID
     ", t.gather_date " + COL_NAME_GATHERDATE

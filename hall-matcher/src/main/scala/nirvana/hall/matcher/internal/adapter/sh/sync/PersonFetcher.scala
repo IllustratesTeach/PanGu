@@ -21,23 +21,74 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
-  override val SYNC_SQL: String = "SELECT t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
-    " t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate," +
-    " t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode," +
-    " t.recordmark, t.deletag, db.logic_db_pkid as logicDB, t.gather_org_code gatherOrgCode, t.nativeplace_code nativeplaceCode," +
-    " t.foreign_name foreignName, t.assist_level assistLevel, t.assist_ref_person assistRefPerson, t.assist_ref_case assistRefCase," +
-    " t.gatherdepartname, t.gatherusername, t.contrcapture_code contrcaptureCode," +
-    " t.certificatetype, t.certificateid, t.process_no processNo, t.psis_no psisNo," +
-    " t.spellname, t.usedname, t.usedspell, t.aliasname, t.aliasspell, t.birth_code birthCode, t.birth_street birthStreet," +
-    " t.birthdetail, t.door_street doorStreet, t.doordetail, t.address_street addressStreet," +
-    " t.addressdetail, t.culture_code cultureCode, t.faith_code faithCode, t.haveemployment," +
-    " t.job_code jobCode, t.otherspecialty, t.specialidentity_code specialidentityCode," +
-    " t.specialgroup_code specialgroupCode, t.gatherer_id gathererId, t.fingerrepeatno, t.inputpsn," +
-    " t.inputtime, t.modifiedpsn, t.modifiedtime, t.person_category personCategory, t.gather_finger_mode gatherFingerMode," +
-    " t.case_name caseName, t.reason, t.gatherdepartcode, t.gatheruserid," +
-    " t.gather_finger_time gatherFingerTime, t.cardid, t.is_xjssmz isXjssmz" +
-    " FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
-    " WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
+  override val SYNC_SQL: String = s"SELECT t.sid" +
+                                        s", t.seq" +
+                                        s", t.personid" +
+                                        s", t.name" +
+                                        s", t.sex_code " + COL_NAME_SEXCODE +
+                                        s", t.birthdayst " + COL_NAME_BIRTHDAY +
+                                        s", t.door" +
+                                        s", t.address" +
+                                        s", t.gather_category " + COL_NAME_GATHERCATEGORY +
+                                        s", t.gather_type_id " + COL_NAME_GATHERTYPE +
+                                        s", t.gather_date " + COL_NAME_GATHERDATE +
+                                        s", t.data_sources " + COL_NAME_DATASOURCES +
+                                        s", t.case_classes " + COL_NAME_CASECLASS
+                                        s", t.idcardno" +
+                                        s", t.person_type " + COL_NAME_PERSONTYPE +
+                                        s", t.nation_code " + COL_NAME_NATIONCODE +
+                                        s", t.recordmark" +
+                                        s", t.deletag" +
+                                        s", db.logic_db_pkid as " + COL_NAME_LOGICDB +
+                                        s", t.gather_org_code " + COL_NAME_GATHERORGCODE +
+                                        s", t.nativeplace_code " + COL_NAME_NATIVEPLACECODE +
+                                        s", t.foreign_name " + COL_NAME_FOREIGNNAME +
+                                        s", t.assist_level " + COL_NAME_ASSISTLEVEL +
+                                        s", t.assist_ref_person " + COL_NAME_ASSISTREFPERSON +
+                                        s", t.assist_ref_case " + COL_NAME_ASSISTREFCASE +
+                                        s", t.gatherdepartname" +
+                                        s", t.gatherusername" +
+                                        s", t.contrcapture_code " + COL_NAME_CONTRCAPTURECODE +
+                                        s", t.certificatetype" +
+                                        s", t.certificateid" +
+                                        s", t.process_no " + COL_NAME_PROCESSNO +
+                                        s", t.psis_no " + COL_NAME_PSISNO +
+                                        s", t.spellname" +
+                                        s", t.usedname" +
+                                        s", t.usedspell" +
+                                        s", t.aliasname" +
+                                        s", t.aliasspell" +
+                                        s", t.birth_code " + COL_NAME_BIRTHCODE +
+                                        s", t.birth_street " + COL_NAME_BIRTHSTREET +
+                                        s", t.birthdetail" +
+                                        s", t.door_street " + COL_NAME_DOORSTREET +
+                                        s", t.doordetail" +
+                                        s", t.address_street " + COL_NAME_ADDRESSSTREET +
+                                        s", t.addressdetail" +
+                                        s", t.culture_code " + COL_NAME_CULTURECODE +
+                                        s", t.faith_code " + COL_NAME_FAITHCODE +
+                                        s", t.haveemployment" +
+                                        s", t.job_code " + COL_NAME_JOBCODE +
+                                        s", t.otherspecialty" +
+                                        s", t.specialidentity_code " + COL_NAME_SPECIALIDENTITYCODE +
+                                        s", t.specialgroup_code " + COL_NAME_SPECIALGROUPCODE +
+                                        s", t.gatherer_id " + COL_NAME_GATHERERID +
+                                        s", t.fingerrepeatno" +
+                                        s", t.inputpsn" +
+                                        s", t.inputtime" +
+                                        s", t.modifiedpsn" +
+                                        s", t.modifiedtime" +
+                                        s", t.person_category " + COL_NAME_PERSONCATEGORY +
+                                        s", t.gather_finger_mode " + COL_NAME_GATHERFINGERMODE +
+                                        s", t.case_name " + COL_NAME_CASENAME +
+                                        s", t.reason" +
+                                        s", t.gatherdepartcode" +
+                                        s", t.gatheruserid" +
+                                        s", t.gather_finger_time " + COL_NAME_GATHERFINGERTIME +
+                                        s", t.cardid" +
+                                        s", t.is_xjssmz " + COL_NAME_ISXJSSMZ +
+                                 s" FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
+                                 s" WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
   private val personCols: Array[String] = Array[String](COL_NAME_PERSONID, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS,
     COL_NAME_SEXCODE, COL_NAME_NAME, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, IDCARDNO, COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_LOGICDB,
     COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE, COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON, COL_NAME_ASSISTREFCASE, COL_NAME_GATHERDEPARTNAME,
