@@ -17,7 +17,7 @@ import org.junit.{Assert, Test}
 class SyncDataTest {
 
 //  val url = "http://10.1.6.247:9003"
-  val url = "http://127.0.0.1:9003"
+  val url = "http://127.0.0.1:10000"
   @Test
   def testSyncData(): Unit ={
      val syncUrl = url+"/syncData"

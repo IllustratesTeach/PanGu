@@ -2,6 +2,7 @@ package nirvana.hall.webservice
 
 import java.io.FileOutputStream
 
+import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import org.junit.Test
 
@@ -47,5 +48,10 @@ class WsFingerServiceImplTest extends BaseTestCase{
     dataHandler.writeTo(fileOutPutStream)
     fileOutPutStream.flush()
     fileOutPutStream.close()
+  }
+  @Test
+  def test_insertXC_report(): Unit ={
+    val service = getService[AssistCheckRecordService]
+    service.saveErrorReport("123456","123",0,"测试")
   }
 }

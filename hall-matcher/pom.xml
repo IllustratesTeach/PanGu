@@ -130,6 +130,14 @@
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
         </dependency>
+
+        <!-- using profile  -P oracle -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3.0</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>hall-matcher-${project.version}</finalName>

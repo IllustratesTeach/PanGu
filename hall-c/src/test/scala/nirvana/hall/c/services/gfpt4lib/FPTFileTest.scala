@@ -89,7 +89,7 @@ class FPTFileTest {
   }
   @Test
   def test_parse: Unit ={
-    val is = getClass.getResourceAsStream("/fpt3.fpt")
+    val is = getClass.getResourceAsStream("/3100002009627747H_20170521071902867.fpt")
     val fpt=FPTFile.parseFromInputStream(is)
     Assert.assertTrue(fpt.isLeft)
     val is2 = getClass.getResourceAsStream("/fpt4.fpt")
@@ -146,5 +146,40 @@ class FPTFileTest {
         logger.error(e.getMessage,e)
     }
     val head = fpt4.head
+  }
+
+
+  @Test
+  def test_filterFPT: Unit ={
+    val files = FileUtils.listFiles(new File("E:\\20170525"),Array[String]("fpt","FPT","fptt"),true)
+    val it = files.iterator()
+    while(it.hasNext){
+      val file = it.next()
+      try {
+        val is = new FileInputStream(file)
+        val result = FPTFile.parseFromInputStream(is)
+        IOUtils.closeQuietly(is)
+        result match{
+          case Right(fpt4)=>
+            fpt4.logic02Recs.head.fingers.foreach { (f: FPT4File.FingerTData)
+            => f.customInfoLength = "0" //自定义信息长度	不能为空 必须为数字
+              f.imgHorizontalLength = "640" //    图像水平方向长度	必须为640
+              f.imgVerticalLength = "640" //      图像垂直方向长度	必须为640
+              f.dpi = "500" //      图像分辨率	必须为500
+              if(!f.imgCompressMethod.startsWith("14")){
+                f.imgCompressMethod = "1419" //      图像压缩方法代码	不能为空 必须为14开头的WSQ压缩方法
+              }
+            }
+            FileUtils.writeByteArrayToFile(new File(file.getAbsolutePath)
+              ,fpt4.toByteArray(AncientConstants.GBK_ENCODING))
+
+          case Left(fpt3) =>
+            println("No support FPT V3.0")
+        }
+      }catch{
+        case e:Throwable=>
+        //          println(file.getAbsolutePath+" \n\te:"+e.toString)
+      }
+    }
   }
 }

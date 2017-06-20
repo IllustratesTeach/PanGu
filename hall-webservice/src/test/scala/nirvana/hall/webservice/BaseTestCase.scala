@@ -14,10 +14,12 @@ import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.TenPrinterExportServiceImpl
-import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
-import nirvana.hall.webservice.services.TenPrinterExportService
+import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TenPrinterExportServiceImpl}
+import nirvana.hall.webservice.internal.bjwcsy.{Union4pfmipCronService, WsFingerServiceImpl}
+import nirvana.hall.webservice.internal.xingzhuan.FetchFPTServiceImpl
+import nirvana.hall.webservice.services.{SendQueryService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
+import nirvana.hall.webservice.services.xingzhuan.FetchFPTService
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -77,8 +79,9 @@ object TestWebserviceModule{
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
-
+    binder.bind(classOf[FetchFPTService],classOf[FetchFPTServiceImpl])
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
+    binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
   }
 }
 object TestV62Module{

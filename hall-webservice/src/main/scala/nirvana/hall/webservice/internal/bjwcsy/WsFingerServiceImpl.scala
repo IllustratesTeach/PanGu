@@ -154,7 +154,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService, lpCardService: LPCardSer
       val logic03Rec = fptService.getLogic03Rec(ajno)
       if(logic03Rec != null){
         fPT4File.logic03Recs = Array(logic03Rec)
-        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.toByteArray()))
+        dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }else{
         dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
       }
@@ -162,7 +162,7 @@ class WsFingerServiceImpl(tpCardService: TPCardService, lpCardService: LPCardSer
     }catch{
       case e : Exception => error("fun:getLatentFinger Exception" +
         ",inputParam-userid:{};password:{};ajno:{},errormessage:{},outtime:{}"
-        ,userid,password,ajno,e.getMessage,new Date)
+        ,userid,password,ajno,e.getMessage + ";" + e.getStackTrace,new Date)
         new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
     }
   }

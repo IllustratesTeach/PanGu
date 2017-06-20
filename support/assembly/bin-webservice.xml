@@ -34,6 +34,13 @@
       <outputDirectory>config</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>../support/config</directory>
+      <includes>
+        <include>hall-api.xml.example</include>
+      </includes>
+      <outputDirectory>config</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>src/main/resources/hall/webservice</directory>
       <includes>
         <include>webservice.xsd</include>
@@ -51,6 +58,13 @@
       <directory>src/main/resources/hall/v62</directory>
       <includes>
         <include>v62.xsd</include>
+      </includes>
+      <outputDirectory>doc/xsd</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources/hall/api</directory>
+      <includes>
+        <include>api.xsd</include>
       </includes>
       <outputDirectory>doc/xsd</outputDirectory>
     </fileSet>

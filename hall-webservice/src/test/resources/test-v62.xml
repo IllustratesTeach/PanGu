@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <hall_v62>
     <app_server>
-        <host>127.0.0.1</host>
+        <host>localhost</host>
         <port>6898</port>
         <user>afisadmin</user>
-        <password>helloafis</password>
+        <password></password>
     </app_server>
     <template_finger_table>
         <database_id>1</database_id>
@@ -26,6 +26,6 @@
         <driver>oracle.jdbc.driver.OracleDriver</driver>
         <user>afis</user>
         <password>helloafis</password>
-        <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+        <url>jdbc:oracle:thin:@localhost:1521:oragafis</url>
     </database>
 </hall_v62>

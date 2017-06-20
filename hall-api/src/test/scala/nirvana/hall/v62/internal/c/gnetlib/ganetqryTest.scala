@@ -24,7 +24,7 @@ class ganetqryTest {
   @Test
   def test_add: Unit ={
     val config = new HallV62Config
-    config.appServer.host = "10.1.6.119"
+    config.appServer.host = "192.168.1.17"
     config.appServer.port = 6898
     config.appServer.user = "afisadmin"
 
