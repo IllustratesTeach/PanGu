@@ -6,7 +6,6 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
@@ -105,7 +104,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     }
 
     //6.2文本查询条件和组查询卡号列表
-    var isGroupQry = false  //是否是组查询，通过qrycondition的keyList来判断
+    /*var isGroupQry = false  //是否是组查询，通过qrycondition的keyList来判断
     val qryCondition = rs.getBytes("qrycondition")
     if(qryCondition != null && qryCondition.length > 0){
       val itemPkg = new GBASE_ITEMPKG_OPSTRUCT().fromByteArray(qryCondition)
@@ -117,7 +116,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
           case GAFIS_TEXTSQL_GetName=>
         }
       }
-    }
+    }*/
 
     val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
     val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()

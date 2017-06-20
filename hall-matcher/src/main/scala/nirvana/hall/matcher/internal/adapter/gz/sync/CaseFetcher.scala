@@ -23,7 +23,21 @@ import nirvana.hall.matcher.internal.TextQueryConstants._
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
-  override val SYNC_SQL: String = "select c.case_id caseId, c.case_class_code caseClassCode, c.case_nature caseNature, c.case_occur_place_code caseOccurPlaceCode, c.suspicious_area_code suspiciousAreaCode, c.is_murder isMurder, c.assist_level assistLevel, c.case_state caseState, c.case_occur_date caseOccurDate, t.sid sid, t.cardid cardId, t.is_assist isAssist, t.seq seq, t.deletag, t.is_palm isPalm " +
+  override val SYNC_SQL: String = "select c.case_id " + COL_NAME_CASEID
+    ", c.case_class_code " + COL_NAME_CASECLASSCODE
+    ", c.case_nature " + COL_NAME_CASENATURE
+    ", c.case_occur_place_code " + COL_NAME_CASEOCCURPLACECODE
+    ", c.suspicious_area_code " + COL_NAME_SUSPICIOUSAREACODE
+    ", c.is_murder " + COL_NAME_ISMURDER
+    ", c.assist_level " + COL_NAME_ASSISTLEVEL
+    ", c.case_state " + COL_NAME_CASESTATE
+    ", c.case_occur_date " + COL_NAME_CASEOCCURDATE
+    ", t.cardid " + COL_NAME_CARDID
+    ", t.is_assist " + COL_NAME_ISASSIST
+    ", t.sid sid" +
+    ", t.seq seq" +
+    ", t.deletag" +
+    ", t.is_palm isPalm " +
     " from (select f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm   from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm   from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
     " left join gafis_case c on t.case_id = c.case_id order by t.seq"
@@ -73,7 +87,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
         }
       }
       //案件编号
-      val caseId = rs.getString("caseId")
+      val caseId = rs.getString(COL_NAME_CASEID)
       if(caseId != null){
         TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
       }
