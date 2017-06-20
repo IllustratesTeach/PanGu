@@ -159,9 +159,9 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
         gCand.nScore = cand.getScore
         gCand.szKey = keyId.get
         //dbid, tableid 分别截取desc的前两位字节和三四位字节, 分别表示比对类型和指位
-        val desc = ByteBuffer.allocate(8).putLong(cand.getDesc)
-        gCand.nDBID = desc.getShort(4)
-        gCand.nTableID = desc.getShort(6)
+        //val desc = ByteBuffer.allocate(8).putLong(cand.getDesc)
+        //gCand.nDBID = desc.getShort(4)
+        //gCand.nTableID = desc.getShort(6)
 //        gCand.nDBID = if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_LT) 1 else 2
 //        gCand.nTableID = 2
         gCand.nIndex = fgp.toByte

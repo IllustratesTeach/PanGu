@@ -18,19 +18,40 @@ import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, 
   */
 class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor: FeatureExtractor,override implicit val dataSource: DataSource) extends GetMatchTaskServiceImpl(hallMatcherConfig, featureExtractor, dataSource){
   /** 获取比对任务  */
-  override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+  override val MATCH_TASK_QUERY: String = s" SELECT * FROM (SELECT " +
+                                                              s"t.ora_sid ora_sid" +
+                                                              s", t.keyid" +
+                                                              s", t.querytype" +
+                                                              s", t.maxcandnum" +
+                                                              s", t.minscore" +
+                                                              s", t.priority" +
+                                                              s", t.mic" +
+                                                              s", t.qrycondition" +
+                                                              s", t.textsql" +
+                                                              s", t.flag" +
+                                                        s"  FROM GAFIS_NORMALQUERY_QUERYQUE t" +
+                                                        s"  WHERE t.submittsystem <> 3" +
+                                                              s" AND t.status=0" +
+                                                              s" AND t.deletag=1" +
+                                                              s" AND t.sync_target_sid IS NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt" +
+                                        s"  WHERE ROWNUM <=?"
 
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
-    "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
-    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
-    "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
-    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno",
-    "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
-  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
+  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY,COL_NAME_GATHERTYPEID,COL_NAME_GATHERTYPE,COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE,COL_NAME_DATASOURCES,COL_NAME_CASECLASS,
+    COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE,COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON,COL_NAME_ASSISTREFCASE,
+    COL_NAME_GATHERDEPARTNAME, COL_NAME_GATHERUSERNAME, COL_NAME_CONTRCAPTURECODE,COL_NAME_CERTIFICATETYPE,COL_NAME_CERTIFICATEID,COL_NAME_PROCESSNO,COL_NAME_PSISNO,COL_NAME_SPELLNAME,COL_NAME_USEDNAME,
+    COL_NAME_USEDSPELL, COL_NAME_ALIASNAME,COL_NAME_ALIASSPELL,COL_NAME_BIRTHCODE,COL_NAME_BIRTHSTREET,COL_NAME_BIRTHDETAIL, COL_NAME_DOORSTREET, COL_NAME_DOORDETAIL, COL_NAME_ADDRESSSTREET, COL_NAME_ADDRESSDETAIL,
+    COL_NAME_CULTURECODE, COL_NAME_FAITHCODE,COL_NAME_HAVEEMPLOYMENT,COL_NAME_JOBCODE,COL_NAME_OTHERSPECIALTY, COL_NAME_SPECIALIDENTITYCODE, COL_NAME_SPECIALGROUPCODE, COL_NAME_GATHERERID, COL_NAME_FINGERREPEATNO,
+    COL_NAME_INPUTPSN, COL_NAME_MODIFIEDPSN, COL_NAME_PERSONCATEGORY, COL_NAME_GATHERFINGERMODE, COL_NAME_CASENAME, COL_NAME_REASON, COL_NAME_GATHERDEPARTCODE,COL_NAME_GATHERUSERID,COL_NAME_CARDID,COL_NAME_ISXJSSMZ)
+  private val caseCols: Array[String] = Array[String](COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE, COL_NAME_SUSPICIOUSAREACODE,COL_NAME_ISMURDER
+    , COL_NAME_ISASSIST
+    , COL_NAME_ASSISTLEVEL,COL_NAME_CASESTATE, COL_NAME_ISCHECKED,COL_NAME_LTSTATUS,COL_NAME_CASESOURCE
+    , COL_NAME_CASEOCCURPLACEDETAIL, COL_NAME_EXTRACTOR, COL_NAME_EXTRACTUNITCODE,COL_NAME_EXTRACTUNITNAME
+    , COL_NAME_BROKENSTATUS,COL_NAME_CREATORUNITCODE,COL_NAME_UPDATORUNITCODE,COL_NAME_INPUTPSN, COL_NAME_MODIFIEDPSN)
 
   /**
    * 获取捺印文本查询条件
-   * @param textSql
+    *
+    * @param textSql
    * @return
    */
   override def getTextQueryDataOfTemplate(textSql: String): TextQueryProto.TextQueryData ={
@@ -60,7 +81,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
         //处理其他特殊的查询条件
         //模糊字段
-        val fuzzyColumn = Array("name", "idcardno")
+        val fuzzyColumn = Array(PERSON_NAME,IDCARDNO)
         fuzzyColumn.foreach{col =>
           if (json.has(col)) {
             val keywordQuery = KeywordQuery.newBuilder()
@@ -68,19 +89,37 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
-        //时间段
-        val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime")
-        dateCols.foreach{col =>
-          if (json.has(col + "ST") && json.has(col + "ED")) {
-            val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-            textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
-          }
+
+        if(json.has(BIRTHDAY_BEG) && json.has(BIRTHDAY_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(BIRTHDAY_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(BIRTHDAY_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_BIRTHDAY).setExtension(LongRangeQuery.query, longQuery.build())
         }
+        if(json.has(GATHERDATE_BEG) && json.has(GATHERDATE_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(GATHERDATE_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(GATHERDATE_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_GATHERDATE).setExtension(LongRangeQuery.query, longQuery.build())
+        }
+
+        if(json.has(INPUTTIME_BEG) && json.has(INPUTTIME_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(INPUTTIME_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(INPUTTIME_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_INPUTTIME).setExtension(LongRangeQuery.query, longQuery.build())
+        }
+
+        if(json.has(MODIFIEDTIME_BEG) && json.has(MODIFIEDTIME_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(MODIFIEDTIME_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(MODIFIEDTIME_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_MODIFIEDTIME).setExtension(LongRangeQuery.query, longQuery.build())
+        }
+
         //导入编号
-        if(json.has("impKeys")){
-          val personIds = json.getString("impKeys").split("\\|")
+        if(json.has(IMPKEYS)){
+          val personIds = json.getString(IMPKEYS).split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           personIds.foreach{personId =>
             groupQuery.addClauseQueryBuilder().setName("personId").setExtension(KeywordQuery.query,
@@ -101,9 +140,9 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           values.foreach{value =>
             val keywordQuery = KeywordQuery.newBuilder()
             keywordQuery.setValue(value)
-            groupQuery.addClauseQueryBuilder().setName("logicDB").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("logicDB").setExtension(GroupQuery.query, groupQuery.build())
+          textQuery.addQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(GroupQuery.query, groupQuery.build())
         }
       }
       catch {
@@ -116,7 +155,8 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
 
   /**
    * 现场文本检索
-   * @param textSql
+    *
+    * @param textSql
    * @return
    */
   override def getTextQueryDataOfLatent(textSql: String): TextQueryData ={
@@ -144,21 +184,32 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //时间段
-        val dateCols = Array("extractDate", "inputtime", "modifiedtime")
-        dateCols.foreach{col =>
-          if (json.has(col + "ST") && json.has(col + "ED")) {
-            val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-            textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
-          }
+        if (json.has(EXTRACTDATE_BEG) && json.has(EXTRACTDATE_END)) {
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(EXTRACTDATE_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(EXTRACTDATE_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_EXTRACTDATE).setExtension(LongRangeQuery.query, longQuery.build())
+        }
+
+        if(json.has(INPUTTIME_BEG) && json.has(INPUTTIME_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(INPUTTIME_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(INPUTTIME_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_INPUTTIME).setExtension(LongRangeQuery.query, longQuery.build())
+        }
+
+        if(json.has(MODIFIEDTIME_BEG) && json.has(MODIFIEDTIME_END)){
+          val longQuery = LongRangeQuery.newBuilder()
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(MODIFIEDTIME_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(MODIFIEDTIME_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder().setName(COL_NAME_MODIFIEDTIME).setExtension(LongRangeQuery.query, longQuery.build())
         }
         //发案时间
-        if (json.has("caseOccurDateBeg") && json.has("caseOccurDateEnd")) {
+        if (json.has(CASEOCCURDATE_BEG) && json.has(CASEOCCURDATE_END)) {
           val longQuery = LongRangeQuery.newBuilder
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder.setName("caseOccurDate").setExtension(LongRangeQuery.query, longQuery.build)
+          longQuery.setMin(DateConverter.convertStr2Date(json.getString(CASEOCCURDATE_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
+          longQuery.setMax(DateConverter.convertStr2Date(json.getString(CASEOCCURDATE_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+          textQuery.addQueryBuilder.setName(COL_NAME_CASEOCCURDATE).setExtension(LongRangeQuery.query, longQuery.build)
         }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
@@ -173,9 +224,9 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           values.foreach{value =>
             val keywordQuery = KeywordQuery.newBuilder()
             keywordQuery.setValue(value)
-            groupQuery.addClauseQueryBuilder().setName("logicDB").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("logicDB").setExtension(GroupQuery.query, groupQuery.build())
+          textQuery.addQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(GroupQuery.query, groupQuery.build())
         }
       }catch {
         case e: Exception =>

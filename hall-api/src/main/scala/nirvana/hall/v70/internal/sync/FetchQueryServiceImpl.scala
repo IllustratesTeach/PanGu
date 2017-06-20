@@ -2,7 +2,6 @@ package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
-
 import nirvana.hall.api.config.QueryQue
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.sync.FetchQueryService
@@ -14,9 +13,8 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisTask62Record}
-
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ListBuffer}
 
 /**
   * Created by songpeng on 16/8/26.
@@ -65,6 +63,11 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
     }
+
+//    GafisNormalqueryQueryque.update.set(status = "2"
+//      ,curcandnum = candNum
+//      ,candlist = candList
+//      ,hitpossibility = maxScore).execute
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, candNum)
       ps.setBytes(2, candList)

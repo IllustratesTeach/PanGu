@@ -60,13 +60,14 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       val personId: String = rs.getString(COL_NAME_PERSONID)
       TextQueryUtil.getColDataById(personId, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE).foreach(textData.addCol(_))
 
-      val birthdayst: Long = if (rs.getDate(COL_NAME_BIRTHDAY) != null) rs.getDate(COL_NAME_BIRTHDAY).getTime else 0
-      if (birthdayst > 0) {
-        textData.addColBuilder.setColName(COL_NAME_BIRTHDAY).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(birthdayst)))
-      }
-      val gatherDate: Long = if (rs.getDate(COL_NAME_GATHERDATE) != null) rs.getDate(COL_NAME_GATHERDATE).getTime else 0
-      if (gatherDate > 0) {
-        textData.addColBuilder.setColName(COL_NAME_GATHERDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(gatherDate)))
+      //日期类型
+      val dateCols = Array(COL_NAME_BIRTHDAY, COL_NAME_GATHERDATE)
+      for (col <- dateCols) {
+        val value = rs.getDate(col)
+        val time = if (value != null) value.getTime else 0
+        if (time > 0) {
+          textData.addColBuilder.setColName(col).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(time)))
+        }
       }
 
       syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))

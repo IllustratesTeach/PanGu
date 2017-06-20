@@ -38,7 +38,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     val query = entityManager.createNativeQuery("select SEQ_ORASID.nextval from dual")
     gafisQuery.oraSid = query.getResultList.get(0).toString.toLong
     gafisQuery.pkId = CommonUtils.getUUID()
-    gafisQuery.submittsystem = QueryConstants.SUBMIT_SYS_FINGER
+    gafisQuery.submittsystem = QueryConstants.SUBMIT_SYS_AFIS
     //用户信息，单位信息
     val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
     gafisQuery.userid = Gafis70Constants.INPUTPSN

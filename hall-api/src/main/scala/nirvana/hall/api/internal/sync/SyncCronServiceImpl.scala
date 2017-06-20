@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal.sync
 
 import java.util.UUID
-
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
@@ -23,8 +22,6 @@ import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.v70.jpa.GafisTask62Record
-import org.apache.commons.lang.StringUtils
-
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -527,7 +524,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        e.printStackTrace
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
     }

@@ -12,6 +12,7 @@ object QueryConstants {
   //提交比对的系统
   val SUBMIT_SYS_FINGER = "1" //指纹系统
   val SUBMIT_SYS_GATHER = "2" //标采
+  val SUBMIT_SYS_AFIS = "3" //afis6.2系统
 
   val QUERY_TYPE_TT = 0 //查重
   val QUERY_TYPE_TL = 1 //倒查

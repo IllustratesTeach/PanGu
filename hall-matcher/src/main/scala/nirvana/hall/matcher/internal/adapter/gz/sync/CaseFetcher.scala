@@ -78,9 +78,9 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
         TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
       }
 
-      val caseOccurDate = if(rs.getDate("caseOccurDate") != null) rs.getDate("caseOccurDate").getTime() else 0
+      val caseOccurDate = if(rs.getDate(COL_NAME_CASEOCCURDATE) != null) rs.getDate(COL_NAME_CASEOCCURDATE).getTime() else 0
       if(caseOccurDate > 0){
-        textData.addColBuilder().setColName("caseOccurDate").setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(caseOccurDate)))
+        textData.addColBuilder().setColName(COL_NAME_CASEOCCURDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(caseOccurDate)))
       }
 
       syncDataBuilder.setData(ByteString.copyFrom(textData.build().toByteArray()))

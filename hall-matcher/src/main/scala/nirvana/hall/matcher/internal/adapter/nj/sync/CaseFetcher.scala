@@ -31,7 +31,12 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     " union all select p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
     " left join gafis_case c on t.case_id = c.case_id " +
     " left join gafis_logic_db_case db on db.case_pkid = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String]("caseId", "cardId", "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "deletag", "isPalm", "logicDB", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
+  private val caseCols: Array[String] = Array[String](COL_NAME_CASEID, COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE,
+                                                      COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST,
+                                                      COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG,COL_NAME_ISPALM, COL_NAME_LOGICDB,
+                                                      COL_NAME_ISCHECKED, COL_NAME_LTSTATUS, COL_NAME_CASESOURCE, COL_NAME_CASEOCCURPLACEDETAIL,
+                                                      COL_NAME_EXTRACTOR, COL_NAME_EXTRACTUNITCODE, COL_NAME_EXTRACTUNITNAME, COL_NAME_BROKENSTATUS,
+                                                      COL_NAME_CREATORUNITCODE, COL_NAME_UPDATORUNITCODE, COL_NAME_INPUTPSN,COL_NAME_MODIFIEDPSN)
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -83,7 +88,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       }
 
       //日期类型
-      val dateCols = Array("caseOccurDate", "extractDate", "inputtime", "modifiedtime")
+      val dateCols = Array(COL_NAME_CASEOCCURDATE, COL_NAME_EXTRACTDATE,COL_NAME_INPUTTIME, COL_NAME_MODIFIEDTIME)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0

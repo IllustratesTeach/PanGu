@@ -21,7 +21,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
-  override val SYNC_SQL: String = "select t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
+  override val SYNC_SQL: String = "SELECT t.sid, t.seq, t.personid, t.name, t.sex_code sexCode, t.birthdayst birthday," +
     " t.door, t.address, t.gather_category gatherCategory, t.gather_type_id gatherType, t.gather_date gatherDate," +
     " t.data_sources dataSources, t.case_classes caseClass, t.idcardno, t.person_type personType, t.nation_code nationCode," +
     " t.recordmark, t.deletag, db.logic_db_pkid as logicDB, t.gather_org_code gatherOrgCode, t.nativeplace_code nativeplaceCode," +
@@ -36,16 +36,16 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     " t.inputtime, t.modifiedpsn, t.modifiedtime, t.person_category personCategory, t.gather_finger_mode gatherFingerMode," +
     " t.case_name caseName, t.reason, t.gatherdepartcode, t.gatheruserid," +
     " t.gather_finger_time gatherFingerTime, t.cardid, t.is_xjssmz isXjssmz" +
-    " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid" +
-    " where t.seq >= ? and t.seq <= ? order by t.seq"
-  private val personCols: Array[String] = Array[String]("personId", "gatherCategory", "gatherType", "door", "address",
-    "sexCode", "name", "dataSources", "caseClass", "idcardno", "personType", "nationCode", "recordmark", "logicDB",
-    "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase", "gatherdepartname",
-    "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "spellname", "usedname",
-    "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail",
-    "addressStreet", "addressdetail", "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty",
-    "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno", "inputpsn", "modifiedpsn", "personCategory",
-    "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
+    " FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
+    " WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
+  private val personCols: Array[String] = Array[String](COL_NAME_PERSONID, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS,
+    COL_NAME_SEXCODE, COL_NAME_NAME, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, IDCARDNO, COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_LOGICDB,
+    COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE, COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON, COL_NAME_ASSISTREFCASE, COL_NAME_GATHERDEPARTNAME,
+    COL_NAME_GATHERUSERNAME, COL_NAME_CONTRCAPTURECODE, COL_NAME_CERTIFICATETYPE, COL_NAME_CERTIFICATEID, COL_NAME_PROCESSNO, COL_NAME_PSISNO, COL_NAME_SPELLNAME, COL_NAME_USEDNAME,
+    COL_NAME_USEDSPELL, COL_NAME_ALIASNAME, COL_NAME_ALIASSPELL, COL_NAME_BIRTHCODE, COL_NAME_BIRTHSTREET, COL_NAME_BIRTHDETAIL, COL_NAME_DOORSTREET, COL_NAME_DOORDETAIL,
+    COL_NAME_ADDRESSSTREET, COL_NAME_ADDRESSDETAIL,COL_NAME_CULTURECODE, COL_NAME_FAITHCODE, COL_NAME_HAVEEMPLOYMENT,COL_NAME_JOBCODE, COL_NAME_OTHERSPECIALTY,
+    COL_NAME_SPECIALIDENTITYCODE, COL_NAME_SPECIALGROUPCODE, COL_NAME_GATHERERID, COL_NAME_FINGERREPEATNO, COL_NAME_INPUTPSN, COL_NAME_MODIFIEDPSN,COL_NAME_PERSONCATEGORY,
+    COL_NAME_GATHERFINGERMODE, COL_NAME_CASENAME, COL_NAME_REASON, COL_NAME_GATHERDEPARTCODE, COL_NAME_GATHERUSERID, COL_NAME_CARDID, COL_NAME_ISXJSSMZ)
 
   /**
     * 读取人员信息
@@ -82,11 +82,11 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       }
 
       //人员编号
-      val personId: String = rs.getString("personId")
+      val personId: String = rs.getString(COL_NAME_PERSONID)
       TextQueryUtil.getColDataById(personId, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE).foreach(textData.addCol(_))
 
       //日期类型
-      val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime", "gatherFingerTime")
+      val dateCols = Array(COL_NAME_BIRTHDAY, COL_NAME_GATHERDATE, COL_NAME_INPUTTIME, COL_NAME_MODIFIEDTIME, COL_NAME_GATHERFINGERTIME)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0
