@@ -125,7 +125,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
 
   override def saveErrorReport(serviceid: String, typ: String, status: Long, msg: String): Unit = {
     val uuid = UUID.randomUUID().toString.replace("-", "")
-    val sql = "insert into hall_xc_report(id,serviceid,typ,status,msg,create_time,update_time) values(?,?,?,?,?,sysdate,sysdate) "
+    val sql = "insert into hall_xc_report(id,serviceid,typ,status,errormsg,create_time,update_time) values(?,?,?,?,?,sysdate,sysdate) "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, uuid)
       ps.setString(2, serviceid)

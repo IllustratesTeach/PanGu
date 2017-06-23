@@ -16,10 +16,10 @@ import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TenPrinterExportServiceImpl}
 import nirvana.hall.webservice.internal.bjwcsy.{Union4pfmipCronService, WsFingerServiceImpl}
-import nirvana.hall.webservice.internal.xingzhuan.FetchFPTServiceImpl
+import nirvana.hall.webservice.internal.xingzhuan.{FetchFPTServiceImpl, LocalCheckinServiceImpl}
 import nirvana.hall.webservice.services.{SendQueryService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
-import nirvana.hall.webservice.services.xingzhuan.FetchFPTService
+import nirvana.hall.webservice.services.xingzhuan.{FetchFPTService, LocalCheckinService}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -82,6 +82,7 @@ object TestWebserviceModule{
     binder.bind(classOf[FetchFPTService],classOf[FetchFPTServiceImpl])
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
     binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
+    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])
   }
 }
 object TestV62Module{
