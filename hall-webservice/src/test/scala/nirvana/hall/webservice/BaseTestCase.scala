@@ -5,9 +5,9 @@ import javax.persistence.EntityManagerFactory
 import monad.support.services.XmlLoader
 import nirvana.hall.api.internal.FeatureExtractorImpl
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
-import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
+import nirvana.hall.api.internal.remote._
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.api.services.remote._
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
@@ -40,13 +40,13 @@ class BaseTestCase {
   def setup: Unit ={
     val modules = Seq[String](
       //v62
-      "nirvana.hall.v62.LocalV62ServiceModule",
-      "nirvana.hall.v62.LocalV62DataSourceModule",
-      "nirvana.hall.webservice.TestV62Module",
+//      "nirvana.hall.v62.LocalV62ServiceModule",
+//      "nirvana.hall.v62.LocalV62DataSourceModule",
+//      "nirvana.hall.webservice.TestV62Module",
       //v70
-//      "nirvana.hall.webservice.TestV70Module",
-//      "nirvana.hall.v70.LocalV70ServiceModule",
-//      "nirvana.hall.v70.LocalDataSourceModule",
+      "nirvana.hall.webservice.TestV70Module",
+      "nirvana.hall.v70.LocalV70ServiceModule",
+      "nirvana.hall.v70.LocalDataSourceModule",
 
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
@@ -73,6 +73,12 @@ object TestWebserviceModule{
     XmlLoader.parseXML[HallWebserviceConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/webservice/webservice.xsd")))
   }
   def bind(binder: ServiceBinder): Unit = {
+    //
+    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
+    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
+    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
+    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
+    binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])
     binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
     binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")

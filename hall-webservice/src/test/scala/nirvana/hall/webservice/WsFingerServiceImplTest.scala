@@ -3,6 +3,9 @@ package nirvana.hall.webservice
 import java.io.FileOutputStream
 
 import nirvana.hall.api.services.AssistCheckRecordService
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import org.junit.Test
 
@@ -53,5 +56,29 @@ class WsFingerServiceImplTest extends BaseTestCase{
   def test_insertXC_report(): Unit ={
     val service = getService[AssistCheckRecordService]
     service.saveErrorReport("123456","123",0,"测试")
+  }
+
+
+  @Test
+  def fPtImport_test(): Unit ={
+    val service = getService[FPTService]
+    try{
+      val taskFpt = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/C3702000000002016000532.fpt"), AncientConstants.GBK_ENCODING)
+      taskFpt match {
+        case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
+        case Right(fpt4) =>
+          if(fpt4.logic02Recs.length>0){
+            fpt4.logic02Recs.foreach { logic02Rec =>
+              service.addLogic02Res(logic02Rec)
+            }
+          }else if(fpt4.logic03Recs.length>0){
+            fpt4.logic03Recs.foreach{ logic03Res =>
+              service.addLogic03Res(_)
+            }
+          }
+      }
+    }catch{
+      case e:Exception => println(e.getMessage)
+    }
   }
 }
