@@ -160,7 +160,7 @@ class ShangHaiInteractiveCron(hallApiConfig: HallApiConfig
       val tBuffer = FPTFileHandler.fingerDataToGafisImage(fdata)
 
       //图像解压   //http://192.168.1.214:9001
-      val s = FPTFileHandler.callHallImageDecompressionImage("hallApiConfig.hallImageUrl",tBuffer)
+      val s = FPTFileHandler.callHallImageDecompressionImage(hallApiConfig.hallImageUrl,tBuffer)
       //提取特征
       val mntAndBin = FPTFileHandler.extractorFeature(s, fgpParesEnum(optionZW.get.toString), FeatureType.FingerTemplate)
       val blobBuilder = tPCard.addBlobBuilder()
