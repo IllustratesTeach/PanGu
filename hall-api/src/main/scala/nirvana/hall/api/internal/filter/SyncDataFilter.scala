@@ -13,6 +13,7 @@ import nirvana.hall.api.services.sync._
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
+import nirvana.hall.protocol.fpt.MatchRelationProto.MatchRelation
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.QueryMatchStatusConstants
 import org.apache.tapestry5.json.JSONObject
@@ -320,7 +321,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           if (matchResultOpt.nonEmpty) {
             responseBuilder.setMatchResult(matchResultOpt.get)
           }
-        } else {
+        }else {
           responseBuilder.setMatchStatus(MatchStatus.UN_KNOWN)
         }
         commandResponse.writeMessage(commandRequest, SyncMatchResultResponse.cmd, responseBuilder.build())
@@ -330,6 +331,28 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchResult-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}", uuid, match_task_orasid, eInfo, e.getMessage)
           syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid.toString, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+      }
+      true
+    }else if(commandRequest.hasExtension(SyncMatchRelationRequest.cmd)){
+      val request = commandRequest.getExtension(SyncMatchRelationRequest.cmd)
+      val uuid = request.getUuid
+      var match_task_orasid=""
+      try{
+        val responseBuilder = SyncMatchRelationResponse.newBuilder()
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+        val ip = httpServletRequest.getRemoteAddr
+        //验证是否有权限
+        val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RELATION, request.getDbid, "1").headOption
+        var matchRelationList: Seq[MatchRelation] = null
+
+        commandResponse.writeMessage(commandRequest, SyncMatchRelationResponse.cmd, responseBuilder.build())
+        syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, match_task_orasid.toString, HallApiConstants.SYNC_TYPE_MATCH_RELATION, ip, "1", "1")
+
+      } catch {
+        case e:Exception =>
+          val eInfo = ExceptionUtil.getStackTraceInfo(e)
+          error("MatchRelation-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
       }
       true
     }else{

@@ -4,6 +4,7 @@ import "api/hall_match_relation.proto";
 import "monad/rpc/protocol/command.proto";
 import "matcher/match_task_query.proto";
 import "matcher/match_result.proto";
+import "fpt/match_relation.proto";
 
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "SyncDataProto";
@@ -170,3 +171,22 @@ message SyncMatchResultResponse{
     optional matcher.MatchResult match_result = 2;
 
 }
+//同步比中关系
+message SyncMatchRelationRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchRelationRequest cmd = 10612;
+    }
+    required int64 seq = 1;
+    optional int32 size = 2 [default = 1];
+    optional string dbid = 3;
+    optional string uuid = 4;
+}
+
+message SyncMatchRelationResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchRelationResponse cmd = 10613;
+    }
+    //比中关系
+    repeated fpt.MatchRelation match_relation = 1; //比对关系
+}
+
