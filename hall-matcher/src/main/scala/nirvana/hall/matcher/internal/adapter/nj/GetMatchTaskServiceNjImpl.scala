@@ -18,7 +18,19 @@ import nirvana.hall.matcher.internal.TextQueryConstants._
   */
 class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor: FeatureExtractor, override implicit val dataSource: DataSource) extends GetMatchTaskServiceImpl(hallMatcherConfig, featureExtractor, dataSource){
   /** 获取比对任务  */
-  override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 and t.sync_target_sid is null order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+  override val MATCH_TASK_QUERY: String = "SELECT * FROM (SELECT t.ora_sid ora_sid" +
+                                                              ", t.keyid" +
+                                                              ", t.querytype" +
+                                                              ", t.maxcandnum" +
+                                                              ", t.minscore" +
+                                                              ", t.priority" +
+                                                              ", t.mic" +
+                                                              ", t.qrycondition" +
+                                                              ", t.textsql" +
+                                                              ", t.flag  " +
+                                                          "FROM GAFIS_NORMALQUERY_QUERYQUE t " +
+                                                          "WHERE t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " AND t.deletag=1 AND t.sync_target_sid IS NULL AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt " +
+                                          "WHERE ROWNUM <=?"
 
   private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
     "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",

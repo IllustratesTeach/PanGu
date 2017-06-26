@@ -17,7 +17,19 @@ import nirvana.hall.matcher.internal.TextQueryConstants._
  * Created by songpeng on 16/7/10.
  */
 class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor: FeatureExtractor,override implicit val dataSource: DataSource) extends GetMatchTaskServiceImpl(hallMatcherConfig, featureExtractor, dataSource){
-  override val MATCH_TASK_QUERY: String = "select * from (select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag  from GAFIS_NORMALQUERY_QUERYQUE t where t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " and t.deletag=1 order by t.prioritynew desc, t.ora_sid ) tt where rownum <=?"
+  override val MATCH_TASK_QUERY: String = "SELECT * FROM (SELECT t.ora_sid ora_sid" +
+                                                              ", t.keyid" +
+                                                              ", t.querytype" +
+                                                              ", t.maxcandnum" +
+                                                              ", t.minscore" +
+                                                              ", t.priority" +
+                                                              ", t.mic" +
+                                                              ", t.qrycondition" +
+                                                              ", t.textsql" +
+                                                              ", t.flag  " +
+                                                           "FROM GAFIS_NORMALQUERY_QUERYQUE t " +
+                                                           "WHERE t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " AND t.deletag=1 AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt " +
+                                          "WHERE ROWNUM <=?"
 
   private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS)
   private val caseCols: Array[String] = Array[String](COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE, COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST, COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE)

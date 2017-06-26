@@ -23,17 +23,17 @@ import nirvana.hall.matcher.internal.TextQueryConstants._
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
-  override val SYNC_SQL: String = "select c.case_id " + COL_NAME_CASEID
-    ", c.case_class_code " + COL_NAME_CASECLASSCODE
-    ", c.case_nature " + COL_NAME_CASENATURE
-    ", c.case_occur_place_code " + COL_NAME_CASEOCCURPLACECODE
-    ", c.suspicious_area_code " + COL_NAME_SUSPICIOUSAREACODE
-    ", c.is_murder " + COL_NAME_ISMURDER
-    ", c.assist_level " + COL_NAME_ASSISTLEVEL
-    ", c.case_state " + COL_NAME_CASESTATE
-    ", c.case_occur_date " + COL_NAME_CASEOCCURDATE
-    ", t.cardid " + COL_NAME_CARDID
-    ", t.is_assist " + COL_NAME_ISASSIST
+  override val SYNC_SQL: String = "select c.case_id " + COL_NAME_CASEID +
+    ", c.case_class_code " + COL_NAME_CASECLASSCODE +
+    ", c.case_nature " + COL_NAME_CASENATURE +
+    ", c.case_occur_place_code " + COL_NAME_CASEOCCURPLACECODE +
+    ", c.suspicious_area_code " + COL_NAME_SUSPICIOUSAREACODE +
+    ", c.is_murder " + COL_NAME_ISMURDER +
+    ", c.assist_level " + COL_NAME_ASSISTLEVEL +
+    ", c.case_state " + COL_NAME_CASESTATE +
+    ", c.case_occur_date " + COL_NAME_CASEOCCURDATE +
+    ", t.cardid " + COL_NAME_CARDID +
+    ", t.is_assist " + COL_NAME_ISASSIST +
     ", t.sid sid" +
     ", t.seq seq" +
     ", t.deletag" +

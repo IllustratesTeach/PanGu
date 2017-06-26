@@ -33,7 +33,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
                                                         s"  WHERE t.submittsystem <> 3" +
                                                               s" AND t.status=0" +
                                                               s" AND t.deletag=1" +
-                                                              s" AND t.sync_target_sid IS NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt" +
+                                                              s" AND t.sync_target_sid IS NULL AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt" +
                                         s"  WHERE ROWNUM <=?"
 
   private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY,COL_NAME_GATHERTYPEID,COL_NAME_GATHERTYPE,COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE,COL_NAME_DATASOURCES,COL_NAME_CASECLASS,

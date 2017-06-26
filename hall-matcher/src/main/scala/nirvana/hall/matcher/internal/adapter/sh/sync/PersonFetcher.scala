@@ -33,7 +33,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
                                         s", t.gather_type_id " + COL_NAME_GATHERTYPE +
                                         s", t.gather_date " + COL_NAME_GATHERDATE +
                                         s", t.data_sources " + COL_NAME_DATASOURCES +
-                                        s", t.case_classes " + COL_NAME_CASECLASS
+                                        s", t.case_classes " + COL_NAME_CASECLASS  +
                                         s", t.idcardno" +
                                         s", t.person_type " + COL_NAME_PERSONTYPE +
                                         s", t.nation_code " + COL_NAME_NATIONCODE +
