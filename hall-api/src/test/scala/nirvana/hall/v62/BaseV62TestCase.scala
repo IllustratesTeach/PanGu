@@ -43,6 +43,7 @@ class BaseV62TestCase {
       "nirvana.hall.v62.LocalV62DataSourceModule",
       //LiaoNing
 //      "nirvana.hall.v62.LocalV62LiaoNingServiceModule",
+//      "nirvana.hall.v62.LocalV62ShangHaiServiceModule",
 //      "nirvana.hall.api.LocalApiWebServiceModule",
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.v62.TestV62Module"
