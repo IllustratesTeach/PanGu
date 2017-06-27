@@ -1,23 +1,26 @@
 package nirvana.hall.v62.internal
 
 
+import javax.sql.DataSource
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
-import nirvana.hall.protocol.api.FPTProto.FingerFgp
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.c.gloclib.ganetlogverifyConverter
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
 
 /**
  * Created by songpeng on 16/6/21.
  */
-class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService with LoggerSupport{
+class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService,implicit val dataSource: DataSource) extends MatchRelationService with LoggerSupport{
   /**
    * 获取比对关系
     *
@@ -159,4 +162,61 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
       statementOpt,
       limit)
   }
+
+  /**
+    * 增加比中关系
+    *
+    * @param matchRelationInfo
+    * @param dbId
+    */
+  override def addMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = {
+    val gafis_VERIFYLOGSTRUCT = ganetlogverifyConverter.convertProtoBuf2GAFIS_VERIFYLOGSTRUCT(matchRelationInfo)
+    facade.NET_GAFIS_VERIFY_Add(getDBID(dbId),V62Facade.TID_BREAKCASE,gafis_VERIFYLOGSTRUCT)
+  }
+
+  /**
+    * 判断是否存在该breakid的比中关系
+    *
+    * @param szBreakID
+    * @param dbId
+    * @return
+    */
+  override def isExist(szBreakID: String, dbId: Option[String]): Boolean = {
+    var bStr = false
+    val statement = Option("(BREAKID='%s')".format(szBreakID))
+    bStr = queryMatchInfo(statement, 1).size > 0
+    bStr
+  }
+
+  /**
+    * 更新比中关系
+    *
+    * @param matchRelationInfo
+    * @param dbId
+    */
+  override def updateMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = {
+    val gafis_VERIFYLOGSTRUCT = ganetlogverifyConverter.convertProtoBuf2GAFIS_VERIFYLOGSTRUCT(matchRelationInfo)
+    facade.NET_GAFIS_VERIFY_Update(getDBID(dbId),V62Facade.TID_BREAKCASE,gafis_VERIFYLOGSTRUCT)
+  }
+
+  /**
+    * 获取DBID
+    *
+    * @param dbId
+    */
+  private def getDBID(dbId: Option[String]): Short ={
+    if(dbId == None){
+      v62Config.breakTable.dbId.toShort
+    }else{
+      dbId.get.toShort
+    }
+  }
+
+  /**
+    * 获取比对关系
+    *
+    * @param breakId
+    * @return
+    */
+  override def getMatchRelation(breakId: String): MatchRelationInfo = ???
 }

@@ -41,7 +41,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           lPPalmRemoteService: LPPalmRemoteService,
                           syncInfoLogManageService: SyncInfoLogManageService,
                           logicDBJudgeService: LogicDBJudgeService,
-                          caseInfoRemoteService: CaseInfoRemoteService) extends SyncCronService with LoggerSupport{
+                          caseInfoRemoteService: CaseInfoRemoteService,
+                          matchRelationService:MatchRelationService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
   final val SYNC_MATCH_TASK_BATCH_SIZE = 5          //一批抓取的比对任务数
@@ -489,20 +490,40 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-    * 抓取比中关系结果
-    * TODO 先查询比对状态是正在比对的任务sid，然后再根据sid获取比对结果
-    *
+    * 抓取比中关系
     * @param fetchConfig
     */
   def  fetchMatchRelation(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
     info("fetchMatchRelation name:{}", fetchConfig.name)
     val uuid = UUID.randomUUID().toString
+    var seq = fetchConfig.seq
     try {
       val request = SyncMatchRelationRequest.newBuilder()
       request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
       request.setDbid(fetchConfig.dbid)
+      request.setSeq(seq)
       request.setUuid(uuid)
       val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncMatchRelationRequest.cmd, request.build())
+      if(baseResponse.getStatus == CommandStatus.OK){
+        val response = baseResponse.getExtension(SyncMatchRelationResponse.cmd)
+        val iterator = response.getSyncMatchRelationList.iterator()
+        while (iterator.hasNext) {
+          val syncMatchRelation = iterator.next()
+          val matchRelationInfo = syncMatchRelation.getMatchRelationInfo
+          if(matchRelationService.isExist(matchRelationInfo.getBreakid)){
+            matchRelationService.updateMatchRelation(matchRelationInfo)
+          }else{
+            matchRelationService.addMatchRelation(matchRelationInfo)
+          }
+        }
+        seq = response.getSeq
+        if(seq > 0 && fetchConfig.seq != seq){
+          //更新配置seq
+          fetchConfig.seq = seq
+          updateSeq(fetchConfig)
+          fetchMatchRelation(fetchConfig, update)
+        }
+      }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)

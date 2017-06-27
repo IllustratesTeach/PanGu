@@ -173,7 +173,10 @@ object galoclog {
     // to here is 256+16+40*3 bytes long.
 
     // following is 16 pointers. 16*8=128 bytes long.
-    var pbnData_Ptr:Int = _ //using 4 byte as pointer
+
+    //var pbnData_Ptr:Int = _ //using 4 byte as pointer
+    @Length(16*4)
+    var pbnData_Ptr:Array[Byte] = _
   @IgnoreTransfer
   var pbnData_Data:Array[Byte] = _ // for pbnData pointer ,struct:char;	// each item index is VFLOG_IDX_xxxx
   @Length(16*4)

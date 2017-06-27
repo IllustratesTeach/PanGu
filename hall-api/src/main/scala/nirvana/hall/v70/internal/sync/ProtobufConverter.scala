@@ -9,7 +9,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
-import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.protocol.api.FPTProto.{MatchRelationInfo, _}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
@@ -19,8 +19,7 @@ import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.services.DictCode6Map7
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants, TransSpellName}
-import nirvana.hall.v70.jpa._
-import nirvana.hall.v70.services.sys.DictService
+import nirvana.hall.v70.jpa.{GafisCheckinInfo, _}
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -804,6 +803,32 @@ object ProtobufConverter extends LoggerSupport{
     gafisQuery.candlist = convertMatchResult2CandList(matchResult)
 
     gafisQuery
+  }
+
+
+  def convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo:GafisCheckinInfo):MatchRelationInfo = {
+    val matchRelationInfo = MatchRelationInfo.newBuilder
+    matchRelationInfo.setSrckey(gafisCheckinInfo.code)
+    matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)
+    val isPlam = !(gafisCheckinInfo.cardType1==1)
+    matchRelationInfo.setQuerytype(convertQueryType2MatchType(gafisCheckinInfo.querytype,isPlam).toString)
+    matchRelationInfo.setInputer(gafisCheckinInfo.registerUser)
+    matchRelationInfo.setInputDate(gafisCheckinInfo.registerTime)
+    matchRelationInfo.setInputUnitCode(gafisCheckinInfo.registerOrg)
+    matchRelationInfo.setHitposs(gafisCheckinInfo.hitpossibility.toString)
+    matchRelationInfo.setScore(gafisCheckinInfo.fraction.toString)
+    matchRelationInfo.setRank(gafisCheckinInfo.rank.toString)
+    matchRelationInfo.setFirstRankScore(gafisCheckinInfo.fraction.toString)
+    matchRelationInfo.setFg(FingerFgp.valueOf(Integer.valueOf(gafisCheckinInfo.fgp)))
+    matchRelationInfo.setHitposs(gafisCheckinInfo.hitpossibility.toString)
+    matchRelationInfo.setBreakUsername(gafisCheckinInfo.confirmUser)
+    matchRelationInfo.setBreakDateTime(gafisCheckinInfo.confirmTime)
+    matchRelationInfo.setBreakUserUnitCode(gafisCheckinInfo.registerOrg)
+    matchRelationInfo.setBreakid(CommonUtils.createBreakId(gafisCheckinInfo.confirmUser,gafisCheckinInfo.confirmTime,gafisCheckinInfo.rank))
+    matchRelationInfo.setMatchUnitCode(gafisCheckinInfo.reviewOrg)
+    matchRelationInfo.setMatcher(gafisCheckinInfo.confirmUser)
+    matchRelationInfo.setMatchDate(gafisCheckinInfo.confirmTime)
+    matchRelationInfo.build
   }
 
   private def convertMatchResult2CandList(matchResult: MatchResult): Array[Byte] = {

@@ -4,7 +4,6 @@ import "api/hall_match_relation.proto";
 import "monad/rpc/protocol/command.proto";
 import "matcher/match_task_query.proto";
 import "matcher/match_result.proto";
-import "fpt/match_relation.proto";
 
 option java_package = "nirvana.hall.protocol.api";
 option java_outer_classname = "SyncDataProto";
@@ -41,6 +40,12 @@ message SyncLPCard{
 //同步案件数据
 message SyncCase{
     required Case caseInfo = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步比中关系
+message SyncMatchRelation{
+    required MatchRelationInfo matchRelationInfo = 1;
     optional OperationType operation_type = 2;
     required int64 seq = 3;
 }
@@ -186,7 +191,7 @@ message SyncMatchRelationResponse{
     extend monad.rpc.protocol.BaseCommand{
         optional SyncMatchRelationResponse cmd = 10613;
     }
-    //比中关系
-    repeated fpt.MatchRelation match_relation = 1; //比对关系
+    repeated SyncMatchRelation syncMatchRelation = 1;
+    required int64 seq = 2;
 }
 

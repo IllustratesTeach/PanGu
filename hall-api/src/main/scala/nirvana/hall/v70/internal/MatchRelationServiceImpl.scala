@@ -3,12 +3,14 @@ package nirvana.hall.v70.internal
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.protocol.api.FPTProto.FingerFgp
+import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.jpa.GafisCheckinInfo
+import nirvana.hall.v70.internal.sync.ProtobufConverter
+import nirvana.hall.v70.jpa.{GafisCheckinInfo}
+
 
 /**
  * Created by songpeng on 16/9/21.
@@ -106,5 +108,40 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     }
 
     response.build()
+  }
+
+  override def isExist(szBreakID: String, dbId: Option[String]): Boolean = {
+    var result=false
+    if(GafisCheckinInfo.findOption(szBreakID).nonEmpty){
+        result=true
+    }
+    result
+  }
+
+  /**
+    * 增加比中关系
+    *
+    * @param matchRelationInfo
+    * @param dbId
+    */
+  override def addMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = ???
+
+  /**
+    * 更新比中关系
+    *
+    * @param matchRelationInfo
+    * @param dbId
+    */
+  override def updateMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = ???
+
+  /**
+    * 获取比对关系
+    *
+    * @param breakId
+    * @return
+    */
+  override def getMatchRelation(breakId: String): MatchRelationInfo = {
+    val gafisCheckinInfo = GafisCheckinInfo.find(breakId)
+    ProtobufConverter.convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo)
   }
 }

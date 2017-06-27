@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
-import nirvana.hall.api.jpa.{HallFetchConfig, HallReadConfig}
+import nirvana.hall.api.jpa.{HallFetchConfig}
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
@@ -18,7 +18,6 @@ import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
 import org.apache.commons.lang.StringUtils
-import org.apache.tapestry5.json.JSONObject
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}

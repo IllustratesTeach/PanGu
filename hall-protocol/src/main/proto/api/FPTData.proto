@@ -357,3 +357,48 @@ message AdminfoData {
 	optional string createUnitCode = 5;		//创建单位代码
 	optional string updateUnitCode = 6;		//更新单位代码
 }
+
+
+message MatchRelationInfo{
+
+	required string match_unit_code = 1; //比对单位代码
+	optional string match_unit_name = 2; //比对单位名称
+	required string matcher = 3; //比对人姓名
+	required string match_date = 4; //比对日期
+	optional string remark = 5; //备注
+	optional string inputer = 6; //填报人
+	optional string input_date = 7; //填报日期
+	optional string approver = 8; //审批人
+	optional string approve_date = 9; //审批日期
+	optional string input_unit_code = 10; //填报单位代码
+	optional string input_unit_name = 11; //填报单位名称
+	optional string rechecker = 12; //复核人
+	optional string recheck_unit_code = 13; //复核单位代码
+	optional string recheck_date = 14; //复核日期
+	optional string breakid = 15; //6.2破案表中的主键
+	optional string srckey = 16; //送检卡号
+	optional string destkey = 17; //目标卡号
+	optional string score = 18;
+	optional string firstRankScore = 19;
+	optional string rank = 20;
+	optional FingerFgp fg = 21;
+	optional string hitposs = 22;
+	optional bool   is_rmt_searched = 23;
+	optional bool   is_crime_captured = 24;
+	optional string fgtype = 25;
+	optional string total_matched_cnt =26;
+	optional string querytype = 27;
+	optional string srcdbid = 28;
+	optional string destdbid = 29;
+	optional string src_person_caseID = 30;
+	optional string dest_person_caseID = 31;
+	optional string case_class_code1 = 32;
+	optional string case_class_code2 = 33;
+	optional string case_class_code3 = 34;
+	optional string searching_unitCode = 35;
+	optional string break_username = 36;
+	optional string break_userUnitCode = 37;
+	optional string break_dateTime = 38;
+	optional string query_taskId = 39;
+
+}

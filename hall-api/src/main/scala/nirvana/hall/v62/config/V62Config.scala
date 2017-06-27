@@ -29,7 +29,8 @@ class HallV62Config extends ActiveRecordConfigSupport{
   var caseTable:DatabaseTable = _
   @XmlElement(name="query_table")
   var queryTable:DatabaseTable = _
-
+  @XmlElement(name="break_table")
+  var breakTable:DatabaseTable = _
   @XmlElement(name = "database")
   var db: DatabaseConfig = _
 }

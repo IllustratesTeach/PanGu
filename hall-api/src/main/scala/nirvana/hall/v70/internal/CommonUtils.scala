@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal
 
 import java.nio.ByteBuffer
+import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, UUID}
 
 /**
@@ -35,5 +36,26 @@ object CommonUtils {
     result(6) = yy(1)
     result(7) = yy(0)
     return result
+  }
+
+  /**
+    * 创建破案编号
+    * @param reChecker 复核人
+    * @param reCheckedTime 复核完成时间
+    * @param rank 排名
+    * @param dateFormat 日期格式化范式 --MMddHHmmss
+    * @return breakId
+    */
+  def createBreakId(reChecker:String,reCheckedTime:Date,rank:Int,dateFormat:String = "MMddHHmmss"): String ={
+    val breakId = new StringBuilder
+    val length = reChecker.length + dateFormat.length + rank.toString.length
+    val zeroStr = new StringBuilder
+    for (i <- length until 23){
+      zeroStr.append("0")
+    }
+    breakId.append(reChecker)
+    breakId.append(new SimpleDateFormat(dateFormat).format(reCheckedTime))
+    breakId.append(zeroStr.append(rank))
+    breakId.toString
   }
 }

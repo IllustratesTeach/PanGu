@@ -3,11 +3,12 @@ package nirvana.hall.v62.internal.c.gnetlib
 import nirvana.hall.c.services.ganumia.gadbrec
 import nirvana.hall.c.services.ganumia.gadbrec._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp._
-import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_DUPCARDSTRUCT, GPERSONINFOSTRUCT, GAFIS_TPADMININFO_EX, GTPCARDINFOSTRUCT}
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYCANDHEADSTRUCT, GAFIS_QUERYINFO, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_DUPCARDSTRUCT, GAFIS_TPADMININFO_EX, GPERSONINFOSTRUCT, GTPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAFIS_QUERYINFO, GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
-import nirvana.hall.c.services.gloclib.glocndef.{GNETREQUESTHEADOBJECT, GNETANSWERHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
 import nirvana.hall.v62.internal.c.CodeHelper
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 import nirvana.hall.v62.services.ChannelOperator
@@ -562,6 +563,12 @@ trait gnetcsr {
         }
       }
     }
+  }
+
+  protected def GAFIS_NETSCR_SendVerifyLog(channel:ChannelOperator,pstVerifyLog:GAFIS_VERIFYLOGSTRUCT){
+    val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstVerifyLog)
+    validateResponse(channel,response)
+
   }
 
   /**

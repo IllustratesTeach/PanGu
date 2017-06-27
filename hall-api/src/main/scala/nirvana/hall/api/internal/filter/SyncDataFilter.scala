@@ -8,16 +8,15 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.api.jpa.HallReadConfig
-import nirvana.hall.api.services.{QueryService, _}
-import nirvana.hall.api.services.sync._
+import nirvana.hall.api.services.{MatchRelationService, QueryService, _}
+import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
-import nirvana.hall.protocol.fpt.MatchRelationProto.MatchRelation
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.v62.internal.QueryMatchStatusConstants
+import nirvana.hall.v70.jpa.HallPkIdBreakId
 import org.apache.tapestry5.json.JSONObject
-import org.slf4j.LoggerFactory
 
 /**
   * Created by songpeng on 16/6/17.
@@ -28,11 +27,13 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
                      fetchLPPalmService: FetchLPPalmService,
                      fetchCaseInfoService: FetchCaseInfoService,
                      fetchQueryService: FetchQueryService,
+                     fetchMatchRelationService:FetchMatchRelationService,
                      queryService: QueryService,
                      tPCardService: TPCardService,
                      lPCardService: LPCardService,
                      lPPalmService: LPPalmService,
                      caseInfoService: CaseInfoService,
+                     matchRelationService:MatchRelationService,
                      syncInfoLogManageService: SyncInfoLogManageService) extends RpcServerMessageFilter with LoggerSupport{
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean ={
     if(commandRequest.hasExtension(SyncTPCardRequest.cmd)) {
@@ -336,23 +337,45 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncMatchRelationRequest.cmd)){
       val request = commandRequest.getExtension(SyncMatchRelationRequest.cmd)
       val uuid = request.getUuid
-      var match_task_orasid=""
+      var pk_id = ""
+      var status = -1
+      var typ_add = ""
       try{
         val responseBuilder = SyncMatchRelationResponse.newBuilder()
-        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
+        val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)//比中关系没有逻辑库分区？？
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
         val hallReadConfigOpt = HallReadConfig.find_by_ip_and_typ_and_dbid_and_deletag(ip, HallApiConstants.SYNC_TYPE_MATCH_RELATION, request.getDbid, "1").headOption
-        var matchRelationList: Seq[MatchRelation] = null
-
+        if(hallReadConfigOpt.nonEmpty){
+          val pKIdList = fetchMatchRelationService.fetchPkId(request.getSeq, request.getSize, dbId)
+          pKIdList.foreach{
+            pkId =>
+              pk_id = pkId._1
+              responseBuilder.setSeq(pkId._2)
+                if(matchRelationService.isExist(pkId._1)){
+                  val matchRelationInfo = matchRelationService.getMatchRelation(pkId._1)
+                  new HallPkIdBreakId(pkId._1,matchRelationInfo.getBreakid).save
+                  val matchRelation = responseBuilder.addSyncMatchRelationBuilder()
+                  matchRelation.setMatchRelationInfo(matchRelationInfo)
+                  matchRelation.setSeq(pkId._2)
+                  matchRelation.setOperationType(OperationType.PUT)
+                  typ_add = HallApiConstants.PUT
+                }
+          }
+          hallReadConfigOpt.get.seq = request.getSeq
+          status = updateSeq(hallReadConfigOpt.get)
+          if(status >0){
+            syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, pk_id, HallApiConstants.SYNC_TYPE_MATCH_RELATION + typ_add, ip, HallApiConstants.MESSAGE_RECEIVE, HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
+          }else{
+            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_MATCHRELATION_SEQ_FAIL + "pk_Id:{} " + pk_id)
+          }
+        }
         commandResponse.writeMessage(commandRequest, SyncMatchRelationResponse.cmd, responseBuilder.build())
-        syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, match_task_orasid.toString, HallApiConstants.SYNC_TYPE_MATCH_RELATION, ip, "1", "1")
-
       } catch {
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("MatchRelation-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
+          error("MatchRelation-ResponseData fail,uuid{};pk_id:{};错误堆栈信息:{};错误信息:{}",uuid,pk_id,eInfo,e.getMessage)
+          syncInfoLogManageService.recordSyncDataLog(uuid, pk_id, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
       }
       true
     }else{

@@ -24,6 +24,7 @@ class V62Facade(defaultConfig:HallV62Config)
   with ganetdbp
   with ganetlp
   with ganettp
+  with ganetlog
   with gnetflib
   with nettable
   with gnetfunc
@@ -62,6 +63,7 @@ object V62Facade{
   val TID_LATPALM:Short    = 3
   val TID_CASE:Short       = 4
   val TID_QUERYQUE:Short   = 2
+  val TID_BREAKCASE:Short  = 4
 
   //默认捺印库
   val DBID_TP_DEFAULT: Short = 1

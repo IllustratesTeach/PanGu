@@ -62,4 +62,11 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
     fileOutPutStream.close()
 
   }
+
+  @Test
+  def test_getMatchRelation(): Unit ={
+    val service = getService[MatchRelationService]
+    val matchRelationInfo = service.getMatchRelation("402881e45cafe1fe015cafe38d000001")
+    Assert.assertEquals("430111501999201206001703",matchRelationInfo.getSrckey)
+  }
 }

@@ -33,6 +33,7 @@ object HallApiErrorConstants {
   final val SYNC_UPDATE_TPCard_SEQ_FAIL = "更新TPCard的SEQ失败"
   final val SYNC_UPDATE_LPCard_SEQ_FAIL = "更新LPCard的SEQ失败"
   final val SYNC_UPDATE_LPalm_SEQ_FAIL = "更新LPalm的SEQ失败"
+  final val SYNC_UPDATE_MATCHRELATION_SEQ_FAIL = "更新MatchRelation的SEQ失败"
 
   final val SEND_REMOTE_TASK_FAIL = "Hall7.0 向Hall6.2发送远程比对任务失败"
   final val GET_REMOTE_RESULT_FAIL = "Hall7.0 向Hall6.2请求远程比对结果失败"
