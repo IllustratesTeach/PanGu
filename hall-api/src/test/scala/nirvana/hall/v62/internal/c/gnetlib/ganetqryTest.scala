@@ -120,4 +120,16 @@ class ganetqryTest {
     println("sid:::",ret)
 
   }
+
+  @Test
+  def test_NET_GAFIS_QUERY_Get: Unit ={
+    val config = new HallV62Config
+    config.appServer.host = "192.168.1.17"
+    config.appServer.port = 6898
+    config.appServer.user = "afisadmin"
+
+    val facade = new V62Facade(config)
+//    facade.NET_GAFIS_QUERY_Get()
+
+  }
 }

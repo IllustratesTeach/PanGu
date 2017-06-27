@@ -171,7 +171,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     */
   override def addMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = {
     val gafis_VERIFYLOGSTRUCT = ganetlogverifyConverter.convertProtoBuf2GAFIS_VERIFYLOGSTRUCT(matchRelationInfo)
-    facade.NET_GAFIS_VERIFY_Add(getDBID(dbId),V62Facade.TID_BREAKCASE,gafis_VERIFYLOGSTRUCT)
+    facade.NET_GAFIS_VERIFYLOG_Add(gafis_VERIFYLOGSTRUCT)
   }
 
   /**
@@ -196,7 +196,7 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     */
   override def updateMatchRelation(matchRelationInfo: MatchRelationInfo, dbId: Option[String]): Unit = {
     val gafis_VERIFYLOGSTRUCT = ganetlogverifyConverter.convertProtoBuf2GAFIS_VERIFYLOGSTRUCT(matchRelationInfo)
-    facade.NET_GAFIS_VERIFY_Update(getDBID(dbId),V62Facade.TID_BREAKCASE,gafis_VERIFYLOGSTRUCT)
+    facade.NET_GAFIS_VERIFYLOG_Update(gafis_VERIFYLOGSTRUCT)
   }
 
   /**

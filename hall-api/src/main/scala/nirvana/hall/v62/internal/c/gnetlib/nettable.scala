@@ -1,9 +1,11 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.v62.internal.AncientClientSupport
-import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELSTATEMENT, GADB_SELRESULT}
+import java.nio.ByteBuffer
+
+import nirvana.hall.c.services.ganumia.gadbrec.{GADB_SELRESULT, GADB_SELSTATEMENT}
 import nirvana.hall.c.services.ghpcbase.gnopcode
-import nirvana.hall.c.services.gloclib.glocndef.{GNETANSWERHEADOBJECT, GNETREQUESTHEADOBJECT}
+import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
+import nirvana.hall.v62.internal.AncientClientSupport
 
 /**
  * clone from nettable.c
@@ -36,5 +38,31 @@ trait nettable {
       GAFIS_NETSCR_RecvSelResult(channel, pstRes)
     }
     return n;
+  }
+
+  def NET_GAFIS_TABLE_UTIL_AddUpdate(nDBID:Short,nTID:Short,pstRes:GADB_SELRESULT,pstStmt:GADB_SELSTATEMENT, nOption:Int = 0, isUpdate: Boolean = false):Int =  executeInChannel { channel =>
+    if(pstRes.nRecGot <= 0){
+      return 0
+    }
+    val pReq = createRequestHeader
+    pReq.nDBID = nDBID
+    pReq.nTableID = nTID
+    pReq.nOpClass = gnopcode.OP_CLASS_TABLE.toShort
+    pReq.nOption = nOption
+    if(isUpdate){
+      pReq.nOpCode = gnopcode.OP_TABLE_UPDATEBYSELRES.toShort
+    }else{
+      pReq.nOpCode = gnopcode.OP_TABLE_ADDBYSELRES.toShort
+    }
+    pReq.bnData = ByteBuffer.allocate(4).putInt(pstRes.nRecGot).array()
+
+    val pAns = channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
+    validateResponse(channel,pAns)
+
+    GAFIS_NETSCR_SendSelResult(channel, pReq, pAns, pstRes)
+    NETOP_RECVANS(channel, pAns)
+    val n = pAns.nReturnValue
+    println(n)
+    n
   }
 }

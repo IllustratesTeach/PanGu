@@ -4,7 +4,6 @@ package nirvana.hall.v62.internal.c.gnetlib
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
-import org.junit.Test
 
 /**
   * Created by yuchen on 2017/6/20.
@@ -50,7 +49,7 @@ class ganetverifyTest {
 
 
 
-  @Test
+ /* @Test
   def test_add: Unit ={
     try{
       facade.NET_GAFIS_VERIFY_Add(21,4,verifyLogStruct)
@@ -78,6 +77,6 @@ class ganetverifyTest {
     }catch{
       case e:Exception => e.printStackTrace
     }
-  }
+  }*/
 
 }

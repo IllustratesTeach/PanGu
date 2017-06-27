@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.services.ganumia.gadbrec
 import nirvana.hall.c.services.ganumia.gadbrec._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
@@ -565,11 +567,98 @@ trait gnetcsr {
     }
   }
 
-  protected def GAFIS_NETSCR_SendVerifyLog(channel:ChannelOperator,pstVerifyLog:GAFIS_VERIFYLOGSTRUCT){
+  protected def GAFIS_NETSCR_SendSelResult(pstCon:ChannelOperator,pReq:GNETREQUESTHEADOBJECT, pAns:GNETANSWERHEADOBJECT, pstRes:GADB_SELRESULT): Unit ={
+    GAFIS_NETSCR_SendSelResultEx(pstCon, pReq, pAns, pstRes, true)
+  }
+  protected def GAFIS_NETSCR_SendSelResultEx(pstCon:ChannelOperator,pReq:GNETREQUESTHEADOBJECT, pAns:GNETANSWERHEADOBJECT, pstRes:GADB_SELRESULT, bSendRes:Boolean): Unit ={
+    if(bSendRes){
+      // we must assure that the size is equal
+      NETOP_SENDDATA(pstCon, pstRes)
+    }
+    // wait for other side to alloc memory
+    NETOP_RECVANS(pstCon, pAns)
+    if(NETANS_GetRetVal(pAns) < 0){
+      return
+    }
+    if((pstRes.nItemFlag & SELRES_ITEM_RESITEM) > 0){
+      NETOP_SENDDATA(pstCon, pstRes.pstItem_Data)
+    }
+    if ((pstRes.nItemFlag & SELRES_ITEM_READFLAG) > 0 ) {
+      NETOP_SENDDATA(pstCon, pstRes.pReadFlag_Data)
+    }
+    if ((pstRes.nItemFlag & SELRES_ITEM_DATABUF) > 0) {
+      // send data
+      var n = 0:Int
+      if ( (pstRes.nFlag & gadbrec.SELRES_FLAG_FLATMEMORY) > 0) {
+        n = pstRes.nNextAvailBlobPos
+      } else {
+        n = pstRes.nSegSize * pstRes.nRecGot
+      }
+      NETOP_SENDDATA(pstCon, pstRes.pDataBuf_Data)
+      if (((pstRes.nFlag & SELRES_FLAG_BLOBHASDATA) > 0) &&
+        ((pstRes.nFlag & SELRES_FLAG_FLATMEMORY) < 0) && n > 0) {
+        val nItemCnt = pstRes.nResItemCount
+        val nRowCnt = pstRes.nRecGot
+//        val nRowSice = pstRes.nSegSize
+        for (i <- (0 until nItemCnt)){
+          val pstItem = pstRes.pstItem_Data(i)
+          if(pstItem.nFormFlag == SELRESITEM_FFLAG_ISMEMBLOB){
+            val buffer = ChannelBuffers.wrappedBuffer(pstRes.pDataBuf_Data)
+//            val nOffset = pstItem.nDataOffset
+            for(k <- (0 until nRowCnt)){
+//              if ( GADB_MEMFORMROW_IsColNULL(pstRes. +k*nRowSize, i) ) continue;	// column is null
+//              new GADB_MEMBLOB().fromByteArray()
+                val pstBlob = new GADB_MEMBLOB().fromStreamReader(buffer)
+                val nBlobSize = pstBlob.stLobInfo.nBlobSize
+                if(nBlobSize > 0 && pstBlob.pData_Data != null){
+                  val buffer = ByteBuffer.allocate(12)
+                  buffer.putInt(i)
+                  buffer.putInt(k)
+                  buffer.putInt(nBlobSize)
+                  pAns.bnData = buffer.array()
+                  NETOP_SENDANS(pstCon, pAns)
+                  NETOP_RECVANS(pstCon, pAns)
+                  if ( NETANS_GetRetVal(pAns)<0 ) {
+                    return
+                  }
+                  NETOP_SENDDATA(pstCon, pstBlob.pData_Data)
+                }
+            }
+            NETOP_SENDANS(pstCon, pAns)
+          }
+        }
+      }
+    }
+  }
+  protected def GAFIS_NETSCR_SendVerifyLog(pstCon:ChannelOperator, pstv: GAFIS_VERIFYLOGSTRUCT): Unit ={
+//    val n = 16 //galoclog.GAFIS_VERIFYLOG_PtCnt pstLog.bDataCanBeFree.length
+//    (0 until n).foreach { i =>
+//    }
+    NETOP_SENDDATA(pstCon, pstv)
+    //这里一次发送全部pbnData_Data数据，不再跟进
+    if(pstv.pbnData_Data != null && pstv.pbnData_Data.length > 0){
+      NETOP_SENDDATA(pstCon, pstv.pbnData_Data)
+    }
+  }
+  protected def GAFIS_NETSCR_RecvVerifyLog(pstCon:ChannelOperator, pstv: GAFIS_VERIFYLOGSTRUCT): Unit= {
+    NETOP_RECVDATA(pstCon, pstv)
+    val dataLenBuffer = ChannelBuffers.wrappedBuffer(pstv.nDataLen)
+    val dataBuf = ChannelBuffers.dynamicBuffer()
+//    ByteArrayOutputStream
+    val n = 16 //n = GAFIS_VERIFYLOG_PtCnt();
+    (0 until n).foreach{i =>
+      val len = dataLenBuffer.readInt()
+      if(len > 0){
+        dataBuf.writeBytes(pstCon.receiveByteArray(len))
+      }
+    }
+    pstv.pbnData_Data = dataBuf.array()
+  }
+/*  protected def GAFIS_NETSCR_SendVerifyLog(channel:ChannelOperator,pstVerifyLog:GAFIS_VERIFYLOGSTRUCT){
     val response = channel.writeMessage[GNETANSWERHEADOBJECT](pstVerifyLog)
     validateResponse(channel,response)
 
-  }
+  }*/
 
   /**
     * 是否新版本验证, 这是使用pAns验证，免去了UTIL_GNETLIB_SetNewClientVersionFlag

@@ -63,6 +63,33 @@ trait V62QueryTableSupport {
     }
     Nil
   }
+
+  def addOrUpdateV62Table[T <: AncientData : ClassTag](dbId:Short,
+                                                 tableId:Short,
+                                                 mapper:Map[String,String],
+                                                 statementOpt:Option[String]):Unit ={
+
+    /**
+      * 首先构造查询列到实体字段的映射
+      */
+    val stSelRes = new GADB_SELRESULT
+    val clazz = classTag[T].runtimeClass.asInstanceOf[Class[T]]
+    val destStruct = clazz.newInstance()
+    stSelRes.nSegSize = destStruct.getDataSize
+    val stItems = mapper.map{ case (column,field)=>
+      gadbrec.SETSELRESITEM_FIXED(destStruct, column,field)
+    }
+    stSelRes.pstItem_Data = stItems.toArray
+    stSelRes.nResItemCount = stItems.size
+//    stSelRes.pDataBuf_Data =
+    //构造查询条件
+    val stSelStatement = new GADB_SELSTATEMENT
+//    stSelStatement.nMaxToGet = 0
+    statementOpt.foreach(stSelStatement.szStatement = _)
+
+    NET_GAFIS_TABLE_UTIL_AddUpdate(dbId, tableId, stSelRes, stSelStatement)
+
+  }
 }
 
 /**

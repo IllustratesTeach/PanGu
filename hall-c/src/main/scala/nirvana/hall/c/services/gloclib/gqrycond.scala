@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gloclib
 
-import nirvana.hall.c.annotations.{Length, IgnoreTransfer}
+import nirvana.hall.c.annotations.{IgnoreTransfer, Length, LengthRef}
 import nirvana.hall.c.services.AncientData
 
 /**
@@ -68,7 +68,7 @@ object gqrycond {
   @Length(2)
   var bnRes:Array[Byte] = _ ;
     var nKeyCount:Short = _ ;	// # of keys.
-  @Length(1)
+  @LengthRef("nKeyCount")
   var stKey:Array[GAFIS_KEYITEM] = _;	// store key self.
   } // GAFIS_KEYLISTSTRUCT;	// size is 8+sizeof(GAFIS_KEYITEM)*nKeyCount.
 

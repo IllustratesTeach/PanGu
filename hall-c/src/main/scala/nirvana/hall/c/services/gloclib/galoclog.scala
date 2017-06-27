@@ -107,7 +107,7 @@ object galoclog {
   @Length(4)
   var bnRes0:Array[Byte] = _ ;
     @Length(SID_SIZE)
-    var nSID:String = _ ;			//
+    var nSID:Array[Byte] = _ ;			//
   @Length(8-SID_SIZE)
   var bnRes_SID:Array[Byte] = _ ;	// to here is 16 bytes long
   // to here is 16 bytes long.
@@ -173,10 +173,7 @@ object galoclog {
     // to here is 256+16+40*3 bytes long.
 
     // following is 16 pointers. 16*8=128 bytes long.
-
-    //var pbnData_Ptr:Int = _ //using 4 byte as pointer
-    @Length(16*4)
-    var pbnData_Ptr:Array[Byte] = _
+    var pbnData_Ptr:Int = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pbnData_Data:Array[Byte] = _ // for pbnData pointer ,struct:char;	// each item index is VFLOG_IDX_xxxx
   @Length(16*4)

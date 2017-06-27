@@ -22,6 +22,17 @@ class MatchRelationServiceImplTest extends BaseV62TestCase{
 
   }
   @Test
+  def test_MatchRelationGetOfBreakCase(): Unit ={
+    val service = getService[MatchRelationService]
+    val request = MatchRelationGetRequest.newBuilder()
+    request.setCardId("1234567890")
+    request.setMatchType(MatchType.FINGER_TL)
+    val relation = service.getMatchRelation(request.build())
+    println(relation.getMatchStatus)
+    println(relation)
+
+  }
+  @Test
   def test_exportMatchRelation(): Unit ={
 
     val service = getService[ExceptRelationService]
