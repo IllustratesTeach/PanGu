@@ -8,8 +8,8 @@ import nirvana.hall.protocol.fpt.MatchRelationProto.MatchSysInfo
 /**
   * Created by win-20161010 on 2017/6/27.
   */
-class FetchMatchRelationServiceImpl (implicit dataSource: DataSource) extends SyncDataFetcher with  FetchMatchRelationService{
-  override val KEY_NAME: String = _
+class FetchMatchRelationServiceImpl (implicit dataSource: DataSource) extends FetchMatchRelationService{
+
 
   /**
     * 获取比中关系pkid列表
