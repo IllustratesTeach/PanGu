@@ -57,7 +57,7 @@ trait ganetlog {
     val pstLog = new GAFIS_VERIFYLOGSTRUCT
     pstLog.nSID = gaqryqueConverter.convertLongAsSixByteArray(sid)
     NET_GAFIS_VERIFYLOG_Op(channel, pstLog, null, gnopcode.OP_ADM_VERIFYLOG_GET)
-    pstLog
+    return pstLog
   }
   def NET_GAFIS_VERIFYLOG_Del(sid: Long): Unit = executeInChannel { channel =>
     val pstLog = new GAFIS_VERIFYLOGSTRUCT

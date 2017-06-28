@@ -173,7 +173,8 @@ object galoclog {
     // to here is 256+16+40*3 bytes long.
 
     // following is 16 pointers. 16*8=128 bytes long.
-    var pbnData_Ptr:Int = _ //using 4 byte as pointer
+    @Length(16*4)
+    var pbnData_Ptr:Array[Byte] = _ //using 4 byte as pointer
   @IgnoreTransfer
   var pbnData_Data:Array[Byte] = _ // for pbnData pointer ,struct:char;	// each item index is VFLOG_IDX_xxxx
   @Length(16*4)
@@ -184,7 +185,7 @@ object galoclog {
     // above length is 16*4=64 bytes long.
     // to here is 512+8+64 bytes long.
     @Length(16)
-    var bDataCanBeFree:String = _ ;
+    var bDataCanBeFree: Array[Byte]= _ ;
     @Length(40+128)
     var bnRes9:Array[Byte] = _ ;	// reserved.
   } // GAFIS_VERIFYLOGSTRUCT;	// size of this structure is 768 bytes

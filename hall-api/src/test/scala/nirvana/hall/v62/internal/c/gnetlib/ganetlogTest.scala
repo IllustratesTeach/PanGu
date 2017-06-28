@@ -26,8 +26,9 @@ class ganetlogTest {
   def test_NET_GAFIS_VERIFYLOG_Add: Unit ={
 
     val verifyLog = facade.NET_GAFIS_VERIFYLOG_Get(1)
-    verifyLog.szSubmitUserUnitCode = "37020000"
-    verifyLog.szSubmitUserName = "hall"
+//    verifyLog.szSubmitUserUnitCode = "37020000"
+//    verifyLog.szSubmitUserName = "hall"
+//    verifyLog.nDataLen = new Array[Byte](16*4)
     verifyLog.szBreakID = "hall370200000001" //主键
 
     facade.NET_GAFIS_VERIFYLOG_Add(verifyLog)

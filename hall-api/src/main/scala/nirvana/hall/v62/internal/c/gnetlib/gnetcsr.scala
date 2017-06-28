@@ -634,11 +634,13 @@ trait gnetcsr {
 //    val n = 16 //galoclog.GAFIS_VERIFYLOG_PtCnt pstLog.bDataCanBeFree.length
 //    (0 until n).foreach { i =>
 //    }
+    //设置其他数据长度为0，不发送其他数据
+    pstv.nDataLen = new Array[Byte](64)
     NETOP_SENDDATA(pstCon, pstv)
-    //这里一次发送全部pbnData_Data数据，不再跟进
-    if(pstv.pbnData_Data != null && pstv.pbnData_Data.length > 0){
-      NETOP_SENDDATA(pstCon, pstv.pbnData_Data)
-    }
+    //这里一次发送全部pbnData_Data数据
+//    if(pstv.pbnData_Data != null && pstv.pbnData_Data.length > 0){
+//      NETOP_SENDDATA(pstCon, pstv.pbnData_Data)
+//    }
   }
   protected def GAFIS_NETSCR_RecvVerifyLog(pstCon:ChannelOperator, pstv: GAFIS_VERIFYLOGSTRUCT): Unit= {
     NETOP_RECVDATA(pstCon, pstv)
