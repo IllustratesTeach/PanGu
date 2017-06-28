@@ -30,7 +30,8 @@ import scala.collection.mutable.ArrayBuffer
 class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
    * 发送查询任务
-   * @param matchTask
+    *
+    * @param matchTask
    * @return
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long = {
@@ -59,7 +60,8 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
    * 获取查询信息
-   * @param oraSid
+    *
+    * @param oraSid
    * @return
    */
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult]= {
@@ -84,6 +86,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 通过卡号查找第一个的比中结果
+    *
     * @param cardId 卡号
     * @return 比对结果
     */
@@ -93,7 +96,8 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
    * 根据卡号查找第一个比对任务的状态, 如果没有获取到返回UN_KNOWN
-   * @param cardId
+    *
+    * @param cardId
    * @return
    */
   override def findFirstQueryStatusByCardIdAndMatchType(cardId: String, matchType: MatchType, dbId: Option[String]): MatchStatus = {
@@ -103,6 +107,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
     * 根据卡号信息发送查询, 不需要特征信息
     * 根据卡号和查询类型从数据库查询特征数据，并放入matchTask，然后调用addMatchTask
+    *
     * @param matchTask 只有查询信息不需要特征信息
     * @param queryDBConfig
     * @return 任务号
@@ -158,6 +163,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
   /**
     * 根据编号和查询类型发送查询
     * 最大候选50，优先级2，最小分数60
+    *
     * @param cardId
     * @param matchType
     * @param queryDBConfig
@@ -186,6 +192,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 根据任务号sid获取比对状态
+    *
     * @param oraSid
     * @param dbId
     * @return
@@ -276,4 +283,11 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gaQuery
   }
 
+  /**
+    * 更新任务表中对应这条认定的候选信息的候选状态
+    *
+    * @param tCode
+    * @return
+    */
+  override def updateCandListStatus(tCode: String,taskId:String,taskType:String,keyId:String): Long = ???
 }

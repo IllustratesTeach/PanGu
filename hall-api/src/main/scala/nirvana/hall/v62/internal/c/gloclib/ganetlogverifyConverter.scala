@@ -21,15 +21,12 @@ object ganetlogverifyConverter extends LoggerSupport{
     gAFIS_VERIFYLOGSTRUCT.nScore = matchRelationInfo.getScore.toShort
     gAFIS_VERIFYLOGSTRUCT.nFirstRankScore = matchRelationInfo.getFirstRankScore.toShort
     gAFIS_VERIFYLOGSTRUCT.nRank = matchRelationInfo.getRank.toShort
-    gAFIS_VERIFYLOGSTRUCT.nFg = matchRelationInfo.getFg.asInstanceOf[Byte]
+    gAFIS_VERIFYLOGSTRUCT.nFg = matchRelationInfo.getFg.getNumber.asInstanceOf[Byte]
     gAFIS_VERIFYLOGSTRUCT.nHitPoss = matchRelationInfo.getHitposs.asInstanceOf[Byte]
     gAFIS_VERIFYLOGSTRUCT.bIsRmtSearched = matchRelationInfo.getIsCrimeCaptured.asInstanceOf[Byte]
     gAFIS_VERIFYLOGSTRUCT.bIsCrimeCaptured = matchRelationInfo.getIsCrimeCaptured.asInstanceOf[Byte]
-    gAFIS_VERIFYLOGSTRUCT.nFgType = matchRelationInfo.getFgtype.asInstanceOf[Byte]
     gAFIS_VERIFYLOGSTRUCT.nTotalMatchedCnt = matchRelationInfo.getTotalMatchedCnt.asInstanceOf[Byte]
     gAFIS_VERIFYLOGSTRUCT.nQueryType = matchRelationInfo.getQuerytype.asInstanceOf[Byte]
-    gAFIS_VERIFYLOGSTRUCT.nSrcDBID = matchRelationInfo.getSrcdbid.toShort
-    gAFIS_VERIFYLOGSTRUCT.nDestDBID = matchRelationInfo.getDestdbid.toShort
     gAFIS_VERIFYLOGSTRUCT.szSrcPersonCaseID = matchRelationInfo.getSrcPersonCaseID
     gAFIS_VERIFYLOGSTRUCT.szDestPersonCaseID = matchRelationInfo.getDestPersonCaseID
     gAFIS_VERIFYLOGSTRUCT.szCaseClassCode1 = matchRelationInfo.getCaseClassCode1

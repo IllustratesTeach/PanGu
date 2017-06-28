@@ -527,8 +527,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("fetchMatchRelation-RequestData fail,uuid:{};seq:{};错误堆栈信息:{};错误信息:{}",uuid,seq,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("fetchMatchRelation-RequestData fail,uuid:{};seq:{};错误堆栈信息:{};错误信息:{}",uuid,seq,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
     }
   }
 

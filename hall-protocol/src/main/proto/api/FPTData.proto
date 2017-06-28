@@ -382,12 +382,12 @@ message MatchRelationInfo{
 	optional string firstRankScore = 19;
 	optional string rank = 20;
 	optional FingerFgp fg = 21;
-	optional string hitposs = 22;
-	optional bool   is_rmt_searched = 23;
-	optional bool   is_crime_captured = 24;
+	optional int32 hitposs = 22;
+	optional int32   is_rmt_searched = 23;
+	optional int32   is_crime_captured = 24;
 	optional string fgtype = 25;
-	optional string total_matched_cnt =26;
-	optional string querytype = 27;
+	optional int32 total_matched_cnt =26;
+	optional int32 querytype = 27;
 	optional string srcdbid = 28;
 	optional string destdbid = 29;
 	optional string src_person_caseID = 30;

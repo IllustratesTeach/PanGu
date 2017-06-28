@@ -51,9 +51,8 @@ abstract class SyncDataFetcher(implicit dataSource: DataSource) {
     val from = getMinSeq(seq, dbId)
     if(from >0 && from <= getMaxSeq(dbId)){
       JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
-        ps.setString(1, dbId.get)
-        ps.setLong(2, from)
-        ps.setLong(3, from + FETCH_BATCH_SIZE)
+        ps.setLong(1, from)
+        ps.setLong(2, from + FETCH_BATCH_SIZE)
       }{rs=>
         while (rs.next()){
           val pk_id = rs.getString("PK_ID")

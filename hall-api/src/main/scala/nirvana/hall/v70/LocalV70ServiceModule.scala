@@ -1,7 +1,7 @@
 package nirvana.hall.v70
 
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.sync._
+import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal._
@@ -45,7 +45,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
     binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
-
+    binder.bind(classOf[FetchMatchRelationService],classOf[FetchMatchRelationServiceImpl])
     //定时服务
 //    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()

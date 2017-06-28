@@ -34,7 +34,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
    * 获取查询信息，只有文本
-   * @param dbId
+    *
+    * @param dbId
    * @param statement 查询条件
    * @param limit 限制个数
    * @return
@@ -82,7 +83,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
    * 发送查询任务
-   * @param matchTask
+    *
+    * @param matchTask
    * @return 查询任务号
    */
   override def addMatchTask(matchTask: MatchTask, queryDBConfig: QueryDBConfig): Long= {
@@ -99,7 +101,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
    * 获取查询信息
-   * @param oraSid
+    *
+    * @param oraSid
    * @return
    */
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult] = {
@@ -113,7 +116,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
    * 根据卡号查找第一个比对任务的状态, 没有比对任务返回UN_KNOWN
-   * @param cardId
+    *
+    * @param cardId
    * @return
    */
   override def findFirstQueryStatusByCardIdAndMatchType(cardId: String, matchType: MatchType, dbId: Option[String]): MatchStatus = {
@@ -127,6 +131,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
     * 根据卡号信息发送查询, 不需要特征信息
+    *
     * @param matchTask 只有查询信息不需要特征信息
     * @param queryDBConfig
     * @return 任务号
@@ -152,6 +157,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
   /**
     * 根据编号和查询类型发送查询
     * 最大候选50，优先级2，最小分数60
+    *
     * @param cardId
     * @param matchType
     * @return
@@ -179,6 +185,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
     * 根据任务号sid获取比对状态
+    *
     * @param oraSid
     * @param dbId
     * @return
@@ -194,6 +201,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
     * 获取查询信息GAQUERYSTRUCT
+    *
     * @param oraSid
     * @param dbId
     * @return
@@ -205,7 +213,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   /**
    * 获取DBID
-   * @param dbId
+    *
+    * @param dbId
    */
   private def getDBID(dbId: Option[String]): Short ={
     if(dbId == None){
@@ -215,4 +224,13 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
   }
 
+  /**
+    * 更新任务表中对应这条认定的候选信息的候选状态
+    *
+    * @param tCode
+    * @return
+    */
+  override def updateCandListStatus(tCode: String,taskId:String,taskType:String,keyId:String): Long = {
+      1
+  }
 }

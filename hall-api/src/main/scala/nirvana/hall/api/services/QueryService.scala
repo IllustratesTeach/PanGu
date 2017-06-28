@@ -74,4 +74,12 @@ trait QueryService {
     */
   def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String] = None): GAQUERYSTRUCT
 
+
+  /**
+    * 更新任务表中对应这条认定的候选信息的候选状态
+    * @param tCode
+    * @return
+    */
+  def updateCandListStatus(tCode:String,taskId:String,taskType:String,keyId:String):Long
+
 }

@@ -342,6 +342,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       var typ_add = ""
       try{
         val responseBuilder = SyncMatchRelationResponse.newBuilder()
+        responseBuilder.setSeq(request.getSeq)
         val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)//比中关系没有逻辑库分区？？
         val ip = httpServletRequest.getRemoteAddr
         //验证是否有权限
