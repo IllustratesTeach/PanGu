@@ -1,9 +1,10 @@
 package nirvana.hall.v62
 
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.sync.LogicDBJudgeService
+import nirvana.hall.api.services.sync.{FetchMatchRelationService, LogicDBJudgeService}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v62.internal.sync.FetchMatchRelationServiceImpl
 import nirvana.hall.v62.internal.{AssistCheckRecordServiceImpl, _}
 import nirvana.hall.v62.services.GetPKIDServiceImpl
 import nirvana.hall.v62.services.service.GetPKIDService
@@ -28,7 +29,7 @@ object LocalV62ServiceModule {
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
     binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
-
+    binder.bind(classOf[FetchMatchRelationService],classOf[FetchMatchRelationServiceImpl])
     binder.bind(classOf[FPTFilterService],classOf[FPTFilterServiceImpl])
   }
 
