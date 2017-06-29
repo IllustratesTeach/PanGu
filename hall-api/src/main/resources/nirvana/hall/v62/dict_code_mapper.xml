@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dict>
+    <person_type>
+        <mapper code6="01" code7="01"/>
+        <mapper code6="02" code7="02"/>
+        <mapper code6="03" code7="03"/>
+        <mapper code6="04" code7="04"/>
+        <mapper code6="05" code7="05"/>
+        <mapper code6="06" code7="06"/>
+        <mapper code6="07" code7="07"/>
+        <mapper code6="08" code7="08"/>
+        <mapper code6="21" code7="21"/>
+        <mapper code6="99" code7="99"/>
+    </person_type>
+    <certificatetype>
+        <mapper code6="1" code7="34"/>
+        <mapper code6="2" code7="22"/>
+        <mapper code6="9" code7="99"/>
+    </certificatetype>
+</dict>
+

@@ -1,0 +1,21 @@
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+option java_package = "nirvana.hall.protocol.extract";
+
+option java_outer_classname = "OldConverterNewProto";
+
+message OldConverterNewRequest{
+  extend monad.rpc.protocol.BaseCommand {
+    optional OldConverterNewRequest cmd = 10009;
+  }
+  required bytes oldMnt = 1;
+}
+
+message OldConverterNewResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional OldConverterNewResponse cmd = 10010;
+  }
+  optional bytes newMnt = 1;
+}

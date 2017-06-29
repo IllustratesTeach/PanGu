@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+  <xs:include schemaLocation="monad.xsd"/>
+  <xs:element name="hall_image" type="hallImageType"/>
+  <xs:complexType name="hallImageType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="log_file" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置日志文件的路径</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="local_store_dir" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>本地化存储的配置</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="rpcType" name="rpc" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置RPC绑定的的地址</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="zkType" name="zk" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置Zookeeper服务器相关信息</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="heartbeatType" name="heartbeat" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置心跳相关信息</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="webType" name="web" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>配置Web服务器相关参数</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="imageType" name="image" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>图像处理相关配置</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="imageType">
+    <xs:sequence>
+      <xs:element type="dllsType" name="dll_properties" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>定义dll的并发特性</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dllsType">
+  <xs:sequence>
+    <xs:element type="dllType" name="dll" maxOccurs="unbounded" minOccurs="1">
+      <xs:annotation>
+        <xs:documentation>定义dll的属性</xs:documentation>
+      </xs:annotation>
+    </xs:element>
+  </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dllType">
+    <xs:attribute type="xs:string" name="name" use="required">
+      <xs:annotation>
+        <xs:documentation>dll的名称</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute type="xs:boolean" name="is_concurrent" use="required">
+      <xs:annotation>
+        <xs:documentation>是否支持并发</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+</xs:schema>

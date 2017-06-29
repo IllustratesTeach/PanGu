@@ -1,0 +1,24 @@
+package sys.stamp;
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "UpdatePortraitProto";
+
+//人像修改请求
+message UpdatePortraitRequest {
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdatePortraitRequest cmd = 10239;
+    }
+    required string personId = 1;
+    required string fgp = 2;
+    required string gatherData = 3;
+}
+
+message UpdatePortraitResponse {
+    extend monad.rpc.protocol.BaseCommand {
+        optional UpdatePortraitResponse cmd = 10240;
+    }
+    optional string next = 1;
+
+}

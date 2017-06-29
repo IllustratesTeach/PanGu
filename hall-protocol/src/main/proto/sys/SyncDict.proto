@@ -1,0 +1,22 @@
+package sys;
+import "sys/Dict.proto";
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys";
+option java_outer_classname = "SyncDictProto";
+
+//字典同步
+message SyncDictRequest {
+  extend monad.rpc.protocol.BaseCommand {
+    optional SyncDictRequest cmd = 10113;
+  }
+  required DictType dict_type = 1;
+}
+//字典同步的响应
+message SyncDictResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional SyncDictResponse cmd = 10114;
+  }
+  required DictType dict_type = 1;
+  repeated DictData dict_data = 2;
+}

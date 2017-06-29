@@ -1,0 +1,22 @@
+package sys;
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys";
+
+option java_outer_classname = "LoginProto";
+
+//登录请求
+message LoginRequest {
+  extend monad.rpc.protocol.BaseCommand {
+    optional LoginRequest cmd = 10101;
+  }
+  required string login = 1;
+  required string password = 2;
+}
+//登录之后的响应
+message LoginResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional LoginResponse cmd = 10102;
+  }
+  required string token = 1;
+}

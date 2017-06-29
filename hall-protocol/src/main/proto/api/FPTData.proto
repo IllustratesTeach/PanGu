@@ -1,0 +1,404 @@
+package api;
+option java_package = "nirvana.hall.protocol.api";
+
+option java_outer_classname = "FPTProto";
+
+message	FPTData
+{
+	//头信息
+	required FPTHead		head = 1;
+	//十指指纹
+	repeated FPTTPCard		tpcard = 2;
+	//现场指纹
+	repeated FPTCaseLPCard	case = 3;
+	//比中信息
+	repeated FPTHitLog		hitlog = 4;
+
+	//保留
+	//查询 * 2，候选列表 * 5
+}
+
+message	FPTTPCard
+{
+	required TPCard	tpcard = 1;
+}
+
+message	FPTCaseLPCard
+{
+	required Case	case = 1;
+	repeated LPCard	lpcard = 2;
+}
+
+//比中类型
+enum HitType
+{
+	HIT_UNDET	= 0;	//不确定
+	HIT_TLLT	= 1;
+	HIT_TT		= 2;
+	HIT_LL		= 3;
+}
+
+message	FPTHitLog
+{
+	required HitType	type = 1;
+	optional TLLTHitLog	tlorlt = 2;
+	optional TTHitLog	tt = 3;
+	optional LLHitLog	ll = 4;
+}
+
+message	FPTHead
+{
+	optional int32	nVerSionID = 1;
+	optional string	strSendTime = 2;
+	optional string	strRecvUnitCode = 3;
+	optional string	strSendUnitCode = 4;
+	optional string	strSendUnitName = 5;
+	optional string	strSender = 6;
+	optional string	strSendUnitType = 7;
+	optional string	strTaskControlCode = 8;
+	optional string	strComment = 9;
+}
+
+//纹型
+enum PatternType
+{
+	PATTERN_UNDET		= 0;	//不确定
+	PATTERN_ARCH		= 1;	//弓型
+	PATTERN_LEFTLOOP	= 2;	//左箕
+	PATTERN_RIGHTLOOP	= 3;	//右箕
+	PATTERN_WHORL		= 4;	//斗
+
+}
+
+//指位
+enum	FingerFgp
+{
+	FINGER_UNDET	= 0;	//不确定
+	FINGER_R_THUMB	= 1;	//右拇
+	FINGER_R_INDEX	= 2;	//右食
+	FINGER_R_MIDDLE	= 3;	//右中
+	FINGER_R_RING	= 4;	//右环
+	FINGER_R_LITTLE	= 5;	//右小
+	FINGER_L_THUMB	= 6;	//左姆
+	FINGER_L_INDEX	= 7;	//左食
+	FINGER_L_MIDDLE	= 8;	//左中
+	FINGER_L_RING	= 9;	//左环
+	FINGER_L_LITTLE	= 10;	//左小
+}
+
+//掌位	//当前FPT4.0不支持掌纹
+enum	PalmFgp
+{
+	PALM_UNKNOWN	= 0;//未知
+	PALM_RIGHT		= 1;//右掌
+	PALM_LEFT		= 2;//左掌
+	//新增6.2定义的掌纹
+	PALM_FINGER_R   = 3;//右手指尖
+	PALM_FINGER_L   = 4;//左手指尖
+	PALM_THUMB_R_LOW  = 5;//右掌拇指下部区域
+	PALM_THUMB_R_UP  = 6;//右掌拇指上部区域
+	PALM_THUMB_L_LOW  = 7;//左掌拇指下部区域
+	PALM_THUMB_L_UP  = 8;//左掌拇指上部区域
+	//7.0掌纹
+	PALM_RIGTH_SIDE = 9;//右侧掌纹
+	PALM_LEFT_SIDE = 10;//左侧掌纹
+}
+
+//脸位
+enum	FaceFgp
+{
+	FACE_UNKNOWN	= 0;	// 未知
+	FACE_FRONT		= 1;	// 脸部正面像
+	FACE_LEFT		= 2;	// 脸部左侧像
+	FACE_RIGHT		= 3;	// 脸部右侧像
+};
+
+//类型
+enum	ImageType
+{
+	IMAGETYPE_UNKNOWN	= 0;	//不确定
+	IMAGETYPE_FINGER	= 1;	//指纹
+	IMAGETYPE_PALM		= 2;	//掌纹
+	IMAGETYPE_FACE		= 3;	//人像
+	IMAGETYPE_CARDIMG	= 4;	//文字框
+	IMAGETYPE_VOICE		= 5;	//声纹
+
+}
+
+message	TPCard
+{
+	message	TPCardText
+	{
+		optional string	strName = 1;                    //姓名
+		optional string	strAliasName = 2;               //别名
+		optional int32	nSex = 3;                       //性别
+		optional string	strBirthDate = 4;               //出生日期
+		optional string	strIdentityNum = 5;             //身份证
+		optional string	strBirthAddrCode = 6;           //出生地代码
+		optional string	strBirthAddr = 7;               //出生地详址
+		optional string	strAddrCode = 8;                //现住址代码
+		optional string	strAddr = 9;                    //现住址详址
+		optional string	strPersonType = 10;             //人员类型
+		optional string	strCaseType1 = 11;              //案件类别
+		optional string	strCaseType2 = 12;
+		optional string	strCaseType3 = 13;
+		optional string	strPrintUnitCode = 14;          //采集单位代码
+		optional string	strPrintUnitName = 15;          //采集单位名称
+		optional string	strPrinter = 16;                //采集人姓名
+		optional string	strPrintDate = 17;              //采集时间
+		optional string	strComment = 18;                //备注
+
+		//追加4.0文字信息
+		optional string	strNation = 19;                 //国籍
+		optional string	strRace = 20;                   //民族
+		optional string	strCertifType = 21;				//证件类型
+		optional string	strCertifID = 22;				//证件号
+		optional bool	bHasCriminalRecord = 23;		//前科标记
+		optional string	strCriminalRecordDesc = 24;		//前科信息
+		//optional string	strPersonID;				//人员编号	不在此处，移到TPCard.strPersonID
+		optional string	strPremium = 25;				//奖金
+		optional int32	nXieChaFlag = 26;				//协查标识
+		optional string	strXieChaRequestUnitName = 27;	//协查请求单位代码
+		optional string	strXieChaRequestUnitCode = 28;	//协查请求单位名称
+		optional int32	nXieChaLevel = 29;				//协查级别
+		optional string	strXieChaForWhat = 30;			//协查目的
+		optional string	strRelPersonNo = 31;			//关联人员编号
+		optional string	strRelCaseNo = 32;				//关联案件编号
+		optional string	strXieChaTimeLimit = 33;		//协查有效时限：1. 一个月	2. 三个月	3 六个月	4 长期
+		optional string	strXieChaDate = 34;				//协查请求日期
+		optional string	strXieChaRequestComment = 35;	//协查请求说明
+		optional string	strXieChaContacter = 36;		//联系人
+		optional string	strXieChaTelNo = 37;			//联系电话
+		optional string	strShenPiBy = 38;				//审批人
+
+		//6-7同步数据追加信息
+		optional string	strHuKouPlaceCode = 39;			//户籍地代码
+		optional string	strHuKouPlaceTail = 40;			//户籍地址
+	}
+
+	message	TPCardBlob
+	{
+		optional string			stImage = 1;                            //图像数据
+		optional string			stMnt = 2;                              //特征数据
+		optional PatternType	rp = 3 [default = PATTERN_UNDET];		//主纹型
+		optional PatternType	vrp = 4 [default = PATTERN_UNDET];		//副纹型
+		optional FingerFgp		fgp = 5 [default = FINGER_UNDET];		//指位
+		required ImageType		type = 6 [default = IMAGETYPE_UNKNOWN]; //图像类型
+		optional bool			bPlain = 7;                             //是否平面
+		optional string			strMntExtractMethod = 8;				//GAFIS结构中无
+		optional FaceFgp		facefgp = 9 [default = FACE_UNKNOWN];	//脸位
+		optional PalmFgp		palmfgp = 10 [default = PALM_UNKNOWN];	//掌位
+		optional string			stBin = 11;	//纹线数据
+	}
+
+	required string		strCardID = 1;      //捺印卡号
+	optional string		strPersonID = 2;    //人员编号
+	optional TPCardText	text = 3;
+	repeated TPCardBlob	blob = 4;
+	optional AdminfoData admData = 5;	 //操作信息
+	optional string strMisPersonID = 6;	 //重卡组号
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 7;   //数据来源类型
+
+}
+
+message	Case
+{
+	message	CaseText
+	{
+		optional string	strCaseType1 = 1;           //案件类别
+		optional string	strCaseType2 = 2;
+		optional string	strCaseType3 = 3;
+		optional string	strSuspArea1Code = 4;       //可疑地区行政区划
+		optional string	strSuspArea2Code = 5;
+		optional string	strSuspArea3Code = 6;
+		optional string	strCaseOccurDate = 7;       //案发日期
+		optional string	strCaseOccurPlaceCode = 8;  //案发地点代码
+		optional string	strCaseOccurPlace = 9;      //案发地址详情
+		optional int32	nSuperviseLevel = 10;       //协查级别
+		optional string	strExtractUnitCode = 11;    //提取单位代码
+		optional string	strExtractUnitName = 12;    //提取单位
+		optional string	strExtractor = 13;          //提取人
+		optional string	strExtractDate = 14;        //提取时间
+		optional string	strMoneyLost = 15;          //涉案金额
+		optional string	strPremium = 16;            //协查奖金
+		optional bool	bPersonKilled = 17;         //命案标识
+		optional string	strComment = 18;            //备注
+		optional int32	nCaseState = 19;            //案件状态
+		optional int32	nXieChaState = 20;          //协查状态
+		optional int32	nCancelFlag = 21;           //撤销标识
+		optional string	strXieChaDate = 22;         //协查日期
+		optional string	strXieChaRequestUnitName = 23;  //协查单位名称
+		optional string	strXieChaRequestUnitCode = 24;  //协查单位代码
+	}
+
+	required string	strCaseID = 1;          //案件编号
+	repeated string	strFingerID = 2;        //指纹编号
+	repeated string	strPalmID = 3;          //掌纹编号
+	optional int32	nCaseFingerCount = 4;	//GAFIS结构中无
+	optional int32	nSendFingerCount = 5;	//GAFIS结构中无
+
+	optional CaseText	text = 6;
+	optional AdminfoData admData = 7;		//操作信息
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 8;   //数据来源类型
+}
+
+message	LPCard
+{
+	message	LPCardText
+	{
+		optional string	strSeq = 1;
+		optional string	strRemainPlace = 2;     //遗留部位
+		optional string	strRidgeColor = 3;      //乳突线颜色
+		optional bool	bDeadBody = 4;          //未知名尸体标识
+		optional string	strDeadPersonNo = 5;    //未知名尸体编号
+		optional int32	nXieChaState = 6;       //协查状态
+		optional int32	nBiDuiState = 7;        //比对状态
+		optional string	strStart = 8;           //联指开始序号
+		optional string	strEnd = 9;             //联指结束序号
+		optional string	strCaseId= 10;          //案件编号
+		optional string strCaptureMethod = 11;  //提取方式
+		optional string	strComment= 12;         //备注
+	}
+
+	message	LPCardBlob
+	{
+		optional string			stImage = 1;    //图像
+		optional string			stMnt = 2;      //特征
+		repeated PatternType	rp = 3;			//候选纹型
+		repeated FingerFgp		fgp = 4;		//候选指位
+		required ImageType		type = 5;       //图像类型
+		optional string			strMntExtractMethod = 6;	//"A" 自动提取	"U"	需要人工编辑	"E"	自动提取但经过人工编辑	"M"	人工提取//GAFIS结构中无
+		optional string			stBin = 7;		//纹线数据
+		optional PalmFgp		palmFgp = 8;	//掌位
+	}
+
+	required string		strCardID = 1;  //现场卡号
+	optional LPCardText	text = 2;
+	optional LPCardBlob	blob = 3;
+	optional AdminfoData admData = 4;
+	// 双向同步需要读策略过滤数据类型
+    optional string	strDataSource = 5;   //数据来源类型
+}
+
+message	TLLTHitLog
+{
+	optional string	strCaseNo = 1;
+	optional int32	nLatFingerSeq = 2;
+	optional string	strPersonNo = 3;
+	optional int32	nTPFingerPos = 4;
+	optional bool	bCaughtDirectly = 5;
+	optional int32	nBiDuiMethod = 6;
+	optional string	strBiDuiUnitCode = 7;
+	optional string	strBiDuiUnitName = 8;
+	optional string	strBiDuiUser = 9;
+	optional string	strBiDuiDate = 10;
+	optional string	strComment = 11;
+	optional string	strReporter = 12;
+	optional string	strReportDate = 13;
+	optional string	strShenPiBy = 14;
+	optional string	strShenPiDate = 15;
+	optional string	strReportUnitCode = 16;
+	optional string	strReportUnitName = 17;
+	optional string	strRechecker = 18;
+	optional string	strRecheckUnitCode = 19;
+	optional string	strRecheckDate = 20;
+}
+
+message	TTHitLog
+{
+	optional string	strPersonNo1 = 1;
+	optional string	strPersonNo2 = 2;
+	optional string	strBiDuiUnitCode = 3;
+	optional string	strBiDuiUnitName = 4;
+	optional string	strBiDuiUser = 5;
+	optional string	strBiDuiDate = 6;
+	optional string	strComment = 7;
+	optional string	strReporter = 8;
+	optional string	strReportDate = 9;
+	optional string	strShenPiBy = 10;
+	optional string	strShenPiDate = 11;
+	optional string	strReportUnitCode = 12;
+	optional string	strReportUnitName = 13;
+	optional string	strRechecker = 14;
+	optional string	strRecheckUnitCode = 15;
+	optional string	strRecheckDate = 16;
+}
+
+message	LLHitLog
+{
+	optional string	strCaseNo1 = 1;
+	optional string	strCaseNo2 = 2;
+	optional int32	nLatFingerSeq1 = 3;
+	optional int32	nLatFingerSeq2 = 4;
+	optional string	strBiDuiUnitCode = 5;
+	optional string	strBiDuiUnitName = 6;
+	optional string	strBiDuiUser = 7;
+	optional string	strBiDuiDate = 8;
+	optional string	strComment = 9;
+	optional string	strReporter = 10;
+	optional string	strReportDate = 11;
+	optional string	strShenPiBy = 12;
+	optional string	strShenPiDate = 13;
+	optional string	strReportUnitCode = 14;
+	optional string	strReportUnitName = 15;
+	optional string	strRechecker = 16;
+	optional string	strRecheckUnitCode = 17;
+	optional string	strRecheckDate = 18;
+}
+
+//操作信息
+message AdminfoData {
+	optional string creator = 1;			//创建人
+	optional string updator = 2;			//更新人
+	optional string createDatetime = 3;		//创建时间yyyyMMddHHmmss
+	optional string updateDatetime = 4;		//更新时间yyyyMMddHHmmss
+	optional string createUnitCode = 5;		//创建单位代码
+	optional string updateUnitCode = 6;		//更新单位代码
+}
+
+
+message MatchRelationInfo{
+
+	required string match_unit_code = 1; //比对单位代码
+	optional string match_unit_name = 2; //比对单位名称
+	required string matcher = 3; //比对人姓名
+	required string match_date = 4; //比对日期
+	optional string remark = 5; //备注
+	optional string inputer = 6; //填报人
+	optional string input_date = 7; //填报日期
+	optional string approver = 8; //审批人
+	optional string approve_date = 9; //审批日期
+	optional string input_unit_code = 10; //填报单位代码
+	optional string input_unit_name = 11; //填报单位名称
+	optional string rechecker = 12; //复核人
+	optional string recheck_unit_code = 13; //复核单位代码
+	optional string recheck_date = 14; //复核日期
+	optional string breakid = 15; //6.2破案表中的主键
+	optional string srckey = 16; //送检卡号
+	optional string destkey = 17; //目标卡号
+	optional string score = 18;
+	optional string firstRankScore = 19;
+	optional string rank = 20;
+	optional FingerFgp fg = 21;
+	optional int32 hitposs = 22;
+	optional int32   is_rmt_searched = 23;
+	optional int32   is_crime_captured = 24;
+	optional string fgtype = 25;
+	optional int32 total_matched_cnt =26;
+	optional int32 querytype = 27;
+	optional string srcdbid = 28;
+	optional string destdbid = 29;
+	optional string src_person_caseID = 30;
+	optional string dest_person_caseID = 31;
+	optional string case_class_code1 = 32;
+	optional string case_class_code2 = 33;
+	optional string case_class_code3 = 34;
+	optional string searching_unitCode = 35;
+	optional string break_username = 36;
+	optional string break_userUnitCode = 37;
+	optional string break_dateTime = 38;
+	optional string query_taskId = 39;
+
+}

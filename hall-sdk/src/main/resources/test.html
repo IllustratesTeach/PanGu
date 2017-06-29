@@ -1,0 +1,19 @@
+<html>
+<head>
+  <script src="./ByteBufferAB.min.js"></script>
+  <script src="./Long.min.js"></script>
+  <script src="./ProtoBuf.noparse.min.js"></script>
+  <script src="./Nirvana.hall.js"></script>
+</head>
+<body>
+<script>
+   hall.api.Init("http://localhost:9081");
+   hall.api.AddProto("/sys/login.json");
+   var nirvana= hall.api.Build();
+   var loginRequest = new nirvana.sys.LoginRequest ();
+   loginRequest.setLogin("jcai");
+   loginRequest.setPassword("password");
+   hall.api.Execute(loginRequest,function(response){},function(message){alert(message);})
+</script>
+</body>
+</html>

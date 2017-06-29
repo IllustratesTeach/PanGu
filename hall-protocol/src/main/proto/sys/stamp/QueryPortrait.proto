@@ -1,0 +1,29 @@
+package sys.stamp;
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "QueryPortraitProto";
+
+message PortraitInfo {
+    optional string personid = 1;
+    optional string fgp = 2;
+    optional string gatherData = 3;
+    optional string inputpsn = 4;
+    optional string inputtime = 5;
+}
+
+//人像查询请求
+message QueryPortraitRequest {
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryPortraitRequest cmd = 10225;
+    }
+    required string personId = 1;
+}
+
+message QueryPortraitResponse {
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryPortraitResponse cmd = 10226;
+    }
+    repeated PortraitInfo portraitInfo = 1;
+}

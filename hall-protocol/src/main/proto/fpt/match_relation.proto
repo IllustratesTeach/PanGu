@@ -1,0 +1,55 @@
+package fpt;
+import "api/FPTData.proto";
+import "matcher/type_definition.proto";
+
+option java_package = "nirvana.hall.protocol.fpt";
+option java_outer_classname = "MatchRelationProto";
+
+//查中登记系统信息
+message MatchSysInfo{
+    required string match_unit_code = 1; //比对单位代码
+    required string match_unit_name = 2; //比对单位名称
+    required string matcher = 3; //比对人姓名
+    required string match_date = 4; //比对日期
+    optional string remark = 5; //备注
+    optional string inputer = 6; //填报人
+    optional string input_date = 7; //填报日期
+    optional string approver = 8; //审批人
+    optional string approve_date = 9; //审批日期
+    optional string input_unit_code = 10; //填报单位代码
+    optional string input_unit_name = 11; //填报单位名称
+    optional string rechecker = 12; //复核人
+    optional string recheck_unit_code = 13; //复核单位代码
+    optional string recheck_date = 14; //复核日期
+}
+
+message MatchRelation{
+    extensions 100 to max;
+    required MatchSysInfo match_sys_info = 1;
+}
+message MatchRelationTT{
+    extend MatchRelation {
+        optional MatchRelationTT data = 100;
+    }
+    required string person_id1 = 1; //人员编号1
+    required string person_id2 = 2; //人员编号2
+}
+message MatchRelationLL{
+    extend MatchRelation {
+        optional MatchRelationLL data = 101;
+    }
+    required string case_id1= 1; //案件编号1
+    required string seq_no1 = 2; //现场指纹序号1
+    required string case_id2 = 3; //人员编号2
+    required string seq_no2 = 4; //现场指纹序号2
+}
+message MatchRelationTLAndLT{
+    extend MatchRelation {
+        optional MatchRelationTLAndLT data = 103;
+    }
+    required string case_id = 1; //案件编号
+    required string seq_no = 2; //现场指纹序号
+    required string person_id = 3; //人员编号
+    required api.FingerFgp fpg = 4; //十指指纹指位
+    required bool capture = 5; //是否抓获
+}

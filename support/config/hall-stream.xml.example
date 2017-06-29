@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   Copyright 2014,2015 Jun Tsai. All rights reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_stream>
+  <log_file>${server.home}/log/nirvana.hall.stream.log</log_file>
+  <stream>
+    <decompress_thread_num>1</decompress_thread_num>
+    <extract_thread_num>1</extract_thread_num>
+    <save_feature_thread_num>1</save_feature_thread_num>
+  </stream>
+</hall_stream>
+

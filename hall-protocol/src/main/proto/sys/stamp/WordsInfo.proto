@@ -1,0 +1,43 @@
+package sys.stamp;
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+option java_outer_classname = "WordsInfoProto";
+
+
+message WordsInfoRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional WordsInfoRequest cmd = 10241;
+    }
+    optional string personid = 1;
+}
+
+
+message WordsInfoResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional WordsInfoResponse cmd = 10242;
+    }
+    optional string personid = 1;               //捺印卡号
+    optional string name = 2;                   //姓名
+    optional string nativeplaceCode = 3;        //国籍字典
+    optional string door = 4;                   //户籍地区化
+    optional string address = 5;                //现住址区化
+    optional string caseclasses = 6;            //案件类别
+    optional string fptGatherDepartCode = 7;    //捺印单位代码
+    optional string remark = 8;                 //备注
+    optional string aliasname = 9;              //别名
+    optional string nationCode = 10;            //民族字典
+    optional string doordetail = 11;            //户籍地详址
+    optional string addressdetail = 12;         //现住地详址
+    optional string recordmark = 13;            //前科库标识
+    optional string fptGatherDepartName = 14;   //捺印单位名称
+    optional string personType = 15;            //人员类别
+    optional string sexCode = 16;               //性别字典
+    optional string idcardno = 17;              //身份证号码
+    optional string recordsituation = 18;       //前科库劣迹情况
+    optional string gatherUserName = 19;        //捺印人姓名
+    optional string certificatetype = 20;       //证件类型
+    optional string certificateid = 21;         //证件号码
+    optional string birthdayst = 22;            //出生日期
+    optional string gatherFingerTime = 23;      //捺印日期
+}

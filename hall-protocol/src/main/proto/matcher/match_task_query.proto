@@ -1,0 +1,107 @@
+package matcher;
+
+option java_package = "nirvana.hall.protocol.matcher";
+
+option java_outer_classname = "MatchTaskQueryProto";
+
+import "matcher/text_data.proto";
+
+import "matcher/type_definition.proto";
+
+message MatchTask {
+  /**
+   * 发送档案数据进行比对
+   */
+  message TemplateMatchData {
+    /**
+     * 档案指纹数据特征
+     */
+    message TemplateMinutiaData {
+      /**
+     * 指位或者掌位
+     * 档案指纹：
+     * 譬如：譬如：右手拇指是 1 << 0 ,左手小指是 1 << 9
+     * pos从第1位到第10位表示滚动指纹的指位
+     * pos从第11位到第20位表示平面指纹的指位
+     */
+      required int32 pos = 1;
+      //特征点
+      required bytes minutia = 2;
+      //纹线数据
+      optional bytes ridge = 3;
+    }
+    //特征数据,如果是TT的时候，有多个特征数据，如果是TL的时候只有一个数据
+    repeated TemplateMinutiaData minutia_data = 1;
+    //用于文字筛选
+    optional TextQueryData text_query = 2;
+  }
+  /**
+   * 发送现场指纹进行比对时候的数据定义
+   */
+  message LatentMatchData {
+    //特征数据
+    required bytes minutia = 1;
+    //纹线数据
+    optional bytes ridge = 2;
+    /**
+     * 疑似指位
+     * 从第1位到10位表示疑似指位
+     */
+    optional int32 pos_suspected = 3;
+
+    //用于文字筛选
+    optional TextQueryData text_query = 4;
+  }
+  message MatchConfig {
+    //前台界面对本次比对的设置
+    // 1）什么意思 2）怎么判定 3）对比对结果有什么影响
+    optional uint32 be_two_step_match = 1 [default = 0]; //是否进行二次比对
+    optional uint32 minutia = 2 [default = 3]; //匹配特征基数;
+    optional uint32 distore = 3 [default = 3]; //变形程度	 1... 小，2... 较小，3...中等（缺省），4...较大,  5...大;
+    optional uint32 loc_structure = 4 [default = 3]; //容错能力		1... 低，2... 较低，3...中等（缺省），4...较高， 5...高
+    optional uint32 mask_enh_feat = 5 [default = 0]; //屏蔽增强型现场特征	0...否（缺省），1...是
+    optional uint32 morph_accu_use = 6 [default = 0]; //是否精确进行形态筛选，0...按指纹实际条件使用，1...忽略形态特征变化范围，精确使用
+    optional uint32 full_match_on = 7 [default = 0]; //是否进行全面比对，0...否（缺省），1...是，当需要给即时比对提供候选或进行即时比对时，需要选择1
+    optional double scale0 = 8 [default = 0]; //数据缩放比例范围（0.5---2.0，Scale1>=Scale0)，如果两个值都是0.0，表示原大
+    optional double scale1 = 9 [default = 0];
+  }
+  //比对的任务ID
+  required string match_id = 1;
+  //比对类型
+  required MatchType match_type = 2;
+  //取前N个
+  optional uint32 top_n = 3 [default = 100];
+  //最小得分，>= 该值的记录留下
+  required uint32 score_threshold = 4;
+  //发送档案数据时候的比对数据
+  optional TemplateMatchData t_data = 5;
+  //发送现场数据的时候比对数据
+  optional LatentMatchData l_data = 6;
+  //前台界面对本次比对的设置
+  optional MatchConfig config = 7;
+  //优先级,优先级越高，数越大
+  required int32 priority = 8 [default = 0];
+  //任务号oraSid
+  required int64 object_id = 9;
+
+  //指位信息
+  // 譬如：譬如：右手拇指是 1 << 0 ,左手小指是 1 << 9
+  // 指定要比对的指位信息，只能指定一个，范围是 1-10
+  optional int32 pos = 10;
+  //纹型
+  optional int32 ridge_pattern = 11;
+
+  //提交人
+  optional string commit_user = 12;
+  //远程查询idT.I. - Castle Wall
+  optional string queryid = 13;
+
+  // 提交机器IP
+  optional string computer_ip = 14 ;
+
+  //提交者单位代码
+  optional string user_unit_code = 15 ;
+
+  //6.2发起任务的创建时间
+  optional string ora_createtime = 16;
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   Copyright 2012,2015 the original author or authors. All rights reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_webservice>
+<log_file>${server.home}/log/hall.webservice.log</log_file>
+<local_store_dir>${server.home}/config/local.webservice</local_store_dir>
+<web>
+    <bind>0.0.0.0:8080</bind>
+</web>
+<union4pfmip>
+    <cron>0 * * * * ? *</cron>
+    <url>http://10.12.223.4:9001/AFIS/SJZWZDSB?wsdl</url>
+    <target_namespace>http://www.msp.gov.cn/szxc</target_namespace>
+    <user>370000350000</user>
+    <password>123456</password>
+    <dateLimit>2017</dateLimit>
+    <TenPrintPrex>1</TenPrintPrex>
+    <LatentPrex>2</LatentPrex>
+    <send_checkin_cron>30 * * * * ? *</send_checkin_cron>
+    <upload_checkin_cron>30 * * * * ? *</upload_checkin_cron>
+</union4pfmip>
+</hall_webservice>

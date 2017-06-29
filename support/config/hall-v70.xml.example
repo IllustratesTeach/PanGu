@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   Copyright 2012,2015 the original author or authors. All rights reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_v70>
+    <database>
+        <driver>oracle.jdbc.driver.OracleDriver</driver>
+        <user>gafis</user>
+        <password>gafis</password>
+        <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+    </database>
+    <cron>
+        <sync_dict_cron>0 0 * * * ? *</sync_dict_cron>
+        <query_7to6_cron>0 0 * * * ? *</query_7to6_cron>
+    </cron>
+</hall_v70>

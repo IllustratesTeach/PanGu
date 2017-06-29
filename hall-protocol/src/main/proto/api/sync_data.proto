@@ -1,0 +1,197 @@
+package api;
+import "api/FPTData.proto";
+import "api/hall_match_relation.proto";
+import "monad/rpc/protocol/command.proto";
+import "matcher/match_task_query.proto";
+import "matcher/match_result.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+option java_outer_classname = "SyncDataProto";
+
+//数据同步接口，cmd[10600-10699]
+/**
+    10600   SyncTPCardRequest
+    10601   SyncTPCardResponse
+    10602   SyncLPCardRequest
+    10603   SyncLPCardResponse
+    10604   SyncCaseRequest
+    10605   SyncCaseResponse
+    10606   SyncLPPalmRequest
+    10607   SyncLPPalmResponse
+    10608   SyncMatchTaskRequest
+    10609   SyncMatchTaskResponse
+*/
+enum OperationType {
+    PUT = 1; //新增或者修改
+    DEL = 2; //删除
+}
+//同步捺印数据，添加seq时间
+message SyncTPCard{
+    required TPCard tpCard = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步现场数据
+message SyncLPCard{
+    required LPCard lpCard = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步案件数据
+message SyncCase{
+    required Case caseInfo = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步比中关系
+message SyncMatchRelation{
+    required MatchRelationInfo matchRelationInfo = 1;
+    optional OperationType operation_type = 2;
+    required int64 seq = 3;
+}
+//同步TPCard
+message SyncTPCardRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncTPCardRequest cmd = 10600;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 seq = 1;
+    //数据大小，一次传送的数据大小,默认为1
+    optional int32 size = 2 [default = 1];
+    //物理库dbid
+    optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
+}
+message SyncTPCardResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncTPCardResponse cmd = 10601;
+    }
+    repeated SyncTPCard syncTPCard = 1;
+    required int64 seq = 2;
+}
+//同步LPCard
+message SyncLPCardRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPCardRequest cmd = 10602;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 seq = 1;
+    //数据大小，一次传送的数据大小,默认为10
+    optional int32 size = 2 [default = 1];
+    optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
+}
+message SyncLPCardResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPCardResponse cmd = 10603;
+    }
+    repeated SyncLPCard syncLPCard = 1;
+    required int64 seq = 2;
+}
+
+//同步Case
+message SyncCaseRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncCaseRequest cmd = 10604;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 seq = 1;
+    //数据大小，一次传送的数据大小,默认为1
+    optional int32 size = 2 [default = 1];
+    optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
+
+}
+message SyncCaseResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncCaseResponse cmd = 10605;
+    }
+    repeated SyncCase syncCase = 1;
+    required int64 seq = 2;
+}
+
+//同步LPPalm
+message SyncLPPalmRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPPalmRequest cmd = 10606;
+    }
+    //数据时间戳,Web服务器可以用此时间戳进行数据查询
+    required int64 seq = 1;
+    //数据大小，一次传送的数据大小,默认为1
+    optional int32 size = 2 [default = 1];
+    optional string dbid = 3;
+    //记录exception
+    optional string uuid = 4;
+}
+message SyncLPPalmResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncLPPalmResponse cmd = 10607;
+    }
+    repeated SyncLPCard syncLPCard = 1;
+    required int64 seq = 2;
+}
+
+//同步比对任务
+message SyncMatchTaskRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchTaskRequest cmd = 10608;
+    }
+   // optional int64 seq = 1;
+    //数据大小，一次传送的数据大小,默认为1
+    optional int32 size = 1 [default = 1];
+    optional string dbid = 2;
+    //记录exception
+    optional string uuid = 3;
+}
+message SyncMatchTaskResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchTaskResponse cmd = 10609;
+    }
+    repeated matcher.MatchTask match_task = 1;
+}
+
+//同步比对任务
+message SyncMatchResultRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchResultRequest cmd = 10610;
+    }
+    //比对任务号
+    required int64 sid = 1;
+    optional string dbid = 2;
+    optional string pkid = 3; //捺印卡号
+    optional string typ = 4; //查询类型
+    //记录exception
+    optional string uuid = 5;
+}
+message SyncMatchResultResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchResultResponse cmd = 10611;
+    }
+    //比对状态
+    required MatchStatus match_status = 1;
+    //比对候选
+    optional matcher.MatchResult match_result = 2;
+
+}
+//同步比中关系
+message SyncMatchRelationRequest{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchRelationRequest cmd = 10612;
+    }
+    required int64 seq = 1;
+    optional int32 size = 2 [default = 1];
+    optional string dbid = 3;
+    optional string uuid = 4;
+}
+
+message SyncMatchRelationResponse{
+    extend monad.rpc.protocol.BaseCommand{
+        optional SyncMatchRelationResponse cmd = 10613;
+    }
+    repeated SyncMatchRelation syncMatchRelation = 1;
+    required int64 seq = 2;
+}
+

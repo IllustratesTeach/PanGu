@@ -1,0 +1,23 @@
+package sys.stamp;
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.sys.stamp";
+
+option java_outer_classname = "GatherTypeNodeFieldProto";
+
+//通过人员类型获取采集项
+message QueryGatherTypeNodeFieldRequest {
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherTypeNodeFieldRequest cmd = 10219;
+    }
+    required string category = 1;
+}
+
+//返回采集项(格式item1:required-item2:optinal...)
+message QueryGatherTypeNodeFieldResponse {
+    extend monad.rpc.protocol.BaseCommand {
+        optional QueryGatherTypeNodeFieldResponse cmd = 10220;
+    }
+    required string fields = 1;
+
+}

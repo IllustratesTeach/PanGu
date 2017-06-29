@@ -1,0 +1,55 @@
+/**
+ * 定义了依赖厂商的解压缩算法进行解压缩
+ */
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+
+option java_package = "nirvana.hall.protocol.extract";
+
+option java_outer_classname = "ExtractProto";
+//指位
+enum	FingerPosition
+{
+  FINGER_UNDET	= 0;	//不确定
+  FINGER_R_THUMB	= 1;	//右拇
+  FINGER_R_INDEX	= 2;	//右食
+  FINGER_R_MIDDLE	= 3;	//右中
+  FINGER_R_RING	= 4;	//右环
+  FINGER_R_LITTLE	= 5;	//右小
+  FINGER_L_THUMB	= 6;	//左姆
+  FINGER_L_INDEX	= 7;	//左食
+  FINGER_L_MIDDLE	= 8;	//左中
+  FINGER_L_RING	= 9;	//左环
+  FINGER_L_LITTLE	= 10;	//左小
+}
+enum NewFeatureTry{
+  V1 = 0; //老的
+  V2 = 1; //新版本
+}
+/* send request to image server */
+message ExtractRequest{
+  extend monad.rpc.protocol.BaseCommand {
+    optional ExtractRequest cmd = 10003;
+  }
+  enum FeatureType{
+    FingerTemplate = 1;
+    FingerLatent = 2;
+    PalmTemplate = 3;
+    PalmLatent = 4;
+  }
+  required bytes img_data = 1;
+  required FingerPosition position = 2;
+  required FeatureType mnt_type = 3;
+  optional NewFeatureTry feature_try= 4[default = V1];
+}
+
+/* response */
+message ExtractResponse {
+  extend monad.rpc.protocol.BaseCommand {
+    optional ExtractResponse cmd = 10004;
+  }
+  optional bytes mnt_data = 1;
+  optional bytes bin_data = 2;
+}

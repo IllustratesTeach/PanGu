@@ -1,0 +1,817 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GAFIS_RESOURCE version="1.0" langid="0x0804" >
+  <STRINGTABLE>
+    <ITEM id="30" value="条码格式或长度错误" />
+    <ITEM id="31" value="条码太长" />
+    <ITEM id="32" value="条码太短" />
+    <ITEM id="33" value="条码已经存在" />
+    <ITEM id="34" value="条码长度不匹配" />
+    <ITEM id="35" value="条码不存在" />
+    <ITEM id="36" value="把长整型转换为条码，给定缓冲区太短" />
+    <ITEM id="301" value="bad key conversion rule file signature" />
+    <ITEM id="298" value="bad berrorlog head" />
+    <ITEM id="299" value="bad bmp file signature" />
+    <ITEM id="251" value="bad collate type string" />
+    <ITEM id="302" value="bad NOBF file head" />
+    <ITEM id="300" value="非法的UDP数据包" />
+    <ITEM id="263" value="create mutex" />
+    <ITEM id="277" value="创建线程失败" />
+    <ITEM id="259" value="create file mapping" />
+    <ITEM id="255" value="create registry key." />
+    <ITEM id="286" value="create event" />
+    <ITEM id="287" value="open event" />
+    <ITEM id="288" value="set event" />
+    <ITEM id="289" value="wait event" />
+    <ITEM id="294" value="failed to create temp file" />
+    <ITEM id="297" value="offset invalid" />
+    <ITEM id="293" value="file pkg align" />
+    <ITEM id="292" value="file pkg item too large" />
+    <ITEM id="303" value="完整读取文件的时候文件太长" />
+    <ITEM id="275" value="file version query value" />
+    <ITEM id="266" value="get effective user name" />
+    <ITEM id="274" value="取得文件版本发生错误" />
+    <ITEM id="273" value="取得文件版本信息长度发生错误" />
+    <ITEM id="270" value="ibm get kern info" />
+    <ITEM id="265" value="get logon user name" />
+    <ITEM id="264" value="get pass" />
+    <ITEM id="267" value="get password name" />
+    <ITEM id="306" value="parameter in afisinit.ini has an invalid value." />
+    <ITEM id="260" value="map view of file" />
+    <ITEM id="272" value="memory stream reach end" />
+    <ITEM id="252" value="没有检测到适用的授权" />
+    <ITEM id="295" value="bad first bkid in nobf" />
+    <ITEM id="250" value="no valid collate id" />
+    <ITEM id="304" value="offset exceed file end" />
+    <ITEM id="261" value="open file mapping" />
+    <ITEM id="276" value="打开进程失败" />
+    <ITEM id="253" value="open registry key" />
+    <ITEM id="258" value="取得BOOL参数信息的时候发生错误" />
+    <ITEM id="257" value="取得整型参数信息的时候发生错误" />
+    <ITEM id="269" value="platform does not suitable for database run" />
+    <ITEM id="278" value="pthread attr init" />
+    <ITEM id="290" value="pthread cond wait" />
+    <ITEM id="280" value="UNIX 上创建线程失败" />
+    <ITEM id="285" value="pthread mutex destroy" />
+    <ITEM id="281" value="pthread mutex init" />
+    <ITEM id="282" value="pthread mutex lock" />
+    <ITEM id="283" value="pthread mutex try lock" />
+    <ITEM id="284" value="pthread mutex unlock" />
+    <ITEM id="279" value="pthread set stack size" />
+    <ITEM id="254" value="query registry value" />
+    <ITEM id="291" value="set end of file" />
+    <ITEM id="256" value="set registry value" />
+    <ITEM id="268" value="set uid" />
+    <ITEM id="262" value="sock ntoa" />
+    <ITEM id="271" value="stack array get deep top : bad index" />
+    <ITEM id="296" value="temp file name" />
+    <ITEM id="305" value="txt hook does not exist with given hook id" />
+    <ITEM id="8511" value="async db main path is null" />
+    <ITEM id="8503" value="backup skm log not exist" />
+    <ITEM id="8506" value="not given backup task" />
+    <ITEM id="8505" value="backup task not whole db" />
+    <ITEM id="8507" value="backup task whole db" />
+    <ITEM id="8501" value="invalid bkp time log" />
+    <ITEM id="8502" value="load bkp time log file fail" />
+    <ITEM id="8512" value="once db main path is null" />
+    <ITEM id="8520" value="task info recycle db is empty" />
+    <ITEM id="8504" value="recycle db not exist" />
+    <ITEM id="8521" value="task info recycle table is empty" />
+    <ITEM id="8513" value="seg log file head invalid" />
+    <ITEM id="8514" value="seg log seg format invalid" />
+    <ITEM id="8524" value="svr cfg file head invalid" />
+    <ITEM id="8525" value="remove all task before remove server" />
+    <ITEM id="8510" value="sync db main path is null" />
+    <ITEM id="8500" value="table not exist" />
+    <ITEM id="8517" value="task info bkp type invalid" />
+    <ITEM id="8518" value="task info dbuuid invalid" />
+    <ITEM id="8522" value="task info file size not match" />
+    <ITEM id="8515" value="task info size error" />
+    <ITEM id="8519" value="task info table uuid invalid" />
+    <ITEM id="8516" value="task info version invalid" />
+    <ITEM id="8523" value="update task param error" />
+    <ITEM id="3001" value="指位错误" />
+    <ITEM id="3000" value="长度不等" />
+    <ITEM id="8030" value="code multisearch : bad item name" />
+    <ITEM id="8031" value="code table : code too long" />
+    <ITEM id="8032" value="code table : input code too long" />
+    <ITEM id="8033" value="code table : name too long" />
+    <ITEM id="9501" value="backup service not started" />
+    <ITEM id="9500" value="key count error" />
+    <ITEM id="2632" value="add to cache error" />
+    <ITEM id="2678" value="bad block size" />
+    <ITEM id="2683" value="bad database type" />
+    <ITEM id="2672" value="bad file id" />
+    <ITEM id="2604" value="错误的数据库属性" />
+    <ITEM id="2650" value="bad pt type" />
+    <ITEM id="2605" value="队列文件发生错误，需要被重置" />
+    <ITEM id="2646" value="bad share object status" />
+    <ITEM id="2688" value="错误的表格类型" />
+    <ITEM id="2674" value="bad xlogfile head" />
+    <ITEM id="2663" value="buffer not initialized" />
+    <ITEM id="2631" value="cache data pt error" />
+    <ITEM id="2640" value="给定名称的列已经存在" />
+    <ITEM id="2684" value="列值为空" />
+    <ITEM id="2643" value="列的长度为0" />
+    <ITEM id="2639" value="给定名称的列在表中不存在" />
+    <ITEM id="2654" value="列不匹配" />
+    <ITEM id="2648" value="给定的列没有有效值" />
+    <ITEM id="2669" value="ct cnt not match" />
+    <ITEM id="2670" value="ct not same" />
+    <ITEM id="2624" value="目标缓冲区太小" />
+    <ITEM id="2675" value="dup chkpt flag" />
+    <ITEM id="2642" value="表中发现具有相同名称的列" />
+    <ITEM id="2641" value="表中发现具有相同UUID的列" />
+    <ITEM id="2603" value="已经存在并且与当前的不同" />
+    <ITEM id="2671" value="file count not match" />
+    <ITEM id="2622" value="文件个数不等" />
+    <ITEM id="2627" value="FIFO 队列记录已经删除" />
+    <ITEM id="2629" value="FIFO 队列当前记录不是最后一条" />
+    <ITEM id="2628" value="FIFO 队列当前记录不是第一条" />
+    <ITEM id="2667" value="get auto key error" />
+    <ITEM id="2677" value="has active xact" />
+    <ITEM id="2630" value="idbt lost" />
+    <ITEM id="2612" value="给定的列的数据类型不支持索引" />
+    <ITEM id="2616" value="无效的数据块号" />
+    <ITEM id="2647" value="invalid bkpt" />
+    <ITEM id="2617" value="无效的 bmid" />
+    <ITEM id="2618" value="无效的BMF文件头部格式" />
+    <ITEM id="2621" value="无效的文件ID" />
+    <ITEM id="2619" value="invalid srid" />
+    <ITEM id="2682" value="lob pt in isa not used" />
+    <ITEM id="2633" value="item size not match" />
+    <ITEM id="2657" value="key length not match" />
+    <ITEM id="2658" value="key not match" />
+    <ITEM id="2652" value="key too long" />
+    <ITEM id="2636" value="数据库所在目录超过70个字符" />
+    <ITEM id="2649" value="mapper buffer not enough" />
+    <ITEM id="2676" value="met start chkpt twice" />
+    <ITEM id="2660" value="need key" />
+    <ITEM id="2655" value="need length field" />
+    <ITEM id="2665" value="need lob" />
+    <ITEM id="2666" value="need more leaf entry" />
+    <ITEM id="2685" value="对于给定的UUID没有列对应" />
+    <ITEM id="2610" value="给定CTID的子表不存在" />
+    <ITEM id="2664" value="no enough src data" />
+    <ITEM id="2600" value="没有此数据库(一般是数据库ID错误)" />
+    <ITEM id="2661" value="no group col" />
+    <ITEM id="2609" value="给定的表没有关键字列" />
+    <ITEM id="2602" value="特征不存在" />
+    <ITEM id="2611" value="给定TID的表不存在" />
+    <ITEM id="2681" value="not applicable" />
+    <ITEM id="2607" value="数据库不存在" />
+    <ITEM id="2614" value="SID没有被使用(记录不存在)" />
+    <ITEM id="2673" value="no xact" />
+    <ITEM id="2644" value="path head not match" />
+    <ITEM id="2645" value="path tail not match" />
+    <ITEM id="2608" value="入库队列发生错误,需要被重置" />
+    <ITEM id="2601" value="达到数据库容量限制" />
+    <ITEM id="2606" value="记录已经存在" />
+    <ITEM id="2615" value="Record in reserved state" />
+    <ITEM id="2634" value="role not set" />
+    <ITEM id="2651" value="根据SID更新记录，但是SID没有使用" />
+    <ITEM id="2679" value="row size is zero" />
+    <ITEM id="2620" value="数据行的长度与实际不符合" />
+    <ITEM id="2656" value="有关键字的表不能够调用顺序存储函数" />
+    <ITEM id="2653" value="bad serial row type" />
+    <ITEM id="2659" value="sid not match" />
+    <ITEM id="2686" value="SID too large" />
+    <ITEM id="2635" value="数据库服务器正在关闭" />
+    <ITEM id="2613" value="表ID不能为0" />
+    <ITEM id="2680" value="table no key" />
+    <ITEM id="2625" value="tag not found" />
+    <ITEM id="2626" value="tag type not match" />
+    <ITEM id="2623" value="token too long" />
+    <ITEM id="2637" value="too much bkp name" />
+    <ITEM id="2638" value="too much dbid" />
+    <ITEM id="2668" value="too much entry" />
+    <ITEM id="2662" value="value len is zero" />
+    <ITEM id="2687" value="no space in tranaction log" />
+    <ITEM id="900" value="目录非空" />
+    <ITEM id="201" value="取得磁盘信息错误" />
+    <ITEM id="202" value="磁盘没有足够的空间" />
+    <ITEM id="4051" value="compress image error" />
+    <ITEM id="4050" value="compress image exception" />
+    <ITEM id="4063" value="dll bad version" />
+    <ITEM id="4062" value="dll load failed" />
+    <ITEM id="4061" value="dll not exists" />
+    <ITEM id="4065" value="滚动指纹中有两个指纹具有比较相似的特征" />
+    <ITEM id="4053" value="extract mnt error" />
+    <ITEM id="4052" value="extract mnt exception" />
+    <ITEM id="4066" value="提取的特征中的各个部分不一致" />
+    <ITEM id="4057" value="match error" />
+    <ITEM id="4056" value="match exception" />
+    <ITEM id="4058" value="pattern replace exception" />
+    <ITEM id="4059" value="pattern replace error" />
+    <ITEM id="4064" value="滚动指纹于平面指纹不匹配" />
+    <ITEM id="4055" value="uncompress image error" />
+    <ITEM id="4054" value="uncompress image exception" />
+    <ITEM id="4060" value="exf unknown error" />
+    <ITEM id="1000" value="GAFIS系统主目录为空" />
+    <ITEM id="1001" value="文件、路径名称的长度超过允许值" />
+    <ITEM id="25" value="非法的文件偏移" />
+    <ITEM id="29" value="改变工作目录发生错误" />
+    <ITEM id="13" value="修改文件属性失败" />
+    <ITEM id="15" value="改变文件大小失败" />
+    <ITEM id="6" value="关闭文件失败" />
+    <ITEM id="12" value="拷贝失败" />
+    <ITEM id="7" value="创建文件失败" />
+    <ITEM id="17" value="删除文件失败" />
+    <ITEM id="24" value="文件已经存在" />
+    <ITEM id="28" value="拷贝文件名称参数错误" />
+    <ITEM id="27" value="查找文件，但是给定目录为空" />
+    <ITEM id="2" value="文件加锁失败" />
+    <ITEM id="9" value="文件映射失败" />
+    <ITEM id="16" value="文件中没有足够的空间容纳需要写入的内容" />
+    <ITEM id="23" value="文件不存在" />
+    <ITEM id="1" value="打开文件失败" />
+    <ITEM id="11" value="未知操作" />
+    <ITEM id="3" value="读取文件失败" />
+    <ITEM id="14" value="改变文件名称失败" />
+    <ITEM id="5" value="文件定位失败" />
+    <ITEM id="19" value="文件长度太长" />
+    <ITEM id="18" value="文件长度太短" />
+    <ITEM id="10" value="取得文件属性失败" />
+    <ITEM id="26" value="同步文件" />
+    <ITEM id="8" value="文件解锁失败" />
+    <ITEM id="4" value="写入文件失败" />
+    <ITEM id="5502" value="flob bad block size" />
+    <ITEM id="5536" value="next bk info in chain is invalid." />
+    <ITEM id="5537" value="flob bad pointer entry" />
+    <ITEM id="5501" value="flob bad size type" />
+    <ITEM id="5518" value="flob bad sub bkid" />
+    <ITEM id="5511" value="Flob block head not valid" />
+    <ITEM id="5530" value="block index exceed limit" />
+    <ITEM id="5515" value="Flob block size not match" />
+    <ITEM id="5524" value="block has been checked" />
+    <ITEM id="5523" value="pt can not be hold for given space" />
+    <ITEM id="5513" value="Flob block content type not match" />
+    <ITEM id="5506" value="Col dat lost" />
+    <ITEM id="5516" value="Flob col dir head invalid" />
+    <ITEM id="5517" value="actual coldir head length is not match will colcnt" />
+    <ITEM id="5500" value="loading flob coldir cnttype not match" />
+    <ITEM id="5503" value="data lost" />
+    <ITEM id="5534" value="flob pt count in entry differ actual" />
+    <ITEM id="5533" value="flob col dir space calculated not match actual" />
+    <ITEM id="5539" value="invalid block size type" />
+    <ITEM id="5525" value="lob pt in isa does not match given one" />
+    <ITEM id="5532" value="can not be link head" />
+    <ITEM id="5508" value="Key too long" />
+    <ITEM id="5507" value="link cycle" />
+    <ITEM id="5505" value="many data lost" />
+    <ITEM id="5510" value="需要检查标志为真" />
+    <ITEM id="5520" value="need set bkpt in isa" />
+    <ITEM id="5509" value="no slot" />
+    <ITEM id="5528" value="not enough preloaded pt" />
+    <ITEM id="5535" value="space can not hold given number pt" />
+    <ITEM id="5521" value="not link head" />
+    <ITEM id="5522" value="not link tail" />
+    <ITEM id="5531" value="not match next size type or cnt type" />
+    <ITEM id="5529" value="not match preloaded pt" />
+    <ITEM id="5538" value="flob orphan block" />
+    <ITEM id="5512" value="Flob ptdir head not valid" />
+    <ITEM id="5519" value="释放已经被释放过的数据块" />
+    <ITEM id="5526" value="sid in lob file does not match that in isa" />
+    <ITEM id="5514" value="Flob too much pointer" />
+    <ITEM id="5504" value="lob data is unrecoverable. lost forver." />
+    <ITEM id="4202" value="bad installed history file head" />
+    <ITEM id="4201" value="bad patch file head." />
+    <ITEM id="4200" value="bad patch id string" />
+    <ITEM id="4204" value="duplicate patch id" />
+    <ITEM id="4206" value="install history file too short" />
+    <ITEM id="4203" value="patch history file too short." />
+    <ITEM id="4205" value="patch id sequence error." />
+    <ITEM id="1201" value="create mutex failed" />
+    <ITEM id="1204" value="create semphore failed" />
+    <ITEM id="1202" value="open mutex failed" />
+    <ITEM id="1205" value="open semphore failed" />
+    <ITEM id="1206" value="open semphore parameter error" />
+    <ITEM id="1203" value="release mutex failed" />
+    <ITEM id="1207" value="release semphore error" />
+    <ITEM id="1208" value="release semphore paramter error" />
+    <ITEM id="1200" value="wait failed" />
+    <ITEM id="4001" value="记录已经存在" />
+    <ITEM id="4005" value="关键字还有非法的字符" />
+    <ITEM id="4002" value="记录不存在。" />
+    <ITEM id="4003" value="key column does not exist in mapper" />
+    <ITEM id="4004" value="key in parameter does not match that in mapper" />
+    <ITEM id="4006" value="key no terminate null" />
+    <ITEM id="4007" value="key too short" />
+    <ITEM id="89" value="非法的特征" />
+    <ITEM id="3503" value="lock item param invalid" />
+    <ITEM id="3502" value="没有足够的锁资源" />
+    <ITEM id="3501" value="锁对象还没有被初始化" />
+    <ITEM id="3504" value="unlock item param invalid" />
+    <ITEM id="8020" value="bad card data index" />
+    <ITEM id="8000" value="bad code table file line" />
+    <ITEM id="8016" value="bad face index." />
+    <ITEM id="8013" value="bad finger index" />
+    <ITEM id="8162" value="bad image signature" />
+    <ITEM id="8092" value="bad index" />
+    <ITEM id="8019" value="bad item type" />
+    <ITEM id="8003" value="bad lock file id" />
+    <ITEM id="8052" value="bad log type" />
+    <ITEM id="8012" value="bad palm index" />
+    <ITEM id="8014" value="bad plain finger index" />
+    <ITEM id="8017" value="bad signature index" />
+    <ITEM id="8015" value="bad tplain finger index" />
+    <ITEM id="8018" value="bad voice index" />
+    <ITEM id="8201" value="内建数据库名称和ID不匹配" />
+    <ITEM id="8050" value="case op table id error" />
+    <ITEM id="8193" value="finish qry : get time not match." />
+    <ITEM id="8194" value="finish qry : muid not match." />
+    <ITEM id="8196" value="finish qry : query id not match." />
+    <ITEM id="8195" value="finish qry : submit time not match." />
+    <ITEM id="8021" value="col name not initialized" />
+    <ITEM id="8011" value="create temp file failed" />
+    <ITEM id="8071" value="create db : database name is empty" />
+    <ITEM id="8090" value="fifo que name not set" />
+    <ITEM id="8202" value="数据库属性不能为空" />
+    <ITEM id="8181" value="db type not match" />
+    <ITEM id="8203" value="数据库类型与内建数据库类型不匹配" />
+    <ITEM id="8166" value="bad finger type or palm type" />
+    <ITEM id="8040" value="inner user name : server type error" />
+    <ITEM id="8091" value="design error" />
+    <ITEM id="8093" value="invalid image index" />
+    <ITEM id="8164" value="invalid lcw query condition" />
+    <ITEM id="8163" value="invalid xgw query condition" />
+    <ITEM id="8192" value="Key already exist in key list" />
+    <ITEM id="8190" value="Key list length error" />
+    <ITEM id="8191" value="Key not in key list" />
+    <ITEM id="8061" value="lp card image does not conform to china national standard" />
+    <ITEM id="8060" value="lp card image size too small" />
+    <ITEM id="8062" value="lp card mnt error" />
+    <ITEM id="8064" value="lp get sig : need buf" />
+    <ITEM id="8063" value="lp card op : table id error" />
+    <ITEM id="8180" value="mobile case op table id error" />
+    <ITEM id="8150" value="create new db but main path not set" />
+    <ITEM id="8151" value="create new db from exist one but type not match" />
+    <ITEM id="8152" value="create new db but db type invalid" />
+    <ITEM id="8010" value="not enough mcast ip address" />
+    <ITEM id="8001" value="no thread user info" />
+    <ITEM id="8100" value="person op tid error" />
+    <ITEM id="8165" value="bad query type" />
+    <ITEM id="8006" value="stream length does not match" />
+    <ITEM id="8004" value="mic stream name not match" />
+    <ITEM id="8005" value="stream does not contain enough data" />
+    <ITEM id="8171" value="bad syspath type" />
+    <ITEM id="8070" value="table type not que type" />
+    <ITEM id="8002" value="table user defined data is null" />
+    <ITEM id="8182" value="table type not match" />
+    <ITEM id="8094" value="temp path can not be null" />
+    <ITEM id="8161" value="text item invalid" />
+    <ITEM id="8160" value="text item name error" />
+    <ITEM id="8082" value="tp card get signature parameter error" />
+    <ITEM id="8081" value="tp card image does not conform to china national standard" />
+    <ITEM id="8080" value="tp card image size too small" />
+    <ITEM id="8083" value="tp card mnt size error" />
+    <ITEM id="8095" value="unit code can not be null" />
+    <ITEM id="8096" value="unit name can not be null" />
+    <ITEM id="8041" value="user with given name exists" />
+    <ITEM id="8042" value="no user with given name" />
+    <ITEM id="2500" value="记录类型错误" />
+    <ITEM id="20" value="申请内存失败" />
+    <ITEM id="21" value="释放内存发生错误！" />
+    <ITEM id="22" value="内存超过范围！" />
+    <ITEM id="60" value="无效或没有作用" />
+    <ITEM id="8324" value="change key : key too long" />
+    <ITEM id="8302" value="db type not tp or lp" />
+    <ITEM id="8300" value="only tp or lp support parallel searching" />
+    <ITEM id="8307" value="invalid connection" />
+    <ITEM id="8308" value="invalid authentication info" />
+    <ITEM id="8325" value="invalid net request" />
+    <ITEM id="8305" value="machine uuid not match" />
+    <ITEM id="8306" value="same uuid for different host" />
+    <ITEM id="8320" value="mcast svr invalid op class" />
+    <ITEM id="8304" value="mnt2feat proc not set" />
+    <ITEM id="8301" value="no user data" />
+    <ITEM id="8311" value="given operation only for tplib" />
+    <ITEM id="8321" value="parameter not integer type" />
+    <ITEM id="8322" value="parameter not long type" />
+    <ITEM id="8323" value="parameter not string" />
+    <ITEM id="8303" value="receive col parameter error" />
+    <ITEM id="8310" value="text too long" />
+    <ITEM id="8309" value="too much right to query" />
+    <ITEM id="3100" value="bmf alloc block fatal error" />
+    <ITEM id="3179" value="bad bm file head" />
+    <ITEM id="3181" value="bad colsta file" />
+    <ITEM id="3183" value="bad device management file" />
+    <ITEM id="3110" value="bad data type class" />
+    <ITEM id="3197" value="bmid too big and exceed actual size" />
+    <ITEM id="3132" value="change key but old key not exists" />
+    <ITEM id="3131" value="change key but new key already exists" />
+    <ITEM id="3182" value="colsta bad row count" />
+    <ITEM id="3107" value="bmf create file : invalid bksize or head size" />
+    <ITEM id="3106" value="bmf create file : invalid parameter" />
+    <ITEM id="3109" value="child table create file invalid param" />
+    <ITEM id="3108" value="child table initobject invalid param" />
+    <ITEM id="3145" value="data exceed column width" />
+    <ITEM id="3115" value="two databases with same uuid" />
+    <ITEM id="3198" value="磁盘没有足够的空间" />
+    <ITEM id="3208" value="没有文件对应给定的文件号码" />
+    <ITEM id="3119" value="dup bulk read option error" />
+    <ITEM id="3120" value="dup bulk save option error" />
+    <ITEM id="3196" value="reach block row limit(32765)" />
+    <ITEM id="3113" value="file head magic signature" />
+    <ITEM id="3114" value="file head version not match" />
+    <ITEM id="3168" value="file type error" />
+    <ITEM id="3121" value="get all column but some parameter not zero" />
+    <ITEM id="3125" value="get res invalid parameter" />
+    <ITEM id="3172" value="index invalid file head" />
+    <ITEM id="3171" value="index name too long" />
+    <ITEM id="3170" value="index node size too large" />
+    <ITEM id="3101" value="collate need more parameters" />
+    <ITEM id="3124" value="get column invalid column format" />
+    <ITEM id="3102" value="invalid collate parameters" />
+    <ITEM id="3184" value="invalid device info" />
+    <ITEM id="3185" value="invalid dfid file" />
+    <ITEM id="3206" value="OID 的值非法" />
+    <ITEM id="3116" value="invalid role" />
+    <ITEM id="3190" value="xact invalid work item" />
+    <ITEM id="3122" value="get given column but some parameter invalid" />
+    <ITEM id="3148" value="update but old row is empty" />
+    <ITEM id="3151" value="selres column is null" />
+    <ITEM id="3142" value="need load lob but table parameter not given" />
+    <ITEM id="3134" value="nm user file size not match" />
+    <ITEM id="3133" value="nm user file too short" />
+    <ITEM id="3118" value="no column specified in select statement" />
+    <ITEM id="3147" value="no given ctid in row" />
+    <ITEM id="3200" value="没有任何子表包含给定名称的列" />
+    <ITEM id="3202" value="没有文件对应给定的文件号" />
+    <ITEM id="3167" value="no device with given device id" />
+    <ITEM id="3117" value="no index with given name" />
+    <ITEM id="3146" value="del by key but table no key" />
+    <ITEM id="3103" value="sta invalid bksid" />
+    <ITEM id="3111" value="non-lob column can not hold lob column" />
+    <ITEM id="3199" value="给定名称的表不存在" />
+    <ITEM id="3178" value="no table with given uuid" />
+    <ITEM id="3112" value="not enough target buffer" />
+    <ITEM id="3144" value="null column not permitted" />
+    <ITEM id="3123" value="get prepared column but some parameter invalid" />
+    <ITEM id="3194" value="reach idbt tree page limit" />
+    <ITEM id="3195" value="too much modlog" />
+    <ITEM id="3143" value="reserved column can not be set" />
+    <ITEM id="3127" value="save selres but data buffer is null" />
+    <ITEM id="3128" value="save selres but pos parameter invalid" />
+    <ITEM id="3129" value="save selres but save mode invalid" />
+    <ITEM id="3203" value="没有足够的内存供Select语句使用。操作失败！" />
+    <ITEM id="3160" value="selres has duplicate column" />
+    <ITEM id="3156" value="selres has invalid column" />
+    <ITEM id="3149" value="selres bad item form flag" />
+    <ITEM id="3180" value="bad selres net head format" />
+    <ITEM id="3154" value="selres general blob but no length field" />
+    <ITEM id="3157" value="selres no row head" />
+    <ITEM id="3150" value="selres not in flat form" />
+    <ITEM id="3152" value="selres does not contain key column" />
+    <ITEM id="3158" value="selres only free format has null flag" />
+    <ITEM id="3159" value="selres read flag is not null" />
+    <ITEM id="3153" value="selres row head does not contain sid" />
+    <ITEM id="3155" value="selres source data too long" />
+    <ITEM id="3191" value="not enough space in work item head" />
+    <ITEM id="3192" value="not enough buffer in work item" />
+    <ITEM id="3177" value="change sid entry state : invalid parameter" />
+    <ITEM id="3204" value="SID已经被使用" />
+    <ITEM id="3175" value="sid invalid file head" />
+    <ITEM id="3205" value="SID 必须属于同一个数据块" />
+    <ITEM id="3176" value="sid not used" />
+    <ITEM id="3126" value="sid range's start sid larger then endsid" />
+    <ITEM id="3130" value="table does not have key column" />
+    <ITEM id="3165" value="table sta not match" />
+    <ITEM id="3193" value="too much data file" />
+    <ITEM id="3104" value="trace index file too large" />
+    <ITEM id="3105" value="trace modlog file too large" />
+    <ITEM id="3207" value="列值需唯一，但是值已经存在" />
+    <ITEM id="3141" value="vm between statement error" />
+    <ITEM id="3140" value="vm expression type not match" />
+    <ITEM id="0" value="GAFIS未发生错误。" />
+    <ITEM id="6522" value="创建用户连接失败" />
+    <ITEM id="6520" value="创建环境变量失败" />
+    <ITEM id="6521" value="创建连接池失败" />
+    <ITEM id="6524" value="创建序列失败" />
+    <ITEM id="6523" value="创建表失败" />
+    <ITEM id="6543" value="删除记录失败" />
+    <ITEM id="6545" value="删除表失败" />
+    <ITEM id="6500" value="发生异常" />
+    <ITEM id="6540" value="添加记录失败" />
+    <ITEM id="6503" value="无效的数据库类型" />
+    <ITEM id="6501" value="无效的Rowid" />
+    <ITEM id="6502" value="无效的RowPosition" />
+    <ITEM id="6542" value="检索记录失败" />
+    <ITEM id="6544" value="清空记录失败" />
+    <ITEM id="6541" value="更新记录失败" />
+    <ITEM id="50" value="无效参数" />
+    <ITEM id="51" value="参数不能为空(NULL)" />
+    <ITEM id="52" value="在初始参数配置文件中没有相应的参数设置" />
+    <ITEM id="430" value="bad block size" />
+    <ITEM id="421" value="bad hz code" />
+    <ITEM id="411" value="bad license file head" />
+    <ITEM id="418" value="bad time cycle type" />
+    <ITEM id="404" value="param invalid : copy read" />
+    <ITEM id="403" value="param invalid : bad start position" />
+    <ITEM id="412" value="create main path" />
+    <ITEM id="420" value="escape need more char" />
+    <ITEM id="401" value="参数错误: list file in dir" />
+    <ITEM id="431" value="bad file size" />
+    <ITEM id="422" value="half hz" />
+    <ITEM id="408" value="load bmp" />
+    <ITEM id="434" value="mem array del and move param error" />
+    <ITEM id="435" value="mem array insert" />
+    <ITEM id="402" value="参数必须是一个目录" />
+    <ITEM id="416" value="pa copy : bad param" />
+    <ITEM id="415" value="pa del : bad index" />
+    <ITEM id="417" value="pa get : bad index" />
+    <ITEM id="414" value="pa insert : bad index" />
+    <ITEM id="425" value="bad pkg head" />
+    <ITEM id="426" value="bad pkg item" />
+    <ITEM id="423" value="pkg extinmem bad offset" />
+    <ITEM id="424" value="pkg ext item bad offset" />
+    <ITEM id="427" value="pkg need data" />
+    <ITEM id="428" value="pkg need data2" />
+    <ITEM id="429" value="pkg need data3" />
+    <ITEM id="406" value="param invalid : read bin" />
+    <ITEM id="407" value="save bmp" />
+    <ITEM id="410" value="sem create" />
+    <ITEM id="409" value="time wait" />
+    <ITEM id="419" value="time wait not initialized" />
+    <ITEM id="433" value="bad callback(install hook)" />
+    <ITEM id="432" value="bad mask(install hook)" />
+    <ITEM id="413" value="参数值必须是0或者1" />
+    <ITEM id="405" value="param invalid : write bin" />
+    <ITEM id="931" value="param error" />
+    <ITEM id="932" value="bad hz code" />
+    <ITEM id="930" value="拼音不存在" />
+    <ITEM id="934" value="not hz" />
+    <ITEM id="933" value="pinyin not initialized" />
+    <ITEM id="935" value="str2pinyin param error" />
+    <ITEM id="936" value="str2pinyin : string too long" />
+    <ITEM id="8133" value="查询中纹线数据长度错误" />
+    <ITEM id="8132" value="查询中特征数据长度错误" />
+    <ITEM id="8122" value="query : bad query type" />
+    <ITEM id="8129" value="query : query comment reach limit" />
+    <ITEM id="2012" value="查询条件中没有给定名称的条件" />
+    <ITEM id="8124" value="query : database type not match query type" />
+    <ITEM id="8121" value="query : database not query type" />
+    <ITEM id="8123" value="query : dest db not tp or lp type" />
+    <ITEM id="8115" value="query : source data has duplicate finger" />
+    <ITEM id="2006" value="查询已经存在" />
+    <ITEM id="2010" value="比对初始化查询失败" />
+    <ITEM id="8112" value="query : invalid query type" />
+    <ITEM id="8118" value="query : ll source data both have palm and finger" />
+    <ITEM id="8117" value="query : lt source data item type invalid" />
+    <ITEM id="8119" value="query : lt or tt. but dest table type not tenprint" />
+    <ITEM id="8199" value="mic's index is not consecutive." />
+    <ITEM id="8198" value="duplicate mic's itemindex." />
+    <ITEM id="8197" value="mic's itemindex too large." />
+    <ITEM id="8111" value="query : dest db count is zero" />
+    <ITEM id="8113" value="query : no source mnt" />
+    <ITEM id="2004" value="查询不存在" />
+    <ITEM id="2003" value="未完成" />
+    <ITEM id="2002" value="没有可以匹配的查询" />
+    <ITEM id="8130" value="平面指纹没有配置为可以被查询" />
+    <ITEM id="2007" value="不是相同的查询" />
+    <ITEM id="8110" value="query op tid error" />
+    <ITEM id="2001" value="查询ID超出范围" />
+    <ITEM id="2009" value="被中心服务器拒绝" />
+    <ITEM id="8125" value="query : target db count error" />
+    <ITEM id="8126" value="query : has at least 2 target db but type not same" />
+    <ITEM id="8127" value="query : target db is not configured as parallel searched" />
+    <ITEM id="8128" value="query : target table does not exist" />
+    <ITEM id="8120" value="query : tl or ll. but dest table type not latent" />
+    <ITEM id="8116" value="query : tl query source data has palm and finger, only one allowed" />
+    <ITEM id="2008" value="已经超过允许提交的查询数量的上限" />
+    <ITEM id="2011" value="查询注释太多，不能够继续添加新注释" />
+    <ITEM id="8114" value="query : too much mic" />
+    <ITEM id="8131" value="进行文本查询的时候，候选结果过多" />
+    <ITEM id="2005" value="查询正在被执行" />
+    <ITEM id="6150" value="无效的异步命令" />
+    <ITEM id="6061" value="没有找到相应的自动发送查询配置" />
+    <ITEM id="6060" value="自动发送查询配置不存在" />
+    <ITEM id="6008" value="线路被占用" />
+    <ITEM id="6140" value="在数据转换时没有找到相应的数据项" />
+    <ITEM id="6071" value="没有找到相应的数据控制配置" />
+    <ITEM id="6070" value="数据控制配置不存在" />
+    <ITEM id="6130" value="在数据库映射表中没有找到相应的数据库" />
+    <ITEM id="6009" value="拨号失败" />
+    <ITEM id="6001" value="已经超过允许下载的记录数量的上限" />
+    <ITEM id="6016" value="禁止添加记录" />
+    <ITEM id="6018" value="禁止下载记录" />
+    <ITEM id="6006" value="被禁止的IP地址" />
+    <ITEM id="6015" value="条码不符合条件" />
+    <ITEM id="6024" value="禁止上报质量不合格的记录" />
+    <ITEM id="6017" value="禁止更新记录" />
+    <ITEM id="6012" value="异步命令的格式不正确" />
+    <ITEM id="6011" value="上报/下载纪录的格式不正确" />
+    <ITEM id="6004" value="条码头和单位代码不匹配" />
+    <ITEM id="6014" value="路由构成了闭合回路" />
+    <ITEM id="6223" value="缺少现场指纹提取方法" />
+    <ITEM id="6224" value="缺少现场指纹备注信息" />
+    <ITEM id="6221" value="缺少现场指纹遗留部位" />
+    <ITEM id="6222" value="缺少现场指纹乳突线颜色" />
+    <ITEM id="6220" value="缺少现场指纹序号" />
+    <ITEM id="6230" value="缺少案件类别" />
+    <ITEM id="6235" value="缺少案件描述" />
+    <ITEM id="6233" value="缺少案件提取单位" />
+    <ITEM id="6234" value="缺少案件提取人" />
+    <ITEM id="6236" value="缺少案件协查级别" />
+    <ITEM id="6232" value="缺少案发地点" />
+    <ITEM id="6231" value="缺少案发日期" />
+    <ITEM id="6013" value="超过了允许的最大TTL" />
+    <ITEM id="6020" value="缺少指纹/掌纹图像" />
+    <ITEM id="6021" value="缺少指纹/掌纹特征" />
+    <ITEM id="6022" value="缺少文字信息项" />
+    <ITEM id="6019" value="需要重新输入该记录" />
+    <ITEM id="6010" value="系统不支持的操作" />
+    <ITEM id="6052" value="主通讯服务器不能设置为本机" />
+    <ITEM id="6051" value="在txserver.ini中没有设置主通讯服务器" />
+    <ITEM id="6050" value="在初始参数配置文件txserver.ini中没有相应的参数设置" />
+    <ITEM id="6143" value="在远程传输包中数据项格式不正确" />
+    <ITEM id="6141" value="在远程传输包中没有相应的数据项" />
+    <ITEM id="6003" value="已经超过允许转发记录数量的上限" />
+    <ITEM id="6007" value="已经超过允许转发查询数量的上限" />
+    <ITEM id="6081" value="没有找到相应的远程查询控制/转发查询控制配置" />
+    <ITEM id="6080" value="远程查询控制/转发查询控制配置不存在" />
+    <ITEM id="6091" value="没有找到相应的自动回拨配置" />
+    <ITEM id="6090" value="自动回拨配置不存在" />
+    <ITEM id="6162" value="无效的远程查询状态" />
+    <ITEM id="6161" value="无效的查询状态" />
+    <ITEM id="6160" value="无效的查询类型" />
+    <ITEM id="6002" value="没有找到相应的远程配置" />
+    <ITEM id="6023" value="服务器条码已存在，请修改" />
+    <ITEM id="6121" value="没有配置直接上级服务器" />
+    <ITEM id="6124" value="没有找到自动更新服务器" />
+    <ITEM id="6122" value="没有找到转发服务器" />
+    <ITEM id="6123" value="不是可以直接连接的服务器" />
+    <ITEM id="6120" value="远程服务器不存在" />
+    <ITEM id="6204" value="缺少被捺印人现住址代码" />
+    <ITEM id="6210" value="缺少被捺印人现住址名称" />
+    <ITEM id="6201" value="缺少被捺印人出生日期" />
+    <ITEM id="6212" value="缺少案件类别" />
+    <ITEM id="6213" value="缺少备注信息" />
+    <ITEM id="6203" value="缺少被捺印人户籍地代码" />
+    <ITEM id="6209" value="缺少被捺印人户籍地名称" />
+    <ITEM id="6208" value="缺少人员信息编号" />
+    <ITEM id="6200" value="缺少被捺印人姓名" />
+    <ITEM id="6207" value="缺少捺印日期" />
+    <ITEM id="6205" value="缺少捺印单位代码" />
+    <ITEM id="6211" value="缺少捺印单位名称" />
+    <ITEM id="6206" value="缺少捺印人姓名" />
+    <ITEM id="6202" value="缺少被捺印人性别" />
+    <ITEM id="6142" value="在文字信息中没有相应的数据项" />
+    <ITEM id="6000" value="已经超过允许上报的记录数量的上限" />
+    <ITEM id="6111" value="无效单位代码" />
+    <ITEM id="6110" value="单位代码为空" />
+    <ITEM id="6112" value="单位代码不存在" />
+    <ITEM id="6005" value="质量不合格的指纹/掌纹" />
+    <ITEM id="6101" value="远程用户不存在" />
+    <ITEM id="6100" value="超过了允许登录的上限" />
+    <ITEM id="9019" value="add table but table type not match" />
+    <ITEM id="9002" value="bad local tid" />
+    <ITEM id="9013" value="match method invalid" />
+    <ITEM id="9001" value="bad server tid" />
+    <ITEM id="9015" value="bad task type" />
+    <ITEM id="9016" value="candidate has invalid tid" />
+    <ITEM id="9014" value="parameter in candidate invalid" />
+    <ITEM id="9020" value="can not remove active mu" />
+    <ITEM id="9021" value="estimate query coefficient query type error" />
+    <ITEM id="9031" value="超过并行比对允许的可以支持的并行比对表的数量" />
+    <ITEM id="9009" value="get handle(may be design error)" />
+    <ITEM id="9017" value="initialize cand management parameter error" />
+    <ITEM id="9018" value="invalid candidate" />
+    <ITEM id="9000" value="invalid tid in task" />
+    <ITEM id="9005" value="match method lcw only support tt" />
+    <ITEM id="9010" value="load sid but time not match" />
+    <ITEM id="9004" value="license on server and local not match" />
+    <ITEM id="9007" value="convert loc tid to server tid error" />
+    <ITEM id="9029" value="GMU（一般比对器）不支持给定的服务" />
+    <ITEM id="9030" value="本地比对器类型和服务器比对器类型不匹配" />
+    <ITEM id="9027" value="reach memusage limit" />
+    <ITEM id="9024" value="matcher type not set" />
+    <ITEM id="9023" value="no db to be searched" />
+    <ITEM id="9012" value="pm table status error(may be design error)" />
+    <ITEM id="9008" value="query initialization failed" />
+    <ITEM id="9026" value="seg lob file head invalid" />
+    <ITEM id="9011" value="sid file size not match head" />
+    <ITEM id="9025" value="sublib main path not set" />
+    <ITEM id="9028" value="把服务器端DTID转换为本机DTID时候发生错误" />
+    <ITEM id="9003" value="server neither support palm nor finger" />
+    <ITEM id="9022" value="target db does not exist on mu" />
+    <ITEM id="9006" value="unknown task type(may be design error)" />
+    <ITEM id="78" value="接收网络端口失败" />
+    <ITEM id="76" value="绑定网络端口失败" />
+    <ITEM id="72" value="关闭网络端口失败" />
+    <ITEM id="82" value="连接网络端口失败" />
+    <ITEM id="81" value="取得IP地址" />
+    <ITEM id="79" value="初始化网络失败" />
+    <ITEM id="77" value="监听网络端口失败" />
+    <ITEM id="84" value="name 2ip error" />
+    <ITEM id="71" value="打开网络端口失败" />
+    <ITEM id="74" value="接收数据失败" />
+    <ITEM id="86" value="recv with opt param error" />
+    <ITEM id="75" value="选择网络端口失败(Select)" />
+    <ITEM id="73" value="发送数据失败" />
+    <ITEM id="85" value="send with opt param error" />
+    <ITEM id="80" value="一般网络端口错误" />
+    <ITEM id="83" value="未知的网络错误" />
+    <ITEM id="87" value="wait param error" />
+    <ITEM id="501" value="给定的缓冲区不足以容纳数据" />
+    <ITEM id="108" value="操作被客户终止" />
+    <ITEM id="115" value="已经运行" />
+    <ITEM id="128" value="错误的格式" />
+    <ITEM id="126" value="错误的授权（软件许可）" />
+    <ITEM id="122" value="错误的队列类型" />
+    <ITEM id="131" value="错误的状态类型" />
+    <ITEM id="141" value="非法的小时、分钟或者秒数值" />
+    <ITEM id="140" value="非法的年、月或者日数值" />
+    <ITEM id="102" value="系统忙" />
+    <ITEM id="119" value="客户端发生错误" />
+    <ITEM id="147" value="释放动态库句柄发生错误" />
+    <ITEM id="139" value="太多的管理库，只允许一个管理库存在" />
+    <ITEM id="132" value="已经存在" />
+    <ITEM id="101" value="未知致命错误" />
+    <ITEM id="136" value="不支持的数据文件版本" />
+    <ITEM id="127" value="取得计算机名称错误" />
+    <ITEM id="142" value="取得当前工作目录发生错误" />
+    <ITEM id="125" value="错误的未压缩图象长度" />
+    <ITEM id="135" value="程序设计错误" />
+    <ITEM id="100" value="无效的格式" />
+    <ITEM id="124" value="长度过长或过短" />
+    <ITEM id="143" value="装载动态库失败" />
+    <ITEM id="110" value="资源不足" />
+    <ITEM id="106" value="并行比对器已被改变" />
+    <ITEM id="138" value="没有管理库" />
+    <ITEM id="116" value="不支持回调函数" />
+    <ITEM id="117" value="没有此数据库或对应的项" />
+    <ITEM id="146" value="DLL 中没有输出此函数" />
+    <ITEM id="111" value="没有软件授权许可" />
+    <ITEM id="123" value="请求在此情形下不适用" />
+    <ITEM id="120" value="不存在" />
+    <ITEM id="145" value="此功能没有实现" />
+    <ITEM id="137" value="长度不正好是块的整数倍" />
+    <ITEM id="114" value="不被客户端支持" />
+    <ITEM id="107" value="不支持并行比对" />
+    <ITEM id="105" value="无此用户" />
+    <ITEM id="104" value="无效操作命令" />
+    <ITEM id="129" value="对应汉字的拼音不存在" />
+    <ITEM id="109" value="同时登录请求过多" />
+    <ITEM id="144" value="序列没有被初始化" />
+    <ITEM id="134" value="设置语言环境" />
+    <ITEM id="113" value="长度不匹配" />
+    <ITEM id="130" value="服务器没有运行" />
+    <ITEM id="112" value="GAFIS数据库服务器即将被终止运行" />
+    <ITEM id="118" value="被客户端终止" />
+    <ITEM id="121" value="未完成" />
+    <ITEM id="103" value="未知错误" />
+    <ITEM id="133" value="不可到达代码" />
+    <ITEM id="3552" value="read table is disabled" />
+    <ITEM id="3551" value="writing table is disabled" />
+    <ITEM id="3550" value="table is not ready" />
+    <ITEM id="40" value="无效的十指串" />
+    <ITEM id="41" value="十指串太长" />
+    <ITEM id="42" value="十指串太短" />
+    <ITEM id="1107" value="用户被停用" />
+    <ITEM id="1111" value="禁止使用本地程序登录" />
+    <ITEM id="1112" value="禁止通过通讯服务器登录" />
+    <ITEM id="1104" value="用户已经存在" />
+    <ITEM id="1108" value="用户登陆的IP地址，与允许的地址不同" />
+    <ITEM id="1110" value="给定ID对应的是组" />
+    <ITEM id="1109" value="系统中没有任何用户（系统不可使用）" />
+    <ITEM id="1106" value="用户名称太长" />
+    <ITEM id="1100" value="没有此用户" />
+    <ITEM id="1103" value="用户没有登录或服务器被终止过需要重新登录" />
+    <ITEM id="1101" value="用户没有权限" />
+    <ITEM id="1102" value="密码错误" />
+    <ITEM id="1105" value="密码太长" />
+    <ITEM id="5005" value="an invalid char met" />
+    <ITEM id="5016" value="Bad date time format" />
+    <ITEM id="5011" value="the given expression type does not seem valid" />
+    <ITEM id="5012" value="the variable type does not match" />
+    <ITEM id="5018" value="bad operand" />
+    <ITEM id="5013" value="operator type is invalid" />
+    <ITEM id="5017" value="bad token type" />
+    <ITEM id="5006" value="variable as column does not exist in table" />
+    <ITEM id="5015" value="Divided by zero, over flow" />
+    <ITEM id="5007" value="function does not exist" />
+    <ITEM id="5001" value="an interal name is like $$ID" />
+    <ITEM id="5002" value="binary operator need two operands" />
+    <ITEM id="5003" value="right bracket ] is omitted" />
+    <ITEM id="5008" value="some operator need more token" />
+    <ITEM id="5009" value="not expected token" />
+    <ITEM id="5014" value="The given column can not be included in a query statement" />
+    <ITEM id="5004" value="back slash need parameter or parameter is invalid" />
+    <ITEM id="5010" value="too many parameters in function call" />
+    <ITEM id="20001" value="北京东方金指指纹自动识别系统 GAFIS" />
+    <ITEM id="20002" value="北京东方金指科技有限公司" />
+    <ITEM id="20003" value="GAFIS 6.2" />
+    <ITEM id="20004" value="版权所有(c) 1996-2009." />
+    <ITEM id="20006" value="东方金指指纹自动识别系统GAFIS6.2" />
+    <ITEM id="20101" value="指纹自动识别系统 AFIS" />
+    <ITEM id="20102" value="指纹自动识别系统" />
+    <ITEM id="20103" value="AFIS 6.2" />
+    <ITEM id="20104" value="版权所有(c) 1996-2009." />
+    <ITEM id="20106" value="指纹自动识别系统AFIS6.2" />
+    <ITEM id="20401" value="北京东方金指指纹自动识别系统 GAFIS" />
+    <ITEM id="20402" value="北京东方金指科技有限公司" />
+    <ITEM id="20403" value="GAFIS 7.0" />
+    <ITEM id="20404" value="版权所有(c) 2010-2012." />
+    <ITEM id="20406" value="东方金指指纹自动识别系统GAFIS7.0" />
+  </STRINGTABLE>
+</GAFIS_RESOURCE>

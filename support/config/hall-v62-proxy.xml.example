@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2012,2015,2016 the original author or authors. All rights reserved.
+   site: http://www.ganshane.com
+-->
+
+<hall_v62_proxy>
+    <server>
+      <bind>0.0.0.0:7777</bind>
+    </server>
+    <tx_server>
+      <host>10.1.6.182</host>
+      <port>6811</port>
+    </tx_server>
+</hall_v62_proxy>
+
+

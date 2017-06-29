@@ -1,0 +1,46 @@
+package matcher;
+
+option java_package = "nirvana.hall.protocol.matcher";
+
+option java_outer_classname = "NirvanaTypeDefinition";
+
+/*
+ * 数据类型
+ * 系统数据类型，此处定义需要和C端定义的类型一致
+ *
+ *  enum DataType{
+ *   FINGER_TEMPLATE = 100,
+ *   FINGER_LATENT = 101,
+ *   PALM_TEMPLATE = 102,
+ *   PALM_LATENT = 103,
+ *   PERSON = 104,
+ *   CASE = 105
+ *  }
+ */
+enum SyncDataType {
+  TEMPLATE_FINGER = 100; //档案指纹
+  LATENT_FINGER = 101; //现场指纹
+  TEMPLATE_PALM = 102; //档案掌纹
+  LATENT_PALM = 103; //现场掌纹
+  PERSON = 104; //人员档案相关信息
+  CASE = 105; //案件
+}
+/**
+ * 比对类型定义，此处参考C端定义
+ *  enum MatchType{
+ *   kTTS=0, //查前科
+ *   kTLM=1, //倒查
+ *   kLTM=2, //正查
+ *   kLLS=3  //串查
+ *  }
+ */
+enum MatchType {
+  FINGER_TT = 1;
+  FINGER_TL = 2;
+  FINGER_LT = 3;
+  FINGER_LL = 4;
+  PALM_TT = 5;
+  PALM_TL = 6;
+  PALM_LT = 7;
+  PALM_LL = 8;
+}
