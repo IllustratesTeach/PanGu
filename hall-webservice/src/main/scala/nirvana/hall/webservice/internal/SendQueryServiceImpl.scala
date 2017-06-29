@@ -1,5 +1,6 @@
 package nirvana.hall.webservice.internal
 
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{AssistCheckRecordService, CaseInfoService, QueryService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
@@ -23,11 +24,25 @@ class SendQueryServiceImpl(queryService: QueryService
         }
         var oraSid = 0L
         var fingerId = ""
+        var status = 0
         if(sLogic03Rec.fingers.length>0){
           sLogic03Rec.fingers.foreach{ finger =>
             fingerId = finger.fingerId
-            oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
-            assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id)
+            for(i<- 0 to 3){
+              try{
+                status = 7
+                oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
+                assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id,status,"")
+              }catch{
+                case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
+                  status = -2
+                  assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id,status,ExceptionUtil.getStackTraceInfo(e))
+              }
+              if(status == 7){
+                return
+              }
+            }
+
           }
         }
       }
@@ -36,8 +51,19 @@ class SendQueryServiceImpl(queryService: QueryService
         if(!tPCardService.isExist(sLogic02Rec.cardId)){
           fPTService.addLogic02Res(sLogic02Rec)
         }
-        val oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
-        assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId,id)
+        var oraSid = 0L
+        var status = 0
+        for(i<- 0 to 3){
+          try {
+            status = 7
+            oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
+            assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId, id, status, "")
+          }catch{
+            case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
+              status = -2
+              assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId,id,status,ExceptionUtil.getStackTraceInfo(e))
+          }
+        }
       }
     }
   }

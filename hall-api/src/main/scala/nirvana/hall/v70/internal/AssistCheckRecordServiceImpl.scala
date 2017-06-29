@@ -119,7 +119,7 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
 
   override def saveErrorReport(serviceid: String, typ: String, status: Long, msg: String): Unit = ???
 
-  override def updateAssistcheckLT(queryId: String, oraSid: String, caseId: String, id: String): Unit = ???
+  override def updateAssistcheckLT(queryId: String, oraSid: String, caseId: String, id: String, status:Int, msg:String): Unit = ???
 
-  override def updateAssistcheckTT(queryId: String, oraSid: String, personId: String, id: String): Unit = ???
+  override def updateAssistcheckTT(queryId: String, oraSid: String, personId: String, id: String, status:Int, msg:String): Unit = ???
 }

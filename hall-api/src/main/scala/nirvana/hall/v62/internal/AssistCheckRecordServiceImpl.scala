@@ -137,36 +137,38 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
 
 
 
-  override def updateAssistcheckLT(queryId:String,oraSid:String,caseId:String, id:String): Unit = {
-    val sql = s"UPDATE HALL_ASSISTTASK " +
-      s"SET QUERYID = ?,ORASID = ?,CASEID = ?,STATUS = ?,ORA_UUID = ?,UPDATETIME = sysdate,SERVICE_TYPE = ?,FINGERID = ? " +
+  override def updateAssistcheckLT(queryId:String,oraSid:String,caseId:String, id:String, status:Int, msg:String): Unit = {
+    val sql = s"UPDATE HALL_ASSISTCHECK " +
+      s"SET QUERYID = ?,ORASID = ?,CASEID = ?,STATUS = ?,ORA_UUID = ?,UPDATETIME = sysdate,SERVICE_TYPE = ?,FINGERID = ?,ERRORMSG = ? " +
       s"WHERE id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, queryId)
       ps.setString(2, oraSid)
       ps.setString(3, caseId)
-      ps.setInt(4, 7)
+      ps.setInt(4, status)
       ps.setString(5,UUID.randomUUID.toString.replace("-",""))
       ps.setString(6,"7")
       ps.setString(7,caseId)
-      ps.setString(8,id)
+      ps.setString(8,msg)
+      ps.setString(9,id)
 
     }
   }
 
 
-  override def updateAssistcheckTT(queryId:String,oraSid:String,personId:String, id:String): Unit = {
-    val sql = s"UPDATE HALL_ASSISTTASK " +
-      s"SET QUERYID = ?,ORASID = ?,PERSONID = ?,STATUS = ?,ORA_UUID = ?,UPDATETIME = sysdate,SERVICE_TYPE = ? " +
+  override def updateAssistcheckTT(queryId:String,oraSid:String,personId:String, id:String, status:Int, msg:String): Unit = {
+    val sql = s"UPDATE HALL_ASSISTCHECK " +
+      s"SET QUERYID = ?,ORASID = ?,PERSONID = ?,STATUS = ?,ORA_UUID = ?,UPDATETIME = sysdate,SERVICE_TYPE = ?,ERRORMSG = ? " +
       s"WHERE id = ? "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, queryId)
       ps.setString(2, oraSid)
       ps.setString(3, personId)
-      ps.setInt(4, 7)
+      ps.setInt(4, status)
       ps.setString(5,UUID.randomUUID.toString.replace("-",""))
       ps.setString(6,"8")
-      ps.setString(7,id)
+      ps.setString(7,msg)
+      ps.setString(8,id)
 
     }
   }

@@ -29,7 +29,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
 
   def fetchAssistTask(): mutable.ListBuffer[mutable.HashMap[String,Any]] = {
     val sql = s"SELECT t.id,t.fpt_path " +
-      s"FROM HALL_ASSISTTASK t " +
+      s"FROM HALL_ASSISTCHECK t " +
       s"WHERE t.status = '0' AND t.id IS NOT NULL AND rownum<= ? "
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>

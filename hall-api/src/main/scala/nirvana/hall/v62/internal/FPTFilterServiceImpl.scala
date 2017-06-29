@@ -141,7 +141,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
         throw new Exception("cardId is empty")
       }
 
-      if(!fPT4File.logic02Recs.head.personId.startsWith("R")){
+      if((!fPT4File.logic02Recs.head.personId.startsWith("R"))||(fPT4File.logic02Recs.head.personId.length == 22)){
         //人员编号	必须为23位长度
         fPT4File.logic02Recs.head.personId = "R" + fPT4File.logic02Recs.head.personId
       }
@@ -286,7 +286,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       //逻辑记录长度	必须为数字
       //hall导出时，该项属性肯定为数字
       //案件编号	必须23位长度
-      if(!fPT4File.logic03Recs.head.caseId.startsWith("A")){
+      if((!fPT4File.logic03Recs.head.caseId.startsWith("A"))||(fPT4File.logic03Recs.head.caseId.length == 22)){
         fPT4File.logic03Recs.head.caseId = "A" + fPT4File.logic03Recs.head.caseId
       }
       if (fPT4File.logic03Recs.head.caseId.length != 23) {
@@ -437,7 +437,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
         f.imgVerticalLength = "512" //      图像垂直方向长度	必须为512
         f.dpi = "500" //      图像分辨率	必须为500
         if(!f.imgCompressMethod.startsWith("14")){
-          f.imgCompressMethod = "1419" //      图像压缩方法代码	不能为空 必须为14开头的WSQ压缩方法
+          f.imgCompressMethod = "0000" //      图像压缩方法代码	不能为空 必须为14开头的WSQ压缩方法
         }
       }
       fPT4File
