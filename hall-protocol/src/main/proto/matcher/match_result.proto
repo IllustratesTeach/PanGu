@@ -48,4 +48,6 @@ message MatchResult {
 
    // 比中概率 2017/01/18
    optional uint32  HITPOSSIBILITY = 9;
+  //比对完成时间
+  optional string match_finish_time = 10;
 }

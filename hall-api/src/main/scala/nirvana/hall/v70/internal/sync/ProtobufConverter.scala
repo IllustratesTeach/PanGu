@@ -808,15 +808,25 @@ object ProtobufConverter extends LoggerSupport{
 
   def convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo:GafisCheckinInfo):MatchRelationInfo = {
     val matchRelationInfo = MatchRelationInfo.newBuilder
-    matchRelationInfo.setSrckey(gafisCheckinInfo.code)
-    matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)
     val isPlam = !(gafisCheckinInfo.cardType1==1)
+    val queryType = convertQueryType2MatchType(gafisCheckinInfo.querytype,isPlam).getNumber.toString
+    if(queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_LL){
+      matchRelationInfo.setSrckey(gafisCheckinInfo.code)
+      matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)
+    }else if(queryType == QueryConstants.QUERY_TYPE_TL){
+      matchRelationInfo.setSrckey(gafisCheckinInfo.tcode)
+      matchRelationInfo.setDestkey(gafisCheckinInfo.code)
+    }else if(queryType == QueryConstants.QUERY_TYPE_LT){
+      matchRelationInfo.setSrckey(gafisCheckinInfo.code)
+      matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)
+    }else{
+      throw new Exception("queryType error:" + queryType)
+    }
+    matchRelationInfo.setQuerytype(queryType)
     matchRelationInfo.setQueryTaskId(GafisNormalqueryQueryque.find_by_pkId(gafisCheckinInfo.queryUUID).headOption.get.queryid.toString)
-    matchRelationInfo.setQuerytype(convertQueryType2MatchType(gafisCheckinInfo.querytype,isPlam).getNumber.toString)
     matchRelationInfo.setInputer(gafisCheckinInfo.registerUser)
     matchRelationInfo.setInputDate(DateConverter.convertDate2String(gafisCheckinInfo.registerTime,"yyyyMMddHHmmss"))
     matchRelationInfo.setInputUnitCode(gafisCheckinInfo.registerOrg)
-    matchRelationInfo.setHitposs(gafisCheckinInfo.hitpossibility.toString)
     matchRelationInfo.setScore(gafisCheckinInfo.fraction.toString)
     matchRelationInfo.setRank(gafisCheckinInfo.rank.toString)
     matchRelationInfo.setFirstRankScore(gafisCheckinInfo.fraction.toString)

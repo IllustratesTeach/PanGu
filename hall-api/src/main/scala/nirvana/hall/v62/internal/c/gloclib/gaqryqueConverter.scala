@@ -274,7 +274,9 @@ object gaqryqueConverter extends LoggerSupport{
 
     //比中概率
     matchResult.setHITPOSSIBILITY(gaQueryStruct.stSimpQry.nHitPossibility)
-
+    matchResult.setTimeElapsed(gaQueryStruct.stSimpQry.nTimeUsed)
+    matchResult.setRecordNumMatched(gaQueryStruct.stSimpQry.nCurCandidateNum)
+    matchResult.setMatchFinishTime(DateConverter.convertAFISDateTime2String(gaQueryStruct.stSimpQry.tFinishTime))
     matchResult.build()
   }
 

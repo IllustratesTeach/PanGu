@@ -285,9 +285,11 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
-    *
-    * @param tCode
+    * @param oraSid
+    * @param taskType
+    * @param keyId
+    * @param fgp
     * @return
     */
-  override def updateCandListStatus(tCode: String,taskId:String,taskType:String,keyId:String): Long = ???
+  override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
 }

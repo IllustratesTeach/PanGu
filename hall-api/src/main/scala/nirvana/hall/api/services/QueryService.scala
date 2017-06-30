@@ -77,9 +77,12 @@ trait QueryService {
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
-    * @param tCode
+    * @param oraSid
+    * @param taskType
+    * @param keyId
+    * @param fgp
     * @return
     */
-  def updateCandListStatus(tCode:String,taskId:String,taskType:String,keyId:String):Long
+  def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long
 
 }
