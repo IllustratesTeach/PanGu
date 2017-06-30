@@ -173,9 +173,12 @@ object FPTFileBuilder {
 
     var sendNo = 1 //发送编号，从1开始计数
     lPCard.foreach{card =>
-      val gafisMnt =  new GAFISIMAGESTRUCT
-      gafisMnt.fromStreamReader(card.getBlob.getStMntBytes.newInput())
-      val fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
+      var fingerLData = new FingerLData
+      if(card.getBlob.getStMnt.nonEmpty){//判断是否有特征
+        val gafisMnt =  new GAFISIMAGESTRUCT
+        gafisMnt.fromStreamReader(card.getBlob.getStMntBytes.newInput())
+        fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
+      }
       fingerLData.sendNo = sendNo + ""
       sendNo += 1
       fingerLData.fingerNo = card.getText.getStrSeq
