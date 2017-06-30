@@ -2,7 +2,9 @@ package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
+
 import nirvana.hall.api.config.QueryQue
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
@@ -13,8 +15,9 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisTask62Record}
+
 import scala.collection.mutable
-import scala.collection.mutable.{ListBuffer}
+import scala.collection.mutable.ListBuffer
 
 /**
   * Created by songpeng on 16/8/26.
@@ -49,7 +52,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
                   s", t.time_elapsed=?" +
                   s", t.record_num_matched=?" +
                   s", t.match_progress=100" +
-                  s", t.FINISHTIME=sysdate " +
+                  s", t.FINISHTIME=? " +
               s"WHERE t.queryid=?"
     val oraSid = matchResult.getMatchId
     val candNum = matchResult.getCandidateNum
@@ -82,7 +85,8 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       }
       ps.setLong(6, matchResult.getTimeElapsed)
       ps.setLong(7, matchResult.getRecordNumMatched)
-      ps.setString(8, oraSid)
+      ps.setString(8,DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss"))
+      ps.setString(9, oraSid)
     }
   }
 

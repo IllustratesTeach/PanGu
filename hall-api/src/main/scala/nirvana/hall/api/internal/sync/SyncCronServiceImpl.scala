@@ -1,6 +1,7 @@
 package nirvana.hall.api.internal.sync
 
 import java.util.UUID
+
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
@@ -9,7 +10,7 @@ import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, LPPalmRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, LogicDBJudgeService, SyncCronService}
 import nirvana.hall.api.services._
-import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.protocol.api.FPTProto.{Case, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -21,7 +22,9 @@ import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
 import nirvana.hall.api.HallApiErrorConstants
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.jpa.GafisTask62Record
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -45,7 +48,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           matchRelationService:MatchRelationService) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
-  final val SYNC_MATCH_TASK_BATCH_SIZE = 5          //一批抓取的比对任务数
+  final val SYNC_MATCH_TASK_BATCH_SIZE = 5
+  final val SYNC_MATCH_RELATION_BATCH_SIZE = 5
   /**
     * 定时器，同步数据
     *
@@ -499,7 +503,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     var seq = fetchConfig.seq
     try {
       val request = SyncMatchRelationRequest.newBuilder()
-      request.setSize(SYNC_MATCH_TASK_BATCH_SIZE)
+      request.setSize(SYNC_MATCH_RELATION_BATCH_SIZE)
       request.setDbid(fetchConfig.dbid)
       request.setSeq(seq)
       request.setUuid(uuid)
@@ -515,6 +519,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }else{
             matchRelationService.addMatchRelation(matchRelationInfo)
           }
+          val option = getKeyIdAndTcodeByQueryType(matchRelationInfo)
+          queryService.updateCandListStatus(matchRelationInfo.getQueryTaskId
+                                            ,matchRelationInfo.getQuerytype
+                                            ,option.headOption.get._1
+                                            ,option.headOption.get._2
+                                            ,matchRelationInfo.getFg.getNumber)
         }
         seq = response.getSeq
         if(seq > 0 && fetchConfig.seq != seq){
@@ -727,6 +737,26 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
     dbidList
   }
+
+  /**
+    * 通过查询类型获得keyid和Tcode的值
+    * 在数据库中比中关系表中由于根据不同的查询类型，存的列不固定，所以需要判断一下
+    * @param matchRelationInfo
+    * @return
+    */
+  private def getKeyIdAndTcodeByQueryType(matchRelationInfo:MatchRelationInfo): Seq[(String, String)] ={
+    val arrayBuf = ArrayBuffer[(String, String)]()
+    if(matchRelationInfo.getQuerytype == MatchType.FINGER_TT.getNumber||matchRelationInfo.getQuerytype == MatchType.FINGER_LL.getNumber){
+      arrayBuf += (matchRelationInfo.getSrckey -> matchRelationInfo.getDestkey)
+    }else if(matchRelationInfo.getQuerytype==MatchType.FINGER_TL.getNumber){
+      arrayBuf += (matchRelationInfo.getDestkey -> matchRelationInfo.getSrckey)
+    }else if(matchRelationInfo.getQuerytype==MatchType.FINGER_LT.getNumber){
+      arrayBuf += (matchRelationInfo.getSrckey -> matchRelationInfo.getDestkey)
+    }
+    arrayBuf.toSeq
+  }
+
+
 
   /**
     * 更新同步HallFetchConfig.seq 的值, 因为直接调用save方法，session问题,程序调用insert而不是update

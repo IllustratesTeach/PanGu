@@ -3,7 +3,7 @@ package nirvana.hall.v70.gz
 import nirvana.hall.api.services._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.gz.services.TPCardServiceImpl
+import nirvana.hall.v70.gz.services.{TPCardServiceImpl, CaseInfoServiceImpl, LPCardServiceImpl}
 import nirvana.hall.v70.internal._
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.services.sys.{DictService, UserService}

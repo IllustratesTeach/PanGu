@@ -16,4 +16,11 @@ class FPTServiceImplTest extends BaseV70TestCase{
     val logic02Rec = service.getLogic02Rec("1234567890")
     Assert.assertNotNull(logic02Rec)
   }
+
+  @Test
+  def test_getLogic03Rec: Unit ={
+    val service = getService[FPTService]
+    val logic03Rec = service.getLogic03Rec("A0000000000000000000000")
+    Assert.assertNotNull(logic03Rec)
+  }
 }

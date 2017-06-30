@@ -97,36 +97,6 @@ object FPTExportApp extends JettyServerSupport
     val filePath = options.valueOf(FILE).asInstanceOf[String]
     val tpe = options.valueOf(TYPE).asInstanceOf[String]
     val fptOutputPath = options.valueOf(PATH).asInstanceOf[String]
-
-    val modules = module match {
-      case MODULE_V70 =>
-        Seq[String](
-          "stark.activerecord.StarkActiveRecordModule",
-          "nirvana.hall.v70.LocalV70ServiceModule",
-          "nirvana.hall.v70.LocalDataSourceModule",
-          "nirvana.hall.api.LocalProtobufModule",
-          "nirvana.hall.api.app.FPTExportV70Module"
-        )
-      case MODULE_GZ =>
-        Seq[String](
-          "stark.activerecord.StarkActiveRecordModule",
-          "nirvana.hall.v70.gz.LocalV70ServiceModule",
-          "nirvana.hall.v70.LocalDataSourceModule",
-          "nirvana.hall.api.LocalProtobufModule",
-          "nirvana.hall.api.app.FPTExportV70Module"
-        )
-
-      case MODULE_V62 =>
-        Seq[String](
-          "stark.activerecord.StarkActiveRecordModule",
-          "nirvana.hall.api.LocalProtobufModule",
-          "nirvana.hall.v62.LocalV62ServiceModule",
-          "nirvana.hall.v62.LocalV62DataSourceModule",
-          "nirvana.hall.api.app.FPTExportV62Module"
-        )
-      case other =>
-        return
-    }
     //配置文件
 //    val configFile = new File(config)
 //    if(!configFile.exists()){
@@ -145,26 +115,47 @@ object FPTExportApp extends JettyServerSupport
       logger.error("fptOutputPath: %s is not dir".format(fptOutputPath))
       return
     }*/
-
+    val module = System.getProperty(MODULE, MODULE_GZ)
+    val tpe = System.getProperty(TYPE, TYPE_LP)
+    val modules = module match {
+      case MODULE_V70 =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.v70.LocalV70ServiceModule",
+          "nirvana.hall.v70.LocalDataSourceModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.api.app.FPTExportV70Module"
+        )
+      case MODULE_GZ =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.v70.gz.LocalV70ServiceModule",
+          "nirvana.hall.v70.LocalDataSourceModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.api.app.FPTExportV70Module"
+        )
+      case MODULE_V62 =>
+        Seq[String](
+          "stark.activerecord.StarkActiveRecordModule",
+          "nirvana.hall.api.LocalProtobufModule",
+          "nirvana.hall.v62.LocalV62ServiceModule",
+          "nirvana.hall.v62.LocalV62DataSourceModule",
+          "nirvana.hall.api.app.FPTExportV62Module"
+        )
+      case other =>
+        return
+    }
     /*暂时不使用命令行参数，使用hall-api相同的运行方式，
       fpt文件放在./fpt路径下
-      捺印卡号输入文件./config/TPCardId.txt
+      捺印卡号输入文件./config/cardId.txt
      */
     val filePath = serverHome + "/config"
-    val file = new File(filePath+"/TPCardId.txt")
+    val file = new File(filePath+"/cardId.txt")
     if(!file.exists()){
       file.createNewFile()
     }
-    val modules = Seq[String](
-      "stark.activerecord.StarkActiveRecordModule",
-      "nirvana.hall.v70.gz.LocalV70ServiceModule",
-      "nirvana.hall.v70.LocalDataSourceModule",
-      "nirvana.hall.api.LocalProtobufModule",
-      "nirvana.hall.api.app.FPTExportV70Module"
-    )
-    val tpe = TYPE_TP
-    val fptOutputPath = serverHome+"/fpt"
 
+    val fptOutputPath = serverHome + "/fpt"
     val fptFilePath = new File(fptOutputPath)
     if(!fptFilePath.exists()) {
       fptFilePath.mkdir()
@@ -174,6 +165,7 @@ object FPTExportApp extends JettyServerSupport
     loadJni()
     //启动registry
     setup(modules)
+    logger.info("module: {}, type:{}, fptOutputPath:{}", module, tpe, fptFilePath.getAbsolutePath)
 
     //TODO 支持比中关系导出
     try{
@@ -198,7 +190,7 @@ object FPTExportApp extends JettyServerSupport
             }
           } catch {
             case e:Exception =>
-              logger.error("cardId:{}", cardId)
+              logger.error("cardId:{} msg:"+e.getMessage, cardId)
           }
         }
       }else if(TYPE_LP.equals(tpe)){
@@ -259,8 +251,9 @@ object FPTExportV70Module{
     val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-v70.xml")
     XmlLoader.parseXML[HallV70Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v70/v70.xsd")))
   }
-  def buildHallApiConfig={
-    new HallApiConfig
+  def buildHallApiConfig(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome: String)={
+    val content = MonadConfigFileUtils.readConfigFileContent(serverHome, "hall-api.xml")
+    XmlLoader.parseXML[HallApiConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/api/api.xsd")))
   }
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
