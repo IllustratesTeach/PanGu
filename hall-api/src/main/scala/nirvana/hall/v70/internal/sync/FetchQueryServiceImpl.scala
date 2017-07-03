@@ -1,6 +1,7 @@
 package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
+import java.sql.Timestamp
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
@@ -50,7 +51,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
                   s", t.verifyresult=?" +
                   s", t.handleresult=?" +
                   s", t.time_elapsed=?" +
-                  s", t.record_num_matched=?" +
                   s", t.match_progress=100" +
                   s", t.FINISHTIME=? " +
               s"WHERE t.queryid=?"
@@ -66,11 +66,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
     }
-
-//    GafisNormalqueryQueryque.update.set(status = "2"
-//      ,curcandnum = candNum
-//      ,candlist = candList
-//      ,hitpossibility = maxScore).execute
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, candNum)
       ps.setBytes(2, candList)
@@ -83,10 +78,9 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
         ps.setInt(4, 99)
         ps.setInt(5, 1)
       }
-      ps.setLong(6, matchResult.getTimeElapsed)
-      ps.setLong(7, matchResult.getRecordNumMatched)
-      ps.setString(8,DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss"))
-      ps.setString(9, oraSid)
+      ps.setLong(6, matchResult.getTimeElapsed * 1000L)
+      ps.setTimestamp(7,new Timestamp(DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyyMMddHHmmss").getTime))
+      ps.setString(8, oraSid)
     }
   }
 
