@@ -638,7 +638,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                     val caseId = lpCard.getText.getStrCaseId
                     if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                       //获取案件
-                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                     }
                     candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                   }
@@ -651,7 +651,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                   val caseId = lpCard.getText.getStrCaseId
                   if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                     //获取案件
-                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                   }
                   candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                 }
