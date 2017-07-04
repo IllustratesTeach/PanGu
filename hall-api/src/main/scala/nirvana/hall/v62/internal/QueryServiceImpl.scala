@@ -257,6 +257,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
         if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
           gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
           gaCand.nStatus = HallApiConstants.GAQRYCAND_STATUS_FINISHED.toByte
+          gaCand.nFlag = HallApiConstants.GAQRYCAND_STATUS_BREAKED.toByte
         }
         candListResult.write(gaCand.toByteArray())
       }
