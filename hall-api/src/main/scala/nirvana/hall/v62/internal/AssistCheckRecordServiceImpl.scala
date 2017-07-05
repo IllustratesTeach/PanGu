@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 
+import java.sql.Timestamp
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -173,9 +174,9 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     }
   }
 
-  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, errorinfo: String): Unit = {
+  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, errorinfo: String,date:Timestamp): Unit = {
     val uuid = UUID.randomUUID().toString.replace("-", "")
-    val sql = "insert into xc_query(id,keyid,service_type,status,custom1,custom2,errorinfo,create_time) values(?,?,?,?,?,?,?,sysdate) "
+    val sql = "insert into xc_query(id,keyid,service_type,status,custom1,custom2,errorinfo,create_time) values(?,?,?,?,?,?,?,?) "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, id)
       ps.setString(2, fingerid)
@@ -184,13 +185,14 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(5, custom1)
       ps.setString(6, custom2)
       ps.setString(7, errorinfo)
+      ps.setTimestamp(8, date)
     }
   }
 
-  override def updateXcQuery(id: String, fingerid: String, typ: Int, status: Int, oraSid: String, queryId: String, errorinfo: String): Unit = {
+  override def updateXcQuery(id: String, fingerid: String, typ: Int, status: Int, oraSid: String, queryId: String, errorinfo: String,date:Timestamp): Unit = {
     val sql = s"UPDATE xc_query " +
       s"SET status = ?,custom1 = ?,errorinfo = ?,update_time = sysdate " +
-      s"WHERE id = ? and keyid = ? and service_type = ? "
+      s"WHERE id = ? and keyid = ? and service_type = ? and create_time = ?"
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, status)
       ps.setString(2,oraSid)
@@ -198,6 +200,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(4,id)
       ps.setString(5,fingerid)
       ps.setInt(6, typ)
+      ps.setTimestamp(7, date)
     }
   }
 

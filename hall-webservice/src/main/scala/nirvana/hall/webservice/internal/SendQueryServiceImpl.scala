@@ -1,5 +1,7 @@
 package nirvana.hall.webservice.internal
 
+import java.sql.Timestamp
+
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{AssistCheckRecordService, CaseInfoService, QueryService, TPCardService}
@@ -17,6 +19,7 @@ class SendQueryServiceImpl(queryService: QueryService
                            ,fPTService: FPTService) extends SendQueryService{
   override def sendQuery(fPTFile: FPT4File,id:String,custom1:String): Unit = {
     val queryId = fPTFile.sid
+    val ts = new Timestamp(System.currentTimeMillis());
     if (fPTFile.logic03Recs.length > 0) {
       fPTFile.logic03Recs.foreach { sLogic03Rec =>
         if(!caseInfoService.isExist(sLogic03Rec.caseId)){
@@ -33,15 +36,15 @@ class SendQueryServiceImpl(queryService: QueryService
               if (finger.fingerNo.equals(a) || finger.fingerNo.equals(aa(i))) {
                 //判断指纹序号的格式“01”“011”或“1”“11”
                 fingerId = finger.fingerId
-                assistCheckRecordService.saveXcQuery(id, fingerId, 1, status, "", queryId, "")
+                assistCheckRecordService.saveXcQuery(id, fingerId, 1, status, "", queryId, "", ts)
                 try {
                   status = 7
                   oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
-                  assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, "")
+                  assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, "", ts)
                 } catch {
                   case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
                     status = -2
-                    assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e))
+                    assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
                 }
               }
             }
@@ -60,15 +63,15 @@ class SendQueryServiceImpl(queryService: QueryService
         }
         var oraSid = 0L
         var status = 0
-        assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,2,status,"",queryId,"")
+        assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,2,status,"",queryId,"", ts)
         try {
           status = 7
           oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
-          assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,"")
+          assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,"", ts)
         }catch{
           case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
             status = -2
-            assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,ExceptionUtil.getStackTraceInfo(e))
+            assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,ExceptionUtil.getStackTraceInfo(e), ts)
         }
         if(status == 7){
           assistCheckRecordService.updateXcTask(id,7)
