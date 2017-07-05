@@ -28,8 +28,8 @@ class FetchFPTServiceImpl(queryService: QueryService,
   val BATCH_SIZE = 10
 
   def fetchAssistTask(): mutable.ListBuffer[mutable.HashMap[String,Any]] = {
-    val sql = s"SELECT t.id,t.fpt_path " +
-      s"FROM HALL_ASSISTCHECK t " +
+    val sql = s"SELECT t.id,t.fpt_path,t.custom1 " +
+      s"FROM xc_task t " +
       s"WHERE t.status = '0' AND t.id IS NOT NULL AND rownum<= ? "
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
@@ -38,6 +38,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
       var map = new scala.collection.mutable.HashMap[String,Any]
       map += ("id" -> rs.getString("id"))
       map += ("fpt_path" -> rs.getString("fpt_path"))
+      map += ("custom1" -> rs.getString("custom1"))
       resultList.append(map)
     }
     resultList
@@ -45,13 +46,13 @@ class FetchFPTServiceImpl(queryService: QueryService,
 
   def fetchFPT(): Unit = {
     fetchAssistTask.foreach{
-      t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString)
+      t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString,t.get("custom1").get.toString)
     }
   }
 
-  private def sendQuery(fptPath:String,id:String): Unit ={
+  private def sendQuery(fptPath:String,id:String,custom1:String): Unit ={
     val is = FileUtils.openInputStream(new File(fptPath))
     val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
-    sendQueryService.sendQuery(fptFile,id)
+    sendQueryService.sendQuery(fptFile,id,custom1)
   }
 }

@@ -122,4 +122,10 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
   override def updateAssistcheckLT(queryId: String, oraSid: String, caseId: String, id: String, status:Int, msg:String): Unit = ???
 
   override def updateAssistcheckTT(queryId: String, oraSid: String, personId: String, id: String, status:Int, msg:String): Unit = ???
+
+  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, errorinfo: String): Unit = ???
+
+  override def updateXcQuery(id: String, fingerid: String, typ: Int, status: Int, oraSid: String, queryId: String, errorinfo: String): Unit = ???
+
+  override def updateXcTask(id: String, status: Int): Unit = ???
 }

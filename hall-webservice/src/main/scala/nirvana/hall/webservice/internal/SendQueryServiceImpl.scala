@@ -15,7 +15,7 @@ class SendQueryServiceImpl(queryService: QueryService
                            ,caseInfoService: CaseInfoService
                            ,tPCardService: TPCardService
                            ,fPTService: FPTService) extends SendQueryService{
-  override def sendQuery(fPTFile: FPT4File,id:String): Unit = {
+  override def sendQuery(fPTFile: FPT4File,id:String,custom1:String): Unit = {
     val queryId = fPTFile.sid
     if (fPTFile.logic03Recs.length > 0) {
       fPTFile.logic03Recs.foreach { sLogic03Rec =>
@@ -26,23 +26,30 @@ class SendQueryServiceImpl(queryService: QueryService
         var fingerId = ""
         var status = 0
         if(sLogic03Rec.fingers.length>0){
-          sLogic03Rec.fingers.foreach{ finger =>
-            fingerId = finger.fingerId
-            for(i<- 0 to 3){
-              try{
-                status = 7
-                oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
-                assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id,status,"")
-              }catch{
-                case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
-                  status = -2
-                  assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id,status,ExceptionUtil.getStackTraceInfo(e))
-              }
-              if(status == 7){
-                return
+          val aa = custom1.split(",")
+          for(i<- 0 to aa.size.toInt-1){
+            val a  = "0" + aa(i)
+            sLogic03Rec.fingers.foreach{ finger =>
+              if (finger.fingerNo.equals(a) || finger.fingerNo.equals(aa(i))) {
+                //判断指纹序号的格式“01”“011”或“1”“11”
+                fingerId = finger.fingerId
+                assistCheckRecordService.saveXcQuery(id, fingerId, 1, status, "", queryId, "")
+                try {
+                  status = 7
+                  oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
+                  assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, "")
+                } catch {
+                  case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+                    status = -2
+                    assistCheckRecordService.updateXcQuery(id, fingerId, 1, status, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e))
+                }
               }
             }
-
+          }
+          if (status == 7) {
+            assistCheckRecordService.updateXcTask(id, 7)
+          } else {
+            assistCheckRecordService.updateXcTask(id, 6)
           }
         }
       }
@@ -53,16 +60,20 @@ class SendQueryServiceImpl(queryService: QueryService
         }
         var oraSid = 0L
         var status = 0
-        for(i<- 0 to 3){
-          try {
-            status = 7
-            oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
-            assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId, id, status, "")
-          }catch{
-            case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
-              status = -2
-              assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId,id,status,ExceptionUtil.getStackTraceInfo(e))
-          }
+        assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,2,status,"",queryId,"")
+        try {
+          status = 7
+          oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
+          assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,"")
+        }catch{
+          case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
+            status = -2
+            assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,2,status,oraSid.toString,queryId,ExceptionUtil.getStackTraceInfo(e))
+        }
+        if(status == 7){
+          assistCheckRecordService.updateXcTask(id,7)
+        }else{
+          assistCheckRecordService.updateXcTask(id,6)
         }
       }
     }
