@@ -39,6 +39,7 @@ object HallWebserviceModule {
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
 
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
+    binder.bind(classOf[WsSendQueryService],classOf[WsSendQueryServiceImpl]).withSimpleId()
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
     binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
@@ -52,10 +53,10 @@ object HallWebserviceModule {
     binder.bind(classOf[SendCheckinService], classOf[SendCheckinServiceImpl])//.eagerLoad()
     binder.bind(classOf[UploadCheckinService], classOf[UploadCheckinServiceImpl])//.eagerLoad()
     //============================================================================//
-    binder.bind(classOf[TenPrinterCronService],classOf[TenPrinterCronServiceImpl]).eagerLoad()
-    binder.bind(classOf[LatentCronService],classOf[LatentCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[TenPrinterCronService],classOf[TenPrinterCronServiceImpl])//.eagerLoad()
+    binder.bind(classOf[LatentCronService],classOf[LatentCronServiceImpl])//.eagerLoad()
     binder.bind(classOf[AssistcheckService],classOf[AssistcheckServiceImpl])//.eagerLoad()
-    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl]).eagerLoad()
-    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])//.eagerLoad()
+    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl])//.eagerLoad()
   }
 }

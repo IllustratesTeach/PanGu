@@ -809,7 +809,7 @@ object ProtobufConverter extends LoggerSupport{
   def convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo:GafisCheckinInfo):MatchRelationInfo = {
     val matchRelationInfo = MatchRelationInfo.newBuilder
     val isPlam = !(gafisCheckinInfo.cardType1==1)
-    val queryType = convertQueryType2MatchType(gafisCheckinInfo.querytype,isPlam).getNumber.toString
+    val queryType = gafisCheckinInfo.querytype.toInt
     if(queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_LL){
       matchRelationInfo.setSrckey(gafisCheckinInfo.code)
       matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)

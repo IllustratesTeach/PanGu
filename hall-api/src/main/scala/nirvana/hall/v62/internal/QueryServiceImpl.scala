@@ -8,6 +8,7 @@ import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
+import nirvana.hall.c.services.gloclib.gaqryque
 import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
@@ -256,7 +257,8 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
         gaCand.fromStreamReader(buffer)
         if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
           gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
-          gaCand.nStatus = HallApiConstants.GAQRYCAND_STATUS_FINISHED.toByte
+          gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte
+          gaCand.nFlag = gaqryque.GAQRYCAND_FLAG_BROKEN.toByte
         }
         candListResult.write(gaCand.toByteArray())
       }

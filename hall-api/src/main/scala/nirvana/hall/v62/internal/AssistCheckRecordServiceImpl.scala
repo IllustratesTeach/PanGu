@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
 
+import java.sql.Timestamp
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -169,6 +170,47 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(6,"8")
       ps.setString(7,msg)
       ps.setString(8,id)
+
+    }
+  }
+
+  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, errorinfo: String,date:Timestamp): Unit = {
+    val uuid = UUID.randomUUID().toString.replace("-", "")
+    val sql = "insert into xc_query(id,keyid,service_type,status,custom1,custom2,errorinfo,create_time) values(?,?,?,?,?,?,?,?) "
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1, id)
+      ps.setString(2, fingerid)
+      ps.setInt(3, typ)
+      ps.setInt(4, status)
+      ps.setString(5, custom1)
+      ps.setString(6, custom2)
+      ps.setString(7, errorinfo)
+      ps.setTimestamp(8, date)
+    }
+  }
+
+  override def updateXcQuery(id: String, fingerid: String, typ: Int, status: Int, oraSid: String, queryId: String, errorinfo: String,date:Timestamp): Unit = {
+    val sql = s"UPDATE xc_query " +
+      s"SET status = ?,custom1 = ?,errorinfo = ?,update_time = sysdate " +
+      s"WHERE id = ? and keyid = ? and service_type = ? and create_time = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setInt(1, status)
+      ps.setString(2,oraSid)
+      ps.setString(3,errorinfo)
+      ps.setString(4,id)
+      ps.setString(5,fingerid)
+      ps.setInt(6, typ)
+      ps.setTimestamp(7, date)
+    }
+  }
+
+  override def updateXcTask(id: String, status: Int): Unit = {
+    val sql = s"UPDATE xc_task " +
+      s"SET status = ? " +
+      s"WHERE id = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setInt(1, status)
+      ps.setString(2,id)
 
     }
   }

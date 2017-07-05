@@ -53,7 +53,5 @@ object HallApiConstants {
   final val LOG_ERROR_TYPE = 2
 
   //Afis62 breakcase status
-  final val GAQRYCAND_CHKSTATE_MATCH = 3
-  final val GAQRYCAND_STATUS_FINISHED = 1
-
+  final val GAQRYCAND_CHKSTATE_MATCH = 0x3
 }
