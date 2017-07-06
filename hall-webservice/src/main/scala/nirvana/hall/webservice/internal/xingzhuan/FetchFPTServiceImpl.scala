@@ -60,7 +60,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
       sendQueryService.sendQuery(fptFile, id, custom1)
     } catch {
       case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.ErrStatus, ExceptionUtil.getStackTraceInfo(e), "")
+        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus, ExceptionUtil.getStackTraceInfo(e), "")
     }
   }
 }

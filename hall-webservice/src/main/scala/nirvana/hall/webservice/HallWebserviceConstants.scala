@@ -16,6 +16,7 @@ object HallWebserviceConstants {
   val Status = 0 //发查询初始状态
   val SucStatus = 7  //发查询成功
   val ErrStatus = -2 //发查询失败
+  val FILEStatus = -1 //文件记录不存在
 
   val TaskXC = 1 //现场任务
   val TaskZT = 2 //现场任务
