@@ -2,14 +2,26 @@ package nirvana.hall.webservice.internal.xingzhuan
 
 import java.sql.Timestamp
 
+import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.api.internal.fpt.{FPTConverter, FPTServiceImpl}
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.{AssistCheckRecordService, CaseInfoService, QueryService, TPCardService}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.api.services._
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
+import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.protocol.api.FPTProto.ImageType
+import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.webservice.HallWebserviceConstants
-import nirvana.hall.webservice.services.xingzhuan.SendQueryService
+import nirvana.hall.webservice.{HallDatasource, HallWebserviceConstants}
+import nirvana.hall.webservice.services.xingzhuan.{HallDatasourceService, SendQueryService}
+import org.springframework.transaction.annotation.Transactional
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.extractor.services.FeatureExtractor
+
 
 /**
   * Created by ssj on 2017/5/31.
@@ -17,7 +29,11 @@ import nirvana.hall.webservice.services.xingzhuan.SendQueryService
 class SendQueryServiceImpl(queryService: QueryService
                            , assistCheckRecordService: AssistCheckRecordService
                            , caseInfoService: CaseInfoService
+                           ,hallImageRemoteService: HallImageRemoteService
                            , tPCardService: TPCardService
+                           ,lPCardService: LPCardService
+                           ,hallDatasourceService: HallDatasourceService
+                           ,extractor: FeatureExtractor
                            , fPTService: FPTService) extends SendQueryService with LoggerSupport{
   override def sendQuery(fPTFile: FPT4File,id:String,custom1:String): Unit = {
     val queryId = fPTFile.sid
@@ -27,7 +43,7 @@ class SendQueryServiceImpl(queryService: QueryService
       if (fPTFile.logic03Recs.length > 0) {
         fPTFile.logic03Recs.foreach { sLogic03Rec =>
           if(!caseInfoService.isExist(sLogic03Rec.caseId)){
-            fPTService.addLogic03Res(sLogic03Rec)
+            addLogic03Res(sLogic03Rec)
             isAdd = HallWebserviceConstants.IsAdd
           }
           var oraSid = 0L
@@ -46,7 +62,7 @@ class SendQueryServiceImpl(queryService: QueryService
                     assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.SucStatus, oraSid.toString, queryId, "", ts)
                   } catch {
                     case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-                      assistCheckRecordService.updateXcQuery(id, fingerId, 1, HallWebserviceConstants.ErrStatus, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
+                      assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.ErrStatus, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
                       throw new Exception(ExceptionUtil.getStackTraceInfo(e))
                   }
                 }
@@ -57,11 +73,11 @@ class SendQueryServiceImpl(queryService: QueryService
       } else if(fPTFile.logic02Recs.length > 0) {
         fPTFile.logic02Recs.foreach{ sLogic02Rec =>
           if(!tPCardService.isExist(sLogic02Rec.cardId)){
-            fPTService.addLogic02Res(sLogic02Rec)
+            addLogic02Res(sLogic02Rec)
             isAdd = HallWebserviceConstants.IsAdd
           }
           var oraSid = 0L
-          assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,2,HallWebserviceConstants.Status,"",queryId,sLogic02Rec.personId ,"", ts)
+          assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,HallWebserviceConstants.TaskZT,HallWebserviceConstants.Status,"",queryId,sLogic02Rec.personId ,"", ts)
           try {
             oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
             assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,HallWebserviceConstants.TaskZT,HallWebserviceConstants.SucStatus,oraSid.toString,queryId,"", ts)
@@ -84,6 +100,90 @@ class SendQueryServiceImpl(queryService: QueryService
         }else{
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic03Recs(0).caseId.toString,isAdd)
         }
+    }
+  }
+
+  @Transactional
+  def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
+    try{
+      val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
+      caseInfoService.addCaseInfo(caseInfo)
+      val hallDatasource=new HallDatasource(logic03Rec.caseId,logic03Rec.caseId,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
+      hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_CASE)
+      val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
+      lPCardList.foreach{lPCard =>
+        val lpCardBuiler = lPCard.toBuilder
+        //Í¼Ïñ½âÑ¹
+        val blobBuilder = lpCardBuiler.getBlobBuilder
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
+        if(gafisImage.stHead.bIsCompressed > 0){
+          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+          blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
+        }
+        lPCardService.addLPCard(lpCardBuiler.build())
+        val hallDatasource=new HallDatasource(lPCard.getStrCardID,lPCard.getStrCardID,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
+        hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_LATFINGER)
+      }
+    }
+    catch {
+      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+        throw new Exception(ExceptionUtil.getStackTraceInfo(e))
+    }
+  }
+
+  @Transactional
+  def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
+    try{
+      val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
+      //Í¼Ïñ×ª»»ºÍÌØÕ÷ÌáÈ¡
+      val iter = tpCardBuilder.getBlobBuilderList.iterator()
+      while (iter.hasNext) {
+        val blob = iter.next()
+        if (blob.getType == ImageType.IMAGETYPE_FINGER) {
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+          if (gafisImage.stHead.bIsCompressed > 0) {
+            val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+            val mntData = extractByGAFISIMG(originalImage, false)
+            blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+            //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+
+            val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+            if (compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE) {
+              blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+            } else {
+              val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+              blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+            }
+          } else {
+            val mntData = extractByGAFISIMG(gafisImage, false)
+            blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+            //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+          }
+        }
+      }
+      tPCardService.addTPCard(tpCardBuilder.build())
+      val hallDatasource=new HallDatasource(tpCardBuilder.getStrCardID,tpCardBuilder.getStrCardID,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
+      hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_TPCARD)
+    }
+    catch {
+      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+        throw new Exception(ExceptionUtil.getStackTraceInfo(e))
+    }
+  }
+
+  def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={
+    if(isLatent){
+      extractor.extractByGAFISIMG(originalImage, FingerPosition.FINGER_UNDET, FeatureType.FingerLatent)
+    }else{
+      val fingerIndex = originalImage.stHead.nFingerIndex
+      val fingerPos = if(fingerIndex > 10){
+        FingerPosition.valueOf(fingerIndex - 10)
+      }else{
+        FingerPosition.valueOf(fingerIndex)
+      }
+      extractor.extractByGAFISIMG(originalImage, fingerPos, FeatureType.FingerTemplate)
     }
   }
 }

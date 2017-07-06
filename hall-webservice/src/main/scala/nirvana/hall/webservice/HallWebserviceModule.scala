@@ -44,6 +44,7 @@ object HallWebserviceModule {
     binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
     binder.bind(classOf[FetchFPTService],classOf[FetchFPTServiceImpl])
+    binder.bind(classOf[HallDatasourceService],classOf[HallDatasourceServiceImpl])
 
     binder.bind(classOf[FetchLPCardExportService],classOf[FetchLPCardExportServiceImpl])
 
