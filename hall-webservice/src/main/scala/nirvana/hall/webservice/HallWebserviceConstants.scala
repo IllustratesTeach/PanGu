@@ -19,5 +19,7 @@ object HallWebserviceConstants {
   val FILEStatus = -1 //文件记录不存在
 
   val TaskXC = 1 //现场任务
-  val TaskZT = 2 //现场任务
+  val TaskZT = 2 //追逃任务
+
+  val IsAdd = "1" //是否存库，1 存库
 }

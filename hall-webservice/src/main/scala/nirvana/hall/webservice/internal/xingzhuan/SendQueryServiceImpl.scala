@@ -22,11 +22,13 @@ class SendQueryServiceImpl(queryService: QueryService
   override def sendQuery(fPTFile: FPT4File,id:String,custom1:String): Unit = {
     val queryId = fPTFile.sid
     val ts = new Timestamp(System.currentTimeMillis());
+    var isAdd = "0"
     try {
       if (fPTFile.logic03Recs.length > 0) {
         fPTFile.logic03Recs.foreach { sLogic03Rec =>
           if(!caseInfoService.isExist(sLogic03Rec.caseId)){
             fPTService.addLogic03Res(sLogic03Rec)
+            isAdd = HallWebserviceConstants.IsAdd
           }
           var oraSid = 0L
           var fingerId = ""
@@ -56,6 +58,7 @@ class SendQueryServiceImpl(queryService: QueryService
         fPTFile.logic02Recs.foreach{ sLogic02Rec =>
           if(!tPCardService.isExist(sLogic02Rec.cardId)){
             fPTService.addLogic02Res(sLogic02Rec)
+            isAdd = HallWebserviceConstants.IsAdd
           }
           var oraSid = 0L
           assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,2,HallWebserviceConstants.Status,"",queryId,sLogic02Rec.personId ,"", ts)
@@ -69,17 +72,17 @@ class SendQueryServiceImpl(queryService: QueryService
           }
         }
       }
-      if (fPTFile.logic03Recs(0).caseId.toString==null||fPTFile.logic03Recs(0).caseId.toString==""){
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic02Recs(0).personId.toString)
+      if (fPTFile.logic03Recs.length > 0){
+        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic02Recs(0).personId.toString,isAdd)
       }else{
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic03Recs(0).caseId.toString)
+        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic03Recs(0).caseId.toString,isAdd)
       }
     }catch{
       case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
-        if (fPTFile.logic03Recs(0).caseId.toString==null||fPTFile.logic03Recs(0).caseId.toString==""){
-          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic02Recs(0).personId.toString)
+        if (fPTFile.logic03Recs.length > 0){
+          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic02Recs(0).personId.toString,isAdd)
         }else{
-          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic03Recs(0).caseId.toString)
+          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic03Recs(0).caseId.toString,isAdd)
         }
     }
   }
