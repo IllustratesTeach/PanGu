@@ -174,9 +174,9 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     }
   }
 
-  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, errorinfo: String,date:Timestamp): Unit = {
+  override def saveXcQuery(id: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String,detail:String, errorinfo: String,date:Timestamp): Unit = {
     val uuid = UUID.randomUUID().toString.replace("-", "")
-    val sql = "insert into xc_query(id,keyid,service_type,status,custom1,custom2,errorinfo,create_time) values(?,?,?,?,?,?,?,?) "
+    val sql = "insert into xc_query(id,keyid,service_type,status,custom1,custom2,errorinfo,create_time,detail) values(?,?,?,?,?,?,?,?,?) "
     JdbcDatabase.update(sql) { ps =>
       ps.setString(1, id)
       ps.setString(2, fingerid)
@@ -186,6 +186,7 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(6, custom2)
       ps.setString(7, errorinfo)
       ps.setTimestamp(8, date)
+      ps.setString(9, detail)
     }
   }
 
@@ -204,14 +205,15 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
     }
   }
 
-  override def updateXcTask(id: String, status: Int): Unit = {
+  override def updateXcTask(id: String, status: Int, errorinfo: String, detail:String): Unit = {
     val sql = s"UPDATE xc_task " +
-      s"SET status = ? " +
+      s"SET status = ? , errorinfo = ?,detail = ?" +
       s"WHERE id = ?"
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, status)
-      ps.setString(2,id)
-
+      ps.setString(2,errorinfo)
+      ps.setString(3,detail)
+      ps.setString(4,id)
     }
   }
 }

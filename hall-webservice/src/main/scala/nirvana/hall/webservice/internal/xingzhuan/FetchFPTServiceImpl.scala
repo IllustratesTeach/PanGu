@@ -8,9 +8,12 @@ import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.webservice.services.SendQueryService
+import nirvana.hall.webservice.services.xingzhuan.SendQueryService
 import nirvana.hall.webservice.services.xingzhuan.FetchFPTService
 import org.apache.commons.io.FileUtils
+import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.webservice.HallWebserviceConstants
 
 import scala.collection.mutable
 
@@ -23,7 +26,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
                           caseInfoService: CaseInfoService,
                           tPCardService: TPCardService,
                           sendQueryService: SendQueryService,
-                          implicit val dataSource: DataSource) extends FetchFPTService {
+                          implicit val dataSource: DataSource) extends FetchFPTService with LoggerSupport{
 
   val BATCH_SIZE = 10
 
@@ -45,14 +48,19 @@ class FetchFPTServiceImpl(queryService: QueryService,
   }
 
   def fetchFPT(): Unit = {
-    fetchAssistTask.foreach{
-      t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString,t.get("custom1").get.toString)
-    }
+      fetchAssistTask.foreach{
+        t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString,t.get("custom1").get.toString)
+      }
   }
 
-  private def sendQuery(fptPath:String,id:String,custom1:String): Unit ={
-    val is = FileUtils.openInputStream(new File(fptPath))
-    val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
-    sendQueryService.sendQuery(fptFile,id,custom1)
+  private def sendQuery(fptPath:String,id:String,custom1:String): Unit = {
+    try {
+      val is = FileUtils.openInputStream(new File(fptPath))
+      val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
+      sendQueryService.sendQuery(fptFile, id, custom1)
+    } catch {
+      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.ErrStatus, ExceptionUtil.getStackTraceInfo(e), "")
+    }
   }
 }

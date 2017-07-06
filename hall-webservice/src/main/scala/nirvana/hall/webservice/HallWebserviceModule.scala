@@ -12,11 +12,11 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
+import nirvana.hall.webservice.internal.{TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
 import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
 import nirvana.hall.webservice.internal.xingzhuan._
 import nirvana.hall.webservice.internal.xingzhuan.{FetchLPCardExportServiceImpl, LatentCronServiceImpl}
-import nirvana.hall.webservice.services.{SendQueryService, TaskHandlerService, TenPrinterExportService}
+import nirvana.hall.webservice.services.{TaskHandlerService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import nirvana.hall.webservice.services.xingzhuan._
 import org.apache.tapestry5.ioc.ServiceBinder
@@ -38,8 +38,8 @@ object HallWebserviceModule {
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
 
-    binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
-    binder.bind(classOf[WsSendQueryService],classOf[WsSendQueryServiceImpl]).withSimpleId()
+    binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl])//.withSimpleId()
+    binder.bind(classOf[WsSendQueryService],classOf[WsSendQueryServiceImpl])//.withSimpleId()
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
     binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
     binder.bind(classOf[TaskHandlerService],classOf[TaskHandlerServiceImpl])
@@ -57,6 +57,6 @@ object HallWebserviceModule {
     binder.bind(classOf[LatentCronService],classOf[LatentCronServiceImpl])//.eagerLoad()
     binder.bind(classOf[AssistcheckService],classOf[AssistcheckServiceImpl])//.eagerLoad()
     binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])//.eagerLoad()
-    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl])//.eagerLoad()
+    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl]).eagerLoad()
   }
 }
