@@ -116,13 +116,6 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisCaseFinger.findOption(cardId).nonEmpty
-    var result=false
-    if(GafisCaseFinger.findOption(cardId).nonEmpty){
-      val finger=GafisCaseFinger.findOption(cardId).get
-      if(finger.deletag.equals("1"))
-        result=true
-    }
-    result
   }
 
 }
