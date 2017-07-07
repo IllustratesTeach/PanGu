@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 
+import scala.collection.mutable.ArrayBuffer
+
 
 /**
   * Created by ssj on 2017/5/31.
@@ -88,14 +90,14 @@ class SendQueryServiceImpl(queryService: QueryService
           }
         }
       }
-      if (fPTFile.logic03Recs.length > 0){
+      if (fPTFile.logic03Recs.length <= 0){
         assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic02Recs(0).personId.toString,isAdd)
       }else{
         assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic03Recs(0).caseId.toString,isAdd)
       }
     }catch{
       case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
-        if (fPTFile.logic03Recs.length > 0){
+        if (fPTFile.logic03Recs.length <= 0){
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic02Recs(0).personId.toString,isAdd)
         }else{
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,ExceptionUtil.getStackTraceInfo(e),fPTFile.logic03Recs(0).caseId.toString,isAdd)
@@ -113,7 +115,7 @@ class SendQueryServiceImpl(queryService: QueryService
       val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
       lPCardList.foreach{lPCard =>
         val lpCardBuiler = lPCard.toBuilder
-        //Í¼Ïñ½âÑ¹
+        //图像解压
         val blobBuilder = lpCardBuiler.getBlobBuilder
         val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
         if(gafisImage.stHead.bIsCompressed > 0){
@@ -121,12 +123,15 @@ class SendQueryServiceImpl(queryService: QueryService
           blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
         }
         lPCardService.addLPCard(lpCardBuiler.build())
-        val hallDatasource=new HallDatasource(lPCard.getStrCardID,lPCard.getStrCardID,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
+        val hallDatasource=new HallDatasource(logic03Rec.caseId,lPCard.getStrCardID,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
         hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_LATFINGER)
       }
     }
     catch {
       case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+        val hallDatasource=new HallDatasource(logic03Rec.caseId,logic03Rec.caseId,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
+        hallDatasourceService.del(hallDatasource,HallDatasource.TABLE_V62_CASE)
+        hallDatasourceService.del(hallDatasource,HallDatasource.TABLE_V62_LATFINGER)
         throw new Exception(ExceptionUtil.getStackTraceInfo(e))
     }
   }
@@ -135,7 +140,7 @@ class SendQueryServiceImpl(queryService: QueryService
   def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
     try{
       val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
-      //Í¼Ïñ×ª»»ºÍÌØÕ÷ÌáÈ¡
+      //图像转换和特征提取
       val iter = tpCardBuilder.getBlobBuilderList.iterator()
       while (iter.hasNext) {
         val blob = iter.next()

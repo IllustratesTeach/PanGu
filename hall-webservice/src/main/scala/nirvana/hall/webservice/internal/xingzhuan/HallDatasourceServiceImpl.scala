@@ -48,4 +48,11 @@ class HallDatasourceServiceImpl(implicit val dataSource: DataSource) extends Hal
       }
     }
   }
+
+  override def del(hallDatasource: HallDatasource, table: String): Unit = {
+    val sql = "delete from  "+table+" where  serviceid = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1,hallDatasource.serviceid)
+    }
+  }
 }
