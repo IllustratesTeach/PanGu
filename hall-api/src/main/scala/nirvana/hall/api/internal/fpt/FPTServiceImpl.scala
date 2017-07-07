@@ -64,7 +64,10 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       val fingerIdCount = caseInfo.getStrFingerIDList.size
       for (i <- 0 until fingerIdCount) {
         val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
-        lpCardList.append(lPCard)
+        //有可能现场没有图像，为null
+        if(lPCard != null){
+          lpCardList.append(lPCard)
+        }
       }
 
       FPTFileBuilder.convertCaseAndLPCard2Logic03Rec(caseInfo, lpCardList)
