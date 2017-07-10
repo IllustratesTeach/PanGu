@@ -261,6 +261,7 @@ object gaqryqueConverter extends LoggerSupport{
         cand.setObjectId(candData.szKey)
         cand.setPos(candData.nIndex)
         cand.setDbid(candData.nDBID.toString)
+        cand.setMatchFinishTime(DateConverter.convertAFISDateTime2String(candData.tFinishTime))
         cand.setScore(candData.nScore)
         if(maxScore < candData.nScore)
           maxScore = candData.nScore

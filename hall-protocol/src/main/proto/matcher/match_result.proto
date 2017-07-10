@@ -26,6 +26,8 @@ message MatchResult {
     required uint32 score = 3;
     //候选dbid,6.2专用
     optional string dbid = 4;
+
+    optional string match_finish_time = 5;
   }
   //比对任务的ID
   required string match_id = 1;

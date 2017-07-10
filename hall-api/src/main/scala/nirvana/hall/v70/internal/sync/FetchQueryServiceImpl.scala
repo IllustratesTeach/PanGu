@@ -8,7 +8,6 @@ import nirvana.hall.api.config.QueryQue
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.sync.FetchQueryService
-import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
@@ -138,7 +137,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       gCand.nDBID = if (queryType == 0 || queryType == 1) 1 else 2
       gCand.nTableID = 2
       gCand.nIndex = cand.getPos.toByte
-      gCand.tFinishTime = new AFISDateTime
+      gCand.tFinishTime = DateConverter.convertString2AFISDateTime(cand.getMatchFinishTime)
       gCand.nStepOneRank = index
       result.write(gCand.toByteArray())
     }
