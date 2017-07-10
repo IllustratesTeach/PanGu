@@ -52,5 +52,5 @@ override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: Da
     * @param readStrategy
     * @return
     */
-  override def validateByReadStrategy(matchSysInfo: MatchSysInfo, readStrategy: String): Boolean = ???
+  override def validateByReadStrategy(matchSysInfo: MatchSysInfo, readStrategy: String): Boolean = {true}
 }

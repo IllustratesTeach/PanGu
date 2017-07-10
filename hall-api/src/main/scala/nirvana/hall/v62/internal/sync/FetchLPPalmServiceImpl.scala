@@ -34,5 +34,5 @@ class FetchLPPalmServiceImpl(implicit dataSource: DataSource) extends SyncDataFe
     * @param readStrategy
     * @return
     */
-  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = ???
+  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = {true}
 }
