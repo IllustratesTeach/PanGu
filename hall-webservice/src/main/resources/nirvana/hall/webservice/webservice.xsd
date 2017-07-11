@@ -29,6 +29,12 @@
                     <xs:documentation>配置Webservice服务器相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="AutoQuerySetting" name="AutoQuerySetting" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>配置是否根据任务自动发送查询相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
             <xs:element type="xs:string" name="hall_image_url" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>配置hall-image服务器地址</xs:documentation>
@@ -106,6 +112,16 @@
             <xs:element type="xs:string" name="upload_checkin_cron" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>获取上报比对关系任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AutoQuerySetting">
+        <xs:sequence>
+            <xs:element type="xs:string" name="isAutoQuery" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>是否根据任务自动发送查询 0不发送 1发送</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

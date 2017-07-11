@@ -21,6 +21,7 @@ import nirvana.hall.webservice.services.xingzhuan.{HallDatasourceService, SendQu
 import org.springframework.transaction.annotation.Transactional
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
+import nirvana.hall.webservice.config.HallWebserviceConfig
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -36,32 +37,37 @@ class SendQueryServiceImpl(queryService: QueryService
                            ,lPCardService: LPCardService
                            ,hallDatasourceService: HallDatasourceService
                            ,extractor: FeatureExtractor
+                           ,hallWebserviceConfig: HallWebserviceConfig
                            , fPTService: FPTService) extends SendQueryService with LoggerSupport{
-  override def sendQuery(fPTFile: FPT4File,id:String,custom1:String): Unit = {
+  override def sendQuery(fPTFile: FPT4File,id:String,custom1:String,executetimes:Int): Unit = {
     val queryId = fPTFile.sid
     val ts = new Timestamp(System.currentTimeMillis());
+    val isAutoQuery = hallWebserviceConfig.autoQuerySetting.isAutoQuery
     var isAdd = "0"
+    assistCheckRecordService.updateXcTask(id,executetimes+1)
     try {
       if (fPTFile.logic03Recs.length > 0) {
         fPTFile.logic03Recs.foreach { sLogic03Rec =>
-          if(!caseInfoService.isExist(sLogic03Rec.caseId)){
-            addLogic03Res(sLogic03Rec)
+          if (!caseInfoService.isExist(sLogic03Rec.caseId)) {
             isAdd = HallWebserviceConstants.IsAdd
+            addLogic03Res(sLogic03Rec)
           }
+          //判断是否发送查询
+          if(isAutoQuery.equals("1")){
           var oraSid = 0L
           var fingerId = ""
           val fingernos = custom1.split(",")
-          if(sLogic03Rec.fingers.length>0){
-            for(i<- 0 until fingernos.size){
-              val fingerno  = "0" + fingernos(i)
-              sLogic03Rec.fingers.foreach{ finger =>
+          if (sLogic03Rec.fingers.length > 0) {
+            for (i <- 0 until fingernos.size) {
+              val fingerno = "0" + fingernos(i)
+              sLogic03Rec.fingers.foreach { finger =>
                 if (finger.fingerNo.equals(fingerno) || finger.fingerNo.equals(fingernos(i))) {
                   //判断指纹序号的格式“01”“011”或“1”“11”
                   fingerId = finger.fingerId
-                  assistCheckRecordService.saveXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.Status, "", queryId,sLogic03Rec.caseId, "", ts)
+                  assistCheckRecordService.saveXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.Status, "", queryId, sLogic03Rec.caseId, "", ts)
                   try {
                     oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
-                    assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.SucStatus, oraSid.toString, queryId, "", ts)
+                    assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, "", ts)
                   } catch {
                     case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
                       assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.ErrStatus, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
@@ -72,28 +78,36 @@ class SendQueryServiceImpl(queryService: QueryService
             }
           }
         }
+        }
       } else if(fPTFile.logic02Recs.length > 0) {
-        fPTFile.logic02Recs.foreach{ sLogic02Rec =>
-          if(!tPCardService.isExist(sLogic02Rec.cardId)){
-            addLogic02Res(sLogic02Rec)
+        fPTFile.logic02Recs.foreach { sLogic02Rec =>
+          if (!tPCardService.isExist(sLogic02Rec.cardId)) {
             isAdd = HallWebserviceConstants.IsAdd
+            addLogic02Res(sLogic02Rec)
           }
+          //判断是否发送查询
+          if (isAutoQuery.equals("1")){
           var oraSid = 0L
-          assistCheckRecordService.saveXcQuery(id,sLogic02Rec.personId,HallWebserviceConstants.TaskZT,HallWebserviceConstants.Status,"",queryId,sLogic02Rec.personId ,"", ts)
+          assistCheckRecordService.saveXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.Status, "", queryId, sLogic02Rec.personId, "", ts)
           try {
             oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
-            assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,HallWebserviceConstants.TaskZT,HallWebserviceConstants.SucStatus,oraSid.toString,queryId,"", ts)
-          }catch{
-            case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
-              assistCheckRecordService.updateXcQuery(id,sLogic02Rec.personId,HallWebserviceConstants.TaskZT,HallWebserviceConstants.ErrStatus,oraSid.toString,queryId,ExceptionUtil.getStackTraceInfo(e), ts)
+            assistCheckRecordService.updateXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, "", ts)
+          } catch {
+            case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+              assistCheckRecordService.updateXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
               throw new Exception(ExceptionUtil.getStackTraceInfo(e))
           }
         }
+        }
       }
       if (fPTFile.logic03Recs.length <= 0){
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic02Recs(0).personId.toString,isAdd)
+        if (isAutoQuery.equals("1"))
+          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_SendQuery,"",fPTFile.logic02Recs(0).personId.toString,isAdd)
+        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"",fPTFile.logic02Recs(0).personId.toString,isAdd)
       }else{
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus,"",fPTFile.logic03Recs(0).caseId.toString,isAdd)
+        if (isAutoQuery.equals("1"))
+          assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_SendQuery,"",fPTFile.logic03Recs(0).caseId.toString,isAdd)
+        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"",fPTFile.logic03Recs(0).caseId.toString,isAdd)
       }
     }catch{
       case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))
@@ -107,33 +121,39 @@ class SendQueryServiceImpl(queryService: QueryService
 
   @Transactional
   def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
-    try{
-      val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
+
+    val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
+    try {
       caseInfoService.addCaseInfo(caseInfo)
-      val hallDatasource=new HallDatasource(logic03Rec.caseId,logic03Rec.caseId,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
-      hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_CASE)
+      val hallDatasource = new HallDatasource(logic03Rec.caseId, logic03Rec.caseId, "", HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD, HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD)
+      hallDatasourceService.save(hallDatasource, HallDatasource.TABLE_V62_CASE)
+
+    }
+    catch {
+      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+        throw new Exception(ExceptionUtil.getStackTraceInfo(e))
+    }
+
+    try {
       val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
-      lPCardList.foreach{lPCard =>
+      lPCardList.foreach { lPCard =>
         val lpCardBuiler = lPCard.toBuilder
         //图像解压
         val blobBuilder = lpCardBuiler.getBlobBuilder
         val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
-        if(gafisImage.stHead.bIsCompressed > 0){
+        if (gafisImage.stHead.bIsCompressed > 0) {
           val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
           blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
         }
         lPCardService.addLPCard(lpCardBuiler.build())
-        val hallDatasource=new HallDatasource(logic03Rec.caseId,lPCard.getStrCardID,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
-        hallDatasourceService.save(hallDatasource,HallDatasource.TABLE_V62_LATFINGER)
+        val hallDatasource = new HallDatasource(lPCard.getStrCardID, lPCard.getStrCardID, "", HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD, HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD)
+        hallDatasourceService.save(hallDatasource, HallDatasource.TABLE_V62_LATFINGER)
       }
     }
-    catch {
-      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-        val hallDatasource=new HallDatasource(logic03Rec.caseId,logic03Rec.caseId,"",HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD,HallDatasource.SERVICE_TYPE_TaskXC,HallDatasource.OPERATION_TYPE_ADD)
-        hallDatasourceService.del(hallDatasource,HallDatasource.TABLE_V62_CASE)
-        hallDatasourceService.del(hallDatasource,HallDatasource.TABLE_V62_LATFINGER)
-        throw new Exception(ExceptionUtil.getStackTraceInfo(e))
-    }
+     catch {
+        case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
+           throw new Exception(ExceptionUtil.getStackTraceInfo(e))
+      }
   }
 
   @Transactional

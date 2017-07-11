@@ -35,5 +35,6 @@ trait AssistCheckRecordService {
 
   def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,custom2:String): Unit
 
+  def updateXcTask(id:String,executetimes:Int): Unit
 
 }

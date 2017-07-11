@@ -217,4 +217,14 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
       ps.setString(5,id)
     }
   }
+
+  override def updateXcTask(id: String,executetimes: Int): Unit = {
+    val sql = s"UPDATE xc_task " +
+      s"SET executetimes = ? " +
+      s"WHERE id = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setInt(1, executetimes)
+      ps.setString(2,id)
+    }
+  }
 }

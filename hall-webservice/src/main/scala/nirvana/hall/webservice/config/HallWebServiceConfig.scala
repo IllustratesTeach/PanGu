@@ -21,6 +21,9 @@ class HallWebserviceConfig
 
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
+
+  @XmlElement(name = "AutoQuerySetting")
+  var autoQuerySetting: AutoQuerySetting = new AutoQuerySetting
   @XmlElement(name = "local_tenprint_path")
   var localTenprintPath:String = _
   @XmlElement(name = "local_latent_path")
@@ -29,6 +32,8 @@ class HallWebserviceConfig
   var localHitResultPath:String = _
   @XmlElement(name = "xc_hit_result_path")
   var xcHitResultPath:String = _
+  @XmlElement(name = "hall_image_url")
+  var hall_image_url: String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")
@@ -53,4 +58,11 @@ class Union4pfmipConfig{
   var sendCheckinCron: String = _
   @XmlElement(name = "upload_checkin_cron")
   var uploadCheckinCron: String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "AutoQuerySetting")
+class AutoQuerySetting{
+  @XmlElement(name = "isAutoQuery")
+  var isAutoQuery: String = _
 }

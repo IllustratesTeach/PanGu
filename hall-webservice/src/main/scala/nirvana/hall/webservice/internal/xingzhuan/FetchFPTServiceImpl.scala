@@ -31,9 +31,9 @@ class FetchFPTServiceImpl(queryService: QueryService,
   val BATCH_SIZE = 10
 
   def fetchAssistTask(): mutable.ListBuffer[mutable.HashMap[String,Any]] = {
-    val sql = s"SELECT t.id,t.fpt_path,t.custom1 " +
+    val sql = s"SELECT t.id,t.fpt_path,t.custom1,executetimes " +
       s"FROM xc_task t " +
-      s"WHERE t.status = '0' AND t.id IS NOT NULL AND rownum<= ? "
+      s"WHERE t.status = '0' AND EXECUTETIMES < 3 AND t.id IS NOT NULL AND rownum<= ? "
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
       ps.setInt(1, BATCH_SIZE)
@@ -42,6 +42,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
       map += ("id" -> rs.getString("id"))
       map += ("fpt_path" -> rs.getString("fpt_path"))
       map += ("custom1" -> rs.getString("custom1"))
+      map += ("executetimes" -> rs.getInt("executetimes"))
       resultList.append(map)
     }
     resultList
@@ -49,15 +50,15 @@ class FetchFPTServiceImpl(queryService: QueryService,
 
   def fetchFPT(): Unit = {
       fetchAssistTask.foreach{
-        t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString,t.get("custom1").get.toString)
+        t => sendQuery(t.get("fpt_path").get.toString,t.get("id").get.toString,t.get("custom1").get.toString,t.get("executetimes").get.asInstanceOf[Int])
       }
   }
 
-  private def sendQuery(fptPath:String,id:String,custom1:String): Unit = {
+  private def sendQuery(fptPath:String,id:String,custom1:String,executetimes: Int): Unit = {
     try {
       val is = FileUtils.openInputStream(new File(fptPath))
       val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
-      sendQueryService.sendQuery(fptFile, id, custom1)
+      sendQueryService.sendQuery(fptFile, id, custom1,executetimes)
     } catch {
       case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
         assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus, ExceptionUtil.getStackTraceInfo(e), "","")
