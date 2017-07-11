@@ -259,7 +259,11 @@ object gaqryqueConverter extends LoggerSupport{
       pstCandData.foreach{ candData =>
         val cand = matchResult.addCandidateResultBuilder()
         cand.setObjectId(candData.szKey)
-        cand.setPos(candData.nIndex)
+        var pos = candData.nIndex
+        if(pos > 20){//gafis6.2中平指指位[21,30],所以这里-10
+          pos -= 10
+        }
+        cand.setPos(pos)
         cand.setDbid(candData.nDBID.toString)
         cand.setMatchFinishTime(DateConverter.convertAFISDateTime2String(candData.tFinishTime))
         cand.setScore(candData.nScore)
