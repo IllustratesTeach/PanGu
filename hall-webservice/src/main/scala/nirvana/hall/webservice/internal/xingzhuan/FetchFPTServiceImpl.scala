@@ -28,7 +28,7 @@ class FetchFPTServiceImpl(queryService: QueryService,
                           sendQueryService: SendQueryService,
                           implicit val dataSource: DataSource) extends FetchFPTService with LoggerSupport{
 
-  val BATCH_SIZE = 10
+  val BATCH_SIZE = 100
 
   def fetchAssistTask(): mutable.ListBuffer[mutable.HashMap[String,Any]] = {
     val sql = s"SELECT t.id,t.fpt_path,t.custom1,executetimes " +
