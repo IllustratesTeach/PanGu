@@ -259,7 +259,7 @@ object gaqryqueConverter extends LoggerSupport{
       pstCandData.foreach{ candData =>
         val cand = matchResult.addCandidateResultBuilder()
         cand.setObjectId(candData.szKey)
-        var pos = candData.nIndex
+        var pos = candData.nIndex.toInt
         if(pos > 20){//gafis6.2中平指指位[21,30],所以这里-10
           pos -= 10
         }
