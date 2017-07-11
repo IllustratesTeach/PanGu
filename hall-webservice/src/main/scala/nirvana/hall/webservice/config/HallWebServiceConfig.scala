@@ -22,8 +22,8 @@ class HallWebserviceConfig
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
 
-  @XmlElement(name = "AutoQuerySetting")
-  var autoQuerySetting: AutoQuerySetting = new AutoQuerySetting
+  @XmlElement(name = "XingZhuanSetting")
+  var XingZhuanSetting: XingZhuanSetting = new XingZhuanSetting
   @XmlElement(name = "local_tenprint_path")
   var localTenprintPath:String = _
   @XmlElement(name = "local_latent_path")
@@ -61,8 +61,10 @@ class Union4pfmipConfig{
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AutoQuerySetting")
-class AutoQuerySetting{
+@XmlType(name = "XingZhuanSetting")
+class XingZhuanSetting{
   @XmlElement(name = "isAutoQuery")
   var isAutoQuery: String = _
+  @XmlElement(name = "cron")
+  var cron: String = _
 }

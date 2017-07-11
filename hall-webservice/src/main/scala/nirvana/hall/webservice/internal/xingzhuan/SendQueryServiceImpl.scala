@@ -42,7 +42,7 @@ class SendQueryServiceImpl(queryService: QueryService
   override def sendQuery(fPTFile: FPT4File,id:String,custom1:String,executetimes:Int): Unit = {
     val queryId = fPTFile.sid
     val ts = new Timestamp(System.currentTimeMillis());
-    val isAutoQuery = hallWebserviceConfig.autoQuerySetting.isAutoQuery
+    val isAutoQuery = hallWebserviceConfig.XingZhuanSetting.isAutoQuery
     var isAdd = "0"
     assistCheckRecordService.updateXcTask(id,executetimes+1)
     try {
