@@ -8,11 +8,12 @@ import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
+import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v62.services.AncientEnum.MatchType
 import nirvana.hall.v62.services.{DatabaseTable, MatchOptions, SelfMatchTask}
 import org.apache.commons.io.IOUtils
 import org.jboss.netty.buffer.ChannelBuffers
-import org.junit.{Test, Assert}
+import org.junit.{Assert, Test}
 
 /**
  *
@@ -75,12 +76,12 @@ class ganetqryTest {
     item.stXgw.nMntMatchType = 4
     val itemDataLength = item.getDataSize
     val itemHead = new GBASE_ITEMPKG_ITEMHEADSTRUCT
-    itemHead.szItemName = facade.GAFIS_QRYPARAM_GetName
+    itemHead.szItemName = gaqryqueConverter.GAFIS_QRYPARAM_GetName
     itemHead.nItemLen = itemDataLength
 
     val xmlData = "<?xml version=\"1.0\" encoding=\"gb2312\" ?>\n<GAFISTEXTSQL version=\"1.0\" caseidcanbenull=\"FALSE\">\n    <TABLESQL TID=\"2\" >\n        <![CDATA[ \n            ((CardID LIKE '11') AND (CreateUserName LIKE '22') AND ((Name LIKE '3'))) \n        ]]>\n    </TABLESQL>\n</GAFISTEXTSQL>\u0000".getBytes
     val itemHead2 = new GBASE_ITEMPKG_ITEMHEADSTRUCT
-    itemHead2.szItemName = facade.GAFIS_TEXTSQL_GetName
+    itemHead2.szItemName = gaqryqueConverter.GAFIS_TEXTSQL_GetName
     itemHead2.nItemLen = xmlData.length
 
 
