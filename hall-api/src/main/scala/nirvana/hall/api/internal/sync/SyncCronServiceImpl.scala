@@ -616,10 +616,26 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             捺印卡在6.2保存时先进行判断 若已存在执行更新捺印卡信息 不存在添加捺印卡信息  2016/12/7
              */
           if(tpCardService.isExist(cardId)){
-            tpCardOpt.foreach(tpCardService.updateTPCard(_))
+            tpCardOpt.foreach{
+              t =>
+                var tpCard = t
+                val strategy = new JSONObject(fetchConfig.writeStrategy)
+                if(strategy.has("setdatasource")){
+                  tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+                }
+              tpCardService.updateTPCard(tpCard)
+            }
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }else{
-            tpCardOpt.foreach(tpCardService.addTPCard(_))
+            tpCardOpt.foreach{
+              t =>
+                var tpCard = t
+                val strategy = new JSONObject(fetchConfig.writeStrategy)
+                if(strategy.has("setdatasource")){
+                  tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+                }
+              tpCardService.addTPCard(tpCard)
+            }
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }
         }
