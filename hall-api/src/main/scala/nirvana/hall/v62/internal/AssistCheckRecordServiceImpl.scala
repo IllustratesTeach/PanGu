@@ -208,14 +208,14 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
 
   override def updateXcTask(id: String, status: Int, errorinfo: String, detail:String, serviceid:String, custom2: String): Unit = {
     val sql = s"UPDATE xc_task " +
-      s"SET status = ? , errorinfo = ?,detail= ?, serviceid = ?,custom2 = ?" +
+      s"SET status = ? , custom2 = ?,serviceid= ?, detail = ?,errorinfo = ?" +
       s"WHERE id = ?"
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, status)
-      ps.setString(2,errorinfo)
-      ps.setString(3,detail)
-      ps.setString(4,serviceid)
-      ps.setString(5,custom2)
+      ps.setString(2,custom2)
+      ps.setString(3,serviceid)
+      ps.setString(4,detail)
+      ps.setString(5,errorinfo)
       ps.setString(6,id)
     }
   }
@@ -223,15 +223,15 @@ class AssistCheckRecordServiceImpl(implicit val dataSource: DataSource) extends 
 
   override def updateXcTask(id: String, status: Int, errorinfo: String, detail:String, serviceid:String, custom2: String, custom4:String): Unit = {
     val sql = s"UPDATE xc_task " +
-      s"SET status = ? , errorinfo = ?,detail = ?, serviceid = ?,custom2 = ?,custom4= ? " +
+      s"SET status = ? , custom2 = ?,custom4 = ?, serviceid = ?,detail = ?,errorinfo= ? " +
       s"WHERE id = ?"
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, status)
-      ps.setString(2,errorinfo)
-      ps.setString(3,detail)
+      ps.setString(2,custom2)
+      ps.setString(3,custom4)
       ps.setString(4,serviceid)
-      ps.setString(5,custom2)
-      ps.setString(6,custom4)
+      ps.setString(5,detail)
+      ps.setString(6,errorinfo)
       ps.setString(7,id)
     }
   }

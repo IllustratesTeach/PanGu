@@ -66,7 +66,10 @@ class SendQueryServiceImpl(queryService: QueryService
               sLogic03Rec.fingers.foreach { finger =>
                 if (finger.fingerNo.equals(fingerno) || finger.fingerNo.equals(fingernos(i))) {
                   //判断指纹序号的格式“01”“011”或“1”“11”
-                  fingerId = finger.fingerId
+                  if (finger.fingerId.equals("")) {
+                  fingerId = sLogic03Rec.caseId + finger.fingerNo
+                  }
+                  else fingerId = finger.fingerId
                   assistCheckRecordService.saveXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.Status, "", queryId, sLogic03Rec.caseId, "", ts)
                   try {
                     oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
@@ -106,23 +109,27 @@ class SendQueryServiceImpl(queryService: QueryService
       if (fPTFile.logic03Recs.length <= 0){
         if (isAutoQuery.equals("1"))
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_SendQuery,"","",fPTFile.logic02Recs(0).personId.toString,isAdd)
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"","",fPTFile.logic02Recs(0).personId.toString,isAdd)
+        else assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"","",fPTFile.logic02Recs(0).personId.toString,isAdd)
       }else{
         if (isAutoQuery.equals("1"))
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_SendQuery,"","",fPTFile.logic03Recs(0).caseId.toString,isAdd,custom4)
-        assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"","",fPTFile.logic03Recs(0).caseId.toString,isAdd,custom4)
+        else assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.SucStatus_NotSendQuery,"","",fPTFile.logic03Recs(0).caseId.toString,isAdd,custom4)
       }
     }catch{
       case e:Exception=>
-        var exceptionInfo = ExceptionUtil.getStackTraceInfo(e);
-        var msg = e.getMessage();
+        var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+        var msg = e.getMessage()
         if(msg == null) {
-          var index = exceptionInfo.indexOf("\r\n");
+          var index = exceptionInfo.indexOf("\r\n")
           if(index == -1) {
             if(exceptionInfo.length() < 100) index = exceptionInfo.length()
             index = 100
           }
-          msg = exceptionInfo.substring(0, index);
+          msg = exceptionInfo.substring(0, index)
+        }
+        else{
+          if(msg.length>100)
+            msg = msg.substring(0,100)
         }
         if (fPTFile.logic03Recs.length <= 0){
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,exceptionInfo,msg,fPTFile.logic02Recs(0).personId.toString,isAdd)
@@ -162,10 +169,13 @@ class SendQueryServiceImpl(queryService: QueryService
           lPCardService.addLPCard(lpCardBuiler.build())
           val hallDatasource = new HallDatasource(lPCard.getStrCardID, lPCard.getStrCardID, "", HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD, HallDatasource.SERVICE_TYPE_TaskXC, HallDatasource.OPERATION_TYPE_ADD)
           hallDatasourceService.save(hallDatasource, HallDatasource.TABLE_V62_LATFINGER)
-          custom4 += lPCard.getTextOrBuilder.getStrSeq+","
+          custom4 +=  Integer.parseInt(lPCard.getText.getStrSeq) + ","
         }
       }
-      custom4.substring(1,custom4.length)
+      if(custom4.length>=1)
+      custom4.substring(0,custom4.length-1)
+      else
+      custom4
     }
      catch {
         case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))

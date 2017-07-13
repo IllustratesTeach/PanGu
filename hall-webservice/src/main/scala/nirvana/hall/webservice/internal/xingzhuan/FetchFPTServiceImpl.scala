@@ -13,6 +13,7 @@ import nirvana.hall.webservice.services.xingzhuan.FetchFPTService
 import org.apache.commons.io.FileUtils
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.webservice.HallWebserviceConstants
 
 import scala.collection.mutable
@@ -57,21 +58,34 @@ class FetchFPTServiceImpl(queryService: QueryService,
   private def sendQuery(fptPath:String,id:String,custom1:String,executetimes: Int): Unit = {
     try {
       val is = FileUtils.openInputStream(new File(fptPath))
-      val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
+      var fptFile:FPT4File = null
+        try{
+        fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
+      }
+      catch{
+        case e: Exception =>
+          var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+          assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEParseErrorStatus,exceptionInfo,"FPT文件解析异常", "","")
+          return
+      }
       sendQueryService.sendQuery(fptFile, id, custom1,executetimes)
     } catch {
       case e: Exception =>
-        var exceptionInfo = ExceptionUtil.getStackTraceInfo(e);
-        var msg = e.getMessage();
+        var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+        var msg = e.getMessage()
         if(msg == null) {
-          var index = exceptionInfo.indexOf("\r\n");
+          var index = exceptionInfo.indexOf("\r\n")
           if(index == -1) {
             if(exceptionInfo.length() < 100) index = exceptionInfo.length()
             index = 100
           }
-          msg = exceptionInfo.substring(0, index);
+          msg = exceptionInfo.substring(0, index)
         }
-        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus,ExceptionUtil.getStackTraceInfo(e),msg, "","")
+        else{
+          if(msg.length>100)
+            msg = msg.substring(0,100)
+        }
+        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus,exceptionInfo,msg, "","")
     }
   }
 }
