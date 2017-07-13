@@ -5,13 +5,11 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
-import net.sf.json.JSONObject
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.protocol.MatchTaskQueryProto.MatchTask.MatchConfig
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
 import nirvana.protocol.NirvanaTypeDefinition.MatchType
 import org.jboss.netty.buffer.ChannelBuffers
@@ -21,7 +19,7 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
    /** 获取比对任务  */
-  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.textsql, t.flag " +
+  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag " +
   " from NORMALQUERY_QUERYQUE t where rowid in " +
   " (select rid from (select rowid rid from NORMALQUERY_QUERYQUE t1 where t1.status = 0 order by t1.priority desc, t1.ora_sid) tt where rownum <= ?)"
 
@@ -60,7 +58,6 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
      val queryType = rs.getInt("querytype")
      val flag = rs.getInt("flag")
      val isPalm = flag == 2 || flag == 22
-//     val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
      matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
@@ -118,6 +115,25 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        }
      }
      //TODO 高级查询
+     //文本查询
+     /*val qrycondition = rs.getBytes("qrycondition")
+     val textQuery = GafisConverter.convertQrycondition2TextQueryData(qrycondition)
+
+     queryType match {
+       case HallMatcherConstants.QUERY_TYPE_TT |
+            HallMatcherConstants.QUERY_TYPE_LT =>
+         val iter = matchTaskBuilder.getTDataBuilderList.iterator()
+         while(iter.hasNext){
+           iter.next().setTextQuery(textQuery)
+         }
+       case HallMatcherConstants.QUERY_TYPE_LL |
+            HallMatcherConstants.QUERY_TYPE_TL =>
+         val iter = matchTaskBuilder.getLDataBuilderList.iterator()
+         while(iter.hasNext){
+           iter.next().setTextQuery(textQuery)
+         }
+     }*/
+
      //更新status
      updateStatusMatching(oraSid)
 
@@ -145,34 +161,6 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
      }else{
        0
      }
-   }
-
-  /**
-   * 高级查询配置
-   * @param textSql
-   * @return
-   */
-   private def getMatchConfig(textSql:String): MatchConfig ={
-     val builder = MatchConfig.newBuilder
-     if (textSql != null && textSql.length > 0) {
-       try {
-         val json: JSONObject = JSONObject.fromObject(textSql)
-         if (json.has("minutia")) builder.setMinutia(json.getInt("minutia"))
-         if (json.has("distore")) builder.setDistore(json.getInt("distore"))
-         if (json.has("loc_structure")) builder.setLocStructure(json.getInt("loc_structure"))
-         if (json.has("full_match_on")) builder.setFullMatchOn(json.getInt("full_match_on"))
-         if (json.has("mask_enh_feat")) builder.setMaskEnhFeat(json.getInt("mask_enh_feat"))
-         if (json.has("morph_accu_use")) builder.setMorphAccuUse(json.getInt("morph_accu_use"))
-         if (json.has("scale0")) builder.setScale0(json.getDouble("scale0") / 100.0)
-         if (json.has("scale1")) builder.setScale1(json.getDouble("scale1") / 100.0)
-       }
-       catch {
-         case e: Exception => {
-           error(e.getMessage, e)
-         }
-       }
-     }
-     return builder.build
    }
 
   /**

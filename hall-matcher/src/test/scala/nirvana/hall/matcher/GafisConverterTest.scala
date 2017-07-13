@@ -1,9 +1,10 @@
 package nirvana.hall.matcher
 
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_KEYLISTSTRUCT
-import nirvana.hall.matcher.internal.GafisConverter
+import nirvana.hall.matcher.internal.{GafisConverter, TextQueryConstants}
 import org.apache.commons.io.IOUtils
 import org.dom4j.{DocumentHelper, Element}
 import org.jboss.netty.buffer.ChannelBuffers
@@ -64,13 +65,13 @@ class GafisConverterTest {
     itemPkg.fromByteArray(qrycondition)
     itemPkg.items.foreach{item =>
       item.stHead.szItemName match {
-        case GAFIS_KEYLIST_GetName =>
+        case TextQueryConstants.GAFIS_KEYLIST_GetName =>
           val keylist = new GAFIS_KEYLISTSTRUCT().fromByteArray(item.bnRes)
           keylist.stKey.foreach{key =>
             println(key.szKey)
           }
-        case GAFIS_TEXTSQL_GetName=>
-          val xml = new String(item.bnRes, "gbk").trim
+        case TextQueryConstants.GAFIS_TEXTSQL_GetName=>
+          val xml = new String(item.bnRes, AncientConstants.GBK_ENCODING).trim
           println(xml)
           val dom = DocumentHelper.parseText(xml)
           //    val encoding = dom.getXMLEncoding
@@ -85,9 +86,4 @@ class GafisConverterTest {
       }
     }
   }
-  val GAFIS_KEYLIST_GetName = "KeyList"
-  val GAFIS_QRYPARAM_GetName = "QryParam"
-  val GAFIS_QRYFILTER_GetName = "QryFilter"
-  val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
-  val GAFIS_TEXTSQL_GetName = "TextSql"
 }

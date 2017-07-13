@@ -3,10 +3,13 @@ package nirvana.hall.matcher.internal
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.protocol.TextQueryProto.TextData.{ColData, ColType}
 import nirvana.protocol.TextQueryProto.TextQueryData._
-
 import nirvana.hall.matcher.internal.TextQueryConstants._
+import nirvana.protocol.TextQueryProto.TextQueryData
+import org.dom4j.{DocumentHelper, Element}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -316,4 +319,73 @@ object TextQueryUtil extends LoggerSupport{
     }
   }
 
+  def convertQrycondition2TextQueryData(qrycondition: Array[Byte]): TextQueryData ={
+    val textQuery = TextQueryData.newBuilder()
+    val itemPkg = new GBASE_ITEMPKG_OPSTRUCT
+    itemPkg.fromByteArray(qrycondition)
+    itemPkg.items.foreach{item =>
+      item.stHead.szItemName match {
+        case TextQueryConstants.GAFIS_KEYLIST_GetName =>
+        case TextQueryConstants.GAFIS_TEXTSQL_GetName=>
+          val xml = new String(item.bnRes, AncientConstants.GBK_ENCODING).trim
+          val dom = DocumentHelper.parseText(xml)
+          val root = dom.getRootElement
+          val iter = root.elementIterator()
+          while (iter.hasNext) {
+            val element =  iter.next().asInstanceOf[Element]
+            val tid = element.attribute("TID").getValue
+            val textSql = element.getText.trim
+            convertTextSql2TextQueryData(textSql)
+          }
+        case other =>
+      }
+    }
+
+    textQuery.build()
+  }
+
+  /**
+    * 解析textSql
+    * @param textSql
+    * @return
+    */
+  private def convertTextSql2TextQueryData(textSql: String): TextQueryData ={
+    val textQuery = TextQueryData.newBuilder()
+    val sql = textSql.split("\\) AND \\(")
+    sql.foreach{ item =>
+      item.split(" AND ").foreach{f =>
+        if(f.indexOf("TO_DATE") > 0){
+          //TODO 处理日期
+        }else{
+          //删除（）' 等字符，替换%为*
+          val a = f.replace("(","").replace(")", "").replace("'","").replace("%","*").split(" ")
+          val column = a(0)
+          val value = a(2)
+          /* 统一处理所有LIKE，= 为KeywordQuery
+          val restrictions = a(1)
+          if(restrictions.equals("LIKE") || restrictions.equals("=")){
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            textQuery.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+          }*/
+          //先根据字段来处理
+          column match {
+            case //COLUMN_CARDID |
+              TextQueryConstants.COL_NAME6_NAME |
+              TextQueryConstants.COL_NAME6_CREATEUSERNAME |
+              TextQueryConstants.COL_NAME6_ADDRESSTAIL |
+              TextQueryConstants.COL_NAME6_CASECLASS1CODE |
+              TextQueryConstants.COL_NAME6_SEXCODE |
+              TextQueryConstants.COL_NAME6_RACECODE =>
+              val keywordQuery = KeywordQuery.newBuilder()
+              keywordQuery.setValue(value)
+              textQuery.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+          }
+
+        }
+      }
+    }
+
+    textQuery.build()
+  }
 }

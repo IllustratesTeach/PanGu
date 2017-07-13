@@ -144,4 +144,23 @@ object TextQueryConstants {
   val COL_NAME_MODIFIEDTIME = "modifiedtime"
   val COL_NAME_GATHERFINGERTIME = "gatherFingerTime"
   val COL_NAME_EXTRACTDATE = "extractDate"
+
+  //gafis6.2字段
+  val GAFIS_KEYLIST_GetName = "KeyList"
+  val GAFIS_QRYPARAM_GetName = "QryParam"
+  val GAFIS_QRYFILTER_GetName = "QryFilter"
+  val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
+  val GAFIS_TEXTSQL_GetName = "TextSql"
+
+  val COL_NAME6_CARDID = "CardID"
+  val COL_NAME6_NAME = "Name"
+  val COL_NAME6_CREATEUSERNAME = "CreateUserName"
+  val COL_NAME6_BIRTHDATE = "BirthDate"
+  val COL_NAME6_ADDRESSTAIL = "AddressTail"
+  val COL_NAME6_CASECLASS1CODE = "CaseClass1Code"
+  val COL_NAME6_PRINTERUNITNAMETAIL = "PrinterUnitNameTail"
+  val COL_NAME6_SEXCODE = "SexCode"
+  val COL_NAME6_RACECODE = "RaceCode"
+  val COL_NAME6_FINGERID = "FingerID"
+  val COL_NAME6_CASEID = "CaseID"
 }
