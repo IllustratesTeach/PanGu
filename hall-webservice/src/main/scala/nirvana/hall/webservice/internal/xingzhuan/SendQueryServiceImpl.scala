@@ -1,6 +1,7 @@
 package nirvana.hall.webservice.internal.xingzhuan
 
 import java.sql.Timestamp
+import java.util.UUID
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
@@ -23,6 +24,7 @@ import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.FPTImageConverter
+import nirvana.hall.v70.internal.CommonUtils
 import nirvana.hall.webservice.config.HallWebserviceConfig
 
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +44,7 @@ class SendQueryServiceImpl(queryService: QueryService
                            ,hallWebserviceConfig: HallWebserviceConfig
                            , fPTService: FPTService) extends SendQueryService with LoggerSupport{
   override def sendQuery(fPTFile: FPT4File,id:String,custom1:String,executetimes:Int): Unit = {
-    val queryId = fPTFile.sid
+    val custom2 = ""
     val ts = new Timestamp(System.currentTimeMillis());
     val isAutoQuery = hallWebserviceConfig.XingZhuanSetting.isAutoQuery
     var isAdd = "0"
@@ -70,13 +72,17 @@ class SendQueryServiceImpl(queryService: QueryService
                   fingerId = sLogic03Rec.caseId + finger.fingerNo
                   }
                   else fingerId = finger.fingerId
-                  assistCheckRecordService.saveXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.Status, "", queryId, sLogic03Rec.caseId, "", ts)
+                  val uuid = CommonUtils.getUUID()
+                  assistCheckRecordService.saveXcQuery(uuid,id,fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.Status, "", custom2, "", "", ts)
                   try {
-                    oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
-                    assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, "", ts)
+                    oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, custom2,MatchType.FINGER_LT)
+                    val orauuid = assistCheckRecordService.getOraUuid(oraSid)
+                    assistCheckRecordService.updateXcQuery(uuid,orauuid, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, custom2, "", ts)
                   } catch {
-                    case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-                      assistCheckRecordService.updateXcQuery(id, fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.ErrStatus, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
+                    case e: Exception =>
+                      var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+                      var msg = getMsg(e)
+                      assistCheckRecordService.updateXcQuery(uuid,"", fingerId, HallWebserviceConstants.TaskXC, HallWebserviceConstants.ErrStatus, oraSid.toString, msg, exceptionInfo, ts)
                       throw new Exception(ExceptionUtil.getStackTraceInfo(e))
                   }
                 }
@@ -94,13 +100,17 @@ class SendQueryServiceImpl(queryService: QueryService
           //判断是否发送查询
           if (isAutoQuery.equals("1")){
           var oraSid = 0L
-          assistCheckRecordService.saveXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.Status, "", queryId, sLogic02Rec.personId, "", ts)
+          val uuid = CommonUtils.getUUID()
+          assistCheckRecordService.saveXcQuery(uuid,id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.Status, "", custom2,"", "", ts)
           try {
-            oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
-            assistCheckRecordService.updateXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, "", ts)
+            oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId,custom2, MatchType.FINGER_TT)
+            val orauuid = assistCheckRecordService.getOraUuid(oraSid)
+            assistCheckRecordService.updateXcQuery(uuid, orauuid,sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, custom2, "", ts)
           } catch {
-            case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-              assistCheckRecordService.updateXcQuery(id, sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, queryId, ExceptionUtil.getStackTraceInfo(e), ts)
+            case e: Exception =>
+              var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+              var msg = getMsg(e)
+              assistCheckRecordService.updateXcQuery(uuid,"", sLogic02Rec.personId, HallWebserviceConstants.TaskZT, HallWebserviceConstants.SucStatus_SendQuery, oraSid.toString, msg, exceptionInfo, ts)
               throw new Exception(ExceptionUtil.getStackTraceInfo(e))
           }
         }
@@ -118,19 +128,7 @@ class SendQueryServiceImpl(queryService: QueryService
     }catch{
       case e:Exception=>
         var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
-        var msg = e.getMessage()
-        if(msg == null) {
-          var index = exceptionInfo.indexOf("\r\n")
-          if(index == -1) {
-            if(exceptionInfo.length() < 100) index = exceptionInfo.length()
-            index = 100
-          }
-          msg = exceptionInfo.substring(0, index)
-        }
-        else{
-          if(msg.length>100)
-            msg = msg.substring(0,100)
-        }
+        var msg = getMsg(e)
         if (fPTFile.logic03Recs.length <= 0){
           assistCheckRecordService.updateXcTask(id,HallWebserviceConstants.ErrStatus,exceptionInfo,msg,fPTFile.logic02Recs(0).personId.toString,isAdd)
         }else{
@@ -292,5 +290,23 @@ class SendQueryServiceImpl(queryService: QueryService
     }
   }
     lpCardList
+  }
+
+  def getMsg(e:Exception ):String = {
+    var exceptionInfo = ExceptionUtil.getStackTraceInfo(e)
+    var msg = e.getMessage()
+    if(msg == null) {
+      var index = exceptionInfo.indexOf("\r\n")
+      if(index == -1) {
+        if(exceptionInfo.length() < 100) index = exceptionInfo.length()
+        index = 100
+      }
+      msg = exceptionInfo.substring(0, index)
+    }
+    else{
+      if(msg.length>100)
+        msg = msg.substring(0,100)
+    }
+    msg
   }
 }
