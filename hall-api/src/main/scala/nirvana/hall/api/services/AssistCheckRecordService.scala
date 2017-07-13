@@ -33,7 +33,9 @@ trait AssistCheckRecordService {
 
   def updateXcQuery(id:String, fingerid:String, typ:Int, status:Int, oraSid:String, queryId:String, errorinfo:String,date:Timestamp): Unit
 
-  def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,custom2:String): Unit
+  def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,serviceid:String,custom2:String): Unit
+
+  def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,serviceid:String,custom2:String,custom4:String): Unit
 
   def updateXcTask(id:String,executetimes:Int): Unit
 

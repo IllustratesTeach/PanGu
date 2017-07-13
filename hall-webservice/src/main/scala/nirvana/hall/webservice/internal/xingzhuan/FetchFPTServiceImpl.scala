@@ -60,8 +60,18 @@ class FetchFPTServiceImpl(queryService: QueryService,
       val fptFile = FPTFile.parseFromInputStream(is, AncientConstants.GBK_ENCODING).right.get
       sendQueryService.sendQuery(fptFile, id, custom1,executetimes)
     } catch {
-      case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
-        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus, ExceptionUtil.getStackTraceInfo(e), "","")
+      case e: Exception =>
+        var exceptionInfo = ExceptionUtil.getStackTraceInfo(e);
+        var msg = e.getMessage();
+        if(msg == null) {
+          var index = exceptionInfo.indexOf("\r\n");
+          if(index == -1) {
+            if(exceptionInfo.length() < 100) index = exceptionInfo.length()
+            index = 100
+          }
+          msg = exceptionInfo.substring(0, index);
+        }
+        assistCheckRecordService.updateXcTask(id, HallWebserviceConstants.FILEStatus,ExceptionUtil.getStackTraceInfo(e),msg, "","")
     }
   }
 }
