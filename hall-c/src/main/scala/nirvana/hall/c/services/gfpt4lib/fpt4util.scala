@@ -327,7 +327,7 @@ object fpt4util {
       stmnt.x = pszFPTMnt.substring(0, 3).replace(" ","").toShort
       stmnt.y = pszFPTMnt.substring(3, 6).replace(" ","").toShort
       val zString = pszFPTMnt.substring(6, 9)
-      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.replace(" ","").toInt)
+      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.trim.replace(" ","").toInt)
       stmnt.nReliability = 1
     }
   }
