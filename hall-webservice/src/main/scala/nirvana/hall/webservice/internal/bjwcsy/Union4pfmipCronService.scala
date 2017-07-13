@@ -57,7 +57,7 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
                   if(fpt4.logic02Recs.length>0){
                     fpt4.logic02Recs.foreach{ logic02Rec =>
                       fptService.addLogic02Res(logic02Rec)//保存数据
-                      val queryId = queryService.sendQueryByCardIdAndMatchType(logic02Rec.cardId, MatchType.FINGER_TT) //发送TT查询
+                      val queryId = queryService.sendQueryByCardIdAndMatchType(logic02Rec.cardId, null, MatchType.FINGER_TT) //发送TT查询
                       updateMatchResultStatus(queryId, 0) //更新状态
                       info("addLogic02Res:{} and sendQuery TT", logic02Rec.cardId)
 
@@ -67,7 +67,7 @@ class Union4pfmipCronService(hallWebserviceConfig: HallWebserviceConfig,
                     fpt4.logic03Recs.foreach{ logic03Res =>
                       fptService.addLogic03Res(_)
                       logic03Res.fingers.foreach{ finger=>
-                        val queryId = queryService.sendQueryByCardIdAndMatchType(finger.fingerId, MatchType.FINGER_LT)//发送LT查询
+                        val queryId = queryService.sendQueryByCardIdAndMatchType(finger.fingerId, null,MatchType.FINGER_LT)//发送LT查询
                         updateMatchResultStatus(queryId, 0)//更新状态
                         info("addLogic03Res:fingerId:{} and sendQuery LT", finger.fingerId)
                       }

@@ -30,7 +30,7 @@ class SendQueryServiceImpl(queryService: QueryService
           sLogic03Rec.fingers.foreach{ finger =>
             fingerId = finger.fingerId
             try {
-              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
+              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId,"", MatchType.FINGER_LT)
               assistCheckRecordService.updateAssistcheckLT(queryId, oraSid.toString, fingerId,id,HallWebserviceConstants.ErrStatus,"")
             } catch {
               case e: Exception => error(ExceptionUtil.getStackTraceInfo(e))
@@ -46,7 +46,7 @@ class SendQueryServiceImpl(queryService: QueryService
         }
         var oraSid = 0L
         try {
-          oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
+          oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId,"", MatchType.FINGER_TT)
           assistCheckRecordService.updateAssistcheckTT(queryId, oraSid.toString, sLogic02Rec.personId,id,HallWebserviceConstants.ErrStatus,"")
         }catch{
           case e:Exception=> error(ExceptionUtil.getStackTraceInfo(e))

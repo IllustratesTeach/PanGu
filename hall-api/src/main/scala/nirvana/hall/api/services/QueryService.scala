@@ -64,7 +64,7 @@ trait QueryService {
     * @param matchType
     * @return
     */
-  def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long
+  def sendQueryByCardIdAndMatchType(cardId: String, queryid: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long
 
   /**
     * 获取查询信息GAQUERYSTRUCT
@@ -84,5 +84,7 @@ trait QueryService {
     * @return
     */
   def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long
+
+  def getQueryid():String
 
 }

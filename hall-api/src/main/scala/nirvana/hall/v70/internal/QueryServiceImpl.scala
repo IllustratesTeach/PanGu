@@ -169,7 +169,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     * @param queryDBConfig
     * @return
     */
-  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long = {
+  override def sendQueryByCardIdAndMatchType(cardId: String, queryid:String,matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long = {
     val matchTask = MatchTask.newBuilder
     matchType match {
       case MatchType.FINGER_TT |
@@ -186,6 +186,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     matchTask.setObjectId(0)
     matchTask.setPriority(2)
     matchTask.setScoreThreshold(60)
+    matchTask.setQueryid(queryid)
 
     sendQuery(matchTask.build(), queryDBConfig)
   }
@@ -285,6 +286,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
+ *
     * @param oraSid
     * @param taskType
     * @param keyId
@@ -292,4 +294,6 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     * @return
     */
   override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
+
+  override def getQueryid(): String = ???
 }
