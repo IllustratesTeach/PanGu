@@ -59,11 +59,11 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
                                 s"FROM NORMALQUERY_QUERYQUE  t " +
                                 s"WHERE  NOT EXISTS (SELECT 1 " +
                                                     s"FROM HALL_READ_RECORD p " +
-                                                    s"WHERE p.orasid=t.ora_sid) AND t.rmtflag=0 ORDER BY t.ora_createtime ASC"
+                                                    s"WHERE p.orasid=t.ora_sid) AND t.rmtflag=0 "
     if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
       sql ++= s"  AND t.ora_createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
     }
-    sql ++= s" ) WHERE  ROWNUM <=?"
+    sql ++= s" ORDER BY t.ora_createtime ASC ) WHERE  ROWNUM <=?"
     JdbcDatabase.queryWithPsSetter(sql.toString) {ps =>
       ps.setLong(1, size)
     } { rs =>
