@@ -168,7 +168,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
     * @param matchType
     * @return
     */
-  override def sendQueryByCardIdAndMatchType(cardId: String, queryid:String,matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long={
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long={
     val matchTask = MatchTask.newBuilder
     matchType match {
       case MatchType.FINGER_TT |
@@ -185,9 +185,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
     matchTask.setObjectId(0)
     matchTask.setPriority(2)
     matchTask.setScoreThreshold(60)
-    if(queryid != null ||(!queryid.equals(""))) {
-      matchTask.setQueryid("")
-    }
+
     sendQuery(matchTask.build())
   }
 
@@ -234,7 +232,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
- *
     * @param oraSid
     * @param taskType
     * @param keyId
@@ -282,16 +279,5 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
       ps.setInt(4,taskType)
       ps.setString(5,keyId)
     }
-  }
-
-  override def getQueryid(): String = {
-    var queryId = ""
-    val sql = "select 0-seq_xc_query_queryid.nextval as queryid from dual where '1' = ?"
-    JdbcDatabase.queryFirst(sql) { ps =>
-      ps.setString(1, "1")
-    } { rs =>
-      queryId = rs.getString("queryid")
-    }
-    queryId
   }
 }

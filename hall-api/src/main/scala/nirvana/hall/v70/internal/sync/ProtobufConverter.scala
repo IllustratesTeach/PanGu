@@ -667,6 +667,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisQuery.maxcandnum = matchTask.getTopN
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
     gafisQuery.status = QueryConstants.STATUS_WAIT
+    gafisQuery.username = matchTask.getCommitUser
 
     matchTask.getMatchType match {
       case MatchType.FINGER_LL |

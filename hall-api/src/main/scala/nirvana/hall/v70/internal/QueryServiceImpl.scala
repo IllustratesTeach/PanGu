@@ -19,6 +19,7 @@ import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.services.sys.UserService
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
@@ -27,7 +28,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/1/26.
  */
-class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
+class QueryServiceImpl(entityManager: EntityManager,userService:UserService) extends QueryService{
   /**
    * 发送查询任务
     *
@@ -40,11 +41,15 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gafisQuery.oraSid = query.getResultList.get(0).toString.toLong
     gafisQuery.pkId = CommonUtils.getUUID()
     gafisQuery.submittsystem = QueryConstants.SUBMIT_SYS_AFIS
-    //用户信息，单位信息
-    val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
-    gafisQuery.userid = Gafis70Constants.INPUTPSN
-    gafisQuery.username = sysUser.trueName
-    gafisQuery.userunitcode = sysUser.departCode
+    
+    //用户名获取用户ID
+    var sysUser = userService.findSysUserByLoginName(gafisQuery.username)
+    if (sysUser.isEmpty){
+      sysUser = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisQuery.userid = sysUser.get.pkId
+    gafisQuery.username = sysUser.get.trueName
+    gafisQuery.userunitcode = sysUser.get.departCode
 
     if(matchTask.getOraCreatetime.nonEmpty){
       gafisQuery.createtime = DateConverter.convertString2Date(matchTask.getOraCreatetime, "yyyy-MM-dd HH:mm:ss")
@@ -169,7 +174,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     * @param queryDBConfig
     * @return
     */
-  override def sendQueryByCardIdAndMatchType(cardId: String, queryid:String,matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long = {
+  override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig = new QueryDBConfig(None, None, None)): Long = {
     val matchTask = MatchTask.newBuilder
     matchType match {
       case MatchType.FINGER_TT |
@@ -186,7 +191,6 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     matchTask.setObjectId(0)
     matchTask.setPriority(2)
     matchTask.setScoreThreshold(60)
-    matchTask.setQueryid(queryid)
 
     sendQuery(matchTask.build(), queryDBConfig)
   }
@@ -286,7 +290,6 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
- *
     * @param oraSid
     * @param taskType
     * @param keyId
@@ -294,6 +297,4 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     * @return
     */
   override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
-
-  override def getQueryid(): String = ???
 }
