@@ -245,14 +245,14 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                 typ_add= HallApiConstants.UPDATE
               }
               if(caseInfoService.isExist(caseId,destDBID)){
-                fetchCaseInfo(fetchConfig,caseId, true, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
             } else {
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
-                fetchCaseInfo(fetchConfig,caseId, false, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, false,Option(fetchConfig.dbid), destDBID)
               }else{
-                fetchCaseInfo(fetchConfig,caseId, true, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
               lPCardService.addLPCard(lpCard, destDBID)
               info("add LPCard:{}", cardId)
@@ -306,30 +306,14 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     *
     * @param caseId
     */
-  def fetchCaseInfo(fetchConfig: HallFetchConfig,caseId: String,isExist:Boolean, destDbId: Option[String] = None): Unit ={
+  def fetchCaseInfo(caseId: String, url: String,isExist:Boolean,dbId: Option[String] = None, destDbId: Option[String] = None): Unit ={
     info("syncCaseInfo caseId:{}", caseId)
-    if(caseInfoRemoteService.isExist(caseId, fetchConfig.url, Option(fetchConfig.dbid).get)){
-      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, fetchConfig.url, Option(fetchConfig.dbid).get)
+    if(caseInfoRemoteService.isExist(caseId, url, dbId.get)){
+      val caseInfoOpt = caseInfoRemoteService.getCaseInfo(caseId, url, dbId.get)
       if(isExist){
-        caseInfoOpt.foreach{
-          t =>
-            var caseInfo = t
-            val strategy = new JSONObject(fetchConfig.writeStrategy)
-            if(strategy.has("setdatasource")){
-              caseInfo = caseInfo.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
-            }
-            caseInfoService.updateCaseInfo(caseInfo, destDbId)
-        }
+        caseInfoOpt.foreach(caseInfoService.updateCaseInfo(_, destDbId))
       }else{
-        caseInfoOpt.foreach{
-          t =>
-            var caseInfo = t
-            val strategy = new JSONObject(fetchConfig.writeStrategy)
-            if(strategy.has("setdatasource")){
-              caseInfo = caseInfo.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
-            }
-          caseInfoService.addCaseInfo(caseInfo, destDbId)
-        }
+        caseInfoOpt.foreach(caseInfoService.addCaseInfo(_, destDbId))
       }
     }else{
       //如果远程没有案件信息，系统自动新建一个案件，保证在7.0系统能够查询到数据
@@ -388,14 +372,14 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                 typ_add="-UPDATE"
               }
               if(caseInfoService.isExist(caseId, destDBID)){
-                fetchCaseInfo(fetchConfig,caseId,  true, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
             } else {
               //如果没有案件信息获取案件
               if(!caseInfoService.isExist(caseId, destDBID)){
-                fetchCaseInfo(fetchConfig,caseId,  false, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, false,Option(fetchConfig.dbid), destDBID)
               }else{
-                fetchCaseInfo(fetchConfig,caseId,  true, destDBID)
+                fetchCaseInfo(caseId, fetchConfig.url, true,Option(fetchConfig.dbid), destDBID)
               }
               lPPalmService.addLPCard(lpCard, destDBID)
               info("add LPPalm:{}", cardId)
@@ -670,7 +654,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                     val caseId = lpCard.getText.getStrCaseId
                     if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                       //获取案件
-                      fetchCaseInfo(fetchConfig,caseId, false)
+                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                     }
                     candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                   }
@@ -683,7 +667,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                   val caseId = lpCard.getText.getStrCaseId
                   if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                     //获取案件
-                    fetchCaseInfo(fetchConfig,caseId, false)
+                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                   }
                   candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                 }
