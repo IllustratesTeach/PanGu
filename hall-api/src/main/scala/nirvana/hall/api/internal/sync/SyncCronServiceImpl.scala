@@ -571,7 +571,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val matchResult = response.getMatchResult
           if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
             val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig,candDBDIMap)
             fetchQueryService.updateStatusWithGafis_Task62Record(matchStatus.getNumber.toString,uniqueId)
             info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
           }
@@ -582,10 +582,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        fetchQueryService.updateStatusWithGafis_Task62Record("-9",uniqueId)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        fetchQueryService.updateStatusWithGafis_Task62Record("-9",uniqueId)
     }
   }
 
@@ -607,7 +609,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val cardId = cand.getObjectId
       val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-        val dbId = getTPDBIDByCardId(cardId, dbidList,isPalm)
+        val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         } else {
@@ -640,7 +642,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           }
         }
       }else{//候选是现场
-            val dbId = getLPDBIDByCardId(cardId, dbidList)
+            val dbId = getLPDBIDByCardId(cardId, dbidList,isPalm)
             if(dbId.nonEmpty){
               candDBIDMap.+=(cardId -> dbId.get.toShort)
             }else {
@@ -681,23 +683,15 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-    * 根据捺印卡号查找所在DBID
-    *
-    * @param cardId
-    * @param dbidList
-    * @return
-    */
-  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm:Boolean): Option[String]={
+   * 根据捺印卡号查找所在DBID
+   * @param cardId
+   * @param dbidList
+   * @return
+   */
+  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
     dbidList.foreach{dbid =>
-      if(!isPalm) {
-        if (lPCardService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
-      }
-      else{
-        if (lPPalmService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
+      if(tpCardService.isExist(cardId, Option(dbid))){
+        return Option(dbid)
       }
     }
     None
@@ -710,10 +704,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param dbidList
     * @return
     */
-  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm:Boolean): Option[String]={
     dbidList.foreach{dbid =>
-      if (lPCardService.isExist(cardId, Option(dbid))) {
-        return Option(dbid)
+      if(!isPalm) {
+        if (lPCardService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
+      }
+      else{
+        if (lPPalmService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
       }
     }
     None
