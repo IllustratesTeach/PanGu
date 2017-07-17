@@ -582,12 +582,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
-        fetchQueryService.updateStatusWithGafis_Task62Record("-9",uniqueId)
+        fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
-        fetchQueryService.updateStatusWithGafis_Task62Record("-9",uniqueId)
+        fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
     }
   }
 
