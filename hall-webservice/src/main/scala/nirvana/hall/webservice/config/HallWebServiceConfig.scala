@@ -32,8 +32,6 @@ class HallWebserviceConfig
   var localHitResultPath:String = _
   @XmlElement(name = "xc_hit_result_path")
   var xcHitResultPath:String = _
-  @XmlElement(name = "hall_image_url")
-  var hall_image_url: String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")

@@ -40,13 +40,13 @@ class BaseTestCase {
   def setup: Unit ={
     val modules = Seq[String](
       //v62
-//      "nirvana.hall.v62.LocalV62ServiceModule",
-//      "nirvana.hall.v62.LocalV62DataSourceModule",
-//      "nirvana.hall.webservice.TestV62Module",
+      "nirvana.hall.v62.LocalV62ServiceModule",
+      "nirvana.hall.v62.LocalV62DataSourceModule",
+      "nirvana.hall.webservice.TestV62Module",
       //v70
-      "nirvana.hall.webservice.TestV70Module",
-      "nirvana.hall.v70.LocalV70ServiceModule",
-      "nirvana.hall.v70.LocalDataSourceModule",
+//      "nirvana.hall.webservice.TestV70Module",
+//      "nirvana.hall.v70.LocalV70ServiceModule",
+//      "nirvana.hall.v70.LocalDataSourceModule",
 
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
