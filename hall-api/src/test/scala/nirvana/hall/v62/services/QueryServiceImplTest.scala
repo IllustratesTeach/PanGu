@@ -64,7 +64,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def sendQueryByCardIdAndMatchType: Unit ={
     val service = getService[QueryService]
-    val oraSid = service.sendQueryByCardIdAndMatchType("1234567890","", MatchType.FINGER_TT)
+    val oraSid = service.sendQueryByCardIdAndMatchType("1234567890", MatchType.FINGER_TT)
     Assert.assertTrue(oraSid > 0)
   }
 
