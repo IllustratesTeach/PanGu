@@ -3,6 +3,7 @@ package nirvana.hall.api.internal.fpt
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
 import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.protocol.api.FPTProto._
@@ -97,10 +98,16 @@ object FPTFileBuilder {
           fingerTData.extractMethod = fpt4code.EXTRACT_METHOD_A
 
           val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-          fingerTData.imgData = gafisImage.bnData
+          //如果是GFS压缩，保留头信息并transformForFPT
+          if(gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS){
+            gafisImage.transformForFPT()
+            fingerTData.imgData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
+          }else{
+            fingerTData.imgData = gafisImage.bnData
+          }
           fingerTData.imgDataLength = fingerTData.imgData.length.toString
-          fingerTData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
           fingerTData.dataLength = fingerTData.toByteArray(AncientConstants.GBK_ENCODING).length.toString
+          fingerTData.imgCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
 
           fingers += fingerTData
         //人像
