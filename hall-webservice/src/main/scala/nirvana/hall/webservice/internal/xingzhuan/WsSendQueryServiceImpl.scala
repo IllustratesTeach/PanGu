@@ -31,7 +31,7 @@ class WsSendQueryServiceImpl(queryService: QueryService
           sLogic03Rec.fingers.foreach{ finger =>
             fingerId = finger.fingerId
             try{
-              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, null,MatchType.FINGER_LT)
+              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId,MatchType.FINGER_LT)
             }catch{
               case e:Exception => throwException(e)
             }
@@ -44,7 +44,7 @@ class WsSendQueryServiceImpl(queryService: QueryService
           fPTService.addLogic02Res(sLogic02Rec)
         }
         try {
-          oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId,null, MatchType.FINGER_TT)
+          oraSid = queryService.sendQueryByCardIdAndMatchType(sLogic02Rec.personId, MatchType.FINGER_TT)
         }catch{
           case e:Exception => throwException(e)
         }
