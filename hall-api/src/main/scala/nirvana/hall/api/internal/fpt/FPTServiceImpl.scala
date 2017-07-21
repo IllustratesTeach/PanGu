@@ -92,7 +92,8 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
           //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
 
           val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE){
+          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+          ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
             blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
           }else{
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
