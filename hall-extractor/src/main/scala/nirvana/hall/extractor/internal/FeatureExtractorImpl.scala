@@ -3,7 +3,7 @@ package nirvana.hall.extractor.internal
 import java.awt.Image
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{FileInputStream, File, ByteArrayInputStream, InputStream}
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
@@ -11,7 +11,7 @@ import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def._
 import nirvana.hall.extractor.HallExtractorConstants
-import nirvana.hall.extractor.jni.NativeExtractor
+import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
@@ -35,7 +35,8 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
   /**
    * old feature converter to new feature
-   * @param oldMnt
+    *
+    * @param oldMnt
    * @return
    */
   override def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]] = {
@@ -149,5 +150,22 @@ class FeatureExtractorImpl extends FeatureExtractor{
 
 
     gafisImg
+  }
+}
+object FeatureExtractorImpl {
+  def main(args:Array[String]): Unit ={
+    val file = new File("support")
+    if (file.exists())
+      JniLoader.loadJniLibrary("support", "stderr")
+    else
+      JniLoader.loadJniLibrary("../support", "stderr")
+    val imgData = new FileInputStream(new File(args(0)))
+
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new FINGERMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+    System.out.println(feature.cm)
   }
 }
