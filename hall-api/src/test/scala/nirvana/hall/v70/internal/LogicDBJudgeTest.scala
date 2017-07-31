@@ -14,11 +14,11 @@ class LogicDBJudgeTest extends BaseV70TestCase {
     val logicDBJudge = new LogicDBJudgeServiceImpl
     //val logicDb: GafisLogicDb = logicDBJudge.logicTJudge(tpCard)
 
-/*    val logicDbFingerprint = new GafisLogicDbFingerprint()
+    val logicDbFingerprint = new GafisLogicDbFingerprint()
     val tpcard = TPCard.newBuilder()
     tpcard.setStrCardID("JLRY370233333333333333")
-    var destDBT = logicDBJudge.logicTJudge("JLRY370233333333333333")
-    var destDBL = logicDBJudge.logicLJudge("370133333333333333")*/
+    var destDBT = logicDBJudge.logicJudge("JLRY370233333333333333",null,"0")
+    var destDBL = logicDBJudge.logicJudge("370133333333333333",null,"1")
    // subcase2("370133333333333333")
   }
 
