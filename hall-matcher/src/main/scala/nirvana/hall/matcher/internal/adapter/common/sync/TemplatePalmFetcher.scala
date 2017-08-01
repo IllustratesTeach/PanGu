@@ -14,12 +14,14 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
  * Created by songpeng on 16/4/26.
  */
 class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+  //是否对纹线分库
+  val hasRidge = hallMatcherConfig.mnt.hasRidge
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_gather_palm t "
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_gather_palm t where t.group_id=0 and t.seq >"
   override val SYNC_SQL: String = "select p.sid, t.fgp, t.group_id, t.gather_data, t.seq, p.deletag " +
     " from gafis_gather_palm t " +
     " left join gafis_person p on t.person_id=p.personid " +
-    " where t.group_id in(0,4) and t.fgp in (11,12) and t.seq >= ? and t.seq <= ? order by t.seq"
+    " where "+(if(hasRidge) " t.group_id in(0,4) " else " t.group_id =0 ")+" and t.fgp in (11,12) and t.seq >= ? and t.seq <= ? order by t.seq"
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
     if(syncDataResponse.getSyncDataCount < size){
