@@ -23,9 +23,7 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
     val logicDbRules = GafisLogicDbRule.select(GafisLogicDbRule.logicRule).where(GafisLogicDbRule.logicRule.notNull and GafisLogicDbRule.logicCategory === cType)
     //先获取规则为空的库，赋初值,默认库的禁起用标识必须是1，否则会出错
     val logicDbRule = GafisLogicDbRule.where(GafisLogicDbRule.logicRule.isNull and GafisLogicDbRule.logicCategory === cType).headOption
-    if (logicDbRule != None) {
-      logicDbPkid = logicDbRule.get.pkId
-    }
+    logicDbPkid = logicDbRule.map(x => x.pkId).get
     var head = "tmp"
     var exclusive = "tmp"
     val list = logicDbRules.toList
@@ -56,11 +54,12 @@ class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
     } else {
       logicDb = GafisLogicDb.where(GafisLogicDb.logicName === remoteIP.get and GafisLogicDb.logicCategory === "1" and GafisLogicDb.logicDeltag === "1").headOption
     }
-    if (logicDb != None) {
-      logicDbPkid = logicDb.get.pkId
-    } else {
-      return None
-    }
+//    if (logicDb != None) {
+//      logicDbPkid = logicDb.get.pkId
+//    } else {
+//      return None
+//    }
+    logicDbPkid = logicDb.map(x => x.pkId).get
     Option(logicDbPkid)
   }
 }

@@ -136,7 +136,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
 
             //逻辑分库处理
-            destDBID = logicDBJudgeService.logicTJudge(cardId,Option(fetchConfig.destDbid))
+            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {
@@ -236,7 +236,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
             //逻辑分库处理
             //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
-            destDBID = logicDBJudgeService.logicLJudge(caseId,Option(fetchConfig.destDbid))
+            //逻辑分库处理
+            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_LPCARD)
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新

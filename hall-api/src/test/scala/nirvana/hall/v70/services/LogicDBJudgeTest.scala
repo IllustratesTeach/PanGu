@@ -1,6 +1,8 @@
-package nirvana.hall.v70.internal
+package nirvana.hall.v70.services
 
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.v70.internal.{BaseV70TestCase, LogicDBJudgeServiceImpl}
 import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbFingerprint, GafisLogicDbRule}
 import org.junit.Test
 
@@ -14,12 +16,13 @@ class LogicDBJudgeTest extends BaseV70TestCase {
     val logicDBJudge = new LogicDBJudgeServiceImpl
     //val logicDb: GafisLogicDb = logicDBJudge.logicTJudge(tpCard)
 
-    val logicDbFingerprint = new GafisLogicDbFingerprint()
-    val tpcard = TPCard.newBuilder()
-    tpcard.setStrCardID("JLRY370233333333333333")
-    var destDBT = logicDBJudge.logicJudge("JLRY370233333333333333",null,"0")
-    var destDBL = logicDBJudge.logicJudge("370133333333333333",null,"1")
+//    val logicDbFingerprint = new GafisLogicDbFingerprint()
+//    val tpcard = TPCard.newBuilder()
+
+    var destDBT = logicDBJudge.logicJudge("JLRY370233333333333333",null,HallApiConstants.SYNC_TYPE_TPCARD)
+    var destDBL = logicDBJudge.logicJudge("370133333333333333",null,HallApiConstants.SYNC_TYPE_LPCARD)
    // subcase2("370133333333333333")
+    println(destDBL + "\t" + destDBT)
   }
 
   def subcase1(tpCard:String):Unit = {
