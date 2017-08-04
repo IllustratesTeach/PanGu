@@ -20,6 +20,8 @@ trait FPTService {
 
   def addLogic02Res(logic02Rec: Logic02Rec)
 
+  def updateLogic02Res(logic02Rec: Logic02Rec)
+
   def addLogic03Res(logic03Rec: Logic03Rec)
 
 }

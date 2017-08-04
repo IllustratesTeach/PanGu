@@ -78,37 +78,12 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   @Transactional
   override def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
-    val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
-    //图像转换和特征提取
-    val iter = tpCardBuilder.getBlobBuilderList.iterator()
-    while(iter.hasNext){
-      val blob = iter.next()
-      if(blob.getType == ImageType.IMAGETYPE_FINGER){
-        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-        if(gafisImage.stHead.bIsCompressed > 0){
-          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-          val mntData = extractByGAFISIMG(originalImage, false)
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+    tPCardService.addTPCard(getTpCardBuilder(logic02Rec).build)
+  }
 
-          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE){
-            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
-          }else{
-            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
-            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-          }
-        }else{
-          val mntData = extractByGAFISIMG(gafisImage, false)
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-        }
-      }
-    }
-
-    tPCardService.addTPCard(tpCardBuilder.build())
+  @Transactional
+  override def updateLogic02Res(logic02Rec: Logic02Rec): Unit = {
+    tPCardService.updateTPCard(getTpCardBuilder(logic02Rec).build)
   }
 
   @Transactional
@@ -234,5 +209,45 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     logic06Rec.matchDate = gafisMatchInfo.registerTime
     logic06Rec.head.fileLength = logic06Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     logic06Rec
+  }
+
+  /**
+    *
+    * @param logic02Rec
+    * @return
+    */
+  private def  getTpCardBuilder(logic02Rec: Logic02Rec) = {
+    val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
+    //图像转换和特征提取
+    val iter = tpCardBuilder.getBlobBuilderList.iterator()
+    while(iter.hasNext){
+      val blob = iter.next()
+      if(blob.getType == ImageType.IMAGETYPE_FINGER){
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+        if(gafisImage.stHead.bIsCompressed > 0){
+          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+          val mntData = extractByGAFISIMG(originalImage, false)
+
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+
+          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+          }else{
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+          }
+        }else{
+          val mntData = extractByGAFISIMG(gafisImage, false)
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+        }
+      }
+    }
+    tpCardBuilder
   }
 }
