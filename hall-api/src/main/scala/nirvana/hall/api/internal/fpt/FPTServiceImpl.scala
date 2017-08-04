@@ -92,8 +92,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
           //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
 
           val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
-          ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE){
             blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
           }else{
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
@@ -149,9 +148,17 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
     val logic04Rec = new Logic04Rec
     logic04Rec.systemType = "1900"
-    logic04Rec.caseId = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2).length==22){
+      logic04Rec.caseId = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    }else{
+      logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    }
     logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
-    logic04Rec.personId = "R"+gafisMatchInfo.tcode
+    if(gafisMatchInfo.tcode.length()==22){
+      logic04Rec.personId = "R"+gafisMatchInfo.tcode
+    }else{
+      logic04Rec.personId = gafisMatchInfo.tcode
+    }
     logic04Rec.fgp = gafisMatchInfo.fgp
     logic04Rec.capture = "0" //7.0web项目直接写的是0,有待确认
     //比中类型(捺印查重(TT):0;  捺印倒查(TL):1;  现场查案(LT):2;  现场串查(LL):3)
@@ -186,8 +193,16 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
     val logic05Rec = new Logic05Rec
     logic05Rec.systemType = "1900"
-    logic05Rec.personId1 = "R"+gafisMatchInfo.code
-    logic05Rec.personId2 = "R"+gafisMatchInfo.tcode
+    if(gafisMatchInfo.code.length()==22){
+      logic05Rec.personId1 = "R"+gafisMatchInfo.code
+    }else{
+      logic05Rec.personId1 = gafisMatchInfo.code
+    }
+    if(gafisMatchInfo.tcode.length()==22){
+      logic05Rec.personId2 = "R"+gafisMatchInfo.tcode
+    }else{
+      logic05Rec.personId2 = gafisMatchInfo.tcode
+    }
     logic05Rec.matchUnitCode = gafisMatchInfo.registerOrg
     logic05Rec.matchName = gafisMatchInfo.matchName
     logic05Rec.matcher = gafisMatchInfo.registerUser
@@ -201,9 +216,17 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
     val logic06Rec = new Logic06Rec
     logic06Rec.systemType = "1900"
-    logic06Rec.caseId1 = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2).length==22){
+      logic06Rec.caseId1 = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    }else{
+      logic06Rec.caseId1 = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    }
     logic06Rec.seqNo1 = gafisMatchInfo.code.substring(gafisMatchInfo.code.length - 2)
-    logic06Rec.caseId2 = "A"+gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    if(gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2).length==22){
+      logic06Rec.caseId2 = "A"+gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    }else{
+      logic06Rec.caseId2 = gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    }
     logic06Rec.seqNo2 = gafisMatchInfo.tcode.substring(gafisMatchInfo.tcode.length - 2)
     logic06Rec.matchUnitCode = gafisMatchInfo.registerOrg
     logic06Rec.matchName = gafisMatchInfo.matchName
