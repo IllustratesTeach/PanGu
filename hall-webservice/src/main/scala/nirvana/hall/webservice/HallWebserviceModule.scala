@@ -14,10 +14,12 @@ import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.{TaskHandlerServiceImpl, TenPrinterExportServiceImpl}
 import nirvana.hall.webservice.internal.bjwcsy.WsFingerServiceImpl
+import nirvana.hall.webservice.internal.haixin.{StrategyServiceImpl, SyncCronSendQueryServiceImpl, WsHaiXinFingerServiceImpl}
 import nirvana.hall.webservice.internal.xingzhuan._
 import nirvana.hall.webservice.internal.xingzhuan.{FetchLPCardExportServiceImpl, LatentCronServiceImpl}
 import nirvana.hall.webservice.services.{TaskHandlerService, TenPrinterExportService}
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
+import nirvana.hall.webservice.services.haixin.{StrategyService, SyncCronSendQueryService, WsHaiXinFingerService}
 import nirvana.hall.webservice.services.xingzhuan._
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.ioc.annotations.Symbol
@@ -37,8 +39,10 @@ object HallWebserviceModule {
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
+    binder.bind(classOf[StrategyService], classOf[StrategyServiceImpl])//对接海鑫综采平台时使用
 
     binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl])//.withSimpleId()
+    binder.bind(classOf[WsHaiXinFingerService],classOf[WsHaiXinFingerServiceImpl]).withSimpleId()
     binder.bind(classOf[WsSendQueryService],classOf[WsSendQueryServiceImpl])//.withSimpleId()
     binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
     binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
@@ -58,6 +62,8 @@ object HallWebserviceModule {
     binder.bind(classOf[LatentCronService],classOf[LatentCronServiceImpl])//.eagerLoad()
     binder.bind(classOf[AssistcheckService],classOf[AssistcheckServiceImpl])//.eagerLoad()
     binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])//.eagerLoad()
-    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl]).eagerLoad()
+    binder.bind(classOf[SyncSyCronService],classOf[SyncSyCronServiceImpl])//.eagerLoad()
+    //========海鑫综采平台对接===================//
+    binder.bind(classOf[SyncCronSendQueryService],classOf[SyncCronSendQueryServiceImpl]).eagerLoad()
   }
 }
