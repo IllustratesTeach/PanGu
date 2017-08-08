@@ -26,10 +26,9 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     * @param  ora_sid
     * @return
     */
-  override def exportMatchRelation(queryid:String,ora_sid:String): ArrayBuffer[DataHandler] = {
+  override def exportMatchRelation(queryid:String,ora_sid:String): DataHandler = {
     val fPT4File = new FPT4File
     var dataHandler:DataHandler = null
-    var dataHandlers = new ArrayBuffer[DataHandler]()
     var tscnt = new Array[Byte](1)
     var flag:Byte= {0}
     var tflag:Byte= {0}
@@ -59,12 +58,11 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
             exportImplMRELATION(fPT4File,source,pkidlist(i).get("querytype").get.asInstanceOf[String],
               code,pkidlist(i).get("ora_uuid").get.asInstanceOf[String],ii)
             dataHandler = new DataHandler(new ByteArrayDataSource(fPT4File.build().toByteArray()))
-            dataHandlers += dataHandler
           }
         }
       }
     }
-    dataHandlers
+    dataHandler
   }
 
   /**
@@ -82,7 +80,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
         val logic02RecSource = fptService.getLogic02Rec(code)
         val logic02RecDest = fptService.getLogic02Rec(tcode)
         val logic05Rec = fptService.getLogic05Rec(uuid,num)
-        val logic02List = new ArrayBuffer[Logic02Rec]()
+        val logic02List = new ArrayBuffer[Logic02Rec]
         logic02List += logic02RecSource
         logic02List += logic02RecDest
         fPT4File.logic02Recs = logic02List.toArray

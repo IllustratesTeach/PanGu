@@ -4,7 +4,6 @@ import javax.activation.DataHandler
 import javax.jws.{WebMethod, WebParam, WebService}
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2017/7/24.
@@ -94,7 +93,7 @@ trait WsHaiXinFingerService {
     */
   @WebMethod def getFingerMatchData(@WebParam(name="userid") userid:String
                                     ,@WebParam(name="unitcode") unitcode:String
-                                    ,@WebParam(name="personid") personid:String):mutable.ListBuffer[ArrayBuffer[DataHandler]]
+                                    ,@WebParam(name="personid") personid:String):mutable.ListBuffer[DataHandler]
 
   /**
     * 接口07:获取指纹系统服务器时间

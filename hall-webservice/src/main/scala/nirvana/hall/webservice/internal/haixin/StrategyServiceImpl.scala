@@ -182,7 +182,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
                 ps.setInt(10,0)
               }
 
-    if(indoorReturnValue == 9){
+    if(indoorReturnValue == IAConstant.SUCCESS){
       if(null != dataHandler){
         val sql_t2 = s"INSERT INTO HALL_GAFIS_IA_FINGER_FPT(UUID" +
                                                           s",IA_FINGER_PKID" +

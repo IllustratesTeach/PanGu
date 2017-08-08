@@ -56,9 +56,11 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     val listDataHandler = service.getFingerMatchData("0101","3701","44200372622242323322549")
 
     var i = 1
-    listDataHandler.foreach{
-       t => t.foreach(m => FileUtils.writeByteArrayToFile(new File("D:\\" + "1111" + i + ".FPT"),IOUtils.toByteArray(m.getInputStream)))
+    listDataHandler.foreach { t =>
+      if(null != t){
+        FileUtils.writeByteArrayToFile(new File("D:\\" + "20170809" + i + ".FPT"), IOUtils.toByteArray(t.getInputStream))
         i = i+1
+      }
     }
 
     Assert.assertTrue(listDataHandler.size > 0)

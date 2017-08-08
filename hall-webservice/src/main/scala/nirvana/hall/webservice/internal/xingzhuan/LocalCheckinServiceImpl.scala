@@ -56,7 +56,7 @@ class LocalCheckinServiceImpl(config: HallWebserviceConfig,
     val uploadTime = config.union4pfmip.dateLimit
     val size = "20"
     try{
-      var resultList = assistCheckRecordService.findUploadCheckin(uploadTime, size)
+      val resultList = assistCheckRecordService.findUploadCheckin(uploadTime, size)
       if(resultList.size > 0){
         resultList.foreach{ resultMap =>
           var queryId:String = ""
@@ -73,15 +73,10 @@ class LocalCheckinServiceImpl(config: HallWebserviceConfig,
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
             val typ:String = getType(queryType)
-            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            for(i <- 0 to dataHandlers.size - 1){
-              val dataHandler = dataHandlers(i)
-              if(dataHandler != null) {
-                status = 1
-                val fptPath:String = saveFpt(dataHandler.getInputStream,keyId,config.localHitResultPath)
-                assistCheckRecordService.saveXcReport(oraUuid,typ,status, fptPath)
-              }
-            }
+            val dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            status = 1
+            val fptPath:String = saveFpt(dataHandler.getInputStream,keyId,config.localHitResultPath)
+            assistCheckRecordService.saveXcReport(oraUuid,typ,status, fptPath)
           } catch {
             case e:Exception=> error("localCheckin-error: queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " errorInfo:" + ExceptionUtil.getStackTraceInfo(e))
               val status = 8

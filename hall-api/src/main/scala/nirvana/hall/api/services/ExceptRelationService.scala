@@ -28,7 +28,7 @@ trait ExceptRelationService {
     * @param ora_sid
     * @return
     */
-  def exportMatchRelation(queryid:String,ora_sid:String): ArrayBuffer[DataHandler]
+  def exportMatchRelation(queryid:String,ora_sid:String): DataHandler
 
   /**
     * 获取查询的比对关系

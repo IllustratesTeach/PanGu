@@ -9,13 +9,11 @@ import javax.activation.DataHandler
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.services.{ExceptRelationService, QueryService}
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.webservice.internal.haixin.exception.CustomException._
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig,ListItem}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2017/7/24.
@@ -267,9 +265,9 @@ class WsHaiXinFingerServiceImpl(strategyService:StrategyService
     * @param personid 公安部标准的23位唯一码，人员编号
     * @return DataHandler 比中关系的FPT文件
     */
-  override def getFingerMatchData(userid: String, unitcode: String, personid: String): mutable.ListBuffer[ArrayBuffer[DataHandler]] = {
+  override def getFingerMatchData(userid: String, unitcode: String, personid: String): mutable.ListBuffer[DataHandler] = {
 
-    val listDataHandler = new mutable.ListBuffer[ArrayBuffer[DataHandler]]
+    val listDataHandler = new mutable.ListBuffer[DataHandler]
 
     val uuid = UUID.randomUUID().toString.replace("-","")
     try{
@@ -285,10 +283,9 @@ class WsHaiXinFingerServiceImpl(strategyService:StrategyService
       val listMapBuffer = strategyService.getOraSidAndQueryIdByPersonId(personid)
 
       listMapBuffer match {
-        case Some(m) => m.foreach{
-            t =>
-              listDataHandler.append(exceptRelationService.exportMatchRelation(t.get("queryid").get.toString,t.get("orasid").get.toString))
-
+        case Some(m) => m.foreach{ t =>
+          listDataHandler.+=(exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
+            ,t.get("orasid").get.toString))
         }
 
         case _ =>
