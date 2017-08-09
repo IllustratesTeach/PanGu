@@ -73,7 +73,6 @@ object TextQueryConstants {
   val COL_NAME_PID_DATE = "pId_date"
   val COL_NAME_GATHERCATEGORY = "gatherCategory"
   val COL_NAME_GATHERTYPE = "gatherType"
-  val COL_NAME_GATHERTYPEID = "gatherTypeID"
   val COL_NAME_DOOR = "door"
   val COL_NAME_ADDRESS = "address"
   val COL_NAME_SEXCODE = "sexCode"

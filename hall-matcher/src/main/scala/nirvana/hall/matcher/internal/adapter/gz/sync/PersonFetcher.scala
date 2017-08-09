@@ -29,7 +29,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     ", t.door " + COL_NAME_DOOR +
     ", t.address " + COL_NAME_ADDRESS +
     ", t.gather_category " + COL_NAME_GATHERCATEGORY +
-    ", t.gather_type_id " + COL_NAME_GATHERTYPEID +
+    ", t.gather_type_id " + COL_NAME_GATHERTYPE +
     ", t.gather_date " + COL_NAME_GATHERDATE +
     ", t.data_sources " + COL_NAME_DATASOURCES +
     ", t.case_classes " + COL_NAME_CASECLASS +
