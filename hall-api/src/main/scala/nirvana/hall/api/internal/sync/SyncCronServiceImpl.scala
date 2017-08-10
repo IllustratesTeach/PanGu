@@ -454,6 +454,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           cardId = matchTask.getMatchId
           if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
             val queryId = queryService.addMatchTask(matchTask)
+            fetchQueryService.updateQueryIdWithOraSidQueryQue(matchTask.getObjectId,queryId)
             fetchQueryService.recordGafisTask(matchTask.getObjectId.toString,queryId.toString
               ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType.toString)

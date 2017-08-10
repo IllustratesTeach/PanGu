@@ -48,6 +48,7 @@ object gaqryqueConverter extends LoggerSupport{
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+    queryStruct.stSimpQry.nStatus = matchTask.getStatus.toByte
 
     //flag
     matchTask.getMatchType match {

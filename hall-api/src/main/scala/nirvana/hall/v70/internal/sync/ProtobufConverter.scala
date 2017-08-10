@@ -742,6 +742,7 @@ object ProtobufConverter extends LoggerSupport{
     matchTask.setPriority(gafisQuery.priority.toInt)
     matchTask.setScoreThreshold(gafisQuery.minscore)
     matchTask.setTopN(gafisQuery.maxcandnum)
+    if(null!=gafisQuery.status)matchTask.setStatus(gafisQuery.status.toInt)
     if(null!=gafisQuery.username) matchTask.setCommitUser(gafisQuery.username)
     matchTask.setComputerIp(gafisQuery.computerip)
     if(null!=gafisQuery.userunitcode) matchTask.setUserUnitCode(gafisQuery.userunitcode)

@@ -59,7 +59,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
                                 s"FROM NORMALQUERY_QUERYQUE  t " +
                                 s"WHERE  NOT EXISTS (SELECT 1 " +
                                                     s"FROM HALL_READ_RECORD p " +
-                                                    s"WHERE p.orasid=t.ora_sid) AND t.rmtflag=0 "
+                                                    s"WHERE p.orasid=t.ora_sid OR p.orasid=t.queryid) AND t.rmtflag=0 "
     if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
       sql ++= s"  AND t.ora_createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
     }
@@ -320,10 +320,24 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
   override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = ???
 
   /**
-    * 记录从6.2或7.0抓取过来的任务的信息，有了这些信息后，为了通过这些任务号再去抓取比对结果。
+    * 记录到Hall_read_record表，记录这些数据是从7.0抓过来的，当7.0再次请求时这些数据就不再给7.0了
+    *
     */
   override def recordGafisTask(objectId: String, queryId: String, isSyncCandList: String, matchType: String, cardId: String, pkId: String): Unit = {
+    val sql = s"INSERT INTO HALL_READ_RECORD (UUID,ORASID,Createtime) " +
+              s"VALUES (?,?,sysdate)"
+    JdbcDatabase.update(sql){ ps =>
+      ps.setString(1,java.util.UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,objectId)
+    }
+  }
 
+  override def updateQueryIdWithOraSidQueryQue(queryid:Long,objectId: Long): Unit = {
+    val sql = s"UPDATE NORMALQUERY_QUERYQUE t SET t.queryid = ? WHERE t.ora_sid = ?"
+    JdbcDatabase.update(sql){ ps =>
+      ps.setLong(1,queryid)
+      ps.setLong(2,objectId)
+    }
   }
 }
 

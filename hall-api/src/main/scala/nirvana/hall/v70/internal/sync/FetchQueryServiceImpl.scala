@@ -51,6 +51,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       s",t.qrycondition" +
       s",t.textsql" +
       s",t.flag " +
+      s",t.status " +
       s"FROM Gafis_Normalquery_Queryque  t " +
       s"WHERE  NOT EXISTS (SELECT 1 " +
       s"FROM HALL_READ_RECORD p " +
@@ -75,6 +76,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       gaQuery.username = rs.getString("username")
       gaQuery.computerip = rs.getString("computerip")
       gaQuery.userunitcode = rs.getString("userunitcode")
+      gaQuery.status = rs.getShort("status")
       matchTaskList += ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gaQuery)
     }
 
@@ -217,6 +219,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 获得没有同步候选的比对任务的任务号
+    *
     * @author yuchen
     * @param size 单次请求数量
     */
@@ -256,9 +259,11 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   }
 
   /**
-    * 记录从6.2或7.0抓取过来的任务的信息，有了这些信息后，为了通过这些任务号再去抓取比对结果。
+    * 7.0抓取过来的任务的信息，有了这些信息后，为了通过这些任务号再去抓取比对结果。
     */
   override def recordGafisTask(objectId:String,queryId:String,isSyncCandList:String,matchType:String,cardId:String,pkId:String): Unit = {
     new GafisTask62Record(UUID.randomUUID().toString.replace("-",""),objectId,queryId,isSyncCandList,matchType,cardId,pkId).save
   }
+
+  override def updateQueryIdWithOraSidQueryQue(queryid:Long,objectId: Long): Unit = {}
 }
