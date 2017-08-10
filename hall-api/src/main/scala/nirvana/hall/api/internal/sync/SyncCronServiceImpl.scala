@@ -452,11 +452,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         while (iterator.hasNext) {
           val matchTask = iterator.next()
           cardId = matchTask.getMatchId
-          if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)) {
+          if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
             val queryId = queryService.addMatchTask(matchTask)
-            new GafisTask62Record(UUID.randomUUID().toString.replace("-","")
-              ,matchTask.getObjectId.toString,queryId.toString
-              ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId).save
+            fetchQueryService.recordGafisTask(matchTask.getObjectId.toString,queryId.toString
+              ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType.toString)
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ, fetchConfig.url.substring(7,fetchConfig.url.length-5) ,HallApiConstants.MESSAGE_SEND,HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }
