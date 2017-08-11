@@ -52,7 +52,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       s",t.textsql" +
       s",t.flag " +
       s",t.status " +
-      s"FROM Gafis_Normalquery_Queryque  t " +
+    s" FROM Gafis_Normalquery_Queryque  t " +
       s"WHERE  NOT EXISTS (SELECT 1 " +
       s"FROM HALL_READ_RECORD p " +
       s"WHERE p.orasid=t.ora_sid) AND t.SYNC_TARGET_SID IS NULL  AND t.submittsystem <> 3 AND t.status = 2"
@@ -249,7 +249,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 更新Gafis_Task62Record的是否同步的状态
-    *
     * @author yuchen
     * @param status
     * @param uuid
@@ -264,6 +263,4 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
   override def recordGafisTask(objectId:String,queryId:String,isSyncCandList:String,matchType:String,cardId:String,pkId:String): Unit = {
     new GafisTask62Record(UUID.randomUUID().toString.replace("-",""),objectId,queryId,isSyncCandList,matchType,cardId,pkId).save
   }
-
-  override def updateQueryIdWithOraSidQueryQue(queryid:Long,objectId: Long): Unit = {}
 }

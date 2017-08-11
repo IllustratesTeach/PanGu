@@ -92,8 +92,6 @@ trait FetchQueryService {
     * 记录从6.2或7.0抓取过来的任务的信息，有了这些信息后，为了通过这些任务号再去抓取比对结果。
     */
   def recordGafisTask(objectId:String,queryId:String,isSyncCandList:String,matchType:String,cardId:String,pkId:String): Unit
-
-  def updateQueryIdWithOraSidQueryQue(queryid:Long,objectId: Long):Unit
 }
 
 
