@@ -59,7 +59,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
                                 s"FROM NORMALQUERY_QUERYQUE  t " +
                                 s"WHERE  NOT EXISTS (SELECT 1 " +
                                                     s"FROM HALL_READ_RECORD p " +
-                                                    s"WHERE p.orasid=t.ora_sid OR p.orasid=t.queryid) AND t.rmtflag=0 "
+                                                    s"WHERE p.orasid=t.ora_sid) AND t.rmtflag=0 "
     if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
       sql ++= s"  AND t.ora_createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
     }
@@ -105,7 +105,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       * @param matchResult
     */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
-    val oraSid = matchResult.getMatchId       //oraSid
+    val oraSid = getOraSidByQueryId(matchResult.getMatchId)       //oraSid
     val candNum = matchResult.getCandidateNum //candidateNum
     val maxScore = matchResult.getMaxScore   //hitpossibility
     val maxcandnum = matchResult.getMaxcandnum //maxcandnum
@@ -293,6 +293,17 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     return configMap
   }
 
+  private def getOraSidByQueryId(queryId:String):String ={
+    val sql = s"SELECT orasid from GAFIS_TASK70RECORD where queryid=?"
+    var oraSid = ""
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,queryId)
+    }{rs=>
+      oraSid = rs.getString("orasid")
+    }
+    oraSid
+  }
+
   /**
     * 保存6.2已经给7.0抓取的任务的任务号
     *
@@ -315,28 +326,60 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @author yuchen
     * @param size 单次请求数量
     */
-  override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = ???
+  override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = {
+    val sql = s"SELECT " +
+                s"t.uuid" +
+                s",t.queryid" +
+                s",t.orasid" +
+                s",t.querytype" +
+                s",t.keyid " +
+              s"FROM GAFIS_TASK70RECORD t " +
+              s"WHERE t.issynccandlist = '0' AND ROWNUM <=?"
+    val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,size)
+    } { rs =>
+      var map = new scala.collection.mutable.HashMap[String,Any]
+      map += ("uuid" -> rs.getString("uuid"))
+      map += ("queryid" -> rs.getString("queryid"))
+      map += ("orasid" -> rs.getString("orasid"))
+      map += ("querytype" -> rs.getString("querytype"))
+      map += ("keyid" -> rs.getString("keyid"))
+      resultList.append(map)
+    }
+    resultList
+  }
 
-  override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = ???
-
-  /**
-    * 记录到Hall_read_record表，记录这些数据是从7.0抓过来的，当7.0再次请求时这些数据就不再给7.0了
-    *
-    */
-  override def recordGafisTask(objectId: String, queryId: String, isSyncCandList: String, matchType: String, cardId: String, pkId: String): Unit = {
-    val sql = s"INSERT INTO HALL_READ_RECORD (UUID,ORASID,Createtime) " +
-              s"VALUES (?,?,sysdate)"
+  override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = {
+    val sql = s"UPDATE GAFIS_TASK70RECORD t SET t.issynccandlist=?,t.updatetime=sysdate WHERE t.uuid=?"
     JdbcDatabase.update(sql){ ps =>
-      ps.setString(1,java.util.UUID.randomUUID().toString.replace("-",""))
-      ps.setString(2,objectId)
+      ps.setString(1,status)
+      ps.setString(2,uuid)
     }
   }
 
-  override def updateQueryIdWithOraSidQueryQue(queryid:Long,objectId: Long): Unit = {
-    val sql = s"UPDATE NORMALQUERY_QUERYQUE t SET t.queryid = ? WHERE t.ora_sid = ?"
+
+  override def recordGafisTask(objectId: String, queryId: String, isSyncCandList: String, matchType: String, cardId: String, pkId: String): Unit = {
+
+    val sql = s"INSERT INTO GAFIS_TASK70RECORD (UUID" +
+                                            s",queryid" +
+                                            s",orasid" +
+                                            s",issynccandlist" +
+                                            s",createtime" +
+                                            s",updatetime" +
+                                            s",querytype" +
+                                            s",keyid" +
+                                            s",pkid) " +
+              s"VALUES (?,?,?,?,sysdate,?,?,?,?)"
     JdbcDatabase.update(sql){ ps =>
-      ps.setLong(1,queryid)
-      ps.setLong(2,objectId)
+      ps.setString(1,java.util.UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,objectId)
+      ps.setString(3,queryId)
+      ps.setInt(4,isSyncCandList.toInt)
+      ps.setString(5,"")
+      ps.setInt(6,matchType.toInt)
+      ps.setString(7,cardId)
+      ps.setString(8,pkId)
     }
   }
 }

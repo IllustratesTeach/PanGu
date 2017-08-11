@@ -454,7 +454,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           cardId = matchTask.getMatchId
           if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
             val queryId = queryService.addMatchTask(matchTask)
-            fetchQueryService.updateQueryIdWithOraSidQueryQue(matchTask.getObjectId,queryId)
             fetchQueryService.recordGafisTask(matchTask.getObjectId.toString,queryId.toString
               ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType.toString)
@@ -571,7 +570,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
           val matchResult = response.getMatchResult
           if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-            val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
+            val candDBDIMap = fetchCandListDataByMatchResult(hashMap.get("orasid").headOption.get.toString,matchResult, fetchConfig)
             fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig,candDBDIMap)
             fetchQueryService.updateStatusWithGafis_Task62Record(matchStatus.getNumber.toString,uniqueId)
             info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
@@ -599,9 +598,9 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     *
     * @param matchResult
     */
-  private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
+  private def fetchCandListDataByMatchResult(oraSid:String,matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
     val candDBIDMap = mutable.HashMap[String, Short]()
-    val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
+    val queryQue = fetchQueryService.getQueryQue(oraSid.toInt)
     val isPalm = queryQue.isPalm //指掌纹标识
     val dbidList = getDBIDList(fetchConfig, queryQue.queryType)
     val candIter = matchResult.getCandidateResultList.iterator()

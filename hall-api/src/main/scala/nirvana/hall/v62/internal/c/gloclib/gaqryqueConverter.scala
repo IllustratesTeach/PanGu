@@ -86,6 +86,7 @@ object gaqryqueConverter extends LoggerSupport{
     queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
 
     queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
+    //queryStruct.stSimpQry.nRmtState =  gaqryque.GAQRY_RMTFLAG_LOCAL.toByte //标记任务是本地还是远程
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     if(matchTask.getQueryid.nonEmpty){
       queryStruct.stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(matchTask.getQueryid.toLong) //远程查询ID
