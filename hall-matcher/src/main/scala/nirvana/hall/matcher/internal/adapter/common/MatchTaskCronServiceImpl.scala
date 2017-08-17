@@ -25,10 +25,10 @@ class MatchTaskCronServiceImpl(implicit dataSource: DataSource) extends MatchTas
     })
   }
   /**
-   * 当比对任务超过1小时没有返回结果信息，设置比对状态为0，重发比对
+   * 当比对任务超过1小时没有返回结果信息，设置比对状态为0，比对进度为0
    */
   override def updateMatchStatusWaitingByMatchTaskTimeout(): Unit = {
-    val sql = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=0 where t.status=1 and t.begintime < (sysdate - 1/24) "
+    val sql = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=0, t.match_progress='' where t.status=1 and t.begintime < (sysdate - 1/24) "
     JdbcDatabase.update(sql){ps=>}
   }
 }
