@@ -21,6 +21,10 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
   var module: String = "gz"
   @XmlElement(name = "mnt")
   var mnt = new MntSizeConfig
+  @XmlElement(name = "match_timeout")
+  var matchTimeout: MatchTimeoutConfig = _
+  @XmlElement(name = "auto_check")
+  var autoCheck: AutoCheckConfig = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MntSizeConfig")
@@ -40,4 +44,21 @@ class MntSizeConfig {
   @XmlElement(name = "has_ridge")
   var hasRidge = true
 }
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "MatchTimeoutConfig")
+class MatchTimeoutConfig{
+  @XmlElement(name = "cron")
+  var cron:String = "0 0/5 * * * ? *"
+  @XmlElement(name = "timeout")
+  var timeout = 60
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "AutoCheckConfig")
+class AutoCheckConfig{
+  @XmlElement(name = "confirm_score")
+  var confirmScore = 60
+  @XmlElement(name = "deny_score")
+  var denyScore = 30
+}
+
 
