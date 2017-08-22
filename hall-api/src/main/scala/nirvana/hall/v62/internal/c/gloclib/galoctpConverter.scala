@@ -12,6 +12,7 @@ import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.v62.internal.c.FgpConverter
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter.appendTextStruct
 import nirvana.hall.v62.services.DictCodeConverter
 
@@ -168,6 +169,7 @@ object galoctpConverter extends LoggerSupport{
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
+          mic.nItemData = FgpConverter.convertPalmFgp2GTPIO_ITEMINDEX(blob.getPalmfgp)
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case other =>
@@ -304,18 +306,7 @@ object galoctpConverter extends LoggerSupport{
             micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
           case glocdef.GAMIC_ITEMTYPE_PALM =>
             micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
-            import nirvana.hall.c.services.ghpcbase.glocdef
-            mic.nItemData match {
-              case glocdef.GTPIO_ITEMINDEX_PALM_RIGHT => micDataBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LEFT => micDataBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
-              case glocdef.GTPIO_ITEMINDEX_PALM_RFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => micDataBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
-              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
-              case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW => micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
-              case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP=> micDataBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
-              case other => micDataBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
-            }
+            micDataBuilder.setPalmfgp(FgpConverter.convertGTPIO_ITEMINDEX2PalmFgp(mic.nItemData))
           case glocdef.GAMIC_ITEMTYPE_VOICE =>
             micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
           case other =>
