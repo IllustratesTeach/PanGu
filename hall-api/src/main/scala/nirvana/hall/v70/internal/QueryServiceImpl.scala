@@ -83,6 +83,7 @@ class QueryServiceImpl(entityManager: EntityManager,userService:UserService) ext
       matchResult.setRecordNumMatched(queryQue.recordNumMatched)
       matchResult.setMaxScore(queryQue.hitpossibility.toInt)
       matchResult.setStatus(MatcherStatus.newBuilder().setCode(0))
+      matchResult.setMatchFinishTime(DateConverter.convertDate2String(queryQue.finishtime))
       Option(matchResult.build())
     }else{
       None

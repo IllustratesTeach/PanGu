@@ -4,7 +4,8 @@ import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
-import nirvana.hall.api.jpa.{HallFetchConfig}
+import nirvana.hall.api.internal.{DataConverter, DateConverter}
+import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
@@ -134,8 +135,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@'," +
-          "t.finishtime         = sysdate, " +
-          "t.checktime          = sysdate, " +
+          "t.finishtime         = " + matchResult.getMatchFinishTime +
           "t.curcandnum         = ?, " +   //matchresult.getcandidatenum
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = 2," +
@@ -163,8 +163,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@', " +
-          "t.finishtime         = sysdate, " +
-          "t.checktime          = sysdate, " +
+          "t.finishtime         = " + matchResult.getMatchFinishTime +
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = '1'," +
           "t.status             = '7'," +
@@ -187,7 +186,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
           ps.setLong(7,oraSid.toLong)
         }
       } else {
-        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.ora_sid =?"
+        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" +  matchResult.getMatchFinishTime +" where t.ora_sid =?"
         JdbcDatabase.update(sql) { ps =>
           ps.setInt(1, candNum)
           ps.setBytes(2, candHead)
@@ -197,7 +196,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         }
       }
     } else {
-      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.ora_sid =?"
+      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" + matchResult.getMatchFinishTime + " where t.ora_sid =?"
       JdbcDatabase.update(sql) { ps =>
         ps.setInt(1, candNum)
         ps.setBytes(2, candHead)
@@ -233,7 +232,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       }
       gCand.nTableID = 2
       gCand.nIndex = cand.getPos.toByte
-      gCand.tFinishTime = new AFISDateTime
+      gCand.tFinishTime = DateConverter.convertString2AFISDateTime(cand.getMatchFinishTime)
       gCand.nStepOneRank = index
       val gCandArray: Array[Byte] = gCand.toByteArray()
       val TTSearchQryAutoCheckLocal = configMap("TTSearchQryAutoCheckLocal")      //自动认定

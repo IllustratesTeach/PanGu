@@ -409,10 +409,15 @@ object gaqryqueConverter extends LoggerSupport{
         gaCand.fromStreamReader(buffer)
         val matchResultObject = MatchResultObject.newBuilder()
         matchResultObject.setObjectId(gaCand.szKey)
-        matchResultObject.setPos(gaCand.nIndex)
+        var pos = gaCand.nIndex.toInt
+        if(pos > 10){
+          pos += 10
+        }
+        matchResultObject.setPos(pos)
         matchResultObject.setScore(gaCand.nScore)
         matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
-        result += matchResultObject.build()
+        matchResultObject.setMatchFinishTime(DateConverter.convertAFISDateTime2String(gaCand.tFinishTime))
+        result += matchResultObject.build
       }
       result
     }else{

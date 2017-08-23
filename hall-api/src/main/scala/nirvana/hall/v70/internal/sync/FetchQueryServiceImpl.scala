@@ -196,7 +196,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     result.toByteArray
   }
   override def getQueryQue(oraSid: Int): QueryQue = {
-    val sql = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.QUERYID =?"
+    val sql = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ORA_SID =?"
     JdbcDatabase.queryFirst(sql) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
