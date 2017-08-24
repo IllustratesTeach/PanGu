@@ -196,13 +196,13 @@ object TextQueryUtil extends LoggerSupport{
     if (idBeg.matches("^[a-zA-Z]\\w*")) {
       val id_ = splitCardidByPre(idBeg)
       val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
       idBeg = id_._2
     }
     if (idEnd.matches("^[a-zA-Z]\\w*")) {
       val id_ = splitCardidByPre(idEnd)
       val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
       idEnd = id_._2
     }
     /*
@@ -237,10 +237,10 @@ object TextQueryUtil extends LoggerSupport{
       //由于deptBeg默认为0,所有这里只判断deptEnd
       if(deptEnd > 0){
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build()).setOccur(Occur.SHOULD)
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build())
       }else{
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build()).setOccur(Occur.SHOULD)
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build())
       }
       //日期判断
       if(dateBeg > 0){
