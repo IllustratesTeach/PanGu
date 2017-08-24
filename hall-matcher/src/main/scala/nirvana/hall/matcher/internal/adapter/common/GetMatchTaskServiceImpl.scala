@@ -162,7 +162,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
           }
         case HallMatcherConstants.QUERY_TYPE_TL =>
           tdataBuilderMap.foreach { f =>
-            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
+            f._2.setTextQuery(getTextQueryDataOfLatent(textSql))
           }
         case HallMatcherConstants.QUERY_TYPE_LT =>
           ldataBuilderMap.foreach{ f =>
