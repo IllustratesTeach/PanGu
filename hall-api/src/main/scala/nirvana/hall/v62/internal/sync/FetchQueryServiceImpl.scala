@@ -135,7 +135,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@'," +
-          "t.finishtime         = " + matchResult.getMatchFinishTime +
+          "t.finishtime         = " + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") +  ", " +
           "t.curcandnum         = ?, " +   //matchresult.getcandidatenum
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = 2," +
@@ -163,7 +163,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@', " +
-          "t.finishtime         = " + matchResult.getMatchFinishTime +
+          "t.finishtime         = " + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") + ", " +
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = '1'," +
           "t.status             = '7'," +
@@ -186,7 +186,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
           ps.setLong(7,oraSid.toLong)
         }
       } else {
-        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" +  matchResult.getMatchFinishTime +" where t.ora_sid =?"
+        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" +  DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") +" where t.ora_sid =?"
         JdbcDatabase.update(sql) { ps =>
           ps.setInt(1, candNum)
           ps.setBytes(2, candHead)
@@ -196,7 +196,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         }
       }
     } else {
-      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" + matchResult.getMatchFinishTime + " where t.ora_sid =?"
+      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") + " where t.ora_sid =?"
       JdbcDatabase.update(sql) { ps =>
         ps.setInt(1, candNum)
         ps.setBytes(2, candHead)
