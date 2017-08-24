@@ -103,42 +103,18 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       }
     }
 
-    //6.2文本查询条件和组查询卡号列表
-    /*var isGroupQry = false  //是否是组查询，通过qrycondition的keyList来判断
-    val qryCondition = rs.getBytes("qrycondition")
-    if(qryCondition != null && qryCondition.length > 0){
-      val itemPkg = new GBASE_ITEMPKG_OPSTRUCT().fromByteArray(qryCondition)
-      itemPkg.items.foreach{item =>
-        item.stHead.szItemName match {
-          case GAFIS_KEYLIST_GetName =>
-//            val keylist = new GAFIS_KEYLISTSTRUCT().fromByteArray(item.bnRes)
-            isGroupQry = true
-          case GAFIS_TEXTSQL_GetName=>
-        }
-      }
-    }*/
-
-    val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
-    val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()
     val mic = rs.getBytes("mic")
     val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     mics.foreach { micStruct =>
-      val index = micStruct.nIndex.toInt
       if (micStruct.bIsLatent == 1) {
-        if(ldataBuilderMap.get(index).isEmpty){
-          ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
-        }
-        val ldata = ldataBuilderMap.get(index).get
+        val ldata = matchTaskBuilder.getLDataBuilder
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
           val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
           ldata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
         }
       } else {
-        if(tdataBuilderMap.get(index).isEmpty){
-          tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
-        }
-        val tdata = tdataBuilderMap.get(index).get.addMinutiaDataBuilder()
+        val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
         var mnt = micStruct.pstMnt_Data
         //TT，TL查询老特征转新特征
@@ -157,21 +133,13 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     if (textSql != null) {
       queryType match {
         case HallMatcherConstants.QUERY_TYPE_TT =>
-          tdataBuilderMap.foreach { f =>
-            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
-          }
+          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
         case HallMatcherConstants.QUERY_TYPE_TL =>
-          tdataBuilderMap.foreach { f =>
-            f._2.setTextQuery(getTextQueryDataOfLatent(textSql))
-          }
+          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
         case HallMatcherConstants.QUERY_TYPE_LT =>
-          ldataBuilderMap.foreach{ f =>
-            f._2.setTextQuery(getTextQueryDataOfTemplate(textSql))
-          }
+          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
         case HallMatcherConstants.QUERY_TYPE_LL =>
-          ldataBuilderMap.foreach{ f=>
-            f._2.setTextQuery(getTextQueryDataOfLatent(textSql))
-          }
+          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
       }
       //高级查询
       matchTaskBuilder.setConfig(DataConverter.getMatchConfig(textSql))

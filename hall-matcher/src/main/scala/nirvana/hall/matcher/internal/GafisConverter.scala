@@ -120,7 +120,7 @@ object GafisConverter {
         gCand.nIndex = fgp.toByte
         gCand.tFinishTime = new AFISDateTime
         gCand.nStepOneRank = index
-        gCand.nSrcKeyIndex = cand.getSrcIndex.toByte
+//        gCand.nSrcKeyIndex = cand.getSrcIndex.toByte
         result.write(gCand.toByteArray(AncientConstants.GBK_ENCODING))//这里使用GBK编码，防止keyId是中文的时候报错
       }
       /*  result.write(new Array[Byte](4))
