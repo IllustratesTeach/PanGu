@@ -640,7 +640,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                 if(strategy.has("setdatasource")){
                   tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
                 }
-              tpCardService.addTPCard(tpCard)
+              //tpCardService.addTPCard(tpCard)
             }
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }
@@ -660,7 +660,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                     val caseId = lpCard.getText.getStrCaseId
                     if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                       //获取案件
-                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
+                      //fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                     }
                     candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                   }
@@ -673,7 +673,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                   val caseId = lpCard.getText.getStrCaseId
                   if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                     //获取案件
-                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
+                    //fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                   }
                   candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                 }
