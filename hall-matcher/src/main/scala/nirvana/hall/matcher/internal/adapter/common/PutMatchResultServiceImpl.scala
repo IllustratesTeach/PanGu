@@ -4,6 +4,7 @@ import javax.sql.DataSource
 
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.GafisConverter
+import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
 import nirvana.hall.matcher.service.{AutoCheckService, PutMatchResultService}
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
@@ -29,7 +30,7 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
     if (matchResultRequest.getStatus.getCode == 0) {
-      val queryQue = getQueryQue(matchResultRequest.getMatchId.toInt)
+      val queryQue = getQueryQueVo(matchResultRequest.getMatchId.toInt)
       addMatchResult(matchResultRequest, queryQue)
       autoCheckService.ttAutoCheck(matchResultRequest, queryQue)
     } else {
@@ -38,7 +39,7 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
     matchResultResponse.build()
   }
 
-  private def addMatchResult(matchResultRequest: MatchResultRequest, queryQue: QueryQue): Unit = {
+  private def addMatchResult(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo): Unit = {
     val oraSid = matchResultRequest.getMatchId
     val candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
@@ -84,7 +85,7 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
    * @param dataSource
    * @return
    */
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo)(implicit dataSource: DataSource): Map[Long, String] = {
     val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
@@ -118,16 +119,16 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
     map.toMap
   }
 
-  private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {
+  private def getQueryQueVo(oraSid: Int)(implicit dataSource: DataSource): QueryQueVo = {
     JdbcDatabase.queryFirst(GET_QUERY_QUE_SQL) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
     }.get
   }
 }
 
-class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)
+//class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)
