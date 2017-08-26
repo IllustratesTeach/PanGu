@@ -6,6 +6,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import monad.support.services.LoggerSupport
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.protocol.MatchTaskQueryProto.MatchTaskQueryRequest
+import nirvana.protocol.NirvanaTypeDefinition.MatchType
 import org.apache.tapestry5.StreamResponse
 import org.apache.tapestry5.ioc.annotations.Inject
 import org.apache.tapestry5.services.Response
@@ -29,7 +30,14 @@ class GetMatchTaskQuery extends LoggerSupport{
       val iter = matchTaskQueryResponse.getMatchTaskList.iterator()
       while (iter.hasNext){
         val matchTask = iter.next()
-        info("getMatchTask sid:{} matchId:{} type:{}", matchTask.getObjectId, matchTask.getMatchId, matchTask.getMatchType)
+        info("getMatchTask sid:{} matchId:{} type:{} ", matchTask.getObjectId, matchTask.getMatchId, matchTask.getMatchType)
+        matchTask.getMatchType match {
+          case MatchType.FINGER_TT | MatchType.FINGER_TL | MatchType.PALM_TT | MatchType.PALM_TL =>
+            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getTData.getTextQuery)
+          case MatchType.FINGER_LT | MatchType.FINGER_LL | MatchType.PALM_LT | MatchType.PALM_LL  =>
+            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getLData.getTextQuery)
+          case other =>
+        }
       }
     }
     new StreamResponse {

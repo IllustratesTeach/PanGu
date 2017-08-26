@@ -58,7 +58,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
                                         " UNION ALL SELECT p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
                                         " LEFT JOIN gafis_case c ON t.case_id = c.case_id " +
                                         " LEFT JOIN gafis_logic_db_case db ON db.case_pkid = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String](COL_NAME_CASEID, COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE,
+  private val caseCols: Array[String] = Array[String](COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE,
                                                       COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST,
                                                       COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG,COL_NAME_ISPALM, COL_NAME_LOGICDB,
                                                       COL_NAME_ISCHECKED, COL_NAME_LTSTATUS, COL_NAME_CASESOURCE, COL_NAME_CASEOCCURPLACEDETAIL,
@@ -109,9 +109,9 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
         }
       }
       //案件编号
-      val caseId = rs.getString("caseId")
+      val caseId = rs.getString(COL_NAME_CASEID)
       if(caseId != null){
-        TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataByCaseid(caseId).foreach(textData.addCol(_))
       }
 
       //日期类型

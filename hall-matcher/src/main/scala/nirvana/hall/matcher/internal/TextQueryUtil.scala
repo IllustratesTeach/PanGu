@@ -19,11 +19,22 @@ import scala.collection.mutable.ArrayBuffer
   */
 object TextQueryUtil extends LoggerSupport{
 
+  /**
+    * 获取人员编号的ColData
+    * @param personid
+    * @return
+    */
   def getColDataByPersonid(personid: String): Seq[ColData] ={
-    getColDataById(personid, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
+    getColDataById(personid, COL_NAME_PERSONID, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
   }
+
+  /**
+    * 获取案件编号的ColData
+    * @param caseid
+    * @return
+    */
   def getColDataByCaseid(caseid: String): Seq[ColData] ={
-    getColDataById(caseid, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
+    getColDataById(caseid, COL_NAME_CASEID, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
   }
 
   def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
@@ -129,14 +140,17 @@ object TextQueryUtil extends LoggerSupport{
     * 1，前缀  KeyWord
     * 2，12位单位代码 36进制的Long
     * 3，10位日期 36进制的Long
-    * @param cardid  案件编号
+    * @param cardid  人员编号或者案件编号
+    * @param colName  编号的COL_NAME
     * @param preColName 前缀COL_NAME
     * @param deptColName 单位COL_NAME
     * @param dateColName 日期COL_NAME
     * @return
     */
-  def getColDataById(cardid: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
-    val colDataArr = new ArrayBuffer[ColData]()
+  def getColDataById(cardid: String, colName: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
+    val colDataArr = ArrayBuffer[ColData]()
+    //cardid转为小写
+    colDataArr += ColData.newBuilder().setColName(colName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(cardid.toLowerCase().getBytes())).build()
     var id = cardid
     try{
       if (id.matches("^[a-zA-Z]\\w*")) {
