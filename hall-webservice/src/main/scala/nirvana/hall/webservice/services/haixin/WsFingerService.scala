@@ -102,4 +102,55 @@ trait WsHaiXinFingerService {
   @WebMethod def getSysTime():String
 
 
+  /**
+    * 接口08:捺印掌纹信息录入
+    * @param collectsrc 来源
+    * @param userid 用户id
+    * @param unitcode 单位代码
+    * @param palmid 请求方掌纹编号
+    * @param palmtype 公安部掌纹部位代码
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @param dh WSQ文件
+    * @return 1: 成功加入队列 0: 失败
+    */
+  @WebMethod def setPalm(@WebParam(name="collectsrc") collectsrc:String
+                         ,@WebParam(name="userid") userid:String
+                         ,@WebParam(name="unitcode") unitcode:String
+                         ,@WebParam(name="palmid") palmid:String
+                         ,@WebParam(name="palmtype") palmtype:Int
+                         ,@WebParam(name="personid") personid:String
+                         ,@WebParam(name="dh") dh: Array[Byte]):Int
+
+  /**
+    * 接口09:捺印掌纹信息状态查询
+    * @param userid 用户id
+    * @param unitcode 单位代码
+    * @param palmid 请求方掌纹编号
+    * @param palmtype 公安部掌纹部位代码
+    * @return 4: 建库失败 3: 处理中 1: 成功建库 0: 查询失败
+    */
+  @WebMethod def getPalmStatus(@WebParam(name="userid") userid:String
+                               ,@WebParam(name="unitcode") unitcode:String
+                               ,@WebParam(name="palmid") palmid:String
+                               ,@WebParam(name="palmtype") palmtype:Int):Int
+
+
+  /**
+    * 接口10:捺印掌纹信息更新
+    * @param collectsrc 来源
+    * @param userid 用户id
+    * @param unitcode 单位代码
+    * @param palmid 请求方掌纹编号
+    * @param palmtype 公安部掌纹部位代码
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @param dh WSQ文件
+    * @return 1: 成功加入队列 0: 失败
+    */
+  @WebMethod def setPalmAgain(@WebParam(name="collectsrc") collectsrc:String
+                              ,@WebParam(name="userid") userid:String
+                              ,@WebParam(name="unitcode") unitcode:String
+                              ,@WebParam(name="palmid") palmid:String
+                              ,@WebParam(name="palmtype") palmtype:Int
+                              ,@WebParam(name="personid") personid:String
+                              ,@WebParam(name="dh") dh: Array[Byte]):Int
 }

@@ -460,5 +460,130 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     returnValue
   }
 
+  /**
+    * 检查当前传入的捺印掌纹是否存在
+    *
+    * @param palmid
+    * @param palmtype
+    * @param bussType
+    * @return
+    */
+  override def checkPalmIsExist(palmid: String, palmtype: Int, bussType: Int): Unit = {
+    var count = 0
+    val sql = s"SELECT  count(1) num  " +
+      s"FROM  HALL_GAFIS_IA_PALM  t " +
+      s"WHERE t.response_status = 1 AND t.OPER_TYPE = 8 " +
+      s"AND   t.palmid = ?   AND  t.palmfgp = ?"
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,palmid)
+      ps.setInt(2,palmtype)
+    }{rs=>
+      while (rs.next()){
+        count = rs.getString("num").toInt
+      }
+    }
+    bussType match {
+      case IAConstant.SET_PALM =>
+        if(count > 0){
+          throw new FingerExistException("掌纹编号为" + palmid + "的卡已经存在,不能再次添加")
+        }
+      case IAConstant.GET_PALM_STATUS |
+           IAConstant.SET_PALM_AGAIN =>
+        if(count <= 0){
+          throw new FingerNotExistException("掌纹编号为" + palmid + "的卡在本系统中不存在")
+        }
+    }
+  }
 
+  /**
+    * 处理业务完成的通用方法(掌纹)
+    *
+    * @param uuid            全球唯一编码，程序自动生成；
+    * @param collectsrc      请求方来源；
+    * @param userid          用户id
+    * @param unitcode        用户id所属的单位代码
+    * @param response_status 返回给客户端的程序执行状态
+    * @param oper_type       操作类型，区分是添加还是修改还是删除还是查询
+    * @param palmid          请求方掌纹编号
+    * @param palmtype        公安部掌纹部位代码
+    * @param personid        公安部标准的23位唯一码，人员编号
+    * @param dataHandler     承载FPT的一种数据类型
+    * @param throwAble       异常对象
+    */
+  override def palmBusinessFinishedHandler(uuid: String, collectsrc: String, userid: String, unitcode: String, response_status: Int, oper_type: Int, palmid: String, palmtype: Int, personid: String, dataHandler: Array[Byte], throwAble: Option[Throwable]): Unit = {
+    var indoorReturnValue = IAConstant.SUCCESS
+    throwAble match{
+      case Some(t) => indoorReturnValue = getIndoorReturnValue(t)
+      case _ =>
+    }
+
+    val sql_t1 = s"INSERT INTO HALL_GAFIS_IA_PALM ( UUID" +
+      s",COLLECTSRC" +
+      s",USERID" +
+      s",UNITCODE" +
+      s",INDOOR_STATUS" +
+      s",RESPONSE_STATUS" +
+      s",OPER_TYPE" +
+      s",PERSONID" +
+      s",PALMID" +
+      s",PALMFGP" +
+      s",CREATETIME" +
+      s",MATCHSTATUS )" +
+      s" VALUES(?,?,?,?,?,?,?,?,?,?,sysdate,?)"
+    JdbcDatabase.update(sql_t1){ps=>
+      ps.setString(1, uuid)
+      ps.setString(2,collectsrc)
+      ps.setString(3,userid)
+      ps.setString(4,unitcode)
+      ps.setInt(5,indoorReturnValue)
+      ps.setInt(6,response_status)
+      ps.setInt(7,oper_type)
+      ps.setString(8,personid)
+      ps.setString(9,palmid)
+      ps.setInt(10,palmtype)
+      ps.setInt(11,0)
+    }
+
+    if(indoorReturnValue == 9){
+      if(null != dataHandler){
+        val sql_t2 = s"INSERT INTO HALL_GAFIS_IA_PALM_WSQ(UUID" +
+          s",IA_PALM_PKID" +
+          s",PALMID" +
+          s",PERSONID" +
+          s",PALMFGP" +
+          s",WSQ) VALUES(?,?,?,?,?,?)"
+        JdbcDatabase.update(sql_t2){ps=>
+          ps.setString(1, UUID.randomUUID().toString.replace("-",""))
+          ps.setString(2,uuid)
+          ps.setString(3,palmid)
+          ps.setString(4,personid)
+          ps.setInt(5,palmtype)
+          ps.setBytes(6, dataHandler)
+        }
+      }
+    }else{
+      val sql_t3 = s"INSERT INTO HALL_GAFIS_IA_PALM_EXCEPTION(UUID,IA_PALM_PKID,EXCEPTIONINFO) VALUES(?,?,?)"
+      JdbcDatabase.update(sql_t3){ps=>
+        ps.setString(1, UUID.randomUUID().toString.replace("-",""))
+        ps.setString(2,uuid)
+        ps.setString(3,throwAble.get.getMessage)
+      }
+    }
+  }
+
+  override def getResponseStatusAndPlam(palmid: String, palmtype: Int): Int =  {
+    var count = 0
+    val sql = s"SELECT count(1)  num  " +
+      s"FROM HALL_GAFIS_IA_PALM t " +
+      s"WHERE t.palmid = ? AND t.palmfgp = ? AND t.response_status = 1 AND t.OPER_TYPE = 8 "
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1, palmid)
+      ps.setInt(2, palmtype)
+    }{rs=>
+      while (rs.next()){
+        count = rs.getString("num").toInt
+      }
+    }
+    count
+  }
 }

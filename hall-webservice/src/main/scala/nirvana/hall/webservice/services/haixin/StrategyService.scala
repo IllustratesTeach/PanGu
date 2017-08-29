@@ -131,4 +131,33 @@ trait StrategyService {
     * @return
     */
   def getOraSidAndQueryIdByPersonId(personId:String): Option[ListBuffer[mutable.HashMap[String,Any]]]
+
+  /**
+    * 检查当前传入的捺印掌纹是否存在
+    * @param palmid
+    * @param palmtype
+    * @param bussType
+    * @return
+    */
+  def checkPalmIsExist(palmid:String,palmtype:Int,bussType:Int): Unit
+
+  /**
+    * 处理业务完成的通用方法(掌纹)
+    * @param uuid 全球唯一编码，程序自动生成；
+    * @param collectsrc 请求方来源；
+    * @param userid 用户id
+    * @param unitcode 用户id所属的单位代码
+    * @param response_status 返回给客户端的程序执行状态
+    * @param oper_type 操作类型，区分是添加还是修改还是删除还是查询
+    * @param palmid 请求方掌纹编号
+    * @param palmtype 公安部掌纹部位代码
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @param dataHandler 承载FPT的一种数据类型
+    * @param throwAble   异常对象
+    */
+  def palmBusinessFinishedHandler( uuid:String,collectsrc:String,userid:String
+                                     ,unitcode:String,response_status:Int
+                                     ,oper_type:Int,palmid:String,palmtype:Int,personid:String,dataHandler: Array[Byte],throwAble:Option[Throwable]):Unit
+
+  def getResponseStatusAndPlam(palmid:String,palmtype:Int): Int
 }

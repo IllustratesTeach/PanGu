@@ -48,6 +48,9 @@ object IAConstant {
   final val GET_FINGER_MATCH_LIST = 4
   final val GET_FINGER_MATCH_COUNT = 5
   final val GET_FINGER_MATCH_DATA = 6
+  final val SET_PALM = 8
+  final val GET_PALM_STATUS = 9
+  final val SET_PALM_AGAIN = 10
 
   /**
     * 操作类型常量
