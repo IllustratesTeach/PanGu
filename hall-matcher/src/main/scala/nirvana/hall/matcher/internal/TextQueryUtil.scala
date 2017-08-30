@@ -37,11 +37,21 @@ object TextQueryUtil extends LoggerSupport{
     getColDataById(caseid, COL_NAME_CASEID, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
   }
 
-  def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
-    getGroupQuery(personidBeg, personidEnd, false)
+  private def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
+    if(personidBeg.indexOf("*") >=0 || personidBeg.indexOf("?") >= 0
+      || personidEnd.indexOf("*") >= 0 || personidEnd.indexOf("?") >= 0){
+      getCardidGroupQueryOfKeyword(personidBeg, personidEnd, false)
+    }else{
+      getCardidGroupQueryOfRange(personidBeg, personidEnd, false)
+    }
   }
-  def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
-    getGroupQuery(caseidBeg, caseidEnd, true)
+  private def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
+    if(caseidBeg.indexOf("*") >=0 || caseidBeg.indexOf("?") >= 0
+      || caseidEnd.indexOf("*") >= 0 || caseidEnd.indexOf("?") >= 0){
+      getCardidGroupQueryOfKeyword(caseidBeg, caseidEnd, true)
+    }else {
+      getCardidGroupQueryOfRange(caseidBeg, caseidEnd, true)
+    }
   }
   def getPersonidGroupQueryByJSONObject(json: JSONObject): GroupQuery={
     getCardidGroupQueryByJSONObject(json, false)
@@ -57,18 +67,18 @@ object TextQueryUtil extends LoggerSupport{
     */
   def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
     var begKey1 = PERSONID_BEG1
-    var endKey1 = TextQueryConstants.PERSONID_END1
-    var begKey2 = TextQueryConstants.PERSONID_BEG2
-    var endKey2 = TextQueryConstants.PERSONID_END2
-    var occurKey1 = TextQueryConstants.PERSONID_OCCUR1
-    var occurKey2 = TextQueryConstants.PERSONID_OCCUR2
+    var endKey1 = PERSONID_END1
+    var begKey2 = PERSONID_BEG2
+    var endKey2 = PERSONID_END2
+    var occurKey1 = PERSONID_OCCUR1
+    var occurKey2 = PERSONID_OCCUR2
     if(isLatent){
-      begKey1 = TextQueryConstants.CASEID_BEG1
-      endKey1 = TextQueryConstants.CASEID_END1
-      begKey2 = TextQueryConstants.CASEID_BEG2
-      endKey2 = TextQueryConstants.CASEID_END2
-      occurKey1 = TextQueryConstants.CASEID_OCCUR1
-      occurKey2 = TextQueryConstants.CASEID_OCCUR2
+      begKey1 = CASEID_BEG1
+      endKey1 = CASEID_END1
+      begKey2 = CASEID_BEG2
+      endKey2 = CASEID_END2
+      occurKey1 = CASEID_OCCUR1
+      occurKey2 = CASEID_OCCUR2
     }
     val groupQuery1 = getGroupQueryByJSONObject(json, begKey1, endKey1, isLatent)
     val groupQuery2 = getGroupQueryByJSONObject(json, begKey2, endKey2, isLatent)
@@ -193,7 +203,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param isLatent true:现场
     * @return
     */
-  def getGroupQuery(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
+  def getCardidGroupQueryOfRange(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
     var preColName = COL_NAME_PID_PRE
     var deptColName = COL_NAME_PID_DEPT
     var dateColName = COL_NAME_PID_DATE
@@ -207,101 +217,104 @@ object TextQueryUtil extends LoggerSupport{
     //前缀
     var idBeg = cardidBeg
     var idEnd = cardidEnd
-    if(!idBeg.contains("*") && !idEnd.contains("*")){
-      if (idBeg.matches("^[a-zA-Z]\\w*")) {
-        val id_ = splitCardidByPre(idBeg)
-        val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-        groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
-        idBeg = id_._2
-      }
-      if (idEnd.matches("^[a-zA-Z]\\w*")) {
-        val id_ = splitCardidByPre(idEnd)
-        val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-        groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
-        idEnd = id_._2
-      }
-      /*
-      人员编号一分为二，dept, date A1=deptBeg A2=dateBeg B1=deptEnd B2=dateEnd
-      or 代表should, and 代表must
-      程序逻辑可能跟一下描述不太一样，但是结果一样
-      A1=B1          dept:[A1] and date:[A2,B2]
-      A1             dept:[A1,_)
-      A1 A2          dept:(A1,_) or (dept:A1 and date:[A2,_))
-      A1 A2 B1       dept:(A1, B1] or (dept:A1 and date:[A2,_))
-      A1 A2 B1 B2    dept:(A1, B1) or (dept:A1 and date:[A2,_) or (dept:B1 and date:(_,B2])
-      A1 B1          dept:[A1, B1]
-      A1 B1 B2       dept:[A1, B1) or (dept: B1 and date:(_,B2])
-      B1             dept:(_, B1]
-      B1 B2          dept:(_, B1) or (dept:B1 and date:(_,B2])
-       */
-      val beg = getLong36ValueById(idBeg)
-      val end = getLong36ValueById(idEnd)
+    if (idBeg.matches("^[a-zA-Z]\\w*")) {
+      val id_ = splitCardidByPre(idBeg)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
+      idBeg = id_._2
+    }
+    if (idEnd.matches("^[a-zA-Z]\\w*")) {
+      val id_ = splitCardidByPre(idEnd)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
+      idEnd = id_._2
+    }
+    /*
+    人员编号一分为二，dept, date A1=deptBeg A2=dateBeg B1=deptEnd B2=dateEnd
+    or 代表should, and 代表must
+    程序逻辑可能跟一下描述不太一样，但是结果一样
+    A1=B1          dept:[A1] and date:[A2,B2]
+    A1             dept:[A1,_)
+    A1 A2          dept:(A1,_) or (dept:A1 and date:[A2,_))
+    A1 A2 B1       dept:(A1, B1] or (dept:A1 and date:[A2,_))
+    A1 A2 B1 B2    dept:(A1, B1) or (dept:A1 and date:[A2,_) or (dept:B1 and date:(_,B2])
+    A1 B1          dept:[A1, B1]
+    A1 B1 B2       dept:[A1, B1) or (dept: B1 and date:(_,B2])
+    B1             dept:(_, B1]
+    B1 B2          dept:(_, B1) or (dept:B1 and date:(_,B2])
+     */
+    val beg = getLong36ValueById(idBeg)
+    val end = getLong36ValueById(idEnd)
 
-      val deptBeg = beg._1
-      val dateBeg = beg._2
-      val deptEnd = end._1
-      val dateEnd = end._2
+    val deptBeg = beg._1
+    val dateBeg = beg._2
+    val deptEnd = end._1
+    val dateEnd = end._2
 
-      if(deptBeg == deptEnd){//如果部门编号相同，对部门编号使用LongQuery，对日期使用LongRangeQuery
-        groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
-          LongQuery.newBuilder().setValue(deptBeg).build())
+    if(deptBeg == deptEnd){//如果部门编号相同，对部门编号使用LongQuery，对日期使用LongRangeQuery
+      groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+        LongQuery.newBuilder().setValue(deptBeg).build())
 
-        groupQuery.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).setMax(dateEnd).setMaxInclusive(true).build())
-      }else{
-        //由于deptBeg默认为0,所有这里只判断deptEnd
-        if(deptEnd > 0){
-          groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-            LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build())
-        }else{
-          groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-            LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build())
-        }
-        //日期判断
-        if(dateBeg > 0){
-          val groupQuery2 = GroupQuery.newBuilder()
-          groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
-            LongQuery.newBuilder().setValue(deptBeg).build())
-          groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
-            LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).build())
-
-          groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
-        }
-        if(dateEnd > 0){
-          val groupQuery2 = GroupQuery.newBuilder()
-          groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
-            LongQuery.newBuilder().setValue(deptEnd).build())
-          groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
-            LongRangeQuery.newBuilder().setMax(dateEnd).setMaxInclusive(true).build())
-
-          groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
-        }
-      }
+      groupQuery.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+        LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).setMax(dateEnd).setMaxInclusive(true).build())
     }else{
+      //由于deptBeg默认为0,所有这里只判断deptEnd
+      if(deptEnd > 0){
+        groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build())
+      }else{
+        groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build())
+      }
+      //日期判断
+      if(dateBeg > 0){
+        val groupQuery2 = GroupQuery.newBuilder()
+        groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+          LongQuery.newBuilder().setValue(deptBeg).build())
+        groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).build())
 
-      if(idBeg.contains("*") && !idEnd.contains("*")){
+        groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
+      }
+      if(dateEnd > 0){
+        val groupQuery2 = GroupQuery.newBuilder()
+        groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
+          LongQuery.newBuilder().setValue(deptEnd).build())
+        groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
+          LongRangeQuery.newBuilder().setMax(dateEnd).setMaxInclusive(true).build())
 
-        val keywordQueryIdBeg = KeywordQuery.newBuilder().setValue(idBeg)
-        groupQuery.addClauseQueryBuilder().setName(PERSONID_BEG1).setExtension(KeywordQuery.query, keywordQueryIdBeg.build()).setOccur(Occur.MUST)
-
-      }else if(!idBeg.contains("*") && idEnd.contains("*")){
-
-        val keywordQueryIdEnd = KeywordQuery.newBuilder().setValue(idEnd)
-        groupQuery.addClauseQueryBuilder().setName(TextQueryConstants.PERSONID_END1).setExtension(KeywordQuery.query, keywordQueryIdEnd.build()).setOccur(Occur.MUST)
-
-      }else if(idBeg.contains("*") && idEnd.contains("*")){
-
-        val keywordQueryIdBeg = KeywordQuery.newBuilder().setValue(idBeg)
-        groupQuery.addClauseQueryBuilder().setName(PERSONID_BEG1).setExtension(KeywordQuery.query, keywordQueryIdBeg.build()).setOccur(Occur.MUST)
-
-        val keywordQueryIdEnd = KeywordQuery.newBuilder().setValue(idEnd)
-        groupQuery.addClauseQueryBuilder().setName(TextQueryConstants.PERSONID_END1).setExtension(KeywordQuery.query, keywordQueryIdEnd.build()).setOccur(Occur.MUST)
+        groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
       }
     }
 
     groupQuery.build()
   }
 
+  /**
+    * 根据编号Keyword查询
+    * @param cardidBeg
+    * @param cardidEnd
+    * @param isLatent
+    * @return
+    */
+  private def getCardidGroupQueryOfKeyword(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery ={
+    val groupQuery = GroupQuery.newBuilder()
+    val colName = if(isLatent){
+      COL_NAME_CASEID
+    }else{
+      COL_NAME_PERSONID
+    }
+    if(cardidBeg.nonEmpty){
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidBeg)
+      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+    }
+    if(cardidEnd.nonEmpty){
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidEnd)
+      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+    }
+
+   groupQuery.build()
+  }
   /**
     * 将人员编号或案件编号拆分为两部分（dept: 12位，date: 10位  位数不够不够补0）,并转为Long36
     * @param id
