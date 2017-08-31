@@ -65,7 +65,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param json
     * @return
     */
-  def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
+  private def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
     var begKey1 = PERSONID_BEG1
     var endKey1 = PERSONID_END1
     var begKey2 = PERSONID_BEG2
@@ -305,11 +305,11 @@ object TextQueryUtil extends LoggerSupport{
       COL_NAME_PERSONID
     }
     if(cardidBeg.nonEmpty){
-      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidBeg)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidBeg.toLowerCase())
       groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
     }
     if(cardidEnd.nonEmpty){
-      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidEnd)
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidEnd.toLowerCase())
       groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
     }
 
