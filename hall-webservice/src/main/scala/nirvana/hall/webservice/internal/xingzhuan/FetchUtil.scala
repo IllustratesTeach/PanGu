@@ -23,8 +23,9 @@ class FetchUtil(implicit dataSource: DataSource,
     * @param tableName
     * @param dateLimit 上报数据年限
     */
-  def doFetcher(cardIdBuffer: ArrayBuffer[(String,String)], size: Int, tableName: String, dateLimit:String): Unit ={
-    val SYNC_SQL=s"select t.fingerid,t.caseid from ${tableName} t where  t.createtime>= to_date('${dateLimit}-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss') " +
+  def doFetcher(cardIdBuffer: ArrayBuffer[(String,String)], size: Int, tableName: String,latentPrex: String, dateLimit:String): Unit ={
+    val SYNC_SQL=s"select t.fingerid,t.caseid from ${tableName} t where  t.createtime>= to_date('${dateLimit}-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss')" +
+      s"and t.fingerid like '" + latentPrex +"%' " +
       s"and not exists(select t1.serviceid " +
                         s"from HALL_XC_REPORT t1 " +
                         s"where t1.typ='" + FPTUtil.Latent +"' and t1.serviceid=t.fingerid ) " +

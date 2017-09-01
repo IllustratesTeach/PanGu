@@ -26,16 +26,16 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Proto与po实体对象相互转换
- */
+  * Proto与po实体对象相互转换
+  */
 object ProtobufConverter extends LoggerSupport{
 
   /**
-   * 案件信息转换
+    * 案件信息转换
     *
     * @param caseInfo
-   * @return
-   */
+    * @return
+    */
   def convertCase2GafisCase(caseInfo: Case, gafisCase: GafisCase = new GafisCase()): GafisCase = {
     gafisCase.caseId = caseInfo.getStrCaseID
     gafisCase.cardId = caseInfo.getStrCaseID
@@ -56,7 +56,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseState = text.getNCaseState.toString
     gafisCase.assistBonus = text.getStrPremium
     gafisCase.assistSign = text.getNXieChaState.toString
-//    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
+    //    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
     gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
     gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
 
@@ -149,11 +149,11 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 现在指纹protobuf转为现场指纹特征
+    * 现在指纹protobuf转为现场指纹特征
     *
     * @param lpCard
-   * @return
-   */
+    * @return
+    */
   def convertLPCard2GafisCaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
     val caseFingerMnt = new GafisCaseFingerMnt()
     caseFingerMnt.fingerId = lpCard.getStrCardID
@@ -168,12 +168,12 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 现场指纹转为protobuf
+    * 现场指纹转为protobuf
     *
     * @param caseFinger
-   * @param caseFingerMnt
-   * @return
-   */
+    * @param caseFingerMnt
+    * @return
+    */
   def convertGafisCaseFinger2LPCard(caseFinger: GafisCaseFinger, caseFingerMnt: GafisCaseFingerMnt): LPCard = {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(caseFinger.fingerId)
@@ -192,7 +192,7 @@ object ProtobufConverter extends LoggerSupport{
 
     val blobBuilder = lpCard.getBlobBuilder
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-//    magicSet(caseFinger.developMethod, blobBuilder.setStrMntExtractMethod)
+    //    magicSet(caseFinger.developMethod, blobBuilder.setStrMntExtractMethod)
     blobBuilder.setStImageBytes(ByteString.copyFrom(caseFinger.fingerImg))
     //特征
     if(caseFingerMnt.fingerMnt != null)
@@ -211,12 +211,12 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 现场掌纹protobuf转为GafisPalm
+    * 现场掌纹protobuf转为GafisPalm
     *
     * @param lpCard
-   * @param casePalm
-   * @return
-   */
+    * @param casePalm
+    * @return
+    */
   def convertLPCard2GafisCasePalm(lpCard: LPCard, casePalm: GafisCasePalm = new GafisCasePalm()): GafisCasePalm = {
     casePalm.palmId = lpCard.getStrCardID
     val text = lpCard.getText
@@ -251,11 +251,11 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 现场掌纹特征转换
+    * 现场掌纹特征转换
     *
     * @param lpCard
-   * @return
-   */
+    * @return
+    */
   def convertLPCard2GafisCasePalmMnt(lpCard: LPCard, casePalmMnt: GafisCasePalmMnt = new GafisCasePalmMnt()): GafisCasePalmMnt = {
     casePalmMnt.palmId = lpCard.getStrCardID
     val blob = lpCard.getBlob
@@ -268,12 +268,12 @@ object ProtobufConverter extends LoggerSupport{
     casePalmMnt
   }
   /**
-   * 现场指纹转为protobuf
+    * 现场指纹转为protobuf
     *
     * @param casePalm
-   * @param casePalmMnt
-   * @return
-   */
+    * @param casePalmMnt
+    * @return
+    */
   def convertGafisCasePalm2LPCard(casePalm: GafisCasePalm, casePalmMnt: GafisCasePalmMnt): LPCard = {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(casePalm.palmId)
@@ -307,14 +307,14 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 捺印人员信息转为protobuf
+    * 捺印人员信息转为protobuf
     *
     * @param person
-   * @param photoList
-   * @param fingerList
-   * @param palmList
-   * @return
-   */
+    * @param photoList
+    * @param fingerList
+    * @param palmList
+    * @return
+    */
   def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
@@ -413,12 +413,12 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 将tpcard
+    * 将tpcard
     *
     * @param tpCard
-   * @param person
-   * @return
-   */
+    * @param person
+    * @return
+    */
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
     person.personid = tpCard.getStrCardID
     person.cardid = tpCard.getStrPersonID
@@ -453,7 +453,7 @@ object ProtobufConverter extends LoggerSupport{
     person.certificateid = text.getStrCertifID
     person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
 
-//    person.assistSign = text.getNXieChaFlag.toString
+    //    person.assistSign = text.getNXieChaFlag.toString
     person.assistLevel = text.getNXieChaLevel.toString
     //协查状态，根据协查级别确定是否是协查
     if(text.getNXieChaLevel > 0){
@@ -500,11 +500,11 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 指纹转换
+    * 指纹转换
     *
     * @param tpCard
-   * @return
-   */
+    * @return
+    */
   def convertTPCard2GafisGatherFinger(tpCard: TPCard): Seq[GafisGatherFinger] = {
     val fingerList = new ArrayBuffer[GafisGatherFinger]()
     val personId = tpCard.getStrCardID
@@ -556,11 +556,11 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 人像转换
+    * 人像转换
     *
     * @param tpCard
-   * @return
-   */
+    * @return
+    */
   def convertTPCard2GafisGatherPortrait(tpCard: TPCard): Seq[GafisGatherPortrait]={
     val portaitList = new ArrayBuffer[GafisGatherPortrait]()
     val personId = tpCard.getStrCardID
@@ -588,11 +588,11 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   /**
-   * 掌纹转换
+    * 掌纹转换
     *
     * @param tpCard
-   * @return
-   */
+    * @return
+    */
   def convertTPCard2GafisGatherPalm(tpCard: TPCard): Seq[GafisGatherPalm] ={
     val palmList = new ArrayBuffer[GafisGatherPalm]()
     val personId = tpCard.getStrCardID
@@ -667,6 +667,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisQuery.maxcandnum = matchTask.getTopN
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
     gafisQuery.status = QueryConstants.STATUS_WAIT
+    gafisQuery.username = matchTask.getCommitUser
 
     matchTask.getMatchType match {
       case MatchType.FINGER_LL |
@@ -741,10 +742,11 @@ object ProtobufConverter extends LoggerSupport{
     matchTask.setPriority(gafisQuery.priority.toInt)
     matchTask.setScoreThreshold(gafisQuery.minscore)
     matchTask.setTopN(gafisQuery.maxcandnum)
+    if(null!=gafisQuery.status)matchTask.setStatus(gafisQuery.status.toInt)
     if(null!=gafisQuery.username) matchTask.setCommitUser(gafisQuery.username)
     matchTask.setComputerIp(gafisQuery.computerip)
     if(null!=gafisQuery.userunitcode) matchTask.setUserUnitCode(gafisQuery.userunitcode)
-    matchTask.setOraCreatetime(DateConverter.convertDate2String(gafisQuery.createtime, "yyyy-MM-dd HH:mm:ss"))
+    matchTask.setOraCreatetime(DateConverter.convertDate2String(gafisQuery.createtime, "yyyyMMddHHmmss"))
     val flag = gafisQuery.flag
     val isPalm = flag == QueryConstants.FLAG_PALM || flag == QueryConstants.FLAG_PALM_TEXT
     val matchType = convertQueryType2MatchType(gafisQuery.querytype, isPalm)
@@ -765,7 +767,7 @@ object ProtobufConverter extends LoggerSupport{
             tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
           case glocdef.GAMIC_ITEMTYPE_TPLAIN =>
             //平面
-            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData+10)
+            tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemData)
           case glocdef.GAMIC_ITEMTYPE_PALM =>
             //掌纹
             tdata.setMinutia(ByteString.copyFrom(mic.pstMnt_Data)).setPos(mic.nItemFlag)

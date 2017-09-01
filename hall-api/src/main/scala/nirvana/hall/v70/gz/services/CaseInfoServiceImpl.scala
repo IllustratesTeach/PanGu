@@ -119,7 +119,8 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     magicSet(caseInfo.assistBonus, textBuilder.setStrPremium)
     textBuilder.setNCaseState(caseInfo.assistSign)
     textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
-    textBuilder.setNCaseState(caseInfo.caseState)
+    //案件状态字典不符fpt标准，暂时忽略该项信息
+//    textBuilder.setNCaseState(caseInfo.caseState)
 
     if(fingerIds != null)
       fingerIds.foreach(f => caseBuilder.addStrFingerID(f))

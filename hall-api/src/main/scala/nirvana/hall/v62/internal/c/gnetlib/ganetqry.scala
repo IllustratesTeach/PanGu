@@ -143,9 +143,4 @@ trait ganetqry {
     validateResponse(channel,pAns)
   }
 
-  final val GAFIS_KEYLIST_GetName = "KeyList"
-  final val GAFIS_QRYPARAM_GetName = "QryParam"
-  final val GAFIS_QRYFILTER_GetName = "QryFilter"
-  final val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
-  final val GAFIS_TEXTSQL_GetName = "TextSql"
 }

@@ -16,6 +16,7 @@ object TextQueryConstants {
   val OCCUR_MUST_NOT = "no"
 
   //文本查询json KEY
+  val PERSONID = "personId"
   val PERSONID_BEG1 = "personIdST1"
   val PERSONID_END1 = "personIdED1"
   val PERSONID_BEG2 = "personIdST2"
@@ -32,6 +33,7 @@ object TextQueryConstants {
   val MODIFIEDTIME_END = "modifiedtimeED"
   val IMPKEYS = "impKeys"
 
+  val CASEID = "caseId"
   val CASEID_BEG1 = "caseIdST1"
   val CASEID_END1 = "caseIdED1"
   val CASEID_BEG2 = "caseIdST2"
@@ -48,7 +50,7 @@ object TextQueryConstants {
 
   //案件
   //贵州
-  val COL_NAME_CASEID = "caseId"
+  val COL_NAME_CASEID = CASEID
   val COL_NAME_CID_PRE = "cId_pre"
   val COL_NAME_CID_DEPT = "cId_deptCode"
   val COL_NAME_CID_DATE = "cId_date"
@@ -67,17 +69,17 @@ object TextQueryConstants {
 
   //捺印
   //贵州
-  val COL_NAME_PERSONID = "personId"
+  val COL_NAME_PERSONID = PERSONID
   val COL_NAME_PID_PRE = "pId_pre"
   val COL_NAME_PID_DEPT = "pId_deptCode"
   val COL_NAME_PID_DATE = "pId_date"
   val COL_NAME_GATHERCATEGORY = "gatherCategory"
   val COL_NAME_GATHERTYPE = "gatherType"
-  val COL_NAME_GATHERTYPEID = "gatherTypeID"
   val COL_NAME_DOOR = "door"
   val COL_NAME_ADDRESS = "address"
   val COL_NAME_SEXCODE = "sexCode"
-  val COL_NAME_NAME = "name"
+  val COL_NAME_NAME = PERSON_NAME
+  val COL_NAME_IDCARDNO = IDCARDNO
   val COL_NAME_DATASOURCES = "dataSources"
   val COL_NAME_CASECLASS = "caseClass"
   val COL_NAME_BIRTHDAY = "birthday"
@@ -144,4 +146,23 @@ object TextQueryConstants {
   val COL_NAME_MODIFIEDTIME = "modifiedtime"
   val COL_NAME_GATHERFINGERTIME = "gatherFingerTime"
   val COL_NAME_EXTRACTDATE = "extractDate"
+
+  //gafis6.2字段
+  val GAFIS_KEYLIST_GetName = "KeyList"
+  val GAFIS_QRYPARAM_GetName = "QryParam"
+  val GAFIS_QRYFILTER_GetName = "QryFilter"
+  val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
+  val GAFIS_TEXTSQL_GetName = "TextSql"
+
+  val COL_NAME6_CARDID = "CardID"
+  val COL_NAME6_NAME = "Name"
+  val COL_NAME6_CREATEUSERNAME = "CreateUserName"
+  val COL_NAME6_BIRTHDATE = "BirthDate"
+  val COL_NAME6_ADDRESSTAIL = "AddressTail"
+  val COL_NAME6_CASECLASS1CODE = "CaseClass1Code"
+  val COL_NAME6_PRINTERUNITNAMETAIL = "PrinterUnitNameTail"
+  val COL_NAME6_SEXCODE = "SexCode"
+  val COL_NAME6_RACECODE = "RaceCode"
+  val COL_NAME6_FINGERID = "FingerID"
+  val COL_NAME6_CASEID = "CaseID"
 }

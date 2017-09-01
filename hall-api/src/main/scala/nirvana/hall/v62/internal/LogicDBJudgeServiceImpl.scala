@@ -7,23 +7,13 @@ import nirvana.hall.protocol.api.FPTProto.TPCard
   * Created by zhangjinqi on 2017/4/18.
   */
 class LogicDBJudgeServiceImpl extends LogicDBJudgeService {
-  /**
-    * 获取捺印逻辑库
-    *
-    * @param cardId
-    * @param dbid
-    */
-  override def logicTJudge(cardId: String,dbid :Option[String]): Option[String] = {
-      return dbid
-  }
 
   /**
-    * 获取案件逻辑库
-    *
+    * 获取逻辑库
     * @param caseId
     * @param dbid
     */
-  override def logicLJudge(caseId: String,dbid :Option[String]): Option[String] = {
+  def logicJudge(caseId: String,dbid :Option[String],cardType: String): Option[String] = {
     return dbid
   }
 

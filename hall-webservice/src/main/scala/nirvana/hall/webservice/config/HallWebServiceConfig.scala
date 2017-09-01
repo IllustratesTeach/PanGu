@@ -21,6 +21,9 @@ class HallWebserviceConfig
 
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
+
+  @XmlElement(name = "XingZhuanSetting")
+  var XingZhuanSetting: XingZhuanSetting = new XingZhuanSetting
   @XmlElement(name = "local_tenprint_path")
   var localTenprintPath:String = _
   @XmlElement(name = "local_latent_path")
@@ -53,4 +56,13 @@ class Union4pfmipConfig{
   var sendCheckinCron: String = _
   @XmlElement(name = "upload_checkin_cron")
   var uploadCheckinCron: String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "XingZhuanSetting")
+class XingZhuanSetting{
+  @XmlElement(name = "isAutoQuery")
+  var isAutoQuery: String = _
+  @XmlElement(name = "cron")
+  var cron: String = _
 }

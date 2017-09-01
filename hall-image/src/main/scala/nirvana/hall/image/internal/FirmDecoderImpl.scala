@@ -173,7 +173,7 @@ class FirmDecoderImpl(@Symbol(MonadCoreSymbols.SERVER_HOME) serverHome:String,im
 
     destImg.stHead.bIsCompressed = 0
     destImg.stHead.nCompressMethod = 0
-    destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN
+    destImg.stHead.nCaptureMethod = glocdef.GA_IMGCAPTYPE_CPRGEN.toByte
     destImg.stHead.nImgSize = destImg.bnData.length
 
     destImg

@@ -24,8 +24,8 @@ class SyncSyCronServiceImpl(implicit val database: DataSource,
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, syncSyCronService: SyncSyCronService): Unit = {
-    if(hallWebserviceConfig.union4pfmip.cron!= null){
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sync-cron", new Runnable {
+    if(hallWebserviceConfig.XingZhuanSetting.cron!= null){
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.XingZhuanSetting.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           info("begin sync-cron assistCheck_query")
           try{

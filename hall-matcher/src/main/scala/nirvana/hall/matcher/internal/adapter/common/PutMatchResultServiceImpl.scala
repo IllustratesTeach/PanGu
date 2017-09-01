@@ -4,7 +4,8 @@ import javax.sql.DataSource
 
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.GafisConverter
-import nirvana.hall.matcher.service.PutMatchResultService
+import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
+import nirvana.hall.matcher.service.{AutoCheckService, PutMatchResultService}
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
 import nirvana.protocol.MatchResult.MatchResultResponse.MatchResultResponseStatus
@@ -16,7 +17,7 @@ import scala.collection.mutable
 /**
  * Created by songpeng on 16/4/9.
  */
-class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
+class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid=?"
   val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
@@ -29,18 +30,19 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
     if (matchResultRequest.getStatus.getCode == 0) {
-      addMatchResult(matchResultRequest)
+      val queryQue = getQueryQueVo(matchResultRequest.getMatchId.toInt)
+      addMatchResult(matchResultRequest, queryQue)
+      autoCheckService.ttAutoCheck(matchResultRequest, queryQue)
     } else {
       updateMatchStatusFail(matchResultRequest.getMatchId, matchResultRequest.getStatus)
     }
     matchResultResponse.build()
   }
 
-  private def addMatchResult(matchResultRequest: MatchResultRequest): Unit = {
+  private def addMatchResult(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo): Unit = {
     val oraSid = matchResultRequest.getMatchId
     val candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
-    val queryQue = getQueryQue(oraSid.toInt)
 
     var candList:Array[Byte] = null
     if(candNum > 0){
@@ -83,7 +85,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param dataSource
    * @return
    */
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo)(implicit dataSource: DataSource): Map[Long, String] = {
     val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
@@ -117,16 +119,16 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     map.toMap
   }
 
-  private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {
+  private def getQueryQueVo(oraSid: Int)(implicit dataSource: DataSource): QueryQueVo = {
     JdbcDatabase.queryFirst(GET_QUERY_QUE_SQL) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
     }.get
   }
 }
 
-class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)
+//class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)

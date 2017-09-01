@@ -4,7 +4,6 @@ import javax.sql.DataSource
 
 import net.sf.json.JSONObject
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.TextQueryConstants._
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
@@ -36,7 +35,7 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
                                                               s" AND t.sync_target_sid IS NULL AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt" +
                                         s"  WHERE ROWNUM <=?"
 
-  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY,COL_NAME_GATHERTYPEID,COL_NAME_GATHERTYPE,COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE,COL_NAME_DATASOURCES,COL_NAME_CASECLASS,
+  private val personCols: Array[String] = Array[String](PERSON_NAME, COL_NAME_GATHERCATEGORY,COL_NAME_GATHERTYPE,COL_NAME_GATHERTYPE,COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE,COL_NAME_DATASOURCES,COL_NAME_CASECLASS,
     COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE,COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON,COL_NAME_ASSISTREFCASE,
     COL_NAME_GATHERDEPARTNAME, COL_NAME_GATHERUSERNAME, COL_NAME_CONTRCAPTURECODE,COL_NAME_CERTIFICATETYPE,COL_NAME_CERTIFICATEID,COL_NAME_PROCESSNO,COL_NAME_PSISNO,COL_NAME_SPELLNAME,COL_NAME_USEDNAME,
     COL_NAME_USEDSPELL, COL_NAME_ALIASNAME,COL_NAME_ALIASSPELL,COL_NAME_BIRTHCODE,COL_NAME_BIRTHSTREET,COL_NAME_BIRTHDETAIL, COL_NAME_DOORSTREET, COL_NAME_DOORDETAIL, COL_NAME_ADDRESSSTREET, COL_NAME_ADDRESSDETAIL,
@@ -80,16 +79,14 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //处理其他特殊的查询条件
-        //模糊字段
-        val fuzzyColumn = Array(PERSON_NAME,IDCARDNO)
-        fuzzyColumn.foreach{col =>
+        //通配符查询,转为小写
+        val wildcardColumn = Array(PERSONID, IDCARDNO)
+        wildcardColumn.foreach{col =>
           if (json.has(col)) {
-            val keywordQuery = KeywordQuery.newBuilder()
-            keywordQuery.setValue(json.getString(col) + "*")
+            val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(col).toLowerCase())
             textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
-
         if(json.has(BIRTHDAY_BEG) && json.has(BIRTHDAY_END)){
           val longQuery = LongRangeQuery.newBuilder()
           longQuery.setMin(DateConverter.convertStr2Date(json.getString(BIRTHDAY_BEG), "yyyy-MM-dd").getTime).setMinInclusive(true)
@@ -119,22 +116,22 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
 
         //导入编号
         if(json.has(IMPKEYS)){
-          val personIds = json.getString(IMPKEYS).split("\\|")
+          val personIds = json.getString(IMPKEYS).toLowerCase().split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           personIds.foreach{personId =>
-            groupQuery.addClauseQueryBuilder().setName("personId").setExtension(KeywordQuery.query,
+            groupQuery.addClauseQueryBuilder().setName(PERSONID).setExtension(KeywordQuery.query,
               KeywordQuery.newBuilder().setValue(personId).build()).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
+          textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, groupQuery.build())
         }
         //人员编号区间
         val personidGroupQuery = TextQueryUtil.getPersonidGroupQueryByJSONObject(json)
         if(personidGroupQuery != null){
-          textQuery.addQueryBuilder().setName("personid").setExtension(GroupQuery.query, personidGroupQuery)
+          textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, personidGroupQuery)
         }
         //逻辑库
-        if(json.has("logicDBValues")){
-          val logicDB = json.getString("logicDBValues")
+        if(json.has(COL_NAME_LOGICDB)){
+          val logicDB = json.getString(COL_NAME_LOGICDB)
           val values = logicDB.split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           values.foreach{value =>
@@ -211,14 +208,19 @@ class GetMatchTaskServiceShImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           longQuery.setMax(DateConverter.convertStr2Date(json.getString(CASEOCCURDATE_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
           textQuery.addQueryBuilder.setName(COL_NAME_CASEOCCURDATE).setExtension(LongRangeQuery.query, longQuery.build)
         }
+        //案件编号
+        if (json.has(CASEID)) {
+          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(CASEID).toLowerCase())
+          textQuery.addQueryBuilder().setName(CASEID).setExtension(KeywordQuery.query, keywordQuery.build())
+        }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
         if (caseidGroupQuery != null) {
-          textQuery.addQueryBuilder().setName("caseid").setExtension(GroupQuery.query, caseidGroupQuery)
+          textQuery.addQueryBuilder().setName(CASEID).setExtension(GroupQuery.query, caseidGroupQuery)
         }
         //逻辑库
-        if(json.has("logicDBValues")){
-          val logicDB = json.getString("logicDBValues")
+        if(json.has(COL_NAME_LOGICDB)){
+          val logicDB = json.getString(COL_NAME_LOGICDB)
           val values = logicDB.split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           values.foreach{value =>

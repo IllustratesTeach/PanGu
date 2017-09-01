@@ -104,4 +104,6 @@ message MatchTask {
 
   //6.2发起任务的创建时间
   optional string ora_createtime = 16;
+
+  optional int32 status = 17;
 }

@@ -37,7 +37,7 @@ class HallDatasourceServiceImpl(implicit val dataSource: DataSource) extends Hal
         ps.setString(3,hallDatasource.distServiceid)
         ps.setString(4,hallDatasource.servicePkid)
         ps.setString(5,hallDatasource.ipSource)
-        ps.setInt(6,1)
+        ps.setInt(6,2)
         ps.setInt(7,hallDatasource.createServiceType)
         ps.setInt(8,hallDatasource.createOperationType)
         ps.setInt(9,hallDatasource.updateServiceType)
@@ -46,6 +46,13 @@ class HallDatasourceServiceImpl(implicit val dataSource: DataSource) extends Hal
         ps.setString(12,HallDatasource.SIGN)
         ps.setString(13,hallDatasource.remark)
       }
+    }
+  }
+
+  override def del(hallDatasource: HallDatasource, table: String): Unit = {
+    val sql = "delete from  "+table+" where  serviceid = ?"
+    JdbcDatabase.update(sql) { ps =>
+      ps.setString(1,hallDatasource.serviceid)
     }
   }
 }

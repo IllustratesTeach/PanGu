@@ -27,5 +27,5 @@ class FetchMatchRelationServiceImpl (implicit dataSource: DataSource) extends Fe
     * @param readStrategy
     * @return
     */
-  override def validateByReadStrategy(matchSysInfo: MatchSysInfo, readStrategy: String): Boolean = ???
+  override def validateByReadStrategy(matchSysInfo: MatchSysInfo, readStrategy: String): Boolean = {true}
 }

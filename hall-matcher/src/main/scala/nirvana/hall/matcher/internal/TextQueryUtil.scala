@@ -3,10 +3,13 @@ package nirvana.hall.matcher.internal
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
 import nirvana.protocol.TextQueryProto.TextData.{ColData, ColType}
 import nirvana.protocol.TextQueryProto.TextQueryData._
-
 import nirvana.hall.matcher.internal.TextQueryConstants._
+import nirvana.protocol.TextQueryProto.TextQueryData
+import org.dom4j.{DocumentHelper, Element}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -16,18 +19,39 @@ import scala.collection.mutable.ArrayBuffer
   */
 object TextQueryUtil extends LoggerSupport{
 
+  /**
+    * 获取人员编号的ColData
+    * @param personid
+    * @return
+    */
   def getColDataByPersonid(personid: String): Seq[ColData] ={
-    getColDataById(personid, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
-  }
-  def getColDataByCaseid(caseid: String): Seq[ColData] ={
-    getColDataById(caseid, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
+    getColDataById(personid, COL_NAME_PERSONID, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE)
   }
 
-  def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
-    getGroupQuery(personidBeg, personidEnd, false)
+  /**
+    * 获取案件编号的ColData
+    * @param caseid
+    * @return
+    */
+  def getColDataByCaseid(caseid: String): Seq[ColData] ={
+    getColDataById(caseid, COL_NAME_CASEID, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
   }
-  def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
-    getGroupQuery(caseidBeg, caseidEnd, true)
+
+  private def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
+    if(personidBeg.indexOf("*") >=0 || personidBeg.indexOf("?") >= 0
+      || personidEnd.indexOf("*") >= 0 || personidEnd.indexOf("?") >= 0){
+      getCardidGroupQueryOfKeyword(personidBeg, personidEnd, false)
+    }else{
+      getCardidGroupQueryOfRange(personidBeg, personidEnd, false)
+    }
+  }
+  private def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
+    if(caseidBeg.indexOf("*") >=0 || caseidBeg.indexOf("?") >= 0
+      || caseidEnd.indexOf("*") >= 0 || caseidEnd.indexOf("?") >= 0){
+      getCardidGroupQueryOfKeyword(caseidBeg, caseidEnd, true)
+    }else {
+      getCardidGroupQueryOfRange(caseidBeg, caseidEnd, true)
+    }
   }
   def getPersonidGroupQueryByJSONObject(json: JSONObject): GroupQuery={
     getCardidGroupQueryByJSONObject(json, false)
@@ -41,20 +65,20 @@ object TextQueryUtil extends LoggerSupport{
     * @param json
     * @return
     */
-  def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
+  private def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
     var begKey1 = PERSONID_BEG1
-    var endKey1 = TextQueryConstants.PERSONID_END1
-    var begKey2 = TextQueryConstants.PERSONID_BEG2
-    var endKey2 = TextQueryConstants.PERSONID_END2
-    var occurKey1 = TextQueryConstants.PERSONID_OCCUR1
-    var occurKey2 = TextQueryConstants.PERSONID_OCCUR2
+    var endKey1 = PERSONID_END1
+    var begKey2 = PERSONID_BEG2
+    var endKey2 = PERSONID_END2
+    var occurKey1 = PERSONID_OCCUR1
+    var occurKey2 = PERSONID_OCCUR2
     if(isLatent){
-      begKey1 = TextQueryConstants.CASEID_BEG1
-      endKey1 = TextQueryConstants.CASEID_END1
-      begKey2 = TextQueryConstants.CASEID_BEG2
-      endKey2 = TextQueryConstants.CASEID_END2
-      occurKey1 = TextQueryConstants.CASEID_OCCUR1
-      occurKey2 = TextQueryConstants.CASEID_OCCUR2
+      begKey1 = CASEID_BEG1
+      endKey1 = CASEID_END1
+      begKey2 = CASEID_BEG2
+      endKey2 = CASEID_END2
+      occurKey1 = CASEID_OCCUR1
+      occurKey2 = CASEID_OCCUR2
     }
     val groupQuery1 = getGroupQueryByJSONObject(json, begKey1, endKey1, isLatent)
     val groupQuery2 = getGroupQueryByJSONObject(json, begKey2, endKey2, isLatent)
@@ -126,14 +150,17 @@ object TextQueryUtil extends LoggerSupport{
     * 1，前缀  KeyWord
     * 2，12位单位代码 36进制的Long
     * 3，10位日期 36进制的Long
-    * @param cardid  案件编号
+    * @param cardid  人员编号或者案件编号
+    * @param colName  编号的COL_NAME
     * @param preColName 前缀COL_NAME
     * @param deptColName 单位COL_NAME
     * @param dateColName 日期COL_NAME
     * @return
     */
-  def getColDataById(cardid: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
-    val colDataArr = new ArrayBuffer[ColData]()
+  def getColDataById(cardid: String, colName: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
+    val colDataArr = ArrayBuffer[ColData]()
+    //cardid转为小写
+    colDataArr += ColData.newBuilder().setColName(colName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(cardid.toLowerCase().getBytes())).build()
     var id = cardid
     try{
       if (id.matches("^[a-zA-Z]\\w*")) {
@@ -176,7 +203,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param isLatent true:现场
     * @return
     */
-  def getGroupQuery(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
+  def getCardidGroupQueryOfRange(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
     var preColName = COL_NAME_PID_PRE
     var deptColName = COL_NAME_PID_DEPT
     var dateColName = COL_NAME_PID_DATE
@@ -193,13 +220,13 @@ object TextQueryUtil extends LoggerSupport{
     if (idBeg.matches("^[a-zA-Z]\\w*")) {
       val id_ = splitCardidByPre(idBeg)
       val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
       idBeg = id_._2
     }
     if (idEnd.matches("^[a-zA-Z]\\w*")) {
       val id_ = splitCardidByPre(idEnd)
       val keywordQuery = KeywordQuery.newBuilder().setValue(id_._1)
-      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build())
+      groupQuery.addClauseQueryBuilder().setName(preColName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.MUST)
       idEnd = id_._2
     }
     /*
@@ -234,10 +261,10 @@ object TextQueryUtil extends LoggerSupport{
       //由于deptBeg默认为0,所有这里只判断deptEnd
       if(deptEnd > 0){
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build()).setOccur(Occur.SHOULD)
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build())
       }else{
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build()).setOccur(Occur.SHOULD)
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build())
       }
       //日期判断
       if(dateBeg > 0){
@@ -263,6 +290,31 @@ object TextQueryUtil extends LoggerSupport{
     groupQuery.build()
   }
 
+  /**
+    * 根据编号Keyword查询
+    * @param cardidBeg
+    * @param cardidEnd
+    * @param isLatent
+    * @return
+    */
+  private def getCardidGroupQueryOfKeyword(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery ={
+    val groupQuery = GroupQuery.newBuilder()
+    val colName = if(isLatent){
+      COL_NAME_CASEID
+    }else{
+      COL_NAME_PERSONID
+    }
+    if(cardidBeg.nonEmpty){
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidBeg.toLowerCase())
+      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+    }
+    if(cardidEnd.nonEmpty){
+      val keywordQuery = KeywordQuery.newBuilder().setValue(cardidEnd.toLowerCase())
+      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+    }
+
+   groupQuery.build()
+  }
   /**
     * 将人员编号或案件编号拆分为两部分（dept: 12位，date: 10位  位数不够不够补0）,并转为Long36
     * @param id
@@ -316,4 +368,73 @@ object TextQueryUtil extends LoggerSupport{
     }
   }
 
+  def convertQrycondition2TextQueryData(qrycondition: Array[Byte]): TextQueryData ={
+    val textQuery = TextQueryData.newBuilder()
+    val itemPkg = new GBASE_ITEMPKG_OPSTRUCT
+    itemPkg.fromByteArray(qrycondition)
+    itemPkg.items.foreach{item =>
+      item.stHead.szItemName match {
+        case TextQueryConstants.GAFIS_KEYLIST_GetName =>
+        case TextQueryConstants.GAFIS_TEXTSQL_GetName=>
+          val xml = new String(item.bnRes, AncientConstants.GBK_ENCODING).trim
+          val dom = DocumentHelper.parseText(xml)
+          val root = dom.getRootElement
+          val iter = root.elementIterator()
+          while (iter.hasNext) {
+            val element =  iter.next().asInstanceOf[Element]
+            val tid = element.attribute("TID").getValue
+            val textSql = element.getText.trim
+            convertTextSql2TextQueryData(textSql)
+          }
+        case other =>
+      }
+    }
+
+    textQuery.build()
+  }
+
+  /**
+    * 解析textSql
+    * @param textSql
+    * @return
+    */
+  private def convertTextSql2TextQueryData(textSql: String): TextQueryData ={
+    val textQuery = TextQueryData.newBuilder()
+    val sql = textSql.split("\\) AND \\(")
+    sql.foreach{ item =>
+      item.split(" AND ").foreach{f =>
+        if(f.indexOf("TO_DATE") > 0){
+          //TODO 处理日期
+        }else{
+          //删除（）' 等字符，替换%为*
+          val a = f.replace("(","").replace(")", "").replace("'","").replace("%","*").split(" ")
+          val column = a(0)
+          val value = a(2)
+          /* 统一处理所有LIKE，= 为KeywordQuery
+          val restrictions = a(1)
+          if(restrictions.equals("LIKE") || restrictions.equals("=")){
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            textQuery.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+          }*/
+          //先根据字段来处理
+          column match {
+            case //COLUMN_CARDID |
+              TextQueryConstants.COL_NAME6_NAME |
+              TextQueryConstants.COL_NAME6_CREATEUSERNAME |
+              TextQueryConstants.COL_NAME6_ADDRESSTAIL |
+              TextQueryConstants.COL_NAME6_CASECLASS1CODE |
+              TextQueryConstants.COL_NAME6_SEXCODE |
+              TextQueryConstants.COL_NAME6_RACECODE =>
+              val keywordQuery = KeywordQuery.newBuilder()
+              keywordQuery.setValue(value)
+              textQuery.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+          }
+
+        }
+      }
+    }
+
+    textQuery.build()
+  }
 }

@@ -45,9 +45,13 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
   override def getLPCard(fingerId: String, dbId: Option[String]): LPCard = {
     if(isExist(fingerId, dbId)){
       val caseFinger = GafisCaseFinger.find(fingerId)
-      val caseFingerMntOp = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption
       //处理特征不存在的情况
-      convertGafisCaseFinger2LPCard(caseFinger, caseFingerMntOp.getOrElse(new GafisCaseFingerMnt()))
+      if(caseFinger.fingerImg != null){
+        val caseFingerMntOp = GafisCaseFingerMnt.where(GafisCaseFingerMnt.fingerId === fingerId).and(GafisCaseFingerMnt.isMainMnt === "1").headOption
+        convertGafisCaseFinger2LPCard(caseFinger, caseFingerMntOp.getOrElse(new GafisCaseFingerMnt()))
+      }else{
+        null
+      }
     }else{
       null
     }

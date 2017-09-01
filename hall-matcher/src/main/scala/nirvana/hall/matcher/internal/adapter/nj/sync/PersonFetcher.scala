@@ -89,8 +89,8 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
                                         s", t.is_xjssmz " + COL_NAME_ISXJSSMZ +
                                         s" FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
                                         s" WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
-  private val personCols: Array[String] = Array[String](COL_NAME_PERSONID, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS,
-    COL_NAME_SEXCODE, COL_NAME_NAME, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, IDCARDNO, COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_LOGICDB,
+  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS,
+    COL_NAME_SEXCODE, COL_NAME_NAME, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, COL_NAME_IDCARDNO, COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_LOGICDB,
     COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE, COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON, COL_NAME_ASSISTREFCASE, COL_NAME_GATHERDEPARTNAME,
     COL_NAME_GATHERUSERNAME, COL_NAME_CONTRCAPTURECODE, COL_NAME_CERTIFICATETYPE, COL_NAME_CERTIFICATEID, COL_NAME_PROCESSNO, COL_NAME_PSISNO, COL_NAME_SPELLNAME, COL_NAME_USEDNAME,
     COL_NAME_USEDSPELL, COL_NAME_ALIASNAME, COL_NAME_ALIASSPELL, COL_NAME_BIRTHCODE, COL_NAME_BIRTHSTREET, COL_NAME_BIRTHDETAIL, COL_NAME_DOORSTREET, COL_NAME_DOORDETAIL,
@@ -133,8 +133,8 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       }
 
       //人员编号
-      val personId: String = rs.getString("personId")
-      TextQueryUtil.getColDataById(personId, COL_NAME_PID_PRE, COL_NAME_PID_DEPT, COL_NAME_PID_DATE).foreach(textData.addCol(_))
+      val personId: String = rs.getString(COL_NAME_PERSONID)
+      TextQueryUtil.getColDataByPersonid(personId).foreach(textData.addCol(_))
 
       //日期类型
       val dateCols = Array(COL_NAME_BIRTHDAY, COL_NAME_GATHERDATE, COL_NAME_INPUTTIME,COL_NAME_MODIFIEDTIME,COL_NAME_GATHERFINGERTIME)
@@ -147,7 +147,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       }
 
       //姓名拼音,由于数据库数据不规范，这里不使用数据库spellname,这里通过转换汉字得到拼音
-      val name= rs.getString("name")
+      val name= rs.getString(COL_NAME_NAME)
       if(name != null){
         val spellName = PinyinConverter.convert2Pinyin(name)
         textData.addColBuilder.setColName(COL_NAME_SPELLNAME).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(spellName.getBytes("UTF-8")))

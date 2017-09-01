@@ -31,7 +31,7 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
                                                            "WHERE t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " AND t.deletag=1 AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt " +
                                           "WHERE ROWNUM <=?"
 
-  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS)
+  private val personCols: Array[String] = Array[String](PERSON_NAME, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS)
   private val caseCols: Array[String] = Array[String](COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE, COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST, COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE)
 
   /**
@@ -64,10 +64,13 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //处理其他特殊的查询条件
-        if(json.has(PERSON_NAME)){
-          val keywordQuery = KeywordQuery.newBuilder()
-          keywordQuery.setValue(json.getString(PERSON_NAME) + "*")
-          textQuery.addQueryBuilder().setName(COL_NAME_NAME).setExtension(KeywordQuery.query, keywordQuery.build())
+        //通配符查询,转为小写
+        val wildcardColumn = Array(PERSONID, IDCARDNO)
+        wildcardColumn.foreach{col =>
+          if (json.has(col)) {
+            val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(col).toLowerCase())
+            textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
+          }
         }
         if(json.has(BIRTHDAY_BEG) && json.has(BIRTHDAY_END)){
           val longQuery = LongRangeQuery.newBuilder()
@@ -83,18 +86,18 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
         //导入编号
         if(json.has(IMPKEYS)){
-          val personIds = json.getString(IMPKEYS).split("\\|")
+          val personIds = json.getString(IMPKEYS).toLowerCase().split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           personIds.foreach{personId =>
-            groupQuery.addClauseQueryBuilder().setName(COL_NAME_PERSONID).setExtension(KeywordQuery.query,
+            groupQuery.addClauseQueryBuilder().setName(PERSONID).setExtension(KeywordQuery.query,
               KeywordQuery.newBuilder().setValue(personId).build()).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
+          textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, groupQuery.build())
         }
         //人员编号区间
         val personidGroupQuery = TextQueryUtil.getPersonidGroupQueryByJSONObject(json)
         if(personidGroupQuery != null){
-          textQuery.addQueryBuilder().setName("personid").setExtension(GroupQuery.query, personidGroupQuery)
+          textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, personidGroupQuery)
         }
       }
       catch {
@@ -103,7 +106,6 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
       }
 
     }
-    println(textQuery)
     return textQuery.build()
   }
 
@@ -142,11 +144,16 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           longQuery.setMax(DateConverter.convertStr2Date(json.getString(CASEOCCURDATE_END), "yyyy-MM-dd").getTime).setMaxInclusive(true)
           textQuery.addQueryBuilder.setExtension(LongRangeQuery.query, longQuery.build).setName(COL_NAME_CASEOCCURDATE)
         }
+        //案件编号
+        if (json.has(CASEID)) {
+          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(CASEID).toLowerCase())
+          textQuery.addQueryBuilder().setName(CASEID).setExtension(KeywordQuery.query, keywordQuery.build())
+        }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
         if (caseidGroupQuery != null) {
           println(caseidGroupQuery)
-          textQuery.addQueryBuilder().setName("caseid").setExtension(GroupQuery.query, caseidGroupQuery)
+          textQuery.addQueryBuilder().setName(CASEID).setExtension(GroupQuery.query, caseidGroupQuery)
         }
       }
     }

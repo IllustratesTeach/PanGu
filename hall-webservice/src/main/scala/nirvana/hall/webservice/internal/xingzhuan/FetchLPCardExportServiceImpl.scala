@@ -29,7 +29,8 @@ class FetchLPCardExportServiceImpl(implicit dataSource: DataSource,
     */
   override def fetchCardIdListBySize_AssistCheck(size: Int, dbId: Option[String]): Seq[(String,String)] = {
     val cardIdList = new ArrayBuffer[(String,String)]()
-    doFetcher(cardIdList, size, FPTUtil.getTableName(dataSource,v62config.latentTable.dbId.toShort, V62Facade.TID_LATFINGER),hallWebserviceConfig.union4pfmip.dateLimit)
+    doFetcher(cardIdList, size, FPTUtil.getTableName(dataSource,v62config.latentTable.dbId.toShort, V62Facade.TID_LATFINGER)
+      ,hallWebserviceConfig.union4pfmip.LatentPrex,hallWebserviceConfig.union4pfmip.dateLimit)
     cardIdList
   }
 

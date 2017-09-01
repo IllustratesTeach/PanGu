@@ -32,13 +32,13 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
                                                           "WHERE t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " AND t.deletag=1 AND t.sync_target_sid IS NULL AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt " +
                                           "WHERE ROWNUM <=?"
 
-  private val personCols: Array[String] = Array[String]("gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
+  private val personCols: Array[String] = Array[String](PERSONID, IDCARDNO, PERSON_NAME, "gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
     "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
     "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "usedname",
     "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
     "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno",
     "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
-  private val caseCols: Array[String] = Array[String]("caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
+  private val caseCols: Array[String] = Array[String](CASEID, "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
 
   /**
    * 获取捺印文本查询条件
@@ -71,12 +71,11 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //处理其他特殊的查询条件
-        //模糊字段
-        val fuzzyColumn = Array(IDCARDNO)
-        fuzzyColumn.foreach{col =>
+        //通配符查询,转为小写
+        val wildcardColumn = Array(PERSONID, IDCARDNO)
+        wildcardColumn.foreach{col =>
           if (json.has(col)) {
-            val keywordQuery = KeywordQuery.newBuilder()
-            keywordQuery.setValue(json.getString(col) + "*")
+            val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(col).toLowerCase())
             textQuery.addQueryBuilder().setName(col).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
@@ -105,13 +104,13 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         }
         //导入编号
         if(json.has("impKeys")){
-          val personIds = json.getString("impKeys").split("\\|")
+          val personIds = json.getString("impKeys").toLowerCase().split("\\|")
           val groupQuery = GroupQuery.newBuilder()
           personIds.foreach{personId =>
-            groupQuery.addClauseQueryBuilder().setName("personId").setExtension(KeywordQuery.query,
+            groupQuery.addClauseQueryBuilder().setName(PERSONID).setExtension(KeywordQuery.query,
               KeywordQuery.newBuilder().setValue(personId).build()).setOccur(Occur.SHOULD)
           }
-          textQuery.addQueryBuilder().setName("personId").setExtension(GroupQuery.query, groupQuery.build())
+          textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, groupQuery.build())
         }
         //人员编号区间
         val personidGroupQuery = TextQueryUtil.getPersonidGroupQueryByJSONObject(json)
@@ -184,6 +183,11 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
           longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
           textQuery.addQueryBuilder.setName("caseOccurDate").setExtension(LongRangeQuery.query, longQuery.build)
+        }
+        //案件编号
+        if (json.has(CASEID)) {
+          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(CASEID).toLowerCase())
+          textQuery.addQueryBuilder().setName(CASEID).setExtension(KeywordQuery.query, keywordQuery.build())
         }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)

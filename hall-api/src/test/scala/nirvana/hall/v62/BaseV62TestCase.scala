@@ -2,6 +2,7 @@ package nirvana.hall.v62
 
 import javax.persistence.EntityManagerFactory
 
+import monad.core.MonadCoreSymbols
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
@@ -106,7 +107,9 @@ object TestV62Module {
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
   }
   def buildHallApiConfig={
-    new HallApiConfig
+    System.setProperty(MonadCoreSymbols.SERVER_HOME, "")
+    val content = Source.fromInputStream(getClass.getResourceAsStream("/test-api.xml"),"utf8").mkString
+    XmlLoader.parseXML[HallApiConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/api/api.xsd")))
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.api.jpa")

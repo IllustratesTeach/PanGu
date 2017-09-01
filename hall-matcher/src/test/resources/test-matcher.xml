@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   Copyright 2014,2015 Jun Tsai. All rights reserved.
+   site: http://www.ganshane.com
+-->
+<hall_matcher>
+  <log_file>/log/nirvana.hall.matcher.log</log_file>
+  <local_store_dir>/config/local</local_store_dir>
+  <web>
+    <bind>0.0.0.0:10000</bind>
+  </web>
+  <database>
+    <driver>oracle.jdbc.driver.OracleDriver</driver>
+    <user>gafis</user>
+    <password>gafis</password>
+    <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
+  </database>
+  <module>gz</module>
+  <mnt>
+    <header_size>64</header_size>
+    <finger_template_size>640</finger_template_size>
+    <finger_latent_size>640</finger_latent_size>
+    <!--<is_new_feature>true</is_new_feature>-->
+    <has_ridge>false</has_ridge>
+  </mnt>
+  <match_timeout>
+    <cron>0 0/5 * * * ? *</cron>
+    <timeout>100</timeout>
+  </match_timeout>
+  <auto_check>
+    <confirm_score>60</confirm_score>
+  </auto_check>
+</hall_matcher>
+

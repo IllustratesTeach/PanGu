@@ -240,7 +240,13 @@ object fpt4util {
     if(nRadius > 100 || nRadius < 0)
       nRadius = 30
 
-    "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
+    val result = "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
+    //中心特征长度超长14，返回空字符串
+    if(result.length > 14){
+      return ""
+    }else{
+      return result
+    }
   }
 
   /**
@@ -321,7 +327,7 @@ object fpt4util {
       stmnt.x = pszFPTMnt.substring(0, 3).replace(" ","").toShort
       stmnt.y = pszFPTMnt.substring(3, 6).replace(" ","").toShort
       val zString = pszFPTMnt.substring(6, 9)
-      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.replace(" ","").toInt)
+      stmnt.z = UTIL_Angle_FPT2MntDisp(zString.trim.replace(" ","").toInt)
       stmnt.nReliability = 1
     }
   }

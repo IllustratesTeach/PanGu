@@ -210,13 +210,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisPerson.findOption(cardId).nonEmpty
-    var result=false
-    if(GafisPerson.findOption(cardId).nonEmpty){
-      val person=GafisPerson.findOption(cardId).get
-      if(person.deletag.equals("1"))
-        result=true
-    }
-    result
   }
 
   /**

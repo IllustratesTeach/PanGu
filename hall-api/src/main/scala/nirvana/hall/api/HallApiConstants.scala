@@ -52,6 +52,9 @@ object HallApiConstants {
   final val LOG_MESSAGE_TYPE = 1
   final val LOG_ERROR_TYPE = 2
 
+  //use sync candlist
+  final val CANDLIST_SYNC_FAIL = -9
+
   //Afis62 breakcase status
   final val GAQRYCAND_CHKSTATE_MATCH = 0x3
 }
