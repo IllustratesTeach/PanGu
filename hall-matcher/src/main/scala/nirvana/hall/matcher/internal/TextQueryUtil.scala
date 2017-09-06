@@ -129,10 +129,10 @@ object TextQueryUtil extends LoggerSupport{
       var beg = ""
       var end = ""
       if(json.has(begKey)){
-        beg = json.getString(begKey)
+        beg = json.getString(begKey).trim
       }
       if(json.has(endKey)){
-        end = json.getString(endKey)
+        end = json.getString(endKey).trim
       }
       if(beg.nonEmpty || end.nonEmpty){//如果有人员编号区间
         if(isLatent){

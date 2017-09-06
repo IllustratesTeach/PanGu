@@ -17,7 +17,6 @@ import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
   * Created by win-20161010 on 2017/5/13.
@@ -29,11 +28,10 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
     var id = ""
     var serviceId = ""
     var path = ""
-
     getWillFilterFPTFilePath(count).foreach {
       f: (mutable.HashMap[String, Any])
       =>
-        info("handle start id:{}", id)
+        info("handle start id:{}", f.get("id").get.toString)
         id = f.get("id").get.toString
         serviceId = f.get("serviceid").get.toString
         path = f.get("FPT_PATH").get.toString
@@ -68,11 +66,14 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       * @param rowNum
       * @return
       */
-    def getWillFilterFPTFilePath(rowNum: Int): ListBuffer[mutable.HashMap[String, Any]] = {
+    def getWillFilterFPTFilePath(rowNum: Int) = {
       val sql = s"SELECT t.id,t.serviceid,t.FPT_PATH " +
         s"FROM hall_xc_report t " +
         s" WHERE t.status = '9' " +
         s"AND update_time IS NULL " +
+        s"AND FPT_PATH IS NOT NULL " +
+        s"AND SERVICEID IS NOT NULL " +
+        s"AND ID IS NOT NULL " +
         s"AND rownum <=?"
       val resultList = new mutable.ListBuffer[mutable.HashMap[String, Any]]
       JdbcDatabase.queryWithPsSetter(sql) { ps =>
@@ -155,6 +156,20 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       }else{
         fPT4File.logic02Recs.head.personId = "R" + fPT4File.logic02Recs.head.personId.substring(1,23)
       }
+      //针对6.2补位异常问题
+      if(fPT4File.logic02Recs.head.personId.substring(0,2).equals("R0")){
+        fPT4File.logic02Recs.head.personId = "R" + fPT4File.logic02Recs.head.personId.substring(4,12) + "999" + fPT4File.logic02Recs.head.personId.substring(13,23)
+      }else if(fPT4File.logic02Recs.head.personId.length == 20){
+        fPT4File.logic02Recs.head.personId = "R" + fPT4File.logic02Recs.head.personId.substring(1,9) + "999" + fPT4File.logic02Recs.head.personId.substring(10,20)
+      }else if(fPT4File.logic02Recs.head.personId.length < 20){
+        val lens = fPT4File.logic02Recs.head.personId.length
+        val ss = 20-lens
+        var s = ""
+        for(ss <- 1 to 10){
+            s += "0"
+        }
+        fPT4File.logic02Recs.head.personId = "R" + fPT4File.logic02Recs.head.personId.substring(1,lens-11) + s + "999" + fPT4File.logic02Recs.head.personId.substring(lens-10,lens)
+      }
 
       if (StringUtils.isEmpty(fPT4File.logic02Recs.head.index)
         ||StringUtils.isBlank(fPT4File.logic02Recs.head.index)) {
@@ -172,7 +187,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
 
 
 
-      fPT4File.logic02Recs.head.systemType = "1900" //系统类型	不能为空
+      fPT4File.logic02Recs.head.systemType = "1900"                                                                    //系统类型	不能为空
 
 
       if (StringUtils.isEmpty(fPT4File.logic02Recs.head.personName)
@@ -218,7 +233,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       if (StringUtils.isEmpty(fPT4File.logic02Recs.head.gatherDate)
         ||StringUtils.isBlank(fPT4File.logic02Recs.head.gatherDate)) {
         //捺印日期		不能为空
-        fPT4File.logic02Recs.head.gatherDate = new SimpleDateFormat("YYYYMMDD").format(new Date)
+        //fPT4File.logic02Recs.head.gatherDate = new SimpleDateFormat("YYYYMMDD").format(new Date)
       }
       //发送指纹个数
       if (StringUtils.isEmpty(fPT4File.logic02Recs.head.sendFingerCount)
@@ -289,6 +304,12 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       *
       */
     def filterLPFPTFile(fPT4File: FPT4File): FPT4File = {
+
+
+      if (StringUtils.isEmpty(fPT4File.logic03Recs.head.cardId)
+        ||StringUtils.isBlank(fPT4File.logic03Recs.head.cardId)) {
+        throw new Exception("cardId is empty")
+      }
       //逻辑记录长度	必须为数字
       //hall导出时，该项属性肯定为数字
       //案件编号	必须23位长度
@@ -304,6 +325,21 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       }else{
         fPT4File.logic03Recs.head.caseId = "A" + fPT4File.logic03Recs.head.caseId.substring(1,23)
       }
+
+      if(fPT4File.logic03Recs.head.caseId.substring(0,2).equals("A0")){
+        fPT4File.logic03Recs.head.caseId = "A" + fPT4File.logic03Recs.head.caseId.substring(4,12) + "999" + fPT4File.logic03Recs.head.caseId.substring(13,23)
+      }else if(fPT4File.logic03Recs.head.caseId.length == 20){
+        fPT4File.logic03Recs.head.caseId = "A" + fPT4File.logic03Recs.head.caseId.substring(1,9) + "999" + fPT4File.logic03Recs.head.caseId.substring(10,20)
+      }else if(fPT4File.logic03Recs.head.caseId.length < 20){
+        val lens = fPT4File.logic03Recs.head.caseId.length
+        val ss = 20-lens
+        var s = ""
+        for(ss <- 1 to 10){
+          s += "0"
+        }
+        fPT4File.logic03Recs.head.caseId = "A" + fPT4File.logic03Recs.head.caseId.substring(1,lens-11) + s + "999" + fPT4File.logic03Recs.head.caseId.substring(lens-10,lens)
+      }
+
       //特征点	不能为空
       fPT4File.logic03Recs.head.fingers.foreach { (f: FPT4File.FingerLData)
       => if (StringUtils.isEmpty(f.feature)||StringUtils.isBlank(f.feature)) {
@@ -331,7 +367,7 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       //发案日期	不能为空
       if (StringUtils.isEmpty(fPT4File.logic03Recs.head.occurDate)
         ||StringUtils.isBlank(fPT4File.logic03Recs.head.occurDate)) {
-        fPT4File.logic03Recs.head.occurDate = new SimpleDateFormat("YYYYMMDD").format(new Date)
+        //fPT4File.logic03Recs.head.occurDate = new SimpleDateFormat("YYYYMMDD").format(new Date)
       }
       //发案地点代码	不能为空
       if (isNullOrEmpty(fPT4File.logic03Recs.head.occurPlaceCode)) {
@@ -370,8 +406,8 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
       }
       //        提取日期	不能为空
       if (isNullOrEmpty(fPT4File.logic03Recs.head.extractDate)) {
-        fPT4File.logic03Recs.head.extractDate
-          = new SimpleDateFormat("YYYYMMDD").format(new Date)
+        //fPT4File.logic03Recs.head.extractDate
+          //= new SimpleDateFormat("YYYYMMDD").format(new Date)
       }
       //        提取人	不能为空
       fPT4File.logic03Recs.foreach{
