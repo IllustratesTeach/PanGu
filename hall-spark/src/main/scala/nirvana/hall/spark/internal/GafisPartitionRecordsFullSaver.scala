@@ -1,7 +1,6 @@
 package nirvana.hall.spark.internal
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.FptPropertiesConverter._
 import nirvana.hall.spark.services.{FingerConstants, SysProperties, PartitionRecordsSaver}
@@ -61,8 +60,8 @@ object GafisPartitionRecordsFullSaver {
               "ADDRESS,ADDRESSDETAIL,PERSON_CATEGORY,CASE_CLASSES,GATHERDEPARTCODE,GATHERDEPARTNAME,GATHERUSERNAME," +
               "GATHER_DATE,REMARK,NATIVEPLACE_CODE,NATION_CODE,ASSIST_LEVEL,ASSIST_BONUS,ASSIST_PURPOSE,ASSIST_REF_PERSON," +
               "ASSIST_REF_CASE,ASSIST_VALID_DATE,ASSIST_EXPLAIN,ASSIST_DEPT_CODE,ASSIST_DEPT_NAME,ASSIST_DATE,ASSIST_CONTACTS," +
-              "ASSIST_NUMBER,ASSIST_APPROVAL,ASSIST_SIGN,ISFINGERREPEAT,DATA_SOURCES,FINGERSHOW_STATUS,DELETAG,INPUTTIME,SEQ,SID,FPT_PATH) " +
-              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysDate,gafis_person_seq.nextval,gafis_person_sid_seq.nextval,?)"
+              "ASSIST_NUMBER,ASSIST_APPROVAL,ASSIST_SIGN,ISFINGERREPEAT,DATA_SOURCES,FINGERSHOW_STATUS,DELETAG,INPUTTIME,SEQ,SID) " +
+              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysDate,gafis_person_seq.nextval,gafis_person_sid_seq.nextval)"
 
     JdbcDatabase.update(saveFullPersonInfo) { ps =>
       ps.setString(1, person.personId)
@@ -103,7 +102,6 @@ object GafisPartitionRecordsFullSaver {
       ps.setInt(36, person.dataSource)
       ps.setInt(37, person.fingerShowStatus)
       ps.setString(38, person.delTag)
-      ps.setString(39,person.fptPath)
     }
   }
 
@@ -119,8 +117,8 @@ object GafisPartitionRecordsFullSaver {
   }
 
   def saveTemplateFinger(finger : TemplateFingerConvert): Unit ={
-    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path,main_pattern,vice_pattern)" +
-      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?,?)"
+    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,main_pattern,vice_pattern)" +
+      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?)"
     //保存指纹特征信息
     JdbcDatabase.update(saveFingerSql) { ps =>
       ps.setString(1, finger.personId)
@@ -129,16 +127,15 @@ object GafisPartitionRecordsFullSaver {
       ps.setString(4, finger.groupId)
       ps.setString(5,finger.lobType)
       ps.setBytes(6, finger.gatherData)
-      ps.setString(7, finger.path)
-      ps.setString(8, finger.mainPattern)
-      ps.setString(9, finger.vicePattern)
+      ps.setString(7, finger.mainPattern)
+      ps.setString(8, finger.vicePattern)
     }
   }
 
 
   def saveTemplateFingerMntAndBin(finger : TemplateFingerConvert,groupId : String, lobType : String, data : Array[Byte]): Unit ={
-    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,fpt_path,main_pattern,vice_pattern)" +
-      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?,?)"
+    val saveFingerSql: String = "insert into gafis_gather_finger(pk_id,person_id,fgp,fgp_case,group_id,lobtype,inputtime,seq,gather_data,main_pattern,vice_pattern)" +
+      "values(sys_guid(),?,?,?,?,?,sysdate,gafis_gather_finger_seq.nextval,?,?,?)"
     //保存指纹特征信息
     JdbcDatabase.update(saveFingerSql) { ps =>
       ps.setString(1, finger.personId)
@@ -147,24 +144,32 @@ object GafisPartitionRecordsFullSaver {
       ps.setString(4, groupId)
       ps.setString(5,lobType)
       ps.setBytes(6, data)
-      ps.setString(7, finger.path)
-      ps.setString(8, finger.mainPattern)
-      ps.setString(9, finger.vicePattern)
+      ps.setString(7, finger.mainPattern)
+      ps.setString(8, finger.vicePattern)
     }
   }
 
   /***************************************************************************LATENT******************************************************************************/
   def saveLatent(latentCaseConvert: LatentCaseConvert): Unit ={
+    var errMsg = ""
     val hasLatentCase = updateLatentCase(latentCaseConvert.caseId)
     if (hasLatentCase==0) saveLatnetCase(latentCaseConvert)
     latentCaseConvert.latentFingers.foreach { finger =>
-      val hasLatentFinger = updateLatentFinger(finger.fingerId,finger.imgData)
-      if (hasLatentFinger==0) saveLatentFinger(finger)
-      finger.LatentFingerFeatures.foreach{ feature =>
-        val hasLatentFingerFeature = updateLatentFingerFeature(feature.fingerId,feature.fingerMnt)
-        if (hasLatentFingerFeature==0) saveLatnentFingerFeature(feature)
+      val hasLatentFinger = queryLatentFinger(finger.fingerId)
+      if (hasLatentFinger == None || hasLatentFinger.get.isEmpty) saveLatentFinger(finger)
+      if (finger.LatentFingerFeatures == null) {
+        errMsg += finger.fingerId+": feature is empty,"
+      } else {
+        finger.LatentFingerFeatures.foreach { feature =>
+          if (feature.fingerMnt == null || feature.fingerMnt.isEmpty) errMsg += finger.fingerId+": feature is empty,"
+          else {
+            val hasLatentFingerFeature = queryLatentFingerFeature(feature.fingerId)
+            if (hasLatentFingerFeature == None || hasLatentFingerFeature.get.isEmpty) saveLatnentFingerFeature(feature)
+          }
+        }
       }
     }
+    if (!errMsg.isEmpty) throw new Throwable(errMsg)
   }
 
   def updateLatentCase(caseId : String) : Int = {
@@ -207,6 +212,14 @@ object GafisPartitionRecordsFullSaver {
     }
   }
 
+  def queryLatentFinger(fingerId : String) : Option[String] = {
+    JdbcDatabase.queryFirst("SELECT t.finger_id FROM gafis_case_finger t WHERE t.finger_id = ?"){ps =>
+      ps.setString(1,fingerId)
+    }{rs=>
+      rs.getString("finger_id")
+    }
+  }
+
   def updateLatentFinger(fingerId : String,fingerImg : Array[Byte]) : Int = {
     val updateLatnetFingerSql = "UPDATE gafis_case_finger t SET t.modifiedtime = SYSDATE,t.finger_img = ? WHERE t.finger_id = ?"
     JdbcDatabase.update(updateLatnetFingerSql) { ps =>
@@ -217,8 +230,8 @@ object GafisPartitionRecordsFullSaver {
 
   def saveLatentFinger(latentFingerConvert : LatentFingerConvert): Unit ={
     val saveLatentFingerSql = "INSERT INTO gafis_case_finger(case_id,seq_no,finger_id,remain_place,fgp,ridge_color,mittens_beg_no,mittens_end_no," +
-      "finger_img,Is_Corpse,corpse_no,Is_Assist,Inputtime,deletag,SID,seq,fpt_path) " +
-      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_SID_SEQ.Nextval,?)"
+      "finger_img,Is_Corpse,corpse_no,Is_Assist,Inputtime,deletag,SID,seq) " +
+      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_SID_SEQ.Nextval)"
     JdbcDatabase.update(saveLatentFingerSql){ ps =>
       ps.setString(1,latentFingerConvert.caseId)
       ps.setString(2,latentFingerConvert.seqNo)
@@ -232,7 +245,14 @@ object GafisPartitionRecordsFullSaver {
       ps.setString(10,latentFingerConvert.isCorpse)
       ps.setString(11,latentFingerConvert.corpseNo)
       ps.setString(12,latentFingerConvert.isAssist)
-      ps.setString(13,latentFingerConvert.fptPath)
+    }
+  }
+
+  def queryLatentFingerFeature(fingerId : String) : Option[String] = {
+    JdbcDatabase.queryFirst("SELECT t.finger_id FROM gafis_case_finger_mnt t WHERE t.finger_id = ?"){ps =>
+      ps.setString(1,fingerId)
+    }{rs=>
+      rs.getString("finger_id")
     }
   }
 
@@ -252,8 +272,5 @@ object GafisPartitionRecordsFullSaver {
       ps.setString(2,latentFingerFeatureConvert.captureMethod)
       ps.setBytes(3,latentFingerFeatureConvert.fingerMnt)
     }
-
-
-
   }
 }

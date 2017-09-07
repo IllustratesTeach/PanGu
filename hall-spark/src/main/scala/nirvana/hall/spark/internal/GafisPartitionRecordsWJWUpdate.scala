@@ -15,13 +15,15 @@ import scala.util.control.NonFatal
 class GafisPartitionRecordsWJWUpdate extends PartitionRecordsSaver {
   import GafisPartitionRecordsWJWUpdate._
   def savePartitionRecords(parameter: NirvanaSparkConfig)(records:Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]):Unit = {
-    records.foreach { case (event, fingerImg, fingerMnt, fingerBin) =>
-      try {
-        updatePersonFingerMntInfo(event.path,fingerMnt.toByteArray(),fingerImg.gatherData)
-      }  catch {
-        case NonFatal(e) =>
-          e.printStackTrace(System.err)
-          SparkFunctions.reportError(parameter, DbError(event, e.toString))
+    if (records != null && !records.isEmpty) {
+      records.foreach { case (event, fingerImg, fingerMnt, fingerBin) =>
+        try {
+          updatePersonFingerMntInfo(event.path, fingerMnt.toByteArray(), fingerImg.gatherData)
+        } catch {
+          case NonFatal(e) =>
+            e.printStackTrace(System.err)
+            SparkFunctions.reportError(parameter, DbError(event, e.toString))
+        }
       }
     }
   }

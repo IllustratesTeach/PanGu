@@ -33,6 +33,8 @@ object ExtractFeatureService {
     if (event.personId != null && event.personId.length > 0) {
       try {
         val featureTryVersion = if (parameter.isNewFeature) ExtractProto.NewFeatureTry.V2 else ExtractProto.NewFeatureTry.V1
+        //解压后的图头长度定义为0，会导致转原图为空
+        if (originalImg.stHead.nSize == 0) originalImg.stHead.nSize = 64
         if(directExtract) {
           SparkFunctions.loadExtractorJNI()
           if (converterExtract) {

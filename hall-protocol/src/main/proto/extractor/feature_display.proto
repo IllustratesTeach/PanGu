@@ -1,0 +1,21 @@
+package nirvana.proto;
+
+import "monad/rpc/protocol/command.proto";
+option optimize_for = SPEED;
+option java_package = "nirvana.hall.protocol.extract";
+option java_outer_classname = "FeatureDisplayProto";
+
+message FeatureDisplayRequest {
+    extend monad.rpc.protocol.BaseCommand {
+        optional FeatureDisplayRequest cmd = 10011;
+    }
+    required bytes decompressImageData = 1;
+    required bytes mntDispData = 2;
+}
+
+message FeatureDisplayResponse {
+    extend monad.rpc.protocol.BaseCommand {
+        optional FeatureDisplayResponse cmd = 10012;
+    }
+    optional bytes displayData = 1;
+}

@@ -15,7 +15,7 @@ import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGE
   */
 object FptPropertiesConverter {
 
-  def fpt3ToPersonConvert(fpt3 : Logic3Rec, fptPath : String): PersonConvert ={
+  def fpt3ToPersonConvert(fpt3 : Logic3Rec, fptPath : String = ""): PersonConvert ={
     val person = new PersonConvert
     person.personId = fpt3.personId
     person.cardId = fpt3.cardId
@@ -195,17 +195,6 @@ object FptPropertiesConverter {
     latentFinger.mittensBegNo = lData.mittensBegNo
     latentFinger.mittensEndNo = lData.mittensEndNo
 
-    /*val image = new GAFISIMAGESTRUCT
-    image.stHead.nWidth = lData.imgHorizontalLength.toShort
-    image.stHead.nHeight = lData.imgVerticalLength.toShort
-    image.stHead.nBits = 8.toByte
-    image.stHead.nResolution = lData.dpi.toShort
-    image.stHead.bIsCompressed = 0.toByte
-    image.stHead.nCompressMethod = lData.imgCompressMethod.toByte
-    image.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
-    image.bnData = lData.imgData
-    image.stHead.nImgSize = image.bnData.length*/
-
     val image = fpt4code.FPTFingerLDataToGafisImage(lData)
     latentFinger.imgData = image.toByteArray()
 
@@ -289,9 +278,14 @@ object FptPropertiesConverter {
     var vicePattern : String = _
     var gatherData : Array[Byte] = _
     var path : String = _
+
+    //idCard finger info
+    var name : String = _
+    var idCardNO : String = _
+    var idCardID : String = _
   }
 
-  /***  LATENT TO DO ***/
+  /***  LATENT ***/
   class LatentCaseConvert extends Serializable{
     var caseId : String = _
     var cardId : String = _
@@ -382,7 +376,7 @@ object FptPropertiesConverter {
           e.printStackTrace()
       }
     }
-    val d = new sql.Date(date.getTime)
-    d
+    if (date == null) null
+    else new sql.Date(date.getTime)
   }
 }

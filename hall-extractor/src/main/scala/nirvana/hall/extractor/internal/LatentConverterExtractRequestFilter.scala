@@ -30,11 +30,13 @@ class LatentConverterExtractRequestFilter extends RpcServerMessageFilter {
       fingerLData.imgVerticalLength = extractRequest.getFingerLData.getImgVerticalLength
       fingerLData.dpi = extractRequest.getFingerLData.getDpi
 
-      val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(fingerLData)
+      /*val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(fingerLData)
       val latentFeature = FPTLatentConverter.convert(disp)
       val mnt = new GAFISIMAGESTRUCT()
       mnt.bnData = latentFeature.toByteArray()
-      mnt.stHead.nImgSize = mnt.bnData.length
+      mnt.stHead.nImgSize = mnt.bnData.length*/
+
+      val mnt = FPTMntConverter.convertFingerLDataMnt2GafisMnt(fingerLData)
       val extractResponseBuilder = LatentConverterExtractResponse.newBuilder()
       extractResponseBuilder.setMntData(ByteString.copyFrom(mnt.toByteArray()))
       response.writeMessage(commandRequest,LatentConverterExtractResponse.cmd,extractResponseBuilder.build())

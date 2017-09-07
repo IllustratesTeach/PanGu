@@ -30,8 +30,8 @@ trait ImageProvider {
     */
   def requestImageByBMP(parameter:NirvanaSparkConfig,message:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
 
-  case class RequestRemoteFileError(streamEvent: StreamEvent,message:String) extends StreamError(streamEvent) {
-    override def getMessage: String = "R|"+message
+  case class RequestRemoteFileError(streamEvent: StreamEvent,message:String,errorType:String = "R") extends StreamError(streamEvent) {
+    override def getMessage: String = errorType+"|"+message
   }
   //fpg to FingerPosition
   protected def getFingerPosition(fgp : Int) : FingerPosition = {

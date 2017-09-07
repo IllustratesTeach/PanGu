@@ -1,5 +1,6 @@
 package nirvana.hall.spark.services
 
+import java.net.URI
 import java.util.Properties
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -9,6 +10,8 @@ import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 /**
  * utility function
@@ -67,7 +70,7 @@ object SparkFunctions{
     val event = streamError.event
     var message: KeyedMessage[String, String] = null
     //分类待完善
-    if (!event.path.isEmpty()&&event.path.indexOf("脱密案件") != -1) {//latent
+    if (!event.caseId.isEmpty()) {//latent
       message = new KeyedMessage("ERROR", event.path,
         "%s|%s|%s|%s|%s".format(event.path, event.caseId, event.cardId, streamError.getMessage,"latent"))
 
@@ -77,6 +80,17 @@ object SparkFunctions{
     }
 
     producer.send(message)
+  }
+
+  def recordErrorToHBFS(parameter:NirvanaSparkConfig,streamError: StreamError) : Unit = {
+    val hadoopConf = new Configuration()
+    val hdfs = FileSystem.get(new URI(parameter.hdfsServer),hadoopConf)
+    try {
+      hdfs.exists(new Path(parameter.hdfsServer+"/error_file.log"))
+    } catch {
+      case e:IllegalArgumentException =>  hdfs.create(new Path(parameter.hdfsServer+"/error_file.log"))
+    }
+    var error_file = hdfs.open(new Path(parameter.hdfsServer+"/error_file.log"))
   }
 
 }

@@ -118,7 +118,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
     System.arraycopy(binData,0,sbinData,0,sbinHead.nImgSize+64)
     Some((mntData,sbinData))
   }
-  private def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
+  def readByteArrayAsGAFISIMAGE(imgData:InputStream): GAFISIMAGESTRUCT ={
     val img = ImageIO.read(imgData)
     val grayImg = img.getColorModel.getColorSpace match{
       case COLOR_GRAY_SPACE=>

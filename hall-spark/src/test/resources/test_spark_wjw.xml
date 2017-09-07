@@ -6,9 +6,9 @@
   <kafka_server>192.168.56.128:9092</kafka_server>
   <kafka_topic_name>WJW</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
-  <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseImageIdCardProvider</image_provider_class>
+  <image_provider_class>nirvana.hall.spark.internal.GafisDatabaseImageWJWProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
-  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsIdCardUpdate</data_saver_class>
+  <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsWJWUpdate</data_saver_class>
   <hdfs_server>None</hdfs_server>
   <partitions_num>4</partitions_num>
   <is_new_feature>false</is_new_feature>

@@ -94,7 +94,7 @@ object SysProperties{
     hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
     hikariConfig.setMaximumPoolSize(databaseConfig.max)
     //hikariConfig.addDataSourceProperty("maximumPoolSize", "5")
-
+    hikariConfig.setConnectionTimeout(120000)
     new HikariDataSource(hikariConfig)
   }
 }
