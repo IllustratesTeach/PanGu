@@ -251,7 +251,7 @@ object TextQueryUtil extends LoggerSupport{
     val deptEnd = end._1
     val dateEnd = end._2
 
-    if(deptBeg == deptEnd){//如果部门编号相同，对部门编号使用LongQuery，对日期使用LongRangeQuery
+    if(deptBeg.equals(deptEnd)){//如果部门编号相同，对部门编号使用LongQuery，对日期使用LongRangeQuery
       groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
         LongQuery.newBuilder().setValue(deptBeg).build())
 
@@ -261,10 +261,10 @@ object TextQueryUtil extends LoggerSupport{
       //由于deptBeg默认为0,所有这里只判断deptEnd
       if(deptEnd > 0){
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).setMax(deptEnd).setMaxInclusive(false).build())
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(true).setMax(deptEnd).setMaxInclusive(true).build())
       }else{
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(dateBeg == 0).build())
+          LongRangeQuery.newBuilder().setMin(deptBeg).setMinInclusive(true).build())
       }
       //日期判断
       if(dateBeg > 0){
