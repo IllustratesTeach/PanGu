@@ -258,6 +258,7 @@ object TextQueryUtil extends LoggerSupport{
       groupQuery.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
         LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).setMax(dateEnd).setMaxInclusive(true).build())
     }else{
+      //先取单位编码的并集dept:[A1,B1]，然后去掉前后日期区间 (dept:A1 date:[_,A2))和(dept:B1 date:(B2,_])
       //由于deptBeg默认为0,所有这里只判断deptEnd
       if(deptEnd > 0){
         groupQuery.addClauseQueryBuilder().setName(deptColName).setExtension(LongRangeQuery.query,
@@ -272,18 +273,18 @@ object TextQueryUtil extends LoggerSupport{
         groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
           LongQuery.newBuilder().setValue(deptBeg).build())
         groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMin(dateBeg).setMinInclusive(true).build())
+          LongRangeQuery.newBuilder().setMax(dateBeg).setMaxInclusive(false).build())
 
-        groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
+        groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.MUST_NOT)
       }
       if(dateEnd > 0){
         val groupQuery2 = GroupQuery.newBuilder()
         groupQuery2.addClauseQueryBuilder().setName(deptColName).setExtension(LongQuery.query,
           LongQuery.newBuilder().setValue(deptEnd).build())
         groupQuery2.addClauseQueryBuilder().setName(dateColName).setExtension(LongRangeQuery.query,
-          LongRangeQuery.newBuilder().setMax(dateEnd).setMaxInclusive(true).build())
+          LongRangeQuery.newBuilder().setMin(dateEnd).setMinInclusive(false).build())
 
-        groupQuery.addClauseQueryBuilder.setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.SHOULD)
+        groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery2.build()).setOccur(Occur.MUST_NOT)
       }
     }
 
@@ -306,11 +307,11 @@ object TextQueryUtil extends LoggerSupport{
     }
     if(cardidBeg.nonEmpty){
       val keywordQuery = KeywordQuery.newBuilder().setValue(cardidBeg.toLowerCase())
-      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+      groupQuery.addClauseQueryBuilder().setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
     }
     if(cardidEnd.nonEmpty){
       val keywordQuery = KeywordQuery.newBuilder().setValue(cardidEnd.toLowerCase())
-      groupQuery.addClauseQueryBuilder.setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+      groupQuery.addClauseQueryBuilder().setName(colName).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
     }
 
    groupQuery.build()
