@@ -1,5 +1,7 @@
 package nirvana.hall.webservice.services.xingzhuan
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * Created by sjr on 2017/4/25.
   */
@@ -12,10 +14,11 @@ trait FetchLPCardExportService {
     * @param size
     * @param dbId
     */
-  def fetchCardIdListBySize_AssistCheck(size: Int, dbId: Option[String] = None): Seq[(String,String)]
+  def fetchCardIdListBySize_AssistCheck(size: Int, dbId: Option[String] = None): ArrayBuffer[(String)]
 
   /**
     * 保存上报结果
+    *
     * @param uuid
     * @param cardID
     * @param typ

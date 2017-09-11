@@ -23,24 +23,21 @@ class FetchUtil(implicit dataSource: DataSource,
     * @param tableName
     * @param dateLimit 上报数据年限
     */
-  def doFetcher(cardIdBuffer: ArrayBuffer[(String,String)], size: Int, tableName: String,latentPrex: String, dateLimit:String): Unit ={
-    val SYNC_SQL=s"select t.fingerid,t.caseid from ${tableName} t where  t.createtime>= to_date('${dateLimit}-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss')" +
-      s"and t.fingerid like '" + latentPrex +"%' " +
+  def doFetcher(cardIdBuffer: ArrayBuffer[(String)], size: Int, tableName: String,latentPrex: String, dateLimit:String): ArrayBuffer[(String)] ={
+    val SYNC_SQL=s"select t.caseid from ${tableName} t where  t.ora_createtime>= to_date('${dateLimit}-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss')" +
+      s"and t.caseid like '" + latentPrex +"%' " +
       s"and not exists(select t1.serviceid " +
                         s"from HALL_XC_REPORT t1 " +
-                        s"where t1.typ='" + FPTUtil.Latent +"' and t1.serviceid=t.fingerid ) " +
+                        s"where t1.typ='" + FPTUtil.Latent +"' and t1.serviceid=t.caseid or t1.case=t.caseid) " +
       s"  and rownum<= ?"
     JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
       ps.setInt(1, size)
     }{rs=>
       while (rs.next()){
-        val fingerid = rs.getString("fingerid")
-        val caseid = rs.getString("caseid")
-        if(fingerid != null && fingerid.trim.length > 0 && caseid != null && caseid.trim.length > 0){
-          cardIdBuffer += (fingerid -> caseid)
-        }
+        cardIdBuffer += rs.getString("caseid")
       }
     }
+    cardIdBuffer
   }
 
 

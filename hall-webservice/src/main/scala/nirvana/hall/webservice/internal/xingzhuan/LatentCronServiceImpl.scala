@@ -28,7 +28,7 @@ class LatentCronServiceImpl(implicit dataSource: DataSource,
 
   final val Report_BATCH_SIZE = 10
 
-  final val Report_DBID = Some(hallV62Config.latentTable.dbId.toString)
+  final val Report_DBID = Some(hallV62Config.caseTable.dbId.toString)
 
   final val Report_TYPE = "Latent"
 
@@ -59,21 +59,17 @@ class LatentCronServiceImpl(implicit dataSource: DataSource,
     * 上报本地数据
     */
   override def doWork(): Unit = {
-    var id=""
-    try {
-      val cardIdList = fetchLPCardService_Report.fetchCardIdListBySize_AssistCheck(Report_BATCH_SIZE, Report_DBID)
-      cardIdList.foreach { cardId =>
-        id = cardId._1
-        if (lPCardService.isExist(cardId._1, Report_DBID)) {
-          val dataHandler = wsFingerService.getLatentFinger("", "", cardId._2)
-          var path = FPTUtil.saveFPTPath(HallWebserviceConstants.LocalLatent,dataHandler.getInputStream,cardId._1,Upload.UPLOAD_STATUS_CREATED,hallWebserviceConfig,dataSource)
-          fetchLPCardService_Report.saveResult(UUID.randomUUID().toString.replace("-",""),id,FPTUtil.Latent,Upload.UPLOAD_STATUS_CREATED,"",path)
-        }
+    val cardIdList = fetchLPCardService_Report.fetchCardIdListBySize_AssistCheck(Report_BATCH_SIZE, Report_DBID)
+    cardIdList.foreach { cardId =>
+        try {
+            val dataHandler = wsFingerService.getLatentFinger("", "", cardId)
+            val path = FPTUtil.saveFPTPath(HallWebserviceConstants.LocalLatent, dataHandler.getInputStream, cardId, Upload.UPLOAD_STATUS_CREATED, hallWebserviceConfig, dataSource)
+            fetchLPCardService_Report.saveResult(UUID.randomUUID().toString.replace("-", ""), cardId, FPTUtil.Latent, Upload.UPLOAD_STATUS_CREATED, "", path)
+        }catch {
+        case e: Exception =>
+          error("Latent export error:" + ExceptionUtil.getStackTraceInfo(e))
+          fetchLPCardService_Report.saveResult(UUID.randomUUID().toString.replace("-",""),cardId,FPTUtil.Latent,-1,"","")
       }
-    } catch {
-      case e: Exception =>
-        error("Latent export error:" + ExceptionUtil.getStackTraceInfo(e))
-        fetchLPCardService_Report.saveResult(UUID.randomUUID().toString.replace("-",""),id,FPTUtil.Latent,-1,"","")
     }
   }
 }
