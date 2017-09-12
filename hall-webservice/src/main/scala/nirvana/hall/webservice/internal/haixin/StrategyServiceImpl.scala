@@ -5,6 +5,7 @@ import java.util.UUID
 import javax.activation.DataHandler
 import javax.sql.DataSource
 
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.support.services.JdbcDatabase
@@ -200,7 +201,9 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       JdbcDatabase.update(sql_t3){ps=>
         ps.setString(1, UUID.randomUUID().toString.replace("-",""))
         ps.setString(2,uuid)
-        ps.setString(3,throwAble.get.getMessage)
+        ps.setString(3,ExceptionUtil.getStackTraceInfoByThrowAble(throwAble.get)
+          + "&&" + throwAble.get.fillInStackTrace
+          + "&&" + throwAble.get.getLocalizedMessage)
       }
     }
   }
@@ -274,6 +277,35 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
         IAConstant.HANDLE_ING
 
       case IAConstant.RECHECKED =>
+        IAConstant.HITED
+
+      case other =>
+        IAConstant.CREATE_STORE_SUCCESS
+    }
+    result
+  }
+
+
+  /**
+    * 根据6.2返回的查询状态获得应该返回给调用客户端的状态(TT)
+    *
+    * @param status
+    * @return
+    */
+  override def getResponseStatusByGafisStatus_TT(status: Long): Int = {
+    val result = status match {
+
+      case IAConstant.WAITING_MATCH =>
+
+        IAConstant.CREATE_STORE_SUCCESS
+
+      case IAConstant.MATCHING
+           | IAConstant.WAITING_CHECK
+           | IAConstant.CHECKING =>
+
+        IAConstant.HANDLE_ING
+
+      case IAConstant.CHECKED =>
         IAConstant.HITED
 
       case other =>
@@ -358,13 +390,39 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
                                     s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
-      sql ++= s" WHERE breakdatetime >= to_date(" + timefrom + ", 'yyyy-MM-dd hh24:mi:ss') " +
-        s"AND breakdatetime <= to_date(" + timeto + ",  'yyyy-MM-dd hh24:mi:ss')) "
+      sql ++= s" WHERE breakdatetime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+        s"AND breakdatetime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
     }
 
     sql ++= s" ) WHERE  ROWNO >= ?  AND   ROWNO <= ?"
 
     JdbcDatabase.queryWithPsSetter2(sql.toString){ps=>
+      ps.setInt(1,startnum)
+      ps.setInt(2,endnum)
+    }{rs=>
+      while (rs.next()){
+        listArray.add(rs.getString("personid"))
+      }
+    }
+
+
+    val sql_tt = new StringBuilder
+
+    sql_tt ++= s"SELECT personid FROM ( SELECT ROWNUM AS rowno,w.personid " +
+      s"FROM normaltp_personinfo k " +
+      s"JOIN (SELECT p.cardid,m.personid " +
+      s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
+      s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+      s"ON k.PERSONID = w.cardid "
+
+    if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
+      sql_tt ++= s" WHERE ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+        s"AND ora_createtime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
+    }
+
+    sql_tt ++= s" ) WHERE  ROWNO >= ?  AND   ROWNO <= ?"
+
+    JdbcDatabase.queryWithPsSetter2(sql_tt.toString){ps=>
       ps.setInt(1,startnum)
       ps.setInt(2,endnum)
     }{rs=>
@@ -393,8 +451,8 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
             s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
-      sql ++= s" WHERE k.breakdatetime >= to_date(" + timefrom + ", 'yyyy-MM-dd hh24:mi:ss') " +
-        s"AND k.breakdatetime <= to_date(" + timeto + ",  'yyyy-MM-dd hh24:mi:ss')) "
+      sql ++= s" WHERE k.breakdatetime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+        s"AND k.breakdatetime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
     }
 
     JdbcDatabase.queryWithPsSetter2(sql.toString){ps=>
@@ -403,6 +461,29 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
         count = rs.getString("NUM").toInt
       }
     }
+
+
+    val sql_tt = new StringBuilder
+
+    sql_tt ++= s"SELECT COUNT(1) NUM  " +
+      s"FROM normaltp_personinfo k " +
+      s"JOIN (SELECT p.cardid,m.personid " +
+      s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
+      s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+      s"ON k.PERSONID = w.cardid "
+
+    if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
+      sql_tt ++= s" WHERE k.ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+        s"AND k.ora_createtime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
+    }
+
+    JdbcDatabase.queryWithPsSetter2(sql_tt.toString){ps=>
+    }{rs=>
+      while (rs.next()){
+        count += rs.getString("NUM").toInt
+      }
+    }
+
     count
   }
 

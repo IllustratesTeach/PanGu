@@ -22,17 +22,18 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
 
   @Test
   def test_setFinger: Unit ={
-    val dataHandler = new DataHandler(new FileDataSource(new File("D://44200482222242323422163.fpt")))
+    val dataHandler = new DataHandler(new FileDataSource(new File("D://R2100001400022017020001.fpt")))
     val service = getService[WsHaiXinFingerService]
-    val result = service.setFinger("1701","0101","3701","44200482222242323422163",dataHandler)
+    val result = service.setFinger("1701","0101","3701","R2100001400022017020001",dataHandler)
     Assert.assertEquals(1,result)
   }
 
   @Test
   def test_getFingerStatus: Unit ={
     val service = getService[WsHaiXinFingerService]
-    val status = service.getFingerStatus("0101","3701","44200482222242323422163")
-    Assert.assertEquals(4,status)
+    val status = service.getFingerStatus("0101","3701","R2102000600002017020601")
+    println("返回状态:" + status)
+    Assert.assertEquals(2,status)
   }
 
   @Test
@@ -46,7 +47,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
   @Test
   def test_getFingerMatchList: Unit ={
     val service = getService[WsHaiXinFingerService]
-    val result = service.getFingerMatchList("0101","3701","","",1,10)
+    val result = service.getFingerMatchList("0101","3701","2017/08/04 00:00:00","2017/10/04 00:00:00",1,10)
     println(new String(IOUtils.toByteArray(result.getInputStream)))
     Assert.assertNotNull(result)
   }
@@ -54,21 +55,26 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
   @Test
   def test_getFingerMatchCount: Unit ={
     val service = getService[WsHaiXinFingerService]
-    val result = service.getFingerMatchCount("0101","3701","","")
-    Assert.assertTrue(result > 0)
+    val result = service.getFingerMatchCount("0101","3701","2017/08/04 00:00:00","2017/10/04 00:00:00")
+    Assert.assertTrue(result == 1)
   }
 
   @Test
   def test_getFingerMatchData: Unit ={
     val service = getService[WsHaiXinFingerService]
-    val listDataHandler = service.getFingerMatchData("0101","3701","44200372622242323322549")
+    val listDataHandler = service.getFingerMatchData("0101","3701","R2102000600002017020601")
 
     var i = 1
-    listDataHandler.foreach { t =>
+    /*listDataHandler.forEach { t =>
       if(null != t){
-        FileUtils.writeByteArrayToFile(new File("D:\\" + "20170809" + i + ".FPT"), IOUtils.toByteArray(t.getInputStream))
+        FileUtils.writeByteArrayToFile(new File("D:\\" + "20170830" + i + ".FPT"), IOUtils.toByteArray(t.getInputStream))
         i = i+1
       }
+    }*/
+    val a = listDataHandler.iterator()
+    while(a.hasNext){
+      FileUtils.writeByteArrayToFile(new File("D:\\" + "20170911" + i + ".FPT"), IOUtils.toByteArray(a.next.getInputStream))
+      i += 1
     }
 
     Assert.assertTrue(listDataHandler.size > 0)

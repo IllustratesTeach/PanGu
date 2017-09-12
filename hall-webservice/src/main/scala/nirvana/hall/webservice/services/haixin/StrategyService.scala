@@ -107,6 +107,14 @@ trait StrategyService {
     */
   def getResponseStatusByGafisStatus(status:Long):Int
 
+
+  /**
+    * 根据6.2返回的查询状态获得应该返回给调用客户端的状态(TT)
+    * @param status
+    * @return
+    */
+  def getResponseStatusByGafisStatus_TT(status:Long):Int
+
   /**
     * 获得比中列表
     * @param timefrom 开始时间(可选)

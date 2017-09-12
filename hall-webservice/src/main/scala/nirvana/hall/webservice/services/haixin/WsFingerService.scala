@@ -1,14 +1,14 @@
 package nirvana.hall.webservice.services.haixin
 
+import java.util
 import javax.activation.DataHandler
 import javax.jws.{WebMethod, WebParam, WebService}
 
-import scala.collection.mutable
 
 /**
   * Created by yuchen on 2017/7/24.
   */
-@WebService(serviceName = "WsHaiXinFingerService", targetNamespace = "http://www.gafis.com/")
+@WebService(serviceName = "WsHaiXinFingerService", targetNamespace = "http://www.gafis.com")
 trait WsHaiXinFingerService {
 
   /**
@@ -93,7 +93,7 @@ trait WsHaiXinFingerService {
     */
   @WebMethod def getFingerMatchData(@WebParam(name="userid") userid:String
                                     ,@WebParam(name="unitcode") unitcode:String
-                                    ,@WebParam(name="personid") personid:String):mutable.ListBuffer[DataHandler]
+                                    ,@WebParam(name="personid") personid:String):util.ArrayList[DataHandler]
 
   /**
     * 接口07:获取指纹系统服务器时间

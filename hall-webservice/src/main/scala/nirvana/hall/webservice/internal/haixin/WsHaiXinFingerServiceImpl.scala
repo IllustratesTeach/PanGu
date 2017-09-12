@@ -1,35 +1,27 @@
 package nirvana.hall.webservice.internal.haixin
 
 
-import java.io.{ByteArrayInputStream, File, FileOutputStream}
+import java.io.{ File}
 import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
-import javax.imageio.ImageIO
-import javax.imageio.spi.IIORegistry
+
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
-import nirvana.hall.api.internal.JniLoaderUtil
-import nirvana.hall.api.internal.fpt.FPTFileHandler
 import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.FPTImageConverter
-import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, PalmFgp, TPCard}
+import nirvana.hall.protocol.api.FPTProto.{ImageType, PalmFgp, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-import nirvana.hall.support.services.GAFISImageReaderSpi
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
-import org.apache.commons.io.{FileUtils, IOUtils}
-
-import scala.collection.mutable
 
 /**
   * Created by yuchen on 2017/7/24.
@@ -128,7 +120,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       }else{
         if(!responseStatusAndOraSidMap.get("orasid").get.toString.equals(IAConstant.EMPTY_ORASID)){
           val status = queryService.getStatusBySid(responseStatusAndOraSidMap.get("orasid").get.asInstanceOf[Long])
-          result = strategyService.getResponseStatusByGafisStatus(status)
+          result = strategyService.getResponseStatusByGafisStatus_TT(status)
         }else{
           result = IAConstant.CREATE_STORE_SUCCESS
         }
@@ -284,9 +276,9 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
     * @param personid 公安部标准的23位唯一码，人员编号
     * @return DataHandler 比中关系的FPT文件
     */
-  override def getFingerMatchData(userid: String, unitcode: String, personid: String): mutable.ListBuffer[DataHandler] = {
+  override def getFingerMatchData(userid: String, unitcode: String, personid: String): util.ArrayList[DataHandler] = {
 
-    val listDataHandler = new mutable.ListBuffer[DataHandler]
+    val listDataHandler = new util.ArrayList[DataHandler]
 
     val uuid = UUID.randomUUID().toString.replace("-","")
     try{
@@ -303,7 +295,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
 
       listMapBuffer match {
         case Some(m) => m.foreach{ t =>
-          listDataHandler.+=(exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
+          listDataHandler.add(exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
             ,t.get("orasid").get.toString))
         }
 
