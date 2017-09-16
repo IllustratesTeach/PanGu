@@ -52,7 +52,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
       FPTFileBuilder.convertTPCard2Logic02Res(tpCard.build())
     }else{
-      null
+      new Logic02Rec
     }
 
   }
@@ -72,7 +72,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
       FPTFileBuilder.convertCaseAndLPCard2Logic03Rec(caseInfo, lpCardList)
     }else{
-      null
+      new Logic03Rec
     }
   }
 

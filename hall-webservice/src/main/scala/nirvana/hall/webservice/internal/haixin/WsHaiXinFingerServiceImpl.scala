@@ -371,7 +371,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM)
 
-      addPalmTpCard(personid,dh,palmtype)
+      //addPalmTpCard(personid,dh,palmtype)
 
       strategyService.palmBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS
@@ -459,7 +459,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM_AGAIN)
 
-      addPalmTpCard(personid,dh,palmtype)
+      //addPalmTpCard(personid,dh,palmtype)
 
       strategyService.palmBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS

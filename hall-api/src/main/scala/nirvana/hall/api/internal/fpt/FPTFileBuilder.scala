@@ -39,7 +39,7 @@ object FPTFileBuilder {
   def convertTPCard2Logic02Res(card: TPCard): Logic02Rec = {
     val logic02Rec = new Logic02Rec
     logic02Rec.systemType = "1900" //1900 东方金指
-    logic02Rec.personId = card.getStrPersonID
+    logic02Rec.personId = if(card.getStrPersonID.equals("")) card.getStrMisPersonID else card.getStrPersonID
     logic02Rec.cardId = card.getStrCardID
     logic02Rec.personName = card.getText.getStrName
     logic02Rec.alias = card.getText.getStrAliasName

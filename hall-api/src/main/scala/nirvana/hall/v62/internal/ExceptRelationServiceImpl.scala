@@ -35,7 +35,7 @@ class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPC
     val pkidlist = getPKIDService.getDataInfo(queryid,ora_sid)
     for (i <- 0 to pkidlist.size - 1)
     {
-      if(pkidlist(i).get("candlist").size>0){
+      if(null != pkidlist(i).get("candlist")){
         for (ii<- 1 to pkidlist(i).get("num").get.asInstanceOf[Int]){
           if(pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeTT)||pkidlist(i).get("querytype").get.asInstanceOf[String].equals(MatchRelationService.querytypeLL)){
             Array.copy(pkidlist(i).get("candlist").get.asInstanceOf[Array[Byte]],96*(ii-1)+57,tscnt,0,1)
