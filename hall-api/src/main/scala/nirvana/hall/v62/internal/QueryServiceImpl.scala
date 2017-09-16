@@ -185,6 +185,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
     matchTask.setObjectId(0)
     matchTask.setPriority(2)
     matchTask.setScoreThreshold(60)
+    matchTask.setCommitUser(config.appServer.user)
 
     sendQuery(matchTask.build())
   }
