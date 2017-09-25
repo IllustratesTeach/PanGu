@@ -31,10 +31,10 @@ object FPTConverter {
     }
     textBuilder.setStrBirthDate(logic02Rec.birthday)
     textBuilder.setStrIdentityNum(logic02Rec.idCardNo)
-    textBuilder.setStrBirthAddrCode(logic02Rec.addressDetail)
-    textBuilder.setStrBirthAddr(logic02Rec.address)
-    textBuilder.setStrAddrCode(logic02Rec.doorDetail)
-    textBuilder.setStrAddr(logic02Rec.door)
+    textBuilder.setStrBirthAddrCode("") //logic02Rec.address
+    textBuilder.setStrBirthAddr("") //logic02Rec.addressDetail
+    textBuilder.setStrAddrCode(logic02Rec.address)
+    textBuilder.setStrAddr(logic02Rec.addressDetail)
     textBuilder.setStrPersonType(logic02Rec.category)
     textBuilder.setStrCaseType1(logic02Rec.caseClass1Code)
     textBuilder.setStrCaseType2(logic02Rec.caseClass2Code)
@@ -68,6 +68,8 @@ object FPTConverter {
     textBuilder.setStrXieChaContacter(logic02Rec.contact)
     textBuilder.setStrXieChaTelNo(logic02Rec.contactPhone)
     textBuilder.setStrShenPiBy(logic02Rec.approver)
+    textBuilder.setStrHuKouPlaceCode(logic02Rec.door)
+    textBuilder.setStrHuKouPlaceTail(logic02Rec.doorDetail)
 
 
     logic02Rec.fingers.foreach { finger =>

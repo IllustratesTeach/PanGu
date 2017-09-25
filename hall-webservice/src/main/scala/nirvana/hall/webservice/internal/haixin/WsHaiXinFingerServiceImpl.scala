@@ -1,15 +1,15 @@
 package nirvana.hall.webservice.internal.haixin
 
 
-import java.io.{ File}
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
 
-
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
@@ -19,9 +19,12 @@ import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto.{ImageType, PalmFgp, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
+import org.apache.commons.io.{FileUtils, IOUtils}
+import org.apache.commons.lang.StringUtils
 
 /**
   * Created by yuchen on 2017/7/24.
@@ -32,7 +35,8 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
                                 ,tpCardService: TPCardService
                                 ,queryService: QueryService
                                 ,extractor: FeatureExtractor
-                                ,exceptRelationService:ExceptRelationService) extends WsHaiXinFingerService with LoggerSupport{
+                                ,exceptRelationService:ExceptRelationService
+                               ,hallWebserviceConfig: HallWebserviceConfig) extends WsHaiXinFingerService with LoggerSupport{
   /**
     * 接口01:捺印指纹信息录入
     *
@@ -57,6 +61,10 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       paramMap.put("dh",dh)
 
       strategyService.inputParamIsNullOrEmpty(paramMap)
+
+      if(hallWebserviceConfig.saveFPTFlag.equals("1")){
+        FileUtils.writeByteArrayToFile(new File(hallWebserviceConfig.localTenprintPath + personid + ".FPT"), IOUtils.toByteArray(dh.getInputStream))
+      }
       strategyService.checkCollectSrcIsVaild(collectsrc)
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkFingerCardIsExist(personid,IAConstant.SET_FINGER)
@@ -118,9 +126,14 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       if(!responseStatusAndOraSidMap.nonEmpty){
         result = IAConstant.CREATE_STORE_FAIL
       }else{
-        if(!responseStatusAndOraSidMap.get("orasid").get.toString.equals(IAConstant.EMPTY_ORASID)){
-          val status = queryService.getStatusBySid(responseStatusAndOraSidMap.get("orasid").get.asInstanceOf[Long])
-          result = strategyService.getResponseStatusByGafisStatus_TT(status)
+        if(!responseStatusAndOraSidMap.get("orasid").get.toString.equals(IAConstant.EMPTY_ORASID.toString)){
+          val oraSid = responseStatusAndOraSidMap.get("orasid").get.asInstanceOf[Long]
+          if(oraSid > 0){
+            val status = queryService.getStatusBySidSQL(oraSid)
+            result = strategyService.getResponseStatusByGafisStatus_TT(status)
+          }else{
+            result = IAConstant.CREATE_STORE_SUCCESS
+          }
         }else{
           result = IAConstant.CREATE_STORE_SUCCESS
         }
@@ -159,6 +172,11 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       paramMap.put("dh",dh)
 
       strategyService.inputParamIsNullOrEmpty(paramMap)
+
+      if(hallWebserviceConfig.saveFPTFlag.equals("1")){
+        FileUtils.writeByteArrayToFile(new File(hallWebserviceConfig.localTenprintPath + personid + "update.FPT"), IOUtils.toByteArray(dh.getInputStream))
+      }
+
       strategyService.checkCollectSrcIsVaild(collectsrc)
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkFingerCardIsExist(personid,IAConstant.SET_FINGER_AGAIN)
@@ -217,7 +235,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
             ,userid,unitcode
             ,IAConstant.SEARCH_SUCCESS
             ,IAConstant.GET_FINGER_MATCH_LIST
-            ,IAConstant.EMPTY,IAConstant.EMPTY_ORASID.toString,null,None)
+            ,IAConstant.EMPTY,IAConstant.EMPTY_ORASID.toString,dataHandler,None)
 
         case _ =>
       }
@@ -253,9 +271,14 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.checkUserIsVaild(userid,unitcode)
 
       count = strategyService.getHitCount(timefrom,timeto)
+      logger.info("get Hit count|userid:" + userid
+        + "&unitcode:" + unitcode
+        + "&timefrom:" + timefrom
+        + "&timeto:" + timeto
+        + "&count:" + count)
 
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY
-        ,userid,unitcode,IAConstant.SEARCH_SUCCESS
+        ,userid,unitcode,count
         ,IAConstant.GET_FINGER_MATCH_COUNT
         ,IAConstant.EMPTY,IAConstant.EMPTY_ORASID.toString,null,None)
 
@@ -295,18 +318,22 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
 
       listMapBuffer match {
         case Some(m) => m.foreach{ t =>
-          listDataHandler.add(exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
-            ,t.get("orasid").get.toString))
-        }
 
-        case _ =>
+          val dataHandler = exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
+            ,t.get("orasid").get.toString)
+          if(Nil != dataHandler && null != dataHandler){
+            listDataHandler.add(dataHandler)
+          }
+        }
+        case _ => throw new Exception("not found orasid,personid:" + personid)
       }
 
+      saveHitResultFPT(listDataHandler,personid)
 
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY
         ,userid,unitcode,IAConstant.SEARCH_SUCCESS
         ,IAConstant.GET_FINGER_MATCH_DATA
-        ,IAConstant.EMPTY,IAConstant.EMPTY_ORASID.toString,null,None)
+        ,personid,IAConstant.EMPTY_ORASID.toString,null,None)
 
 
     }catch{
@@ -602,6 +629,22 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
         PalmFgp.PALM_LEFT_SIDE
       case other =>
         PalmFgp.PALM_UNKNOWN
+    }
+  }
+
+
+  private def saveHitResultFPT(listDataHandler:util.ArrayList[DataHandler],personid:String): Unit ={
+    try{
+      if(hallWebserviceConfig.saveFPTFlag.equals("1")){
+        val count = listDataHandler.size
+        for( i <- 0 until count){
+          FileUtils.writeByteArrayToFile(new File(hallWebserviceConfig.localHitResultPath
+                         + personid + "\\" + personid + "_" +i + ".FPT")
+            , IOUtils.toByteArray(listDataHandler.get(i).getInputStream))
+        }
+      }
+    }catch{
+      case e:Exception => logger.error("export hit result fail:" + ExceptionUtil.getStackTraceInfo(e))
     }
   }
 }

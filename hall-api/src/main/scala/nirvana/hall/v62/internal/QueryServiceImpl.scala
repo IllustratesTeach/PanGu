@@ -183,7 +183,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
     matchTask.setMatchId(cardId)
     matchTask.setTopN(50)
     matchTask.setObjectId(0)
-    matchTask.setPriority(2)
+    matchTask.setPriority(5)
     matchTask.setScoreThreshold(60)
     matchTask.setCommitUser(config.appServer.user)
 
@@ -233,6 +233,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
 
   /**
     * 更新任务表中对应这条认定的候选信息的候选状态
+    *
     * @param oraSid
     * @param taskType
     * @param keyId
@@ -280,5 +281,21 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
       ps.setInt(4,taskType)
       ps.setString(5,keyId)
     }
+  }
+
+  /**
+    * 根据任务号sid获取比对状态 SQL查询方式
+    *
+    * @param oraSid
+    */
+  override def getStatusBySidSQL(oraSid: Long): Int = {
+    val sql = s"select t.status from NORMALQUERY_QUERYQUE t where t.ora_sid = ?"
+    var status = 0
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,oraSid.toInt)
+    } { rs =>
+      status = rs.getInt("status")
+    }
+    status
   }
 }

@@ -63,10 +63,14 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       val caseInfo = caseInfoService.getCaseInfo(caseId)
       val fingerIdCount = caseInfo.getStrFingerIDList.size
       for (i <- 0 until fingerIdCount) {
-        val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
-        //有可能现场没有图像，为null
-        if(lPCard != null){
-          lpCardList.append(lPCard)
+        try{
+          val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
+          //有可能现场没有图像，为null
+          if(lPCard != null){
+            lpCardList.append(lPCard)
+          }
+        }catch{
+          case e:Exception =>
         }
       }
 

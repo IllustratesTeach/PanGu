@@ -499,9 +499,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
 
     val sql = s"SELECT t.ora_sid,t.queryid " +
               s"FROM Normalquery_Queryque t " +
-              s"WHERE t.keyid IN ( SELECT cardid " +
-                                 s"FROM NORMALTP_TPCARDINFO " +
-                                 s"WHERE personid = ? )"
+              s"WHERE t.keyid = ?"
 
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
       ps.setString(1,personId)

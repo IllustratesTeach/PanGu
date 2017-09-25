@@ -32,6 +32,8 @@ class HallWebserviceConfig
   var localHitResultPath:String = _
   @XmlElement(name = "xc_hit_result_path")
   var xcHitResultPath:String = _
+  @XmlElement(name = "is_save_fpt")
+  var saveFPTFlag:String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")
