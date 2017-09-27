@@ -266,7 +266,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
     }else if(commandRequest.hasExtension(SyncMatchTaskRequest.cmd)){
       val request = commandRequest.getExtension(SyncMatchTaskRequest.cmd)
       val uuid = request.getUuid
-      var match_task_orasid=""
+      var match_task_keyid=""
       try{
         val responseBuilder = SyncMatchTaskResponse.newBuilder()
         val dbId = if(request.getDbid.isEmpty) None else Option(request.getDbid)
@@ -284,10 +284,10 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           }
           matchTaskList = fetchQueryService.fetchMatchTask(request.getSize,yearThreshold, dbId)
           matchTaskList.foreach{matchTask=>
-            match_task_orasid=matchTask.getMatchId
+            match_task_keyid=matchTask.getMatchId
             responseBuilder.addMatchTask(matchTask)
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid
-                                            ,match_task_orasid
+                                            ,match_task_keyid
               ,HallApiConstants.SYNC_TYPE_MATCH_TASK + HallApiConstants.PUT,ip,HallApiConstants.MESSAGE_RECEIVE
               ,HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }
@@ -300,8 +300,8 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
       } catch {
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
-          error("MatchTask-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+          error("MatchTask-ResponseData fail,uuid{};match_task_keyid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_keyid,eInfo,e.getMessage)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_keyid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
       true
     } else if (commandRequest.hasExtension(SyncMatchResultRequest.cmd)) {
