@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hall_api>
+    <log_file>/log/hall.api.log</log_file>
+    <local_store_dir>/config/local.api</local_store_dir>
+    <rpc>
+        <bind>127.*:5559</bind>
+    </rpc>
+    <zk>
+        <address>127.0.0.1:3333</address>
+    </zk>
+    <web>
+      <bind>0.0.0.0:8080</bind>
+    </web>
+    <sync>
+        <!--<sync_cron>0 * * * * ? *</sync_cron>-->
+    </sync>
+    <hall_image_url>http://127.0.0.1:9001</hall_image_url>
+</hall_api>
