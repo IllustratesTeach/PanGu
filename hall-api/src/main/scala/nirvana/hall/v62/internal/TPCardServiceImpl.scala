@@ -196,4 +196,11 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     }
   }
 
+  /**
+    * 针对海鑫综采对接使用
+    * 6.2不实现该方法
+    * @param tpCard
+    * @param dbId
+    */
+  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = {}
 }
