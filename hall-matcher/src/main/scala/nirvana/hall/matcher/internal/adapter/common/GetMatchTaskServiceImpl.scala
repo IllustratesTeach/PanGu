@@ -31,11 +31,6 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
   val GET_SID_BY_CASE_FINGERID: String = "select t.sid as ora_sid from gafis_case_finger t where t.finger_id=?"
   val GET_SID_BY_CASE_PALMID: String = "select t.sid as ora_sid from gafis_case_palm t where t.palm_id=?"
 
-  final val GAFIS_KEYLIST_GetName = "KeyList"
-  final val GAFIS_QRYPARAM_GetName = "QryParam"
-  final val GAFIS_QRYFILTER_GetName = "QryFilter"
-  final val GAFIS_CANDKEYFILTER_GetName = "CandKeyFilter"
-  final val GAFIS_TEXTSQL_GetName = "TextSql"
   /**
    * 获取比对任务
    * @param matchTaskQueryRequest
@@ -74,7 +69,11 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     val flag = rs.getInt("flag")
     val isPalm = flag == 2 || flag == 22
     val textSql = rs.getString("textsql")
-    val topN = rs.getInt("maxcandnum")
+    var topN = rs.getInt("maxcandnum")
+    //如果有候选过滤配置,候选+1000
+    if(hallMatcherConfig.candKeyFilters.nonEmpty && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
+      topN += 1000
+    }
     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
     matchTaskBuilder.setTopN(if (topN <= 0) 50 else topN); //最大候选队列默认50
     matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))

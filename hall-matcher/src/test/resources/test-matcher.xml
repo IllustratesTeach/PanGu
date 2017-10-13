@@ -30,5 +30,10 @@
   <auto_check>
     <confirm_score>60</confirm_score>
   </auto_check>
+  <cand_key_filter query_type="2" is_percent="false">
+    <item reverse="false" count="20">
+      <key_wild>31*</key_wild>
+    </item>
+  </cand_key_filter>
 </hall_matcher>
 

@@ -3,6 +3,7 @@ package nirvana.hall.matcher.internal.adapter.common
 import javax.sql.DataSource
 
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.GafisConverter
 import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
 import nirvana.hall.matcher.service.{AutoCheckService, PutMatchResultService}
@@ -17,7 +18,7 @@ import scala.collection.mutable
 /**
  * Created by songpeng on 16/4/9.
  */
-class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val dataSource: DataSource) extends PutMatchResultService {
+class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckService: AutoCheckService, implicit val dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid=?"
   val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
@@ -47,7 +48,12 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
+      if(hallMatcherConfig.candKeyFilters.nonEmpty && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryQue.queryType)){
+        //TODO
+        //根据候选条码筛选条件过滤编号
+      }else{
+        candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
+      }
     }
     if (queryQue.queryType != HallMatcherConstants.QUERY_TYPE_TT) {
       maxScore = maxScore / 10
