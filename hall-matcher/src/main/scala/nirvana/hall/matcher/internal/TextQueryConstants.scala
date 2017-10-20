@@ -56,6 +56,8 @@ object TextQueryConstants {
   val COL_NAME_CID_DATE = "cId_date"
   val COL_NAME_CARDID = "cardId"
   val COL_NAME_CASECLASSCODE = "caseClassCode"
+  val COL_NAME_CASECLASSCODE2 = "caseClassCode2"
+  val COL_NAME_CASECLASSCODE3 = "caseClassCode3"
   val COL_NAME_CASENATURE = "caseNature"
   val COL_NAME_CASEOCCURPLACECODE = "caseOccurPlaceCode"
   val COL_NAME_SUSPICIOUSAREACODE = "suspiciousAreaCode"
@@ -82,6 +84,8 @@ object TextQueryConstants {
   val COL_NAME_IDCARDNO = IDCARDNO
   val COL_NAME_DATASOURCES = "dataSources"
   val COL_NAME_CASECLASS = "caseClass"
+  val COL_NAME_CASECLASS2 = "caseClass2"
+  val COL_NAME_CASECLASS3 = "caseClass3"
   val COL_NAME_BIRTHDAY = "birthday"
   val COL_NAME_GATHERDATE = "gatherDate"
 
