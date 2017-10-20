@@ -21,82 +21,80 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */
-  override val SYNC_SQL: String = s"SELECT t.sid" +
-                                        s", t.seq" +
-                                        s", t.personid" +
-                                        s", t.name" +
-                                        s", t.sex_code " + COL_NAME_SEXCODE +
-                                        s", t.birthdayst " + COL_NAME_BIRTHDAY +
-                                        s", t.door" +
-                                        s", t.address" +
-                                        s", t.gather_category " + COL_NAME_GATHERCATEGORY +
-                                        s", t.gather_type_id " + COL_NAME_GATHERTYPE +
-                                        s", t.gather_date " + COL_NAME_GATHERDATE +
-                                        s", t.data_sources " + COL_NAME_DATASOURCES +
-                                        s", t.case_classes " + COL_NAME_CASECLASS  +
-                                        s", t.idcardno" +
-                                        s", t.person_type " + COL_NAME_PERSONTYPE +
-                                        s", t.nation_code " + COL_NAME_NATIONCODE +
-                                        s", t.recordmark" +
-                                        s", t.deletag" +
-                                        s", db.logic_db_pkid as " + COL_NAME_LOGICDB +
-                                        s", t.gather_org_code " + COL_NAME_GATHERORGCODE +
-                                        s", t.nativeplace_code " + COL_NAME_NATIVEPLACECODE +
-                                        s", t.foreign_name " + COL_NAME_FOREIGNNAME +
-                                        s", t.assist_level " + COL_NAME_ASSISTLEVEL +
-                                        s", t.assist_ref_person " + COL_NAME_ASSISTREFPERSON +
-                                        s", t.assist_ref_case " + COL_NAME_ASSISTREFCASE +
-                                        s", t.gatherdepartname" +
-                                        s", t.gatherusername" +
-                                        s", t.contrcapture_code " + COL_NAME_CONTRCAPTURECODE +
-                                        s", t.certificatetype" +
-                                        s", t.certificateid" +
-                                        s", t.process_no " + COL_NAME_PROCESSNO +
-                                        s", t.psis_no " + COL_NAME_PSISNO +
-                                        s", t.spellname" +
-                                        s", t.usedname" +
-                                        s", t.usedspell" +
-                                        s", t.aliasname" +
-                                        s", t.aliasspell" +
-                                        s", t.birth_code " + COL_NAME_BIRTHCODE +
-                                        s", t.birth_street " + COL_NAME_BIRTHSTREET +
-                                        s", t.birthdetail" +
-                                        s", t.door_street " + COL_NAME_DOORSTREET +
-                                        s", t.doordetail" +
-                                        s", t.address_street " + COL_NAME_ADDRESSSTREET +
-                                        s", t.addressdetail" +
-                                        s", t.culture_code " + COL_NAME_CULTURECODE +
-                                        s", t.faith_code " + COL_NAME_FAITHCODE +
-                                        s", t.haveemployment" +
-                                        s", t.job_code " + COL_NAME_JOBCODE +
-                                        s", t.otherspecialty" +
-                                        s", t.specialidentity_code " + COL_NAME_SPECIALIDENTITYCODE +
-                                        s", t.specialgroup_code " + COL_NAME_SPECIALGROUPCODE +
-                                        s", t.gatherer_id " + COL_NAME_GATHERERID +
-                                        s", t.fingerrepeatno" +
-                                        s", t.inputpsn" +
-                                        s", t.inputtime" +
-                                        s", t.modifiedpsn" +
-                                        s", t.modifiedtime" +
-                                        s", t.person_category " + COL_NAME_PERSONCATEGORY +
-                                        s", t.gather_finger_mode " + COL_NAME_GATHERFINGERMODE +
-                                        s", t.case_name " + COL_NAME_CASENAME +
-                                        s", t.reason" +
-                                        s", t.gatherdepartcode" +
-                                        s", t.gatheruserid" +
-                                        s", t.gather_finger_time " + COL_NAME_GATHERFINGERTIME +
-                                        s", t.cardid" +
-                                        s", t.is_xjssmz " + COL_NAME_ISXJSSMZ +
-                                        s" FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
-                                        s" WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
-  private val personCols: Array[String] = Array[String](COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS,
-    COL_NAME_SEXCODE, COL_NAME_NAME, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, COL_NAME_IDCARDNO, COL_NAME_PERSONTYPE, COL_NAME_NATIONCODE, COL_NAME_RECORDMARK, COL_NAME_LOGICDB,
-    COL_NAME_GATHERORGCODE, COL_NAME_NATIVEPLACECODE, COL_NAME_FOREIGNNAME, COL_NAME_ASSISTLEVEL, COL_NAME_ASSISTREFPERSON, COL_NAME_ASSISTREFCASE, COL_NAME_GATHERDEPARTNAME,
-    COL_NAME_GATHERUSERNAME, COL_NAME_CONTRCAPTURECODE, COL_NAME_CERTIFICATETYPE, COL_NAME_CERTIFICATEID, COL_NAME_PROCESSNO, COL_NAME_PSISNO, COL_NAME_SPELLNAME, COL_NAME_USEDNAME,
-    COL_NAME_USEDSPELL, COL_NAME_ALIASNAME, COL_NAME_ALIASSPELL, COL_NAME_BIRTHCODE, COL_NAME_BIRTHSTREET, COL_NAME_BIRTHDETAIL, COL_NAME_DOORSTREET, COL_NAME_DOORDETAIL,
-    COL_NAME_ADDRESSSTREET, COL_NAME_ADDRESSDETAIL,COL_NAME_CULTURECODE, COL_NAME_FAITHCODE, COL_NAME_HAVEEMPLOYMENT,COL_NAME_JOBCODE, COL_NAME_OTHERSPECIALTY,
-    COL_NAME_SPECIALIDENTITYCODE, COL_NAME_SPECIALGROUPCODE, COL_NAME_GATHERERID, COL_NAME_FINGERREPEATNO, COL_NAME_INPUTPSN, COL_NAME_MODIFIEDPSN,COL_NAME_PERSONCATEGORY,
-    COL_NAME_GATHERFINGERMODE, COL_NAME_CASENAME, COL_NAME_REASON, COL_NAME_GATHERDEPARTCODE, COL_NAME_GATHERUSERID, COL_NAME_CARDID, COL_NAME_ISXJSSMZ)
+  override val SYNC_SQL: String = s"SELECT t.personid " + COL_NAME_PERSONID +
+    s", t.idcardno " + COL_NAME_IDCARDNO +
+    s", t.name " + COL_NAME_NAME +
+    s", t.spellname " + COL_NAME_SPELLNAME +
+    s", t.aliasname " + COL_NAME_ALIASNAME +
+    s", t.aliasspell " + COL_NAME_ALIASSPELL +
+    s", t.sex_code " + COL_NAME_SEXCODE +
+    s", t.nativeplace_code " + COL_NAME_NATIVEPLACECODE +
+    s", t.nation_code " + COL_NAME_NATIONCODE +
+    s", t.birthdayst " +
+    s", t.door " + COL_NAME_DOOR +
+    s", t.doordetail " +
+    s", t.address " + COL_NAME_ADDRESS +
+    s", t.addressdetail " +
+    s", t.gather_org_code " +
+    s", t.ipaddress" +
+    s", t.gather_date " + COL_NAME_GATHERDATE +
+    s", t.gather_type_id " +
+    s", t.status" +
+    s", t.fingerrepeatno " + COL_NAME_FINGERREPEATNO +
+    s", t.annex " +
+    s", t.inputpsn " +
+    s", t.inputtime " +
+    s", t.modifiedpsn " +
+    s", t.modifiedtime " +
+    s", t.deletag " +
+    s", t.schedule " +
+    s", t.approval " +
+    s", t.person_category " +
+    s", t.auditor " +
+    s", t.auditedtime " +
+    s", t.gather_finger_mode " +
+    s", t.gather_finger_num " +
+    s", t.finger_remark " +
+    s", t.gatherdepartcode " +
+    s", t.gatheruserid " +
+    s", t.gather_finger_time " +
+    s", t.case_brief_contents" +
+    s", t.data_sources" +
+    s", t.city_code " +
+    s", t.sid " +
+    s", t.seq " +
+    s", t.cardid " +
+    s", t.recordmark " +
+    s", t.recordsituation " +
+    s", t.assist_level " + COL_NAME_ASSISTLEVEL +
+    s", t.assist_bonus" +
+    s", t.assist_purpose " +
+    s", t.assist_ref_person " +
+    s", t.assist_ref_case " +
+    s", t.assist_valid_date " +
+    s", t.assist_explain " +
+    s", t.assist_dept_code " +
+    s", t.assist_dept_name " +
+    s", t.assist_date " +
+    s", t.assist_contacts" +
+    s", t.assist_number " +
+    s", t.assist_approval " +
+    s", t.assist_sign " +
+    s", t.gatherdepartname " +
+    s", t.gatherusername " + COL_NAME_GATHERUSERNAME +
+    s", t.certificatetype " +
+    s", t.certificateid " +
+    s", t.person_type " +
+    s", t.case_classes " + COL_NAME_CASECLASS +
+    s", t.case_classes2 " + COL_NAME_CASECLASS2 +
+    s", t.case_classes3 " + COL_NAME_CASECLASS3 +
+    s", t.psis_no " +
+    s", db.logic_db_pkid " + COL_NAME_LOGICDB +
+    s" FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
+    s" WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
+  private val personCols: Array[String] = Array[String](COL_NAME_LOGICDB,COL_NAME_CASECLASS,COL_NAME_CASECLASS2,COL_NAME_CASECLASS3,
+  COL_NAME_IDCARDNO,COL_NAME_NAME,COL_NAME_ALIASNAME,COL_NAME_SEXCODE,COL_NAME_NATIVEPLACECODE,
+  COL_NAME_NATIONCODE,COL_NAME_DOOR,COL_NAME_ADDRESS,COL_NAME_FINGERREPEATNO,COL_NAME_ASSISTLEVEL,COL_NAME_GATHERUSERNAME)
 
   /**
     * 读取人员信息
@@ -137,7 +135,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       TextQueryUtil.getColDataByPersonid(personId).foreach(textData.addCol(_))
 
       //日期类型
-      val dateCols = Array(COL_NAME_BIRTHDAY, COL_NAME_GATHERDATE, COL_NAME_INPUTTIME,COL_NAME_MODIFIEDTIME,COL_NAME_GATHERFINGERTIME)
+      val dateCols = Array(COL_NAME_GATHERDATE)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0
@@ -151,6 +149,12 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       if(name != null){
         val spellName = PinyinConverter.convert2Pinyin(name)
         textData.addColBuilder.setColName(COL_NAME_SPELLNAME).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(spellName.getBytes("UTF-8")))
+      }
+      //别名拼音,由于数据库数据不规范，这里不使用数据库aliasname,这里通过转换汉字得到拼音
+      val aliasname= rs.getString(COL_NAME_ALIASNAME)
+      if(aliasname != null){
+        val aliasspell = PinyinConverter.convert2Pinyin(aliasname)
+        textData.addColBuilder.setColName(COL_NAME_ALIASSPELL).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(aliasspell.getBytes("UTF-8")))
       }
 
       syncDataBuilder.setData(ByteString.copyFrom(textData.build.toByteArray))
