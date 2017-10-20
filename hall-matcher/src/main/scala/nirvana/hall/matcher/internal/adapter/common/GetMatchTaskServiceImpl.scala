@@ -71,7 +71,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     val textSql = rs.getString("textsql")
     var topN = rs.getInt("maxcandnum")
     //如果有候选过滤配置,候选+1000
-    if(hallMatcherConfig.candKeyFilters.nonEmpty && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
+    if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
       topN += 1000
     }
     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))

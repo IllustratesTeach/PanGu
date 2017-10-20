@@ -2,6 +2,7 @@ package nirvana.hall.matcher.internal.adapter.common
 
 import javax.sql.DataSource
 
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.GafisConverter
@@ -21,7 +22,7 @@ import scala.collection.mutable
 class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckService: AutoCheckService, implicit val dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid=?"
   val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
-
+  val candStructLen = new GAQUERYCANDSTRUCT().toByteArray().length
   /**
    * 推送比对结果
    * @param matchResultRequest
@@ -33,7 +34,10 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
     if (matchResultRequest.getStatus.getCode == 0) {
       val queryQue = getQueryQueVo(matchResultRequest.getMatchId.toInt)
       addMatchResult(matchResultRequest, queryQue)
-      autoCheckService.ttAutoCheck(matchResultRequest, queryQue)
+      //如果查询类型是TT，自动重卡认定
+      if(queryQue.queryType == HallMatcherConstants.QUERY_TYPE_TT){
+        autoCheckService.ttAutoCheck(matchResultRequest, queryQue)
+      }
     } else {
       updateMatchStatusFail(matchResultRequest.getMatchId, matchResultRequest.getStatus)
     }
@@ -42,22 +46,39 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
 
   private def addMatchResult(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo): Unit = {
     val oraSid = matchResultRequest.getMatchId
-    val candNum = matchResultRequest.getCandidateNum
+    var candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
 
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      if(hallMatcherConfig.candKeyFilters.nonEmpty && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryQue.queryType)){
-        //TODO
+      if(hallMatcherConfig.candKeyFilters != null){
         //根据候选条码筛选条件过滤编号
+        hallMatcherConfig.candKeyFilters.filter(_.queryType == queryQue.queryType).foreach{filter =>
+          val sidKeyidMap_ = sidKeyidMap.filter{sidKeyid=>
+            var flag = true
+            filter.items.foreach{item=>
+              if(flag){
+                if(item.reverse == sidKeyid._2.startsWith(item.keyWild)){
+                  flag = false
+                }
+              }
+            }
+
+            flag
+          }
+          candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap_, queryQue.isPalm)
+        }
       }else{
         candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
       }
+      //重新计算候选个数，因为sid有匹配不上（数据被人为从数据库删除数据）
+      candNum = candList.length / candStructLen
     }
     if (queryQue.queryType != HallMatcherConstants.QUERY_TYPE_TT) {
-      maxScore = maxScore / 10
+      maxScore = maxScore / 10 //TT最高分数是1000
     }
+
     JdbcDatabase.update(UPDATE_MATCH_RESULT_SQL) { ps =>
       ps.setInt(1, candNum)
       ps.setBytes(2, candList)
