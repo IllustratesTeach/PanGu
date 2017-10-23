@@ -4,12 +4,12 @@ import javax.sql.DataSource
 
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.config.{CandKeyFilterConfig, CandKeyFilterConfigItem, HallMatcherConfig}
 import nirvana.hall.matcher.internal.GafisConverter
 import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
 import nirvana.hall.matcher.service.{AutoCheckService, PutMatchResultService}
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
+import nirvana.protocol.MatchResult.MatchResultRequest.{MatchResultObject, MatcherStatus}
 import nirvana.protocol.MatchResult.MatchResultResponse.MatchResultResponseStatus
 import nirvana.protocol.MatchResult.{MatchResultRequest, MatchResultResponse}
 
@@ -21,7 +21,7 @@ import scala.collection.mutable
  */
 class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckService: AutoCheckService, implicit val dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
   val candStructLen = new GAQUERYCANDSTRUCT().toByteArray().length
   /**
    * 推送比对结果
@@ -52,27 +52,16 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      if(hallMatcherConfig.candKeyFilters != null){
+      if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryQue.queryType)){
         //根据候选条码筛选条件过滤编号
-        hallMatcherConfig.candKeyFilters.filter(_.queryType == queryQue.queryType).foreach{filter =>
-          val sidKeyidMap_ = sidKeyidMap.filter{sidKeyid=>
-            var flag = true
-            filter.items.foreach{item=>
-              if(flag){
-                if(item.reverse == sidKeyid._2.startsWith(item.keyWild)){
-                  flag = false
-                }
-              }
-            }
-
-            flag
-          }
-          candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap_, queryQue.isPalm)
+        hallMatcherConfig.candKeyFilters.filter(_.queryType == queryQue.queryType).foreach{filterConfig=>
+          val matchResultObjectList = filterMatchResultObjectList(matchResultRequest, filterConfig, sidKeyidMap, queryQue.maxcandnum)
+          candList = GafisConverter.convertMatchResultObjectList2CandList(matchResultObjectList, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
         }
       }else{
-        candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
+        candList = GafisConverter.convertMatchResultObjectList2CandList(matchResultRequest.getCandidateResultList, queryQue.queryType, sidKeyidMap, queryQue.isPalm)
       }
-      //重新计算候选个数，因为sid有匹配不上（数据被人为从数据库删除数据）
+      //重新计算候选个数，如果sid有匹配不上（数据被人为从数据库删除数据）
       candNum = candList.length / candStructLen
     }
     if (queryQue.queryType != HallMatcherConstants.QUERY_TYPE_TT) {
@@ -153,9 +142,59 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      val maxcandnum = rs.getInt("maxcandnum")
+      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false, maxcandnum)
     }.get
+  }
+
+  private def filterMatchResultObjectList(matchResultRequest: MatchResultRequest, candKeyFilterConfig: CandKeyFilterConfig, sidKeyidMap: Map[Long, String], maxcandnum: Int): Seq[MatchResultObject]={
+    //新建map存放CandKeyFilterConfigItem和过滤的候选列表
+    val filterConfigItemMap = mutable.Map[CandKeyFilterConfigItem,Seq[MatchResultObject]]()
+    candKeyFilterConfig.items.foreach { item =>
+      //候选个数，如果是百分比，根据最大候选个数计算实际个数
+      val count = if(candKeyFilterConfig.isPercent){
+        item.count * maxcandnum / 100
+      }else{
+        item.count
+      }
+      val matchResultList = filterMatchResultObjectList(matchResultRequest, item, sidKeyidMap, count)
+      filterConfigItemMap.put(item, matchResultList)
+    }
+    //将所有CandKeyFilterConfigItem的候选列表合并
+    val bufferList = new mutable.ArrayBuffer[MatchResultObject]()
+    filterConfigItemMap.foreach(f => bufferList ++= f._2)
+
+    //补全候选信息满足maxcandnum数量
+    matchResultRequest.getCandidateResultList.foreach{cand=>
+      if(bufferList.size < maxcandnum && !bufferList.exists(x=> x.getObjectId == cand.getObjectId)){
+        bufferList += cand
+      }
+    }
+    //排序
+    bufferList.sortWith(_.getScore > _.getScore)
+  }
+
+  /**
+    * 根据候选过滤条件获取候选信息列表
+    * @param matchResultRequest
+    * @param candKeyFilterConfigItem
+    * @param sidKeyidMap
+    * @param count
+    * @return
+    */
+  private def filterMatchResultObjectList(matchResultRequest: MatchResultRequest, candKeyFilterConfigItem: CandKeyFilterConfigItem, sidKeyidMap: Map[Long, String], count: Int): Seq[MatchResultObject]={
+    val bufferList = new mutable.ArrayBuffer[MatchResultObject]()
+    matchResultRequest.getCandidateResultList.foreach{matchResultObject =>
+      val keyid = sidKeyidMap.get(matchResultObject.getObjectId)
+      if(keyid.nonEmpty){
+        if(candKeyFilterConfigItem.reverse != keyid.get.startsWith(candKeyFilterConfigItem.keyWild)){
+          if(bufferList.size < count){
+            bufferList += matchResultObject
+          }
+        }
+      }
+    }
+    bufferList
   }
 }
 
-//class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)

@@ -8,7 +8,7 @@ import nirvana.hall.c.services.gloclib.galoctp.GADB_MICSTREAMNAMESTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.protocol.MatchResult.MatchResultRequest
+import nirvana.protocol.MatchResult.MatchResultRequest.MatchResultObject
 import org.jboss.netty.buffer.ChannelBuffer
 
 import scala.collection.mutable
@@ -87,19 +87,19 @@ object GafisConverter {
   }
 
   /**
-   * 比对结果MatchResult转换为gafis候选列表
-   * @param matchResultRequest
-   * @param queryType
-   * @param sidKeyidMap
-   * @return
-   */
-  def convertMatchResult2CandList(matchResultRequest: MatchResultRequest, queryType: Int,sidKeyidMap: Map[Long, String], isPalm: Boolean = false, isGafis6: Boolean = false): Array[Byte] ={
+    * 比对结果MatchResultObject列表转换为gafis候选列表
+    * @param matchResultObjectList
+    * @param queryType
+    * @param sidKeyidMap
+    * @param isPalm
+    * @param isGafis6
+    * @return
+    */
+  def convertMatchResultObjectList2CandList(matchResultObjectList: Seq[MatchResultObject], queryType: Int, sidKeyidMap: Map[Long, String], isPalm: Boolean = false, isGafis6: Boolean = false): Array[Byte] ={
     val result = new ByteArrayOutputStream()
-    val candIter = matchResultRequest.getCandidateResultList.iterator()
     var index = 0 //比对排名
-    while (candIter.hasNext) {
+    matchResultObjectList.foreach{cand=>
       index += 1
-      val cand = candIter.next()
       val keyId = sidKeyidMap.get(cand.getObjectId)
       if (keyId.nonEmpty) {
         var fgp = cand.getPos
@@ -120,25 +120,11 @@ object GafisConverter {
         gCand.nIndex = fgp.toByte
         gCand.tFinishTime = new AFISDateTime
         gCand.nStepOneRank = index
-//        gCand.nSrcKeyIndex = cand.getSrcIndex.toByte
+        //        gCand.nSrcKeyIndex = cand.getSrcIndex.toByte
         result.write(gCand.toByteArray(AncientConstants.GBK_ENCODING))//这里使用GBK编码，防止keyId是中文的时候报错
       }
-      /*  result.write(new Array[Byte](4))
-          result.write(DataConverter.int2Bytes(cand.getScore))
-          result.write(keyId.get.getBytes)
-          result.write(new Array[Byte](32 - keyId.get.getBytes().length + 2))
-          val dbId = if (queryType == 0 || queryType == 2) 1 else 2
-          result.write(ByteBuffer.allocate(2).putShort(dbId.toShort).array())
-          result.write(ByteBuffer.allocate(2).putShort(2.toShort).array())
-          result.write(new Array[Byte](2 + 1 + 3 + 1 + 1 + 1 + 1))
-          result.write(fgp.toByte)
-          result.write(new Array[Byte](1 + 2 + 1 + 1 + 1 + 1))
-          result.write(DataConverter.getAFISDateTime(new Date()))
-          result.write(new Array[Byte](2 + 2 + 2 + 2))
-          result.write(new Array[Byte](8 + 2))
-          result.write(DataConverter.int2Bytes(index))
-          result.write(new Array[Byte](2))*/
     }
+
     result.toByteArray
   }
 }
