@@ -102,7 +102,7 @@ object TextQueryConstants {
   val COL_NAME_UPDATORUNITCODE = "updatorUnitCode"
   val COL_NAME_INPUTPSN = "inputpsn"
   val COL_NAME_MODIFIEDPSN = "modifiedpsn"
-  val COL_NAME_SPELLNAME = "spellName" //姓名拼音
+  val COL_NAME_SPELLNAME = "spellname" //姓名拼音
   val COL_NAME_PERSONTYPE = "personType"
   val COL_NAME_NATIONCODE = "nationCode"
   val COL_NAME_RECORDMARK = "recordmark"
