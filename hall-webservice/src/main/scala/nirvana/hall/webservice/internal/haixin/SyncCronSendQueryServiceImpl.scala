@@ -61,7 +61,12 @@ class SyncCronSendQueryServiceImpl(strategyService:StrategyService
 
     val ia_finger_pkid = map.get("uuid").get.toString
     try{
-      val ora_sid = queryService.sendQueryByCardIdAndMatchType(map.get("personid").get.toString, MatchType.FINGER_TT)//发送TT查询
+      val ora_sid = queryService.sendQueryByCardIdAndMatchType(
+        if(map.get("personid").get.toString.toUpperCase.startsWith("R"))
+           map.get("personid").get.toString.toUpperCase.drop(1)
+        else
+          map.get("personid").get.toString.toUpperCase
+        , MatchType.FINGER_TT)//发送TT查询
       strategyService.recordAutoSendQueryOraSidAndQueryIdWithTT(map.get("uuid").get.toString
         ,ora_sid,map.get("queryid").get.toString,MatchType.FINGER_TT.getNumber)
       strategyService.setSendQueryStatus(ia_finger_pkid,IAConstant.SEND_QUERY_SUCCESS)

@@ -35,7 +35,7 @@ object galoctpConverter extends LoggerSupport{
   def convertProtoBuf2GTPCARDINFOSTRUCT(card: TPCard): GTPCARDINFOSTRUCT={
     val data = new GTPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
-    data.stAdmData.szMISPersonID = card.getStrPersonID
+    data.stAdmData.szMISPersonID = card.getStrMisPersonID //人员编号
 //    data.stAdmData.szPersonID = card.getStrPersonID//重卡组号
 
     if(card.hasText) {

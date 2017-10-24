@@ -18,12 +18,14 @@ object FPTConverter {
   /**
     * 将Logic02Rec转换为TPCard，不做图像解压和特征转换，如果保存需要解压图像并提取特征
     * @param logic02Rec
+    * personid：重卡组号，mispersonid：人员编号，personid：卡号
     * @return
     */
   def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard = {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-    tpCard.setStrCardID(logic02Rec.personId)
+    tpCard.setStrCardID(if(logic02Rec.personId.toUpperCase.startsWith("R")) logic02Rec.personId.drop(1) else logic02Rec.personId.toUpperCase)
+    tpCard.setStrMisPersonID(if(!logic02Rec.personId.toUpperCase.startsWith("R")) "R" + logic02Rec.personId else logic02Rec.personId.toUpperCase)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
     if (logic02Rec.gender != null && logic02Rec.gender.length > 0) {

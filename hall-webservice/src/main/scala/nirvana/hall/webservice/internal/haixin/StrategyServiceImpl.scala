@@ -382,11 +382,11 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     val listArray = new util.ArrayList[String]
     val sql = new StringBuilder
 
-    sql ++= s"SELECT personid FROM ( SELECT ROWNUM AS rowno,w.personid " +
+    sql ++= s"SELECT cardid FROM ( SELECT ROWNUM AS rowno,w.cardid " +
                                     s"FROM Admin_Breakcase k " +
                                     s"JOIN (SELECT p.cardid,m.personid " +
                                            s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-                                           s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+                                           s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
                                     s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
@@ -401,22 +401,23 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       ps.setInt(2,endnum)
     }{rs=>
       while (rs.next()){
-        listArray.add(rs.getString("personid"))
+        listArray.add(rs.getString("cardid"))
       }
     }
 
 
     val sql_tt = new StringBuilder
 
-    sql_tt ++= s"SELECT personid FROM ( SELECT ROWNUM AS rowno,w.personid " +
-      s"FROM normaltp_personinfo k " +
-      s"JOIN (SELECT p.cardid,m.personid " +
-      s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-      s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
-      s"ON k.PERSONID = w.cardid "
+    sql_tt ++= s"SELECT cardid FROM ( SELECT ROWNUM AS rowno,p.cardid " +
+                                    s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
+                                    s"WHERE p.mispersonid is not null " +
+                                    s"AND p.mispersonid = m.personid " +
+                                    s"AND m.matchstatus = '1' " +
+                                    s"AND m.OPER_TYPE = '1' " +
+                                    s"AND p.personid is not null"
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
-      sql_tt ++= s" WHERE ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+      sql_tt ++= s" AND ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
         s"AND ora_createtime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
     }
 
@@ -427,7 +428,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       ps.setInt(2,endnum)
     }{rs=>
       while (rs.next()){
-        listArray.add(rs.getString("personid"))
+        listArray.add(rs.getString("cardid"))
       }
     }
     Some(listArray)
@@ -443,11 +444,11 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     var count = 0
     val sql = new StringBuilder
 
-    sql ++= s"SELECT COUNT(1) NUM  " +
+    sql ++= s"SELECT COUNT(cardid) NUM  " +
             s"FROM Admin_Breakcase k " +
             s"JOIN (SELECT p.cardid,m.personid " +
                     s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-                    s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+                    s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
             s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
@@ -465,16 +466,17 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
 
     val sql_tt = new StringBuilder
 
-    sql_tt ++= s"SELECT COUNT(1) NUM  " +
-      s"FROM normaltp_personinfo k " +
-      s"JOIN (SELECT p.cardid,m.personid " +
-      s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-      s"WHERE p.personid is not null AND p.personid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
-      s"ON k.PERSONID = w.cardid "
+    sql_tt ++= s"SELECT COUNT(p.cardid) NUM" +
+      s" FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
+      s" WHERE p.mispersonid is not null " +
+      s" AND p.mispersonid = m.personid " +
+      s" AND m.matchstatus = '1' " +
+      s" AND m.OPER_TYPE = '1' " +
+      s" AND p.personid is not null"
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
-      sql_tt ++= s" WHERE k.ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
-        s"AND k.ora_createtime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
+      sql_tt ++= s" AND p.ora_createtime >= to_date('" + timefrom + "', 'yyyy-MM-dd hh24:mi:ss') " +
+        s"AND p.ora_createtime <= to_date('" + timeto + "',  'yyyy-MM-dd hh24:mi:ss') "
     }
 
     JdbcDatabase.queryWithPsSetter2(sql_tt.toString){ps=>

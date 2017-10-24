@@ -314,7 +314,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkFingerCardIsExist(personid,IAConstant.GET_FINGER_MATCH_DATA)
 
-      val listMapBuffer = strategyService.getOraSidAndQueryIdByPersonId(personid)
+      val listMapBuffer = strategyService.getOraSidAndQueryIdByPersonId(if(personid.toUpperCase.startsWith("R")) personid.toUpperCase.drop(1) else personid.toUpperCase)
 
       listMapBuffer match {
         case Some(m) => m.foreach{ t =>
