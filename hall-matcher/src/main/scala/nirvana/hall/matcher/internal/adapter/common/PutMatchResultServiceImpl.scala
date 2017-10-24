@@ -147,6 +147,14 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
     }.get
   }
 
+  /**
+    * 过滤候选列表
+    * @param matchResultRequest
+    * @param candKeyFilterConfig
+    * @param sidKeyidMap
+    * @param maxcandnum
+    * @return
+    */
   private def filterMatchResultObjectList(matchResultRequest: MatchResultRequest, candKeyFilterConfig: CandKeyFilterConfig, sidKeyidMap: Map[Long, String], maxcandnum: Int): Seq[MatchResultObject]={
     //新建map存放CandKeyFilterConfigItem和过滤的候选列表
     val filterConfigItemMap = mutable.Map[CandKeyFilterConfigItem,Seq[MatchResultObject]]()
