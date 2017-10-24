@@ -20,7 +20,7 @@ import scala.collection.JavaConversions._
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
    * 推送比对结果
@@ -47,7 +47,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm, true)
+      candList = GafisConverter.convertMatchResultObjectList2CandList(matchResultRequest.getCandidateResultList, queryQue.queryType, sidKeyidMap, queryQue.isPalm, true)
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
 
@@ -153,7 +153,8 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      val maxcandnum = rs.getInt("maxcandnum")
+      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false, maxcandnum)
     }.get
   }
 }

@@ -20,6 +20,6 @@ object PinyinConverter {
     format.setCaseType(HanyuPinyinCaseType.LOWERCASE)
     format.setToneType(HanyuPinyinToneType.WITHOUT_TONE)
     //这里str追加一个. 来保证最后的拼音是分开的
-    PinyinHelper.toHanYuPinyinString(str+".", format, " ", true)
+    PinyinHelper.toHanYuPinyinString(str+"", format, "", true)
   }
 }

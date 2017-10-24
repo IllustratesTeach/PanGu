@@ -48,6 +48,8 @@ object TextQueryConstants {
   val EXTRACTDATE_BEG = "extractDateBeg"
   val EXTRACTDATE_END = "extractDateEnd"
 
+  val SHIELD_CANDKEYFILTER = "shieldCandkeyfilter" //屏蔽候选条码过滤，1：屏蔽，0：不屏蔽
+
   //案件
   //贵州
   val COL_NAME_CASEID = CASEID
@@ -102,7 +104,7 @@ object TextQueryConstants {
   val COL_NAME_UPDATORUNITCODE = "updatorUnitCode"
   val COL_NAME_INPUTPSN = "inputpsn"
   val COL_NAME_MODIFIEDPSN = "modifiedpsn"
-  val COL_NAME_SPELLNAME = "spellName" //姓名拼音
+  val COL_NAME_SPELLNAME = "spellname" //姓名拼音
   val COL_NAME_PERSONTYPE = "personType"
   val COL_NAME_NATIONCODE = "nationCode"
   val COL_NAME_RECORDMARK = "recordmark"

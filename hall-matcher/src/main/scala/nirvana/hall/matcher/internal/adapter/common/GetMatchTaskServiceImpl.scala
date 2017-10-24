@@ -5,12 +5,13 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import net.sf.json.JSONObject
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
+import nirvana.hall.matcher.internal.{DataConverter, GafisConverter, TextQueryConstants}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
@@ -70,12 +71,22 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     val isPalm = flag == 2 || flag == 22
     val textSql = rs.getString("textsql")
     var topN = rs.getInt("maxcandnum")
-    //如果有候选过滤配置,候选+1000
+    if (topN <= 0) topN = 50 //最大候选队列默认50
+    //如果有候选过滤配置, 同时没有屏蔽候选参数,候选+1000
     if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
-      topN += 1000
+      if(textSql != null){
+        val jsonObj = JSONObject.fromObject(textSql)
+        if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
+          if(!(jsonObj.has(TextQueryConstants.SHIELD_CANDKEYFILTER) && "1".equals(jsonObj.getString(TextQueryConstants.SHIELD_CANDKEYFILTER)))){
+            topN += 1000
+          }
+        }
+      }else{
+        topN += 1000
+      }
     }
     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
-    matchTaskBuilder.setTopN(if (topN <= 0) 50 else topN); //最大候选队列默认50
+    matchTaskBuilder.setTopN(topN)
     matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
     matchTaskBuilder.setPriority(rs.getInt("priority"))
     if (isPalm) {

@@ -5,13 +5,17 @@ import javax.sql.DataSource
 import net.sf.json.JSONObject
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.config.{CandKeyFilterConfig, CandKeyFilterConfigItem, HallMatcherConfig}
+import nirvana.hall.matcher.internal.TextQueryConstants._
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
 import nirvana.hall.matcher.internal.{DateConverter, PinyinConverter, TextQueryUtil}
+import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.TextQueryProto
 import nirvana.protocol.TextQueryProto.TextQueryData
 import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, LongRangeQuery, Occur}
-import nirvana.hall.matcher.internal.TextQueryConstants._
+import org.apache.tapestry5.ioc.annotations.PostInjection
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by songpeng on 16/4/8.
@@ -32,13 +36,12 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
                                                           "WHERE t.status=" + HallMatcherConstants.QUERY_STATUS_WAIT + " AND t.deletag=1 AND t.sync_target_sid IS NULL AND t.ora_sid IS NOT NULL ORDER BY t.prioritynew DESC, t.ora_sid ) tt " +
                                           "WHERE ROWNUM <=?"
 
-  private val personCols: Array[String] = Array[String](PERSONID, IDCARDNO, PERSON_NAME, "gatherCategory", "gatherTypeId", "door", "address", "sexCode", "dataSources", "caseClasses",
-    "personType", "nationCode", "recordmark", "gatherOrgCode", "nativeplaceCode", "foreignName", "assistLevel", "assistRefPerson", "assistRefCase",
-    "gatherdepartname", "gatherusername", "contrcaptureCode", "certificatetype", "certificateid", "processNo", "psisNo", "usedname",
-    "usedspell", "aliasname", "aliasspell", "birthCode", "birthStreet", "birthdetail", "doorStreet", "doordetail", "addressStreet", "addressdetail",
-    "cultureCode", "faithCode", "haveemployment", "jobCode", "otherspecialty", "specialidentityCode", "specialgroupCode", "gathererId", "fingerrepeatno",
-    "inputpsn", "modifiedpsn", "personCategory", "gatherFingerMode", "caseName", "reason", "gatherdepartcode", "gatheruserid", "cardid", "isXjssmz")
-  private val caseCols: Array[String] = Array[String](CASEID, "caseClassCode", "caseNature", "caseOccurPlaceCode", "suspiciousAreaCode", "isMurder", "isAssist", "assistLevel", "caseState", "isChecked", "ltStatus", "caseSource", "caseOccurPlaceDetail", "extractor", "extractUnitCode", "extractUnitName", "brokenStatus", "creatorUnitCode", "updatorUnitCode", "inputpsn", "modifiedpsn")
+  private val personCols: Array[String] = Array[String](
+    COL_NAME_DOOR,COL_NAME_ADDRESS,COL_NAME_ASSISTLEVEL,COL_NAME_NAME,COL_NAME_SPELLNAME,COL_NAME_ALIASNAME,COL_NAME_ALIASSPELL,COL_NAME_IDCARDNO,
+    COL_NAME_SEXCODE,COL_NAME_FINGERREPEATNO,COL_NAME_NATIONCODE,COL_NAME_GATHERUSERNAME,COL_NAME_NATIVEPLACECODE)
+  private val caseCols: Array[String] = Array[String](
+    COL_NAME_CASEOCCURPLACECODE, COL_NAME_CASEOCCURPLACEDETAIL,COL_NAME_SUSPICIOUSAREACODE,COL_NAME_ASSISTLEVEL, COL_NAME_ISMURDER, COL_NAME_CASESTATE,
+    COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTUNITCODE)
 
   /**
    * 获取捺印文本查询条件
@@ -71,6 +74,30 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //处理其他特殊的查询条件
+        //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
+        if(json.has("caseClasses")){
+          val value = json.getString("caseClasses")
+          if(value.indexOf(",")>0){
+            val values = value.split("\\,")
+            val groupQuery = GroupQuery.newBuilder()
+            values.foreach{value =>
+              val keywordQuery = KeywordQuery.newBuilder()
+              keywordQuery.setValue(value)
+              groupQuery.addClauseQueryBuilder().setName("caseClass").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+              groupQuery.addClauseQueryBuilder().setName("caseClass2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+              groupQuery.addClauseQueryBuilder().setName("caseClass3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            }
+            textQuery.addQueryBuilder().setName("caseClass").setExtension(GroupQuery.query, groupQuery.build());
+          } else {
+            val groupQuery = GroupQuery.newBuilder()
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            groupQuery.addClauseQueryBuilder().setName("caseClass").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName("caseClass2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName("caseClass3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            textQuery.addQueryBuilder().setName("caseClass").setExtension(GroupQuery.query, groupQuery.build())
+          }
+        }
         //通配符查询,转为小写
         val wildcardColumn = Array(PERSONID, IDCARDNO)
         wildcardColumn.foreach{col =>
@@ -93,7 +120,7 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //时间段
-        val dateCols = Array("birthday", "gatherDate", "inputtime", "modifiedtime")
+        val dateCols = Array("gatherDate")
         dateCols.foreach{col =>
           if (json.has(col + "ST") && json.has(col + "ED")) {
             val longQuery = LongRangeQuery.newBuilder()
@@ -167,8 +194,33 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             }
           }
         }
+        //处理其他特殊的查询条件
+        //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
+        if(json.has("caseClassCode")){
+          val value = json.getString("caseClassCode")
+          if(value.indexOf(",")>0){
+            val values = value.split("\\,")
+            val groupQuery = GroupQuery.newBuilder()
+            values.foreach{value =>
+              val keywordQuery = KeywordQuery.newBuilder()
+              keywordQuery.setValue(value)
+              groupQuery.addClauseQueryBuilder().setName("caseClassCode").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+              groupQuery.addClauseQueryBuilder().setName("caseClassCode2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+              groupQuery.addClauseQueryBuilder().setName("caseClassCode3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            }
+            textQuery.addQueryBuilder().setName("caseClassCode").setExtension(GroupQuery.query, groupQuery.build());
+          } else {
+            val groupQuery = GroupQuery.newBuilder()
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            groupQuery.addClauseQueryBuilder().setName("caseClassCode").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName("caseClassCode2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            groupQuery.addClauseQueryBuilder().setName("caseClassCode3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+            textQuery.addQueryBuilder().setName("caseClassCode").setExtension(GroupQuery.query, groupQuery.build())
+          }
+        }
         //时间段
-        val dateCols = Array("extractDate", "inputtime", "modifiedtime")
+        val dateCols = Array("caseOccurDate", "extractDateST")
         dateCols.foreach{col =>
           if (json.has(col + "ST") && json.has(col + "ED")) {
             val longQuery = LongRangeQuery.newBuilder()
@@ -177,22 +229,20 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
           }
         }
-        //发案时间
-        if (json.has("caseOccurDateBeg") && json.has("caseOccurDateEnd")) {
-          val longQuery = LongRangeQuery.newBuilder
-          longQuery.setMin(DateConverter.convertStr2Date(json.getString("caseOccurDateBeg"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-          longQuery.setMax(DateConverter.convertStr2Date(json.getString("caseOccurDateEnd"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
-          textQuery.addQueryBuilder.setName("caseOccurDate").setExtension(LongRangeQuery.query, longQuery.build)
-        }
-        //案件编号
-        if (json.has(CASEID)) {
-          val keywordQuery = KeywordQuery.newBuilder().setValue(json.getString(CASEID).toLowerCase())
-          textQuery.addQueryBuilder().setName(CASEID).setExtension(KeywordQuery.query, keywordQuery.build())
-        }
         //案件编号区间
         val caseidGroupQuery = TextQueryUtil.getCaseidGroupQueryByJSONObject(json)
         if (caseidGroupQuery != null) {
           textQuery.addQueryBuilder().setName("caseid").setExtension(GroupQuery.query, caseidGroupQuery)
+        }
+        //导入编号
+        if(json.has("impKeys")){
+          val cardIds = json.getString("impKeys").toLowerCase().split("\\|")
+          val groupQuery = GroupQuery.newBuilder()
+          cardIds.foreach{caseId =>
+            groupQuery.addClauseQueryBuilder().setName(COL_NAME_CARDID).setExtension(KeywordQuery.query,
+              KeywordQuery.newBuilder().setValue(caseId).build()).setOccur(Occur.SHOULD)
+          }
+          textQuery.addQueryBuilder().setName(COL_NAME_CARDID).setExtension(GroupQuery.query, groupQuery.build())
         }
         //逻辑库
         if(json.has("logicDBValues")){
@@ -213,5 +263,59 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
     }
 
     textQuery.build()
+  }
+
+  /**
+    * 初始化条码过滤配置,如果数据库没有配置信息，使用hall-matcher.xml中的配置
+    */
+  @PostInjection
+  def initCandKeyFilterConfig(): Unit ={
+    val candKeyFilterConfigList = getCandKeyFilterConfigList
+    if(candKeyFilterConfigList.nonEmpty){
+      info("initCandKeyFilterConfig by database")
+      hallMatcherConfig.candKeyFilters = candKeyFilterConfigList.toArray
+    }
+  }
+
+  /**
+    * 读取gafis_candkeyfilter_config（候选过滤配置表）信息
+    * item结构：{'items':[{'reverse':false,'count':20, 'keywild':'31'}]}
+    * @return
+    */
+  private def getCandKeyFilterConfigList: Seq[CandKeyFilterConfig] ={
+    val candKeyFilterConfigList = new ArrayBuffer[CandKeyFilterConfig]()
+    try {
+      val sql = "select querytype, ispercent, item from gafis_candkeyfilter_config t where t.deletag =1"
+      JdbcDatabase.queryWithPsSetter2(sql) { ps => } { rs =>
+        while (rs.next()) {
+          val candKeyFilterConfig = new CandKeyFilterConfig
+          val queryType = rs.getInt("querytype")
+          val isPercent = rs.getInt("ispercent")
+          val item = rs.getString("item")
+          candKeyFilterConfig.isPercent = 1 == isPercent
+          candKeyFilterConfig.queryType = queryType
+          if (item != null && item.length > 0) {
+            val itemIter = JSONObject.fromObject(item).getJSONArray("items").iterator()
+            val candKeyFilterConfigItemList = new ArrayBuffer[CandKeyFilterConfigItem]
+            while (itemIter.hasNext) {
+              val candKeyFilterConfigItem = new CandKeyFilterConfigItem
+              val obj = itemIter.next().asInstanceOf[JSONObject]
+              candKeyFilterConfigItem.count = obj.getInt("count")
+              candKeyFilterConfigItem.reverse = obj.getBoolean("reverse")
+              candKeyFilterConfigItem.keyWild = obj.getString("keywild").replace("*","")//这里去掉*，使用startsWith来匹配
+
+              candKeyFilterConfigItemList += candKeyFilterConfigItem
+            }
+            candKeyFilterConfig.items = candKeyFilterConfigItemList.toArray
+            candKeyFilterConfigList += candKeyFilterConfig
+          }
+        }
+      }
+    } catch {
+      case e: Exception =>
+        error("getCandKeyFilterConfigList:" + e.getMessage)
+    }
+
+    candKeyFilterConfigList
   }
 }
