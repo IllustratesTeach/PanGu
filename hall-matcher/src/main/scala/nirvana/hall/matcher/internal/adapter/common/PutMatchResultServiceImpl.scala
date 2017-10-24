@@ -168,14 +168,19 @@ class PutMatchResultServiceImpl(hallMatcherConfig: HallMatcherConfig, autoCheckS
       val matchResultList = filterMatchResultObjectList(matchResultRequest, item, sidKeyidMap, count)
       filterConfigItemMap.put(item, matchResultList)
     }
-    //将所有CandKeyFilterConfigItem的候选列表合并
+    //将所有CandKeyFilterConfigItem的候选列表合并,并使用set来去重
+    val bufferSet = mutable.Set[MatchResultObject]()
+    filterConfigItemMap.foreach(f => bufferSet ++= f._2)
     val bufferList = new mutable.ArrayBuffer[MatchResultObject]()
-    filterConfigItemMap.foreach(f => bufferList ++= f._2)
+    bufferList ++= bufferSet.toList
 
     //补全候选信息满足maxcandnum数量
-    matchResultRequest.getCandidateResultList.foreach{cand=>
-      if(bufferList.size < maxcandnum && !bufferList.exists(x=> x.getObjectId == cand.getObjectId)){
-        bufferList += cand
+    for(i <- 0 until maxcandnum){
+      if(i < matchResultRequest.getCandidateNum){
+        val cand = matchResultRequest.getCandidateResult(i)
+        if(bufferList.size < maxcandnum && !bufferList.contains(cand)){
+          bufferList += cand
+        }
       }
     }
     //排序
