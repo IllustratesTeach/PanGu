@@ -33,9 +33,9 @@ class GetMatchTaskQuery extends LoggerSupport{
         info("getMatchTask sid:{} matchId:{} type:{} ", matchTask.getObjectId, matchTask.getMatchId, matchTask.getMatchType)
         matchTask.getMatchType match {
           case MatchType.FINGER_TT | MatchType.FINGER_TL | MatchType.PALM_TT | MatchType.PALM_TL =>
-            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getTData.getTextQuery)
+            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getTData(0).getTextQuery)
           case MatchType.FINGER_LT | MatchType.FINGER_LL | MatchType.PALM_LT | MatchType.PALM_LL  =>
-            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getLData.getTextQuery)
+            info("matchId:{} TextQuery:{}",matchTask.getMatchId, matchTask.getLData(0).getTextQuery)
           case other =>
         }
       }
