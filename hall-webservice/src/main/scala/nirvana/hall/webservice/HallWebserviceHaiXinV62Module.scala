@@ -9,7 +9,7 @@ import org.apache.tapestry5.ioc.ServiceBinder
 /**
   * Created by yuchen on 2017/9/27.
   */
-object HallWebserviceHaiXinModule {
+object HallWebserviceHaiXinV62Module {
 
   def bind(binder: ServiceBinder) {
 

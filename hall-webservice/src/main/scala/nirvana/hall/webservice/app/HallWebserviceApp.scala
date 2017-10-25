@@ -47,7 +47,7 @@ object HallWebserviceApp
       Class.forName("nirvana.hall.webservice.HallWebserviceModule"),
 
 
-      Class.forName("nirvana.hall.webservice.HallWebserviceHaiXinModule")
+      Class.forName("nirvana.hall.webservice.HallWebserviceHaiXinV62Module")
 
     )
 
