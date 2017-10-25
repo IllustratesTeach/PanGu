@@ -34,6 +34,8 @@ class HallWebserviceConfig
   var xcHitResultPath:String = _
   @XmlElement(name = "is_save_fpt")
   var saveFPTFlag:String = _
+  @XmlElement(name = "template_finger_database_id")
+  var templateFingerDBId:String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")

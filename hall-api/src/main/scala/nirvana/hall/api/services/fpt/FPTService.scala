@@ -18,9 +18,9 @@ trait FPTService {
 
   def getLogic06Rec(pkid: String,num:Int, dbId: Option[String] = None): Logic06Rec
 
-  def addLogic02Res(logic02Rec: Logic02Rec)
+  def addLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None)
 
-  def updateLogic02Res(logic02Rec: Logic02Rec)
+  def updateLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None)
 
   def addLogic03Res(logic03Rec: Logic03Rec)
 

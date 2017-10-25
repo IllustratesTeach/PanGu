@@ -71,7 +71,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       val fpt = strategyService.checkFptIsVaild(personid,dh)
       queryId = Some(fpt.sid)
       fpt.logic02Recs.foreach{
-        t => fptService.addLogic02Res(t)
+        t => fptService.addLogic02Res(t,Some(hallWebserviceConfig.templateFingerDBId))
       }
       strategyService.fingerBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS
@@ -122,7 +122,23 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.inputParamIsNullOrEmpty(paramMap)
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkFingerCardIsExist(personid,IAConstant.GET_FINGER_STATUS)
-      val responseStatusAndOraSidMap = strategyService.getResponseStatusAndOrasidByPersonId(personid)
+      val cardId = if(personid.toUpperCase.startsWith("R")) personid.toUpperCase.drop(1) else personid.toUpperCase
+      val responseStatusAndOraSidMap = strategyService.getRemoteResponseStatusAndOrasidByPersonId(cardId)
+      responseStatusAndOraSidMap match{
+        case Some(t) =>
+          val oraSid = responseStatusAndOraSidMap.get("orasid").asInstanceOf[Long]
+          if(oraSid > 0){
+            val status = queryService.getStatusBySidSQL(oraSid)
+            result = strategyService.getResponseStatusByGafisStatus_TT(status)
+          }else{
+            result = IAConstant.CREATE_STORE_SUCCESS
+          }
+        case _ =>
+          if(tpCardService.isExist(cardId,Some(hallWebserviceConfig.templateFingerDBId))){
+            result = IAConstant.CREATE_STORE_SUCCESS
+          }
+      }
+      /*val responseStatusAndOraSidMap = strategyService.getResponseStatusAndOrasidByPersonId(personid)
       if(!responseStatusAndOraSidMap.nonEmpty){
         result = IAConstant.CREATE_STORE_FAIL
       }else{
@@ -137,7 +153,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
         }else{
           result = IAConstant.CREATE_STORE_SUCCESS
         }
-      }
+      }*/
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
         ,result,IAConstant.GET_FINGER_STATUS,personid,IAConstant.EMPTY_ORASID.toString,null,None)
     }catch{
@@ -182,7 +198,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       strategyService.checkFingerCardIsExist(personid,IAConstant.SET_FINGER_AGAIN)
       val fpt = strategyService.checkFptIsVaild(personid,dh)
       fpt.logic02Recs.foreach{
-        t => fptService.updateLogic02Res(t)
+        t => fptService.updateLogic02Res(t,Some(hallWebserviceConfig.templateFingerDBId))
       }
       strategyService.fingerBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS

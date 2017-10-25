@@ -100,6 +100,15 @@ trait StrategyService {
     */
   def getResponseStatusAndOrasidByPersonId(personId:String):mutable.HashMap[String,Any]
 
+
+  /**
+    * 通过personid获得该卡号所对应的任务状态
+    * -针对模式:各地市向省厅下载采集的捺印卡信息,查询的是远程的查询的状态
+    * @param personId
+    * @return
+    */
+  def getRemoteResponseStatusAndOrasidByPersonId(personId:String):Option[mutable.HashMap[String,Any]]
+
   /**
     * 根据6.2返回的查询状态获得应该返回给调用客户端的状态
     * @param status

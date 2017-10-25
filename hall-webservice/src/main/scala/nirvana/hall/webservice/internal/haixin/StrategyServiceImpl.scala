@@ -254,6 +254,34 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
   }
 
   /**
+    * 通过personid获得该卡号所对应的任务状态
+    * -针对模式:各地市向省厅下载采集的捺印卡信息,查询的是远程的查询的状态
+    * @param personId
+    * @return
+    */
+  def getRemoteResponseStatusAndOrasidByPersonId(personId:String):Option[mutable.HashMap[String,Any]] = {
+    var resultMap = new scala.collection.mutable.HashMap[String,Any]
+    //-- rmtflag = 2 远程的查询 ,人员编号去R 以卡号作为条件进行查询
+    // ,查询内容是状态,以查重的状态作为该卡片在指纹系统里的入库状态
+    val sql = s"SELECT k.status,k.ora_sid " +
+              s"FROM  Normalquery_Queryque k " +
+              s"WHERE k.keyid = ? AND k.rmtflag = 2 AND k.QUERYTYPE = 0"
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1, personId)
+    }{rs=>
+      while(rs.next){
+        resultMap += ("response_status" -> rs.getInt("status"))
+        resultMap += ("orasid" -> rs.getLong("ora_sid"))
+      }
+    }
+    if(resultMap.size > 0){
+      Some(resultMap)
+    }else{
+      None
+    }
+  }
+
+  /**
     * 根据6.2返回的查询状态获得应该返回给调用客户端的状态
     *
     * @param status
@@ -431,7 +459,11 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
         listArray.add(rs.getString("cardid"))
       }
     }
-    Some(listArray)
+    if(listArray.size > 0){
+      Some(listArray)
+    }else{
+      None
+    }
   }
 
   /**
@@ -501,7 +533,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
 
     val sql = s"SELECT t.ora_sid,t.queryid " +
               s"FROM Normalquery_Queryque t " +
-              s"WHERE t.keyid = ?"
+              s"WHERE t.keyid = ? AND t.rmtflag = 2"
 
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
       ps.setString(1,personId)
@@ -513,8 +545,12 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
         listBuffer.append(mapBuffer)
       }
     }
+    if(listBuffer.size > 0){
+      Some(listBuffer)
+    }else{
+      None
+    }
 
-    Some(listBuffer)
   }
 
 

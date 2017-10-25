@@ -15,6 +15,6 @@ object HallWebserviceHaiXinV62Module {
 
     binder.bind(classOf[StrategyService], classOf[StrategyServiceImpl])
     binder.bind(classOf[WsHaiXinFingerService],classOf[WsHaiXinFingerServiceImpl]).withSimpleId
-    binder.bind(classOf[SyncCronSendQueryService],classOf[SyncCronSendQueryServiceImpl]).eagerLoad
+    binder.bind(classOf[SyncCronSendQueryService],classOf[SyncCronSendQueryServiceImpl])//.eagerLoad
   }
 }
