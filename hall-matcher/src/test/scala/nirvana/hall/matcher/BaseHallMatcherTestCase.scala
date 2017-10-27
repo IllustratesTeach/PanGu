@@ -20,10 +20,19 @@ class BaseHallMatcherTestCase {
   def setup: Unit ={
     val classes = List[Class[_]](
       Class.forName("nirvana.hall.matcher.TestHallMatcherModule"),
-      Class.forName("nirvana.hall.matcher.HallMatcherGzServiceModule"),
       Class.forName("nirvana.hall.matcher.HallMatcherDataSourceModule")
     )
-    registry = RegistryBuilder.buildAndStartupRegistry(classes: _*)
+    val config = TestHallMatcherModule.buildHallMatcherConfig()
+    val extraClasses = config.module match {
+      case "gz" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GZ)
+      case "daku" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_DAKU)
+      case "sh" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_SH)
+      case "gafis6" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GAFIS6)
+      case "nj" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_NJ)
+      case other =>
+        throw new UnsupportedOperationException(" module "+other.toString+" unsupported")
+    }
+    registry = RegistryBuilder.buildAndStartupRegistry(classes :+ extraClasses : _*)
   }
 
   @After
