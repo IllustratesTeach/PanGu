@@ -1,9 +1,8 @@
 package nirvana.hall.c.services.gfpt5lib
 
 import java.util
-import java.util.Date
-
 import monad.support.services.XmlLoader
+import org.apache.commons.io.IOUtils
 import org.junit.Test
 
 
@@ -71,12 +70,12 @@ class FPT5FileTest {
     fingerMsg1.fingerRightTriangle = "11111111111111"
     fingerMsg1.fingerExtractionNum = 15
     fingerMsg1.fingerExtractionInfo = "111111111111111"
-    //fingerMsg1.fingerCustomInfo = ""
+    fingerMsg1.fingerCustomInfo = IOUtils.toByteArray(getClass.getResourceAsStream("/img.bmp"))
     fingerMsg1.fingerImageHorizontalDirectionLength = 640
     fingerMsg1.fingerImageVerticalDirectionLength = 640
     fingerMsg1.fingerImageRatio = 500
     fingerMsg1.fingerImageCompressMethodDescript = "1111"
-    //fingerMsg1.fingerImageData = ""
+    fingerMsg1.fingerImageData = IOUtils.toByteArray(getClass.getResourceAsStream("/img.bmp"))
 
 
 
@@ -93,12 +92,12 @@ class FPT5FileTest {
     fingerMsg2.fingerRightTriangle = "11111111111111"
     fingerMsg2.fingerExtractionNum = 15
     fingerMsg2.fingerExtractionInfo = "111"
-    //fingerMsg2.fingerCustomInfo = "111"
+    fingerMsg2.fingerCustomInfo = IOUtils.toByteArray(getClass.getResourceAsStream("/img.bmp"))
     fingerMsg2.fingerImageHorizontalDirectionLength = 640
     fingerMsg2.fingerImageVerticalDirectionLength = 640
     fingerMsg2.fingerImageRatio = 500
     fingerMsg2.fingerImageCompressMethodDescript = "1111"
-    //fingerMsg2.fingerImageData = "111"
+    fingerMsg2.fingerImageData = IOUtils.toByteArray(getClass.getResourceAsStream("/img.bmp"))
 
     listFingerMsg.add(fingerMsg1)
     listFingerMsg.add(fingerMsg2)
@@ -141,7 +140,7 @@ class FPT5FileTest {
   @Test
   def test_stream_lp(): Unit = {
 
-    val fPT5File = new FPT5File
+    /*val fPT5File = new FPT5File
     val latentPackage = new LatentPackage
     val listLatentPackage = new util.ArrayList[LatentPackage]
     listLatentPackage.add(latentPackage)
@@ -259,6 +258,6 @@ class FPT5FileTest {
     fPT5File.latentPackage = listLatentPackage
 
     fPT5File.build(fPT5File).packageHead.originSystem = fPT5File.JINGZONG_SYSTEM
-    println(XmlLoader.toXml(fPT5File))
+    println(XmlLoader.toXml(fPT5File))*/
   }
 }
