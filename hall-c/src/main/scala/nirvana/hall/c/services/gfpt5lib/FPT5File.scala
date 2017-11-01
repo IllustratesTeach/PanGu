@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt5lib
 
-import java.text.SimpleDateFormat
+import java.text.{DecimalFormat, SimpleDateFormat}
 import java.util
 import java.util.Date
 import javax.xml.bind.annotation._
@@ -39,25 +39,25 @@ class FPT5File {
     @XmlElement(name = "latentPackage")
     var latentPackage: util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
     @XmlElement(name = "LatentTaskPackage")
-    var latentTaskPackage: util.ArrayList[LatentTaskPackage] = new util.ArrayList[LatentTaskPackage]
+    var latentTaskPackage: util.ArrayList[LatenttaskPackage] = new util.ArrayList[LatenttaskPackage]
     @XmlElement(name = "PrintTaskPackage")
-    var printTaskPackage: util.ArrayList[PrintTaskPackage] = new util.ArrayList[PrintTaskPackage]
+    var printTaskPackage: util.ArrayList[PrinttaskPackage] = new util.ArrayList[PrinttaskPackage]
     @XmlElement(name = "LTResultPackage")
-    var ltResultPackage: util.ArrayList[LTResultPackage] = new util.ArrayList[LTResultPackage]
+    var ltResultPackage: util.ArrayList[LtResultPackage] = new util.ArrayList[LtResultPackage]
     @XmlElement(name = "TLResultPackage")
-    var tlResultPackage: util.ArrayList[TLResultPackage] = new util.ArrayList[TLResultPackage]
+    var tlResultPackage: util.ArrayList[TlResultPackage] = new util.ArrayList[TlResultPackage]
     @XmlElement(name = "TTResultPackage")
-    var ttResultPackage: util.ArrayList[TTResultPackage] = new util.ArrayList[TTResultPackage]
+    var ttResultPackage: util.ArrayList[TtResultPackage] = new util.ArrayList[TtResultPackage]
     @XmlElement(name = "LLResultPackage")
-    var llResultPackage: util.ArrayList[LLResultPackage] = new util.ArrayList[LLResultPackage]
+    var llResultPackage: util.ArrayList[LlResultPackage] = new util.ArrayList[LlResultPackage]
     @XmlElement(name = "LTHitResultPackage")
-    var ltHitResultPackage: util.ArrayList[LTHitResultPackage] = new util.ArrayList[LTHitResultPackage]
+    var ltHitResultPackage: util.ArrayList[LtHitResultPackage] = new util.ArrayList[LtHitResultPackage]
     @XmlElement(name = "TTHitResultPackage")
-    var ttHitResultPackage: util.ArrayList[TTHitResultPackage] = new util.ArrayList[TTHitResultPackage]
+    var ttHitResultPackage: util.ArrayList[TtHitResultPackage] = new util.ArrayList[TtHitResultPackage]
     @XmlElement(name = "LLHitResultPackage")
-    var llHitResultPackage: util.ArrayList[LLHitResultPackage] = new util.ArrayList[LLHitResultPackage]
+    var llHitResultPackage: util.ArrayList[LlHitResultPackage] = new util.ArrayList[LlHitResultPackage]
     @XmlElement(name = "cancellatentPackage")
-    var cancelLatentPackage: util.ArrayList[cancellatentPackage] = new util.ArrayList[cancellatentPackage]
+    var cancelLatentPackage: util.ArrayList[cancelLatentPackage] = new util.ArrayList[cancelLatentPackage]
 
     /**
       * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
@@ -165,10 +165,8 @@ class FPT5File {
         var knuckleprints:Knuckleprints = new Knuckleprints
         @XmlElement(name = "fullpalms")
         var fullpalms:Fullpalms = new Fullpalms
-        @XmlElement(name = "rxzplxdm")
-        var personPictureTypeCode:String = ""
-        @XmlElement(name = "rx_txsj")
-        var personPictureImageData:String = ""
+        @XmlElement(name = "portraits")
+        var portraits:Portraits = new Portraits
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "FingerprintMsg")
@@ -457,6 +455,16 @@ class FPT5File {
     }
     //--------------------全掌相关end-----------------------//
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Portraits")
+class Portraits{
+    @XmlElement(name = "rxzplxdm")
+    var personPictureTypeCode:String = _
+    @XmlElement(name = "rx_txsj")
+    var personPictureImageData:Array[Byte] = _
+}
+
+
     /**
       * 现场
       */
@@ -486,7 +494,7 @@ class FPT5File {
         @XmlElement(name = "ajlbdm")
         var caseTypeCode:String = _ //案件类别代码 逗号分隔，最多10个
         @XmlElement(name = "asjsscw_jermby")
-        var money:BigDecimal = _
+        var money:Long = _
         @XmlElement(name = "asjfsdd_xzqhdm")
         var caseOccurAdministrativeDivisionCode:String = _
         @XmlElement(name = "asjfsdd_dzmc")
@@ -511,8 +519,7 @@ class FPT5File {
         var latentFingerNum:Int = _
         @XmlElement(name = "xczhw_sl")
         var latentPalmNum:Int = _
-        @XmlElement(name = "ysxt_xczzwbh")
-        var originalSystemLatentFingerPalmId:String = _
+
     }
 
     //--------------------现场指纹相关begin-----------------------//
@@ -529,7 +536,9 @@ class FPT5File {
         * 新数据必须提供，规则是‘F+现勘号后22位+4位物证分类代码+3位顺序号'
         * ,历史数据如无现勘编号，前23位用'F0000000000000000000000'占位
         */
-      @XmlElement(name = "xcwzbh")
+        @XmlElement(name = "ysxt_xczzwbh")
+        var originalSystemLatentFingerPalmId:String = _
+        @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
         @XmlElement(name = "xczw_xczzwylbw")
         var latentFingerLeftPosition:String = _ //现场指纹遗留部位
@@ -553,7 +562,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Xczwtzz")
     class Xczwtzz{
-
         @XmlElement(name = "xczw_tzzhbsf")
         var latentFingerFeatureGroupIdentify:String = _
         @XmlElement(name = "xczw_tzzhms")
@@ -664,8 +672,8 @@ class FPT5File {
       * 现场指掌纹查询比对请求信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LatentTaskPackage")
-    class LatentTaskPackage{
+    @XmlType(name = "LatenttaskPackage")
+    class LatenttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zzwbdrwlxdm")
@@ -695,8 +703,8 @@ class FPT5File {
       * 捺印指掌纹查询比对请求信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "PrintTaskPackage")
-    class PrintTaskPackage{
+    @XmlType(name = "PrinttaskPackage")
+    class PrinttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zzwbdrwlxdm")
@@ -722,8 +730,8 @@ class FPT5File {
       * 指掌纹正查比对结果信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LTResultPackage")
-    class LTResultPackage{
+    @XmlType(name = "LtResultPackage")
+    class LtResultPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -779,8 +787,8 @@ class FPT5File {
       * 指掌纹倒查比对结果信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "TLResultPackage")
-    class TLResultPackage{
+    @XmlType(name = "TlResultPackage")
+    class TlResultPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -836,8 +844,8 @@ class FPT5File {
       * 指掌纹查重比对结果信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "TTResultPackage")
-    class TTResultPackage{
+    @XmlType(name = "TtResultPackage")
+    class TtResultPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -891,8 +899,8 @@ class FPT5File {
       * 指掌纹串查比对结果信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LLResultPackage")
-    class LLResultPackage{
+    @XmlType(name = "LlResultPackage")
+    class LlResultPackage{
         @XmlElement(name = "xxzjbh")
         var xxzjbh:String = _
         @XmlElement(name = "rwbh")
@@ -952,8 +960,8 @@ class FPT5File {
       * 指掌纹正查和倒查比中信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LTHitResultPackage")
-    class LTHitResultPackage{
+    @XmlType(name = "LtHitResultPackage")
+    class LtHitResultPackage{
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "xczw_asjbh")
@@ -963,13 +971,13 @@ class FPT5File {
         @XmlElement(name = "xczw_xckybh")
         var latentFingerLatentSurveyId:String = _
         @XmlElement(name = "xczw_ysxt_xczzwbh")
-        var latentFingerOriginalSystemFingerId:Int = _
+        var latentFingerOriginalSystemFingerId:String = _
         @XmlElement(name = "xczw_xcwzbh")
         var latentFingerLatentPhysicalId:String = _
         @XmlElement(name = "xczw_xczzwkbh")
         var latentFingerCardId:String = _
         @XmlElement(name = "nyzw_ysxt_asjxgrybh")
-        var fingerPrintOriginalSystemPersonId:Int = _
+        var fingerPrintOriginalSystemPersonId:String = _
         @XmlElement(name = "nyzw_jzrybh")
         var fingerPrintJingZongPersonId:String = _
         @XmlElement(name = "nyzw_asjxgrybh")
@@ -985,11 +993,11 @@ class FPT5File {
         @XmlElement(name = "bzdw_gajgmc")
         var hitUnitName:String = _
         @XmlElement(name = "bzr_xm")
-        var hitName:String = _
+        var hitPersonName:String = _
         @XmlElement(name = "bzr_gmsfhm")
-        var hitIdCard:String = _
+        var hitPersonIdCard:String = _
         @XmlElement(name = "bzr_lxdh")
-        var hitTel:String = _
+        var hitPersonTel:String = _
         @XmlElement(name = "bzsj")
         var hitDateTime:String = _
         @XmlElement(name = "fhdw_gajgjgdm")
@@ -1017,8 +1025,8 @@ class FPT5File {
       * 指掌纹查重比中信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "TTHitResultPackage")
-    class TTHitResultPackage{
+    @XmlType(name = "TtHitResultPackage")
+    class TtHitResultPackage{
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "zzwccbzlxdm")
@@ -1035,6 +1043,8 @@ class FPT5File {
         var whetherFingerJudgmentMark:String = _
         @XmlElement(name = "bzjg_ysxt_asjxgrybh")
         var resultOriginalSystemPersonId:String = _
+        @XmlElement(name = "bzjg_jzrybh")
+        var resultjingZongPersonId:String = _
         @XmlElement(name = "bzjg_asjxgrybh")
         var resultPersonId:String = _
         @XmlElement(name = "bzjg_zzwkbh")
@@ -1076,8 +1086,8 @@ class FPT5File {
       * 指掌纹串查比中信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LLHitResultPackage")
-    class LLHitResultPackage{
+    @XmlType(name = "LlHitResultPackage")
+    class LlHitResultPackage{
         @XmlElement(name = "xxzjbh")
         var xxzjbh:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -1089,13 +1099,13 @@ class FPT5File {
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
         @XmlElement(name = "ysxt_xczzwbh")
-        var originalSystemLatentFingerId:Int = _
+        var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
         @XmlElement(name = "xczzwkbh")
         var cardId:String = _
         @XmlElement(name = "bzjg_ysxt_asjbh")
-        var resultOriginalSystemCaseId:Int = _
+        var resultOriginalSystemCaseId:String = _
         @XmlElement(name = "bzjg_asjbh")
         var resultCaseId:String = _
         @XmlElement(name = "bzjg_xckybh")
@@ -1143,16 +1153,16 @@ class FPT5File {
       * 撤销现场指纹信息
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "cancellatentPackage")
-    class cancellatentPackage{
+    @XmlType(name = "cancelLatentPackage")
+    class cancelLatentPackage{
         @XmlElement(name = "ysxt_asjbh")
-        var originalSystemCaseId:Int = _
+        var originalSystemCaseId:String = _
         @XmlElement(name = "asjbh")
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
         @XmlElement(name = "ysxt_xczzwbh")
-        var originalSystemLatentFingerId:Int = _
+        var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
         @XmlElement(name = "xczzwkbh")

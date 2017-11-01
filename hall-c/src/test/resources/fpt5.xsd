@@ -29,53 +29,53 @@
           <xs:documentation>现场指掌纹信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LatentTaskPackage" name="latentTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LatenttaskPackage" name="LatentTaskPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹查询比对请求信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="PrintTaskPackage" name="printTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="PrinttaskPackage" name="PrintTaskPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指掌纹查询比对请求信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LTResultPackage" name="LTResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LtResultPackage" name="LTResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹正查比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TLResultPackage" name="TLResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TlResultPackage" name="TLResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹倒查比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TTResultPackage" name="TTResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TtResultPackage" name="TTResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹查重比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LLResultPackage" name="LLResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LlResultPackage" name="LLResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹串查比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
 
-      <xs:element type="LTHitResultPackage" name="LTHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LtHitResultPackage" name="LTHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹正查和倒查比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TTHitResultPackage" name="TTHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TtHitResultPackage" name="TTHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹查重比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LLHitResultPackage" name="LLHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LlHitResultPackage" name="LLHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹串查比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="cancellatentPackage" name="cancellatentPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="cancelLatentPackage" name="cancellatentPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>撤销现场指纹信息</xs:documentation>
         </xs:annotation>
@@ -191,7 +191,6 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
@@ -202,7 +201,7 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
@@ -212,7 +211,6 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
@@ -233,7 +231,6 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
@@ -278,85 +275,87 @@
           <xs:documentation>全掌相关信息</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="Portraits" name="portraits" minOccurs="0" maxOccurs="unbounded" >
+        <xs:annotation>
+          <xs:documentation>人像相关信息</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="DescriptMsg">
     <xs:sequence>
-      <xs:element name="ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded"  >
+      <xs:element name="ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded"  >
         <xs:annotation>
           <xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="jzrybh" minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="jzrybh" minOccurs="1" maxOccurs="unbounded">
         <xs:annotation>
           <xs:documentation>警综人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:maxLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjxgrybh" minOccurs="0" maxOccurs="unbounded"  >
+      <xs:element name="asjxgrybh" minOccurs="1" maxOccurs="unbounded"  >
         <xs:annotation>
           <xs:documentation>案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bnyzwyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bnyzwyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
-          <xs:documentation>指掌纹卡编号</xs:documentation>
+          <xs:documentation>被捺印指纹原因代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="15"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bmch" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bmch" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>别名/绰号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xbdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xbdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>性别代码</xs:documentation>
         </xs:annotation>
@@ -366,90 +365,87 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:date" name="csrq" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:date" name="csrq" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>出生日期</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="gjdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="gjdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>国籍代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="3"/>
+            <xs:length value="3"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="mzdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="mzdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>民族代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="cyzjdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="cyzjdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>常用证件代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="3"/>
+            <xs:length value="3"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>证件号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="hjdz_xzqhdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="hjdz_xzqhdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>户籍地址_行政区划代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="6"/>
+            <xs:length value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="hjdz_dzmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="hjdz_dzmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>户籍地址_地址名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xzz_xzqhdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xzz_xzqhdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现住址_行政区划代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="6"/>
+            <xs:length value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xzz_dzmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xzz_dzmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现住址_地址名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
@@ -459,49 +455,47 @@
 
   <xs:complexType name="FingerprintMsg">
     <xs:sequence>
-      <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹比对系统描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nydw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nydw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nydw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nydw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyry_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyry_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印人员_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyry_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyry_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印人员_公民身份号码</xs:documentation>
         </xs:annotation>
@@ -511,34 +505,32 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyry_lxdh" minOccurs="0" maxOccurs="unbounded"  >
+      <xs:element name="nyry_lxdh" minOccurs="1" maxOccurs="unbounded"  >
         <xs:annotation>
           <xs:documentation>捺印人员_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="nysj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="nysj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印人员_联系电话</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="bz" minOccurs="0" maxOccurs="unbounded"  >
+      <xs:element name="bz" minOccurs="1" maxOccurs="unbounded"  >
         <xs:annotation>
           <xs:documentation>备注</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="1024"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zw_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zw_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹_数量</xs:documentation>
         </xs:annotation>
@@ -549,7 +541,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhw_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhw_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_数量</xs:documentation>
         </xs:annotation>
@@ -560,7 +552,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="slz_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_数量</xs:documentation>
         </xs:annotation>
@@ -571,7 +563,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjw_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_数量</xs:documentation>
         </xs:annotation>
@@ -582,7 +574,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qz_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_数量</xs:documentation>
         </xs:annotation>
@@ -593,7 +585,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="rx_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="rx_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>人像_数量</xs:documentation>
         </xs:annotation>
@@ -644,27 +636,27 @@
 
   <xs:complexType name="FingerMsg">
     <xs:sequence>
-      <xs:element name="zwzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹指位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zzwtztqfsdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zzwtztqfsdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹特征提取方式代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qzyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qzyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>缺指原因代码</xs:documentation>
         </xs:annotation>
@@ -678,77 +670,77 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwwxzfl_zwwxdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwwxzfl_zwwxdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹纹型主分类_指纹纹型代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwwxffl_zwwxdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwwxffl_zwwxdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹纹型副分类_指纹纹型代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwfxms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwfxms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹方向描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="5"/>
+            <xs:pattern value="\d{0}|\d{5}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwzxd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwzxd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹中心点</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="14"/>
+            <xs:pattern value="\d{0}|\d{14}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwfzx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwfzx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹副中心</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="14"/>
+            <xs:pattern value="\d{0}|\d{14}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwzsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwzsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹左三角</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="14"/>
+            <xs:pattern value="\d{0}|\d{14}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwysj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwysj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹右三角</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="14"/>
+            <xs:pattern value="\d{0}|\d{14}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwtzd_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwtzd_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹特征点_数量</xs:documentation>
         </xs:annotation>
@@ -759,48 +751,47 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zwtzdxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwtzdxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹特征点信息</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="2160"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zw_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zw_zdyxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹_自定义信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zw_txspfxcd" minOccurs="0" maxOccurs="unbounded" fixed="640">
+      <xs:element name="zw_txspfxcd" minOccurs="1" maxOccurs="unbounded" fixed="640">
         <xs:annotation>
           <xs:documentation>指纹_图像水平方向长度</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zw_txczfxcd" minOccurs="0" maxOccurs="unbounded" fixed="640">
+      <xs:element name="zw_txczfxcd" minOccurs="1" maxOccurs="unbounded" fixed="640">
         <xs:annotation>
           <xs:documentation>指纹_图像水平方向长度</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zw_txfbl" minOccurs="0" maxOccurs="unbounded" fixed="500">
+      <xs:element name="zw_txfbl" minOccurs="1" maxOccurs="unbounded" fixed="500">
         <xs:annotation>
           <xs:documentation>指纹_图像分辨率</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zw_txysffms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zw_txysffms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹_图像压缩方法描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zw_txsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zw_txsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹_图像数据</xs:documentation>
         </xs:annotation>
@@ -820,17 +811,17 @@
 
   <xs:complexType name="PalmMsg">
     <xs:sequence>
-      <xs:element name="zhwzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹掌位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qszwyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qszwyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>缺失掌纹原因代码</xs:documentation>
         </xs:annotation>
@@ -844,17 +835,17 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zzwtztqfsdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zzwtztqfsdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指掌纹特征提取方式代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:pattern value="\d{0}|\d{1}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwzfd_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwzfd_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹折返点_数量</xs:documentation>
         </xs:annotation>
@@ -865,18 +856,17 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwzfdxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwzfdxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹折返点信息</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="144"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwsjd_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwsjd_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹三角点_数量</xs:documentation>
         </xs:annotation>
@@ -887,18 +877,17 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwsjdxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwsjdxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹三角点信息</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="240"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwtzd_sl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwtzd_sl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹特征点_数量</xs:documentation>
         </xs:annotation>
@@ -909,66 +898,62 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhwtzdxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhwtzdxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹特征点信息</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="31200"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zhw_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zhw_zdyxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_自定义信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zhw_txspfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhw_txspfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_图像水平方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhw_txczfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhw_txczfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_图像垂直方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhw_txfbl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhw_txfbl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_图像分辨率</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zhw_txysffms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zhw_txysffms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_图像压缩方法描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zhw_txsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zhw_txsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>掌纹_图像数据</xs:documentation>
         </xs:annotation>
@@ -988,17 +973,17 @@
 
   <xs:complexType name="FourprintMsg">
     <xs:sequence>
-      <xs:element name="slz_zwzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_zwzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_指纹指位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="slz_qzyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_qzyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_缺指原因代码</xs:documentation>
         </xs:annotation>
@@ -1012,55 +997,52 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="slz_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="slz_zdyxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_自定义信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="slz_txspfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_txspfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_图像水平方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="slz_txczfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_txczfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_图像垂直方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="slz_txfbl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_txfbl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_图像分辨率</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="slz_txysffms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="slz_txysffms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_图像压缩方法描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="slz_txsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="slz_txsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>四连指_图像数据</xs:documentation>
         </xs:annotation>
@@ -1080,17 +1062,17 @@
 
   <xs:complexType name="KnuckleprintMsg">
     <xs:sequence>
-      <xs:element name="zjw_zwzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_zwzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_指纹指位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjw_qzyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_qzyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_缺指原因代码</xs:documentation>
         </xs:annotation>
@@ -1104,55 +1086,52 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zjw_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zjw_zdyxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_自定义信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="zjw_txspfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_txspfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_图像水平方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjw_txczfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_txczfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_图像垂直方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjw_txfbl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_txfbl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_图像分辨率</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="zjw_txysffms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zjw_txysffms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_图像压缩方法描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="zjw_txsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="zjw_txsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指节纹_图像数据</xs:documentation>
         </xs:annotation>
@@ -1172,17 +1151,17 @@
 
   <xs:complexType name="FullpalmMsg">
     <xs:sequence>
-      <xs:element name="qz_zwzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_zwzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_指纹指位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qz_qzyydm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_qzyydm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_缺指原因代码</xs:documentation>
         </xs:annotation>
@@ -1196,57 +1175,74 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="qz_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="qz_zdyxx" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_自定义信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="qz_txspfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_txspfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_图像水平方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qz_txczfxcd" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_txczfxcd" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_图像垂直方向长度</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qz_txfbl" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_txfbl" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_图像分辨率</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="6"/>
+            <xs:totalDigits value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="qz_txysffms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="qz_txysffms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_图像压缩方法描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:base64Binary" name="qz_txsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:base64Binary" name="qz_txsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>全掌_图像数据</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Portraits">
+    <xs:sequence>
+      <xs:element name="rxzplxdm" minOccurs="1" maxOccurs="unbounded" >
+        <xs:annotation>
+          <xs:documentation>人像照片类型代码</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element type="xs:base64Binary" name="rx_txsj" minOccurs="1" maxOccurs="unbounded" >
+        <xs:annotation>
+          <xs:documentation>人像_图像数据</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>
@@ -1274,180 +1270,173 @@
 
   <xs:complexType name="CaseMsg">
     <xs:sequence>
-      <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹比对系统描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场勘验编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ajlbdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ajlbdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案件类别代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="90"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjsscw_jermby" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjsscw_jermby" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>金额（人民币元）</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:decimal">
             <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="11"/>
+            <xs:maxInclusive value="999999999.99"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjfsdd_xzqhdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjfsdd_xzqhdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案事件发生地点_行政区划代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="6"/>
+            <xs:length value="6"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjfsdd_dzmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjfsdd_dzmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案事件发生地点_地址名称  争议</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="jyaq" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="jyaq" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>简要案情</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="4000"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="sfma_pdbz" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="sfma_pdbz" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>是否命案_判断标识</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-        <xs:element name="tqsj_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="tqsj_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取单位_公安机关机构代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="12"/>
+              <xs:length value="12"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="tqsj_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="tqsj_gajgmc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取单位_公安机关名称</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="100"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="tqry_xm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="tqry_xm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取人员_姓名</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="50"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="tqry_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="tqry_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取人员_公民身份号码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+              <xs:pattern value="\d{15}|\d{18}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="tqry_lxdh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="tqry_lxdh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取人员_联系电话</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="18"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="tqsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="tqsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提取时间</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="xczw_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_数量</xs:documentation>
           </xs:annotation>
@@ -1458,7 +1447,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_数量</xs:documentation>
           </xs:annotation>
@@ -1484,95 +1473,104 @@
 
     <xs:complexType name="LatentFingerMsg">
       <xs:sequence>
-        <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_xczzwylbw" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_xczzwylbw" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_现场指掌纹遗留部位</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zzwtztqfsdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zzwtztqfsdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指掌纹特征提取方式代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_stzzw_pdbz" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_stzzw_pdbz" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_尸体指掌纹_判断标识</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_rtxysdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_rtxysdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_乳突线颜色代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_lzks_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_lzks_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_连指开始_现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:pattern value="\d{0}|\d{30}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_lzjs_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_lzjs_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_连指结束_现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:pattern value="\d{0}|\d{30}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwbdztdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwbdztdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹比对状态代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="xczw_tzzhsl" minOccurs="1" maxOccurs="unbounded" >
+          <xs:annotation>
+            <xs:documentation>现场指纹_特征组合数量</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="15"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -1586,109 +1584,97 @@
 
     <xs:complexType name="Xczwtzz">
       <xs:sequence>
-        <xs:element name="xczw_tzzhsl" minOccurs="0" maxOccurs="unbounded" >
-          <xs:annotation>
-            <xs:documentation>现场指纹_特征组合数量</xs:documentation>
-          </xs:annotation>
-          <xs:simpleType>
-            <xs:restriction base="xs:decimal">
-              <xs:minInclusive value="0"/>
-              <xs:maxInclusive value="15"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:element>
-        <xs:element name="xczw_tzzhbsf" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_tzzhbsf" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_特征组合标识符</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="15"/>
+              <xs:length value="15"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_tzzhms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_tzzhms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_特征组合描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="128"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_fxzw_jyqk" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_fxzw_jyqk" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_分析指位_简要情况</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="10"/>
+              <xs:length value="10"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwwxdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwwxdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹纹型代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="7"/>
+              <xs:length value="7"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwfxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwfxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹方向描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="5"/>
+              <xs:pattern value="\d{0}|\d{5}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwzxd" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwzxd" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹中心点</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="14"/>
+              <xs:pattern value="\d{0}|\d{14}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwfzx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwfzx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹副中心</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="14"/>
+              <xs:pattern value="\d{0}|\d{14}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwzsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwzsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹左三角</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="14"/>
+              <xs:pattern value="\d{0}|\d{14}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwysj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwysj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹右三角</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="14"/>
+              <xs:pattern value="\d{0}|\d{14}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwtzd_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwtzd_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹特征点_数量</xs:documentation>
           </xs:annotation>
@@ -1699,48 +1685,47 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczw_zwtzdxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_zwtzdxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_指纹特征点信息</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="2160"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:base64Binary" name="xczw_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:base64Binary" name="xczw_zdyxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_自定义信息</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="xczw_txspfxcd" minOccurs="0" maxOccurs="unbounded" fixed="512">
+        <xs:element name="xczw_txspfxcd" minOccurs="1" maxOccurs="unbounded" fixed="512">
           <xs:annotation>
             <xs:documentation>现场指纹_图像水平方向长度</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="xczw_txczfxcd" minOccurs="0" maxOccurs="unbounded" fixed="512">
+        <xs:element name="xczw_txczfxcd" minOccurs="1" maxOccurs="unbounded" fixed="512">
         <xs:annotation>
           <xs:documentation>现场指纹_图像水平方向长度</xs:documentation>
         </xs:annotation>
         </xs:element>
-        <xs:element name="xczw_txfbl" minOccurs="0" maxOccurs="unbounded" fixed="500">
+        <xs:element name="xczw_txfbl" minOccurs="1" maxOccurs="unbounded" fixed="500">
           <xs:annotation>
             <xs:documentation>现场指纹_图像分辨率</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="xczw_txysffms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczw_txysffms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_图像压缩方法描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:base64Binary" name="xczw_txsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:base64Binary" name="xczw_txsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指纹_图像数据</xs:documentation>
           </xs:annotation>
@@ -1760,75 +1745,83 @@
 
     <xs:complexType name="LatentplamMsg">
       <xs:sequence>
-        <xs:element name="xczhw_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_xczzwylbw" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_xczzwylbw" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_现场指掌纹遗留部位</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zzwtztqfsdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zzwtztqfsdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_指掌纹特征提取方式代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_stzzw_pdbz" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_stzzw_pdbz" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_尸体指掌纹_判断标识</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_rtxysdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_rtxysdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_乳突线颜色代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zhwbdztdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zhwbdztdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹比对状态代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="xczhw_tzzhsl" minOccurs="1" maxOccurs="unbounded" >
+          <xs:annotation>
+            <xs:documentation>现场掌纹_特征组合数量</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:maxLength value="15"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -1842,49 +1835,37 @@
 
     <xs:complexType name="Xczhwtzz">
       <xs:sequence>
-        <xs:element name="xczhw_tzzhsl" minOccurs="0" maxOccurs="unbounded" >
-          <xs:annotation>
-            <xs:documentation>现场掌纹_特征组合数量</xs:documentation>
-          </xs:annotation>
-          <xs:simpleType>
-            <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
-              <xs:maxLength value="15"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:element>
-        <xs:element name="xczhw_tzzhbsf" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_tzzhbsf" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_特征组合标识符</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="15"/>
+              <xs:length value="15"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_tzzhms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_tzzhms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_特征组合描述</xs:documentation>
           </xs:annotation>
             <xs:simpleType>
               <xs:restriction base="xs:string">
-                <xs:minLength value="0"/>
                 <xs:maxLength value="128"/>
               </xs:restriction>
             </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_fxzhw_jyqk" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_fxzhw_jyqk" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_分析掌位_简要情况</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zwzfd_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zwzfd_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_分析掌位_简要情况</xs:documentation>
           </xs:annotation>
@@ -1895,18 +1876,17 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zwzfdxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zwzfdxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹折返点信息</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="144"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zwsjd_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zwsjd_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹三角点_数量</xs:documentation>
           </xs:annotation>
@@ -1917,18 +1897,17 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zwsjdxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zwsjdxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹三角点信息</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="240"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zhwtzd_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zhwtzd_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹特征点_数量</xs:documentation>
           </xs:annotation>
@@ -1939,66 +1918,62 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_zhwtzdxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_zhwtzdxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_掌纹特征点信息</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="31200"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:base64Binary" name="xczhw_zdyxx" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:base64Binary" name="xczhw_zdyxx" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_自定义信息</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="xczhw_txspfxcd" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_txspfxcd" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_图像水平方向长度</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:decimal">
-              <xs:minInclusive value="0"/>
-              <xs:maxInclusive value="6"/>
+              <xs:totalDigits value="6"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_txczfxcd" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_txczfxcd" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_图像垂直方向长度</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:decimal">
-              <xs:minInclusive value="0"/>
-              <xs:maxInclusive value="6"/>
+              <xs:totalDigits value="6"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_txfbl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_txfbl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_图像分辨率</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:decimal">
-              <xs:minInclusive value="0"/>
-              <xs:maxInclusive value="6"/>
+              <xs:totalDigits value="6"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczhw_txysffms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczhw_txysffms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_图像压缩方法描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:base64Binary" name="xczhw_txsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:base64Binary" name="xczhw_txsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场掌纹_图像数据</xs:documentation>
           </xs:annotation>
@@ -2006,101 +1981,99 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="LatentTaskPackage">
+    <xs:complexType name="LatenttaskPackage">
       <xs:sequence>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zzwbdrwlxdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zzwbdrwlxdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指掌纹比对任务类型代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场勘验编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:minLength value="30"/>
+                <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="tjsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="tjsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提交时间</xs:documentation>
           </xs:annotation>
@@ -2113,80 +2086,79 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="PrintTaskPackage">
+    <xs:complexType name="PrinttaskPackage">
       <xs:sequence>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zzwbdrwlxdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zzwbdrwlxdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指掌纹比对任务类型代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="jzrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="jzrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>警综人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="tjsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="tjsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>提交时间</xs:documentation>
           </xs:annotation>
@@ -2199,112 +2171,110 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="LTResultPackage">
+    <xs:complexType name="LtResultPackage">
       <xs:sequence>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关机构代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="12"/>
+              <xs:length value="12"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关名称</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="100"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对完成时间</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场勘验编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -2323,7 +2293,7 @@
 
     <xs:complexType name="LTResultMsg">
       <xs:sequence>
-        <xs:element name="bdjg_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_数量</xs:documentation>
           </xs:annotation>
@@ -2334,7 +2304,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_mc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_mc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_名次</xs:documentation>
           </xs:annotation>
@@ -2345,7 +2315,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_df" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_df" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_得分</xs:documentation>
           </xs:annotation>
@@ -2356,57 +2326,57 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_原始系统_案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_jzrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_jzrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_警综人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_zzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_zzwdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_zzwdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_指掌位代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="2"/>
+              <xs:length value="2"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="PrintTaskPackage" name="printTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>捺印指掌纹信息</xs:documentation>
           </xs:annotation>
@@ -2414,95 +2384,94 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="TLResultPackage">
+    <xs:complexType name="TlResultPackage">
       <xs:sequence>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关机构代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="12"/>
+              <xs:length value="12"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关名称</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="100"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对完成时间</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="jzrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="jzrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>警综人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="PrintTaskPackage" name="printTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>捺印指掌纹信息</xs:documentation>
           </xs:annotation>
@@ -2517,7 +2486,7 @@
 
     <xs:complexType name="TLResultMsg">
       <xs:sequence>
-        <xs:element name="bdjg_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_数量</xs:documentation>
           </xs:annotation>
@@ -2528,7 +2497,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_mc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_mc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_名次</xs:documentation>
           </xs:annotation>
@@ -2539,7 +2508,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_df" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_df" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_得分</xs:documentation>
           </xs:annotation>
@@ -2550,75 +2519,73 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_原始系统_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xckybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xckybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场勘验编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_zzwdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_zzwdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_指掌位代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="2"/>
+              <xs:length value="2"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -2630,116 +2597,114 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="TTResultPackage">
+    <xs:complexType name="TtResultPackage">
       <xs:sequence>
-        <xs:element name="xxzjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xxzjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>信息主键编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关机构代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="12"/>
+              <xs:length value="12"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关名称</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="100"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对完成时间</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="jzrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="jzrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>警综人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件相关人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="sfzw_pdbz" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="sfzw_pdbz" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>是否指纹_判断标识</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="1"/>
+              <xs:length value="1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="PrintTaskPackage" name="printTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>捺印指掌纹信息</xs:documentation>
           </xs:annotation>
@@ -2754,7 +2719,7 @@
 
     <xs:complexType name="TTResultMsg">
       <xs:sequence>
-        <xs:element name="bdjg_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_数量</xs:documentation>
           </xs:annotation>
@@ -2776,7 +2741,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_df" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_df" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_得分</xs:documentation>
           </xs:annotation>
@@ -2793,17 +2758,17 @@
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_jzrybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_jzrybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_警综人员编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -2813,17 +2778,17 @@
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_zzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -2833,11 +2798,11 @@
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="2"/>
+              <xs:length value="2"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="LatentPackage" name="latentPackage" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="LatentPackage" name="latentPackage" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指掌纹信息</xs:documentation>
           </xs:annotation>
@@ -2845,123 +2810,120 @@
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="LLResultPackage">
+    <xs:complexType name="LlResultPackage">
       <xs:sequence>
-        <xs:element name="xxzjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xxzjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>信息主键编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="rwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="rwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>任务编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:minLength value="23"/>
+                <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>指纹比对系统描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="4"/>
+              <xs:length value="4"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关机构代码</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="12"/>
+              <xs:pattern value="\d{0}|\d{12}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bddw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bddw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对单位_公安机关名称</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="100"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element type="xs:dateTime" name="bdwcsj" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对完成时间</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场勘验编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>现场指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -2980,7 +2942,7 @@
 
     <xs:complexType name="LLResultMsg">
       <xs:sequence>
-        <xs:element name="bdjg_sl" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_sl" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_数量</xs:documentation>
           </xs:annotation>
@@ -2991,7 +2953,7 @@
               </xs:restriction>
             </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_mc" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_mc" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_名次</xs:documentation>
             </xs:annotation>
@@ -3002,7 +2964,7 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_df" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_df" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_得分</xs:documentation>
             </xs:annotation>
@@ -3013,64 +2975,63 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_原始系统_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_asjbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_asjbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_案事件编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xckybh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xckybh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场勘验编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:length value="23"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场物证编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="30"/>
+              <xs:length value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_原始系统_现场指掌纹编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="0"/>
               <xs:maxLength value="30"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="bdjg_xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="bdjg_xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
           <xs:annotation>
             <xs:documentation>比对结果_现场指掌纹卡编号</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:minLength value="23"/>
+              <xs:pattern value="\d{0}|\d{23}"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -3082,272 +3043,264 @@
       </xs:sequence>
     </xs:complexType>
 
-  <xs:complexType name="LTHitResultPackage">
+  <xs:complexType name="LtHitResultPackage">
     <xs:sequence>
-      <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹比对系统描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_原始系统_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="23"/>
+          <xs:restriction base="xs:string">
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_xckybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_xckybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_现场勘验编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_原始系统_现场指掌纹编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="30"/>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_现场物证编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="30"/>
+            <xs:length value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczw_xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczw_xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指纹_现场指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_原始系统_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="23"/>
+          <xs:restriction base="xs:string">
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_jzrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_jzrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_警综人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_zzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_zzwdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_zzwdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_指掌位代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="nyzw_zzwbdffdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="nyzw_zzwbdffdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指纹_指掌纹比对方法代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="bzsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="bzsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="fhdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="fhsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="fhsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="bz" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bz" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>备注</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="1024"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="LatentPackage" name="latentPackage" >
+      <xs:element type="LatentPackage" name="latentPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="FingerprintPackage" name="fingerprintPackage" >
+      <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指掌纹信息</xs:documentation>
         </xs:annotation>
@@ -3355,15 +3308,15 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="TTHitResultPackage">
+  <xs:complexType name="TtHitResultPackage">
     <xs:sequence>
-      <xs:element name="zwbdxtlxms" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="zwbdxtlxms" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>指纹比对系统描述</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
@@ -3373,17 +3326,16 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
+            <xs:length value="2"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
@@ -3394,17 +3346,17 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
@@ -3414,188 +3366,181 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="sfzw_pdbz" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="sfzw_pdbz" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>是否指纹_判断标识</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
+            <xs:length value="1"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_ysxt_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_ysxt_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_原始系统_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_jzrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_jzrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_警综人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_asjxgrybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_asjxgrybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_案事件相关人员编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_zzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_zzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="bzsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="bzsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="fhdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="fhsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="fhsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="bz" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bz" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>备注</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="1024"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="FingerprintPackage" name="fingerprintPackageSource" >
+      <xs:element type="FingerprintPackage" name="fingerprintPackageSource" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指掌纹信息</xs:documentation>
         </xs:annotation>
@@ -3603,15 +3548,14 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="LLHitResultPackage">
+  <xs:complexType name="LlHitResultPackage">
     <xs:sequence>
-      <xs:element name="xxzjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xxzjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>信息主键编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
@@ -3622,17 +3566,17 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="4"/>
+            <xs:length value="4"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="23"/>
+          <xs:restriction base="xs:string">
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
@@ -3642,240 +3586,231 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场勘验编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="30"/>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded">
         <xs:annotation>
           <xs:documentation>现场物证编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="30"/>
+            <xs:length value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_原始系统_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="23"/>
+          <xs:restriction base="xs:string">
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_xckybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_xckybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_现场勘验编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_原始系统_现场指掌纹编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="30"/>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_xcwzbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_现场物证编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="30"/>
+            <xs:length value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzjg_xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzjg_xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中结果_现场指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bzr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bzr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="bzsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="bzsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="fhdw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhdw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhdw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="fhr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="fhr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="fhsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="fhsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>复核时间</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="bz" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bz" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>备注</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="1024"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="LatentPackage" name="latentPackage" >
+      <xs:element type="LatentPackage" name="latentPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹信息</xs:documentation>
         </xs:annotation>
@@ -3883,123 +3818,119 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="cancellatentPackage">
+  <xs:complexType name="cancelLatentPackage">
     <xs:sequence>
-      <xs:element name="ysxt_asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="23"/>
+          <xs:restriction base="xs:string">
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="asjbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="asjbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>案事件编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xckybh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xckybh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场勘验编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:length value="23"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="ysxt_xczzwbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="ysxt_xczzwbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:decimal">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="30"/>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xcwzbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xcwzbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场物证编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="30"/>
+            <xs:length value="30"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="xczzwkbh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="xczzwkbh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>现场指掌纹卡编号</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="23"/>
+            <xs:pattern value="\d{0}|\d{23}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bldw_gajgjgdm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bldw_gajgjgdm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>办理单位_公安机关机构代码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="12"/>
+            <xs:length value="12"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="bldw_gajgmc" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="bldw_gajgmc" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>办理单位_公安机关名称</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="100"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="blr_xm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="blr_xm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>办理人_姓名</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="50"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="blr_gmsfhm" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="blr_gmsfhm" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>办理人_公民身份号码</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$"/>
+            <xs:pattern value="\d{15}|\d{18}"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="blr_lxdh" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element name="blr_lxdh" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>办理人_联系电话</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:minLength value="0"/>
             <xs:maxLength value="18"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="bzsj" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="xs:dateTime" name="bzsj" minOccurs="1" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>比中时间</xs:documentation>
         </xs:annotation>
