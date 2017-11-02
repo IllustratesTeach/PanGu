@@ -1,6 +1,6 @@
 package nirvana.hall.c.services.gfpt5lib
 
-import java.text.{DecimalFormat, SimpleDateFormat}
+import java.text.SimpleDateFormat
 import java.util
 import java.util.Date
 import javax.xml.bind.annotation._
@@ -846,6 +846,8 @@ class Portraits{
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtResultPackage")
     class TtResultPackage{
+        @XmlElement(name = "xxzjbh")
+        var xxzjbh:String = _
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")

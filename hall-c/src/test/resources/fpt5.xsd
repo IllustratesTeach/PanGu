@@ -2802,9 +2802,9 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element type="LatentPackage" name="latentPackage" minOccurs="1" maxOccurs="unbounded" >
+        <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
           <xs:annotation>
-            <xs:documentation>现场指掌纹信息</xs:documentation>
+            <xs:documentation>捺印指掌纹信息</xs:documentation>
           </xs:annotation>
         </xs:element>
       </xs:sequence>
