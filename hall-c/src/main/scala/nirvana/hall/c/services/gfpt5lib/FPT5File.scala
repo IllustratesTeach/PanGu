@@ -455,15 +455,22 @@ class FPT5File {
     }
     //--------------------全掌相关end-----------------------//
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Portraits")
-class Portraits{
-    @XmlElement(name = "rxzplxdm")
-    var personPictureTypeCode:String = _
-    @XmlElement(name = "rx_txsj")
-    var personPictureImageData:Array[Byte] = _
-}
-
+    //--------------------人像相关end-----------------------//
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "Portraits")
+    class Portraits{
+        @XmlElement(name = "portraitsMsg")
+        var portraitsMsg = new util.ArrayList[PortraitsMsg]()
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "PortraitsMsg")
+    class PortraitsMsg{
+        @XmlElement(name = "rxzplxdm")
+        var personPictureTypeCode:String = _
+        @XmlElement(name = "rx_txsj")
+        var personPictureImageData:Array[Byte] = _
+    }
+//--------------------人像相关end-----------------------//
 
     /**
       * 现场
@@ -494,7 +501,7 @@ class Portraits{
         @XmlElement(name = "ajlbdm")
         var caseTypeCode:String = _ //案件类别代码 逗号分隔，最多10个
         @XmlElement(name = "asjsscw_jermby")
-        var money:Long = _
+        var money:String = _
         @XmlElement(name = "asjfsdd_xzqhdm")
         var caseOccurAdministrativeDivisionCode:String = _
         @XmlElement(name = "asjfsdd_dzmc")
@@ -604,12 +611,12 @@ class Portraits{
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LatentPalms")
     class LatentPalms{
-        @XmlElement(name = "plamMsg")
-        var latentplamMsg = new util.ArrayList[LatentplamMsg]()
+        @XmlElement(name = "palmMsg")
+        var latentpalmMsg = new util.ArrayList[LatentpalmMsg]()
     }
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LatentplamMsg")
-    class LatentplamMsg {
+    @XmlType(name = "LatentpalmMsg")
+    class LatentpalmMsg {
 
         @XmlElement(name = "xczhw_xczzwbh")
         var latentPalmId: String = _

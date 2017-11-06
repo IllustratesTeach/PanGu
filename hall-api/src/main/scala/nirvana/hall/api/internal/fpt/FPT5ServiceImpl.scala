@@ -1,14 +1,19 @@
 package nirvana.hall.api.internal.fpt
 
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
+import nirvana.hall.api.internal.JniLoaderUtil
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt5lib.{FingerprintPackage, LatentPackage}
+
 import scala.collection.JavaConversions._
 
 /**
   * Created by songpeng on 2017/11/3.
   */
-class FPT5ServiceImpl(tPCardService: TPCardService, caseInfoService: CaseInfoService, lPCardService: LPCardService) extends FPT5Service{
+class FPT5ServiceImpl(tPCardService: TPCardService, caseInfoService: CaseInfoService, lPCardService: LPCardService, lPPalmService: LPPalmService) extends FPT5Service{
+  //fpt处理需要加载jni
+  JniLoaderUtil.loadExtractorJNI()
+  JniLoaderUtil.loadImageJNI()
   /**
     * 获取捺印信息
     * @param personId 人员编号
@@ -29,6 +34,9 @@ class FPT5ServiceImpl(tPCardService: TPCardService, caseInfoService: CaseInfoSer
     val lpCardList = caseInfo.getStrFingerIDList.map{fingerId=>
       lPCardService.getLPCard(fingerId)
     }
-    FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList)
+    val palmList = caseInfo.getStrPalmIDList.map{palmId=>
+      lPPalmService.getLPCard(palmId)
+    }
+    FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList, palmList)
   }
 }
