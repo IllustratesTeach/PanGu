@@ -3,10 +3,8 @@ package nirvana.hall.v70.gz
 import nirvana.hall.api.services._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
-import nirvana.hall.v70.gz.services.{TPCardServiceImpl, CaseInfoServiceImpl, LPCardServiceImpl}
-import nirvana.hall.v70.internal._
-import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
-import nirvana.hall.v70.services.sys.{DictService, UserService}
+import nirvana.hall.v70.gz.services._
+import nirvana.hall.v70.gz.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
@@ -28,5 +26,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+    binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
   }
 }

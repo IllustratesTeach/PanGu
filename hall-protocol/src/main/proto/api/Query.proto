@@ -43,3 +43,17 @@ message QueryGetResponse {
     required bool isComplete = 1 [default = true];
     optional matcher.MatchResult matchResult = 2;
 }
+
+//标采发送查询
+message QuerySendCaptureRequest {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QuerySendCaptureRequest cmd = 10504;
+    }
+    required matcher.MatchTask matchTask = 1;
+}
+message QuerySendCaptureResponse {
+    extend monad.rpc.protocol.BaseCommand{
+        optional QuerySendCaptureResponse cmd = 10505;
+    }
+    required int64 ora_sid = 1;
+}
