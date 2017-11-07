@@ -1,14 +1,16 @@
-package nirvana.hall.v70.gz.internal
+package nirvana.hall.v70.gz.sys
 
 import javax.persistence.EntityManagerFactory
 
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
+import nirvana.hall.api.internal.fpt.FPT5ServiceImpl
 import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
 import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
@@ -39,7 +41,7 @@ class BaseV70TestCase {
       "nirvana.hall.v70.LocalDataSourceModule",
       "nirvana.hall.api.LocalProtobufModule",
       "monad.rpc.LocalRpcModule",
-      "nirvana.hall.v70.gz.internal.TestV70Module"
+      "nirvana.hall.v70.gz.sys.TestV70Module"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
     //OpenSession In Thread
@@ -73,6 +75,7 @@ object TestV70Module{
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
+    binder.bind(classOf[FPT5Service], classOf[FPT5ServiceImpl])
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.v70.gz.jpa")
