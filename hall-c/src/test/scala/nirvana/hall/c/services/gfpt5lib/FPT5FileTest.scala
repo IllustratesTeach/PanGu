@@ -106,8 +106,6 @@ class FPT5FileTest {
     fingers.rolling.fingerMsg = listFingerMsg
 
     val portrait = new Portraits
-    portrait.personPictureImageData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
-    portrait.personPictureTypeCode = "0"
 
     val fingerPrintPackage = new FingerprintPackage
 
@@ -159,9 +157,9 @@ class FPT5FileTest {
     listLatentFingerMsg.add(latentFingerMsg)
 
 
-    val latentPlamMsg = new LatentplamMsg
-    val listLatentPlamMsg = new util.ArrayList[LatentplamMsg]
-    listLatentPlamMsg.add(latentPlamMsg)
+    val latentPalmMsg = new LatentpalmMsg
+    val listLatentPalmMsg = new util.ArrayList[LatentpalmMsg]
+    listLatentPalmMsg.add(latentPalmMsg)
 
 
     val listTzz = new util.ArrayList[Xczwtzz]
@@ -220,15 +218,15 @@ class FPT5FileTest {
 
 
 
-    latentPlamMsg.latentPalmId = "123"
-    latentPlamMsg.latentPalmPhysicalId = "A12312312313101A12312312313101"
-    latentPlamMsg.latentPalmLeftPostion = "1"
-    latentPlamMsg.latentPalmFeatureExtractMethodCode = "2"
-    latentPlamMsg.latentPalmCorpseJudgeIdentify = "3"
-    latentPlamMsg.latentPalmMastoidProcessLineColorCode = "1"
-    latentPlamMsg.latentPalmComparisonStatusCode = "2"
-    latentPlamMsg.latentPalmFeatureGroupNum = 2
-    latentPlamMsg.latentPalmFeatureGroup = listTzz_zhw
+    latentPalmMsg.latentPalmId = "123"
+    latentPalmMsg.latentPalmPhysicalId = "A12312312313101A12312312313101"
+    latentPalmMsg.latentPalmLeftPostion = "1"
+    latentPalmMsg.latentPalmFeatureExtractMethodCode = "2"
+    latentPalmMsg.latentPalmCorpseJudgeIdentify = "3"
+    latentPalmMsg.latentPalmMastoidProcessLineColorCode = "1"
+    latentPalmMsg.latentPalmComparisonStatusCode = "2"
+    latentPalmMsg.latentPalmFeatureGroupNum = 2
+    latentPalmMsg.latentPalmFeatureGroup = listTzz_zhw
 
 
     val caseMsg = new CaseMsg
@@ -238,7 +236,7 @@ class FPT5FileTest {
     caseMsg.latentSurveyId = "A1230101011212121213211"
     caseMsg.latentCardId = "A123123123"
     caseMsg.caseTypeCode = "AT6765"
-    caseMsg.money = (999999999.99).toLong
+    caseMsg.money = "999999999.99"
     caseMsg.caseOccurAdministrativeDivisionCode = "123543"
     caseMsg.caseOccurAddress = "和平区港湾中心"
     caseMsg.briefCase = "asdasdsadsadsadsadasd"
@@ -256,7 +254,7 @@ class FPT5FileTest {
     latentFingers.latentfingerMsg = listLatentFingerMsg
 
     val latentPalms = new LatentPalms
-    latentPalms.latentplamMsg = listLatentPlamMsg
+    latentPalms.latentpalmMsg = listLatentPalmMsg
 
     latentPackage.caseMsg = caseMsg
     latentPackage.latentFingers = latentFingers
@@ -474,9 +472,9 @@ class FPT5FileTest {
     val latentFingerMsg = new LatentFingerMsg
     val listLatentFingerMsg =new util.ArrayList[LatentFingerMsg]
     listLatentFingerMsg.add(latentFingerMsg)
-    val latentPlamMsg = new LatentplamMsg
-    val listLatentPlamMsg = new util.ArrayList[LatentplamMsg]
-    listLatentPlamMsg.add(latentPlamMsg)
+    val latentPalmMsg = new LatentpalmMsg
+    val listLatentPalmMsg = new util.ArrayList[LatentpalmMsg]
+    listLatentPalmMsg.add(latentPalmMsg)
     val listTzz = new util.ArrayList[Xczwtzz]
     val xczwtzz = new Xczwtzz
     xczwtzz.latentFingerFeatureGroupIdentify = "111111111111111"
@@ -527,15 +525,15 @@ class FPT5FileTest {
     xczwtzz_zhw.latentPalmImageCompressMethodDescript = "1234"
     xczwtzz_zhw.latentPalmImageData = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
     listTzz_zhw.add(xczwtzz_zhw)
-    latentPlamMsg.latentPalmId = "123"
-    latentPlamMsg.latentPalmPhysicalId = "A12312312313101A12312312313101"
-    latentPlamMsg.latentPalmLeftPostion = "1"
-    latentPlamMsg.latentPalmFeatureExtractMethodCode = "2"
-    latentPlamMsg.latentPalmCorpseJudgeIdentify = "3"
-    latentPlamMsg.latentPalmMastoidProcessLineColorCode = "1"
-    latentPlamMsg.latentPalmComparisonStatusCode = "2"
-    latentPlamMsg.latentPalmFeatureGroupNum = 2
-    latentPlamMsg.latentPalmFeatureGroup = listTzz_zhw
+    latentPalmMsg.latentPalmId = "123"
+    latentPalmMsg.latentPalmPhysicalId = "A12312312313101A12312312313101"
+    latentPalmMsg.latentPalmLeftPostion = "1"
+    latentPalmMsg.latentPalmFeatureExtractMethodCode = "2"
+    latentPalmMsg.latentPalmCorpseJudgeIdentify = "3"
+    latentPalmMsg.latentPalmMastoidProcessLineColorCode = "1"
+    latentPalmMsg.latentPalmComparisonStatusCode = "2"
+    latentPalmMsg.latentPalmFeatureGroupNum = 2
+    latentPalmMsg.latentPalmFeatureGroup = listTzz_zhw
     val caseMsg = new CaseMsg
     caseMsg.latentFingerprintComparisonSysTypeDescript = "1231"
     caseMsg.originalSystemCaseId = "A1230101011212121213211"
@@ -543,7 +541,7 @@ class FPT5FileTest {
     caseMsg.latentSurveyId = "A1230101011212121213211"
     caseMsg.latentCardId = "A123123123"
     caseMsg.caseTypeCode = "AT6765"
-    caseMsg.money = (999999999.99).toLong
+    caseMsg.money = "999999999.99"
     caseMsg.caseOccurAdministrativeDivisionCode = "123543"
     caseMsg.caseOccurAddress = "和平区港湾中心"
     caseMsg.briefCase = "asdasdsadsadsadsadasd"
@@ -559,7 +557,7 @@ class FPT5FileTest {
     val latentFingers = new LatentFingers
     latentFingers.latentfingerMsg = listLatentFingerMsg
     val latentPalms = new LatentPalms
-    latentPalms.latentplamMsg = listLatentPlamMsg
+    latentPalms.latentpalmMsg = listLatentPalmMsg
     latentPackage.caseMsg = caseMsg
     latentPackage.latentFingers = latentFingers
     latentPackage.latentPalms = latentPalms
