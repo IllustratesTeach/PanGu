@@ -66,12 +66,6 @@ class GafisCheckinInfo extends ActiveRecord {
   var operatetype: java.lang.Long= _
   @Column(name = "CK_SOURCE", length = 1)
   var ckSource: java.lang.Short = _
-  @Column(name = "PASS_STATUS", length = 1)
-  var passStatus: java.lang.Short = _
-  @Column(name = "PERSON_CONTR_DELTAG", length = 1)
-  var personContrDeltag: java.lang.String = _
-  @Column(name = "REMOVEDELTAG", length = 1)
-  var removedeltag: java.lang.String = _
 
   def this(pkId: java.lang.String){
     this()

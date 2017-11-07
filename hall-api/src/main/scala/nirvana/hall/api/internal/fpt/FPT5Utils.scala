@@ -1,7 +1,7 @@
 package nirvana.hall.api.internal.fpt
 
 /**
-  * Created by Administrator on 2017/11/2.
+  * Created by ssj on 2017/11/2.
   */
 object FPT5Utils {
   /**

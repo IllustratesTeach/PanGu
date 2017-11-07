@@ -12,11 +12,11 @@
           <!--<url>jdbc:h2:mem:hall</url>-->
           <!--<url>jdbc:h2:file:~/h2_db/hall</url>-->
 
-          <driver>oracle.jdbc.driver.OracleDriver</driver>
-          <user>gafis_qd</user>
-          <password>gafis</password>
-          <url>jdbc:oracle:thin:@169.254.200.174:1521:oragafis</url>
-      </database>
+        <driver>oracle.jdbc.driver.OracleDriver</driver>
+        <user>gafis_gz</user>
+        <password>gafis</password>
+        <url>jdbc:oracle:thin:@192.168.1.213:1521:oragafis</url>
+    </database>
     <cron>
         <sync_dict_cron>0 0 * * * ? *</sync_dict_cron>
         <query_7to6_cron>0 0 * * * ? *</query_7to6_cron>

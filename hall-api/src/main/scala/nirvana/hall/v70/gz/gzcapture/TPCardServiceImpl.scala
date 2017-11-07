@@ -204,7 +204,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
-    //    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
+    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
 
     var tpcard:TPCard = null
     val hallHitinfoRecord = new HallHitinfoRecord()
@@ -212,7 +212,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     hallHitinfoRecord.codetype = Constant.GETTP
     hallHitinfoRecord.code = personId
     try{
-      tpcard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, null)
+      tpcard = ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, palmList)
       hallHitinfoRecord.status = Constant.SUCCESS
       hallHitinfoRecord.insertdate = new Date()
       hallHitinfoRecord.save()
