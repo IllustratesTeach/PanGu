@@ -34,17 +34,6 @@ class QueryServiceImpl(entityManager: EntityManager, userService:sys.UserService
 override def sendQueryByCardIdAndMatchType(cardId: String, matchType: MatchType, queryDBConfig: QueryDBConfig): Long = ???
 
   /**
-    * 更新任务表中对应这条认定的候选信息的候选状态
-    *
-    * @param oraSid
-    * @param taskType
-    * @param keyId
-    * @param fgp
-    * @return
-    */
-override def updateCandListStatus(oraSid: String, taskType: Int, keyId: String, tCode: String, fgp: Int): Long = ???
-
-  /**
     * 根据任务号sid获取比对状态
     *
     * @param oraSid

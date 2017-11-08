@@ -1,29 +1,32 @@
 package nirvana.hall.api.internal.sync
 
+import java.io.ByteArrayOutputStream
 import java.util.UUID
+import javax.sql.DataSource
 
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.jpa.HallFetchConfig
+import nirvana.hall.api.services._
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, LPPalmRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, LogicDBJudgeService, SyncCronService}
-import nirvana.hall.api.services._
+import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.api.FPTProto.{Case, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
-import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
+import nirvana.hall.support.services.{JdbcDatabase, RpcHttpClient}
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
-import nirvana.hall.api.HallApiErrorConstants
-import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.v70.jpa.GafisTask62Record
+import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -45,7 +48,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           syncInfoLogManageService: SyncInfoLogManageService,
                           logicDBJudgeService: LogicDBJudgeService,
                           caseInfoRemoteService: CaseInfoRemoteService,
-                          matchRelationService:MatchRelationService) extends SyncCronService with LoggerSupport{
+                          matchRelationService:MatchRelationService, implicit val dataSource: DataSource) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
   final val SYNC_MATCH_TASK_BATCH_SIZE = 5
@@ -520,7 +523,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             matchRelationService.addMatchRelation(matchRelationInfo)
           }
           val option = getKeyIdAndTcodeByQueryType(matchRelationInfo)
-          queryService.updateCandListStatus(matchRelationInfo.getQueryTaskId
+          updateCandListStatus(matchRelationInfo.getQueryTaskId
                                             ,matchRelationInfo.getQuerytype
                                             ,option.headOption.get._1
                                             ,option.headOption.get._2
@@ -787,4 +790,55 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   private def updateSeq(fetchConfig: HallFetchConfig): Unit ={
     HallFetchConfig.update.set(seq = fetchConfig.seq).where(HallFetchConfig.pkId === fetchConfig.pkId).execute
   }
+
+  /**
+    * 更新6.2任务表中对应这条认定的候选信息的候选状态,暂时先写到这里
+    * @param oraSid
+    * @param taskType
+    * @param keyId
+    * @param fgp
+    * @return
+    */
+  def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = {
+    //TODO 使用NET_GAFIS_QUERY_Update代替sql
+    val sql = s"SELECT t.candlist " +
+      s"FROM Normalquery_Queryque t " +
+      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
+    val candListResult = new ByteArrayOutputStream
+    var flag = -1L
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,oraSid.toInt)
+      ps.setInt(2,taskType)
+      ps.setString(3,keyId)
+    } { rs =>
+      val candList = rs.getBytes("candlist")
+      val buffer = ChannelBuffers.wrappedBuffer(candList)
+      while(buffer.readableBytes() >=96){
+        val gaCand = new GAQUERYCANDSTRUCT
+        gaCand.fromStreamReader(buffer)
+        if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
+          gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
+          gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte
+          gaCand.nFlag = gaqryque.GAQRYCAND_FLAG_BROKEN.toByte
+        }
+        candListResult.write(gaCand.toByteArray())
+      }
+      flag = updateCandList(candListResult.toByteArray,oraSid,taskType,keyId)
+    }
+    flag
+  }
+
+  private def updateCandList(candList:Array[Byte],oraSid:String,taskType:Int,keyId:String): Long ={
+    val updateSQL = s"UPDATE Normalquery_Queryque t " +
+      s"SET t.candlist =?,t.status =?  " +
+      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
+    JdbcDatabase.update(updateSQL) { ps =>
+      ps.setBytes(1,candList)
+      ps.setInt(2,11)
+      ps.setInt(3,oraSid.toInt)
+      ps.setInt(4,taskType)
+      ps.setString(5,keyId)
+    }
+  }
+
 }

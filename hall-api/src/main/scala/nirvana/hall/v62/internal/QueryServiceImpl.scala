@@ -1,23 +1,18 @@
 package nirvana.hall.v62.internal
 
-import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import javax.sql.DataSource
 
-import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.ganumia.gadbdef.GADB_KEYARRAY
-import nirvana.hall.c.services.gloclib.gaqryque
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDSTRUCT, GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYSIMPSTRUCT, GAQUERYSTRUCT}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
-import org.jboss.netty.buffer.ChannelBuffers
 
 /**
  * Created by songpeng on 16/1/26.
@@ -228,58 +223,6 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
       config.queryTable.dbId.toShort
     }else{
       dbId.get.toShort
-    }
-  }
-
-  /**
-    * 更新任务表中对应这条认定的候选信息的候选状态
-    *
-    * @param oraSid
-    * @param taskType
-    * @param keyId
-    * @param fgp
-    * @return
-    */
-  override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = {
-
-    val sql = s"SELECT t.candlist " +
-              s"FROM Normalquery_Queryque t " +
-              s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
-    val candListResult = new ByteArrayOutputStream
-    var flag = -1L
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setInt(1,oraSid.toInt)
-      ps.setInt(2,taskType)
-      ps.setString(3,keyId)
-    } { rs =>
-      val candList = rs.getBytes("candlist")
-      val buffer = ChannelBuffers.wrappedBuffer(candList)
-      while(buffer.readableBytes() >=96){
-        val gaCand = new GAQUERYCANDSTRUCT
-        gaCand.fromStreamReader(buffer)
-        if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
-          gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
-          gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte
-          gaCand.nFlag = gaqryque.GAQRYCAND_FLAG_BROKEN.toByte
-        }
-        candListResult.write(gaCand.toByteArray())
-      }
-      flag = updateCandList(candListResult.toByteArray,oraSid,taskType,keyId)
-    }
-    flag
-  }
-
-
-  private def updateCandList(candList:Array[Byte],oraSid:String,taskType:Int,keyId:String): Long ={
-    val updateSQL = s"UPDATE Normalquery_Queryque t " +
-      s"SET t.candlist =?,t.status =?  " +
-      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
-    JdbcDatabase.update(updateSQL) { ps =>
-      ps.setBytes(1,candList)
-      ps.setInt(2,11)
-      ps.setInt(3,oraSid.toInt)
-      ps.setInt(4,taskType)
-      ps.setString(5,keyId)
     }
   }
 

@@ -101,10 +101,4 @@ class QueryServiceImplTest extends BaseV62TestCase{
     Assert.assertEquals(7,statusId)
   }
 
-  @Test
-  def test_updateCandListStatus(): Unit ={
-    val service = getService[QueryService]
-    val flag = service.updateCandListStatus("19",1,"430111501999201206001703","1234567890",1)
-    Assert.assertTrue(flag > 0)
-  }
 }

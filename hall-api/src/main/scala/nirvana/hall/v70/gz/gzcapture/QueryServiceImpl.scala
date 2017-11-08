@@ -7,25 +7,20 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.QueryService
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gloclib.gaqryque.{GAQUERYCANDHEADSTRUCT, GAQUERYCANDSTRUCT, GAQUERYSTRUCT}
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
-import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.gz.jpa._
 import nirvana.hall.v70.gz.sync.ProtobufConverter
 import nirvana.hall.v70.gz.{Constant, sys}
 import nirvana.hall.v70.internal.Gafis70Constants
 import nirvana.hall.v70.internal.query.QueryConstants
-import org.jboss.netty.buffer.ChannelBuffers
 import org.springframework.transaction.annotation.Transactional
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/26.
@@ -205,14 +200,4 @@ class QueryServiceImpl(entityManager: EntityManager, userService:sys.UserService
 
   def convertGafisNormalqueryQueryque2GAQUERYSTRUCT(gafisNormalqueryQueryque: GafisNormalqueryQueryque): GAQUERYSTRUCT = ???
 
-  /**
-    * 更新任务表中对应这条认定的候选信息的候选状态
- *
-    * @param oraSid
-    * @param taskType
-    * @param keyId
-    * @param fgp
-    * @return
-    */
-  override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
 }
