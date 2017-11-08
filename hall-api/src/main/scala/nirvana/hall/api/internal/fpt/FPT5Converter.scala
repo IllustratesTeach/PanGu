@@ -136,7 +136,7 @@ object FPT5Converter {
           val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
           palmMsg.palmPostionCode = if(fgpParesString(blob.getPalmfgp).equals("10")) fgpParesString(blob.getPalmfgp) else ("0" + fgpParesString(blob.getPalmfgp))
           palmMsg.lackPalmCauseCode = "3"
-          palmMsg.palmFeatureExtractionMethodCode = ""
+          palmMsg.palmFeatureExtractionMethodCode = "M"
           palmMsg.palmRetracingPoint = 0
           palmMsg.palmRetracingPointInfo = ""
           palmMsg.palmTrianglePointNum = 0

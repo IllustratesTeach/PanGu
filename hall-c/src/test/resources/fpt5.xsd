@@ -3551,7 +3551,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="FingerprintPackage" name="fingerprintPackageSource" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="FingerprintPackage" name="fingerprintPackage" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>捺印指掌纹信息</xs:documentation>
         </xs:annotation>

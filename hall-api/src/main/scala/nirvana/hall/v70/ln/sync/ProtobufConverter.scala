@@ -76,7 +76,7 @@ object ProtobufConverter extends LoggerSupport{
 
     gafisCase
   }
-  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String], palmIds: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
     caseBuilder.setStrDataSource(caseInfo.caseSource)
@@ -108,6 +108,10 @@ object ProtobufConverter extends LoggerSupport{
     if(fingerIds != null)
       fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
     caseBuilder.setNCaseFingerCount(caseBuilder.getStrFingerIDCount)
+
+    if(palmIds != null)
+      palmIds.foreach(f => caseBuilder.addStrPalmID(f))
+    caseBuilder.setNCaseFingerCount(caseBuilder.getStrPalmIDCount)
 
     caseBuilder.build()
   }
@@ -317,13 +321,13 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
     val tpCard = TPCard.newBuilder()
-    tpCard.setStrCardID(person.cardid)
+    tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)
     tpCard.setStrDataSource(person.dataSources)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
-    magicSet(person.gatherTypeId, textBuilder.setStrPersonType)
+    magicSet("", textBuilder.setStrPersonType)  //person.gatherTypeId
     magicSet(person.name, textBuilder.setStrName)
     magicSet(person.aliasname, textBuilder.setStrAliasName)
     if (isNonBlank(person.sexCode))

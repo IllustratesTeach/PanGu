@@ -5,6 +5,8 @@ import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.ln.services._
 import nirvana.hall.v70.ln.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
+import nirvana.hall.v70.services.GetPKIDServiceImpl
+import nirvana.hall.v70.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
@@ -26,5 +28,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
     binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+
+    binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
   }
 }
