@@ -57,13 +57,6 @@ trait QueryService {
     */
   def getStatusBySid(oraSid: Long, dbId: Option[String] = None): Int
 
-
-  /**
-    * 根据任务号sid获取比对状态 SQL查询方式
-    * @param oraSid
-    */
-  def getStatusBySidSQL(oraSid:Long): Int
-
   /**
     * 根据编号和查询类型发送查询
     * 最大候选50，优先级2，最小分数60

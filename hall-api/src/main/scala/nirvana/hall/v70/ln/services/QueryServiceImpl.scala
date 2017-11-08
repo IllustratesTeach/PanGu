@@ -80,13 +80,6 @@ override def updateCandListStatus(oraSid: String, taskType: Int, keyId: String, 
   override def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String]): GAQUERYSTRUCT = ???
 
   /**
-    * 根据任务号sid获取比对状态 SQL查询方式
-    *
-    * @param oraSid
-    */
-  override def getStatusBySidSQL(oraSid: Long): Int = ???
-
-  /**
     * 通过卡号查找第一个的比中结果
     *
     * @param cardId 卡号

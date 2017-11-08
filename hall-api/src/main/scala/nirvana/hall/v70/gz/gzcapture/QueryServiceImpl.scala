@@ -215,11 +215,4 @@ class QueryServiceImpl(entityManager: EntityManager, userService:sys.UserService
     * @return
     */
   override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
-
-  /**
-    * 根据任务号sid获取比对状态 SQL查询方式
-    *
-    * @param oraSid
-    */
-  override def getStatusBySidSQL(oraSid: Long): Int = ???
 }

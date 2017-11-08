@@ -283,19 +283,4 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataS
     }
   }
 
-  /**
-    * 根据任务号sid获取比对状态 SQL查询方式
-    *
-    * @param oraSid
-    */
-  override def getStatusBySidSQL(oraSid: Long): Int = {
-    val sql = s"select t.status from NORMALQUERY_QUERYQUE t where t.ora_sid = ?"
-    var status = 0
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setInt(1,oraSid.toInt)
-    } { rs =>
-      status = rs.getInt("status")
-    }
-    status
-  }
 }

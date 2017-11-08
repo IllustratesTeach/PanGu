@@ -128,7 +128,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
         case Some(t) =>
           val oraSid = responseStatusAndOraSidMap.get("orasid").asInstanceOf[Long]
           if(oraSid > 0){
-            val status = queryService.getStatusBySidSQL(oraSid)
+            val status = getStatusBySidSQL(oraSid)
             result = strategyService.getResponseStatusByGafisStatus_TT(status)
           }else{
             result = IAConstant.CREATE_STORE_SUCCESS
@@ -662,5 +662,20 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
     }catch{
       case e:Exception => logger.error("export hit result fail:" + ExceptionUtil.getStackTraceInfo(e))
     }
+  }
+  /**
+    * 根据任务号sid获取比对状态 SQL查询方式
+    *
+    * @param oraSid
+    */
+  private def getStatusBySidSQL(oraSid: Long): Int = {
+    val sql = s"select t.status from NORMALQUERY_QUERYQUE t where t.ora_sid = ?"
+    var status = 0
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,oraSid.toInt)
+    } { rs =>
+      status = rs.getInt("status")
+    }
+    status
   }
 }
