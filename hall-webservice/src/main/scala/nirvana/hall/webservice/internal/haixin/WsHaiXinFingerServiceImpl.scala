@@ -6,25 +6,26 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
+import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto.{ImageType, PalmFgp, TPCard}
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
+import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.apache.commons.lang.StringUtils
 
 /**
   * Created by yuchen on 2017/7/24.
@@ -36,7 +37,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
                                 ,queryService: QueryService
                                 ,extractor: FeatureExtractor
                                 ,exceptRelationService:ExceptRelationService
-                               ,hallWebserviceConfig: HallWebserviceConfig) extends WsHaiXinFingerService with LoggerSupport{
+                               ,hallWebserviceConfig: HallWebserviceConfig, implicit val dataSource: DataSource) extends WsHaiXinFingerService with LoggerSupport{
   /**
     * 接口01:捺印指纹信息录入
     *
