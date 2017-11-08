@@ -4,6 +4,7 @@ import javax.sql.DataSource
 
 import nirvana.hall.api.services.sync.FetchMatchRelationService
 import nirvana.hall.protocol.fpt.MatchRelationProto.MatchSysInfo
+import nirvana.hall.support.services.JdbcDatabase
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -44,6 +45,40 @@ override def getMinSeq(from: Long, dbId: Option[String])(implicit dataSource: Da
     doFetcherMatchRelation(pKIdList, seq, size, dbId)
     pKIdList
   }
+
+  /**
+    * 同步比中关系
+    * @param PkIdBuffer
+    * @param seq
+    * @param size
+    * @param dbId
+    */
+  private def doFetcherMatchRelation(PkIdBuffer: ArrayBuffer[(String, Long)], seq: Long, size: Int, dbId: Option[String]): Unit ={
+    val from = getMinSeq(seq, dbId)
+    if(from >0 && from <= getMaxSeq(dbId)){
+      JdbcDatabase.queryWithPsSetter2(SYNC_SQL){ps=>
+        ps.setLong(1, from)
+        ps.setLong(2, from + FETCH_BATCH_SIZE)
+      }{rs=>
+        while (rs.next()){
+          val pk_id = rs.getString("PK_ID")
+          val seq = rs.getLong("SEQ")
+          if(PkIdBuffer.length >= size){
+            val lastSeq = PkIdBuffer.last._2
+            if(lastSeq < seq){
+              return
+            }
+          }
+          PkIdBuffer += (pk_id -> seq)
+        }
+        if(PkIdBuffer.length < size){
+          doFetcher(PkIdBuffer, from + FETCH_BATCH_SIZE, size, dbId)
+        }
+      }
+
+    }
+  }
+
 
   /**
     * 验证读取策略
