@@ -1,7 +1,7 @@
 package nirvana.hall.v70.ln.sys
 
 /**
-  * Created by  on 2017/11/8.
+  * Created by mengxin on 2017/11/8.
   */
 trait QueryStatus {
 

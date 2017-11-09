@@ -5,7 +5,7 @@ import javax.sql.DataSource
 import nirvana.hall.support.services.JdbcDatabase
 
 /**
-  * Created by Administrator on 2017/11/8.
+  * Created by mengxin on 2017/11/8.
   */
 class QueryStatusImpl(implicit val dataSource: DataSource) extends QueryStatus{
   /**
