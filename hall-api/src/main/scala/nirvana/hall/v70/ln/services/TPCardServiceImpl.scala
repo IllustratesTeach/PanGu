@@ -1,5 +1,6 @@
 package nirvana.hall.v70.ln.services
 
+import java.util.Date
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.services.TPCardService
@@ -7,6 +8,9 @@ import nirvana.hall.v70.ln.sys.UserService
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
+import nirvana.hall.v70.ln.jpa._
+import nirvana.hall.v70.ln.sync.ProtobufConverter
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -16,12 +20,81 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
   /**
     * 新增捺印卡片
     *
-    * @param tPCard
+    * @param tpCard
     * @return
     */
   @Transactional
-  override def addTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
-    info("addTPCard cardId:{}", tPCard.getStrCardID)
+  override def addTPCard(tpCard: TPCard, dbId: Option[String]): Unit = {
+    info("addTPCard cardId:{}", tpCard.getStrCardID)
+    //验证卡号是否已经存在
+    if(isExist(tpCard.getStrCardID)){
+      throw new RuntimeException("记录已存在")
+    }else{
+      //保存人员基本信息
+      val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+      val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
+      person.sid = sid
+      //用户名获取用户ID
+      var user = userService.findSysUserByLoginName(person.inputpsn)
+      if (user.isEmpty){
+        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      }
+      person.inputpsn = user.get.pkId
+      person.gatherOrgCode = user.get.departCode
+      val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
+      if(modUser.nonEmpty){
+        person.modifiedpsn = modUser.get.pkId
+      }else{
+        person.modifiedpsn = ""
+      }
+
+      person.deletag = Gafis70Constants.DELETAG_USE
+      //person.fingershowStatus = 1.toShort
+      //person.isfingerrepeat = "0"
+      //person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
+      person.dataSources = tpCard.getStrDataSource
+      person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
+      person.save()
+      //保存逻辑库
+      val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
+        //如果没有指定逻辑库，使用默认库
+        GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+      }else{
+        GafisLogicDb.find(dbId.get)
+      }
+      val logicDbFingerprint = new GafisLogicDbFingerprint()
+      logicDbFingerprint.pkId = CommonUtils.getUUID()
+      logicDbFingerprint.fingerprintPkid = person.personid
+      logicDbFingerprint.logicDbPkid = logicDb.pkId
+      logicDbFingerprint.save()
+      //保存指纹
+      val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      fingerList.foreach{finger =>
+        finger.pkId = CommonUtils.getUUID()
+        finger.inputtime = new Date()
+        finger.inputpsn = Gafis70Constants.INPUTPSN
+        finger.save()
+      }
+      //掌纹
+      val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
+      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      palmList.foreach{palm=>
+        palm.pkId = CommonUtils.getUUID()
+        palm.inputtime = new Date()
+        palm.inputpsn = Gafis70Constants.INPUTPSN
+        palm.save()
+      }
+      //保存人像
+      val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+      portraitList.foreach{ portrait =>
+        portrait.pkId = CommonUtils.getUUID()
+        portrait.inputpsn = Gafis70Constants.INPUTPSN
+        portrait.inputtime = new Date()
+        portrait.deletag = Gafis70Constants.DELETAG_USE
+        portrait.save()
+      }
+    }
   }
 
   /**
@@ -63,7 +136,9 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @return
     */
   @Transactional
-  override def isExist(cardId: String, dbId: Option[String]): Boolean = ???
+  override def isExist(cardId: String, dbId: Option[String]): Boolean = {
+    GafisPerson.findOption(cardId).nonEmpty
+  }
 
   /**
     * 针对海鑫综采对接使用
@@ -72,16 +147,93 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @param dbId
     */
   @Transactional
-  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = ???
+  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = {
+    info("addTPCard cardId:{}", tpCard.getStrCardID)
+    //验证卡号是否已经存在
+    if(isExist(tpCard.getStrCardID)){
+      throw new RuntimeException("记录已存在")
+    }else{
+      //保存人员基本信息
+      val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
+      val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
+      person.sid = sid
+      //用户名获取用户ID
+      var user = userService.findSysUserByLoginName(person.inputpsn)
+      if (user.isEmpty){
+        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      }
+      person.inputpsn = user.get.pkId
+      person.gatherOrgCode = user.get.departCode
+      val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
+      if(modUser.nonEmpty){
+        person.modifiedpsn = modUser.get.pkId
+      }else{
+        person.modifiedpsn = ""
+      }
+
+      person.deletag = Gafis70Constants.DELETAG_USE
+      //person.fingershowStatus = 1.toShort
+      //person.isfingerrepeat = "0"
+      person.dataSources = Gafis70Constants.DATA_SOURCE_HXZC.toString
+      person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
+      person.save()
+      //保存逻辑库
+      val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
+        //如果没有指定逻辑库，使用默认库
+        GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+      }else{
+        GafisLogicDb.find(dbId.get)
+      }
+      val logicDbFingerprint = new GafisLogicDbFingerprint()
+      logicDbFingerprint.pkId = CommonUtils.getUUID()
+      logicDbFingerprint.fingerprintPkid = person.personid
+      logicDbFingerprint.logicDbPkid = logicDb.pkId
+      logicDbFingerprint.save()
+      //保存指纹
+      val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      fingerList.foreach{finger =>
+        finger.pkId = CommonUtils.getUUID()
+        finger.inputtime = new Date()
+        finger.inputpsn = Gafis70Constants.INPUTPSN
+        finger.save()
+      }
+      //掌纹
+      val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
+      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      palmList.foreach{palm=>
+        palm.pkId = CommonUtils.getUUID()
+        palm.inputtime = new Date()
+        palm.inputpsn = Gafis70Constants.INPUTPSN
+        palm.save()
+      }
+      //保存人像
+      val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+      portraitList.foreach{ portrait =>
+        portrait.pkId = CommonUtils.getUUID()
+        portrait.inputpsn = Gafis70Constants.INPUTPSN
+        portrait.inputtime = new Date()
+        portrait.deletag = Gafis70Constants.DELETAG_USE
+        portrait.save()
+      }
+    }
+  }
 
   /**
     * 获取捺印卡信息
     *
-    * @param cardId
+    * @param personId
     * @param dbid
     * @return
     */
-  override def getTPCard(cardId: String, dbid: Option[String]): TPCard = ???
+  override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
+    val person = GafisPerson.find(personId)
+    val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
+    val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
+    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
+
+    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, palmList)
+  }
 
   /**
     * 更新捺印卡片
@@ -90,5 +242,71 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @return
     */
   @Transactional
-  override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit = ???
+  override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit = {
+    info("updateTPCard cardId:{}", tpCard.getStrCardID)
+    val person = GafisPerson.find(tpCard.getStrCardID)
+    ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
+
+    //用户名获取用户ID
+    var user = userService.findSysUserByLoginName(person.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    person.inputpsn = user.get.pkId
+    person.gatherOrgCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
+    if(modUser.nonEmpty){
+      person.modifiedpsn = modUser.get.pkId
+    }else{
+      person.modifiedpsn = ""
+    }
+
+    person.deletag = Gafis70Constants.DELETAG_USE
+    person.save()
+    //删除原来的逻辑库
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
+    //保存逻辑库
+    val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
+      //如果没有指定逻辑库，使用默认库
+      GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
+    }else{
+      GafisLogicDb.find(dbId.get)
+    }
+    val logicDbFingerprint = new GafisLogicDbFingerprint()
+    logicDbFingerprint.pkId = CommonUtils.getUUID()
+    logicDbFingerprint.fingerprintPkid = person.personid
+    logicDbFingerprint.logicDbPkid = logicDb.pkId
+    logicDbFingerprint.save()
+    //指纹
+    val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
+    GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+    fingerList.foreach{finger =>
+      finger.pkId = CommonUtils.getUUID()
+//      finger.inputtime = new Date()
+//      finger.inputpsn = Gafis70Constants.INPUTPSN
+      finger.modifiedtime = new Date()
+      finger.modifiedpsn = Gafis70Constants.INPUTPSN
+      finger.save()
+    }
+    //掌纹
+    val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
+    GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+    palmList.foreach{palm=>
+      palm.pkId = CommonUtils.getUUID()
+      palm.inputtime = new Date()
+      palm.inputpsn = Gafis70Constants.INPUTPSN
+      palm.save()
+    }
+
+    //人像
+    val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
+    GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+    portraitList.foreach{portrait=>
+      portrait.pkId = CommonUtils.getUUID()
+      portrait.inputtime = new Date()
+      portrait.inputpsn = Gafis70Constants.INPUTPSN
+      portrait.deletag = Gafis70Constants.DELETAG_USE
+      portrait.save()
+    }
+  }
 }

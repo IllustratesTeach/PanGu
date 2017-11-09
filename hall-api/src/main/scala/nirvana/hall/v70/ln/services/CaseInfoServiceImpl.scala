@@ -1,9 +1,13 @@
 package nirvana.hall.v70.ln.services
 
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.v70.ln.jpa.{GafisCase, GafisCaseFinger}
 
 /**
   * Created by songpeng on 2017/6/29.
@@ -31,7 +35,14 @@ override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = ???
     * @param caseId
     * @return
    */
-  override def getCaseInfo(caseId: String, dbId: Option[String]): Case = ???
+  override def getCaseInfo(caseId: String, dbId: Option[String]): Case = {
+    val gafisCase = GafisCase.findOption(caseId)
+    if(gafisCase.isEmpty){
+      throw new RuntimeException("记录不存在!");
+    }
+    val fingers = GafisCaseFinger.select(GafisCaseFinger.fingerId).where(GafisCaseFinger.caseId === caseId).toList.asInstanceOf[List[String]]
+    convertGafisCase2Case(gafisCase.get,fingers)
+  }
 
   /**
     * 查询案件编号列表
@@ -54,7 +65,9 @@ override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = ???
     * @param caseId
     * @return
     */
-  override def isExist(caseId: String, dbId: Option[String]): Boolean = ???
+  override def isExist(caseId: String, dbId: Option[String]): Boolean = {
+    GafisCase.findOption(caseId).nonEmpty
+  }
 
   /**
     * 删除案件信息
@@ -63,4 +76,56 @@ override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = ???
     * @return
     */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
+
+  implicit def string2Int(string: String): Int ={
+    if(isNonBlank(string))
+      Integer.parseInt(string)
+    else
+      0
+  }
+  implicit def date2String(date: Date): String = {
+    if (date != null)
+      new SimpleDateFormat("yyyyMMdd").format(date)
+    else ""
+  }
+  def isNonBlank(string: String):Boolean = string != null && string.length >0
+  def magicSet(value:String,fun:String=>Any){
+    if(isNonBlank(value)){ fun(value)}
+  }
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
+    val caseBuilder = Case.newBuilder()
+    caseBuilder.setStrCaseID(caseInfo.caseId)
+    caseBuilder.setStrDataSource(caseInfo.caseSource)
+
+    val textBuilder = caseBuilder.getTextBuilder
+    magicSet(caseInfo.caseClassCode, textBuilder.setStrCaseType1)
+    magicSet(caseInfo.caseOccurDate, textBuilder.setStrCaseOccurDate)
+    magicSet(caseInfo.caseOccurPlaceCode, textBuilder.setStrCaseOccurPlaceCode)
+    magicSet(caseInfo.caseOccurPlaceDetail, textBuilder.setStrCaseOccurPlace)
+
+    magicSet(caseInfo.remark, textBuilder.setStrComment)
+    if("1".equals(caseInfo.isMurder))
+      textBuilder.setBPersonKilled(true)
+    magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
+    magicSet(caseInfo.extractUnitCode, textBuilder.setStrExtractUnitCode)
+    magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
+    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
+    magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
+    magicSet(caseInfo.suspiciousAreaCode, textBuilder.setStrSuspArea1Code)
+    textBuilder.setNSuperviseLevel(caseInfo.assistLevel)
+    magicSet(caseInfo.assistDeptCode, textBuilder.setStrXieChaRequestUnitCode)
+    magicSet(caseInfo.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
+    magicSet(caseInfo.assistDate, textBuilder.setStrXieChaDate)
+    magicSet(caseInfo.assistBonus, textBuilder.setStrPremium)
+    textBuilder.setNCaseState(caseInfo.assistSign)
+    textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
+    //案件状态字典不符fpt标准，暂时忽略该项信息
+    //    textBuilder.setNCaseState(caseInfo.caseState)
+
+    if(fingerIds != null)
+      fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
+    caseBuilder.setNCaseFingerCount(caseBuilder.getStrFingerIDCount)
+
+    caseBuilder.build()
+  }
 }

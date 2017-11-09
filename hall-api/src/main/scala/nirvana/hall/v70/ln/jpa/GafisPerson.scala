@@ -65,13 +65,13 @@ class GafisPerson extends ActiveRecord {
   var annex: java.lang.String = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 24)
   var inputtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 24)
   var modifiedtime: java.util.Date = _
   @Column(name = "DELETAG", length = 1)
   var deletag: java.lang.String = _

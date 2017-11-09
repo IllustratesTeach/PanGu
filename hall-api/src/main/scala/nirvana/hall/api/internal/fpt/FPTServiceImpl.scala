@@ -86,6 +86,11 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
   }
 
   @Transactional
+  override def addLogic02ResHXZC(logic02Rec: Logic02Rec,dbId: Option[String] = None): Unit = {
+    tPCardService.addTPCardHXZC(getTpCardBuilder(logic02Rec).build,dbId)
+  }
+
+  @Transactional
   override def updateLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None): Unit = {
     tPCardService.updateTPCard(getTpCardBuilder(logic02Rec).build,dbId)
   }

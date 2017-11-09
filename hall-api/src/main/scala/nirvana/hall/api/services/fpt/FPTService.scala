@@ -20,6 +20,8 @@ trait FPTService {
 
   def addLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None)
 
+  def addLogic02ResHXZC(logic02Rec: Logic02Rec,dbId: Option[String] = None)
+
   def updateLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None)
 
   def addLogic03Res(logic03Rec: Logic03Rec)
