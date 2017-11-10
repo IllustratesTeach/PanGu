@@ -1,0 +1,78 @@
+package api;
+
+import "monad/rpc/protocol/command.proto";
+
+option java_package = "nirvana.hall.protocol.api";
+
+option java_outer_classname = "FPTTrans";
+
+/**
+ * 返回结果状态
+ */
+enum ResponseStatus {
+    OK = 1;
+    FAIL = 0;
+}
+
+enum ExportType{
+    TP = 1;
+    LP = 2;
+    HIT = 3;
+    CANDLIST = 4;
+    QUERY = 5;
+    CANCEL = 6;
+}
+
+enum FPTVersion{
+    FPT4 = 4;
+    FPT5 = 5;
+}
+
+
+/**
+ * FPT导入请求数据
+ *
+ */
+message FPTImportRequest {
+    extend monad.rpc.protocol.BaseCommand{
+        optional FPTImportRequest cmd = 10800;
+    }
+    required bytes data = 1;
+    required string userId = 2;
+    required FPTVersion fptversion = 3;
+}
+/**
+ * FPT导入请求返回数据响应
+ *
+ */
+message FPTImportResponse {
+    extend monad.rpc.protocol.BaseCommand{
+        optional FPTImportResponse cmd = 10801;
+    }
+    required ResponseStatus status = 1;
+    required string msg = 2;
+}
+
+/**
+ * FPT导出请求数据
+ * data可能是message
+ */
+message FPTExportRequest {
+    extend monad.rpc.protocol.BaseCommand{
+        optional FPTExportRequest cmd = 10802;
+    }
+    required string cardid = 1;
+    required ExportType type = 2;
+}
+/**
+ * FPT导出请求返回数据响应
+ *
+ */
+message FPTExportResponse {
+    extend monad.rpc.protocol.BaseCommand{
+        optional FPTExportResponse cmd = 10803;
+    }
+    required ResponseStatus status = 1;
+    required string msg = 2;
+    required string data = 3;
+}
