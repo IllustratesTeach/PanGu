@@ -73,7 +73,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     }*/
     val a = listDataHandler.iterator()
     while(a.hasNext){
-      FileUtils.writeByteArrayToFile(new File("D:\\" + "20171024" + i + ".FPT"), IOUtils.toByteArray(a.next.getInputStream))
+      FileUtils.writeByteArrayToFile(new File("D:\\" + "20171025" + i + ".FPT"), IOUtils.toByteArray(a.next.getInputStream))
       i += 1
     }
 
@@ -83,7 +83,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
   @Test
   def test_getSysTime: Unit ={
     val service = getService[WsHaiXinFingerService]
-    //println(service.getSysTime)
+    println(service.getSysTime)
   }
 
   @Test
@@ -91,7 +91,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     val data = IOUtils.toByteArray(getClass.getResourceAsStream("/R2100000100002016080603_PM_L.buf"))
     for(i<-105 to 120){
       val service = getService[WsHaiXinFingerService]
-      //val result = service.setPalm("1701","0101","3701",i.toString,2,i.toString,data)
+      val result = service.setPalm("1701","0101","3701",i.toString,2,i.toString,data)
 
     }
 //
@@ -102,16 +102,16 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
   def test_getPalmStatus: Unit ={
     val data = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
     val service = getService[WsHaiXinFingerService]
-    //val result = service.getPalmStatus("0101","3701","6720037262224232332255",1)
-    //Assert.assertEquals(1,result)
+    val result = service.getPalmStatus("0101","3701","6720037262224232332255",1)
+    Assert.assertEquals(1,result)
   }
 
   @Test
   def test_setPalmAgain: Unit ={
     val data = IOUtils.toByteArray(getClass.getResourceAsStream("/wsq.data"))
     val service = getService[WsHaiXinFingerService]
-    //val result = service.setPalmAgain("1701","0101","3701","6720037262224232332255",1,"6720037262224232332255",data)
-    //Assert.assertEquals(1,result)
+    val result = service.setPalmAgain("1701","0101","3701","6720037262224232332255",1,"6720037262224232332255",data)
+    Assert.assertEquals(1,result)
   }
 
   /**

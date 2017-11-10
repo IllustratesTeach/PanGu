@@ -16,6 +16,7 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v70.config.HallV70Config
+import nirvana.hall.v70.gz.services.FPTTransServiceImpl
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -75,7 +76,7 @@ object TestV70Module{
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
-    binder.bind(classOf[FPT5Service], classOf[FPT5ServiceImpl])
+
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.v70.gz.jpa")

@@ -63,7 +63,7 @@ class WsFingerServiceImplTest extends BaseTestCase{
   def fPtImport_test(): Unit ={
     val service = getService[FPTService]
     try{
-      val taskFpt = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/C3702000000002016000532.fpt"), AncientConstants.GBK_ENCODING)
+      val taskFpt = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/R2100000000002017090205.fpt"), AncientConstants.GBK_ENCODING)
       taskFpt match {
         case Left(fpt3) => throw new Exception("Not Support FPT-V3.0")
         case Right(fpt4) =>

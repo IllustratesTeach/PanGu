@@ -3,12 +3,15 @@ package nirvana.hall.webservice
 
 
 
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.activation.DataHandler
 
 import monad.support.services.XmlLoader
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.IOUtils
+import org.apache.tapestry5.json.JSONObject
 import org.junit.Test
 
 /**
@@ -50,6 +53,50 @@ class XStreamTest {
     println("恢复后:" + new String(IOUtils.toByteArray(dataHandle.getInputStream)))
 
 
+
+  }
+
+
+  @Test
+  def test_JSON(): Unit ={
+    val jsonObj= new JSONObject("{\"TPDB\":[1,11]}")
+    var str = ""
+    if(jsonObj.has("TPDB")){
+      val iter = jsonObj.getJSONArray("TPDB").iterator()
+      while (iter.hasNext){
+        val db = iter.next()
+        str += db.toString
+      }
+    }
+    println(str)
+
+
+  }
+
+  @Test
+  def test_map(): Unit ={
+    //if(logic02Rec.personId.toUpperCase.startsWith("R")) logic02Rec.personId.take(1) else logic02Rec.personId
+    val str = "r1000000000111111111123"
+    if(str.toUpperCase.startsWith("R"))
+      println(str.drop(1))
+  }
+
+  @Test
+  def test_date(): Unit ={
+    val date = new SimpleDateFormat("YYYYMMddHHmmss").format(new Date)
+    println(date)
+  }
+
+  @Test
+  def test_option(): Unit ={
+
+    /*val listString:Option[String] = None
+    listString match{
+      case Some(t) => println("****")
+      case _ => println("input")
+    }*/
+
+    None.foreach(t => println(t))
 
   }
 }
