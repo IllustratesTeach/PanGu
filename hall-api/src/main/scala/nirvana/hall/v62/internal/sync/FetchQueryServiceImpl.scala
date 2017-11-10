@@ -4,11 +4,10 @@ import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
-import nirvana.hall.api.internal.{DataConverter, DateConverter}
+import nirvana.hall.api.internal.{ DateConverter}
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
-import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -326,14 +325,16 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @param size 单次请求数量
     */
   override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = {
-    val sql = s"SELECT " +
-                s"t.uuid" +
-                s",t.queryid" +
-                s",t.orasid" +
-                s",t.querytype" +
-                s",t.keyid " +
-              s"FROM GAFIS_TASK70RECORD t " +
-              s"WHERE t.issynccandlist = '0' AND ROWNUM <=?"
+    val sql = s"SELECT * FROM  (SELECT " +
+                                  s"t.uuid" +
+                                  s",t.queryid" +
+                                  s",t.orasid" +
+                                  s",t.querytype" +
+                                  s",t.keyid " +
+                              s" FROM GAFIS_TASK70RECORD t " +
+                              s" WHERE t.issynccandlist = '0'  " +
+                              s" ORDER BY t.createtime ASC )   " +
+             s"WHERE  ROWNUM <=?"
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
       ps.setInt(1,size)
