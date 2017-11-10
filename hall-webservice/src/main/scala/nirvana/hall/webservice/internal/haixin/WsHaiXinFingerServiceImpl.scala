@@ -6,14 +6,13 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
-import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.FPTImageConverter
@@ -37,7 +36,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
                                 ,queryService: QueryService
                                 ,extractor: FeatureExtractor
                                 ,exceptRelationService:ExceptRelationService
-                               ,hallWebserviceConfig: HallWebserviceConfig, implicit val dataSource: DataSource) extends WsHaiXinFingerService with LoggerSupport{
+                                ,hallWebserviceConfig: HallWebserviceConfig) extends WsHaiXinFingerService with LoggerSupport{
   /**
     * 接口01:捺印指纹信息录入
     *
@@ -134,27 +133,13 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
           }else{
             result = IAConstant.CREATE_STORE_SUCCESS
           }
+          tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
         case _ =>
           if(tpCardService.isExist(cardId,Some(hallWebserviceConfig.templateFingerDBId))){
             result = IAConstant.CREATE_STORE_SUCCESS
+            tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
           }
       }
-      /*val responseStatusAndOraSidMap = strategyService.getResponseStatusAndOrasidByPersonId(personid)
-      if(!responseStatusAndOraSidMap.nonEmpty){
-        result = IAConstant.CREATE_STORE_FAIL
-      }else{
-        if(!responseStatusAndOraSidMap.get("orasid").get.toString.equals(IAConstant.EMPTY_ORASID.toString)){
-          val oraSid = responseStatusAndOraSidMap.get("orasid").get.asInstanceOf[Long]
-          if(oraSid > 0){
-            val status = queryService.getStatusBySidSQL(oraSid)
-            result = strategyService.getResponseStatusByGafisStatus_TT(status)
-          }else{
-            result = IAConstant.CREATE_STORE_SUCCESS
-          }
-        }else{
-          result = IAConstant.CREATE_STORE_SUCCESS
-        }
-      }*/
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
         ,result,IAConstant.GET_FINGER_STATUS,personid,IAConstant.EMPTY_ORASID.toString,null,None)
     }catch{
