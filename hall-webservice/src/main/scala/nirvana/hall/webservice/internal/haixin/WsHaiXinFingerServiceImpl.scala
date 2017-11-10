@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
+import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
@@ -29,7 +30,8 @@ import org.apache.commons.io.{FileUtils, IOUtils}
 /**
   * Created by yuchen on 2017/7/24.
   */
-class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
+class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
+                                ,hallImageRemoteService: HallImageRemoteService
                                 ,strategyService:StrategyService
                                 ,fptService: FPTService
                                 ,tpCardService: TPCardService
