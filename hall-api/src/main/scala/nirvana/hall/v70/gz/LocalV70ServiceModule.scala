@@ -8,7 +8,7 @@ import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.gz.services._
 import nirvana.hall.v70.gz.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
-import nirvana.hall.v70.internal.LogicDBJudgeServiceImpl
+import nirvana.hall.v70.internal.{CaseInfoServiceImpl => _, LPCardServiceImpl => _, TPCardServiceImpl => _, _}
 import nirvana.hall.v70.internal.sync.{FetchCaseInfoServiceImpl, FetchLPCardServiceImpl, FetchLPPalmServiceImpl, FetchMatchRelationServiceImpl, FetchQueryServiceImpl, FetchTPCardServiceImpl}
 import org.apache.tapestry5.ioc.ServiceBinder
 
