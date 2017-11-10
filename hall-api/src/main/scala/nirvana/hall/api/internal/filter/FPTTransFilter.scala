@@ -1,6 +1,6 @@
 package nirvana.hall.api.internal.filter
 
-import java.io.File
+
 import javax.servlet.http.HttpServletRequest
 
 import com.google.protobuf.ByteString
@@ -9,8 +9,6 @@ import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMes
 import nirvana.hall.api.services.FPTTransService
 import nirvana.hall.protocol.api.FPTTrans
 import nirvana.hall.protocol.api.FPTTrans._
-import org.apache.commons.io.{FileUtils, IOUtils}
-
 /**
   * Created by yuchen on 2017/11/9.
   * 用于指纹系统7.0导出FPT

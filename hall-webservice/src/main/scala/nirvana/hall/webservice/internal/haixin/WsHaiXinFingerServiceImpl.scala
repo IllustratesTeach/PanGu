@@ -126,7 +126,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       val responseStatusAndOraSidMap = strategyService.getRemoteResponseStatusAndOrasidByPersonId(cardId)
       responseStatusAndOraSidMap match{
         case Some(t) =>
-          val oraSid = responseStatusAndOraSidMap.get("orasid").asInstanceOf[Long]
+          val oraSid = t.get("orasid").asInstanceOf[Long]
           if(oraSid > 0){
             val status = getStatusBySidSQL(oraSid)
             result = strategyService.getResponseStatusByGafisStatus_TT(status)
@@ -137,7 +137,8 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
         case _ =>
           if(tpCardService.isExist(cardId,Some(hallWebserviceConfig.templateFingerDBId))){
             result = IAConstant.CREATE_STORE_SUCCESS
-            tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
+          }else{
+            result = IAConstant.CREATE_STORE_FAIL
           }
       }
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
