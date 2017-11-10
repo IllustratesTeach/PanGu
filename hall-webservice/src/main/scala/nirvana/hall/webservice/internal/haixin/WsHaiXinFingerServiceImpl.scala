@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, UUID}
 import javax.activation.DataHandler
+import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
@@ -29,7 +30,8 @@ import org.apache.commons.io.{FileUtils, IOUtils}
 /**
   * Created by yuchen on 2017/7/24.
   */
-class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
+class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
+                                ,hallImageRemoteService: HallImageRemoteService
                                 ,strategyService:StrategyService
                                 ,fptService: FPTService
                                 ,tpCardService: TPCardService
@@ -126,7 +128,7 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
       val responseStatusAndOraSidMap = strategyService.getRemoteResponseStatusAndOrasidByPersonId(cardId)
       responseStatusAndOraSidMap match{
         case Some(t) =>
-          val oraSid = responseStatusAndOraSidMap.get("orasid").asInstanceOf[Long]
+          val oraSid = t.get("orasid").asInstanceOf[Long]
           if(oraSid > 0){
             val status = getStatusBySidSQL(oraSid)
             result = strategyService.getResponseStatusByGafisStatus_TT(status)
@@ -137,7 +139,8 @@ class WsHaiXinFingerServiceImpl(hallImageRemoteService: HallImageRemoteService
         case _ =>
           if(tpCardService.isExist(cardId,Some(hallWebserviceConfig.templateFingerDBId))){
             result = IAConstant.CREATE_STORE_SUCCESS
-            tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
+          }else{
+            result = IAConstant.CREATE_STORE_FAIL
           }
       }
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
