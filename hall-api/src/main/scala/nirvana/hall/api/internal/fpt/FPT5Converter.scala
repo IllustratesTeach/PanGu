@@ -1,13 +1,13 @@
 package nirvana.hall.api.internal.fpt
 
-import nirvana.hall.c.AncientConstants
+
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib._
-import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.protocol.api.FPTProto
+import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto.{LPCard, _}
 
 /**
@@ -26,9 +26,9 @@ object FPT5Converter {
 
     fingerprintPackage.fingerprintMsg.fingerprintComparisonSysTypeDescript = "1900"  //指纹比对系统描述
     fingerprintPackage.descriptMsg.originalSystemCasePersonId = tpCard.getStrCardID  //原始系统_案事件相关人员编号
-    fingerprintPackage.descriptMsg.jingZongPersonId = ""  //警综人员编号
-    fingerprintPackage.descriptMsg.casePersonid = tpCard.getStrCardID  //案事件相关人员编号
-    fingerprintPackage.descriptMsg.fingerPalmCardId = tpCard.getStrCardID   //指掌纹卡编号
+    fingerprintPackage.descriptMsg.jingZongPersonId = ""  //由警综平台标准化采集系统发号
+    fingerprintPackage.descriptMsg.casePersonid = ""  //案事件相关人员编号 由刑专系统发号，新数据必须提供
+    fingerprintPackage.descriptMsg.fingerPalmCardId = tpCard.getStrCardID   //指掌纹卡编号 系统自用
     fingerprintPackage.descriptMsg.chopedCauseCode = "999"  //被捺印指纹原因代码
     fingerprintPackage.descriptMsg.name = tpCard.getText.getStrName   //姓名
     fingerprintPackage.descriptMsg.alias = tpCard.getText.getStrAliasName    //别名/绰号
@@ -66,95 +66,14 @@ object FPT5Converter {
         case ImageType.IMAGETYPE_FINGER =>
           fingerprintPackage.fingerprintMsg.fingerNum = fingerprintPackage.fingerprintMsg.fingerNum + 1
           if(!blob.getBPlain){
-            val rollingMsg = new FingerMsg
-            val gafisMnt = new GAFISIMAGESTRUCT
-            gafisMnt.fromStreamReader(blob.getStMntBytes.newInput())
-            val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-            val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
-            rollingMsg.fingerPositionCode = if(fingerTData.fgp.equals("10")) (fingerTData.fgp) else ("0"+fingerTData.fgp)
-            rollingMsg.fingerFeatureExtractionMethodCode = fingerTData.extractMethod
-            rollingMsg.adactylismCauseCode = "3"
-            rollingMsg.fingerPatternMasterCode = fingerTData.pattern1
-            rollingMsg.fingerPatternSlaveCode = fingerTData.pattern2
-            rollingMsg.fingerDirectionDescript = fingerTData.fingerDirection
-            rollingMsg.fingerCenterPoint = fingerTData.centerPoint
-            rollingMsg.fingerSlaveCenter = if(FPT5Utils.isNull(fingerTData.subCenterPoint) || FPT5Utils.replaceLength(fingerTData.subCenterPoint,14))"" else fingerTData.subCenterPoint
-            rollingMsg.fingerLeftTriangle = if(FPT5Utils.isNull(fingerTData.leftTriangle) || FPT5Utils.replaceLength(fingerTData.leftTriangle,14))"" else fingerTData.leftTriangle
-            rollingMsg.fingerRightTriangle = if(FPT5Utils.isNull(fingerTData.rightTriangle) || FPT5Utils.replaceLength(fingerTData.rightTriangle,14))"" else fingerTData.rightTriangle
-            rollingMsg.fingerExtractionNum = fingerTData.featureCount.toInt
-            rollingMsg.fingerExtractionInfo = fingerTData.feature
-            rollingMsg.fingerCustomInfo = "".getBytes()
-            rollingMsg.fingerImageHorizontalDirectionLength = 640
-            rollingMsg.fingerImageVerticalDirectionLength = 640
-            rollingMsg.fingerImageRatio = 500
-            rollingMsg.fingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-            if (gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS) {
-              gafisImage.transformForFPT()
-              rollingMsg.fingerImageData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
-            } else {
-              rollingMsg.fingerImageData = gafisImage.bnData
-            }
-            fingerprintPackage.fingers.rolling.fingerMsg.add(rollingMsg)
+            fingerprintPackage.fingers.rolling.fingerMsg.add(getFingerMsg(blob))
           }else{
-            val planarMsg = new FingerMsg
-            val gafisMnt = new GAFISIMAGESTRUCT
-            gafisMnt.fromStreamReader(blob.getStMntBytes.newInput())
-            val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-            val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
-            planarMsg.fingerPositionCode = if(fingerTData.fgp.equals("10")) (fingerTData.fgp) else ("0"+fingerTData.fgp)
-            planarMsg.fingerFeatureExtractionMethodCode = fingerTData.extractMethod
-            planarMsg.adactylismCauseCode = "3"
-            planarMsg.fingerPatternMasterCode = fingerTData.pattern1
-            planarMsg.fingerPatternSlaveCode = fingerTData.pattern2
-            planarMsg.fingerDirectionDescript = fingerTData.fingerDirection
-            planarMsg.fingerCenterPoint = fingerTData.centerPoint
-            planarMsg.fingerSlaveCenter = if(FPT5Utils.isNull(fingerTData.subCenterPoint) || FPT5Utils.replaceLength(fingerTData.subCenterPoint,14))"" else fingerTData.subCenterPoint
-            planarMsg.fingerLeftTriangle = if(FPT5Utils.isNull(fingerTData.leftTriangle) || FPT5Utils.replaceLength(fingerTData.leftTriangle,14))"" else fingerTData.leftTriangle
-            planarMsg.fingerRightTriangle = if(FPT5Utils.isNull(fingerTData.rightTriangle) || FPT5Utils.replaceLength(fingerTData.rightTriangle,14))"" else fingerTData.rightTriangle
-            planarMsg.fingerExtractionNum = fingerTData.featureCount.toInt
-            planarMsg.fingerExtractionInfo = fingerTData.feature
-            planarMsg.fingerCustomInfo = "".getBytes()
-            planarMsg.fingerImageHorizontalDirectionLength = 640
-            planarMsg.fingerImageVerticalDirectionLength = 640
-            planarMsg.fingerImageRatio = 500
-            planarMsg.fingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-            if (gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS) {
-              gafisImage.transformForFPT()
-              planarMsg.fingerImageData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
-            } else {
-              planarMsg.fingerImageData = gafisImage.bnData
-            }
-            fingerprintPackage.fingers.planar.fingerMsg.add(planarMsg)
+            fingerprintPackage.fingers.planar.fingerMsg.add(getFingerMsg(blob))
           }
         //掌纹
         case ImageType.IMAGETYPE_PALM =>
-          val palmMsg = new PalmMsg
           fingerprintPackage.fingerprintMsg.palmNum = fingerprintPackage.fingerprintMsg.palmNum + 1
-          val gafisMnt = new GAFISIMAGESTRUCT
-          gafisMnt.fromStreamReader(blob.getStMntBytes.newInput())
-          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-          val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
-          palmMsg.palmPostionCode = if(fgpParesString(blob.getPalmfgp).equals("10")) fgpParesString(blob.getPalmfgp) else ("0" + fgpParesString(blob.getPalmfgp))
-          palmMsg.lackPalmCauseCode = "3"
-          palmMsg.palmFeatureExtractionMethodCode = "M"
-          palmMsg.palmRetracingPoint = 0
-          palmMsg.palmRetracingPointInfo = ""
-          palmMsg.palmTrianglePointNum = 0
-          palmMsg.palmTrianglePointInfo = ""
-          palmMsg.palmFeaturePointNum = fingerTData.featureCount.toInt
-          palmMsg.palmFeaturePointInfo = if(FPT5Utils.isNull(fingerTData.feature)) "" else fingerTData.feature
-          palmMsg.palmCustomInfo = "".getBytes()
-          palmMsg.palmImageHorizontalDirectionLength = fingerTData.imgHorizontalLength.toInt
-          palmMsg.palmImageVerticalDirectionLength = fingerTData.imgVerticalLength.toInt
-          palmMsg.palmImageRatio = fingerTData.dpi.toInt
-          palmMsg.palmImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if (gafisImage.stHead.nCompressMethod == glocdef.GAIMG_CPRMETHOD_GFS) {
-            gafisImage.transformForFPT()
-            palmMsg.palmImageData = gafisImage.toByteArray(AncientConstants.GBK_ENCODING)
-          } else {
-            palmMsg.palmImageData = gafisImage.bnData
-          }
-          fingerprintPackage.palms.palmMsg.add(palmMsg)
+          fingerprintPackage.palms.palmMsg.add(getPalmMsg(blob))
         //人像
         case ImageType.IMAGETYPE_FACE =>
           val portraitsMsg = new PortraitsMsg
@@ -168,6 +87,60 @@ object FPT5Converter {
     }
     fingerprintPackage
   }
+
+
+
+  private def getFingerMsg(blob:TPCardBlob): FingerMsg ={
+    val fingerMsg = new FingerMsg
+    val gafisMnt = new GAFISIMAGESTRUCT
+    gafisMnt.fromStreamReader(blob.getStMntBytes.newInput())
+    val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+    val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
+    fingerMsg.fingerPositionCode = if(fingerTData.fgp.matches("^([1-9])$")) ("0"+fingerTData.fgp) else (fingerTData.fgp)
+    fingerMsg.fingerFeatureExtractionMethodCode = fingerTData.extractMethod
+    fingerMsg.adactylismCauseCode = "3"
+    fingerMsg.fingerPatternMasterCode = fingerTData.pattern1
+    fingerMsg.fingerPatternSlaveCode = fingerTData.pattern2
+    fingerMsg.fingerDirectionDescript = fingerTData.fingerDirection
+    fingerMsg.fingerCenterPoint = fingerTData.centerPoint
+    fingerMsg.fingerSlaveCenter = if(FPT5Utils.isNull(fingerTData.subCenterPoint) || FPT5Utils.replaceLength(fingerTData.subCenterPoint,14))"" else fingerTData.subCenterPoint
+    fingerMsg.fingerLeftTriangle = if(FPT5Utils.isNull(fingerTData.leftTriangle) || FPT5Utils.replaceLength(fingerTData.leftTriangle,14))"" else fingerTData.leftTriangle
+    fingerMsg.fingerRightTriangle = if(FPT5Utils.isNull(fingerTData.rightTriangle) || FPT5Utils.replaceLength(fingerTData.rightTriangle,14))"" else fingerTData.rightTriangle
+    fingerMsg.fingerExtractionNum = fingerTData.featureCount.toInt
+    fingerMsg.fingerExtractionInfo = fingerTData.feature
+    fingerMsg.fingerCustomInfo = "".getBytes()
+    fingerMsg.fingerImageHorizontalDirectionLength = 640
+    fingerMsg.fingerImageVerticalDirectionLength = 640
+    fingerMsg.fingerImageRatio = 500
+    fingerMsg.fingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+    fingerMsg.fingerImageData = gafisImage.bnData
+    fingerMsg
+  }
+
+  private def getPalmMsg(blob:TPCardBlob):PalmMsg = {
+    val palmMsg = new PalmMsg
+    val gafisMnt = new GAFISIMAGESTRUCT
+    gafisMnt.fromStreamReader(blob.getStMntBytes.newInput())
+    val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+    val fingerTData = FPTMntConverter.convertGafisMnt2FingerTData(gafisMnt)
+    palmMsg.palmPostionCode = if(fgpParesString(blob.getPalmfgp).matches("^([1-9])$"))("0" + fgpParesString(blob.getPalmfgp))  else fgpParesString(blob.getPalmfgp)
+    palmMsg.lackPalmCauseCode = "3"
+    palmMsg.palmFeatureExtractionMethodCode = fingerTData.extractMethod
+    palmMsg.palmRetracingPoint = 0
+    palmMsg.palmRetracingPointInfo = ""
+    palmMsg.palmTrianglePointNum = 0
+    palmMsg.palmTrianglePointInfo = ""
+    palmMsg.palmFeaturePointNum = fingerTData.featureCount.toInt
+    palmMsg.palmFeaturePointInfo = if(FPT5Utils.isNull(fingerTData.feature)) "" else fingerTData.feature
+    palmMsg.palmCustomInfo = "".getBytes()
+    palmMsg.palmImageHorizontalDirectionLength = fingerTData.imgHorizontalLength.toInt
+    palmMsg.palmImageVerticalDirectionLength = fingerTData.imgVerticalLength.toInt
+    palmMsg.palmImageRatio = fingerTData.dpi.toInt
+    palmMsg.palmImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+    palmMsg.palmImageData = gafisImage.bnData
+    palmMsg
+  }
+
 
   /**
     * 人像转换
@@ -227,7 +200,7 @@ object FPT5Converter {
     val latentPackage = new LatentPackage
     latentPackage.caseMsg.latentFingerprintComparisonSysTypeDescript = "1900"  //指纹比对系统描述
     latentPackage.caseMsg.originalSystemCaseId = caseInfo.getStrCaseID  //原始系统_案事件编号
-    latentPackage.caseMsg.caseId = caseInfo.getStrCaseID  //案事件编号
+    latentPackage.caseMsg.caseId = caseInfo.getStrCaseID  //案事件编号 --警综案事件编号，新数据必须提供
     latentPackage.caseMsg.latentSurveyId = caseInfo.getStrCaseID  //现场勘验编号
     latentPackage.caseMsg.latentCardId = ""  //现场指掌纹卡编号
     latentPackage.caseMsg.caseTypeCode = caseInfo.getText.getStrCaseType1  //案件类别代码

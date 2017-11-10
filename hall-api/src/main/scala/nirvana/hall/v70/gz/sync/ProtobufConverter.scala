@@ -336,7 +336,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
     val tpCard = TPCard.newBuilder()
-    tpCard.setStrCardID(person.cardid)
+    tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)
     tpCard.setStrDataSource(person.dataSources)
 

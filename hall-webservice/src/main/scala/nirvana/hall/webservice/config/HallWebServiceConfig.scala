@@ -22,6 +22,9 @@ class HallWebserviceConfig
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
 
+  @XmlElement(name = "handprintService")
+  var handprintService:HandprintServiceConfig = new HandprintServiceConfig
+
   @XmlElement(name = "XingZhuanSetting")
   var XingZhuanSetting: XingZhuanSetting = new XingZhuanSetting
   @XmlElement(name = "local_tenprint_path")
@@ -37,6 +40,22 @@ class HallWebserviceConfig
   @XmlElement(name = "template_finger_database_id")
   var templateFingerDBId:String = _
 }
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "HandprintService")
+class HandprintServiceConfig{
+  @XmlElement(name = "cron")
+  var cron: String = _
+  @XmlElement(name = "url")
+  var url: String = _
+  @XmlElement(name = "target_namespace")
+  var targetNamespace: String = _
+  @XmlElement(name = "user")
+  var user: String = _
+  @XmlElement(name = "password")
+  var password: String = _
+}
+
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Union4pfmip")
 class Union4pfmipConfig{
@@ -61,6 +80,11 @@ class Union4pfmipConfig{
   @XmlElement(name = "upload_checkin_cron")
   var uploadCheckinCron: String = _
 }
+
+
+
+
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "XingZhuanSetting")

@@ -29,6 +29,13 @@
                     <xs:documentation>配置Webservice服务器相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
+
+            <xs:element type="handprintServiceType" name="handprintService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>配置Webservice服务器相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
             <xs:element type="XingZhuanSetting" name="XingZhuanSetting" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>配置是否根据任务自动发送查询相关参数</xs:documentation>
@@ -63,6 +70,11 @@
             <xs:element type="xs:string" name="is_save_fpt" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>是否将FPT保存到本地</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="template_finger_database_id" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2中捺印逻辑库id</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
@@ -117,6 +129,38 @@
             <xs:element type="xs:string" name="upload_checkin_cron" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>获取上报比对关系任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+
+    <xs:complexType name="handprintServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获取比对任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>URL配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="target_namespace" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>targetNamespace配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="user" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>用户名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

@@ -9,16 +9,16 @@ trait FPT5Service {
 
   /**
     * 获取捺印信息
-    * @param personId 人员编号
+    * @param cardId 捺印卡号
     * @return
     */
-  def getFingerprintPackage(personId: String): FingerprintPackage
+  def getFingerprintPackage(cardId: String): FingerprintPackage
 
   /**
     * 获取现场信息
-    * @param caseId 案件编号
+    * @param cardId 现场卡号
     * @return
     */
-  def getLatentPackage(caseId: String): LatentPackage
+  def getLatentPackage(cardId: String): LatentPackage
 
 }
