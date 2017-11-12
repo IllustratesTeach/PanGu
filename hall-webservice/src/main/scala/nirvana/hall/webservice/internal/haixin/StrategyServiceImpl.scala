@@ -414,7 +414,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
                                     s"FROM Admin_Breakcase k " +
                                     s"JOIN (SELECT p.cardid,m.personid " +
                                            s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-                                           s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+                                           s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid  AND m.OPER_TYPE = '1') w " +
                                     s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
@@ -440,7 +440,6 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
                                     s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
                                     s"WHERE p.mispersonid is not null " +
                                     s"AND p.mispersonid = m.personid " +
-                                    s"AND m.matchstatus = '1' " +
                                     s"AND m.OPER_TYPE = '1' " +
                                     s"AND p.personid is not null"
 
@@ -480,7 +479,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
             s"FROM Admin_Breakcase k " +
             s"JOIN (SELECT p.cardid,m.personid " +
                     s"FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
-                    s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid AND m.matchstatus = '1' AND m.OPER_TYPE = '1') w " +
+                    s"WHERE p.mispersonid is not null AND p.mispersonid = m.personid  AND m.OPER_TYPE = '1') w " +
             s"ON k.srckey = w.cardid "
 
     if(!CommonUtils.isNullOrEmpty(timefrom) && !CommonUtils.isNullOrEmpty(timeto)){
@@ -502,7 +501,6 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       s" FROM NORMALTP_TPCARDINFO p,HALL_GAFIS_IA_FINGER m " +
       s" WHERE p.mispersonid is not null " +
       s" AND p.mispersonid = m.personid " +
-      s" AND m.matchstatus = '1' " +
       s" AND m.OPER_TYPE = '1' " +
       s" AND p.personid is not null"
 
