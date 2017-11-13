@@ -3,6 +3,7 @@ package nirvana.hall.api.services
 
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
+import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelationLL, MatchRelationTLAndLT, MatchRelationTT}
 
 /**
  * Created by songpeng on 16/6/21.
@@ -10,13 +11,33 @@ import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest
 trait MatchRelationService {
 
   /**
-   * 获取比对关系
-    *
+    * 获取比对关系
     * @param request
-   * @return
-   */
+    * @return
+    */
   def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse
 
+  /**
+    * 获取重卡比中关系
+    * @param cardId
+    * @return
+    */
+  def getMatchRelationTT(cardId: String): Seq[MatchRelationTT]
+
+  /**
+    * 获取正查或倒查比中关系
+    * @param cardId
+    * @param isLatent
+    * @return
+    */
+  def getMatchRelationTLAndLT(cardId: String, isLatent: Boolean): Seq[MatchRelationTLAndLT]
+
+  /**
+    * 获取串查比中关系
+    * @param cardId
+    * @return
+    */
+  def getMatchRelationLL(cardId: String): Seq[MatchRelationLL]
 
   /**
     * 获取比对关系

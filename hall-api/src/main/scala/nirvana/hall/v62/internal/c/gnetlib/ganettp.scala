@@ -77,6 +77,14 @@ trait ganettp {
     }
 
   }
+
+  /**
+    * 获取重卡组信息. 可以使用通用查询读取normaltp_personinfo表
+    * @param nDBID
+    * @param nTableID
+    * @param pstPersonData
+    * @param nOption
+    */
   def NET_GAFIS_PERSON_Get(nDBID:Short,
     nTableID:Short,
     pstPersonData:GPERSONINFOSTRUCT,

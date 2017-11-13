@@ -42,15 +42,33 @@ class gnettpTest {
   def test_getCardIdList: Unit ={
     val config = new HallV62Config
     config.appServer.host = "127.0.0.1"
-    config.appServer.port = 6798
+    config.appServer.port = 6898
     config.appServer.user = "afisadmin"
     config.appServer.password="helloafis"
     val facade = new V62Facade(config)
+    val a = g_stCN
+    println(a)
     val mapper = Map(
       g_stCN.stTcID.pszName -> "szKey"
     )
     val statementOpt = Option("(1=1) AND (CardID='1234567890') AND (shenfenid = '123456')")
     val cardId = facade.queryV62Table[GAKEYSTRUCT](1, 2, mapper, statementOpt, 10)
     println(cardId.size)
+  }
+
+  @Test
+  def test_getPersonId: Unit ={
+    val config = new HallV62Config
+    config.appServer.host = "127.0.0.1"
+    config.appServer.port = 6898
+    config.appServer.user = "afisadmin"
+    config.appServer.password="helloafis"
+    val facade = new V62Facade(config)
+    val mapper = Map(
+      g_stCN.stTAdm.pszPersonID -> "szKey"
+    )
+    val statementOpt = Option("(1=1) AND (CardID='1234567890')")
+    val cardId = facade.queryV62Table[GAKEYSTRUCT](1, 2, mapper, statementOpt, 10)
+    println(cardId.head.szKey)
   }
 }

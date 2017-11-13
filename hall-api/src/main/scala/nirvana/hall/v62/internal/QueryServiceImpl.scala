@@ -1,7 +1,6 @@
 package nirvana.hall.v62.internal
 
 import java.nio.ByteBuffer
-import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryDBConfig
 import nirvana.hall.api.services.QueryService
@@ -17,7 +16,7 @@ import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
 /**
  * Created by songpeng on 16/1/26.
  */
-class QueryServiceImpl(facade:V62Facade, config:HallV62Config,implicit val dataSource: DataSource) extends QueryService{
+class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryService{
   /**
     * 通过卡号查找第一个的比中结果
     *

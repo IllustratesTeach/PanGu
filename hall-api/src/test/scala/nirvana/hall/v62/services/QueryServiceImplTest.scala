@@ -21,7 +21,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def testQuery: Unit ={
     executeInContext{
-      val service  = new QueryServiceImpl(createFacade,null,null)
+      val service  = new QueryServiceImpl(createFacade,null)
       val queryResult = service.findSimpleQuery(20,Some("((KeyID LIKE '123'))"),10)
       println(queryResult.size)
     }
