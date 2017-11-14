@@ -25,4 +25,14 @@ class gnetblobTest {
     val data = facade.NET_GAFIS_COL_GetByKey(V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO,"1234567890", "hithistory")
     println(new String(data).trim)
   }
+  @Test
+  def test_NET_GAFIS_COL_UpdateByKey: Unit ={
+    val pD = "jcai".getBytes()
+    facade.NET_GAFIS_COL_UpdateByKey(V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO,"1234567890", "name", pD)
+  }
+  @Test
+  def test_NET_GAFIS_COL_UpdateBySID: Unit ={
+    val pD = "jcai".getBytes()
+    facade.NET_GAFIS_COL_UpdateBySID(V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO, 1, "name", pD)
+  }
 }
