@@ -20,6 +20,7 @@ class V62Facade(defaultConfig:HallV62Config)
   extends gnetcsr
   with V62QueryTableSupport
   with DataSyncSupport
+  with gnetblob
   with ganetqry
   with ganetdbp
   with ganetlp
