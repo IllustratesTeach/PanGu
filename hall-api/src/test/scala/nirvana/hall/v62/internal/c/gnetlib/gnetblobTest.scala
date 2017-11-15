@@ -1,7 +1,9 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import monad.support.services.XmlLoader
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.v62.internal.c.gloclib.BreakInfos
 import org.junit.Test
 
 /**
@@ -24,6 +26,8 @@ class gnetblobTest {
   def test_NET_GAFIS_COL_GetByKey: Unit ={
     val data = facade.NET_GAFIS_COL_GetByKey(V62Facade.DBID_TP_DEFAULT, V62Facade.TID_TPCARDINFO,"1234567890", "hithistory")
     println(new String(data).trim)
+    val breakInfos = XmlLoader.parseXML[BreakInfos](new String(data).trim)
+    println(breakInfos.recordCount)
   }
   @Test
   def test_NET_GAFIS_COL_UpdateByKey: Unit ={
