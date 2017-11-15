@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto._
@@ -151,7 +152,7 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     * @param cardId
     * @return
     */
-  override def getMatchRelationTT(cardId: String): Seq[MatchRelationTT] = ???
+  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = ???
 
   /**
     * 获取正查或倒查比中关系
@@ -160,7 +161,7 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     * @param isLatent
     * @return
     */
-  override def getMatchRelationTLAndLT(cardId: String, isLatent: Boolean): Seq[MatchRelationTLAndLT] = ???
+override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
 
   /**
     * 获取串查比中关系
@@ -168,5 +169,5 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     * @param cardId
     * @return
     */
-  override def getMatchRelationLL(cardId: String): Seq[MatchRelationLL] = ???
+  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
 }

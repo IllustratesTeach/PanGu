@@ -2,9 +2,9 @@ package nirvana.hall.v70.ln.services
 
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
-import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelationLL, MatchRelationTLAndLT, MatchRelationTT}
 
 /**
  * Created by songpeng on 16/9/21.
@@ -49,8 +49,7 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * @param cardId
     * @return
     */
-  override def getMatchRelationTT(cardId: String): Seq[MatchRelationTT] = ???
-
+  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = ???
 
   /**
     * 获取正查或倒查比中关系
@@ -59,7 +58,7 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * @param isLatent
     * @return
     */
-  override def getMatchRelationTLAndLT(cardId: String, isLatent: Boolean): Seq[MatchRelationTLAndLT] = ???
+override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
 
   /**
     * 获取串查比中关系
@@ -67,5 +66,5 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * @param cardId
     * @return
     */
-  override def getMatchRelationLL(cardId: String): Seq[MatchRelationLL] = ???
+  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
 }

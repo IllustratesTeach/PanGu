@@ -1,19 +1,21 @@
 package nirvana.hall.v62.internal
 
 
-import monad.support.services.LoggerSupport
+import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp.GAFIS_LPGROUPSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto._
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.c.gloclib.ganetlogverifyConverter
 import nirvana.hall.v62.internal.c.gloclib.gcolnames._
+import nirvana.hall.v62.internal.c.gloclib.{BreakInfos, ganetlogverifyConverter}
 import org.apache.tapestry5.ioc.internal.util.InternalUtils
 
 import scala.collection.mutable.ArrayBuffer
@@ -210,8 +212,8 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     * @param cardId
     * @return
     */
-  override def getMatchRelationTT(cardId: String): Seq[MatchRelationTT] = {
-    val matchRelationList = new ArrayBuffer[MatchRelationTT]()
+  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = {
+    val ttHitList = new ArrayBuffer[TtHitResultPackage]()
     //首先获取重卡组号
     val personId = getPersonid(cardId)
     if(personId.nonEmpty){
@@ -225,44 +227,70 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
       facade.NET_GAFIS_PERSON_Get(dbDef.nAdminDefDBID, V62Facade.TID_PERSONINFO, m_stPersonInfo)
       m_stPersonInfo.pstID_Data.foreach{personInfo =>
         if(!cardId.equals(personInfo.szCardID)){//排除自己
-        val tt = MatchRelationTT.newBuilder()
-          tt.setPersonId1(cardId)
-          tt.setPersonId2(personInfo.szCardID)
-
-          matchRelationList += tt.build()
+          val ttHit = new TtHitResultPackage
+          ttHit.cardId = personId
+          ttHit.resultCardId = personInfo.szCardID
+          ttHit.memo = personInfo.szComment
+          //TODO 补全其他信息
+          ttHitList += ttHit
         }
       }
 
     }
 
-    matchRelationList
+    ttHitList
   }
 
   /**
     * 获取正查或倒查比中关系
+    * 通过解析hithistory字段获取比中信息
     * @param cardId
     * @return
     */
-  override def getMatchRelationTLAndLT(cardId: String, isLatent: Boolean): Seq[MatchRelationTLAndLT] = {
-    val matchRelationList = new ArrayBuffer[MatchRelationTLAndLT]()
-    if(isLatent){
-
-    }else{
-      val hithistory = getHitHistory(cardId)
-
+  override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = {
+    val ltHitList = new ArrayBuffer[LtHitResultPackage]()
+    val hitHistory = getHitHistory(cardId, isLatent)
+    if(hitHistory.nonEmpty){
+      val breakInfos = XmlLoader.parseXML[BreakInfos](hitHistory)
+      breakInfos.breakRecords.foreach{record=>
+        val ltHit = new LtHitResultPackage
+        ltHit.fingerPrintCardId = cardId
+        ltHit.latentFingerCardId = record.latentID
+        //TODO 补全其他信息
+        ltHitList += ltHit
+      }
     }
 
-    matchRelationList
+    ltHitList
   }
 
 
   /**
     * 获取串查比中关系
-    *
+    * 先获取现场关联组号，根据现场关联组号，获取现场关联信息
     * @param cardId
     * @return
     */
-  override def getMatchRelationLL(cardId: String): Seq[MatchRelationLL] = ???
+  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = {
+    val llHitList = new ArrayBuffer[LlHitResultPackage]()
+    val groupName = getGroupName(cardId)
+    if(groupName.nonEmpty){
+      val lpGroup = new GAFIS_LPGROUPSTRUCT
+      lpGroup.szGroupID = groupName
+      facade.NET_GAFIS_LPGROUP_Get(v62Config.latentTable.dbId.toShort, V62Facade.TID_LPGROUP, lpGroup)
+      lpGroup.pstKeyList_Data.foreach{key=>
+        if(!cardId.equals(key.szKey)){//排除自己
+          val llHit = new LlHitResultPackage
+          llHit.cardId = cardId
+          llHit.resultCardId = key.szKey
+          //TODO 补全其他信息
+          llHitList += llHit
+        }
+      }
+    }
+
+    llHitList
+  }
 
   /**
     * 获取重卡组号
@@ -287,17 +315,30 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
     * @param cardId 卡号
     * @return
     */
-  private def getHitHistory(cardId: String): String = {
-    val mapper = Map(
-      g_stCN.stTCardText.pszHitHistory -> "szKey"
-    )
-    val statementOpt = Option("(CardID='%s')".format(cardId))
-    val keyList = facade.queryV62Table[GAKEYSTRUCT](v62Config.templateTable.dbId.toShort, v62Config.templateTable.tableId.toShort, mapper, statementOpt, 1)
-
-    if(keyList.nonEmpty){
-      keyList.head.szKey
+  private def getHitHistory(cardId: String, isLatent: Boolean): String = {
+    var db = v62Config.templateTable
+    if(isLatent){
+      db = v62Config.latentTable
+    }
+    val data = facade.NET_GAFIS_COL_GetByKey(db.dbId.toShort, db.tableId.toShort, cardId, g_stCN.stTCardText.pszHitHistory)
+    if(data != null && data.length > 0){
+      new String(data)
     }else{
       ""
     }
   }
+
+  /**
+    * 获取现场关联
+    * @param cardId
+    */
+  private def getGroupName(cardId: String): String ={
+    val data = facade.NET_GAFIS_COL_GetByKey(v62Config.latentTable.dbId.toShort, v62Config.latentTable.tableId.toShort, cardId, g_stCN.stLAdm.pszGroupName)
+    if(data != null && data.length > 0){
+      new String(data)
+    }else{
+      ""
+    }
+  }
+
 }
