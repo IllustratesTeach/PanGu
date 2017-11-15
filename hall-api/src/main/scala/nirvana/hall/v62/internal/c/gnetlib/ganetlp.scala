@@ -1,7 +1,8 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
-import nirvana.hall.c.services.gloclib.galoclp.GCASEINFOSTRUCT
+import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_LPGROUPSTRUCT, GCASEINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocndef.GNETANSWERHEADOBJECT
 import nirvana.hall.v62.internal.{AncientClientSupport, NoneResponse}
 
@@ -99,5 +100,56 @@ trait ganetlp {
     validateResponse(channel,response)
 
     response.nReturnValue > 0
+  }
+
+  /**
+    * 获取现场关联信息
+    * @param nDBID
+    * @param nTableID
+    * @param pstRec
+    * @param nOption
+    */
+  def NET_GAFIS_LPGROUP_Get(nDBID:Short,nTableID:Short, pstRec: GAFIS_LPGROUPSTRUCT, nOption:Int = 0): Unit ={
+    NET_GAFIS_LPGROUP_Op(nDBID, nTableID, pstRec, nOption, OP_LPGROUP_GET)
+  }
+
+  /**
+    * normallp_lpgroup表（现场关联信息）操作
+    * @param nDBID
+    * @param nTID
+    * @param pstRec
+    * @param nOption
+    * @param nOp
+    */
+  def NET_GAFIS_LPGROUP_Op(nDBID:Short, nTID:Short,pstRec:GAFIS_LPGROUPSTRUCT, nOption:Int, nOp:Int): Unit = executeInChannel{ pstCon=>
+    val pReq = createRequestHeader
+    val pAns = new GNETANSWERHEADOBJECT
+    NETREQ_SetOption(pReq, nOption)
+    NETREQ_SetDBID(pReq, nDBID)
+    NETREQ_SetTableID(pReq, nTID)
+    NETREQ_SetOpClass(pReq, OP_CLASS_LPLIB)
+    NETREQ_SetOpCode(pReq, nOp)
+    nOp match {
+      case OP_LPGROUP_ADD | OP_LPGROUP_UPDATE =>
+        NETOP_SENDREQ(pstCon, pReq)
+        GAFIS_NETSCR_SendLPGroup(pstCon, pAns, pstRec)
+        NETOP_RECVANS(pstCon, pAns)
+        validateResponse(pstCon, pAns)
+      case OP_LPGROUP_DEL =>
+        NETOP_SENDREQ(pstCon, pReq)
+        val groupId = new GAKEYSTRUCT
+        groupId.szKey = pstRec.szGroupID
+        NETOP_SENDDATA(pstCon, groupId)
+        NETOP_RECVANS(pstCon, pAns)
+      case OP_LPGROUP_GET =>
+        NETOP_SENDREQ(pstCon, pReq)
+        val groupId = new GAKEYSTRUCT
+        groupId.szKey = pstRec.szGroupID
+        NETOP_SENDDATA(pstCon, groupId)
+        NETOP_RECVANS(pstCon, pAns)
+        validateResponse(pstCon, pAns)
+        GAFIS_NETSCR_RecvLPGroup(pstCon, pAns, pstRec)
+    }
+
   }
 }
