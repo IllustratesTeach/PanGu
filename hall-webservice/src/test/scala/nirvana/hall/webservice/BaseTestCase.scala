@@ -12,13 +12,15 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.services.GetPKIDServiceImpl
+import nirvana.hall.v62.services.service.GetPKIDService
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.haixin.{StrategyServiceImpl, WsHaiXinFingerServiceImpl}
 import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TenPrinterExportServiceImpl}
-import nirvana.hall.webservice.internal.bjwcsy.{Union4pfmipCronService, WsFingerServiceImpl}
 import nirvana.hall.webservice.internal.xingzhuan.{FetchFPTServiceImpl, LocalCheckinServiceImpl}
+import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import nirvana.hall.webservice.services.{SendQueryService, TenPrinterExportService}
-import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import nirvana.hall.webservice.services.xingzhuan.{FetchFPTService, LocalCheckinService}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
@@ -40,13 +42,13 @@ class BaseTestCase {
   def setup: Unit ={
     val modules = Seq[String](
       //v62
-//      "nirvana.hall.v62.LocalV62ServiceModule",
-//      "nirvana.hall.v62.LocalV62DataSourceModule",
-//      "nirvana.hall.webservice.TestV62Module",
+      "nirvana.hall.v62.LocalV62ServiceModule",
+      "nirvana.hall.v62.LocalV62DataSourceModule",
+      "nirvana.hall.webservice.TestV62Module",
       //v70
-      "nirvana.hall.webservice.TestV70Module",
-      "nirvana.hall.v70.LocalV70ServiceModule",
-      "nirvana.hall.v70.LocalDataSourceModule",
+//      "nirvana.hall.webservice.TestV70Module",
+//      "nirvana.hall.v70.LocalV70ServiceModule",
+//      "nirvana.hall.v70.LocalDataSourceModule",
 
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
@@ -84,11 +86,13 @@ object TestWebserviceModule{
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
-    binder.bind(classOf[WsFingerService], classOf[WsFingerServiceImpl]).withSimpleId()
-    binder.bind(classOf[FetchFPTService],classOf[FetchFPTServiceImpl])
-    binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
-    binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
-    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])
+    binder.bind(classOf[StrategyService], classOf[StrategyServiceImpl])
+    binder.bind(classOf[WsHaiXinFingerService], classOf[WsHaiXinFingerServiceImpl]).withSimpleId()
+    //=======刑专测试时，加载============//
+//    binder.bind(classOf[FetchFPTService],classOf[FetchFPTServiceImpl])
+//    binder.bind(classOf[TenPrinterExportService],classOf[TenPrinterExportServiceImpl])
+//    binder.bind(classOf[SendQueryService],classOf[SendQueryServiceImpl])
+//    binder.bind(classOf[LocalCheckinService],classOf[LocalCheckinServiceImpl])
   }
 }
 object TestV62Module{

@@ -48,6 +48,7 @@ object gaqryqueConverter extends LoggerSupport{
     queryStruct.stSimpQry.szKeyID = matchTask.getMatchId
     queryStruct.stSimpQry.nMaxCandidateNum = matchTask.getTopN  //最大候选个数
     queryStruct.stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
+    queryStruct.stSimpQry.nStatus = matchTask.getStatus.toByte
 
     //flag
     matchTask.getMatchType match {
@@ -85,6 +86,7 @@ object gaqryqueConverter extends LoggerSupport{
     queryStruct.nQryInfoLen = queryStruct.pstInfo_Data.getDataSize
 
     queryStruct.stSimpQry.nRmtFlag = gaqryque.GAQRY_RMTFLAG_FROMREMOTE.toByte //远程查询
+    //queryStruct.stSimpQry.nRmtState =  gaqryque.GAQRY_RMTFLAG_LOCAL.toByte //标记任务是本地还是远程
     queryStruct.stSimpQry.szUserName = matchTask.getCommitUser //提交用户
     if(matchTask.getQueryid.nonEmpty){
       queryStruct.stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(matchTask.getQueryid.toLong) //远程查询ID
@@ -259,8 +261,13 @@ object gaqryqueConverter extends LoggerSupport{
       pstCandData.foreach{ candData =>
         val cand = matchResult.addCandidateResultBuilder()
         cand.setObjectId(candData.szKey)
-        cand.setPos(candData.nIndex)
+        var pos = candData.nIndex.toInt
+        if(pos > 20){//gafis6.2中平指指位[21,30],所以这里-10
+          pos -= 10
+        }
+        cand.setPos(pos)
         cand.setDbid(candData.nDBID.toString)
+        cand.setMatchFinishTime(DateConverter.convertAFISDateTime2String(candData.tFinishTime))
         cand.setScore(candData.nScore)
         if(maxScore < candData.nScore)
           maxScore = candData.nScore
@@ -402,10 +409,15 @@ object gaqryqueConverter extends LoggerSupport{
         gaCand.fromStreamReader(buffer)
         val matchResultObject = MatchResultObject.newBuilder()
         matchResultObject.setObjectId(gaCand.szKey)
-        matchResultObject.setPos(gaCand.nIndex)
+        var pos = gaCand.nIndex.toInt
+        if(pos > 10){
+          pos += 10
+        }
+        matchResultObject.setPos(pos)
         matchResultObject.setScore(gaCand.nScore)
         matchResultObject.setDbid(gaCand.nDBID.toString)     //后来加的，2016.12.5
-        result += matchResultObject.build()
+        matchResultObject.setMatchFinishTime(DateConverter.convertAFISDateTime2String(gaCand.tFinishTime))
+        result += matchResultObject.build
       }
       result
     }else{

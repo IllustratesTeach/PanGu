@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 
@@ -10,13 +11,33 @@ import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest
 trait MatchRelationService {
 
   /**
-   * 获取比对关系
-    *
+    * 获取比对关系
     * @param request
-   * @return
-   */
+    * @return
+    */
   def getMatchRelation(request: MatchRelationGetRequest): MatchRelationGetResponse
 
+  /**
+    * 获取重卡比中关系
+    * @param cardId
+    * @return
+    */
+  def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage]
+
+  /**
+    * 获取正查或倒查比中关系
+    * @param cardId
+    * @param isLatent
+    * @return
+    */
+  def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage]
+
+  /**
+    * 获取串查比中关系
+    * @param cardId
+    * @return
+    */
+  def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage]
 
   /**
     * 获取比对关系

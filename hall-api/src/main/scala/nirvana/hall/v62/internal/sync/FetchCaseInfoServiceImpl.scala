@@ -35,5 +35,5 @@ class FetchCaseInfoServiceImpl (implicit dataSource: DataSource) extends SyncDat
     * @param readStrategy
     * @return
     */
-  override def validateByReadStrategy(caseInfo: Case, readStrategy: String): Boolean = ???
+  override def validateByReadStrategy(caseInfo: Case, readStrategy: String): Boolean = {true}
 }

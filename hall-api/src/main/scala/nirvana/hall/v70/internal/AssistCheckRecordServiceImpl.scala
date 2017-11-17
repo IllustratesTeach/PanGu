@@ -1,9 +1,12 @@
 package nirvana.hall.v70.internal
 
+import java.sql.Timestamp
 import java.util.UUID
 import javax.persistence.EntityManager
+
 import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.v70.jpa.HallAssistCheck
+
 import scala.collection.mutable.{HashMap, ListBuffer}
 import scala.collection.JavaConverters._
 
@@ -115,11 +118,21 @@ class AssistCheckRecordServiceImpl(entityManager: EntityManager) extends AssistC
     }
   }
 
-
-
   override def saveErrorReport(serviceid: String, typ: String, status: Long, msg: String): Unit = ???
 
-  override def updateAssistcheckLT(queryId: String, oraSid: String, caseId: String, id: String, status:Int, msg:String): Unit = ???
+  override def updateAssistcheckLT(queryId: String, oraSid: String, caseId: String, id: String, status: Int, msg: String): Unit = ???
 
-  override def updateAssistcheckTT(queryId: String, oraSid: String, personId: String, id: String, status:Int, msg:String): Unit = ???
+  override def updateXcTask(id: String, status: Int, errorinfo: String, detail: String, serviceid: String, custom2: String): Unit = ???
+
+  override def updateXcTask(id: String, status: Int, errorinfo: String, detail: String, serviceid: String, custom2: String, custom4: String): Unit = ???
+
+  override def updateXcTask(id: String, executetimes: Int): Unit = ???
+
+  override def updateAssistcheckTT(queryId: String, oraSid: String, personId: String, id: String, status: Int, msg: String): Unit = ???
+
+  override def getOraUuid(queryId: Long): String = ???
+
+  override def saveXcQuery(id: String, taskid: String, fingerid: String, typ: Int, status: Int, custom1: String, custom2: String, detail: String, errorinfo: String, date: Timestamp): Unit = ???
+
+  override def updateXcQuery(uuid: String, serviceid: String, fingerid: String, typ: Int, status: Int, oraSid: String, queryId: String, errorinfo: String, date: Timestamp): Unit = ???
 }

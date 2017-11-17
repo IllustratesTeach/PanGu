@@ -3,13 +3,14 @@ package nirvana.hall.v70.internal
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
-import nirvana.hall.protocol.fpt.MatchRelationProto.{MatchRelation, MatchRelationTLAndLT, MatchRelationTT, MatchSysInfo}
+import nirvana.hall.protocol.fpt.MatchRelationProto._
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisCheckinInfo}
+import nirvana.hall.v70.jpa.GafisCheckinInfo
 
 
 /**
@@ -144,4 +145,29 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     val gafisCheckinInfo = GafisCheckinInfo.find(breakId)
     ProtobufConverter.convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo)
   }
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param cardId
+    * @return
+    */
+  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = ???
+
+  /**
+    * 获取正查或倒查比中关系
+    *
+    * @param cardId
+    * @param isLatent
+    * @return
+    */
+override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
+
+  /**
+    * 获取串查比中关系
+    *
+    * @param cardId
+    * @return
+    */
+  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
 }

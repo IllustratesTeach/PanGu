@@ -52,7 +52,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
       FPTFileBuilder.convertTPCard2Logic02Res(tpCard.build())
     }else{
-      null
+      new Logic02Rec
     }
 
   }
@@ -63,49 +63,36 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       val caseInfo = caseInfoService.getCaseInfo(caseId)
       val fingerIdCount = caseInfo.getStrFingerIDList.size
       for (i <- 0 until fingerIdCount) {
-        val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
-        lpCardList.append(lPCard)
+        try{
+          val lPCard = lPCardService.getLPCard(caseInfo.getStrFingerID(i))
+          //有可能现场没有图像，为null
+          if(lPCard != null){
+            lpCardList.append(lPCard)
+          }
+        }catch{
+          case e:Exception =>
+        }
       }
 
       FPTFileBuilder.convertCaseAndLPCard2Logic03Rec(caseInfo, lpCardList)
     }else{
-      null
+      new Logic03Rec
     }
   }
 
   @Transactional
-  override def addLogic02Res(logic02Rec: Logic02Rec): Unit = {
-    val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
-    //图像转换和特征提取
-    val iter = tpCardBuilder.getBlobBuilderList.iterator()
-    while(iter.hasNext){
-      val blob = iter.next()
-      if(blob.getType == ImageType.IMAGETYPE_FINGER){
-        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-        if(gafisImage.stHead.bIsCompressed > 0){
-          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-          val mntData = extractByGAFISIMG(originalImage, false)
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+  override def addLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None): Unit = {
+    tPCardService.addTPCard(getTpCardBuilder(logic02Rec).build,dbId)
+  }
 
-          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE){
-            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
-          }else{
-            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
-            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-          }
-        }else{
-          val mntData = extractByGAFISIMG(gafisImage, false)
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-        }
-      }
-    }
+  @Transactional
+  override def addLogic02ResHXZC(logic02Rec: Logic02Rec,dbId: Option[String] = None): Unit = {
+    tPCardService.addTPCardHXZC(getTpCardBuilder(logic02Rec).build,dbId)
+  }
 
-    tPCardService.addTPCard(tpCardBuilder.build())
+  @Transactional
+  override def updateLogic02Res(logic02Rec: Logic02Rec,dbId: Option[String] = None): Unit = {
+    tPCardService.updateTPCard(getTpCardBuilder(logic02Rec).build,dbId)
   }
 
   @Transactional
@@ -123,6 +110,25 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
         blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
       }
       lPCardService.addLPCard(lpCardBuiler.build())
+    }
+  }
+
+  @Transactional
+  override def addLogic03ResForShangHai(logic03Rec: Logic03Rec): Unit = {
+    val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
+    if(caseInfoService.isExist(logic03Rec.caseId)){
+      caseInfoService.updateCaseInfo(caseInfo)
+    }else{
+      caseInfoService.addCaseInfo(caseInfo)
+    }
+    val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
+    lPCardList.foreach{lPCard =>
+      val lpCardBuiler = lPCard.toBuilder
+      if(lPCardService.isExist(logic03Rec.cardId)){
+        lPCardService.updateLPCard(lpCardBuiler.build)
+      }else{
+        lPCardService.addLPCard(lpCardBuiler.build)
+      }
     }
   }
 
@@ -145,9 +151,17 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
     val logic04Rec = new Logic04Rec
     logic04Rec.systemType = "1900"
-    logic04Rec.caseId = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2).length==22){
+      logic04Rec.caseId = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    }else{
+      logic04Rec.caseId = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2)
+    }
     logic04Rec.seqNo = gafisMatchInfo.code.substring(gafisMatchInfo.code.length-2)
-    logic04Rec.personId = "R"+gafisMatchInfo.tcode
+    if(gafisMatchInfo.tcode.length()==22){
+      logic04Rec.personId = "R"+gafisMatchInfo.tcode
+    }else{
+      logic04Rec.personId = gafisMatchInfo.tcode
+    }
     logic04Rec.fgp = gafisMatchInfo.fgp
     logic04Rec.capture = "0" //7.0web项目直接写的是0,有待确认
     //比中类型(捺印查重(TT):0;  捺印倒查(TL):1;  现场查案(LT):2;  现场串查(LL):3)
@@ -182,8 +196,16 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
     val logic05Rec = new Logic05Rec
     logic05Rec.systemType = "1900"
-    logic05Rec.personId1 = "R"+gafisMatchInfo.code
-    logic05Rec.personId2 = "R"+gafisMatchInfo.tcode
+    if(gafisMatchInfo.code.length()==22){
+      logic05Rec.personId1 = "R"+gafisMatchInfo.code
+    }else{
+      logic05Rec.personId1 = gafisMatchInfo.code
+    }
+    if(gafisMatchInfo.tcode.length()==22){
+      logic05Rec.personId2 = "R"+gafisMatchInfo.tcode
+    }else{
+      logic05Rec.personId2 = gafisMatchInfo.tcode
+    }
     logic05Rec.matchUnitCode = gafisMatchInfo.registerOrg
     logic05Rec.matchName = gafisMatchInfo.matchName
     logic05Rec.matcher = gafisMatchInfo.registerUser
@@ -197,9 +219,17 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
     val logic06Rec = new Logic06Rec
     logic06Rec.systemType = "1900"
-    logic06Rec.caseId1 = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2).length==22){
+      logic06Rec.caseId1 = "A"+gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    }else{
+      logic06Rec.caseId1 = gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2)
+    }
     logic06Rec.seqNo1 = gafisMatchInfo.code.substring(gafisMatchInfo.code.length - 2)
-    logic06Rec.caseId2 = "A"+gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    if(gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2).length==22){
+      logic06Rec.caseId2 = "A"+gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    }else{
+      logic06Rec.caseId2 = gafisMatchInfo.tcode.substring(0,gafisMatchInfo.tcode.length - 2)
+    }
     logic06Rec.seqNo2 = gafisMatchInfo.tcode.substring(gafisMatchInfo.tcode.length - 2)
     logic06Rec.matchUnitCode = gafisMatchInfo.registerOrg
     logic06Rec.matchName = gafisMatchInfo.matchName
@@ -207,5 +237,49 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     logic06Rec.matchDate = gafisMatchInfo.registerTime
     logic06Rec.head.fileLength = logic06Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString
     logic06Rec
+  }
+
+  /**
+    *
+    * @param logic02Rec
+    * @return
+    */
+  private def  getTpCardBuilder(logic02Rec: Logic02Rec) = {
+    val tpCardBuilder = FPTConverter.convertLogic02Rec2TPCard(logic02Rec).toBuilder
+    //图像转换和特征提取
+    val iter = tpCardBuilder.getBlobBuilderList.iterator()
+    while(iter.hasNext){
+      val blob = iter.next()
+      if(blob.getType == ImageType.IMAGETYPE_FINGER){
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+        if(gafisImage.stHead.bIsCompressed > 0){
+          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+          val mntData = try{
+            extractByGAFISIMG(originalImage, false)
+          }catch{
+            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+          }
+
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+
+          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+          }else{
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+          }
+        }else{
+          val mntData = extractByGAFISIMG(gafisImage, false)
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+        }
+      }
+    }
+    tpCardBuilder
   }
 }

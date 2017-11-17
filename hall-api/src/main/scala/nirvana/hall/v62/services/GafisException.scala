@@ -61,13 +61,25 @@ class GafisException(gafisError:GAFISERRDATSTRUCT) extends RuntimeException{
     val message = getSimpleMessage
     val sb = new StringBuilder
     sb.append(message)
-    /*
+
     if(gafisError.bnAFISErrData != null)
       sb.append("\n \t ErrorData: ").append(new String(gafisError.bnAFISErrData, AncientConstants.GBK_ENCODING).trim)
 
     if(gafisError.szFileName != null)
       sb.append( "\n" +"\tat %s:%s".format(gafisError.szFileName,gafisError.nLineNum))
-    */
+
+    if(gafisError.szSysErrStr != null){
+      sb.append( "\n" +"\tat %s:%s".format(gafisError.szSysErrStr,gafisError.nLineNum))
+    }
+
+    if(gafisError.stFileList != null && gafisError.stFileList.size > 0){
+      gafisError.stFileList.map{
+         m =>
+           sb.append( "\n" +"\tat %s:%s".format(m.sFileName,m.nLineNum))
+      }
+      //sb.append( "\n" +"\tat %s:%s".format(gafisError.szSysErrStr,gafisError.nLineNum))
+    }
+
     sb.toString()
   }
   def getFullMessage: String = {

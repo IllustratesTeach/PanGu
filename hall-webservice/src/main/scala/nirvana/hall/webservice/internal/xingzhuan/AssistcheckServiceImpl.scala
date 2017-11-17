@@ -66,16 +66,11 @@ class AssistcheckServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            for(i <- 0 to dataHandlers.size - 1){
-              val dataHandler = dataHandlers(i)
-              if(dataHandler != null) {
-                //保存fpt更新状态
-                status = 1
-                val fptPath:String = FPTUtil.saveFPTPath(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
-                assistCheckRecordService.updateAssistcheck(status, id, fptPath)
-              }
-            }
+            val dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            //保存fpt更新状态
+            status = 1
+            val fptPath:String = FPTUtil.saveFPTPath(HallWebserviceConstants.XCHitResult, dataHandler.getInputStream,id, status,config,dataSource)
+            assistCheckRecordService.updateAssistcheck(status, id, fptPath)
 
           } catch {
             case e:Exception=>

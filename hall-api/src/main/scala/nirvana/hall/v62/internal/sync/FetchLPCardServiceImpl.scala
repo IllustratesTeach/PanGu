@@ -34,5 +34,5 @@ class FetchLPCardServiceImpl (implicit dataSource: DataSource) extends SyncDataF
     * @param readStrategy
     * @return
     */
-  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = ???
+  override def validateByReadStrategy(lPCard: LPCard, readStrategy: String): Boolean = {true}
 }

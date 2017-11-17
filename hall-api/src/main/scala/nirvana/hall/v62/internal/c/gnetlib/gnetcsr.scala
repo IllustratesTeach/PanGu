@@ -662,6 +662,25 @@ trait gnetcsr {
 
   }*/
 
+  protected def GAFIS_NETSCR_RecvLPGroup(pstCon: ChannelOperator, pAns: GNETANSWERHEADOBJECT, pRec: GAFIS_LPGROUPSTRUCT): Unit ={
+    NETOP_RECVDATA(pstCon, pRec)
+    NETANS_SetRetVal(pAns, 1)
+    NETOP_SENDANS(pstCon, pAns)
+    val n = pRec.nKeyListLength / new GAFIS_LPGROUPENTRY().toByteArray().length
+    if(n > 0){
+      pRec.pstKeyList_Data = Range(0, n).map(x=>new GAFIS_LPGROUPENTRY).toArray
+      NETOP_RECVDATA(pstCon, pRec.pstKeyList_Data)
+    }
+  }
+
+  protected def GAFIS_NETSCR_SendLPGroup(pstCon: ChannelOperator, pAns: GNETANSWERHEADOBJECT, pRec: GAFIS_LPGROUPSTRUCT): Unit ={
+    pRec.nKeyListLength = pRec.pstKeyList_Data.length * new GAFIS_LPGROUPENTRY().toByteArray().length
+    NETOP_SENDDATA(pstCon, pRec)
+    NETOP_RECVANS(pstCon, pAns)
+    validateResponse(pstCon, pAns)
+    NETOP_SENDDATA(pstCon, pRec.pstKeyList_Data)
+  }
+
   /**
     * 是否新版本验证, 这是使用pAns验证，免去了UTIL_GNETLIB_SetNewClientVersionFlag
     * @param pAns

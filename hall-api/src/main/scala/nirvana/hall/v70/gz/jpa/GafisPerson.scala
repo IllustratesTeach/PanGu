@@ -141,8 +141,8 @@ class GafisPerson extends ActiveRecord {
   var ipaddress: java.lang.String = _
   @Column(name = "GATHERER_ID", length = 32)
   var gathererId: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "GATHER_DATE", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "GATHER_DATE", length = 14)
   var gatherDate: java.util.Date = _
   @Column(name = "GATHER_TYPE_ID", length = 32)
   var gatherTypeId: java.lang.String = _
@@ -155,24 +155,24 @@ class GafisPerson extends ActiveRecord {
   @Column(name = "TASK_SOURCE", length = 2)
   var taskSource: java.lang.String = _
   @Temporal(TemporalType.DATE)
-  @Column(name = "RECEIVE_TIME", length = 8)
+  @Column(name = "RECEIVE_TIME", length = 14)
   var receiveTime: java.util.Date = _
   @Column(name = "ISRETURN", length = 1)
   var isreturn: java.lang.String = _
   @Temporal(TemporalType.DATE)
-  @Column(name = "RETURN_TIME", length = 8)
+  @Column(name = "RETURN_TIME", length = 14)
   var returnTime: java.util.Date = _
   @Column(name = "ANNEX", length = 1500)
   var annex: java.lang.String = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 23)
   var inputtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 23)
   var modifiedtime: java.util.Date = _
   @Column(name = "DELETAG", length = 1)
   var deletag: java.lang.String = _
@@ -211,8 +211,8 @@ class GafisPerson extends ActiveRecord {
   var gatherdepartcode: java.lang.String = _
   @Column(name = "GATHERUSERID", length = 50)
   var gatheruserid: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "GATHER_FINGER_TIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "GATHER_FINGER_TIME", length = 23)
   var gatherFingerTime: java.util.Date = _
   @Column(name = "IS_SEND_TL", precision = 65535, scale = 32767)
   var isSendTl: java.math.BigDecimal = _
@@ -221,14 +221,14 @@ class GafisPerson extends ActiveRecord {
   @Column(name = "PUSH_STATUS", length = 1)
   var pushStatus: java.lang.String = _
   @Temporal(TemporalType.DATE)
-  @Column(name = "PUSH_DATE", length = 8)
+  @Column(name = "PUSH_DATE", length = 14)
   var pushDate: java.util.Date = _
   @Column(name = "REMARK", length = 2000)
   var remark: java.lang.String = _
   @Column(name = "DATA_SOURCES", precision = 1, scale = 0)
-  var dataSources: java.lang.Boolean = _
+  var dataSources: java.lang.String = _
   @Column(name = "FINGERSHOW_STATUS", precision = 1, scale = 0)
-  var fingershowStatus: java.lang.Boolean = _
+  var fingershowStatus: java.lang.String = _
   @Column(name = "CITY_CODE", length = 4)
   var cityCode: java.lang.String = _
   @Temporal(TemporalType.DATE)
@@ -238,8 +238,8 @@ class GafisPerson extends ActiveRecord {
   var fptGatherDepartCode: java.lang.String = _
   @Column(name = "FPT_GATHER_DEPART_NAME", length = 90)
   var fptGatherDepartName: java.lang.String = _
-  @Column(name = "SID", precision = 65535, scale = 32767)
-  var sid: java.math.BigDecimal = _
+  @Column(name = "SID")
+  var sid: java.lang.Long = _
   @Column(name = "BLOW_CODE", length = 6)
   var blowCode: java.lang.String = _
   @Column(name = "BLOW_STREET", length = 60)
@@ -262,7 +262,7 @@ class GafisPerson extends ActiveRecord {
   var recordmark: java.lang.Character = _
   @Column(name = "RECORDSITUATION", length = 3072)
   var recordsituation: java.lang.String = _
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "VALID_DATE", length = 8)
   var validDate: java.util.Date = _
   @Temporal(TemporalType.DATE)
@@ -342,7 +342,7 @@ class GafisPerson extends ActiveRecord {
     this.personid = personid
   }
 
-  def this(personid: java.lang.String, idcardno: java.lang.String, name: java.lang.String, spellname: java.lang.String, usedname: java.lang.String, usedspell: java.lang.String, aliasname: java.lang.String, aliasspell: java.lang.String, sexCode: java.lang.String, nativeplaceCode: java.lang.String, nationCode: java.lang.String, ifmarryCode: java.lang.String, toneCode: java.lang.String, tone: java.lang.String, birthdayst: java.util.Date, birthdayed: java.util.Date, birthCode: java.lang.String, birthStreet: java.lang.String, birthdetail: java.lang.String, door: java.lang.String, doorStreet: java.lang.String, doordetail: java.lang.String, address: java.lang.String, addressStreet: java.lang.String, addressdetail: java.lang.String, cultureCode: java.lang.String, sourceincomeCode: java.lang.String, faithCode: java.lang.String, haveemployment: java.lang.String, jobCode: java.lang.String, headship: java.lang.String, employunit: java.lang.String, employaddress: java.lang.String, otherspecialty: java.lang.String, specialidentityCode: java.lang.String, politicsCode: java.lang.String, istransientpop: java.lang.String, istempregist: java.lang.String, havepermit: java.lang.String, haveresidence: java.lang.String, isservice: java.lang.String, specialgroupCode: java.lang.String, haveseparation: java.lang.String, ismigrantworker: java.lang.String, nameofschool: java.lang.String, istraining: java.lang.String, havecertificate: java.lang.String, staturest: java.lang.Short, avoirdupois: java.math.BigDecimal, footsize: java.math.BigDecimal, shoelength: java.math.BigDecimal, bodilyformCode: java.lang.String, faceformCode: java.lang.String, iseyeglass: java.lang.String, shoesize: java.lang.Short, bloodtypeCode: java.lang.String, gatherOrgCode: java.lang.String, ipaddress: java.lang.String, gathererId: java.lang.String, gatherDate: java.util.Date, gatherTypeId: java.lang.String, status: java.lang.String, isfingerrepeat: java.lang.String, fingerrepeatno: java.lang.String, taskSource: java.lang.String, receiveTime: java.util.Date, isreturn: java.lang.String, returnTime: java.util.Date, annex: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, schedule: java.lang.String, approval: java.lang.String, dnaCode: java.lang.String, gatherCategory: java.lang.String, personCategory: java.lang.String, auditor: java.lang.String, auditedtime: java.util.Date, isregather: java.lang.String, gatherFingerMode: java.lang.String, caseName: java.lang.String, caseClasses: java.lang.String, reason: java.lang.String, gatherFingerNum: java.math.BigDecimal, fingerRemark: java.lang.String, deprtmac: java.lang.String, gatherdepartcode: java.lang.String, gatheruserid: java.lang.String, gatherFingerTime: java.util.Date, isSendTl: java.math.BigDecimal, caseBriefContents: java.lang.String, pushStatus: java.lang.String, pushDate: java.util.Date, remark: java.lang.String, dataSources: java.lang.Boolean, fingershowStatus: java.lang.Boolean, cityCode: java.lang.String, delayDeadline: java.util.Date, fptGatherDepartCode: java.lang.String, fptGatherDepartName: java.lang.String, sid: java.math.BigDecimal, blowCode: java.lang.String, blowStreet: java.lang.String, blowDetail: java.lang.String, blowLongitude: java.lang.String, blowLatitude: java.lang.String, blowEastwest: java.lang.Character, blowNorthsouth: java.lang.Character, seq: java.math.BigDecimal, cardid: java.lang.String, recordmark: java.lang.Character, recordsituation: java.lang.String, validDate: java.util.Date, arriveLocalDate: java.util.Date, leaveLocalDate: java.util.Date, dbSource: java.lang.String, dbSourceDis: java.lang.String, jobDes: java.lang.String, isXjssmz: java.lang.Character, passportNum: java.lang.String, countryCode: java.lang.String, foreignName: java.lang.String, passportValidDate: java.util.Date, visaPlace: java.lang.String, passportType: java.lang.String, visaDate: java.util.Date, assistLevel: java.lang.String, assistBonus: java.lang.String, assistPurpose: java.lang.String, assistRefPerson: java.lang.String, assistRefCase: java.lang.String, assistValidDate: java.lang.String, assistExplain: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistContacts: java.lang.String, assistNumber: java.lang.String, assistApproval: java.lang.String, assistSign: java.lang.String, gatherdepartname: java.lang.String, gatherusername: java.lang.String, caseNumber: java.lang.String, detainFlag: java.lang.String, reuseStatus: java.lang.String, oldPersonid: java.lang.String) {
+  def this(personid: java.lang.String, idcardno: java.lang.String, name: java.lang.String, spellname: java.lang.String, usedname: java.lang.String, usedspell: java.lang.String, aliasname: java.lang.String, aliasspell: java.lang.String, sexCode: java.lang.String, nativeplaceCode: java.lang.String, nationCode: java.lang.String, ifmarryCode: java.lang.String, toneCode: java.lang.String, tone: java.lang.String, birthdayst: java.util.Date, birthdayed: java.util.Date, birthCode: java.lang.String, birthStreet: java.lang.String, birthdetail: java.lang.String, door: java.lang.String, doorStreet: java.lang.String, doordetail: java.lang.String, address: java.lang.String, addressStreet: java.lang.String, addressdetail: java.lang.String, cultureCode: java.lang.String, sourceincomeCode: java.lang.String, faithCode: java.lang.String, haveemployment: java.lang.String, jobCode: java.lang.String, headship: java.lang.String, employunit: java.lang.String, employaddress: java.lang.String, otherspecialty: java.lang.String, specialidentityCode: java.lang.String, politicsCode: java.lang.String, istransientpop: java.lang.String, istempregist: java.lang.String, havepermit: java.lang.String, haveresidence: java.lang.String, isservice: java.lang.String, specialgroupCode: java.lang.String, haveseparation: java.lang.String, ismigrantworker: java.lang.String, nameofschool: java.lang.String, istraining: java.lang.String, havecertificate: java.lang.String, staturest: java.lang.Short, avoirdupois: java.math.BigDecimal, footsize: java.math.BigDecimal, shoelength: java.math.BigDecimal, bodilyformCode: java.lang.String, faceformCode: java.lang.String, iseyeglass: java.lang.String, shoesize: java.lang.Short, bloodtypeCode: java.lang.String, gatherOrgCode: java.lang.String, ipaddress: java.lang.String, gathererId: java.lang.String, gatherDate: java.util.Date, gatherTypeId: java.lang.String, status: java.lang.String, isfingerrepeat: java.lang.String, fingerrepeatno: java.lang.String, taskSource: java.lang.String, receiveTime: java.util.Date, isreturn: java.lang.String, returnTime: java.util.Date, annex: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, schedule: java.lang.String, approval: java.lang.String, dnaCode: java.lang.String, gatherCategory: java.lang.String, personCategory: java.lang.String, auditor: java.lang.String, auditedtime: java.util.Date, isregather: java.lang.String, gatherFingerMode: java.lang.String, caseName: java.lang.String, caseClasses: java.lang.String, reason: java.lang.String, gatherFingerNum: java.math.BigDecimal, fingerRemark: java.lang.String, deprtmac: java.lang.String, gatherdepartcode: java.lang.String, gatheruserid: java.lang.String, gatherFingerTime: java.util.Date, isSendTl: java.math.BigDecimal, caseBriefContents: java.lang.String, pushStatus: java.lang.String, pushDate: java.util.Date, remark: java.lang.String, dataSources: java.lang.String, fingershowStatus: java.lang.String, cityCode: java.lang.String, delayDeadline: java.util.Date, fptGatherDepartCode: java.lang.String, fptGatherDepartName: java.lang.String, sid: java.lang.Long, blowCode: java.lang.String, blowStreet: java.lang.String, blowDetail: java.lang.String, blowLongitude: java.lang.String, blowLatitude: java.lang.String, blowEastwest: java.lang.Character, blowNorthsouth: java.lang.Character, seq: java.math.BigDecimal, cardid: java.lang.String, recordmark: java.lang.Character, recordsituation: java.lang.String, validDate: java.util.Date, arriveLocalDate: java.util.Date, leaveLocalDate: java.util.Date, dbSource: java.lang.String, dbSourceDis: java.lang.String, jobDes: java.lang.String, isXjssmz: java.lang.Character, passportNum: java.lang.String, countryCode: java.lang.String, foreignName: java.lang.String, passportValidDate: java.util.Date, visaPlace: java.lang.String, passportType: java.lang.String, visaDate: java.util.Date, assistLevel: java.lang.String, assistBonus: java.lang.String, assistPurpose: java.lang.String, assistRefPerson: java.lang.String, assistRefCase: java.lang.String, assistValidDate: java.lang.String, assistExplain: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistContacts: java.lang.String, assistNumber: java.lang.String, assistApproval: java.lang.String, assistSign: java.lang.String, gatherdepartname: java.lang.String, gatherusername: java.lang.String, caseNumber: java.lang.String, detainFlag: java.lang.String, reuseStatus: java.lang.String, oldPersonid: java.lang.String) {
     this()
     this.personid = personid
     this.idcardno = idcardno

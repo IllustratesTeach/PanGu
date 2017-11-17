@@ -15,8 +15,6 @@ import nirvana.hall.webservice.util.WebServicesClient_AssistCheck
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
   * 上报协查比对关系
   */
@@ -79,41 +77,38 @@ class UploadCheckinServiceImpl(config: HallWebserviceConfig,
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
             val typ:String = getType(queryType)
-            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            for(i <- 0 to dataHandlers.size - 1){
-              val dataHandler = dataHandlers(i)
-              if(dataHandler != null) {
-                //debug保存 fpt
-                if(isDeubg != null && isDeubg == "true") {
-                  saveFpt(dataHandler.getInputStream,queryId)
-                }
-                val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
-                methodArgs(0) = username
-                methodArgs(1) = password
-                methodArgs(2) = dataHandler
-                val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setLocalHitResult")
-                //入库成功
-                if (resultCode == 1) {
-                  status = 1
-                  info("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
-                  assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
-                  info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
-                  //重复数据
-                } else if (resultCode == 0) {
-                  status = 0
-                  error("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                  assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
-                  info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
-                } else {
-                  status = -1
-                  info("uploadCheckin fail! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
-                }
-              } else {
-                //未比中
-                status = 3
+            val dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            if(dataHandler != null) {
+              //debug保存 fpt
+              if(isDeubg != null && isDeubg == "true") {
+                saveFpt(dataHandler.getInputStream,queryId)
+              }
+              val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
+              methodArgs(0) = username
+              methodArgs(1) = password
+              methodArgs(2) = dataHandler
+              val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setLocalHitResult")
+              //入库成功
+              if (resultCode == 1) {
+                status = 1
+                info("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
                 assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
                 info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
+                //重复数据
+              } else if (resultCode == 0) {
+                status = 0
+                error("call setLocalHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
+                info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
+              } else {
+                status = -1
+                info("uploadCheckin fail! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
               }
+            } else {
+              //未比中
+              status = 3
+              assistCheckRecordService.saveXcReport(oraUuid,typ,status,null)
+              info("uploadCheckin success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " status:" + status )
             }
 
           } catch {

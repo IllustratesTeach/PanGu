@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
-import nirvana.hall.api.jpa.{HallFetchConfig}
+import nirvana.hall.api.internal.{ DateConverter}
+import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.api.services.sync.FetchQueryService
-import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -59,11 +59,11 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
                                 s"FROM NORMALQUERY_QUERYQUE  t " +
                                 s"WHERE  NOT EXISTS (SELECT 1 " +
                                                     s"FROM HALL_READ_RECORD p " +
-                                                    s"WHERE p.orasid=t.ora_sid)"
+                                                    s"WHERE p.orasid=t.ora_sid) AND t.rmtflag=0 "
     if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
       sql ++= s"  AND t.ora_createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
     }
-    sql ++= s" ) WHERE  ROWNUM <=?"
+    sql ++= s" ORDER BY t.ora_createtime ASC ) WHERE  ROWNUM <=?"
     JdbcDatabase.queryWithPsSetter(sql.toString) {ps =>
       ps.setLong(1, size)
     } { rs =>
@@ -105,7 +105,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       * @param matchResult
     */
   override def saveMatchResult(matchResult: MatchResult, fetchConfig: HallFetchConfig, candDBIDMap: Map[String, Short] = Map()) = {
-    val oraSid = matchResult.getMatchId       //oraSid
+    val oraSid = getOraSidByQueryId(matchResult.getMatchId)       //oraSid
     val candNum = matchResult.getCandidateNum //candidateNum
     val maxScore = matchResult.getMaxScore   //hitpossibility
     val maxcandnum = matchResult.getMaxcandnum //maxcandnum
@@ -134,8 +134,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@'," +
-          "t.finishtime         = sysdate, " +
-          "t.checktime          = sysdate, " +
+          "t.finishtime         = " + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") +  ", " +
           "t.curcandnum         = ?, " +   //matchresult.getcandidatenum
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = 2," +
@@ -163,8 +162,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         val sql : String = "update normalquery_queryque t " +
           "set t.ora_updatetime = sysdate, " +
           "t.ora_updator        = '@match+server@', " +
-          "t.finishtime         = sysdate, " +
-          "t.checktime          = sysdate, " +
+          "t.finishtime         = " + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") + ", " +
           "t.checkusername      = '$autocheck$', " +
           "t.verifyresult       = '1'," +
           "t.status             = '7'," +
@@ -187,7 +185,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
           ps.setLong(7,oraSid.toLong)
         }
       } else {
-        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.ora_sid =?"
+        val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" +  DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") +" where t.ora_sid =?"
         JdbcDatabase.update(sql) { ps =>
           ps.setInt(1, candNum)
           ps.setBytes(2, candHead)
@@ -197,7 +195,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
         }
       }
     } else {
-      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=sysdate where t.ora_sid =?"
+      val sql = "update NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?, t.FINISHTIME=" + DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss") + " where t.ora_sid =?"
       JdbcDatabase.update(sql) { ps =>
         ps.setInt(1, candNum)
         ps.setBytes(2, candHead)
@@ -233,7 +231,7 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       }
       gCand.nTableID = 2
       gCand.nIndex = cand.getPos.toByte
-      gCand.tFinishTime = new AFISDateTime
+      gCand.tFinishTime = DateConverter.convertString2AFISDateTime(cand.getMatchFinishTime)
       gCand.nStepOneRank = index
       val gCandArray: Array[Byte] = gCand.toByteArray()
       val TTSearchQryAutoCheckLocal = configMap("TTSearchQryAutoCheckLocal")      //自动认定
@@ -293,6 +291,17 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     return configMap
   }
 
+  private def getOraSidByQueryId(queryId:String):String ={
+    val sql = s"SELECT orasid from GAFIS_TASK70RECORD where queryid=?"
+    var oraSid = ""
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,queryId)
+    }{rs=>
+      oraSid = rs.getString("orasid")
+    }
+    oraSid
+  }
+
   /**
     * 保存6.2已经给7.0抓取的任务的任务号
     *
@@ -315,8 +324,63 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
     * @author yuchen
     * @param size 单次请求数量
     */
-  override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = ???
+  override def getTaskNumWithNotSyncCandList(size: Int): ListBuffer[mutable.HashMap[String,Any]] = {
+    val sql = s"SELECT * FROM  (SELECT " +
+                                  s"t.uuid" +
+                                  s",t.queryid" +
+                                  s",t.orasid" +
+                                  s",t.querytype" +
+                                  s",t.keyid " +
+                              s" FROM GAFIS_TASK70RECORD t " +
+                              s" WHERE t.issynccandlist = '0'  " +
+                              s" ORDER BY t.createtime ASC )   " +
+             s"WHERE  ROWNUM <=?"
+    val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,size)
+    } { rs =>
+      var map = new scala.collection.mutable.HashMap[String,Any]
+      map += ("uuid" -> rs.getString("uuid"))
+      map += ("queryid" -> rs.getString("queryid"))
+      map += ("orasid" -> rs.getString("orasid"))
+      map += ("querytype" -> rs.getString("querytype"))
+      map += ("keyid" -> rs.getString("keyid"))
+      resultList.append(map)
+    }
+    resultList
+  }
 
-  override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = ???
+  override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = {
+    val sql = s"UPDATE GAFIS_TASK70RECORD t SET t.issynccandlist=?,t.updatetime=sysdate WHERE t.uuid=?"
+    JdbcDatabase.update(sql){ ps =>
+      ps.setString(1,status)
+      ps.setString(2,uuid)
+    }
+  }
+
+
+  override def recordGafisTask(objectId: String, queryId: String, isSyncCandList: String, matchType: String, cardId: String, pkId: String): Unit = {
+
+    val sql = s"INSERT INTO GAFIS_TASK70RECORD (UUID" +
+                                            s",queryid" +
+                                            s",orasid" +
+                                            s",issynccandlist" +
+                                            s",createtime" +
+                                            s",updatetime" +
+                                            s",querytype" +
+                                            s",keyid" +
+                                            s",pkid) " +
+              s"VALUES (?,?,?,?,sysdate,?,?,?,?)"
+    JdbcDatabase.update(sql){ ps =>
+      ps.setString(1,java.util.UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,objectId)
+      ps.setString(3,queryId)
+      ps.setInt(4,isSyncCandList.toInt)
+      ps.setString(5,"")
+      ps.setInt(6,matchType.toInt)
+      ps.setString(7,cardId)
+      ps.setString(8,pkId)
+    }
+  }
 }
 

@@ -34,9 +34,11 @@ class HallImageRemoteServiceImpl(hallImageUrl: HallImageRemoteConfigSupport, rpc
     }
     val fptCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
     fptCompressMethod match {
-      case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE |
-           fpt4code.GAIMG_CPRMETHOD_WSQ_CODE |
-           fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
+      case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+//           |
+//           fpt4code.GAIMG_CPRMETHOD_WSQ_CODE |
+//           fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+      =>
         firmDecoder.decode(gafisImage)
       case other =>
         if(hallImageUrl.hallImageUrl == null || hallImageUrl.hallImageUrl.isEmpty){
@@ -64,8 +66,7 @@ override def encodeGafisImage2Wsq(gafisImage: GAFISIMAGESTRUCT): GAFISIMAGESTRUC
   }
   val fptCompressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
   fptCompressMethod match {
-    case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE |
-         fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE =>
+    case fpt4code.GAIMG_CPRMETHOD_EGFS_CODE  =>
       imageEncoder.encodeWSQ(gafisImage)
     case other =>
       if(hallImageUrl.hallImageUrl == null || hallImageUrl.hallImageUrl.isEmpty){

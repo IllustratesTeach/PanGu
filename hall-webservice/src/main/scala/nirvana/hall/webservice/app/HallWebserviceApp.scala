@@ -5,7 +5,7 @@ import monad.core.services.{BootstrapTextSupport, GlobalLoggerConfigurationSuppo
 import monad.support.services.{JettyServerSupport, SystemEnvDetectorSupport}
 import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.support.HallSupportConstants
-import nirvana.hall.webservice.{HallWebserviceConstants, HallWebserviceModule}
+import nirvana.hall.webservice.{HallWebserviceConstants, HallWebserviceSymbol}
 import org.slf4j.LoggerFactory
 
 /**
@@ -20,7 +20,7 @@ object HallWebserviceApp
   def main(args: Array[String]) {
     val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
     System.setProperty(MonadCoreSymbols.SERVER_HOME, serverHome)
-    val config = HallWebserviceModule.buildHallWebserviceConfig(serverHome)
+    val config = HallWebserviceSymbol.buildHallWebserviceConfig(serverHome)
     configLogger(config.logFile, "webservice", "egf", "nirvana.hall")
     //加载提取特征JNI
     JniLoader.loadJniLibrary(serverHome,config.logFile)
@@ -30,20 +30,24 @@ object HallWebserviceApp
 
     val classes = List[Class[_]](
       //v62
-//      Class.forName("nirvana.hall.v62.LocalV62Module"),
-//      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
-//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-//      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
+      Class.forName("nirvana.hall.v62.LocalV62Module"),
+      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
+      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
       //v70
 //      Class.forName("nirvana.hall.v70.LocalV70Module"),
 //      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
-
+      //公用
       Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("stark.webservice.StarkWebServiceModule"),
-      Class.forName("nirvana.hall.webservice.HallWebserviceModule")
+      Class.forName("nirvana.hall.webservice.HallWebserviceSymbol"),
+      Class.forName("nirvana.hall.webservice.HallWebserviceModule"),
+
+
+      Class.forName("nirvana.hall.webservice.HallWebserviceHaiXinV62Module")
 
     )
 

@@ -4,6 +4,8 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.c.AncientConstants
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
@@ -33,10 +35,17 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
       val fgp_case = rs.getString("fgp_case")
       val lastSeq = rs.getLong("seq")
       val deletag = rs.getString("deletag")
-      val mnt = ByteString.copyFrom(rs.getBytes("gather_data"))
+      val mnt = rs.getBytes("gather_data")
+
+      syncDataBuilder.setData(ByteString.copyFrom(mnt))
       //是否是纹线数据
       if ("4" == group_id) {
         syncDataBuilder.setMinutiaType(SyncData.MinutiaType.RIDGE)
+        //有些纹线数据存在补位情况（4的倍数）,如果长度跟实际不一样，使用GAFISIMAGESTRUCT截取长度
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(mnt)
+        if((gafisImage.stHead.nImgSize + hallMatcherConfig.mnt.headerSize) != mnt.length){
+          syncDataBuilder.setData(ByteString.copyFrom(gafisImage.toByteArray(AncientConstants.GBK_ENCODING)))
+        }
       } else {
         syncDataBuilder.setMinutiaType(SyncData.MinutiaType.FINGER)
       }
@@ -51,7 +60,6 @@ class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: Da
       }
       syncDataBuilder.setPos(DataConverter.fingerPos6to8(fgp))
 
-      syncDataBuilder.setData(mnt)
       syncDataBuilder.setTimestamp(lastSeq)
       if (validSyncData(syncDataBuilder.build, false)) {
         syncDataResponse.addSyncData(syncDataBuilder.build)

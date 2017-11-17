@@ -1,23 +1,25 @@
 package nirvana.hall.v70.internal.sync
 
 import java.io.ByteArrayOutputStream
+import java.sql.Timestamp
+import java.util.UUID
 import javax.sql.DataSource
 
 import nirvana.hall.api.config.QueryQue
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.jpa.HallFetchConfig
 import nirvana.hall.api.services.sync.FetchQueryService
-import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisTask62Record}
+import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisTask62Record, HallReadRecord}
+import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * Created by songpeng on 16/8/26.
@@ -30,9 +32,59 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     * @return
     */
   override def fetchMatchTask(size: Int,yearThreshold:String, dbId: Option[String]): Seq[MatchTask] = {
-    GafisNormalqueryQueryque.find_by_status(0.toShort).limit(size).map{gafisQuery=>
-      ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gafisQuery)
-    }.toSeq
+
+    val matchTaskList = new ArrayBuffer[MatchTask]
+
+    val sql = new StringBuilder;
+    sql ++= s"SELECT * FROM (SELECT " +
+      s"t.username " +
+      s",t.computerip" +
+      s",t.userunitcode" +
+      s",t.ora_sid" +
+      s",t.createtime" +
+      s",t.keyid" +
+      s",t.minscore" +
+      s",t.querytype" +
+      s",t.priority" +
+      s",t.maxcandnum" +
+      s",t.mic" +
+      s",t.qrycondition" +
+      s",t.textsql" +
+      s",t.flag " +
+      s",t.status " +
+    s" FROM Gafis_Normalquery_Queryque  t " +
+      s"WHERE  NOT EXISTS (SELECT 1 " +
+      s"FROM HALL_READ_RECORD p " +
+      s"WHERE p.orasid=t.ora_sid) AND t.SYNC_TARGET_SID IS NULL  AND t.submittsystem <> 3 AND t.status = 2"
+    if(StringUtils.isNotEmpty(yearThreshold) && StringUtils.isNotBlank(yearThreshold)){
+      sql ++= s"  AND t.createtime>= to_date('"+ yearThreshold +"','yyyy-mm-dd hh24:mi:ss')"
+    }
+    sql ++= s" ORDER BY t.createtime ASC ) WHERE  ROWNUM <=?"
+    JdbcDatabase.queryWithPsSetter(sql.toString) {ps =>
+      ps.setLong(1, size)
+    } { rs =>
+      val gaQuery = new GafisNormalqueryQueryque()
+      gaQuery.oraSid = rs.getLong("ora_sid")
+      gaQuery.keyid = rs.getString("keyid")
+      gaQuery.minscore = rs.getInt("minscore")
+      gaQuery.querytype = rs.getShort("querytype")
+      gaQuery.priority = rs.getShort("priority")
+      gaQuery.maxcandnum = rs.getInt("maxcandnum")
+      gaQuery.flag = rs.getShort("flag")
+      gaQuery.mic = rs.getBytes("mic")
+      gaQuery.createtime = rs.getTimestamp("createtime")
+      gaQuery.username = rs.getString("username")
+      gaQuery.computerip = rs.getString("computerip")
+      gaQuery.userunitcode = rs.getString("userunitcode")
+      gaQuery.status = rs.getShort("status")
+      matchTaskList += ProtobufConverter.convertGafisNormalqueryQueryque2MatchTask(gaQuery)
+    }
+
+    matchTaskList.toSeq
+
+
+
+
   }
 
   /**
@@ -50,7 +102,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
                   s", t.verifyresult=?" +
                   s", t.handleresult=?" +
                   s", t.time_elapsed=?" +
-                  s", t.record_num_matched=?" +
                   s", t.match_progress=100" +
                   s", t.FINISHTIME=? " +
               s"WHERE t.queryid=?"
@@ -66,11 +117,6 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     if (queryQue.queryType != 0) {
       maxScore = maxScore / 10
     }
-
-//    GafisNormalqueryQueryque.update.set(status = "2"
-//      ,curcandnum = candNum
-//      ,candlist = candList
-//      ,hitpossibility = maxScore).execute
     JdbcDatabase.update(sql) { ps =>
       ps.setInt(1, candNum)
       ps.setBytes(2, candList)
@@ -83,10 +129,9 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
         ps.setInt(4, 99)
         ps.setInt(5, 1)
       }
-      ps.setLong(6, matchResult.getTimeElapsed)
-      ps.setLong(7, matchResult.getRecordNumMatched)
-      ps.setString(8,DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyy-MM-dd HH:mm:ss"))
-      ps.setString(9, oraSid)
+      ps.setLong(6, matchResult.getTimeElapsed * 1000L)
+      ps.setTimestamp(7,new Timestamp(DateConverter.convertString2Date(matchResult.getMatchFinishTime,"yyyyMMddHHmmss").getTime))
+      ps.setString(8, oraSid)
     }
   }
 
@@ -144,14 +189,14 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       gCand.nDBID = if (queryType == 0 || queryType == 1) 1 else 2
       gCand.nTableID = 2
       gCand.nIndex = cand.getPos.toByte
-      gCand.tFinishTime = new AFISDateTime
+      gCand.tFinishTime = DateConverter.convertString2AFISDateTime(cand.getMatchFinishTime)
       gCand.nStepOneRank = index
       result.write(gCand.toByteArray())
     }
     result.toByteArray
   }
   override def getQueryQue(oraSid: Int): QueryQue = {
-    val sql = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.QUERYID =?"
+    val sql = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ORA_SID =?"
     JdbcDatabase.queryFirst(sql) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
@@ -164,13 +209,17 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
 
   /**
     * 保存抓取记录
+    *
     * @author yuchen
     * @param oraSid
     */
-  override def saveFetchRecord(oraSid:String) = ???
+  override def saveFetchRecord(oraSid:String) = {
+    new HallReadRecord(oraSid).save
+  }
 
   /**
     * 获得没有同步候选的比对任务的任务号
+    *
     * @author yuchen
     * @param size 单次请求数量
     */
@@ -206,5 +255,12 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
     */
   override def updateStatusWithGafis_Task62Record(status: String,uuid:String): Unit = {
     GafisTask62Record.update.set(isSyncCandList = status).where(GafisTask62Record.id === uuid).execute
+  }
+
+  /**
+    * 7.0抓取过来的任务的信息，有了这些信息后，为了通过这些任务号再去抓取比对结果。
+    */
+  override def recordGafisTask(objectId:String,queryId:String,isSyncCandList:String,matchType:String,cardId:String,pkId:String): Unit = {
+    new GafisTask62Record(UUID.randomUUID().toString.replace("-",""),objectId,queryId,isSyncCandList,matchType,cardId,pkId).save
   }
 }

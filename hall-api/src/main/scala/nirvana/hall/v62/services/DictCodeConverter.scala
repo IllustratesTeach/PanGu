@@ -64,7 +64,7 @@ object DictCodeConverter {
       "可疑地区3", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseOccurPlaceCode, textBuilder.getStrCaseOccurPlaceCode, 6,
       "案发地", textBuilder)
-    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrExtractUnitCode, textBuilder.getStrExtractUnitCode, 6,
+    checkNormalCodeOfCaseTextBuilder(textBuilder.setStrExtractUnitCode, textBuilder.getStrExtractUnitCode, 12,
       "提取单位", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrPremium, textBuilder.getStrPremium, 7,
       "奖金", textBuilder)

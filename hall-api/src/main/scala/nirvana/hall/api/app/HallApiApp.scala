@@ -29,16 +29,29 @@ object HallApiApp
     logger.info("starting hall api server ....")
     val classes = List[Class[_]](
       //v70
-      Class.forName("nirvana.hall.v70.LocalV70Module"),
-      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
-      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
+//      Class.forName("nirvana.hall.v70.LocalV70Module"),
+//      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
+//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
       //v62
 //      Class.forName("nirvana.hall.v62.LocalV62Module"),
 //      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
 //      Class.forName("nirvana.hall.v62.proxy.LocalV62ProxyServiceModule"),
+      //gz70
+//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.v70.gz.LocalV70Module"),
+//      Class.forName("nirvana.hall.v70.gz.LocalV70ServiceModule"),
+//      Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
+//      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+      //ln70
+//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.v70.ln.LocalV70Module"),
+//      Class.forName("nirvana.hall.v70.ln.LocalV70ServiceModule"),
+//      Class.forName("nirvana.hall.v70.ln.LocalDataSourceModule"),
+//      Class.forName("nirvana.hall.api.LocalProtobufModule"),
+
       //公共配置
       Class.forName("monad.core.LocalMonadCoreModule"),
       Class.forName("monad.rpc.LocalRpcModule"),

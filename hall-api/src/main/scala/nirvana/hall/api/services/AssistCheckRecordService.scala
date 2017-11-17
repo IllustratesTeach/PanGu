@@ -1,5 +1,7 @@
 package nirvana.hall.api.services
 
+import java.sql.Timestamp
+
 import scala.collection.mutable.{HashMap, ListBuffer}
 
 
@@ -27,5 +29,16 @@ trait AssistCheckRecordService {
 
   def updateAssistcheckTT(queryId:String,oraSid:String,personId:String, id:String, status:Int, msg:String): Unit
 
+  def saveXcQuery(uuid:String,taskid:String , fingerid:String, typ:Int, status:Int, custom1:String, custom2:String,detail:String, errorinfo:String,date:Timestamp): Unit
+
+  def updateXcQuery(uuid:String, serviceid:String, fingerid:String, typ:Int, status:Int, oraSid:String, custom2:String, errorinfo:String,date:Timestamp): Unit
+
+  def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,serviceid:String,custom2:String): Unit
+
+  def updateXcTask(id:String,status:Int,errorinfo:String,detail:String,serviceid:String,custom2:String,custom4:String): Unit
+
+  def updateXcTask(id:String,executetimes:Int): Unit
+
+  def getOraUuid(queryId:Long): String
 
 }

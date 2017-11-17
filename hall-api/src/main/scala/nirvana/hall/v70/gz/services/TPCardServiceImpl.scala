@@ -13,7 +13,7 @@ import nirvana.hall.v70.gz.jpa.{GafisGatherFinger, GafisGatherPalm, GafisGatherP
 /**
   * Created by songpeng on 2017/5/26.
   */
-class TPCardServiceImpl extends TPCardService with LoggerSupport{
+class TPCardServiceImpl extends TPCardService with LoggerSupport {
   /**
     * 新增捺印卡片
     *
@@ -28,7 +28,7 @@ class TPCardServiceImpl extends TPCardService with LoggerSupport{
     * @param cardId
     * @return
     */
-override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
+  override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
 
   /**
     * 更新捺印卡片
@@ -50,6 +50,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
 
   /**
     * 获取捺印卡信息
+    *
     * @param personId
     * @param dbid
     * @return
@@ -58,12 +59,12 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     val person = GafisPerson.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
-//    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
+    //    val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
 
     convertGafisPerson2TPCard(person, photoList, fingerList, null)
   }
 
-  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
+  def convertGafisPerson2TPCard(person: GafisPerson, photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard = {
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
     tpCard.setStrPersonID(person.personid)
@@ -83,11 +84,11 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     magicSet(person.nationCode, textBuilder.setStrRace)
     magicSet(person.nativeplaceCode, textBuilder.setStrNation)
     magicSet(person.caseClasses, textBuilder.setStrCaseType1)
-//    magicSet(person.caseClasses2, textBuilder.setStrCaseType2)
-//    magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
+    //    magicSet(person.caseClasses2, textBuilder.setStrCaseType2)
+    //    magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
     magicSet(person.address, textBuilder.setStrAddrCode)
     magicSet(person.addressdetail, textBuilder.setStrAddr)
-//    magicSet(person.personType, textBuilder.setStrPersonType)
+    //    magicSet(person.personType, textBuilder.setStrPersonType)
 
     magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
     magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
@@ -114,14 +115,14 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     val mntMap = fingerList.filter(_.groupId == 0).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
     //纹线特征数据
     val binMap = fingerList.filter(_.groupId == 4).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
-    fingerList.filter(_.groupId == 1).foreach {finger =>
+    fingerList.filter(_.groupId == 1).foreach { finger =>
       val blobBuilder = tpCard.addBlobBuilder()
       val mnt = mntMap.get((finger.fgpCase, finger.fgp))
       val bin = binMap.get((finger.fgpCase, finger.fgp))
       mnt.foreach { blob =>
         blobBuilder.setStMntBytes(ByteString.copyFrom(blob))
       }
-      bin.foreach{
+      bin.foreach {
         blob => blobBuilder.setStBinBytes(ByteString.copyFrom(blob))
       }
       blobBuilder.setStImageBytes(ByteString.copyFrom(finger.gatherData))
@@ -131,7 +132,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     }
 
     //人像数据
-    photoList.foreach{ photo =>
+    photoList.foreach { photo =>
       val blobBuilder = tpCard.addBlobBuilder()
       blobBuilder.setStImageBytes(ByteString.copyFrom(photo.gatherData))
       blobBuilder.setType(ImageType.IMAGETYPE_FACE)
@@ -143,8 +144,8 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     }
 
     //掌纹数据
-    if (palmList != null){
-      palmList.foreach{ palm =>
+    if (palmList != null) {
+      palmList.foreach { palm =>
         val blobBuilder = tpCard.addBlobBuilder()
         blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
         blobBuilder.setType(ImageType.IMAGETYPE_PALM)
@@ -158,6 +159,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
 
     tpCard.build()
   }
+
   /**
     * 查询捺印文本信息
     *
@@ -179,5 +181,13 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @return Logic02Rec(fpt4捺印文本信息)
     */
   override def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec] = ???
+
+  /**
+    * 针对海鑫综采对接使用
+    *
+    * @param tpCard
+    * @param dbId
+    */
+  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = ???
 
 }

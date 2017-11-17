@@ -119,13 +119,6 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisCasePalm.findOption(cardId).nonEmpty
-    var result=false
-    if(GafisCasePalm.findOption(cardId).nonEmpty){
-      val palm=GafisCasePalm.findOption(cardId).get
-      if(palm.deletag.equals("1"))
-        result=true
-    }
-    result
   }
 
 }

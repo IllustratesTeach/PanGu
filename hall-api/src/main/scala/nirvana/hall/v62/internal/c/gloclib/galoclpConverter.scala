@@ -225,9 +225,6 @@ object galoclpConverter extends LoggerSupport{
     val gafisCase = new GCASEINFOSTRUCT
     gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
     gafisCase.szCaseID = protoCase.getStrCaseID
-    //GAFIS里面没有'A',这里去掉前缀
-//    if(gafisCase.szCaseID.charAt(0) == 'A')
-//      gafisCase.szCaseID = gafisCase.szCaseID.substring(1)
 
     gafisCase.pstFingerID_Data = convertAsKeyArray(protoCase.getStrFingerIDList)
     gafisCase.nFingerCount = gafisCase.pstFingerID_Data.length.asInstanceOf[Short]

@@ -69,4 +69,11 @@ trait TPCardService {
     */
   def getFPT4Logic02RecList(ryno: String, xm: String, xb: String, idno: String, zjlb: String, zjhm: String, hjddm: String, xzzdm: String, rylb: String, ajlb: String, qkbs: String, xcjb: String, nydwdm: String, startnydate: String, endnydate: String): Seq[Logic02Rec]
 
+  /**
+    * 针对海鑫综采对接使用
+    * @param tpCard
+    * @param dbId
+    */
+  def addTPCardHXZC(tpCard: TPCard, dbId: Option[String] = None):Unit
+
 }

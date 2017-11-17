@@ -1,13 +1,13 @@
 package nirvana.hall.matcher.internal.adapter.daku
 
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 import javax.sql.DataSource
 
 import nirvana.hall.c.services.gbaselib.gbasedef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.internal.DataConverter
+import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchResult.MatchResultRequest.MatcherStatus
@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update GAFIS_NORMALQUERY_QUERYQUE t set t.status=2, t.curcandnum=?, t.candlist=?, t.hitpossibility=?, t.verifyresult=?, t.handleresult=?, t.time_elapsed=?, t.record_num_matched=?, t.match_progress=100, t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from GAFIS_NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
    * 推送比对结果
@@ -43,7 +43,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val oraSid = matchResultRequest.getMatchId
     val candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
-    val queryQue = getQueryQue(oraSid.toInt)
+    val queryQue = getQueryQueVo(oraSid.toInt)
 
     var candList:Array[Byte] = null
     if(candNum > 0){
@@ -116,14 +116,14 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     map
   }
 
-  private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {
+  private def getQueryQueVo(oraSid: Int)(implicit dataSource: DataSource): QueryQueVo = {
     JdbcDatabase.queryFirst(GET_QUERY_QUE_SQL) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
-      //      val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType)
+      val maxcandnum = rs.getInt("maxcandnum")
+      new QueryQueVo(keyId, oraSid, queryType, false, maxcandnum)
     }.get
   }
 
@@ -173,4 +173,3 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     result.toByteArray
   }
 }
-class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int)

@@ -15,6 +15,9 @@ object Gafis70Constants {
   val FINGER_SHOW_STATUS = "1"
   //数据来源，gafis6.2
   val DATA_SOURCE_GAFIS6= 4.toShort
+  val DATA_SOURCE_CAPTURE=1.toString
+  //数据来源，海鑫综采
+  val DATA_SOURCE_HXZC= 7.toShort
   //默认采集类型
   val GATHER_TYPE_ID_DEFAULT = "1"
   //主特征

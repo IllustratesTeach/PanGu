@@ -73,40 +73,37 @@ class SendCheckinServiceImpl(config: HallWebserviceConfig,
             keyId = resultMap("keyid").asInstanceOf[String]
             info("queryId: " + queryId + " oraSid:" + oraSid + " keyId:" + keyId + " queryType:" + queryType)
             var status:Long = 0
-            val dataHandlers:ArrayBuffer[DataHandler] = exceptRelationService.exportMatchRelation(queryId,oraSid)
-            for(i <- 0 to dataHandlers.size - 1){
-              val dataHandler = dataHandlers(i)
-              if(dataHandler != null){
-                //debug保存 fpt
-                if(isDeubg != null && isDeubg == "true") {
-                  saveFpt(dataHandler.getInputStream,queryId)
-                }
-                val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
-                methodArgs(0) = username
-                methodArgs(1) = password
-                methodArgs(2) = dataHandler
-                val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setXCHitResult")
-                //入库成功
-                if (resultCode == 1) {
-                  status = 1
-                  info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
-                  updateAssistcheckStatus(status, id)
-                  info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                  //重复数据
-                } else if (resultCode == 0) {
-                  status = 2
-                  info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                  updateAssistcheckStatus(status, id)
-                  info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                } else {
-                  status = -1
-                  error("call setXCHitResult  faild! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
-                }
-              } else {
-                //比对完成无比对关系
-                status = 3
-                updateAssistcheckStatus(status, id)
+            val dataHandler:DataHandler = exceptRelationService.exportMatchRelation(queryId,oraSid)
+            if(dataHandler != null){
+              //debug保存 fpt
+              if(isDeubg != null && isDeubg == "true") {
+                saveFpt(dataHandler.getInputStream,queryId)
               }
+              val methodArgs: Array[AnyRef] = new Array[AnyRef](3)
+              methodArgs(0) = username
+              methodArgs(1) = password
+              methodArgs(2) = dataHandler
+              val resultCode:Int = WebServicesClient_AssistCheck.callHallWebServiceTypeOfInt(url, targetNamespace, methodArgs, "setXCHitResult")
+              //入库成功
+              if (resultCode == 1) {
+                status = 1
+                info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode )
+                updateAssistcheckStatus(status, id)
+                info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                //重复数据
+              } else if (resultCode == 0) {
+                status = 2
+                info("call setXCHitResult  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+                updateAssistcheckStatus(status, id)
+                info("sendCheckinCron  success! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+              } else {
+                status = -1
+                error("call setXCHitResult  faild! queryId: " + queryId + " oraSid:" + oraSid + " keyId:"+ keyId + " queryType:" + queryType + " resultCode:" + resultCode)
+              }
+            } else {
+              //比对完成无比对关系
+              status = 3
+              updateAssistcheckStatus(status, id)
             }
           } catch {
             case e:Exception=>

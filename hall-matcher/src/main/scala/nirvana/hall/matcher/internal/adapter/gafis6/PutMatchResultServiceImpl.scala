@@ -5,6 +5,7 @@ import javax.sql.DataSource
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDHEADSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
+import nirvana.hall.matcher.internal.adapter.common.vo.QueryQueVo
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
 import nirvana.hall.matcher.service.PutMatchResultService
 import nirvana.hall.support.services.JdbcDatabase
@@ -19,7 +20,7 @@ import scala.collection.JavaConversions._
  */
 class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
   val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
 
   /**
    * 推送比对结果
@@ -41,12 +42,12 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val oraSid = matchResultRequest.getMatchId
     val candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
-    val queryQue = getQueryQue(oraSid.toInt)
+    val queryQue = getQueryQueVo(oraSid.toInt)
 
     var candList:Array[Byte] = null
     if(candNum > 0){
       val sidKeyidMap = getCardIdSidMap(matchResultRequest, queryQue)
-      candList = GafisConverter.convertMatchResult2CandList(matchResultRequest, queryQue.queryType, sidKeyidMap, queryQue.isPalm, true)
+      candList = GafisConverter.convertMatchResultObjectList2CandList(matchResultRequest.getCandidateResultList, queryQue.queryType, sidKeyidMap, queryQue.isPalm, true)
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
 
@@ -90,7 +91,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param matchResultRequest
    * @param queryQue
    */
-  private def getCandHead(matchResultRequest: MatchResultRequest, queryQue: QueryQue): Array[Byte] ={
+  private def getCandHead(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo): Array[Byte] ={
     val queryType = queryQue.queryType
     val candHead = new GAQUERYCANDHEADSTRUCT
     candHead.szKey = queryQue.keyId
@@ -111,7 +112,7 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param dataSource
    * @return
    */
-  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQue)(implicit dataSource: DataSource): Map[Long, String] = {
+  private def getCardIdSidMap(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo)(implicit dataSource: DataSource): Map[Long, String] = {
     val queryType = queryQue.queryType
     var sids = ""
     var sql = ""
@@ -145,16 +146,16 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
    * @param dataSource
    * @return
    */
-  private def getQueryQue(oraSid: Int)(implicit dataSource: DataSource): QueryQue = {
+  private def getQueryQueVo(oraSid: Int)(implicit dataSource: DataSource): QueryQueVo = {
     JdbcDatabase.queryFirst(GET_QUERY_QUE_SQL) { ps =>
       ps.setInt(1, oraSid)
     } { rs =>
       val keyId = rs.getString("keyid")
       val queryType = rs.getInt("querytype")
       val flag = rs.getInt("flag")
-      new QueryQue(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false)
+      val maxcandnum = rs.getInt("maxcandnum")
+      new QueryQueVo(keyId, oraSid, queryType, if(flag == 2 || flag == 22) true else false, maxcandnum)
     }.get
   }
 }
 
-class QueryQue(val keyId: String, val oraSid: Int, val queryType: Int, val isPalm: Boolean)

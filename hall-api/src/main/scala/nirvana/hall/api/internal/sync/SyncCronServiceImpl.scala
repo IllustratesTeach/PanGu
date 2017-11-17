@@ -1,29 +1,32 @@
 package nirvana.hall.api.internal.sync
 
+import java.io.ByteArrayOutputStream
 import java.util.UUID
+import javax.sql.DataSource
 
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
 import nirvana.hall.api.config.HallApiConfig
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.jpa.HallFetchConfig
+import nirvana.hall.api.services._
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, LPPalmRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, LogicDBJudgeService, SyncCronService}
-import nirvana.hall.api.services._
+import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.api.FPTProto.{Case, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
-import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
+import nirvana.hall.support.services.{JdbcDatabase, RpcHttpClient}
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tapestry5.json.JSONObject
-import nirvana.hall.api.HallApiErrorConstants
-import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.v70.jpa.GafisTask62Record
+import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -45,7 +48,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                           syncInfoLogManageService: SyncInfoLogManageService,
                           logicDBJudgeService: LogicDBJudgeService,
                           caseInfoRemoteService: CaseInfoRemoteService,
-                          matchRelationService:MatchRelationService) extends SyncCronService with LoggerSupport{
+                          matchRelationService:MatchRelationService, implicit val dataSource: DataSource) extends SyncCronService with LoggerSupport{
 
   final val SYNC_BATCH_SIZE = 1
   final val SYNC_MATCH_TASK_BATCH_SIZE = 5
@@ -136,7 +139,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
 
             //逻辑分库处理
-            destDBID = logicDBJudgeService.logicTJudge(cardId,Option(fetchConfig.destDbid))
+            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {
@@ -236,7 +239,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
             //逻辑分库处理
             //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
-            destDBID = logicDBJudgeService.logicLJudge(caseId,Option(fetchConfig.destDbid))
+            //逻辑分库处理
+            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_LPCARD)
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
@@ -451,11 +455,10 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         while (iterator.hasNext) {
           val matchTask = iterator.next()
           cardId = matchTask.getMatchId
-          if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)) {
+          if (validateMatchTaskByWriteStrategy(matchTask, fetchConfig.writeStrategy)){
             val queryId = queryService.addMatchTask(matchTask)
-            new GafisTask62Record(UUID.randomUUID().toString.replace("-","")
-              ,matchTask.getObjectId.toString,queryId.toString
-              ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId).save
+            fetchQueryService.recordGafisTask(matchTask.getObjectId.toString,queryId.toString
+              ,"0",matchTask.getMatchType.getNumber.toString,cardId,fetchConfig.pkId)
             info("add MatchTask:{} type:{}", matchTask.getMatchId, matchTask.getMatchType.toString)
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ, fetchConfig.url.substring(7,fetchConfig.url.length-5) ,HallApiConstants.MESSAGE_SEND,HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }
@@ -520,7 +523,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             matchRelationService.addMatchRelation(matchRelationInfo)
           }
           val option = getKeyIdAndTcodeByQueryType(matchRelationInfo)
-          queryService.updateCandListStatus(matchRelationInfo.getQueryTaskId
+          updateCandListStatus(matchRelationInfo.getQueryTaskId
                                             ,matchRelationInfo.getQuerytype
                                             ,option.headOption.get._1
                                             ,option.headOption.get._2
@@ -570,8 +573,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         if(matchStatus.getNumber > 2 && matchStatus != MatchStatus.UN_KNOWN){//大于2有候选信息
           val matchResult = response.getMatchResult
           if(validateMatchResultByWriteStrategy(matchResult, fetchConfig.writeStrategy)){
-            val candDBDIMap = fetchCandListDataByMatchResult(matchResult, fetchConfig)
-            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig, candDBDIMap)
+            val candDBDIMap = fetchCandListDataByMatchResult(hashMap.get("orasid").headOption.get.toString,matchResult, fetchConfig)
+            fetchQueryService.saveMatchResult(matchResult, fetchConfig: HallFetchConfig,candDBDIMap)
             fetchQueryService.updateStatusWithGafis_Task62Record(matchStatus.getNumber.toString,uniqueId)
             info("add MatchResult:{} candNum:{}", matchResult.getMatchId, matchResult.getCandidateNum)
           }
@@ -582,10 +585,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
     }
   }
 
@@ -596,9 +601,9 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     *
     * @param matchResult
     */
-  private def fetchCandListDataByMatchResult(matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
+  private def fetchCandListDataByMatchResult(oraSid:String,matchResult: MatchResult,fetchConfig: HallFetchConfig): Map[String, Short]={
     val candDBIDMap = mutable.HashMap[String, Short]()
-    val queryQue = fetchQueryService.getQueryQue(matchResult.getMatchId.toInt)
+    val queryQue = fetchQueryService.getQueryQue(oraSid.toInt)
     val isPalm = queryQue.isPalm //指掌纹标识
     val dbidList = getDBIDList(fetchConfig, queryQue.queryType)
     val candIter = matchResult.getCandidateResultList.iterator()
@@ -607,7 +612,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val cardId = cand.getObjectId
       val candDbId = cand.getDbid
       if(queryQue.queryType == QueryConstants.QUERY_TYPE_TT || queryQue.queryType == QueryConstants.QUERY_TYPE_LT){//候选是捺印
-        val dbId = getTPDBIDByCardId(cardId, dbidList,isPalm)
+        val dbId = getTPDBIDByCardId(cardId, dbidList)
         if(dbId.nonEmpty){
           candDBIDMap.+=(cardId -> dbId.get.toShort)
         } else {
@@ -616,15 +621,35 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             捺印卡在6.2保存时先进行判断 若已存在执行更新捺印卡信息 不存在添加捺印卡信息  2016/12/7
              */
           if(tpCardService.isExist(cardId)){
-            tpCardOpt.foreach(tpCardService.updateTPCard(_))
+            /*tpCardOpt.foreach{
+              t =>
+                var tpCard = t
+                val strategy = new JSONObject(fetchConfig.writeStrategy)
+                if(strategy.has("setdatasource")){
+                  tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+                }
+                if(strategy.has("update")){
+                  if(strategy.getBoolean("update")){
+                    tpCardService.updateTPCard(tpCard)
+                  }
+                }
+            }*/
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }else{
-            tpCardOpt.foreach(tpCardService.addTPCard(_))
+            tpCardOpt.foreach{
+              t =>
+                var tpCard = t
+                val strategy = new JSONObject(fetchConfig.writeStrategy)
+                if(strategy.has("setdatasource")){
+                  tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+                }
+              //tpCardService.addTPCard(tpCard)
+            }
             candDBIDMap.+=(cardId -> V62Facade.DBID_TP_DEFAULT)
           }
         }
       }else{//候选是现场
-            val dbId = getLPDBIDByCardId(cardId, dbidList)
+            val dbId = getLPDBIDByCardId(cardId, dbidList,isPalm)
             if(dbId.nonEmpty){
               candDBIDMap.+=(cardId -> dbId.get.toShort)
             }else {
@@ -638,7 +663,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                     val caseId = lpCard.getText.getStrCaseId
                     if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                       //获取案件
-                      fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                      //fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                     }
                     candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                   }
@@ -651,7 +676,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
                   val caseId = lpCard.getText.getStrCaseId
                   if (!caseInfoService.isExist(caseId, Option(candDbId))) {
                     //获取案件
-                    fetchCaseInfo(caseId, fetchConfig.url, false, Option(fetchConfig.dbid))
+                    //fetchCaseInfo(caseId, fetchConfig.url, false, Option(candDbId))
                   }
                   candDBIDMap.+=(cardId -> V62Facade.DBID_LP_DEFAULT)
                 }
@@ -665,23 +690,15 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   }
 
   /**
-    * 根据捺印卡号查找所在DBID
-    *
-    * @param cardId
-    * @param dbidList
-    * @return
-    */
-  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm:Boolean): Option[String]={
+   * 根据捺印卡号查找所在DBID
+   * @param cardId
+   * @param dbidList
+   * @return
+   */
+  private def getTPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
     dbidList.foreach{dbid =>
-      if(!isPalm) {
-        if (lPCardService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
-      }
-      else{
-        if (lPPalmService.isExist(cardId, Option(dbid))) {
-          return Option(dbid)
-        }
+      if(tpCardService.isExist(cardId, Option(dbid))){
+        return Option(dbid)
       }
     }
     None
@@ -694,10 +711,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param dbidList
     * @return
     */
-  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String]): Option[String]={
+  private def getLPDBIDByCardId(cardId: String, dbidList: Seq[String],isPalm:Boolean): Option[String]={
     dbidList.foreach{dbid =>
-      if (lPCardService.isExist(cardId, Option(dbid))) {
-        return Option(dbid)
+      if(!isPalm) {
+        if (lPCardService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
+      }
+      else{
+        if (lPPalmService.isExist(cardId, Option(dbid))) {
+          return Option(dbid)
+        }
       }
     }
     None
@@ -766,4 +790,55 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   private def updateSeq(fetchConfig: HallFetchConfig): Unit ={
     HallFetchConfig.update.set(seq = fetchConfig.seq).where(HallFetchConfig.pkId === fetchConfig.pkId).execute
   }
+
+  /**
+    * 更新6.2任务表中对应这条认定的候选信息的候选状态,暂时先写到这里
+    * @param oraSid
+    * @param taskType
+    * @param keyId
+    * @param fgp
+    * @return
+    */
+  def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = {
+    //TODO 使用NET_GAFIS_QUERY_Update代替sql
+    val sql = s"SELECT t.candlist " +
+      s"FROM Normalquery_Queryque t " +
+      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
+    val candListResult = new ByteArrayOutputStream
+    var flag = -1L
+    JdbcDatabase.queryWithPsSetter(sql) { ps =>
+      ps.setInt(1,oraSid.toInt)
+      ps.setInt(2,taskType)
+      ps.setString(3,keyId)
+    } { rs =>
+      val candList = rs.getBytes("candlist")
+      val buffer = ChannelBuffers.wrappedBuffer(candList)
+      while(buffer.readableBytes() >=96){
+        val gaCand = new GAQUERYCANDSTRUCT
+        gaCand.fromStreamReader(buffer)
+        if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
+          gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
+          gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte
+          gaCand.nFlag = gaqryque.GAQRYCAND_FLAG_BROKEN.toByte
+        }
+        candListResult.write(gaCand.toByteArray())
+      }
+      flag = updateCandList(candListResult.toByteArray,oraSid,taskType,keyId)
+    }
+    flag
+  }
+
+  private def updateCandList(candList:Array[Byte],oraSid:String,taskType:Int,keyId:String): Long ={
+    val updateSQL = s"UPDATE Normalquery_Queryque t " +
+      s"SET t.candlist =?,t.status =?  " +
+      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
+    JdbcDatabase.update(updateSQL) { ps =>
+      ps.setBytes(1,candList)
+      ps.setInt(2,11)
+      ps.setInt(3,oraSid.toInt)
+      ps.setInt(4,taskType)
+      ps.setString(5,keyId)
+    }
+  }
+
 }

@@ -23,47 +23,71 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
-  override val SYNC_SQL: String = s"select c.case_id caseId" +
-                                        s", c.case_class_code " + COL_NAME_CASECLASSCODE +
-                                        s", c.case_nature " + COL_NAME_CASENATURE +
-                                        s", c.case_occur_place_code " + COL_NAME_CASEOCCURPLACECODE +
-                                        s", c.suspicious_area_code " + COL_NAME_SUSPICIOUSAREACODE +
-                                        s", c.is_murder " + COL_NAME_ISMURDER +
-                                        s", c.assist_level " + COL_NAME_ASSISTLEVEL +
-                                        s", c.case_state " + COL_NAME_CASESTATE +
-                                        s", c.case_occur_date " + COL_NAME_CASEOCCURDATE +
-                                        s", c.is_checked " + COL_NAME_ISCHECKED +
-                                        s", c.case_source " + COL_NAME_CASESOURCE +
-                                        s", c.case_occur_place_detail " + COL_NAME_CASEOCCURPLACEDETAIL +
-                                        s", c.extractor" +
-                                        s", c.extract_unit_code " + COL_NAME_EXTRACTUNITCODE +
-                                        s", c.extract_unit_name " + COL_NAME_EXTRACTUNITNAME +
-                                        s", c.extract_date " + COL_NAME_EXTRACTDATE +
-                                        s", c.broken_status " + COL_NAME_BROKENSTATUS +
-                                        s", t.sid sid" +
-                                        s", t.cardid " + COL_NAME_CARDID +
-                                        s", t.is_assist " + COL_NAME_ISASSIST +
-                                        s", t.seq seq" +
-                                        s", t.deletag" +
-                                        s", t.is_palm " + COL_NAME_ISPALM +
-                                        s", db.logic_db_pkid " + COL_NAME_LOGICDB +
-                                        s", t.lt_status  " + COL_NAME_LTSTATUS +
-                                        s", t.creator_unit_code " + COL_NAME_CREATORUNITCODE +
-                                        s", t.updator_unit_code " + COL_NAME_UPDATORUNITCODE +
-                                        s", t.inputpsn" +
-                                        s", t.inputtime" +
-                                        s", t.modifiedpsn" +
-                                        s", t.modifiedtime " +
-                                        " FROM (SELECT f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm, f.lt_status, f.creator_unit_code, f.updator_unit_code, f.inputpsn, f.inputtime, f.modifiedpsn, f.modifiedtime from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
-                                        " UNION ALL SELECT p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
-                                        " LEFT JOIN gafis_case c ON t.case_id = c.case_id " +
-                                        " LEFT JOIN gafis_logic_db_case db ON db.case_pkid = c.case_id order by t.seq"
-  private val caseCols: Array[String] = Array[String](COL_NAME_CASEID, COL_NAME_CARDID, COL_NAME_CASECLASSCODE, COL_NAME_CASENATURE, COL_NAME_CASEOCCURPLACECODE,
-                                                      COL_NAME_SUSPICIOUSAREACODE, COL_NAME_ISMURDER, COL_NAME_ISASSIST,
-                                                      COL_NAME_ASSISTLEVEL, COL_NAME_CASESTATE, COL_NAME_DELETAG,COL_NAME_ISPALM, COL_NAME_LOGICDB,
-                                                      COL_NAME_ISCHECKED, COL_NAME_LTSTATUS, COL_NAME_CASESOURCE, COL_NAME_CASEOCCURPLACEDETAIL,
-                                                      COL_NAME_EXTRACTOR, COL_NAME_EXTRACTUNITCODE, COL_NAME_EXTRACTUNITNAME, COL_NAME_BROKENSTATUS,
-                                                      COL_NAME_CREATORUNITCODE, COL_NAME_UPDATORUNITCODE, COL_NAME_INPUTPSN,COL_NAME_MODIFIEDPSN)
+  override val SYNC_SQL: String = s"select c.CASE_ID " + COL_NAME_CASEID +
+    s", c.CARD_ID " + COL_NAME_CARDID +
+    s", c.CASE_OCCUR_DATE " + COL_NAME_CASEOCCURDATE +
+    s", c.CASE_OCCUR_PLACE_CODE " +  COL_NAME_CASEOCCURPLACECODE +
+    s", c.CASE_OCCUR_PLACE_DETAIL " + COL_NAME_CASEOCCURPLACEDETAIL +
+    s", c.CASE_BRIEF_DETAIL " +
+    s", c.IS_MURDER " + COL_NAME_ISMURDER +
+    s", c.AMOUNT " +
+    s", c.EXTRACT_UNIT_CODE " + COL_NAME_EXTRACTUNITCODE +
+    s", c.EXTRACT_UNIT_NAME " + COL_NAME_EXTRACTUNITNAME +
+    s", c.EXTRACT_DATE " + COL_NAME_EXTRACTDATE +
+    s", c.EXTRACTOR " +
+    s", c.SUSPICIOUS_AREA_CODE " + COL_NAME_SUSPICIOUSAREACODE +
+    s", c.CASE_STATE " + COL_NAME_CASESTATE +
+    s", c.INPUTPSN " +
+    s", c.INPUTTIME " +
+    s", c.MODIFIEDPSN " +
+    s", c.MODIFIEDTIME " +
+    s", c.DELETAG " +
+    s", c.BROKEN_STATUs" +
+    s", c.CASE_SOURCE " +
+    s", c.CREATE_UNIT_CODE " +
+    s", c.ASSIST_LEVEL " + COL_NAME_ASSISTLEVEL +
+    s", c.IS_CHECKED " +
+    //s", c.SID " +
+    s", c.ASSIST_BONUs" +
+    s", c.ASSIST_DEPT_CODE " +
+    s", c.ASSIST_DEPT_NAME " +
+    s", c.ASSIST_DATE " +
+    s", c.ASSIST_SIGN " +
+    s", c.ASSIST_REVOKE_SIGN " +
+    s", c.CS_NO " +
+    s", c.PSIS_NO " +
+    s", c.THAN_STATE_TL " +
+    s", c.THAN_STATE_LT " +
+    s", c.THAN_STATE_LL " +
+    //s", c.SEQ " +
+    s", c.CASE_CLASS_CODE " + COL_NAME_CASECLASSCODE +
+    s", c.CASE_CLASS_CODE2 " + COL_NAME_CASECLASSCODE2 +
+    s", c.CASE_CLASS_CODE3 " + COL_NAME_CASECLASSCODE3 +
+    s", c.SUSPICIOUS_AREA_CODE2 " +
+    s", c.SUSPICIOUS_AREA_CODE3 " +
+    s", t.SID " +
+    s", t.CASE_ID " +
+    s", t.CARDID " +
+    s", t.IS_ASSIST " +
+    s", t.SEQ " +
+    s", t.DELETAG " +
+    s", t.IS_PALM " +
+    s", t.LT_STATUs" +
+    s", t.CREATOR_UNIT_CODE " +
+    s", t.UPDATOR_UNIT_CODE " +
+//    s", t.INPUTPSN " +
+//    s", t.INPUTTIME " +
+//    s", t.MODIFIEDPSN " +
+//    s", t.MODIFIEDTIME " +
+    s", db.LOGIC_DB_PKID " + COL_NAME_LOGICDB +
+    " FROM (SELECT f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm, f.lt_status, f.creator_unit_code, f.updator_unit_code, f.inputpsn, f.inputtime, f.modifiedpsn, f.modifiedtime from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
+    " UNION ALL SELECT p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
+    " LEFT JOIN gafis_case c ON t.case_id = c.case_id " +
+    " LEFT JOIN gafis_logic_db_case db ON db.case_pkid = c.case_id order by t.seq"
+
+  private val caseCols: Array[String] = Array[String](COL_NAME_LOGICDB,COL_NAME_CASECLASSCODE,COL_NAME_CASECLASSCODE2,COL_NAME_CASECLASSCODE3,
+  COL_NAME_CARDID,COL_NAME_CASEOCCURPLACECODE,COL_NAME_CASEOCCURPLACEDETAIL,COL_NAME_ISMURDER,COL_NAME_EXTRACTUNITCODE,
+  COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTDATE,COL_NAME_SUSPICIOUSAREACODE,COL_NAME_CASESTATE,COL_NAME_ASSISTLEVEL)
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -109,13 +133,13 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
         }
       }
       //案件编号
-      val caseId = rs.getString("caseId")
+      val caseId = rs.getString(COL_NAME_CASEID)
       if(caseId != null){
-        TextQueryUtil.getColDataById(caseId, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE).foreach(textData.addCol(_))
+        TextQueryUtil.getColDataByCaseid(caseId).foreach(textData.addCol(_))
       }
 
       //日期类型
-      val dateCols = Array(COL_NAME_CASEOCCURDATE, COL_NAME_EXTRACTDATE,COL_NAME_INPUTTIME, COL_NAME_MODIFIEDTIME)
+      val dateCols = Array(COL_NAME_CASEOCCURDATE, COL_NAME_EXTRACTDATE)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0

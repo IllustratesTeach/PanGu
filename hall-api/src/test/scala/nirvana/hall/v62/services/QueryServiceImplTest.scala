@@ -21,7 +21,7 @@ class QueryServiceImplTest extends BaseV62TestCase{
   @Test
   def testQuery: Unit ={
     executeInContext{
-      val service  = new QueryServiceImpl(createFacade,null,null)
+      val service  = new QueryServiceImpl(createFacade,null)
       val queryResult = service.findSimpleQuery(20,Some("((KeyID LIKE '123'))"),10)
       println(queryResult.size)
     }
@@ -101,10 +101,4 @@ class QueryServiceImplTest extends BaseV62TestCase{
     Assert.assertEquals(7,statusId)
   }
 
-  @Test
-  def test_updateCandListStatus(): Unit ={
-    val service = getService[QueryService]
-    val flag = service.updateCandListStatus("19",1,"430111501999201206001703","1234567890",1)
-    Assert.assertTrue(flag > 0)
-  }
 }

@@ -18,12 +18,14 @@ object FPTConverter {
   /**
     * 将Logic02Rec转换为TPCard，不做图像解压和特征转换，如果保存需要解压图像并提取特征
     * @param logic02Rec
+    * personid：重卡组号，mispersonid：人员编号，personid：卡号
     * @return
     */
   def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard = {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(logic02Rec.personId)
+    tpCard.setStrMisPersonID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
     if (logic02Rec.gender != null && logic02Rec.gender.length > 0) {
@@ -31,10 +33,10 @@ object FPTConverter {
     }
     textBuilder.setStrBirthDate(logic02Rec.birthday)
     textBuilder.setStrIdentityNum(logic02Rec.idCardNo)
-    textBuilder.setStrBirthAddrCode(logic02Rec.addressDetail)
-    textBuilder.setStrBirthAddr(logic02Rec.address)
-    textBuilder.setStrAddrCode(logic02Rec.doorDetail)
-    textBuilder.setStrAddr(logic02Rec.door)
+    textBuilder.setStrBirthAddrCode("") //logic02Rec.address
+    textBuilder.setStrBirthAddr("") //logic02Rec.addressDetail
+    textBuilder.setStrAddrCode(logic02Rec.address)
+    textBuilder.setStrAddr(logic02Rec.addressDetail)
     textBuilder.setStrPersonType(logic02Rec.category)
     textBuilder.setStrCaseType1(logic02Rec.caseClass1Code)
     textBuilder.setStrCaseType2(logic02Rec.caseClass2Code)
@@ -68,6 +70,8 @@ object FPTConverter {
     textBuilder.setStrXieChaContacter(logic02Rec.contact)
     textBuilder.setStrXieChaTelNo(logic02Rec.contactPhone)
     textBuilder.setStrShenPiBy(logic02Rec.approver)
+    textBuilder.setStrHuKouPlaceCode(logic02Rec.door)
+    textBuilder.setStrHuKouPlaceTail(logic02Rec.doorDetail)
 
 
     logic02Rec.fingers.foreach { finger =>
@@ -143,7 +147,7 @@ object FPTConverter {
     val lpCardList = new ArrayBuffer[LPCard]()
     logic03Rec.fingers.foreach { finger =>
       val lpCard = LPCard.newBuilder()
-      lpCard.setStrCardID(finger.fingerId)
+      lpCard.setStrCardID(logic03Rec.caseId + finger.fingerNo)
       val textBuilder = lpCard.getTextBuilder
       textBuilder.setStrCaseId(logic03Rec.caseId)
       textBuilder.setStrSeq(finger.fingerNo)

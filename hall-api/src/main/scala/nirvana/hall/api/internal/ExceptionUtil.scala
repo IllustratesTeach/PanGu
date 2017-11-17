@@ -32,4 +32,25 @@ object ExceptionUtil {
     }
     info
   }
+
+  def getStackTraceInfoByThrowAble(throwAble:Throwable):String ={
+    var info = ""
+    val writer = new StringWriter
+    val printWriter = new PrintWriter(writer,true)
+    try{
+      throwAble.printStackTrace(printWriter)
+      info = writer.toString
+      printWriter.flush
+      writer.flush
+    }
+    catch {
+      case exception: Exception => {
+        exception.printStackTrace()
+      }
+    } finally {
+      if (printWriter != null) printWriter.close()
+      if (writer != null) writer.close()
+    }
+    info
+  }
 }

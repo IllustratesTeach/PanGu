@@ -21,6 +21,12 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
   var module: String = "gz"
   @XmlElement(name = "mnt")
   var mnt = new MntSizeConfig
+  @XmlElement(name = "match_timeout")
+  var matchTimeout: MatchTimeoutConfig = _
+  @XmlElement(name = "auto_check")
+  var autoCheck: AutoCheckConfig = _
+  @XmlElement(name = "cand_key_filter")
+  var candKeyFilters: Array[CandKeyFilterConfig] = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MntSizeConfig")
@@ -39,5 +45,41 @@ class MntSizeConfig {
   var isNewFeature= false
   @XmlElement(name = "has_ridge")
   var hasRidge = true
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "MatchTimeoutConfig")
+class MatchTimeoutConfig{
+  @XmlElement(name = "cron")
+  var cron:String = "0 0/5 * * * ? *"
+  @XmlElement(name = "timeout")
+  var timeout = 60
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "AutoCheckConfig")
+class AutoCheckConfig{
+  @XmlElement(name = "confirm_score")
+  var confirmScore = 60
+  @XmlElement(name = "deny_score")
+  var denyScore = 30
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "CandKeyFilterConfig")
+class CandKeyFilterConfig{
+  @XmlAttribute(name = "query_type")
+  var queryType: Int = _
+  @XmlAttribute(name = "is_percent")
+  var isPercent: Boolean = false
+  @XmlElement(name = "item")
+  var items:Array[CandKeyFilterConfigItem] = _
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "CandKeyFilterConfigItem")
+class CandKeyFilterConfigItem{
+  @XmlAttribute(name = "reverse")
+  var reverse: Boolean = false
+  @XmlAttribute(name = "count")
+  var count: Int = 0
+  @XmlElement(name = "key_wild")
+  var keyWild: String = _
 }
 

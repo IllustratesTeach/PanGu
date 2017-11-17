@@ -1,7 +1,7 @@
 package nirvana.hall.v70.gz.services
 
 import nirvana.hall.api.services.TPCardService
-import nirvana.hall.v70.gz.internal.BaseV70TestCase
+import nirvana.hall.v70.gz.sys.BaseV70TestCase
 import org.junit.{Assert, Test}
 
 /**

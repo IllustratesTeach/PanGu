@@ -19,6 +19,7 @@ import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.services.sys.UserService
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
@@ -27,7 +28,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/1/26.
  */
-class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
+class QueryServiceImpl(entityManager: EntityManager,userService:UserService) extends QueryService{
   /**
    * 发送查询任务
     *
@@ -40,11 +41,15 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gafisQuery.oraSid = query.getResultList.get(0).toString.toLong
     gafisQuery.pkId = CommonUtils.getUUID()
     gafisQuery.submittsystem = QueryConstants.SUBMIT_SYS_AFIS
-    //用户信息，单位信息
-    val sysUser = SysUser.find(Gafis70Constants.INPUTPSN)
-    gafisQuery.userid = Gafis70Constants.INPUTPSN
-    gafisQuery.username = sysUser.trueName
-    gafisQuery.userunitcode = sysUser.departCode
+    
+    //用户名获取用户ID
+    var sysUser = userService.findSysUserByLoginName(gafisQuery.username)
+    if (sysUser.isEmpty){
+      sysUser = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisQuery.userid = sysUser.get.pkId
+    gafisQuery.username = sysUser.get.trueName
+    gafisQuery.userunitcode = sysUser.get.departCode
 
     if(matchTask.getOraCreatetime.nonEmpty){
       gafisQuery.createtime = DateConverter.convertString2Date(matchTask.getOraCreatetime, "yyyy-MM-dd HH:mm:ss")
@@ -78,6 +83,7 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
       matchResult.setRecordNumMatched(queryQue.recordNumMatched)
       matchResult.setMaxScore(queryQue.hitpossibility.toInt)
       matchResult.setStatus(MatcherStatus.newBuilder().setCode(0))
+      matchResult.setMatchFinishTime(DateConverter.convertDate2String(queryQue.finishtime))
       Option(matchResult.build())
     }else{
       None
@@ -283,13 +289,4 @@ class QueryServiceImpl(entityManager: EntityManager) extends QueryService{
     gaQuery
   }
 
-  /**
-    * 更新任务表中对应这条认定的候选信息的候选状态
-    * @param oraSid
-    * @param taskType
-    * @param keyId
-    * @param fgp
-    * @return
-    */
-  override def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = ???
 }

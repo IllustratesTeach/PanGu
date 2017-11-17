@@ -31,7 +31,7 @@ class WsSendQueryServiceImpl(queryService: QueryService
           sLogic03Rec.fingers.foreach{ finger =>
             fingerId = finger.fingerId
             try{
-              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId, MatchType.FINGER_LT)
+              oraSid = queryService.sendQueryByCardIdAndMatchType(fingerId,MatchType.FINGER_LT)
             }catch{
               case e:Exception => throwException(e)
             }

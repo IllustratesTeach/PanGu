@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        id="breakinfos">
+    <xs:element name="BreakInfos" type="BreakInfosType"/>
+
+    <xs:complexType name="BreakInfosType">
+        <xs:sequence>
+            <xs:element type="xs:int" name="RecordCount" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="BreakRecordType" name="BreakRecord" minOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="BreakRecordType">
+        <xs:sequence>
+            <xs:element type="xs:int" name="Version" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="BreakID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:int" name="QueryType" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="TprCardID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="TprPersonID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="Name" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="SexCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="Birtchday" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="ShenFenID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="HuKouPlaceCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="HuKouPlaceTail" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="PrinterUnitCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="PrintDate" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="PrintName" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="LatentID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="CaseID" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:int" name="NFgIndex" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="CaseOccurDate" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="CaseOccurPlaceTail" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="CaseClassCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="SuperviseLevel" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="ExtractUnitCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="LatentMemo" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="CaseMemo" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="BreakUserName" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="BreakUnitCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="BreakDateTime" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="ReCheckUserName" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="ReCheckUnitCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:string" name="ReCheckDate" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

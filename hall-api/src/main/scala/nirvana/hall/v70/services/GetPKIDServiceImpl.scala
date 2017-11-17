@@ -18,7 +18,7 @@ class GetPKIDServiceImpl(implicit val dataSource: DataSource) extends GetPKIDSer
     val sql = "select Distinct k.pk_id from Gafis_Checkin_Info k  " +
       "where k.query_uuid in (select pk_id  from GAFIS_NORMALQUERY_QUERYQUE t " +
       "where (t.querytype = '1' or t.querytype = '2' or t.querytype = '0' or t.querytype = '3') " +
-      "and deletag='1' and t.status = '2' and ora_sid =?)"
+      "and deletag='1' and t.status = '2' and ora_sid =?) and confirm_status = '98' "
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter(sql) { ps =>
       ps.setString(1,ora_sid)

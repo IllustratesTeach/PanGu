@@ -188,7 +188,10 @@
     <dependency>
       <groupId>com.belerweb</groupId>
       <artifactId>pinyin4j</artifactId>
-      <version>2.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
     </dependency>
     <!--<dependency>-->
       <!--<groupId>com.oracle</groupId>-->
