@@ -26,4 +26,10 @@ trait FPTService {
 
   def addLogic03Res(logic03Rec: Logic03Rec)
 
+  /**
+    * 上海现勘 使用
+    * @param logic03Rec
+    */
+  def addLogic03ResForShangHai(logic03Rec: Logic03Rec)
+
 }

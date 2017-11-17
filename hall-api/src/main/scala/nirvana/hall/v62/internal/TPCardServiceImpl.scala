@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.services.{TPCardService}
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
@@ -20,7 +21,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   override def addTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
-    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
+    val tpCardHandled = tPCard.toBuilder.setStrCardID(dropTPCardNoHeadLetter(tPCard.getStrCardID)).build
+    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCardHandled)
     facade.NET_GAFIS_FLIB_Add(getDBID(dbId),
       V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID,tpCard)
@@ -32,7 +34,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   def delTPCard(cardId: String, dbId: Option[String]): Unit ={
-    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, cardId)
+    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, dropTPCardNoHeadLetter(cardId))
   }
 
   /**
@@ -41,7 +43,8 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   override def updateTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
-    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
+    val tpCardHandled = tPCard.toBuilder.setStrCardID(dropTPCardNoHeadLetter(tPCard.getStrCardID)).build
+    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCardHandled)
     facade.NET_GAFIS_FLIB_Update(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID, tpCard)
   }
@@ -52,7 +55,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_TPCARDINFO, cardId)
+    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_TPCARDINFO, dropTPCardNoHeadLetter(cardId))
   }
 
   /**
@@ -68,9 +71,10 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     }
     val tp = new GTPCARDINFOSTRUCT
     facade.NET_GAFIS_FLIB_Get(tdbId, V62Facade.TID_TPCARDINFO,
-      cardId, tp, null, 3)
+      dropTPCardNoHeadLetter(cardId), tp, null, 3)
 
-    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
+    val tPCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
+    tPCard.toBuilder.setStrCardID(appendTPCardNoHeadLetter(tPCard.getStrCardID)).build
   }
 
   /**
@@ -194,6 +198,19 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     }else{
       dbId.get.toShort
     }
+  }
+
+  private def dropTPCardNoHeadLetter(cardId:String):String ={
+
+    if(cardId.toUpperCase.startsWith(HallApiConstants.TPCARDNO_HEAD_LETTER))
+      cardId.toUpperCase.drop(1)
+    else cardId.toUpperCase
+  }
+
+  private def appendTPCardNoHeadLetter(cardId:String):String ={
+    if(!cardId.toUpperCase.startsWith(HallApiConstants.TPCARDNO_HEAD_LETTER))
+      HallApiConstants.TPCARDNO_HEAD_LETTER + cardId
+    else  cardId.toUpperCase
   }
 
   /**

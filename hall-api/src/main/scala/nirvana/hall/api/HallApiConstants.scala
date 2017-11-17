@@ -57,4 +57,7 @@ object HallApiConstants {
 
   //Afis62 breakcase status
   final val GAQRYCAND_CHKSTATE_MATCH = 0x3
+
+  final val TPCARDNO_HEAD_LETTER = "R"
+  final val LPCARDNO_HEAD_LETTER = "A"
 }

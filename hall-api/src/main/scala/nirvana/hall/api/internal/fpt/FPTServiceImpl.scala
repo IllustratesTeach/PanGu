@@ -113,6 +113,25 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
     }
   }
 
+  @Transactional
+  override def addLogic03ResForShangHai(logic03Rec: Logic03Rec): Unit = {
+    val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
+    if(caseInfoService.isExist(logic03Rec.caseId)){
+      caseInfoService.updateCaseInfo(caseInfo)
+    }else{
+      caseInfoService.addCaseInfo(caseInfo)
+    }
+    val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
+    lPCardList.foreach{lPCard =>
+      val lpCardBuiler = lPCard.toBuilder
+      if(lPCardService.isExist(logic03Rec.cardId)){
+        lPCardService.updateLPCard(lpCardBuiler.build)
+      }else{
+        lPCardService.addLPCard(lpCardBuiler.build)
+      }
+    }
+  }
+
   private def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={
     if(isLatent){
       extractor.extractByGAFISIMG(originalImage, FingerPosition.FINGER_UNDET, FeatureType.FingerLatent)
@@ -235,7 +254,11 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
         val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
         if(gafisImage.stHead.bIsCompressed > 0){
           val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-          val mntData = extractByGAFISIMG(originalImage, false)
+          val mntData = try{
+            extractByGAFISIMG(originalImage, false)
+          }catch{
+            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+          }
 
           blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
           //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))

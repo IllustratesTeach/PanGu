@@ -24,8 +24,8 @@ object FPTConverter {
   def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard = {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-    tpCard.setStrCardID(if(logic02Rec.personId.toUpperCase.startsWith("R")) logic02Rec.personId.drop(1) else logic02Rec.personId.toUpperCase)
-    tpCard.setStrMisPersonID(if(!logic02Rec.personId.toUpperCase.startsWith("R")) "R" + logic02Rec.personId else logic02Rec.personId.toUpperCase)
+    tpCard.setStrCardID(logic02Rec.personId)
+    tpCard.setStrMisPersonID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
     if (logic02Rec.gender != null && logic02Rec.gender.length > 0) {
@@ -147,7 +147,7 @@ object FPTConverter {
     val lpCardList = new ArrayBuffer[LPCard]()
     logic03Rec.fingers.foreach { finger =>
       val lpCard = LPCard.newBuilder()
-      lpCard.setStrCardID(finger.fingerId)
+      lpCard.setStrCardID(logic03Rec.caseId + finger.fingerNo)
       val textBuilder = lpCard.getTextBuilder
       textBuilder.setStrCaseId(logic03Rec.caseId)
       textBuilder.setStrSeq(finger.fingerNo)

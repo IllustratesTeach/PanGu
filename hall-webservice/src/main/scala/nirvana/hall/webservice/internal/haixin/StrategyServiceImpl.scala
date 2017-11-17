@@ -6,7 +6,7 @@ import javax.activation.DataHandler
 import javax.sql.DataSource
 
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec}
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
@@ -138,6 +138,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
             if(!t.personId.equals(personId)){
               throw new IndoorPersonIdNotEqFPTPersonIdException("传入参数personId与FPT中的personid不一致,当前传入personid为:" + personId)
             }
+            fPTPackageRequiredFieldCheck(t)
         }
     }
     fpt.right.get
@@ -573,6 +574,43 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
         returnValue = IAConstant.UNKNOWN_ERROR
       }
     returnValue
+  }
+
+
+  private def fPTPackageRequiredFieldCheck(t:Logic02Rec): Unit ={
+    if(CommonUtils.isNullOrEmpty(t.personName)){
+      throw new Exception("personName is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.birthday)){
+      throw new Exception("birthday is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.gender)){
+      throw new Exception("gender is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.door)){
+      throw new Exception("door is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.doorDetail)){
+      throw new Exception("doorDetail is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.address)){
+      throw new Exception("address is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.addressDetail)){
+      throw new Exception("addressDetail is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.gatherName)){
+      throw new Exception("gatherName is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.gatherDate)){
+      throw new Exception("gatherDate is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.gatherUnitName)){
+      throw new Exception("gatherUnitName is empty")
+    }
+    if(CommonUtils.isNullOrEmpty(t.gatherUnitCode)){
+      throw new Exception("gatherUnitCode is empty")
+    }
   }
 
   /**
