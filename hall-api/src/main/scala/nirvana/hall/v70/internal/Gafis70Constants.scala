@@ -18,6 +18,8 @@ object Gafis70Constants {
   val DATA_SOURCE_CAPTURE=1.toString
   //数据来源，海鑫综采
   val DATA_SOURCE_HXZC= 7.toShort
+  //数据来源，现勘对接
+  val DATA_SOURCE_SURVEY= 8.toShort
   //默认采集类型
   val GATHER_TYPE_ID_DEFAULT = "1"
   //主特征

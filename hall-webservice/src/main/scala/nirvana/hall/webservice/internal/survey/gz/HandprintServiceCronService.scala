@@ -1,25 +1,25 @@
 package nirvana.hall.webservice.internal.survey.gz
 
+import java.io.ByteArrayInputStream
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
-import javax.sql.DataSource
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.internal.survey.XmlToObject
+import nirvana.hall.webservice.internal.survey.gz.vo.OriginalList
+import nirvana.hall.webservice.services.survey.{HandprintService, SurveyRecord}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
 
-import scala.collection.mutable
 
 
 /**
   * Created by ssj on 2017/11/9.
   */
-class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,implicit val dataSource: DataSource) extends LoggerSupport{
+class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,surveyRecord: SurveyRecord) extends LoggerSupport{
   val url = hallWebserviceConfig.union4pfmip.url
   val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
   val userId = hallWebserviceConfig.union4pfmip.user
@@ -37,72 +37,68 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,imp
     if(hallWebserviceConfig.union4pfmip.cron!= null){
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
-          val config = getSurveyConfig()
-          val startTime = config.get("starttime").get.asInstanceOf[Date].getTime
-          val endTime = startTime + config.get("increments").get.asInstanceOf[String].toLong*60*1000  //increments 毫秒数
-          info("begin HandprintServiceCronService")
+          try {
+            val config = surveyRecord.getSurveyConfig()
+            val startTime = config.get("starttime").get.asInstanceOf[Date].getTime
+            val endTime = startTime + config.get("increments").get.asInstanceOf[String].toLong*60*1000  //increments 毫秒数
+            info("begin HandprintServiceCronService")
 
-          //获取海鑫系统时间
-          //val hxtime = new Date(client.getSystemDateTime).getTime
-          val hxtime = new Date().getTime
-          if (hxtime <= endTime) {
-            info("系统休眠...")
-          } else {
-            try {
+            //获取海鑫系统时间
+            //val hxtime = new Date(client.getSystemDateTime).getTime
+            //surveyRecord.saveSurveyLogRecord("getSystemDateTime","","","",hxtime.toString,"")
+            val hxtime = new Date().getTime
+            if (hxtime <= endTime) {
+              info("系统休眠...")
+            } else {
+              //拼接request msg
+              val map = new scala.collection.mutable.HashMap[String,Any]
+              map += ("a" -> userId)
+              map += ("b" -> password)
+              map += ("c" -> "123456")
+              map += ("d" -> dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"))
+              map += ("e" -> dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
               //获取数量
               val num = client.getOriginalDataCount(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
+              val requestmsgs = surveyRecord.mapToSting("getOriginalDataCount",map)
+              surveyRecord.saveSurveyLogRecord("getOriginalDataCount","","",requestmsgs,num.toString,"")
               info("hx  getOriginalDataCount --" + num)
               if (num > 0) {
+
+                //拼接request msg
+                val map1 = new scala.collection.mutable.HashMap[String,Any]
+                map1 += ("a" -> userId)
+                map1 += ("b" -> password)
+                map1 += ("c" -> "123456")
+                map1 += ("d" -> "")
+                map1 += ("e" -> dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"))
+                map1 += ("f" -> dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
+                map1 += ("g" -> 1)
+                map1 += ("h" -> num)
                 //获取现勘号列表
-                val ss = client.getOriginalDataList(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"), 1, num)
-                info("hx  getOriginalDataCount --" + ss.toString)
+                val datelist = client.getOriginalDataList(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"), 1, num)
+                val requestmsgs1 = surveyRecord.mapToSting("getOriginalDataList",map1)
+                surveyRecord.saveSurveyLogRecord("getOriginalDataList","","",requestmsgs1,"","")
+                info("hx  getOriginalDataList --" + datelist.toString)
+                val original = XmlToObject.parseXML[OriginalList](new ByteArrayInputStream(datelist))
+                for(i <- 0 until original.K.size()){
+                  surveyRecord.saveSurveySnoRecord(original.K.get(i).K_No,original.K.get(i).S_No,original.K.get(i).card_type,original.K.get(i).CASE_NAME)
+                  if(surveyRecord.isKno(original.K.get(i).K_No)<=0){
+                    surveyRecord.saveSurveyKnoRecord(original.K.get(i).K_No)
+                  }
+                }
               }
-            } catch {
-              case e: Exception =>
-                error("HandprintServiceCronService-error:" + e.getMessage)
+              surveyRecord.updateSurveyConfig(new Timestamp(endTime))
             }
-            updateSurveyConfig(new Timestamp(endTime))
+            info("end HandprintServiceCronService")
+          } catch {
+            case e: Exception =>
+              error("HandprintServiceCronService-error:" + e.getMessage)
+              surveyRecord.saveSurveyLogRecord("","","","","",e.getMessage)
           }
-          info("end HandprintServiceCronService")
         }
       })
     }
   }
-
-
-  /**
-    * 获取现勘时间配置信息
-    *
-    * @return
-    */
-  def getSurveyConfig(): mutable.HashMap[String,Any] =  {
-    val sql = s"SELECT * " +
-      s"FROM SURVEY_CONFIG t where t.flags = '1'"
-    var map = new scala.collection.mutable.HashMap[String,Any]
-    JdbcDatabase.queryWithPsSetter2(sql){ps=>
-    }{rs=>
-      if(rs.next()){
-        map += ("starttime" -> rs.getTimestamp("START_TIME"))
-        map += ("increments" -> rs.getString("INCREMENTS"))
-      }
-    }
-    map
-  }
-
-  /**
-    * 更新现勘时间配置表 开始时间字段
-    *
-    * @param endTime
-    * @return
-    */
-  def updateSurveyConfig(endTime : Timestamp): Unit =  {
-    val sql = s"update SURVEY_CONFIG " +
-      s"set START_TIME = ? "
-    JdbcDatabase.update(sql){ps=>
-      ps.setTimestamp(1,endTime)
-    }
-  }
-
   /**
     *  date to string
     * @param dateDate
@@ -123,4 +119,6 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,imp
     }
     return dateString
   }
+
+
  }
