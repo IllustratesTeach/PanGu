@@ -393,6 +393,10 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
         result += map.get("e").get.asInstanceOf[String]+"-*-"
         result += map.get("f").get.asInstanceOf[String]+"-*-"
         result += map.get("g").get.asInstanceOf[String]
+      case "getReceptionNo" =>
+        result += map.get("a").get.asInstanceOf[String]+"-*-"
+        result += map.get("b").get.asInstanceOf[String]+"-*-"
+        result += map.get("c").get.asInstanceOf[String]
       case _ =>
     }
     result
