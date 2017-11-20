@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream
 
 import monad.support.services.XmlLoader
 import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.webservice.internal.survey.XmlToObject
 import nirvana.hall.webservice.internal.survey.gz.Constant
 import nirvana.hall.webservice.internal.survey.gz.vo.{CaseTextList, ListNode, OriginalList}
 import nirvana.hall.webservice.services.survey.SurveyRecord
@@ -44,7 +43,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
     println("恢复后:" + new String(IOUtils.toByteArray(dataHandle.getInputStream)))
 
     val datelist = IOUtils.toByteArray(getClass.getResourceAsStream("/ss.xml"))
-    val sss = XmlToObject.parseXML[OriginalList](new ByteArrayInputStream(datelist))
+    val sss = XmlLoader.parseXML[OriginalList](new String(datelist))
     val ss = sss.K.size()
     println("转换后:" + ss)
   }
@@ -57,7 +56,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   def saveSurvey_sno(): Unit ={
     val service = getService[SurveyRecord]
     val datelist = IOUtils.toByteArray(getClass.getResourceAsStream("/ss.xml"))
-    val sss = XmlToObject.parseXML[OriginalList](new ByteArrayInputStream(datelist))
+    val sss = XmlLoader.parseXML[OriginalList](new String(datelist))
     for(i <- 0 until sss.K.size()){
       sss.K.get(i).K_No
       sss.K.get(i).S_No
@@ -75,7 +74,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   def saveSurvey_kno(): Unit ={
     val service = getService[SurveyRecord]
     val datelist = IOUtils.toByteArray(getClass.getResourceAsStream("/ss.xml"))
-    val sss = XmlToObject.parseXML[OriginalList](new ByteArrayInputStream(datelist))
+    val sss = XmlLoader.parseXML[OriginalList](new String(datelist))
     for(i <- 0 until sss.K.size()){
       sss.K.get(i).K_No
       sss.K.get(i).S_No
@@ -94,7 +93,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   def saveCaseinfo(): Unit ={
     val service = getService[SurveyRecord]
     val caseinfo = IOUtils.toByteArray(getClass.getResourceAsStream("/case.xml"))
-    val caseText = XmlToObject.parseXML[CaseTextList](new ByteArrayInputStream(caseinfo))
+    val caseText = XmlLoader.parseXML[CaseTextList](new String(caseinfo))
     for(i <- 0 until caseText.K.size()){
       //案件文字信息解析入库操作(默认caseid案件编号存在或不存在)
       service.addCaseInfo(caseText.K.get(i),"12")

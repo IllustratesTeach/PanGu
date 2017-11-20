@@ -5,9 +5,8 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import monad.support.services.LoggerSupport
+import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.survey.XmlToObject
 import nirvana.hall.webservice.internal.survey.gz.vo.OriginalList
 import nirvana.hall.webservice.services.survey.{HandprintService, SurveyRecord}
 import org.apache.tapestry5.ioc.annotations.PostInjection
@@ -79,7 +78,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
                 val requestmsgs1 = surveyRecord.mapToSting("getOriginalDataList",map1)
                 surveyRecord.saveSurveyLogRecord("getOriginalDataList","","",requestmsgs1,"","")
                 info("hx  getOriginalDataList --" + datelist.toString)
-                val original = XmlToObject.parseXML[OriginalList](new ByteArrayInputStream(datelist))
+                val original = XmlLoader.parseXML[OriginalList](new String(datelist))
                 for(i <- 0 until original.K.size()){
                   surveyRecord.saveSurveySnoRecord(original.K.get(i).K_No,original.K.get(i).S_No,original.K.get(i).card_type,original.K.get(i).CASE_NAME)
                   if(surveyRecord.isKno(original.K.get(i).K_No)<=0){

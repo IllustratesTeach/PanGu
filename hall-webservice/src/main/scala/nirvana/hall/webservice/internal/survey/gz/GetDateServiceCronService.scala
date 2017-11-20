@@ -5,7 +5,7 @@ import java.io.{ByteArrayInputStream, File}
 import java.util.Date
 
 import com.google.protobuf.ByteString
-import monad.support.services.LoggerSupport
+import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService}
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
@@ -15,7 +15,6 @@ import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.survey.XmlToObject
 import nirvana.hall.webservice.internal.survey.gz.vo.{CaseTextList, ListCaseNode}
 import nirvana.hall.webservice.services.survey.{HandprintService, SurveyRecord}
 import org.apache.commons.io.{FileUtils, IOUtils}
@@ -86,7 +85,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
                   surveyRecord.saveSurveyLogRecord("getOriginalData","","",requestmsgs1,caseinfo.toString,"")
                   info("hx  getOriginalDataList --" + caseinfo.toString)
 
-                  val caseText = XmlToObject.parseXML[CaseTextList](new ByteArrayInputStream(caseinfo))
+                  val caseText = XmlLoader.parseXML[CaseTextList](new String(caseinfo))
                   for(i <- 0 until caseText.K.size()){
                     //案件文字信息解析入库操作(默认caseid案件编号存在或不存在)
                     surveyRecord.addCaseInfo(caseText.K.get(i),caseid)
@@ -137,7 +136,6 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
                             val requestmsgs3 = surveyRecord.mapToSting("FBUseCondition",map3)
                             surveyRecord.saveSurveyLogRecord("FBUseCondition","","",requestmsgs3,responses,"")
                         }
-
                       }
                       val map4 = new scala.collection.mutable.HashMap[String,Any]
                       map4 += ("a" -> userId)
