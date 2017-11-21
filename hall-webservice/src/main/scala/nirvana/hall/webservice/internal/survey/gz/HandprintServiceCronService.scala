@@ -1,28 +1,28 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import java.io.ByteArrayInputStream
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
 import java.util.Date
 
 import monad.support.services.{LoggerSupport, XmlLoader}
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.survey.gz.vo.OriginalList
-import nirvana.hall.webservice.services.survey.{HandprintService, SurveyRecord}
+import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
+import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
 
 
-
 /**
   * Created by ssj on 2017/11/9.
   */
-class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,surveyRecord: SurveyRecord) extends LoggerSupport{
-  val url = hallWebserviceConfig.union4pfmip.url
-  val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
-  val userId = hallWebserviceConfig.union4pfmip.user
-  val password = hallWebserviceConfig.union4pfmip.password
+class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,surveyRecordService: SurveyRecordService) extends LoggerSupport{
+  val url = hallWebserviceConfig.handprintService.url
+  val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
+  val userId = hallWebserviceConfig.handprintService.user
+  val password = hallWebserviceConfig.handprintService.password
+  val unitCode = hallWebserviceConfig.handprintService.unitCode
   val client = StarkWebServiceClient.createClient(classOf[HandprintService], url, targetNamespace)
 
   /**
@@ -33,91 +33,84 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    if(hallWebserviceConfig.union4pfmip.cron!= null){
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sync-cron", new Runnable {
+    if(hallWebserviceConfig.handprintService.cron!= null){
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try {
-            val config = surveyRecord.getSurveyConfig()
-            val startTime = config.get("starttime").get.asInstanceOf[Date].getTime
-            val endTime = startTime + config.get("increments").get.asInstanceOf[String].toLong*60*1000  //increments 毫秒数
-            info("begin HandprintServiceCronService")
-
-            //获取海鑫系统时间
-            //val hxtime = new Date(client.getSystemDateTime).getTime
-            //surveyRecord.saveSurveyLogRecord("getSystemDateTime","","","",hxtime.toString,"")
-            val hxtime = new Date().getTime
-            if (hxtime <= endTime) {
-              info("系统休眠...")
-            } else {
-              //拼接request msg
-              val map = new scala.collection.mutable.HashMap[String,Any]
-              map += ("a" -> userId)
-              map += ("b" -> password)
-              map += ("c" -> "123456")
-              map += ("d" -> dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"))
-              map += ("e" -> dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
-              //获取数量
-              val num = client.getOriginalDataCount(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
-              val requestmsgs = surveyRecord.mapToSting("getOriginalDataCount",map)
-              surveyRecord.saveSurveyLogRecord("getOriginalDataCount","","",requestmsgs,num.toString,"")
-              info("hx  getOriginalDataCount --" + num)
-              if (num > 0) {
-
-                //拼接request msg
-                val map1 = new scala.collection.mutable.HashMap[String,Any]
-                map1 += ("a" -> userId)
-                map1 += ("b" -> password)
-                map1 += ("c" -> "123456")
-                map1 += ("d" -> "")
-                map1 += ("e" -> dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"))
-                map1 += ("f" -> dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
-                map1 += ("g" -> 1)
-                map1 += ("h" -> num)
-                //获取现勘号列表
-                val datelist = client.getOriginalDataList(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"), 1, num)
-                val requestmsgs1 = surveyRecord.mapToSting("getOriginalDataList",map1)
-                surveyRecord.saveSurveyLogRecord("getOriginalDataList","","",requestmsgs1,"","")
-                info("hx  getOriginalDataList --" + datelist.toString)
-                val original = XmlLoader.parseXML[OriginalList](new String(datelist))
-                for(i <- 0 until original.K.size()){
-                  surveyRecord.saveSurveySnoRecord(original.K.get(i).K_No,original.K.get(i).S_No,original.K.get(i).card_type,original.K.get(i).CASE_NAME)
-                  if(surveyRecord.isKno(original.K.get(i).K_No)<=0){
-                    surveyRecord.saveSurveyKnoRecord(original.K.get(i).K_No)
-                  }
-                }
-              }
-              surveyRecord.updateSurveyConfig(new Timestamp(endTime))
-            }
-            info("end HandprintServiceCronService")
+            info("begin Cron")
+            doWork
+            info("end Cron")
           } catch {
             case e: Exception =>
-              error("HandprintServiceCronService-error:" + e.getMessage)
-              surveyRecord.saveSurveyLogRecord("","","","","",e.getMessage)
+              error("HandprintServiceCronService-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(e),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
+              )
           }
         }
       })
     }
   }
-  /**
-    *  date to string
-    * @param dateDate
-    * @param format
-    * @return
-    */
-  def dateToStr(dateDate: Date, format: String): String = {
-    var dateString: String = null
-    try {
-      val formatter: SimpleDateFormat = new SimpleDateFormat(format)
-      dateString = formatter.format(dateDate)
-    }
-    catch {
-      case e: Exception => {
-        val formatter: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-        dateString = formatter.format(dateDate)
+
+  private def doWork: Unit ={
+
+    val checkVal = surveyRecordService.isSleep(new Date(client.getSystemDateTime).getTime)
+    if(!checkVal._1){
+      //获取数量
+      val num = client.getOriginalDataCount(userId
+        , password
+        , unitCode
+        , Constant.EMPTY
+        , checkVal._2.startTime
+        , checkVal._2.endTime)
+      surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_COUNT
+        ,Constant.EMPTY
+        ,Constant.EMPTY
+        ,CommonUtil.appendParam("userId:"+userId
+          ,"password:"+password
+          ,"unitCode:"+unitCode
+          ,"kNo:"
+          ,"startTime:"+ checkVal._2.startTime
+          ,"endTime:"+ checkVal._2.endTime)
+        ,num.toString
+        ,Constant.EMPTY)
+      if (num > 0) {
+        //获取现勘号列表
+        val dataList = new String(client.getOriginalDataList(userId
+          , password
+          , unitCode
+          , Constant.EMPTY
+          , checkVal._2.startTime
+          , checkVal._2.endTime
+          , 1
+          , num))
+        surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_LIST
+          ,Constant.EMPTY
+          ,Constant.EMPTY
+          ,CommonUtil.appendParam("userId:"+userId
+            ,"password:"+password
+            ,"unitCode:"+unitCode
+            ,"kNo:"
+            ,"startTime:"+ checkVal._2.startTime
+            ,"endTime:"+ checkVal._2.endTime
+            ,"startNum:" + 1
+            ,"endNum:" + num)
+          ,dataList
+          ,Constant.EMPTY)
+        val original = XmlLoader.parseXML[OriginalList](dataList)
+        val kNoList = original.K.iterator
+        var kNoObj:ListNode = null
+        while(kNoList.hasNext){
+          kNoObj = kNoList.next
+          surveyRecordService.saveSurveySnoRecord(kNoObj.K_No
+            ,kNoObj.S_No
+            ,kNoObj.card_type
+            ,kNoObj.CASE_NAME)
+          if(!surveyRecordService.isKno(kNoObj.K_No)){
+            surveyRecordService.saveSurveyKnoRecord(kNoObj.K_No)
+          }
+        }
       }
+      surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,Constant.DATETIME_FORMAT).getTime))
     }
-    return dateString
   }
-
-
- }
+}

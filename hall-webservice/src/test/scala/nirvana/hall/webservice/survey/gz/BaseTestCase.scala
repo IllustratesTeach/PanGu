@@ -1,11 +1,11 @@
-package nirvana.hall.webservice.survey
+package nirvana.hall.webservice.survey.gz
 
 import javax.persistence.EntityManagerFactory
 
 import monad.support.services.XmlLoader
-import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote._
+import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
 import nirvana.hall.api.services.AuthService
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote._
@@ -15,10 +15,8 @@ import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.haixin.{StrategyServiceImpl, WsHaiXinFingerServiceImpl}
 import nirvana.hall.webservice.internal.survey.gz.recordmod.SurveyRecordImpl
-import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
-import nirvana.hall.webservice.services.survey.SurveyRecord
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -73,7 +71,7 @@ object TestWebserviceModule{
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
-    binder.bind(classOf[SurveyRecord], classOf[SurveyRecordImpl])
+    binder.bind(classOf[SurveyRecordService], classOf[SurveyRecordImpl])
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
   }
 }

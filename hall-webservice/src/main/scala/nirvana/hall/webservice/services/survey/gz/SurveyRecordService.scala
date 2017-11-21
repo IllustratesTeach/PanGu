@@ -1,9 +1,9 @@
-package nirvana.hall.webservice.services.survey
+package nirvana.hall.webservice.services.survey.gz
 
 import java.sql.Timestamp
 
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
-import nirvana.hall.webservice.internal.survey.gz.vo.ListCaseNode
+import nirvana.hall.webservice.internal.survey.gz.vo.{ListCaseNode, TimeConfig}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -11,14 +11,13 @@ import scala.collection.mutable.ListBuffer
 /**
   * Created by ssj on 2017/11/16.
   */
-trait SurveyRecord {
+trait SurveyRecordService {
 
   /**
-    * 获取现勘时间配置信息
-    *
+    * 根据时间判断是否应该休眠
     * @return
     */
-  def getSurveyConfig(): scala.collection.mutable.HashMap[String,Any]
+  def isSleep(haiXinServerTime:Long):(Boolean,TimeConfig)
 
   /**
     * 更新现勘时间配置表 开始时间字段
@@ -42,7 +41,7 @@ trait SurveyRecord {
     * @param kno
     * @return
     */
-  def isKno(kno:String): Int
+  def isKno(kno:String): Boolean
 
   /**
     * 存储现勘号记录到现勘记录表中

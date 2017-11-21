@@ -1,11 +1,11 @@
 package nirvana.hall.webservice.internal.survey.gz.recordmod
 
 import java.sql.Timestamp
-import java.util.UUID
+import java.util.{Date, UUID}
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.JniLoaderUtil
+import nirvana.hall.api.internal.{DateConverter, JniLoaderUtil}
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
@@ -14,8 +14,9 @@ import nirvana.hall.extractor.internal.FPTMntConverter
 import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.webservice.internal.survey.gz.vo.ListCaseNode
-import nirvana.hall.webservice.services.survey.SurveyRecord
+import nirvana.hall.webservice.internal.survey.gz.Constant
+import nirvana.hall.webservice.internal.survey.gz.vo.{ListCaseNode, TimeConfig}
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -27,20 +28,36 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
                        caseInfoService: CaseInfoService,
                        lPCardService: LPCardService,
                        lPPalmService: LPPalmService,
-                       implicit val dataSource: DataSource) extends SurveyRecord{
+                       implicit val dataSource: DataSource) extends SurveyRecordService{
 
-  //fpt处理需要加载jni
-  JniLoaderUtil.loadExtractorJNI()
-  JniLoaderUtil.loadImageJNI()
+  JniLoaderUtil.loadExtractorJNI
+  JniLoaderUtil.loadImageJNI
+
+
+  override def isSleep(haiXinServerTime:Long):(Boolean,TimeConfig) = {
+    var bStr = false
+    val timeConfig = new TimeConfig
+    getSurveyConfig match {
+      case Some(t) =>
+        val endTime = t.get("starttime").get.asInstanceOf[Date].getTime + t.get("increments").get.asInstanceOf[String].toLong*60*1000
+        if(haiXinServerTime <= endTime){
+          bStr = true
+        }else{
+          timeConfig.startTime = DateConverter.convertDate2String(new Date(t.get("starttime").get.asInstanceOf[Date].getTime),Constant.DATETIME_FORMAT)
+          timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),Constant.DATETIME_FORMAT)
+        }
+      case _ => throw new Exception("time config empty or error")
+    }
+    (bStr,timeConfig)
+  }
 
   /**
     * 获取现勘时间配置信息
     *
     * @return
     */
-  def getSurveyConfig(): mutable.HashMap[String,Any] =  {
-    val sql = s"SELECT * " +
-      s"FROM SURVEY_CONFIG t where t.flags = '1'"
+  private def getSurveyConfig(): Option[mutable.HashMap[String,Any]] =  {
+    val sql = "SELECT * FROM SURVEY_CONFIG t WHERE t.flags = '1'"
     var map = new scala.collection.mutable.HashMap[String,Any]
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
     }{rs=>
@@ -49,7 +66,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
         map += ("increments" -> rs.getString("INCREMENTS"))
       }
     }
-    map
+    Some(map)
   }
 
   /**
@@ -59,8 +76,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     * @return
     */
   def updateSurveyConfig(endTime : Timestamp): Unit =  {
-    val sql = s"update SURVEY_CONFIG " +
-      s"set START_TIME = ? "
+    val sql = s"UPDATE SURVEY_CONFIG SET START_TIME = ? ,UPDATE_TIME=sysdate"
     JdbcDatabase.update(sql){ps=>
       ps.setTimestamp(1,endTime)
     }
@@ -91,7 +107,8 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     * @param kno
     * @return
     */
-  def isKno(kno:String): Int={
+  def isKno(kno:String): Boolean={
+    var bStr = false
     val sql = s"select count(1) num from SURVEY_XKCODE_RECORD where kno = ?"
     var num = 0
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
@@ -101,7 +118,10 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
         num = rs.getInt("num")
       }
     }
-    num
+    if(num>0){
+      bStr = true
+    }
+    bStr
   }
 
   /**
@@ -127,8 +147,8 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     * @param error
     */
   override def saveSurveyLogRecord(interfacetype: String, kno: String, Sno: String, requestmsg: String, responsemsg: String, error: String): Unit = {
-    val sql = s"insert into SURVEY_LOGGER_RECORD(UUID,INTERFACETYPE,KNO,SNO,REQUESTMSG,RESPONSEMSG,ERRORMSG,CREATETIME) " +
-      s"values (?,?,?,?,?,?,?,sysdate)"
+    val sql = s"INSERT INTO SURVEY_LOGGER_RECORD(UUID,INTERFACETYPE,KNO,SNO,REQUESTMSG,RESPONSEMSG,ERRORMSG,CREATETIME) " +
+              s"VALUES (?,?,?,?,?,?,?,sysdate)"
     JdbcDatabase.update(sql){ps=>
       ps.setString(1,UUID.randomUUID().toString.replace("-",""))
       ps.setString(2,interfacetype)

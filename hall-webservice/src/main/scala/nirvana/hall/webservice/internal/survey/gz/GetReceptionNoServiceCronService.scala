@@ -3,7 +3,8 @@ package nirvana.hall.webservice.internal.survey.gz
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.{HandprintService, SurveyRecord}
+import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
@@ -11,7 +12,7 @@ import stark.webservice.services.StarkWebServiceClient
 /**
   * Created by ssj on 2017/11/14.
   */
-class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConfig,surveyRecord: SurveyRecord) extends LoggerSupport{
+class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConfig,surveyRecordservice: SurveyRecordService) extends LoggerSupport{
   val url = hallWebserviceConfig.union4pfmip.url
   val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
   val userId = hallWebserviceConfig.union4pfmip.user
@@ -31,7 +32,7 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
         override def run(): Unit = {
           info("begin GetReceptionNoServiceCronService")
           try {
-            val receptionNolist = surveyRecord.getXkcodebyState(-2)
+            val receptionNolist = surveyRecordservice.getXkcodebyState(-2)
             if (receptionNolist.size <= 0) {
               info("没有需要获取的接警编号...")
             } else {
@@ -43,16 +44,16 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
                 map += ("c" -> kno)
                 //获取现勘记录表中没有获取到接警编号的现勘号
                 val receptionid = client.getReceptionNo(userId, password, kno)
-                val requestmsgs = surveyRecord.mapToSting("getReceptionNo",map)
-                surveyRecord.saveSurveyLogRecord("getReceptionNo","","",requestmsgs,receptionid,"")
+                val requestmsgs = surveyRecordservice.mapToSting("getReceptionNo",map)
+                surveyRecordservice.saveSurveyLogRecord("getReceptionNo","","",requestmsgs,receptionid,"")
                 info("hx  getReceptionNo -- 接警编号：" + receptionid)
                 if (receptionid.equals("") || receptionid == null) {
                   return
                 } else {
                   //TODO 接警编号入库操作
-                  surveyRecord.updateCasePeception(receptionid,kno)
+                  surveyRecordservice.updateCasePeception(receptionid,kno)
                   //更新已经获取到接警编号的现勘号的状态
-                  surveyRecord.updateXkcodeState(Constant.xkcodeajbhsuccess,kno)
+                  surveyRecordservice.updateXkcodeState(Constant.SURVEY_CODE_CASEID_SUCCESS,kno)
                 }
               }
 
@@ -61,7 +62,7 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
           } catch {
             case e: Exception =>
               error("GetReceptionNoServiceCronService-error:" + e.getMessage)
-              surveyRecord.saveSurveyLogRecord("","","","","",e.getMessage)
+              surveyRecordservice.saveSurveyLogRecord("","","","","",e.getMessage)
           }
         }
       })

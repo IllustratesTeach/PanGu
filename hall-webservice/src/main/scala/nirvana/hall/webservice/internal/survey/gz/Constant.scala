@@ -7,11 +7,23 @@ package nirvana.hall.webservice.internal.survey.gz
 object Constant {
 
   final val EMPTY = ""
+  final val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
 
-  final val xkcodeinit = 0
-  final val xkcodeknosuccess = 1
-  final val xkcodeajbherror = -2
-  final val xkcodeajbhsuccess = 2
+  final val SURVEY_CODE_INIT = 0
+  final val SURVEY_CODE_KNO_SUCCESS = 1
+  final val SURVEY_CODE_CASEID_ERROR = -2
+  final val SURVEY_CODE_CASEID_SUCCESS = 2
 
-  final val snosuccess = 1
+  final val SNO_SUCCESS = 1
+
+
+
+
+  final val  GET_ORIGINAL_DATA_COUNT = "getOriginalDataCount"
+  final val  GET_ORIGINAL_DATA_LIST = "getOriginalDataList"
+  final val  GET_CASE_NO = "getCaseNo"
+  final val  GET_ORIGINAL_DATA = "getOriginalData"
+  final val  FBUseCondition = "FBUseCondition"
+  final val  GET_RECEPTION_NO = "getReceptionNo"
+
 }
