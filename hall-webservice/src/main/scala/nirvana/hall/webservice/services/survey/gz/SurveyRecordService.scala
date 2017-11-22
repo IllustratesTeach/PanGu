@@ -1,9 +1,7 @@
 package nirvana.hall.webservice.services.survey.gz
 
 import java.sql.Timestamp
-
-import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
-import nirvana.hall.webservice.internal.survey.gz.vo.{ListCaseNode, TimeConfig}
+import nirvana.hall.webservice.internal.survey.gz.vo.{ TimeConfig}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -65,7 +63,7 @@ trait SurveyRecordService {
     * @param state
     * @return
     */
-  def getXkcodebyState(state: Int) : ListBuffer[String]
+  def getXkcodebyState(state: Int,batchSize:Int) : ListBuffer[String]
 
   /**
     * 更新现勘表状态根据kno
@@ -87,35 +85,10 @@ trait SurveyRecordService {
     */
   def updateSnoState(state: Int,sno : String): Unit
 
-  /**
-    * 案件的文字信息解析入库操作
-    * @param caseNode
-    * @param caseid
-    */
-  def addCaseInfo(caseNode : ListCaseNode,caseid: String): Unit
 
-  /**
-    * 新增现场指纹数据入库
-    * @param logic03Rec
-    */
-  def addFingers(logic03Rec: Logic03Rec): Unit
-
-  /**
-    * 新增现场掌纹数据入库
-    * @param logic03Rec
-    */
-  def addPalms(logic03Rec: Logic03Rec): Unit
 
   /**
     * 增加接警编号到case表 中
     */
   def updateCasePeception(peception: String,kno: String): Unit
-
-  /**
-    * map转string 拼接request
-    * @param functionname
-    * @param map
-    * @return
-    */
-  def mapToSting(functionname: String ,map: mutable.HashMap[String,Any]): String
 }

@@ -1,15 +1,13 @@
 package nirvana.hall.webservice.survey.gz
 
-import java.io.ByteArrayInputStream
+
 import java.sql.Timestamp
 import java.util.Date
 
 import monad.support.services.XmlLoader
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.c.services.gfpt4lib.FPTFile
-import nirvana.hall.webservice.internal.survey.XmlToObject
 import nirvana.hall.webservice.internal.survey.gz.{CommonUtil, Constant}
-import nirvana.hall.webservice.internal.survey.gz.vo.{CaseTextList, ListNode, OriginalList}
+import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.IOUtils
@@ -111,8 +109,8 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   def saveSurvey_kno(): Unit ={
     val service = getService[SurveyRecordService]
     var bStr = false
-    if(!service.isKno("K002321")){
-      service.saveSurveyKnoRecord("K002321")
+    if(!service.isKno("K002323")){
+      service.saveSurveyKnoRecord("K002323")
       bStr = true
     }
     println(bStr)
@@ -124,48 +122,17 @@ class SurveyServiceImpl70Test extends BaseTestCase{
     service.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date("2017-11-20 16:27:54",Constant.DATETIME_FORMAT).getTime))
   }
 
-  /**
-    * 存储文字信息解析并gz入库功能
-    */
   @Test
-  def saveCaseinfo(): Unit ={
-    val service = getService[SurveyRecord]
-    val caseinfo = IOUtils.toByteArray(getClass.getResourceAsStream("/case.xml"))
-    val caseText = XmlToObject.parseXML[CaseTextList](new ByteArrayInputStream(caseinfo))
-    for(i <- 0 until caseText.K.size()){
-      //案件文字信息解析入库操作(默认caseid案件编号存在或不存在)
-      service.addCaseInfo(caseText.K.get(i),"12")
-      //更新现勘表状态为入库状态（入库成功）
-      service.updateXkcodeState(Constant.SURVEY_CODE_KNO_SUCCESS,"asd")
-    }
+  def test_getXkcodebyState:Unit ={
+    val service = getService[SurveyRecordService]
+    val list = service.getXkcodebyState(0,10)
+    Assert.assertEquals(3,list.size)
   }
 
-  /**
-    * 存储现场指纹解析并gz入库功能
-    */
   @Test
-  def saveFingers(): Unit ={
-    val service = getService[SurveyRecord]
-    val fptFile = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/A3202050008882016050249.fpt"))
-    val logic03Rec = fptFile.right.get.logic03Recs(0)
-    service.addFingers(logic03Rec)
-
-    service.updateSnoState(Constant.SNO_SUCCESS,"asd")
-
-  }
-
-  /**
-    * 存储现场掌纹解析并gz入库功能
-    */
-  @Test
-  def savePalms(): Unit ={
-    val service = getService[SurveyRecord]
-    val fptFile = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/A3202050008882016050249.fpt"))
-    val logic03Rec = fptFile.right.get.logic03Recs(0)
-    service.addPalms(logic03Rec)
-
-    service.updateSnoState(Constant.SNO_SUCCESS,"asd")
-
+  def test_updateXkcodeState: Unit ={
+    val service = getService[SurveyRecordService]
+    service.updateXkcodeState(Constant.SURVEY_CODE_KNO_SUCCESS,"K002321")
   }
 
 

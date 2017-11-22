@@ -39,11 +39,11 @@ class BaseTestCase {
       //v70
       "nirvana.hall.v70.gz.LocalV70ServiceModule",
       "nirvana.hall.v70.gz.LocalDataSourceModule",
-      "nirvana.hall.webservice.survey.TestV70Module",
+      "nirvana.hall.webservice.survey.gz.TestV70Module",
 
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
-      "nirvana.hall.webservice.survey.TestWebserviceModule",
+      "nirvana.hall.webservice.survey.gz.TestWebserviceModule",
       "stark.activerecord.StarkActiveRecordModule"
     ).map(Class.forName)
     registry = RegistryBuilder.buildAndStartupRegistry(modules: _*)
