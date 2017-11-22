@@ -463,7 +463,7 @@ object FPT4File {
     @Length(12) //比对单位代码
     var matchUnitCode: String = _
     @Length(70) //比对单位名称
-    var matchName: String = _
+    var matchUnitName: String = _
     @Length(30) //比对人姓名
     var matcher: String = _
     @Length(8) //比对日期
