@@ -60,9 +60,7 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
     var path: String = null
     surveyRecordService.getSurveyHit(BATCH_SIZE).foreach {
       hitResult =>
-        if(surveyRecordService.isKno(hitResult.get("kno").toString)){
-          surveyRecordService.updateSurveyHitState(Constant.IsNotCode,hitResult.get("uuid").toString)
-        }else{
+        if(! surveyRecordService.isKno(hitResult.get("kno").toString)){
           hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY,hitResult.get("orasid").toString)
           path = hallWebserviceConfig.localTenprintPath + hitResult.get("kno").toString + hitResult.get("sno").toString + ".FPT"
           if(hallWebserviceConfig.saveFPTFlag.equals("1")){
@@ -74,13 +72,8 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
             ,IOUtils.toByteArray(hitfpt.getInputStream))
           info("FBMatchCondition 反馈返回值： " + matchcode)
 
-          matchcode match {
-            case Constant.SendHitError =>
-              surveyRecordService.updateSurveyHitState(Constant.SendHitError,hitResult.get("uuid").toString)
-            case Constant.SendHitSuccess =>
-              surveyRecordService.updateSurveyHitState(Constant.SendHitSuccess,hitResult.get("uuid").toString)
-            case _ =>
-          }
+          surveyRecordService.updateSurveyHitState(matchcode,hitResult.get("uuid").toString)
+
           surveyRecordService.saveSurveyLogRecord(Constant.FBMatchCondition
             ,Constant.EMPTY
             ,Constant.EMPTY
