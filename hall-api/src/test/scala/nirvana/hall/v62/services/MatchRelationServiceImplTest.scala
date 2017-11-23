@@ -41,6 +41,25 @@ class MatchRelationServiceImplTest extends BaseV62TestCase{
   }
 
   @Test
+  def test_getTtHitResultPackage: Unit ={
+    val service = getService[MatchRelationService]
+    val ttHit = service.getTtHitResultPackage("1234567890")
+    assert(ttHit.nonEmpty)
+  }
+  @Test
+  def test_getLtHitResultPackage: Unit ={
+    val service = getService[MatchRelationService]
+    val ltHit = service.getLtHitResultPackage("1234567890", false)
+    assert(ltHit.nonEmpty)
+  }
+  @Test
+  def test_getLlHitResultPackage: Unit ={
+    val service = getService[MatchRelationService]
+    val llHit = service.getLlHitResultPackage("12345601")
+    assert(llHit.nonEmpty)
+  }
+
+  @Test
   def test_getLogic04Rec: Unit ={
     val service = getService[MatchRelationService]
     val logic04Recs = service.getLogic04Rec("1234567890", false)
