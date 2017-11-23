@@ -37,9 +37,9 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try {
-            info("begin Cron")
+            info("begin HandprintServiceCronService Cron")
             doWork
-            info("end Cron")
+            info("end HandprintServiceCronService Cron")
           } catch {
             case e: Exception =>
               error("HandprintServiceCronService-error:{},currentTime:{}"

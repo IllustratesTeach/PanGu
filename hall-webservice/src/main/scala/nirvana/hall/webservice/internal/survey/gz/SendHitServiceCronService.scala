@@ -41,9 +41,9 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try {
-            info("begin sendHitResult Cron")
+            info("begin SendHitServiceCronService Cron")
             doWork
-            info("end sendHitResult Cron")
+            info("end SendHitServiceCronService Cron")
           } catch {
             case e: Exception =>
               error("SendHitServiceCronService-error:{},currentTime:{}"

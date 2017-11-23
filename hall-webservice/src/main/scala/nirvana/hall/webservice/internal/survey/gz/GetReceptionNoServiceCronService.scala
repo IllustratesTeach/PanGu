@@ -36,7 +36,9 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try{
+            info("begin GetReceptionNoServiceCronService Cron")
             doWork
+            info("end GetReceptionNoServiceCronService Cron")
           }catch{
             case ex:Exception =>
               error("GetReceptionNoServiceCronService-error:{},currentTime:{}"

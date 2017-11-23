@@ -207,7 +207,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
       while (rs.next()){
         val map = new scala.collection.mutable.HashMap[String,Any]
         map += ("cardtype" -> rs.getString("CARDTYPE"))
-        map += ("casename" -> rs.getString("CASENAME"))
+        map += ("sno" -> rs.getString("SNO"))
         resultList.append(map)
       }
 

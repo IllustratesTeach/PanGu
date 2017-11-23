@@ -51,9 +51,9 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try{
-            info("begin Cron")
+            info("begin GetDateServiceCronService Cron")
             doWork
-            info("end Cron")
+            info("end GetDateServiceCronService Cron")
           }catch{
             case ex:Exception =>
               error("GetDateServiceCronService-error:{},currentTime:{}"
@@ -95,7 +95,6 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
       , caseNo
       , Constant.EMPTY)
     if (! CommonUtil.isNullOrEmpty (caseNo) ) {
-      bStr = true
       val caseInfo = client.getOriginalData (userId
         , password
         , kNo
@@ -113,6 +112,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
         , Constant.EMPTY)
       surveyRecordService.saveSurveycaseInfo (kNo, new String (caseInfo))
       surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_SUCCESS, kNo)
+      bStr = true
     }
     bStr
   }
