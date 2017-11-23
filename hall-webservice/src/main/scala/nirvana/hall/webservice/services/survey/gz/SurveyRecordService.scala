@@ -73,6 +73,13 @@ trait SurveyRecordService {
   def updateXkcodeState(state: Int,kno : String): Unit
 
   /**
+    * 新增案件信息xml存入记录表
+    * @param kno
+    * @param caseinfo
+    */
+  def saveSurveycaseInfo(kno: String ,caseinfo: String): Unit
+
+  /**
     * 根据现勘号查询对应的现勘现场数据
     * @param kno
     */
@@ -83,12 +90,30 @@ trait SurveyRecordService {
     * @param state
     * @param sno
     */
-  def updateSnoState(state: Int,sno : String): Unit
+  def updateSnoState(state: Int,kno: String,sno : String): Unit
 
-
+  /**
+    * 增加palm路径到记录表中
+    * @param kno
+    * @param sno
+    * @param path
+    */
+  def savePalmpath(kno: String,sno: String,path: String): Unit
 
   /**
     * 增加接警编号到case表 中
     */
   def updateCasePeception(peception: String,kno: String): Unit
+
+  /**
+    * 获取现勘比中数据列表
+    *
+    * @return
+    */
+  def getSurveyHit(batchSize: Int): ListBuffer[mutable.HashMap[String,Any]]
+
+  /**
+    * 更新比中关系列表状态，根据orasid
+    */
+  def updateSurveyHitState(state: String, uuid : String): Unit
 }

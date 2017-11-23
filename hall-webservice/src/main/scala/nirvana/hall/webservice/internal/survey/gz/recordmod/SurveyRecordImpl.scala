@@ -84,8 +84,8 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     */
 
   def saveSurveySnoRecord(kno:String,sno:String,cardtype:String,casename:String): Unit={
-    val sql = s"insert into SURVEY_SNO_RECORD(UUID,KNO,SNO,CARDTYPE,CASENAME,BACKSTATE,STATE,INSERTTIME,UPDATETIME) " +
-      s"values (?,?,?,?,?,0,0,sysdate,null)"
+    val sql = s"insert into SURVEY_SNO_RECORD(UUID,KNO,SNO,CARDTYPE,CASENAME,STATE,INSERTTIME,UPDATETIME) " +
+      s"values (?,?,?,?,?,0,sysdate,null)"
     JdbcDatabase.update(sql){ps=>
       ps.setString(1,UUID.randomUUID().toString.replace("-",""))
       ps.setString(2,kno)
@@ -184,6 +184,16 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     }
   }
 
+  override def saveSurveycaseInfo(kno: String ,caseinfo: String): Unit = {
+    val sql = s"INSERT INTO SURVEY_SAVE_CASEINFO(UUID,KNO,CASEINFO,INSERTTIME) " +
+      s"VALUES (?,?,?,sysdate)"
+    JdbcDatabase.update(sql){ps=>
+      ps.setString(1,UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,kno)
+      ps.setString(3,caseinfo)
+    }
+  }
+
   /**
     * 根据现勘号查询对应的现勘现场数据
     * @param kno
@@ -191,15 +201,16 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   def getSurveySnoRecord(kno: String): ListBuffer[mutable.HashMap[String,Any]] = {
     val sql = s"SELECT * FROM SURVEY_SNO_RECORD t where t.kno = ? and state = 0 "
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
-
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
       ps.setString(1,kno)
     }{rs=>
-      var map = new scala.collection.mutable.HashMap[String,Any]
-      map += ("sno" -> rs.getString("SNO"))
-      map += ("cardtype" -> rs.getString("CARDTYPE"))
-      map += ("casename" -> rs.getString("CASENAME"))
-      resultList.append(map)
+      while (rs.next()){
+        val map = new scala.collection.mutable.HashMap[String,Any]
+        map += ("cardtype" -> rs.getString("CARDTYPE"))
+        map += ("casename" -> rs.getString("CASENAME"))
+        resultList.append(map)
+      }
+
     }
     resultList
   }
@@ -209,11 +220,29 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     * @param state
     * @param sno
     */
-  def updateSnoState(state: Int,sno : String): Unit = {
-    val sql = s"UPDATE survey_sno_record SET state = ?,updatetime = sysdate WHERE sno = ?"
+  def updateSnoState(state: Int,kno: String,sno : String): Unit = {
+    val sql = s"UPDATE survey_sno_record SET state = ?,updatetime = sysdate WHERE kno = ? and sno = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1,state)
-      ps.setString(2,sno)
+      ps.setString(2,kno)
+      ps.setString(3,sno)
+    }
+  }
+
+  /**
+    * 增加palm路径到记录表中
+    * @param kno
+    * @param sno
+    * @param path
+    */
+  def savePalmpath(kno: String,sno: String,path: String): Unit = {
+    val sql = s"INSERT INTO SURVEY_SAVE_PALM(UUID,KNO,SNO,PALMPATH,INSERTTIME) " +
+      s"VALUES (?,?,?,?,sysdate)"
+    JdbcDatabase.update(sql){ps=>
+      ps.setString(1,UUID.randomUUID().toString.replace("-",""))
+      ps.setString(2,kno)
+      ps.setString(3,sno)
+      ps.setString(4,path)
     }
   }
 
@@ -222,10 +251,47 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     */
   def updateCasePeception(peception: String,kno: String): Unit = {
     val sql = s"update gafis_case " +
-      s"set peception_no = ? where SCENE_SURVEY_ID = ?"
+      s"set reception_no = ? where SCENE_SURVEY_ID = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setString(1,peception)
       ps.setString(2,kno)
+    }
+  }
+
+  /**
+    * 获取现勘比中数据列表
+    *
+    * @return
+    */
+  def getSurveyHit(batchSize: Int): ListBuffer[mutable.HashMap[String,Any]] = {
+    val sql = s"SELECT * " +
+      s"FROM SURVEY_HITRESULT_RECORD t where state = 0 and rownum <= ?"
+    val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
+
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setInt(1,batchSize)
+    }{rs=>
+      while (rs.next()){
+        val map = new scala.collection.mutable.HashMap[String, Any]
+        map += ("uuid" -> rs.getString("UUID"))
+        map += ("kno" -> rs.getString("KNO"))
+        map += ("sno" -> rs.getString("SNO"))
+        map += ("orasid" -> rs.getString("ORA_SID"))
+        resultList.append(map)
+      }
+    }
+    resultList
+  }
+
+  /**
+    * 更新比中关系列表状态，根据orasid
+    */
+  def updateSurveyHitState(state: String, uuid : String): Unit = {
+    val sql = s"update survey_hitresult_record " +
+      s"set state = ? where uuid = ?"
+    JdbcDatabase.update(sql){ps=>
+      ps.setString(1,state)
+      ps.setString(2,uuid)
     }
   }
 }

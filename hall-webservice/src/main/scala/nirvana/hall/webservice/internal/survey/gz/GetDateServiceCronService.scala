@@ -13,7 +13,7 @@ import nirvana.hall.c.services.gfpt4lib.FPTFile.FPTParseException
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.survey.HandprintService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
-import org.apache.commons.io.{FileUtils}
+import org.apache.commons.io.FileUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import stark.webservice.services.StarkWebServiceClient
@@ -51,7 +51,9 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
       periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
           try{
+            info("begin Cron")
             doWork
+            info("end Cron")
           }catch{
             case ex:Exception =>
               error("GetDateServiceCronService-error:{},currentTime:{}"
@@ -109,6 +111,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           , "cardType:" + Constant.GET_TEXT_INFO)
         , new String (caseInfo)
         , Constant.EMPTY)
+      surveyRecordService.saveSurveycaseInfo (kNo, new String (caseInfo))
       surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_SUCCESS, kNo)
     }
     bStr
@@ -136,14 +139,15 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           val fptFile = FPTFile.parseFromInputStream(new ByteArrayInputStream(fpt))
           fptFile match {
             case Right(fpt4) =>
-              fpt4.logic03Recs.foreach{ _ =>
-                fPTService.addLogic03Res(_)
+              fpt4.logic03Recs.foreach{ logic03Rec =>
+                fPTService.addLogic03Res(logic03Rec)
               }
-              surveyRecordService.updateSnoState(Constant.SNO_SUCCESS,sNo)
+              surveyRecordService.updateSnoState(Constant.SNO_SUCCESS,kNo,sNo)
           }
         case Constant.GET_PALM_FPT =>
-          val fptFile = FPTFile.parseFromInputStream(new ByteArrayInputStream(fpt))
-          //TODO:存本地目录下，将路径存储至数据库表中
+          FileUtils.writeByteArrayToFile(new File(path), fpt)
+          surveyRecordService.savePalmpath(kNo,sNo,path)
+          surveyRecordService.updateSnoState(Constant.SNO_SUCCESS,kNo,sNo)
       }
     }catch {
       case ex:AncientDataException =>

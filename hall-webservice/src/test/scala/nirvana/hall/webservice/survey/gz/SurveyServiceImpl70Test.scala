@@ -1,16 +1,20 @@
 package nirvana.hall.webservice.survey.gz
 
 
+import java.io.{ByteArrayInputStream, File}
 import java.sql.Timestamp
 import java.util.Date
 
 import monad.support.services.XmlLoader
 import nirvana.hall.api.internal.DateConverter
+import nirvana.hall.api.services.ExceptRelationService
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.internal.survey.gz.{CommonUtil, Constant}
 import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.axiom.attachments.ByteArrayDataSource
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
 /**
@@ -46,21 +50,21 @@ class SurveyServiceImpl70Test extends BaseTestCase{
     * 解析xml转对象方法，用于获取xml内容
     *
     * <?xml version=”1.0” encoding=”utf-8”?>
-        <List>
-          <K>
-            <K_No>关联编号</K_No>
-            <S_No>指纹序号1</S_No>
-            <card_type>P</card_type>
-            <CASE_NAME>案件名</CASE_NAME>
-          </K>
-          <K>
-            <K_No>关联编号</K_No>
-            <S_No>指纹序号2</S_No>
-            <card_type>F</card_type>
-            <CASE_NAME>案件名</CASE_NAME>
-          </K>
-        </List>
-         注：P代表掌纹，F代表指纹
+    * <List>
+    * <K>
+    * <K_No>关联编号</K_No>
+    * <S_No>指纹序号1</S_No>
+    * <card_type>P</card_type>
+    * <CASE_NAME>案件名</CASE_NAME>
+    * </K>
+    * <K>
+    * <K_No>关联编号</K_No>
+    * <S_No>指纹序号2</S_No>
+    * <card_type>F</card_type>
+    * <CASE_NAME>案件名</CASE_NAME>
+    * </K>
+    * </List>
+    * 注：P代表掌纹，F代表指纹
     *
     */
   @Test
@@ -93,7 +97,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   @Test
   def test_saveSurveySnoRecord: Unit ={
     val service = getService[SurveyRecordService]
-    val originalList = XmlLoader.parseXML[OriginalList](new String(IOUtils.toByteArray(getClass.getResourceAsStream("/list.xml"))))
+    val originalList = XmlLoader.parseXML[OriginalList](new String(IOUtils.toByteArray(getClass.getResourceAsStream("/ss.xml"))))
     val iterator = originalList.K.iterator
     while(iterator.hasNext){
       val obj = iterator.next
@@ -134,6 +138,72 @@ class SurveyServiceImpl70Test extends BaseTestCase{
     val service = getService[SurveyRecordService]
     service.updateXkcodeState(Constant.SURVEY_CODE_KNO_SUCCESS,"K002321")
   }
+
+  @Test
+  def test_save_caseinfo: Unit ={
+    val service = getService[SurveyRecordService]
+    service.saveSurveycaseInfo("K002321",new String(IOUtils.toByteArray(getClass.getResourceAsStream("/case.xml"))))
+  }
+
+  @Test
+  def test_getSurveySnoRecord:Unit = {
+    val service = getService[SurveyRecordService]
+    val list = service.getSurveySnoRecord("K002321")
+    Assert.assertEquals(3,list.size)
+  }
+
+  @Test
+  def test_addcaselp:Unit = {
+    val fPTService = getService[FPTService]
+    val fptFile = FPTFile.parseFromInputStream(getClass.getResourceAsStream("/A3202050008882016050249.fpt"))
+    fptFile match {
+      case Right(fpt4) =>
+        fpt4.logic03Recs.foreach { logic03Rec =>
+          fPTService.addLogic03Res(logic03Rec)
+        }
+    }
+  }
+
+  @Test
+  def test_updateSnoState:Unit = {
+    val service = getService[SurveyRecordService]
+    service.updateSnoState(Constant.SNO_SUCCESS,"K002321","1")
+  }
+
+  @Test
+  def test_savePalmpath:Unit = {
+    val service = getService[SurveyRecordService]
+    service.savePalmpath("123","456","K002321")
+  }
+
+  @Test
+  def test_updateCasePeception:Unit = {
+    val service = getService[SurveyRecordService]
+    service.updateCasePeception("123123","K5200000000002017040003")
+  }
+
+  @Test
+  def test_getSurveyHit:Unit = {
+    val service = getService[SurveyRecordService]
+    val list = service.getSurveyHit(10)
+    Assert.assertEquals(3,list.size)
+  }
+
+  @Test
+  def test_updateSurveyHitState:Unit = {
+    val service = getService[SurveyRecordService]
+    service.updateSurveyHitState(Constant.SendHitSuccess,"2")
+  }
+
+
+  @Test
+  def getHitResult(): Unit ={
+    val Exceptservice = getService[ExceptRelationService]
+    val hitfpt = Exceptservice.exportMatchRelation("","224915")
+    val path = "D:\\" + "224915" + ".FPT"
+    FileUtils.writeByteArrayToFile(new File(path), IOUtils.toByteArray(hitfpt.getInputStream))
+  }
+
 
 
 }

@@ -25,6 +25,14 @@ object Constant {
   final val  GET_ORIGINAL_DATA = "getOriginalData"
   final val  FBUSECONDITION = "FBUseCondition"
   final val  GET_RECEPTION_NO = "getReceptionNo"
+  final val  FBMatchCondition = "FBMatchCondition"
+
+
+  //-1：不存在的勘验号或指纹序号 0：反馈失败 1：反馈成功
+  final val IsNotCode = "-2"
+  final val SendHitError = "-1"
+  final val SendHit = "0"
+  final val SendHitSuccess = "1"
 
   final val  GET_TEXT_INFO = "T"
   final val  GET_FINGER_FPT = "F"
