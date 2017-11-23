@@ -171,7 +171,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       case other => "9"
     }
     logic04Rec.matchUnitCode = gafisMatchInfo.registerOrg
-    logic04Rec.matchName = gafisMatchInfo.matchName
+    logic04Rec.matchUnitName = gafisMatchInfo.matchName
     logic04Rec.matcher = gafisMatchInfo.registerUser
     logic04Rec.matchDate = gafisMatchInfo.registerTime
     logic04Rec.head.fileLength = logic04Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString

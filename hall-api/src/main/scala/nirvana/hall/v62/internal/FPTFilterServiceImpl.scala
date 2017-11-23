@@ -1,7 +1,7 @@
 package nirvana.hall.v62.internal
 
-import java.io.{File, FileOutputStream}
-import java.text.{DecimalFormat, SimpleDateFormat}
+import java.io.File
+import java.text.SimpleDateFormat
 import java.util.Date
 import javax.sql.DataSource
 
@@ -591,8 +591,8 @@ class FPTFilterServiceImpl(implicit val dataSource: DataSource) extends FPTFilte
             t.matchUnitCode = "未知"
           }
           //比对单位名称不能为空
-          if(StringUtils.isBlank(t.matchName)){
-            t.matchName = "未知"
+          if(StringUtils.isBlank(t.matchUnitName)){
+            t.matchUnitName = "未知"
           }
           //比对人员姓名不能为空
           if(StringUtils.isBlank(t.matcher)){
