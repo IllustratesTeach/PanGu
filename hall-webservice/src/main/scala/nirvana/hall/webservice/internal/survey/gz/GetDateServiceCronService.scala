@@ -32,7 +32,11 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService], url, targetNamespace)
+  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+    url,
+    targetNamespace,
+    classOf[HandprintService].getSimpleName,
+    classOf[HandprintService].getSimpleName + "HttpPort")
 
   /**
     * 定时器，调用海鑫现勘接口

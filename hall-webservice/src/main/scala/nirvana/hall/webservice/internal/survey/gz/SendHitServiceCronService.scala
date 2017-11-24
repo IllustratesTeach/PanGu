@@ -25,7 +25,11 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService], url, targetNamespace)
+  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+    url,
+    targetNamespace,
+    classOf[HandprintService].getSimpleName,
+    classOf[HandprintService].getSimpleName + "HttpPort")
 
   final var BATCH_SIZE = 10
 
