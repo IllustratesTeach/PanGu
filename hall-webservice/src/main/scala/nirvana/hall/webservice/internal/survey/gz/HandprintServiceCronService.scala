@@ -1,6 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gz
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.util.Date
 
 import monad.support.services.{LoggerSupport, XmlLoader}
@@ -56,8 +57,9 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
   }
 
   private def doWork: Unit ={
-
-    val checkVal = surveyRecordService.isSleep(new Date(client.getSystemDateTime).getTime)
+    val hxdate = client.getSystemDateTime
+    info("海鑫当前时间：---"+hxdate)
+    val checkVal = surveyRecordService.isSleep(new SimpleDateFormat(Constant.DATETIME_FORMAT).parse(hxdate).getTime())
     if(!checkVal._1){
       //获取数量
       val num = client.getOriginalDataCount(userId
