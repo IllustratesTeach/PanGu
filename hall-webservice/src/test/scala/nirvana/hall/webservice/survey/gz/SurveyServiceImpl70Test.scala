@@ -192,7 +192,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
   @Test
   def test_updateSurveyHitState:Unit = {
     val service = getService[SurveyRecordService]
-    service.updateSurveyHitState(Constant.SendHitSuccess,"2")
+    service.updateSurveyHitState("1","2")
   }
 
 
