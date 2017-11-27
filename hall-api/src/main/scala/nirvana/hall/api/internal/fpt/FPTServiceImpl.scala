@@ -98,23 +98,6 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
   @Transactional
   override def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
     val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
-    caseInfoService.addCaseInfo(caseInfo)
-    val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
-    lPCardList.foreach{lPCard =>
-      val lpCardBuiler = lPCard.toBuilder
-      //图像解压
-      val blobBuilder = lpCardBuiler.getBlobBuilder
-      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
-      if(gafisImage.stHead.bIsCompressed > 0){
-        val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-        blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
-      }
-      lPCardService.addLPCard(lpCardBuiler.build())
-    }
-  }
-  @Transactional
-  override def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
-    val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
     if(!caseInfoService.isExist(logic03Rec.caseId)){
       caseInfoService.addCaseInfo(caseInfo)
     }
