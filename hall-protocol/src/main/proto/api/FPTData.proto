@@ -102,6 +102,12 @@ enum	PalmFgp
 	//7.0掌纹
 	PALM_RIGTH_SIDE = 9;//右侧掌纹
 	PALM_LEFT_SIDE = 10;//左侧掌纹
+
+	PALM_FOUR_PRINT_RIGHT = 11; //四连指右
+	PALM_FOUR_PRINT_LEFT = 12;//四连指左
+
+	PALM_FULL_PALM_RIGHT = 13;//全掌右
+	PALM_FULL_PALM_LEFT = 14;//全掌左
 }
 
 //脸位
@@ -122,6 +128,9 @@ enum	ImageType
 	IMAGETYPE_FACE		= 3;	//人像
 	IMAGETYPE_CARDIMG	= 4;	//文字框
 	IMAGETYPE_VOICE		= 5;	//声纹
+	IMAGETYPE_FOURPRINT = 6;	//四连指
+	IMAGETYPE_KNUCKLEPRINTS = 7;//指节纹
+	IMAGETYPE_FULLPALM = 8;//全掌
 
 }
 
@@ -199,6 +208,12 @@ message	TPCard
 	optional string strMisPersonID = 6;	 //重卡组号
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 7;   //数据来源类型
+	//FPT5.0追加
+	optional string strJingZongPersonId = 8;//警综人员编号--由警综平台标准化采集系统发号
+	optional string	strCasePersonID = 9;//案事件相关人员编号
+	optional string strCredentialsCode = 10;//常用证件代码
+	optional string strPrinterIdCardId = 11;//捺印人身份证号
+	optional string strPrinterTel = 12;//捺印人联系电话
 
 }
 
