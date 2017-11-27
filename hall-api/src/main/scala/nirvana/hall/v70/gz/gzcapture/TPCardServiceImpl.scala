@@ -56,7 +56,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
           person.modifiedpsn = ""
         }
         person.deletag = Gafis70Constants.DELETAG_USE
-        person.fingershowStatus = 1.toString
+        person.fingershowStatus = 1.toShort
         person.isfingerrepeat = "0"
         person.dataSources = Gafis70Constants.DATA_SOURCE_CAPTURE
         person.save()
@@ -147,7 +147,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       person.modifiedpsn = Gafis70Constants.INPUTPSN
     }
     person.deletag = Gafis70Constants.DELETAG_USE
-    person.fingershowStatus = 1.toString
+    person.fingershowStatus = 1.toShort
     person.isfingerrepeat = "0"
     person.dataSources = Gafis70Constants.DATA_SOURCE_CAPTURE
     person.save()

@@ -22,7 +22,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
 
   @Test
   def test_setFinger: Unit ={
-    val dataHandler = new DataHandler(new FileDataSource(new File("D://R2100000000002017090207.fpt")))
+    val dataHandler = new DataHandler(new FileDataSource(new File("/Users/yuchen/fpt/R2100000000002017090207.fpt")))
     val service = getService[WsHaiXinFingerService]
     val result = service.setFinger("1701","0101","3701","R2100000000002017090207",dataHandler)
     Assert.assertEquals(1,result)

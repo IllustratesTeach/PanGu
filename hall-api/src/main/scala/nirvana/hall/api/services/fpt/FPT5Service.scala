@@ -21,4 +21,17 @@ trait FPT5Service {
     */
   def getLatentPackage(cardId: String): LatentPackage
 
+  /**
+    * 捺印指纹导入
+    * @param fingerprintPackage
+    * @param dbId
+    */
+  def addFingerprintPackage(fingerprintPackage:FingerprintPackage,dbId: Option[String] = None):Unit
+
+  /**
+    * 现场指纹导入
+    * @param latentPackage
+    */
+  def addLatentPackage(latentPackage:LatentPackage):Unit
+
 }

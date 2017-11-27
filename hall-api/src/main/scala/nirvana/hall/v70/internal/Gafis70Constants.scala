@@ -16,6 +16,8 @@ object Gafis70Constants {
   //数据来源，gafis6.2
   val DATA_SOURCE_GAFIS6= 4.toShort
   val DATA_SOURCE_CAPTURE=1.toString
+  //FPT导入 
+  val DATA_SOURCE_FPT= "5"
   //数据来源，海鑫综采
   val DATA_SOURCE_HXZC= 7.toShort
   //数据来源，现勘对接
@@ -41,6 +43,10 @@ object Gafis70Constants {
   val FGP_CASE_PLAIN = 1: Short //平面
   val FGP_CASE_ROLL = 0: Short  //滚动
 
+  val FGP_CASE_KNUCKLE_PRINTS = "2" //指节纹  
+  val FGP_CASE_FOUR_PRINT = "1" //四连指 
+  val FGP_CASE_FULL_PALM = "2" //全掌
+
   val PALM_RIGHT        = 11: Short //右掌
   val PALM_LEFT         = 12: Short //左掌
   val PALM_FINGER_R     = 3: Short  //右手指尖
@@ -51,6 +57,11 @@ object Gafis70Constants {
   val PALM_THUMB_L_UP   = 8: Short  //左掌拇指上部区域
   val PALM_RIGHT_SIDE   = 17: Short //右侧掌纹
   val PALM_LEFT_SIDE    = 18: Short //左侧掌纹
+
+  val PALM_FOUR_PRINT_RIGHT = 13:Short //四连指右 
+  val PALM_FOUR_PRINT_LEFT  =14:Short //四连指左  
+  val PALM_FULL_RIGHT = 15:Short //全掌右 
+  val PALM_FULL_LEFT= 16:Short //全掌左
 
   val FACE_FRONT = "1"  //人像正面
   val FACE_RIGHT = "2"  //右侧

@@ -107,16 +107,17 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * 检验来源是否合法
     */
   override def checkCollectSrcIsVaild(collectSrc: String): Unit = {
-    val sql = s"SELECT t.id  " +
-      s"FROM HALL_GAFIS_IA_COLLECTSRC t " +
-      s"WHERE t.parentid = 1700 AND t.id = 1701 AND deleteflag = 1 "
+    var count = 0
+    val sql = s"SELECT COUNT(1) NUM FROM HALL_GAFIS_IA_COLLECTSRC t WHERE id=? AND deleteflag = 1 "
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1, collectSrc)
     }{rs=>
       while (rs.next()){
-        if(!rs.getString("id").equals(collectSrc)){
-          throw new CollectSrcIsNotVaildException("来源不合法:"+collectSrc)
-        }
+        count = rs.getString("NUM").toInt
       }
+    }
+    if(count <= 0){
+      throw new CollectSrcIsNotVaildException("来源不合法:"+collectSrc)
     }
   }
 

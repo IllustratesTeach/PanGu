@@ -8,6 +8,7 @@ import java.util.Date
 import javax.activation.DataHandler
 
 import monad.support.services.XmlLoader
+import nirvana.hall.protocol.api.FPTProto.FingerFgp
 import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.IOUtils
@@ -97,6 +98,18 @@ class XStreamTest {
     }*/
 
     None.foreach(t => println(t))
+
+  }
+
+  class Finger{
+    var id:Int = _
+    var name:String = _
+  }
+  @Test
+  def test_match():Unit ={
+
+
+    println()
 
   }
 }

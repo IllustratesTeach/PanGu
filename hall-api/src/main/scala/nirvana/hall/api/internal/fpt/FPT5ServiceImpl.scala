@@ -5,10 +5,14 @@ import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{FingerprintPackage, LatentPackage}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.api.FPTProto.ImageType
+import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
+import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 
 import scala.collection.JavaConversions._
 
@@ -19,7 +23,8 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       tPCardService: TPCardService,
                       caseInfoService: CaseInfoService,
                       lPCardService: LPCardService,
-                      lPPalmService: LPPalmService) extends FPT5Service{
+                      lPPalmService: LPPalmService,
+                      extractor: FeatureExtractor) extends FPT5Service{
   //fpt处理需要加载jni
   JniLoaderUtil.loadExtractorJNI()
   JniLoaderUtil.loadImageJNI()
@@ -41,10 +46,11 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
             blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
           }
-        case other =>
+        case _ =>
       }
     }
-    FPT5Converter.convertTPCard2FingerprintPackage(tpCard.build)
+    //FPT5Converter.convertTPCard2FingerprintPackage(tpCard.build)
+    null
   }
 
   /**
@@ -60,6 +66,85 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val palmList = caseInfo.getStrPalmIDList.map{palmId=>
       lPPalmService.getLPCard(palmId)
     }
-    FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList, palmList)
+    //FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList, palmList)
+    null
+  }
+
+  /**
+    * 捺印指纹导入
+    *
+    * @param fingerprintPackage
+    * @param dbId
+    */
+  override def addFingerprintPackage(fingerprintPackage: FingerprintPackage, dbId: Option[String]): Unit = {
+      //tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
+  }
+
+  /**
+    * 现场指纹导入
+    *
+    * @param latentPackage
+    */
+  override def addLatentPackage(latentPackage: LatentPackage): Unit = ???
+
+
+
+  private def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={
+    if(isLatent){
+      extractor.extractByGAFISIMG(originalImage, FingerPosition.FINGER_UNDET, FeatureType.FingerLatent)
+    }else{
+      val fingerIndex = originalImage.stHead.nFingerIndex
+      val fingerPos = if(fingerIndex > 10){
+        FingerPosition.valueOf(fingerIndex - 10)
+      }else{
+        FingerPosition.valueOf(fingerIndex)
+      }
+      extractor.extractByGAFISIMG(originalImage, fingerPos, FeatureType.FingerTemplate)
+    }
+  }
+
+
+  /**
+    *
+    * @param fingerprintPackage
+    * @return
+    */
+  private def  getTpCardBuilder(fingerprintPackage: FingerprintPackage) = {
+//    val tpCardBuilder = FPT5Converter.convertFingerprintPackage2TPCard(fingerprintPackage).toBuilder
+//    //图像转换和特征提取
+//    val iter = tpCardBuilder.getBlobBuilderList.iterator()
+//    while(iter.hasNext){
+//      val blob = iter.next()
+//      if(blob.getType == ImageType.IMAGETYPE_FINGER){
+//        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+//        if(gafisImage.stHead.bIsCompressed > 0){
+//          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+//          val mntData = try{
+//            extractByGAFISIMG(originalImage, false)
+//          }catch{
+//            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+//          }
+//
+//          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+//          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+//
+//          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+//          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+//            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+//            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+//          }else{
+//            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+//            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+//          }
+//        }else{
+//          val mntData = extractByGAFISIMG(gafisImage, false)
+//          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+//          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+//          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+//          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+//        }
+//      }
+//    }
+//    tpCardBuilder
   }
 }
