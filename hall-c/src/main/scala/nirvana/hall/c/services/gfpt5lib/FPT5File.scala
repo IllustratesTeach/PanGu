@@ -98,21 +98,21 @@ class FPT5File {
     @XmlType(name = "fingerprintPackage")
     class FingerprintPackage{
         @XmlElement(name = "descriptiveMsg")
-        var descriptiveMsg: DescriptMsg = new DescriptMsg
+        var descriptiveMsg: DescriptMsg = _
         @XmlElement(name = "collectInfoMsg")
-        var collectInfoMsg:CollectInfoMsg = new CollectInfoMsg
+        var collectInfoMsg:CollectInfoMsg = _
         @XmlElement(name = "fingers")
-        var fingers:Fingers = new Fingers
+        var fingers:Fingers = _
         @XmlElement(name = "palms")
-        var palms:Palms = new Palms
+        var palms:Palms = _
         @XmlElement(name = "fourprints")
-        var fourprints:Fourprints = new Fourprints
+        var fourprints:Fourprints = _
         @XmlElement(name = "knuckleprints")
-        var knuckleprints:Knuckleprints = new Knuckleprints
+        var knuckleprints:Knuckleprints = _
         @XmlElement(name = "fullpalms")
-        var fullpalms:Fullpalms = new Fullpalms
+        var fullpalms:Fullpalms = _
         @XmlElement(name = "faceImages")
-        var faceImages:FaceImages = new FaceImages
+        var faceImages:FaceImages = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "CollectInfoMsg")
@@ -357,13 +357,13 @@ class FPT5File {
     @XmlType(name = "PalmMinutia")
     class PalmMinutia{
         @XmlElement(name = "zhwtzd_tzxzb")
-        var palmFeaturePointXCoordinate:Int = _
+        var fingerFeaturePointXCoordinate:Int = _
         @XmlElement(name = "zhwtzd_tzyzb")
-        var palmFeaturePointYCoordinate:Int = _
+        var fingerFeaturePointYCoordinate:Int = _
         @XmlElement(name = "zhwtzd_tzfx")
-        var palmFeatureDirection:Int = _
+        var fingerFeatureDirection:Int = _
         @XmlElement(name = "zhwtzd_tzzl")
-        var palmFeatureQuality:Int = _
+        var fingerFeatureQuality:Int = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -544,13 +544,13 @@ class FPT5File {
     @XmlType(name = "LatentPackage")
     class LatentPackage{
         @XmlElement(name = "caseMsg")
-        var caseMsg:CaseMsg = new CaseMsg
+        var caseMsg:CaseMsg = _
         @XmlElement(name = "collectInfoMsg")
-        var latentCollectInfoMsg = new LatentCollectInfoMsg
+        var latentCollectInfoMsg:LatentCollectInfoMsg = _
         @XmlElement(name = "fingers")
-        var latentFingers:LatentFingers = new LatentFingers
+        var latentFingers:LatentFingers = _
         @XmlElement(name = "palms")
-        var latentPalms:LatentPalms = new LatentPalms
+        var latentPalms:LatentPalms = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -669,13 +669,13 @@ class FPT5File {
     @XmlType(name = "LatentMinutia")
     class LatentMinutia{
         @XmlElement(name = "xczw_zwtzd_tzxzb")
-        var latentFingerFeaturePointXCoordinate:Int = _
+        var fingerFeaturePointXCoordinate:Int = _
         @XmlElement(name = "xczw_zwtzd_tzyzb")
-        var latentFingerFeaturePointYCoordinate:Int = _
+        var fingerFeaturePointYCoordinate:Int = _
         @XmlElement(name = "xczw_zwtzd_tzfx")
-        var latentFingerFeaturePointDirection:Int = _
+        var fingerFeaturePointDirection:Int = _
         @XmlElement(name = "xczw_zwtzd_tzzl")
-        var latentFingerFeaturePointQuality:Int = _
+        var fingerFeaturePointQuality:Int = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
