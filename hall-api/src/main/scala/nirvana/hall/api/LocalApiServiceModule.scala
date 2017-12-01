@@ -8,11 +8,9 @@ import nirvana.hall.api.internal._
 import nirvana.hall.api.internal.filter._
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
 import nirvana.hall.api.internal.remote._
-import nirvana.hall.api.internal.sync.{SyncCronFilterFPTServiceImpl, SyncCronServiceImpl}
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote._
-import nirvana.hall.api.services.sync.{SyncCronFilterFPTService, SyncCronService}
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
@@ -41,8 +39,6 @@ object LocalApiServiceModule {
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
 
-    binder.bind(classOf[SyncCronService], classOf[SyncCronServiceImpl])//.eagerLoad()
-    binder.bind(classOf[SyncCronFilterFPTService],classOf[SyncCronFilterFPTServiceImpl])//.eagerLoad
     //远程服务类
     binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
     binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])

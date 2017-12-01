@@ -1,7 +1,5 @@
 package nirvana.hall.api.internal.fpt
 
-import javax.sql.DataSource
-
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
@@ -25,8 +23,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      caseInfoService: CaseInfoService,
                      lPCardService: LPCardService,
                      exceptRelationService: ExceptRelationService,
-                     extractor: FeatureExtractor,
-                     implicit val dataSource: DataSource) extends FPTService{
+                     extractor: FeatureExtractor) extends FPTService{
 
   override def getLogic02Rec(cardId: String, dbId: Option[String]): Logic02Rec = {
     if(tPCardService.isExist(cardId)){

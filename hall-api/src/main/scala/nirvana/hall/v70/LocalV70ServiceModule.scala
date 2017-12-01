@@ -47,7 +47,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
     binder.bind(classOf[FetchMatchRelationService],classOf[FetchMatchRelationServiceImpl])
     //定时服务
-//    binder.bind(classOf[SyncDictService], classOf[SyncDictServiceImpl]).eagerLoad()
     binder.bind(classOf[Query7to6Service], classOf[Query7to6ServiceImpl]).eagerLoad()
     binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
   }

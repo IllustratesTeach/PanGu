@@ -6,8 +6,12 @@ import javax.sql.DataSource
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.api.services.sync._
+import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, FPTFilterService, SyncInfoLogManageService}
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal._
 import nirvana.hall.v62.internal.sync._
+import nirvana.hall.v62.services.GetPKIDServiceImpl
+import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
@@ -68,6 +72,14 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[FetchLPPalmService], classOf[FetchLPPalmServiceImpl])
     binder.bind(classOf[FetchCaseInfoService], classOf[FetchCaseInfoServiceImpl])
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
+    //其他Service
+    binder.bind(classOf[FetchMatchRelationService],classOf[FetchMatchRelationServiceImpl])
+    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+    binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
+    binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
+    binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
+    binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
+    binder.bind(classOf[FPTFilterService],classOf[FPTFilterServiceImpl])
 
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
