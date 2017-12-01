@@ -11,7 +11,6 @@ import nirvana.hall.v70.gz.sys.{DictService, DictServiceImpl, UserService, UserS
 import nirvana.hall.v70.internal.{CaseInfoServiceImpl => _, LPCardServiceImpl => _, TPCardServiceImpl => _}
 import nirvana.hall.v70.internal.sync.{FetchCaseInfoServiceImpl, FetchLPCardServiceImpl, FetchLPPalmServiceImpl, FetchMatchRelationServiceImpl, FetchQueryServiceImpl, FetchTPCardServiceImpl}
 import nirvana.hall.v70.services.GetPKIDServiceImpl
-import nirvana.hall.v70.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**

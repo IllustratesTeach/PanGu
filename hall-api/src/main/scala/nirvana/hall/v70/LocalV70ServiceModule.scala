@@ -10,7 +10,6 @@ import nirvana.hall.v70.internal.sync._
 import nirvana.hall.v70.internal.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.services.GetPKIDServiceImpl
 import nirvana.hall.v70.services.query.{Query7to6Service, QueryGet7to6Service}
-import nirvana.hall.v70.services.service.GetPKIDService
 import nirvana.hall.v70.services.sys.{DictService, UserService}
 import org.apache.tapestry5.ioc.ServiceBinder
 

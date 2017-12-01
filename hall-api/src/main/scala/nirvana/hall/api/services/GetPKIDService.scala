@@ -1,4 +1,4 @@
-package nirvana.hall.v62.services.service
+package nirvana.hall.api.services
 
 import scala.collection.mutable.ListBuffer
 

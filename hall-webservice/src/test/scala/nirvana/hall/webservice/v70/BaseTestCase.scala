@@ -12,16 +12,10 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.services.GetPKIDServiceImpl
-import nirvana.hall.v62.services.service.GetPKIDService
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.haixin.{StrategyServiceImpl, WsHaiXinFingerServiceImpl}
-import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TenPrinterExportServiceImpl}
-import nirvana.hall.webservice.internal.xingzhuan.{FetchFPTServiceImpl, LocalCheckinServiceImpl}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
-import nirvana.hall.webservice.services.{SendQueryService, TenPrinterExportService}
-import nirvana.hall.webservice.services.xingzhuan.{FetchFPTService, LocalCheckinService}
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}

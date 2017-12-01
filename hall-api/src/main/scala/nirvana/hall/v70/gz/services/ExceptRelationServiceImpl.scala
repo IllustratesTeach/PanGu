@@ -3,11 +3,10 @@ package nirvana.hall.v70.gz.services
 import java.text.SimpleDateFormat
 import javax.activation.DataHandler
 
-import nirvana.hall.api.services.ExceptRelationService
+import nirvana.hall.api.services.{ExceptRelationService, GetPKIDService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
 import nirvana.hall.v70.gz.jpa._
-import nirvana.hall.v70.services.service.GetPKIDService
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 import scala.collection.mutable.ArrayBuffer
