@@ -592,7 +592,7 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "caseClassSet")
         val caseClassSet:CaseClassSet = new CaseClassSet
