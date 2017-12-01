@@ -4,12 +4,13 @@ import java.util.{Date, UUID}
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.sync.SyncErrorConstants
 import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.{HttpHeaderUtils}
+import nirvana.hall.v70.internal.HttpHeaderUtils
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
@@ -155,11 +156,11 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
         case e: nirvana.hall.support.internal.CallRpcException =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SEND_REMOTE_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
+          syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, SyncErrorConstants.SEND_REMOTE_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.GET_REMOTE_RESULT_FAIL + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
+          syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, SyncErrorConstants.GET_REMOTE_RESULT_FAIL + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
       }
       return false
     }

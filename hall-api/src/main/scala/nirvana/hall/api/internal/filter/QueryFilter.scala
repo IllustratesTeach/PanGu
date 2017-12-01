@@ -4,10 +4,11 @@ import javax.servlet.http.HttpServletRequest
 
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
-import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.QueryDBConfig
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.api.internal.sync.SyncErrorConstants
 import nirvana.hall.api.services.{QueryService, SyncInfoLogManageService}
 import nirvana.hall.protocol.api.QueryProto.{QueryGetRequest, QueryGetResponse, QuerySendRequest, QuerySendResponse}
 
@@ -37,7 +38,7 @@ class QueryFilter(httpServletRequest: HttpServletRequest, queryService: QuerySer
           case e:Exception =>
             val eInfo = ExceptionUtil.getStackTraceInfo(e)
             error("Remote_Sync_Type_Match_Task-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
-            syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_TASK)
+            syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_TASK)
       }
       true
     } else if (commandRequest.hasExtension(QueryGetRequest.cmd)) {
@@ -61,7 +62,7 @@ class QueryFilter(httpServletRequest: HttpServletRequest, queryService: QuerySer
           case e:Exception =>
             val eInfo = ExceptionUtil.getStackTraceInfo(e)
             error("Remote_Sync_Type_Match_Result-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_orasid,eInfo,e.getMessage)
-            syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
+            syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_RESULT)
       }
       true
     } else {

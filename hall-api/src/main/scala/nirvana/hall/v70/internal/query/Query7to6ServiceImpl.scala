@@ -6,7 +6,8 @@ import javax.persistence.EntityManager
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.SyncInfoLogManageService
-import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.sync.SyncErrorConstants
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.config.HallV70Config
@@ -85,13 +86,13 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
         GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, HallApiErrorConstants.SEND_REMOTE_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo, 2, SyncErrorConstants.SEND_REMOTE_RESPONSE_UNKNOWN + HallApiConstants.REMOTE_TYPE_MATCH_TASK)
       case e: Exception =>
         //发送比对异常，状态更新为失败
         GafisNormalqueryQueryque.update.set(status= QueryConstants.STATUS_FAIL, oracomment = e.getMessage).where(GafisNormalqueryQueryque.pkId === gafisQuery.pkId).execute
         error(e.getMessage, e)
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, "", eInfo, 2, HallApiErrorConstants.SEND_REMOTE_TASK_FAIL +
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, "", eInfo, 2, SyncErrorConstants.SEND_REMOTE_TASK_FAIL +
           HallApiConstants.REMOTE_TYPE_MATCH_TASK)
     }
   }

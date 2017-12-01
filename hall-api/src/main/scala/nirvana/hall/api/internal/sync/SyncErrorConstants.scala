@@ -1,11 +1,11 @@
-package nirvana.hall.api
+package nirvana.hall.api.internal.sync
 
 /**
  * constant for api error   Hall API同步错误原因常量
  * @author shijiarui
  * @since 2017-02-08
  */
-object HallApiErrorConstants {
+object SyncErrorConstants {
 
   // 6.2 端异常信息
   final val SYNC_6_TO_7_TPCARD_RETURN =    "Hall6.2 向Hall7.0 返回数据时出错 类型: TPCard"

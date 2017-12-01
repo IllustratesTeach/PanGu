@@ -6,7 +6,7 @@ import javax.sql.DataSource
 
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.jpa.HallFetchConfig
@@ -175,19 +175,19 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           fetchTPCard(fetchConfig, update)
         }
       } else {
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, baseResponse.getMsg, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RETURN_FAIL +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, baseResponse.getMsg, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_RETURN_FAIL +
           HallApiConstants.SYNC_TYPE_TPCARD)
       }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH +
           HallApiConstants.SYNC_TYPE_TPCARD)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
           HallApiConstants.SYNC_TYPE_TPCARD)
     }
   }
@@ -286,19 +286,19 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
         info("LP-RequestData success,seq:{};BatchSyncCompleted",seq)
       } else {
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, baseResponse.getMsg, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RETURN_FAIL +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, baseResponse.getMsg, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_RETURN_FAIL +
           HallApiConstants.SYNC_TYPE_LPCARD)
       }
     }catch{
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("LP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH +
           HallApiConstants.SYNC_TYPE_LPCARD)
       case e:Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("LP-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,seq+"", eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
           HallApiConstants.SYNC_TYPE_LPCARD)
     }
   }
@@ -415,19 +415,19 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
         info("LP-Plam-RequestData success,seq:{};BatchSyncCompleted", seq)
       } else {
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, HallApiErrorConstants.SYNC_RETURN_FAIL +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"", null, 2, SyncErrorConstants.SYNC_RETURN_FAIL +
           HallApiConstants.SYNC_TYPE_LPPALM)
       }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("LP-Plam-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_FETCH +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, SyncErrorConstants.SYNC_FETCH +
           HallApiConstants.SYNC_TYPE_LPPALM)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("LP-Plam-RequestData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN +
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq+"",eInfo, 2, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
           HallApiConstants.SYNC_TYPE_LPPALM)
     }
   }
@@ -465,17 +465,17 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         }
         info("MatchTask-RequestData success,taskId:{};BatchSyncCompleted",cardId)
       } else {
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,baseResponse.getMsg , baseResponse.getMsg, HallApiConstants.LOG_MESSAGE_TYPE, HallApiErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId,baseResponse.getMsg , baseResponse.getMsg, HallApiConstants.LOG_MESSAGE_TYPE, SyncErrorConstants.SYNC_RETURN_FAIL + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchTask-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+        syncInfoLogManageService.recordSyncDataLog(uuid, cardId, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
     }
   }
 
@@ -541,11 +541,11 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("fetchMatchRelation-RequestData fail,uuid:{};seq:{};错误堆栈信息:{};错误信息:{}",uuid,seq,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
+        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("fetchMatchRelation-RequestData fail,uuid:{};seq:{};错误堆栈信息:{};错误信息:{}",uuid,seq,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
+        syncInfoLogManageService.recordSyncDataLog(uuid, seq.toString, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
     }
   }
 
@@ -584,12 +584,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
         fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
         error("MatchResult-RequestData fail,uuid:{};taskId:{};错误堆栈信息:{};错误信息:{}",uuid,taskId,eInfo,e.getMessage)
-        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+        syncInfoLogManageService.recordSyncDataLog(uuid, taskId, null, eInfo,HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
         fetchQueryService.updateStatusWithGafis_Task62Record(HallApiConstants.CANDLIST_SYNC_FAIL.toString,uniqueId)
     }
   }
