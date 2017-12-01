@@ -13,8 +13,6 @@ import nirvana.hall.webservice.util.xingzhuan.FPTUtil
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
   * 更新协查比对关系
   */
