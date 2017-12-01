@@ -166,4 +166,14 @@ trait WsHaiXinFingerService {
                               ,@WebParam(name="unitcode") unitcode:String
                               ,@WebParam(name="funType") funType:Int
                               ,@WebParam(name="personid") personid:String):DataHandler
+  /**
+    * 接口12：获取人员信息
+    * @param userid
+    * @param unitcode
+    * @param idcard
+    * @return
+    */
+  @WebMethod def getPersonInfo(@WebParam(name="userid") userid:String
+                               ,@WebParam(name="unitcode") unitcode:String
+                               ,@WebParam(name="idcard") idcard:String) : DataHandler
 }

@@ -636,4 +636,20 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * @return
     */
   override def getErrorInfoList(userid:String,unitcode:String,personid:String,oper_type : Int)  = ???
+
+  /**
+    * 获取人员信息
+    *
+    * @param idcard 身份证号
+    * @return
+    */
+  override def getPersonInfo(idcard: String) = ???
+
+  /**
+    * 处理字符串，不为空返回原字符串，为空返回 ""
+    *
+    * @param str
+    * @return
+    */
+  override def nvlString(str: String) = ???
 }

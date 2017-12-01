@@ -12,6 +12,7 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.internal.haixin.exception.CustomException._
+import nirvana.hall.webservice.internal.haixin.vo.PersonInfoItem
 import nirvana.hall.webservice.services.haixin.StrategyService
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
@@ -767,5 +768,55 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       }
     }
     listBuffer
+  }
+
+  /**
+    * 获取人员信息
+    *
+    * @param idcard 身份证号
+    * @return
+    */
+  override def getPersonInfo(idcard: String) : util.ArrayList[PersonInfoItem] = {
+    val personInfoItemList = new util.ArrayList[PersonInfoItem]()
+    val sql = s"SELECT T.personid,T.cardid,t.name,t.addresstail addressdetail,t.hukouplacetail doordetail, sex.name sex,"
+    s"unit.name gatherunitname, t.printername gatherusername, t.printdate gatherdate, caseclass.name gatherreason "
+    s"  FROM NORMALTP_TPCARDINFO T "
+    s"LEFT JOIN ADMIN_SEX SEX ON T.SEXCODE = SEX.CODE "
+    s"LEFT JOIN ADMIN_CASECLASS CASECLASS ON T.CASECLASS1CODE = CASECLASS.CODE "
+    s"LEFT JOIN ADMIN_UNIT UNIT ON T.PRINTERUNITCODE = UNIT.CODE "
+    s"WHERE SHENFENID = ? "
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,idcard)
+    }{rs=>
+      while (rs.next()){
+        val personInfoItem = new PersonInfoItem
+        personInfoItem.personId = nvlString(rs.getString("personid"))
+        personInfoItem.cardId = nvlString(rs.getString("cardid"))
+        personInfoItem.name = nvlString(rs.getString("name"))
+        personInfoItem.addressDetail = nvlString(rs.getString("addressdetail"))
+        personInfoItem.doorDetail = nvlString(rs.getString("doordetail"))
+        personInfoItem.sex = nvlString(rs.getString("sex"))
+        personInfoItem.gatherUnitName = nvlString(rs.getString("gatherunitname"))
+        personInfoItem.gatherUserName = nvlString(rs.getString("gatherusername"))
+        personInfoItem.gatherDate = nvlString(rs.getString("gatherdate"))
+        personInfoItem.gatherReason = nvlString(rs.getString("gatherreason"))
+        personInfoItemList.add(personInfoItem)
+      }
+    }
+    personInfoItemList
+  }
+
+  /**
+    * 处理字符串，不为空返回原字符串，为空返回 ""
+    *
+    * @param str
+    * @return
+    */
+  override def nvlString(str: String) : String = {
+    if(StringUtils.isEmpty(str) ||StringUtils.isBlank(str)){
+      ""
+    }else{
+      str
+    }
   }
 }

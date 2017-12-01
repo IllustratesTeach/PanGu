@@ -22,7 +22,7 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.haixin.vo.{ErrorInfo, ErrorInfoItem, HitConfig, ListItem}
+import nirvana.hall.webservice.internal.haixin.vo._
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.{FileUtils, IOUtils}
@@ -713,6 +713,44 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       case ex:Throwable =>
         strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
           ,IAConstant.SEARCH_FAIL,IAConstant.GET_ERROR_INFO,personid,IAConstant.EMPTY_ORASID.toString,null,Some(ex))
+    }
+    dataHandler
+  }
+
+  /**
+    * 接口12：根据身份证号获取人员信息
+    *
+    * @param userid
+    * @param unitcode
+    * @param idcard
+    * @return
+    */
+  override def getPersonInfo(userid: String, unitcode: String, idcard: String) : DataHandler = {
+    var dataHandler:DataHandler = null
+
+    val uuid = UUID.randomUUID().toString.replace("-","")
+    try{
+      val paramMap = new scala.collection.mutable.HashMap[String,Any]
+      paramMap.put("userid",userid)
+      paramMap.put("unitcode",unitcode)
+      paramMap.put("idcard",idcard)
+
+      strategyService.inputParamIsNullOrEmpty(paramMap)
+      strategyService.checkUserIsVaild(userid,unitcode)
+
+      val personInfoList = strategyService.getPersonInfo(idcard);
+      val personInfo = new PersonInfo
+      personInfo.Item = personInfoList
+      dataHandler = new DataHandler(new ByteArrayDataSource(XmlLoader.toXml(personInfo).getBytes))
+      strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY
+        ,userid,unitcode
+        ,IAConstant.SEARCH_SUCCESS
+        ,IAConstant.GET_PERSON_INFO
+        ,idcard,IAConstant.EMPTY_ORASID.toString,null,None)
+    }catch{
+      case ex:Throwable =>
+        strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
+          ,IAConstant.SEARCH_FAIL,IAConstant.GET_PERSON_INFO,idcard,IAConstant.EMPTY_ORASID.toString,null,Some(ex))
     }
     dataHandler
   }

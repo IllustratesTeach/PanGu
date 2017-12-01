@@ -145,4 +145,10 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     FileUtils.writeByteArrayToFile(new File("/Users/zqLuo/Desktop/errorInfoTest.xml"), IOUtils.toByteArray(dataHandler.getInputStream))
   }
 
+  @Test
+  def test_get_person_info(): Unit ={
+    val service = getService[WsHaiXinFingerService]
+    val dataHandler = service.getPersonInfo("0101","3701","123");
+    FileUtils.writeByteArrayToFile(new File("/Users/zqLuo/Desktop/personInfoTest.xml"), IOUtils.toByteArray(dataHandler.getInputStream))
+  }
 }
