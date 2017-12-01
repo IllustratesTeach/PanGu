@@ -24,32 +24,32 @@
           <xs:documentation>现场指掌纹信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LatenttaskPackage" name="LatentTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LatenttaskPackage" name="LatentTaskPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>现场指掌纹查询比对请求信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="PrinttaskPackage" name="PrintTaskPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="PrinttaskPackage" name="PrintTaskPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>捺印指掌纹查询比对请求信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LtResultPackage" name="LTResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LtResultPackage" name="LTResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹正查比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TlResultPackage" name="TLResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TlResultPackage" name="TLResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹倒查比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TtResultPackage" name="TTResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TtResultPackage" name="TTResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹查重比对结果信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LlResultPackage" name="LLResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LlResultPackage" name="LLResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹串查比对结果信息</xs:documentation>
         </xs:annotation>
@@ -60,17 +60,17 @@
           <xs:documentation>指掌纹正查和倒查比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="TtHitResultPackage" name="TTHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="TtHitResultPackage" name="TTHitResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹查重比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="LlHitResultPackage" name="LLHitResultPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="LlHitResultPackage" name="LLHitResultPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>指掌纹串查比中信息</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="cancelLatentPackage" name="cancellatentPackage" minOccurs="0" maxOccurs="unbounded" >
+      <xs:element type="cancelLatentPackage" name="cancellatentPackage" minOccurs="0" maxOccurs="256" >
         <xs:annotation>
           <xs:documentation>撤销现场指纹信息</xs:documentation>
         </xs:annotation>
