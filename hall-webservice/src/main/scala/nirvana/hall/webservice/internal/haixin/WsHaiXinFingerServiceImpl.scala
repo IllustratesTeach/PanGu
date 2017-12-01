@@ -135,7 +135,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
           }else{
             result = IAConstant.CREATE_STORE_SUCCESS
           }
-          tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
+          //tpCardService.delTPCard(cardId,Some(hallWebserviceConfig.templateFingerDBId))
         case _ =>
           if(tpCardService.isExist(cardId,Some(hallWebserviceConfig.templateFingerDBId))){
             result = IAConstant.CREATE_STORE_SUCCESS
