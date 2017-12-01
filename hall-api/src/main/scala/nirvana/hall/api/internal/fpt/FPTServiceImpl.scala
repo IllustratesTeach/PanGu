@@ -3,10 +3,9 @@ package nirvana.hall.api.internal.fpt
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, ExceptRelationService, TPCardService}
+import nirvana.hall.api.services.{CaseInfoService, ExceptRelationService, LPCardService, TPCardService}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -28,9 +27,6 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      exceptRelationService: ExceptRelationService,
                      extractor: FeatureExtractor,
                      implicit val dataSource: DataSource) extends FPTService{
-  //fpt处理需要加载jni
-  JniLoaderUtil.loadExtractorJNI()
-  JniLoaderUtil.loadImageJNI()
 
   override def getLogic02Rec(cardId: String, dbId: Option[String]): Logic02Rec = {
     if(tPCardService.isExist(cardId)){

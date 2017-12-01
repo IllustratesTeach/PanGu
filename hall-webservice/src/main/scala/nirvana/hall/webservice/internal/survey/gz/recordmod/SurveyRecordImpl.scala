@@ -3,16 +3,17 @@ package nirvana.hall.webservice.internal.survey.gz.recordmod
 import java.sql.Timestamp
 import java.util.{Date, UUID}
 import javax.sql.DataSource
-import nirvana.hall.api.internal.{DateConverter, JniLoaderUtil}
+
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService}
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.internal.survey.gz.Constant
-import nirvana.hall.webservice.internal.survey.gz.vo.{TimeConfig}
+import nirvana.hall.webservice.internal.survey.gz.vo.TimeConfig
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 
 import scala.collection.mutable
-import scala.collection.mutable.{ListBuffer}
+import scala.collection.mutable.ListBuffer
 
 /**
   * Created by ssj on 2017/11/16.
@@ -22,10 +23,6 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
                        lPCardService: LPCardService,
                        lPPalmService: LPPalmService,
                        implicit val dataSource: DataSource) extends SurveyRecordService{
-
-  JniLoaderUtil.loadExtractorJNI
-  JniLoaderUtil.loadImageJNI
-
 
   override def isSleep(haiXinServerTime:Long):(Boolean,TimeConfig) = {
     var bStr = false
