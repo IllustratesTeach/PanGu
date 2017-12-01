@@ -3,6 +3,7 @@ package nirvana.hall.api.internal.remote
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.config.HallImageRemoteConfigSupport
+import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -20,6 +21,7 @@ import nirvana.hall.support.services.RpcHttpClient
   * gafisImage图像处理service, 调用远程接口imagedecompressurl处理数据，如过没有配置imagedecompressurl，本地处理
   */
 class HallImageRemoteServiceImpl(hallImageUrl: HallImageRemoteConfigSupport, rpcHttpClient: RpcHttpClient) extends HallImageRemoteService with LoggerSupport{
+  JniLoaderUtil.loadImageJNI() //加载动态库
   val firmDecoder = new FirmDecoderImpl("support",new HallImageConfig)
   val imageEncoder = new ImageEncoderImpl(firmDecoder)
   /**

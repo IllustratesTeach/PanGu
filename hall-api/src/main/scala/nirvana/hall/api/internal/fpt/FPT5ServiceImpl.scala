@@ -1,10 +1,9 @@
 package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
-import nirvana.hall.api.internal.JniLoaderUtil
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{FingerprintPackage, LatentPackage}
 import nirvana.hall.c.services.gloclib.glocdef
@@ -25,9 +24,6 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       lPCardService: LPCardService,
                       lPPalmService: LPPalmService,
                       extractor: FeatureExtractor) extends FPT5Service{
-  //fpt处理需要加载jni
-  JniLoaderUtil.loadExtractorJNI()
-  JniLoaderUtil.loadImageJNI()
   /**
     * 获取捺印信息
     * @param cardId 捺印卡号
