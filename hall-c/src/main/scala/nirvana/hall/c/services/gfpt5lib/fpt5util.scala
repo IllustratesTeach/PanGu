@@ -236,7 +236,24 @@ object fpt5util {
         stCoreDelta.nClass = mnt_checker_def.DELTACLASS_UNKNOWN.toByte
     }
   }
-  def UTIL_CoreDelta_MntDisp2FPT(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): String={
+
+  /**
+    * 指纹中心点_特征X坐标
+      指纹中心点_特征Y坐标
+      指纹中心点_特征坐标范围
+      指纹中心点_特征方向
+      指纹中心点_特征方向范围
+      指纹中心点_特征可靠度
+    *  1-3位为x坐标
+    * ，4-6位为y坐标
+    * ，7-8位为坐标范围
+    * ，9-11位为方向
+    * ，12-13位为方向范围
+    * ，14位表示可靠度（1-3可靠度依次递减）。无有效值的数据用ASCII码空格（SP）填写，采用GB/T 1988-1998
+    */
+  case class CoreDelta(x:Int,y:Int,nRadius:Int,szSP3:Int,szSP2:Int,nReliability:Int)
+
+  def UTIL_CoreDelta_MntDisp2FPT(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): CoreDelta={
     var szSP3 = "   " //3个空格SP
     var szSP2 = "  " //2个空格SP
     if ( nType == UTIL_COREDELTA_TYPE_UPCORE || UTIL_COREDELTA_TYPE_VICECORE == nType){
@@ -250,14 +267,7 @@ object fpt5util {
     //TODO 位置半径校验，暂时对不符合要求（两位整数）默认设置30
     if(nRadius > 100 || nRadius < 0)
       nRadius = 30
-
-    val result = "%03d%03d%02d%s%s%d".format(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
-    //中心特征长度超长14，返回空字符串
-    if(result.length > 14){
-      return ""
-    }else{
-      return result
-    }
+    new CoreDelta(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3.toInt, szSP2.toInt, nReliability)
   }
 
   /**
@@ -349,21 +359,34 @@ object fpt5util {
     stmnt.nReliability = 1
   }
 
+  case class FeaturePointInfo(x:Int,y:Int,z:Int)
   /**
-    * 每个特征点用9个字节表示，x坐标、y坐标和方向各3位
+    * FeaturePointInfo包括，x坐标、y坐标和方向各3位
     * @param stmnt
     * @return
     */
-  def UTIL_Minutia_OneMntDisp2FPT(stmnt:AFISMNTPOINTSTRUCT): String ={
-    "%03d%03d%03d".format(stmnt.x, stmnt.y, UTIL_Angle_MntDisp2FPT(stmnt.z))
+  def UTIL_Minutia_OneMntDisp2FPT(stmnt:AFISMNTPOINTSTRUCT): FeaturePointInfo ={
+    new FeaturePointInfo(stmnt.x, stmnt.y, UTIL_Angle_MntDisp2FPT(stmnt.z))
   }
+
+
+  /**
+    * 指纹特征点_特征X坐标	zwtzd_tzxzb	数值型
+      指纹特征点_特征Y坐标	zwtzd_tzyzb	数值型
+      指纹特征点_特征方向	zwtzd_tzfx	数值型
+      指纹特征点_特征质量	zwtzd_tzzl	数值型
+    * @param pstMnt
+    * @param nmntCnt
+    * @return
+    */
 
   def UTIL_Minutia_MntDisp2FPT(pstMnt: Seq[AFISMNTPOINTSTRUCT], nmntCnt: Int): String={
     var pszFPTMnt = ""
     (0 until nmntCnt).foreach(i => pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(pstMnt(i)))
-//    pstMnt.foreach{mnt =>
-//      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
-//    }
+
+    pstMnt.foreach{mnt =>
+      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
+    }
 
     //无有效值的数据用ASCII码空格（SP）填写, 总长度1800
     while (pszFPTMnt.length < 1800) pszFPTMnt += " "
