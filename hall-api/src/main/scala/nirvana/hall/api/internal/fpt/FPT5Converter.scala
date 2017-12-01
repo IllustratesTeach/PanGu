@@ -6,11 +6,12 @@ import java.util
 import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FingerLData
-import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gfpt4lib.{FPT4File, fpt4code}
 import nirvana.hall.c.services.gfpt5lib.{FaceImage, _}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.internal.FPTMntConverter
+import nirvana.hall.image.internal.FPTImageConverter
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto.{LPCard, _}
@@ -356,130 +357,7 @@ object FPT5Converter {
       case "39" => PalmFgp.PALM_UNKNOWN
     }
   }
-//
-//  /**
-//    * 将现场proto信息转为LatentPackage
-//    * @param caseInfo 案件信息
-//    * @param lpCards 现场指纹信息
-//    * @return
-//    */
-//  def convertCaseInfoAndLPCard2LatentPackage(caseInfo: Case, lpCards: Seq[LPCard], palmCards: Seq[LPCard]): LatentPackage = {
-//    val latentPackage = new LatentPackage
-//    //latentPackage.caseMsg.latentFingerprintComparisonSysTypeDescript = "1900"  //指纹比对系统描述
-//    latentPackage.caseMsg.originalSystemCaseId = caseInfo.getStrCaseID  //原始系统_案事件编号
-//    latentPackage.caseMsg.caseId = caseInfo.getStrCaseID  //案事件编号 --警综案事件编号，新数据必须提供
-//    latentPackage.caseMsg.latentSurveyId = caseInfo.getStrCaseID  //现场勘验编号
-//    latentPackage.caseMsg.latentCardId = ""  //现场指掌纹卡编号
-//    //latentPackage.caseMsg.caseTypeCode = caseInfo.getText.getStrCaseType1  //案件类别代码
-//    latentPackage.caseMsg.money = caseInfo.getText.getStrMoneyLost  //金额（人民币元）
-//    latentPackage.caseMsg.caseOccurAdministrativeDivisionCode = caseInfo.getText.getStrCaseOccurPlaceCode  //案事件发生地点_行政区划代码
-//    latentPackage.caseMsg.caseOccurAddress = caseInfo.getText.getStrCaseOccurPlace  //案事件发生地点_地址名称
-//    latentPackage.caseMsg.briefCase = caseInfo.getText.getStrComment  //简要案情
-//    latentPackage.caseMsg.whetherKill = if (caseInfo.getText.getBPersonKilled) "1" else "0"  //是否命案_判断标识
-////    latentPackage.caseMsg.extractUnitCode = caseInfo.getText.getStrExtractUnitCode  //提取单位_公安机关机构代码
-////    latentPackage.caseMsg.extractUnitName = caseInfo.getText.getStrExtractUnitName  //提取单位_公安机关名称
-////    latentPackage.caseMsg.extractPerson = caseInfo.getText.getStrExtractor  //提取人员_姓名
-////    latentPackage.caseMsg.extractPersonIdCard = "000000000000000"  //提取人员_公民身份号码
-////    latentPackage.caseMsg.extractPersonTel = ""  //提取人员_联系电话
-////    latentPackage.caseMsg.extractDateTime = "2017-10-11T10:00:01"   //提取时间  caseInfo.getText.getStrExtractDate
-////    latentPackage.caseMsg.latentFingerNum = lpCards.size
-////    latentPackage.caseMsg.latentPalmNum = palmCards.size
-//
-//    lpCards.foreach( lpcard =>{
-//
-////      val latentfingerMsg = new LatentFingerMsg
-//      var fingerLData = new FingerLData
-//      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lpcard.getBlob.getStImageBytes.toByteArray)
-//
-////      latentfingerMsg.originalSystemLatentFingerPalmId = lpcard.getStrCardID  //原始系统_现场指掌纹编号
-////      latentfingerMsg.latentPhysicalId = "R12345678901234567890123456789"  //现场物证编号
-////      latentfingerMsg.latentFingerLeftPosition = ""  //现场指纹_现场指掌纹遗留部位
-////      latentfingerMsg.latentFingerFeatureExtractMethodCode = "M"  //现场指纹_指掌纹特征提取方式代码
-////      latentfingerMsg.latentFingerCorpseJudgeIdentify = if(lpcard.getText.getBDeadBody) "1" else "0"  //现场指纹_尸体指掌纹_判断标识
-////      latentfingerMsg.latentFingerMastoidProcessLineColorCode = if(FPT5Utils.isNull(lpcard.getText.getStrRidgeColor)) "" else lpcard.getText.getStrRidgeColor  //现场指纹_乳突线颜色代码
-////      latentfingerMsg.latentFingerConnectFingerBeginPhysicalId = lpcard.getText.getStrStart  //现场指纹_连指开始_现场物证编号
-////      latentfingerMsg.latentFingerConnectFingerEndPhysicalId = lpcard.getText.getStrEnd  //现场指纹_连指结束_现场物证编号
-////      latentfingerMsg.latentFingerComparisonStatusCode = lpcard.getText.getNBiDuiState.toString  //现场指纹_指纹比对状态代码
-////      latentfingerMsg.latentFingerFeatureGroupNum = 0  //现场指纹_特征组合数量
-//
-//      //val latentFingerFeatureGroup = new Xczwtzz  //现场指纹特征组相关
-//      if(lpcard.getBlob.getStMnt.nonEmpty){//判断是否有特征
-//
-//        //latentfingerMsg.latentFingerFeatureGroupNum = latentfingerMsg.latentFingerFeatureGroupNum + 1
-//        val gafisMnt =  new GAFISIMAGESTRUCT
-//        gafisMnt.fromStreamReader(lpcard.getBlob.getStMntBytes.newInput())
-//        fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
-//
-////        latentFingerFeatureGroup.latentFingerFeatureGroupIdentify = "123451234512345"  //现场指纹_特征组合标识符
-////        latentFingerFeatureGroup.latentFingerFeatureGroupDescript = ""  //现场指纹_特征组合描述
-////        latentFingerFeatureGroup.latentFingerAnalysisPostionBrief = "1234567890"  //现场指纹_分析指位_简要情况
-////        latentFingerFeatureGroup.latentFingerPatternCode = "1234567"  //fingerLData.pattern  //现场指纹_指纹纹型代码
-////        latentFingerFeatureGroup.latentFingerDirectionDescript = fingerLData.fingerDirection  //现场指纹_指纹方向描述
-////        latentFingerFeatureGroup.latentFingerCenterPoint = fingerLData.centerPoint  //现场指纹_指纹中心点
-////        latentFingerFeatureGroup.latentFingerSlaveCenter = if(FPT5Utils.isNull(fingerLData.subCenterPoint) || FPT5Utils.replaceLength(fingerLData.subCenterPoint,14))"" else fingerLData.subCenterPoint  //现场指纹_指纹副中心
-////        latentFingerFeatureGroup.latentFingerLeftTriangle = if(FPT5Utils.isNull(fingerLData.leftTriangle) || FPT5Utils.replaceLength(fingerLData.leftTriangle,14))"" else fingerLData.leftTriangle   //现场指纹_指纹左三角
-////        latentFingerFeatureGroup.latentFingerRightTriangle = if(FPT5Utils.isNull(fingerLData.rightTriangle) || FPT5Utils.replaceLength(fingerLData.rightTriangle,14))"" else fingerLData.rightTriangle  //现场指纹_指纹右三角
-////        latentFingerFeatureGroup.latentFingerFeatureNum = fingerLData.featureCount.toInt  //现场指纹_指纹特征点_数量
-////        latentFingerFeatureGroup.latentFingerFeatureInfo = fingerLData.feature  //现场指纹_指纹特征点信息
-////        latentFingerFeatureGroup.latentFingerCustomInfo = lpcard.getText.getStrComment.getBytes() //现场指纹_自定义信息
-////        latentFingerFeatureGroup.latentFingerImageHorizontalDirectionLength = 512  //现场指纹_图像水平方向长度
-////        latentFingerFeatureGroup.latentFingerImageVerticalDirectionLength = 512  //现场指纹_图像垂直方向长度
-////        latentFingerFeatureGroup.latentFingerImageRatio = 500  //现场指纹_图像分辨率
-////        latentFingerFeatureGroup.latentFingerImageCompressMethodDescript = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE  //现场指纹_图像压缩方法描述
-////        latentFingerFeatureGroup.latentFingerImageData = gafisImage.bnData  //现场指纹_图像数据
-//      }
-//      //latentfingerMsg.latentFingerFeatureGroup.add(latentFingerFeatureGroup)
-//
-//      //latentPackage.latentFingers.latentfingerMsg.add(latentfingerMsg)
-//    })
-//
-//    palmCards.foreach( palm =>{
-//
-//      //val latentpalmMsg = new LatentpalmMsg
-//      var fingerLData = new FingerLData
-//      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(palm.getBlob.getStImageBytes.toByteArray)
-//
-////      latentpalmMsg.latentPalmId = palm.getStrCardID  //现场掌纹_现场指掌纹编号
-////      latentpalmMsg.latentPalmPhysicalId = "R12345678901234567890123456789"  //现场掌纹_现场物证编号
-////      latentpalmMsg.latentPalmLeftPostion = ""  //现场掌纹_现场指掌纹遗留部位
-////      latentpalmMsg.latentPalmFeatureExtractMethodCode = "M"  //现场掌纹_指掌纹特征提取方式代码
-////      latentpalmMsg.latentPalmCorpseJudgeIdentify = if(palm.getText.getBDeadBody) "1" else "0"  //现场掌纹_尸体指掌纹_判断标识
-////      latentpalmMsg.latentPalmMastoidProcessLineColorCode = if(FPT5Utils.isNull(palm.getText.getStrRidgeColor)) "" else palm.getText.getStrRidgeColor //现场掌纹_乳突线颜色代码
-////      latentpalmMsg.latentPalmComparisonStatusCode = palm.getText.getNBiDuiState.toString  //现场掌纹_掌纹比对状态代码
-////      latentpalmMsg.latentPalmFeatureGroupNum = 0  //现场掌纹_特征组合数量
-//
-//      //val latentPalmFeatureGroup = new Xczhwtzz  //现场掌纹特征组相关
-//      if(palm.getBlob.getStMnt.nonEmpty){//判断是否有特征
-//
-//        //latentpalmMsg.latentPalmFeatureGroupNum = latentpalmMsg.latentPalmFeatureGroupNum + 1
-//        val gafisMnt =  new GAFISIMAGESTRUCT
-//        gafisMnt.fromStreamReader(palm.getBlob.getStMntBytes.newInput())
-//        fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
-//
-////        latentPalmFeatureGroup.latentPalmFeatureGroupIdentify = "123451234512345"  //现场掌纹_特征组合标识符
-////        latentPalmFeatureGroup.latentPalmFeatureGroupDescript = ""  //现场掌纹_特征组合描述
-////        latentPalmFeatureGroup.latentPalmAnalysisPostionBrief = "1234"  //现场掌纹_分析掌位_简要情况
-////        latentPalmFeatureGroup.latentPalmRetracingPointNum = 0  //fingerLData.pattern  //现场掌纹_掌纹折返点数量
-////        latentPalmFeatureGroup.latentPalmRetracingPointInfo = ""  //现场掌纹_掌纹折返点信息
-////        latentPalmFeatureGroup.latentPalmTrianglePointNum = 0  //现场掌纹_掌纹三角点_数量
-////        latentPalmFeatureGroup.latentPalmTrianglePointInfo = ""  //现场掌纹_掌纹三角点信息
-////        latentPalmFeatureGroup.latentPalmFeaturePointNum = fingerLData.featureCount.toInt   //现场掌纹_掌纹特征点_数量
-////        latentPalmFeatureGroup.latentPalmFeaturePointInfo = fingerLData.feature  //现场掌纹_掌纹特征点信息
-////        latentPalmFeatureGroup.latentPalmCustomInfo = palm.getText.getStrComment.getBytes() //现场掌纹_自定义信息
-////        latentPalmFeatureGroup.latentPalmImageHorizontalDirectionLength = fingerLData.imgHorizontalLength.toInt  //现场掌纹_图像水平方向长度
-////        latentPalmFeatureGroup.latentPalmImageVerticalDirectionLength = fingerLData.imgVerticalLength.toInt  //现场掌纹_图像垂直方向长度
-////        latentPalmFeatureGroup.latentPalmImageRatio = fingerLData.dpi.toInt  //现场掌纹_图像分辨率
-////        latentPalmFeatureGroup.latentPalmImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)  //现场掌纹_图像压缩方法描述
-////        latentPalmFeatureGroup.latentPalmImageData = gafisImage.bnData  //现场掌纹_图像数据
-//      }
-//      //latentpalmMsg.latentPalmFeatureGroup.add(latentPalmFeatureGroup)
-//
-//      //latentPackage.latentPalms.latentpalmMsg.add(latentpalmMsg)
-//    })
-//
-//    latentPackage
-//  }
-//
+
   /**
     * 将指纹包转换为tpcard protobuf对象
     * @param fingerprintPackage
@@ -729,6 +607,495 @@ object FPT5Converter {
     }else{
       null
     }
+  }
+
+
+  /**
+    * 导出 LatentPackage
+    *
+    * @param caseInfo
+    * @param lpCards
+    * @param palmCards
+    * @return
+    */
+  def convertCaseInfoAndLPCard2LatentPackage(caseInfo: Case, lpCards: Seq[LPCard], palmCards: Seq[LPCard]): LatentPackage = {
+    val latentPackage = new LatentPackage
+    val caseMsg = new CaseMsg
+    val latentCollectInfoMsg = new LatentCollectInfoMsg
+    var latentFingers = new ArrayBuffer[LatentFingers]
+    var latentPalms = new ArrayBuffer[LatentPalms]
+
+    caseMsg.originalSystemCaseId = caseInfo.getStrCaseID //原始系统_案事件编号
+    caseMsg.caseId = caseInfo.getStrCaseID //案事件编号 --警综案事件编号，新数据必须提供
+    caseMsg.latentSurveyId = caseInfo.getStrSurveyId //现场勘验编号
+    caseMsg.latentCardId = "" //现场指掌纹卡编号
+    val list = new ArrayBuffer[String]
+    list += caseInfo.getText.getStrCaseType1
+    if(caseInfo.getText.getStrCaseType2.nonEmpty){
+      list += caseInfo.getText.getStrCaseType2
+    }
+    if(caseInfo.getText.getStrCaseType3.nonEmpty){
+      list += caseInfo.getText.getStrCaseType3
+    }
+    caseMsg.caseClassSet.caseTypeCode = list.toArray
+    caseMsg.money = caseInfo.getText.getStrMoneyLost //金额（人民币元）
+    caseMsg.caseOccurAdministrativeDivisionCode = caseInfo.getText.getStrCaseOccurPlaceCode //案事件发生地点_行政区划代码
+    caseMsg.caseOccurAddress = caseInfo.getText.getStrCaseOccurPlace //案事件发生地点_地址名称
+    caseMsg.briefCase = caseInfo.getText.getStrBriefCase //简要案情
+    caseMsg.whetherKill = if (caseInfo.getText.getBPersonKilled) "1" else "0" //是否命案_判断标识
+
+    latentCollectInfoMsg.fingerprintComparisonSysTypeDescript = "1900" //指纹比对系统类型描述
+    latentCollectInfoMsg.extractUnitCode = caseInfo.getText.getStrExtractUnitCode //提取单位_公安机关机构代码
+    latentCollectInfoMsg.extractUnitName = caseInfo.getText.getStrExtractUnitName //提取单位_公安机关名称
+    latentCollectInfoMsg.extractPerson = caseInfo.getText.getStrExtractor //提取人员_姓名
+    latentCollectInfoMsg.extractPersonIdCard = caseInfo.getText.getStrExtractorIdCard //"000000000000000000" //提取人员_公民身份号码
+    latentCollectInfoMsg.extractPersonTel = caseInfo.getText.getStrExtractorTel //提取人员_联系电话
+    latentCollectInfoMsg.extractDateTime = caseInfo.getText.getStrExtractDate //"2017-10-11T10:00:01" //提取时间
+
+    if(lpCards.size>0){
+      val latentfinger = getLatentFingers(caseInfo,lpCards)
+      latentFingers += latentfinger
+
+    }
+    if(palmCards.size>0){
+      val latentpalm = getLatentPalms(caseInfo,palmCards)
+      latentPalms += latentpalm
+    }
+    latentPackage.caseMsg = caseMsg
+    latentPackage.latentCollectInfoMsg = latentCollectInfoMsg
+    latentPackage.latentFingers = latentFingers.toArray
+    latentPackage.latentPalms = latentPalms.toArray
+    latentPackage
+  }
+
+  def getLatentFingers(caseInfo: Case,lpCards: Seq[LPCard]): LatentFingers ={
+    val latentFingers = new LatentFingers
+    val latentFingerImageMsg = new ArrayBuffer[LatentFingerImageMsg]
+    var latentFingerFeatureMsg = new ArrayBuffer[LatentFingerFeatureMsg]
+    lpCards.foreach(lpcard => {
+      val latentImageMsg = new LatentFingerImageMsg
+      val latentFeatureMsg = new LatentFingerFeatureMsg
+      var fingerLData = new FingerLData
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lpcard.getBlob.getStImageBytes.toByteArray)
+      latentImageMsg.originalSystemLatentFingerPalmId = lpcard.getStrCardID //原始系统_现场指掌纹编号
+      latentImageMsg.latentPhysicalId = lpcard.getStrPhysicalId //现场物证编号
+      latentImageMsg.latentFingerLeftPosition = "" //现场指纹_现场指掌纹遗留部位
+      latentImageMsg.latentFingerCorpseJudgeIdentify = if (lpcard.getText.getBDeadBody) "1" else "0" //现场指纹_尸体指掌纹_判断标识
+      latentImageMsg.latentFingerMastoidProcessLineColorCode = lpcard.getText.getStrRidgeColor //现场指纹_乳突线颜色代码
+      latentImageMsg.latentFingerConnectFingerBeginPhysicalId = lpcard.getText.getStrStart //现场指纹_连指开始_现场物证编号
+      latentImageMsg.latentFingerConnectFingerEndPhysicalId = lpcard.getText.getStrEnd //现场指纹_连指结束_现场物证编号
+      latentImageMsg.latentFingerComparisonStatusCode = lpcard.getText.getNBiDuiState.toString //现场指纹_指纹比对状态代码
+      if (lpcard.getBlob.getStMnt.nonEmpty) {
+        //判断是否有特征
+        val gafisMnt = new GAFISIMAGESTRUCT
+        gafisMnt.fromStreamReader(lpcard.getBlob.getStMntBytes.newInput())
+        fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
+        latentImageMsg.latentFingerAnalysisPostionBrief = fingerLData.fgp //现场指纹_分析指位_简要情况 "1234567890"
+        latentImageMsg.latentFingerPatternAnalysisBrief = fingerLData.pattern //现场指纹_纹型分析_简要情况
+        latentImageMsg.latentFingerFeatureDirection = fingerLData.fingerDirection.substring(0, 3).toInt //现场指纹_指纹方向_特征方向   指纹方向的前三位 转int
+        latentImageMsg.latentFingerFeatureDirectionRange = fingerLData.fingerDirection.substring(3, 5).toInt //现场指纹_指纹方向_特征方向范围    指纹方向的后两位位 转int
+        latentImageMsg.latentFingerImageHorizontalDirectionLength = 512 //现场指纹_图像水平方向长度
+        latentImageMsg.latentFingerImageVerticalDirectionLength = 512 //现场指纹_图像垂直方向长度
+        latentImageMsg.latentFingerImageRatio = 500 //现场指纹_图像分辨率
+        latentImageMsg.latentFingerImageCompressMethodDescript = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE //现场指纹_图像压缩方法描述
+        latentImageMsg.latentFingerImageData = gafisImage.bnData //现场指纹_图像数据
+        latentImageMsg.latentFingerCustomInfo = lpcard.getText.getStrComment.getBytes() //现场指纹_自定义信息
+        latentFeatureMsg.originalSystemLatentFingerPalmId = lpcard.getStrCardID //原始系统_现场指掌纹编号
+        latentFeatureMsg.latentPhysicalId = lpcard.getStrPhysicalId  //现场物证编号
+        latentFeatureMsg.latentFeatureGroupIdentifier = caseInfo.getText.getStrExtractUnitCode + "123" //现场指纹_特征组合标识符
+        latentFeatureMsg.latentFeatureGroupDscriptInfo = "" //现场指纹_特征组合描述信息
+        latentFeatureMsg.latentFeatureExtractMethodCode = fingerLData.extractMethod //现场指纹_指掌纹特征提取方式代码
+        latentFeatureMsg.fingerAnalysisPostionBrief = fingerLData.fgp //现场指纹_分析指位_简要情况
+        latentFeatureMsg.fingerPatternAnalysisBrief = fingerLData.pattern //现场指纹_纹型分析_简要情况
+        latentFeatureMsg.fingerFeatureDirection = fingerLData.fingerDirection.substring(0, 3).toInt //现场指纹_指纹方向_特征方向
+        latentFeatureMsg.fingerFeatureDirectionRange = fingerLData.fingerDirection.substring(3, 5).toInt //现场指纹_指纹方向_特征方向范围
+        val centerPoint = convertFpt4Feature2CenterFeature(fingerLData.centerPoint)
+        if(centerPoint != null){
+          latentFeatureMsg.fingerCenterPointFeatureXCoordinate = centerPoint.xPoint//现场指纹_指纹中心点_特征X坐标
+          latentFeatureMsg.fingerCenterPointFeatureYCoordinate = centerPoint.yPoint //现场指纹_指纹中心点_特征Y坐标
+          latentFeatureMsg.fingerCenterPointFeatureCoordinateRange = centerPoint.range //现场指纹_指纹中心点_特征坐标范围
+          latentFeatureMsg.fingerCenterPointFeatureDirection = centerPoint.direction //现场指纹_指纹中心点_特征方向
+          latentFeatureMsg.fingerCenterPointFeatureDirectionRange = centerPoint.directionRange //现场指纹_指纹中心点_特征方向范围
+          latentFeatureMsg.fingerCenterPointFeatureReliabilityLevel = centerPoint.reliability //现场指纹_指纹中心点_特征可靠度
+        }
+        val subCenterPoint = convertFpt4Feature2CenterFeature(fingerLData.subCenterPoint)
+        if(subCenterPoint != null){
+          latentFeatureMsg.fingerSlaveCenterFeatureXCoordinate = subCenterPoint.xPoint //现场指纹_指纹副中心_特征X坐标
+          latentFeatureMsg.fingerSlaveCenterFeatureYCoordinate = subCenterPoint.yPoint //现场指纹_指纹副中心_特征Y坐标
+          latentFeatureMsg.fingerSlaveCenterFeatureCoordinateRange = subCenterPoint.range //现场指纹_指纹副中心_特征坐标范围
+          latentFeatureMsg.fingerSlaveCenterFeatureDirection = subCenterPoint.direction //现场指纹_指纹副中心_特征方向
+          latentFeatureMsg.fingerSlaveCenterFeatureDirectionRange = subCenterPoint.directionRange //现场指纹_指纹副中心_特征方向范围
+          latentFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel = subCenterPoint.reliability //现场指纹_指纹副中心_特征可靠度
+        }
+        val leftTriangle = convertFpt4Feature2CenterFeature(fingerLData.leftTriangle)
+        if(leftTriangle != null){
+          latentFeatureMsg.fingerLeftTriangleFeatureXCoordinate = leftTriangle.xPoint //现场指纹_指纹左三角_特征X坐标
+          latentFeatureMsg.fingerLeftTriangleFeatureYCoordinate = leftTriangle.yPoint //现场指纹_指纹左三角_特征Y坐标
+          latentFeatureMsg.fingerLeftTriangleFeatureCoordinateRange = leftTriangle.range //现场指纹_指纹左三角_特征坐标范围
+          latentFeatureMsg.fingerLeftTriangleFeatureDirection = leftTriangle.direction //现场指纹_指纹左三角_特征方向
+          latentFeatureMsg.fingerLeftTriangleFeatureDirectionRange = leftTriangle.directionRange //现场指纹_指纹左三角_特征方向范围
+          latentFeatureMsg.fingerLeftTriangleFeatureReliabilityLevel = leftTriangle.reliability //现场指纹_指纹左三角_特征可靠度
+        }
+        val rightTriangle = convertFpt4Feature2CenterFeature(fingerLData.rightTriangle)
+        if(rightTriangle != null){
+          latentFeatureMsg.fingerRightTriangleFeatureXCoordinate = rightTriangle.xPoint //现场指纹_指纹右三角_特征X坐标
+          latentFeatureMsg.fingerRightTriangleFeatureYCoordinate = rightTriangle.yPoint //现场指纹_指纹右三角_特征Y坐标
+          latentFeatureMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangle.range //现场指纹_指纹右三角_特征坐标范围
+          latentFeatureMsg.fingerRightTriangleFeatureDirection = rightTriangle.direction //现场指纹_指纹右三角_特征方向
+          latentFeatureMsg.fingerRightTriangleFeatureDirectionRange = rightTriangle.directionRange //现场指纹_指纹右三角_特征方向范围
+          latentFeatureMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangle.reliability //现场指纹_指纹右三角_特征可靠度
+        }
+        val latentMinutiaSet = new LatentMinutiaSet
+        latentMinutiaSet.latentMinutia = convertFeature2MinutiaSet(fingerLData.feature,fingerLData.featureCount.toInt)
+        latentFeatureMsg.LatentMinutiaSet = latentMinutiaSet
+        latentFeatureMsg.latentFingerCustomInfo = lpcard.getText.getStrComment.getBytes()
+      }
+      latentFingerImageMsg += latentImageMsg
+      latentFingerFeatureMsg += latentFeatureMsg
+    })
+    latentFingers.latentFingerImageMsg = latentFingerImageMsg.toArray
+    latentFingers.latentFingerFeatureMsg = latentFingerFeatureMsg.toArray
+    latentFingers
+  }
+
+  def getLatentPalms(caseInfo: Case,palmCards: Seq[LPCard]): LatentPalms ={
+    val latentPalms = new LatentPalms
+    palmCards.foreach( palm =>{
+      val latentPalmImageMsg = new LatentPalmImageMsg
+      val latentPalmFeatureMsg = new LatentPalmFeatureMsg
+      var fingerLData = new FingerLData
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(palm.getBlob.getStImageBytes.toByteArray)
+      latentPalmImageMsg.latentPalmId = palm.getStrCardID  //现场掌纹_现场指掌纹编号
+      latentPalmImageMsg.latentPalmPhysicalId = palm.getStrPhysicalId  //现场掌纹_现场物证编号
+      latentPalmImageMsg.latentPalmLeftPostion = ""  //现场掌纹_现场指掌纹遗留部位
+      latentPalmImageMsg.latentPalmCorpseJudgeIdentify = if(palm.getText.getBDeadBody) "1" else "0"  //现场掌纹_尸体指掌纹_判断标识
+      latentPalmImageMsg.latentPalmMastoidProcessLineColorCode = palm.getText.getStrRidgeColor //现场掌纹_乳突线颜色代码
+      latentPalmImageMsg.latentPalmComparisonStatusCode = palm.getText.getNBiDuiState.toString  //现场掌纹_掌纹比对状态代码
+      latentPalmImageMsg.latentPalmImageRatio = 500  //现场掌纹_图像分辨率
+      latentPalmImageMsg.latentPalmImageCompressMethodDescript = fpt4code.GAIMG_CPRMETHOD_NOCPR_CODE  //现场掌纹_图像压缩方法描述
+      latentPalmImageMsg.latentPalmImageData = gafisImage.bnData  //现场掌纹_图像数据
+      latentPalmImageMsg.latentPalmCustomInfo = palm.getText.getStrComment.getBytes()  //现场掌纹_自定义信息
+      if(palm.getBlob.getStMnt.nonEmpty){//判断是否有特征
+      //判断是否有特征
+      val gafisMnt = new GAFISIMAGESTRUCT
+        gafisMnt.fromStreamReader(palm.getBlob.getStMntBytes.newInput())
+        fingerLData = FPTMntConverter.convertGafisMnt2FingerLData(gafisMnt)
+        latentPalmImageMsg.latentPalmPostionAnalysisBriefly = fingerLData.fgp  //现场掌纹_掌位分析_简要情况
+        latentPalmImageMsg.latentPalmImageHorizontalDirectionLength = fingerLData.imgHorizontalLength.toInt //现场掌纹_图像水平方向长度
+        latentPalmImageMsg.latentPalmImageVerticalDirectionLength = fingerLData.imgVerticalLength.toInt  //现场掌纹_图像垂直方向长度
+        latentPalmFeatureMsg.latentPalmNo = palm.getStrCardID //现场掌纹_现场指掌纹编号
+        latentPalmFeatureMsg.latentPalmPhysicalId = palm.getStrPhysicalId //现场掌纹_现场物证编号
+        latentPalmFeatureMsg.latentPalmFeatureGroupIdentifier = caseInfo.getText.getStrExtractUnitCode + "123" //现场掌纹_特征组合标识符
+        latentPalmFeatureMsg.latentPalmFeatureDscriptInfo = "" //现场掌纹_特征组合描述信息
+        latentPalmFeatureMsg.latentPalmFeatureExtractMethodCode = fingerLData.extractMethod //现场掌纹_指掌纹特征提取方式代码
+        latentPalmFeatureMsg.latentPalmComparisonStatusCode = palm.getText.getNBiDuiState.toString //现场掌纹_指掌纹比对状态代码
+        latentPalmFeatureMsg.latentPalmAnalysisBrief = fingerLData.fgp //现场掌纹_掌位分析_简要情况
+        val latentPalmCoreLikePatternSet = new LatentPalmCoreLikePatternSet
+        //掌纹折返点
+        val latentPalmCoreLikePattern = new LatentPalmCoreLikePattern
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureXCoordinate = 1
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureYCoordinate =2
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureCoordinateRange =3
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureDirection =4
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureDirectionRange =5
+        //        latentPalmCoreLikePattern.latentPalmRetracingPointFeatureQuality =6
+        latentPalmCoreLikePatternSet.latentPalmCoreLikePattern :+ latentPalmCoreLikePattern
+
+        val latentPalmDeltaSet = new LatentPalmDeltaSet
+        val latentPalmDelta = new LatentPalmDelta
+        latentPalmDelta.latentPalmTrianglePointFeatureXCoordinate = fingerLData.centerPoint.substring(0,4).toInt
+        latentPalmDelta.latentPalmTrianglePointFeatureYCoordinate = fingerLData.centerPoint.substring(4,8).toInt
+        latentPalmDelta.latentPalmTrianglePointFeatureRange = fingerLData.centerPoint.substring(8,11).toInt
+
+        val latentPalmDeltaDirection = new LatentPalmDeltaDirection
+        latentPalmDeltaDirection.latentPalmTrianglePointFeatureDirection = fingerLData.centerPoint.substring(11,14).toInt
+        latentPalmDeltaDirection.latentPalmTrianglePointFeatureDirectionRange = fingerLData.centerPoint.substring(14,16).toInt
+        latentPalmDelta.latentPalmDeltaDirection :+ latentPalmDeltaDirection
+
+        latentPalmDelta.palmTrianglePostionTypeCode = fingerLData.centerPoint.substring(26,28).toInt
+        latentPalmDelta.latentPalmTrianglePointFeatureQuality = fingerLData.centerPoint.substring(28,30).toInt
+        latentPalmDeltaSet.latentPalmDelta :+ latentPalmDelta
+
+        val latentPalmMinutiaSet = new LatentPalmMinutiaSet
+        latentPalmMinutiaSet.latentPalmMinutia = convertFeature2PalmMinutiaSet(fingerLData.feature,fingerLData.featureCount.toInt)
+        latentPalmFeatureMsg.latentPalmCoreLikePatternSet = latentPalmCoreLikePatternSet
+        latentPalmFeatureMsg.latentPalmDeltaSet = latentPalmDeltaSet
+        latentPalmFeatureMsg.latentPalmMinutiaSet = latentPalmMinutiaSet
+        latentPalmFeatureMsg.latentPalmCustomInfo = palm.getText.getStrComment.getBytes()
+      }
+      latentPalms.latentPalmImageMsg :+ latentPalmImageMsg
+      latentPalms.LatentPalmFeatureMsg :+ latentPalmFeatureMsg
+    })
+    latentPalms
+  }
+
+  def convertFeature2MinutiaSet(feature:String,featureCount:Int):Array[LatentMinutia]={
+    var latentminutias = new ArrayBuffer[LatentMinutia]
+    var mnts:String = ""
+    var index:Int = 0
+    for(i<-0 until featureCount){
+      val Latentminutia = new LatentMinutia
+      index = i
+      mnts = feature.substring(index,index+9)
+      Latentminutia.fingerFeaturePointXCoordinate = if(FPT5Utils.isNull(mnts.substring(0,3)))0 else mnts.substring(0,3).toInt
+      Latentminutia.fingerFeaturePointYCoordinate = if(FPT5Utils.isNull(mnts.substring(3,6)))0 else mnts.substring(3,6).toInt
+      Latentminutia.fingerFeaturePointDirection = if(FPT5Utils.isNull(mnts.substring(6,9)))0 else mnts.substring(6,9).toInt
+      latentminutias += Latentminutia
+    }
+    latentminutias.toArray
+  }
+
+  def convertFeature2PalmMinutiaSet(feature:String,featureCount:Int):Array[LatentPalmMinutia]={
+    var palmlatentminutias  = new ArrayBuffer[LatentPalmMinutia]
+    var palmmnts:String = null
+    var index:Int = 0
+    for(i<-0 until featureCount){
+      val palmLatentminutia = new LatentPalmMinutia
+      index = i
+      palmmnts = feature.substring(index,index+9)
+      palmLatentminutia.fingerFeaturePointXCoordinate = palmmnts.substring(index,index+3).toInt
+      palmLatentminutia.fingerFeaturePointYCoordinate = palmmnts.substring(index+3,index+6).toInt
+      palmLatentminutia.fingerFeaturePointDirection = palmmnts.substring(index+6,index+9).toInt
+      palmlatentminutias += palmLatentminutia
+    }
+    palmlatentminutias.toArray
+  }
+
+  def convertLatentPackage2Case(latentPackage: LatentPackage): Case = {
+    val caseInfo = Case.newBuilder()
+    val textBuilder = caseInfo.getTextBuilder
+    caseInfo.setStrCaseID(latentPackage.caseMsg.caseId) //案事件编号
+    caseInfo.setStrSurveyId(latentPackage.caseMsg.latentSurveyId) //现场勘验编号
+    caseInfo.setNCaseFingerCount(latentPackage.latentFingers.length) //现场指纹个数
+    latentPackage.latentFingers.foreach(
+      latentFingers =>
+        caseInfo.addStrFingerID(latentFingers.latentFingerImageMsg(0).originalSystemLatentFingerPalmId)  //原始系统_现场指掌纹编号
+    )
+    textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString) //案件类别
+    textBuilder.setStrCaseType2(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
+    textBuilder.setStrCaseType3(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
+    textBuilder.setStrMoneyLost(latentPackage.caseMsg.money) //涉案金额
+    textBuilder.setStrCaseOccurPlaceCode(latentPackage.caseMsg.caseOccurAdministrativeDivisionCode) //案发地点代码
+    textBuilder.setStrCaseOccurPlace(latentPackage.caseMsg.caseOccurAddress) //案发地址详情
+    textBuilder.setStrBriefCase(latentPackage.caseMsg.briefCase) //简要案情
+    textBuilder.setBPersonKilled("1".equals(latentPackage.caseMsg.whetherKill)) //命案标识
+    textBuilder.setStrExtractUnitCode(latentPackage.latentCollectInfoMsg.extractUnitCode) //提取单位代码
+    textBuilder.setStrExtractUnitName(latentPackage.latentCollectInfoMsg.extractUnitName) //提取单位
+    textBuilder.setStrExtractor(latentPackage.latentCollectInfoMsg.extractPerson) //提取人
+    textBuilder.setStrExtractorIdCard(latentPackage.latentCollectInfoMsg.extractPersonIdCard) //提取人
+    textBuilder.setStrExtractorTel(latentPackage.latentCollectInfoMsg.extractPersonTel) //提取人
+    textBuilder.setStrExtractDate(latentPackage.latentCollectInfoMsg.extractDateTime) //提取时间
+
+    textBuilder.setStrSuspArea1Code("") //可疑地区行政区划
+    textBuilder.setStrSuspArea2Code("")
+    textBuilder.setStrSuspArea3Code("")
+    textBuilder.setStrCaseOccurDate("") //案发日期
+    textBuilder.setStrPremium("") //协查奖金
+    textBuilder.setStrXieChaDate("") //协查日期
+    textBuilder.setStrXieChaRequestUnitName("") //协查单位名称
+    textBuilder.setStrXieChaRequestUnitCode("") //协查单位代码
+    //隐式转换，字符串转数字
+    implicit def string2Int(str: String): Int = {
+      if (str != null && str.matches("[0-9]+"))
+        Integer.parseInt(str)
+      else 0
+    }
+    textBuilder.setNSuperviseLevel("") //协查级别
+    textBuilder.setNCaseState("") //案件状态
+    textBuilder.setNCaseState("") //协查状态
+    textBuilder.setNCancelFlag("") //撤销标识
+
+    caseInfo.build()
+  }
+
+  def convertLatentPackage2LPCard(latentPackage: LatentPackage): Seq[LPCard] = {
+    val lpCardList = new ArrayBuffer[LPCard]()
+    val finger = new FPT4File.FingerLData
+    val mnt = new FPT4File.FingerLData
+    if(latentPackage.latentFingers != null){
+      latentPackage.latentFingers.foreach(
+        latentFingers=>{
+          val lpCard = LPCard.newBuilder()
+          val blobBuilder = lpCard.getBlobBuilder
+          if(latentFingers.latentFingerImageMsg != null){
+            latentFingers.latentFingerImageMsg.foreach(
+              latentFingerImageMsg => {
+                lpCard.setStrCardID(latentFingerImageMsg.originalSystemLatentFingerPalmId)
+                val textBuilder = lpCard.getTextBuilder
+                textBuilder.setStrCaseId(latentPackage.caseMsg.caseId)
+                textBuilder.setStrSeq(latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23))
+                textBuilder.setStrRemainPlace(latentFingerImageMsg.latentFingerLeftPosition) //遗留部位
+                textBuilder.setStrRidgeColor(latentFingerImageMsg.latentFingerMastoidProcessLineColorCode) //乳突线颜色
+                textBuilder.setBDeadBody("1".equals(latentFingerImageMsg.latentFingerCorpseJudgeIdentify)) //未知名尸体标识
+                textBuilder.setStrDeadPersonNo("") //未知名尸体编号
+                textBuilder.setStrStart(latentFingerImageMsg.latentFingerConnectFingerBeginPhysicalId) //联指开始序号
+                textBuilder.setStrEnd(latentFingerImageMsg.latentFingerConnectFingerEndPhysicalId) //联指结束序号
+
+                if (latentFingerImageMsg.latentFingerImageData != null &&
+                  latentFingerImageMsg.latentFingerImageData.length > 0) {
+                  blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+                  if (latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23) != null &&
+                    latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23).length > 0) {
+                    0.until(latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23).length)
+                      .filter("1" == latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23).charAt(_))
+                      .foreach(i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
+                  }
+                  finger.imgCompressMethod = "0000"
+                  finger.imgData = latentFingerImageMsg.latentFingerImageData
+                  finger.imgHorizontalLength = "512"
+                  finger.imgVerticalLength = "512"
+                  finger.dpi = "500"
+                  finger.fgp = latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(23)
+
+                  val gafisImage = FPTImageConverter.convert2GafisImage(finger, true)
+                  blobBuilder.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+                }
+                //隐式转换，字符串转数字
+                implicit def string2Int(str: String): Int = {
+                  if (str != null && str.matches("[0-9]+"))
+                    Integer.parseInt(str)
+                  else 0
+                }
+                textBuilder.setNXieChaState("")
+                textBuilder.setNBiDuiState(latentFingerImageMsg.latentFingerComparisonStatusCode)
+
+              })
+          }
+          if(latentFingers.latentFingerFeatureMsg != null) {
+            latentFingers.latentFingerFeatureMsg.foreach(
+              latentFingerFeatureMsg => {
+                lpCard.setStrCardID(latentFingerFeatureMsg.originalSystemLatentFingerPalmId)
+
+                mnt.fgp = finger.fgp
+                mnt.pattern = latentFingerFeatureMsg.fingerPatternAnalysisBrief
+                mnt.fingerDirection = latentFingerFeatureMsg.fingerFeatureDirection.toString +
+                  latentFingerFeatureMsg.fingerFeatureDirectionRange.toString
+                mnt.centerPoint = latentFingerFeatureMsg.fingerCenterPointFeatureXCoordinate.toString +
+                  latentFingerFeatureMsg.fingerCenterPointFeatureYCoordinate.toString +
+                  latentFingerFeatureMsg.fingerCenterPointFeatureCoordinateRange.toString +
+                  latentFingerFeatureMsg.fingerCenterPointFeatureDirection.toString +
+                  latentFingerFeatureMsg.fingerCenterPointFeatureDirectionRange.toString +
+                  latentFingerFeatureMsg.fingerCenterPointFeatureReliabilityLevel.toString
+                mnt.subCenterPoint = latentFingerFeatureMsg.fingerSlaveCenterFeatureXCoordinate.toString +
+                  latentFingerFeatureMsg.fingerSlaveCenterFeatureYCoordinate.toString +
+                  latentFingerFeatureMsg.fingerSlaveCenterFeatureCoordinateRange.toString +
+                  latentFingerFeatureMsg.fingerSlaveCenterFeatureDirection.toString +
+                  latentFingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange.toString +
+                  latentFingerFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel.toString
+                mnt.leftTriangle = latentFingerFeatureMsg.fingerLeftTriangleFeatureXCoordinate.toString +
+                  latentFingerFeatureMsg.fingerLeftTriangleFeatureYCoordinate.toString +
+                  latentFingerFeatureMsg.fingerLeftTriangleFeatureCoordinateRange.toString +
+                  latentFingerFeatureMsg.fingerLeftTriangleFeatureDirection.toString +
+                  latentFingerFeatureMsg.fingerLeftTriangleFeatureDirectionRange.toString +
+                  latentFingerFeatureMsg.fingerLeftTriangleFeatureReliabilityLevel.toString
+                mnt.rightTriangle = latentFingerFeatureMsg.fingerRightTriangleFeatureXCoordinate.toString +
+                  latentFingerFeatureMsg.fingerRightTriangleFeatureYCoordinate.toString +
+                  latentFingerFeatureMsg.fingerRightTriangleFeatureCoordinateRange.toString +
+                  latentFingerFeatureMsg.fingerRightTriangleFeatureDirection.toString +
+                  latentFingerFeatureMsg.fingerRightTriangleFeatureDirectionRange.toString +
+                  latentFingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel.toString
+                mnt.featureCount = latentFingerFeatureMsg.LatentMinutiaSet.latentMinutia.length.toString
+
+                var features = ""
+                latentFingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach(
+                  latentMinutia => {
+                    features +=
+                      "%03d%03d%03d".format(latentMinutia.fingerFeaturePointXCoordinate,
+                        latentMinutia.fingerFeaturePointYCoordinate,
+                        latentMinutia.fingerFeaturePointDirection)
+                  }
+                )
+                mnt.feature = features
+                mnt.imgHorizontalLength = "512"
+                mnt.imgVerticalLength = "512"
+                mnt.dpi = "500"
+                val gafisMnt = FPTMntConverter.convertFingerLData2GafisMnt(mnt)
+                blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
+              })
+          }
+          lpCardList += lpCard.build()
+        })
+    }
+    if(latentPackage.latentPalms != null){
+      latentPackage.latentPalms.foreach(
+        latentPalms => {
+          val lpCard = LPCard.newBuilder()
+          val textBuilder = lpCard.getTextBuilder
+          val blobBuilder = lpCard.getBlobBuilder
+          if(latentPalms.latentPalmImageMsg != null){
+            latentPalms.latentPalmImageMsg.foreach(
+              latentPalmImageMsg => {
+                lpCard.setStrCardID(latentPalmImageMsg.latentPalmId)
+                textBuilder.setStrCaseId(latentPackage.caseMsg.caseId)
+                textBuilder.setStrSeq(latentPalmImageMsg.latentPalmId.substring(23))
+                textBuilder.setStrRemainPlace(latentPalmImageMsg.latentPalmLeftPostion) //遗留部位
+                textBuilder.setStrRidgeColor(latentPalmImageMsg.latentPalmMastoidProcessLineColorCode) //乳突线颜色
+                textBuilder.setBDeadBody("1".equals(latentPalmImageMsg.latentPalmCorpseJudgeIdentify)) //未知名尸体标识
+                textBuilder.setStrDeadPersonNo("") //未知名尸体编号
+                textBuilder.setStrStart("") //联指开始序号
+                textBuilder.setStrEnd("") //联指结束序号
+
+                if (latentPalmImageMsg.latentPalmImageData != null &&
+                  latentPalmImageMsg.latentPalmImageData.length > 0) {
+                  blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+                  if (latentPalmImageMsg.latentPalmId.substring(23) != null &&
+                    latentPalmImageMsg.latentPalmId.substring(23).length > 0) {
+                    0.until(latentPalmImageMsg.latentPalmId.substring(23).length)
+                      .filter("1" == latentPalmImageMsg.latentPalmId.substring(23).charAt(_))
+                      .foreach(i => blobBuilder.setPalmFgp(PalmFgp.valueOf(i + 10)))
+                  }
+                  finger.imgCompressMethod = "0000"
+                  finger.imgData = latentPalmImageMsg.latentPalmImageData
+                  finger.imgHorizontalLength = "512"
+                  finger.imgVerticalLength = "512"
+                  finger.dpi = "500"
+                  finger.fgp = latentPalmImageMsg.latentPalmId.substring(23)
+
+                  val gafisImage = FPTImageConverter.convert2GafisImage(finger, true)
+                  blobBuilder.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+
+                  //隐式转换，字符串转数字
+                  implicit def string2Int(str: String): Int = {
+                    if (str != null && str.matches("[0-9]+"))
+                      Integer.parseInt(str)
+                    else 0
+                  }
+                  textBuilder.setNXieChaState("")
+                  textBuilder.setNBiDuiState(latentPalmImageMsg.latentPalmComparisonStatusCode)
+                }
+              })
+          }
+          if(latentPalms.LatentPalmFeatureMsg != null){
+            latentPalms.LatentPalmFeatureMsg.foreach(
+              LatentPalmFeatureMsg => {
+                mnt.fgp = finger.fgp
+                mnt.pattern = ""
+                mnt.fingerDirection = ""
+                mnt.centerPoint = ""
+                mnt.subCenterPoint = ""
+                mnt.featureCount = LatentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.length.toString
+                var features = ""
+                LatentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.foreach(
+                  latentPalmMinutia => {
+                    features +=
+                      "%03d%03d%03d".format(latentPalmMinutia.fingerFeaturePointXCoordinate,
+                        latentPalmMinutia.fingerFeaturePointYCoordinate,
+                        latentPalmMinutia.fingerFeaturePointDirection)
+                  })
+                mnt.feature = features
+                mnt.imgHorizontalLength = "512"
+                mnt.imgVerticalLength = "512"
+                mnt.dpi = "500"
+
+                val gafisMnt = FPTMntConverter.convertFingerLData2GafisMnt(mnt)
+                blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
+
+              })
+          }
+          lpCardList += lpCard.build()
+        })
+    }
+    lpCardList
   }
 }
 

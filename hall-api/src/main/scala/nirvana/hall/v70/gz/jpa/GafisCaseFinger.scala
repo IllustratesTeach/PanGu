@@ -41,9 +41,9 @@ class GafisCaseFinger extends ActiveRecord {
   var ridgeColor: java.lang.String = _
   @Column(name = "PATTERN", length = 20)
   var pattern: java.lang.String = _
-  @Column(name = "MITTENS_BEG_NO", length = 2)
+  @Column(name = "MITTENS_BEG_NO", length = 30)
   var mittensBegNo: java.lang.String = _
-  @Column(name = "MITTENS_END_NO", length = 2)
+  @Column(name = "MITTENS_END_NO", length = 30)
   var mittensEndNo: java.lang.String = _
   @Column(name = "THAN_STATUS", length = 2)
   var thanStatus: java.lang.String = _

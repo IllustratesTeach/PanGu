@@ -552,9 +552,9 @@ class FPT5File {
         @XmlElement(name = "collectInfoMsg")
         var latentCollectInfoMsg:LatentCollectInfoMsg = _
         @XmlElement(name = "fingers")
-        var latentFingers:LatentFingers = _
+        var latentFingers:Array[LatentFingers] = _
         @XmlElement(name = "palms")
-        var latentPalms:LatentPalms = _
+        var latentPalms:Array[LatentPalms] = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

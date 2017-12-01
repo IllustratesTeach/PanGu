@@ -1,24 +1,56 @@
 package nirvana.hall.v70.gz.services.versionfpt5
 
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.{Date, UUID}
+import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
-import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
+import nirvana.hall.v70.gz.Constant
+import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
+import nirvana.hall.v70.gz.sync.ProtobufConverter
+import nirvana.hall.v70.gz.sys.UserService
+import nirvana.hall.v70.internal.Gafis70Constants
 
 /**
   * Created by songpeng on 2017/6/29.
   */
-class LPCardServiceImpl extends LPCardService{
+class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) extends LPCardService{
   /**
     * 新增现场卡片
     *
     * @param lpCard
     * @return
     */
-  override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = ???
+  override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
+    val caseFinger = ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard)
+    val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
+    val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
+    val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
+    caseFinger.sid = sid
+    //将用户名转为用户id
+    var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    caseFinger.inputpsn = user.get.pkId
+    caseFinger.inputtime = new Date
+    caseFinger.creatorUnitCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
+    if(modUser.nonEmpty){
+      caseFinger.modifiedpsn = modUser.get.pkId
+    }else{
+      caseFinger.modifiedpsn = ""
+    }
+    caseFinger.deletag = Gafis70Constants.DELETAG_USE
+    caseFinger.save()
+
+    caseFingerMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
+    caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
+    caseFingerMnt.save()
+  }
 
   /**
     * 删除现场卡片
@@ -34,7 +66,34 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @param lpCard
     * @return
     */
-  override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = ???
+  override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
+    val caseFinger = GafisCaseFinger.find(lpCard.getStrCardID)
+    ProtobufConverter.convertLPCard2GafisCaseFinger(lpCard, caseFinger)
+    //将用户名转为用户id
+    var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    caseFinger.inputpsn = user.get.pkId
+    caseFinger.inputtime = new Date
+    caseFinger.creatorUnitCode= user.get.departCode
+    val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
+    if(modUser.nonEmpty){
+      caseFinger.modifiedpsn = modUser.get.pkId
+    }else{
+      caseFinger.modifiedpsn = ""
+    }
+    caseFinger.deletag = Gafis70Constants.DELETAG_USE
+    caseFinger.save()
+
+    val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
+    //先删除，后插入
+    GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
+    caseFingerMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
+    caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
+    caseFingerMnt.save()
+  }
 
   /**
     * 获取现场卡片

@@ -71,8 +71,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val palmList = caseInfo.getStrPalmIDList.map{palmId=>
       lPPalmService.getLPCard(palmId)
     }
-    //FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList, palmList)
-    null
+    FPT5Converter.convertCaseInfoAndLPCard2LatentPackage(caseInfo, lpCardList, palmList)
   }
 
   /**
@@ -90,7 +89,36 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     *
     * @param latentPackage
     */
-  override def addLatentPackage(latentPackage: LatentPackage): Unit = ???
+  override def addLatentPackage(latentPackage: LatentPackage, dbId: Option[String]): Unit = {
+    val caseInfo = FPT5Converter.convertLatentPackage2Case(latentPackage)
+    if(!caseInfoService.isExist(latentPackage.caseMsg.caseId)){
+      caseInfoService.addCaseInfo(caseInfo)
+    }
+    val lPCardList = FPT5Converter.convertLatentPackage2LPCard(latentPackage)
+    lPCardList.foreach{lPCard =>
+      val lpCardBuiler = lPCard.toBuilder
+      //图像解压
+      val blobBuilder = lpCardBuiler.getBlobBuilder
+      val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blobBuilder.getStImageBytes.toByteArray)
+      if(gafisImage.stHead.bIsCompressed > 0){
+        val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+        blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
+      }
+      if(lPCard.getBlob.getType.equals(ImageType.IMAGETYPE_PALM)){
+        if(!lPPalmService.isExist(lPCard.getStrCardID)){
+          lPPalmService.addLPCard(lpCardBuiler.build())
+        }else{
+          lPPalmService.updateLPCard(lpCardBuiler.build())
+        }
+      }else{
+        if(!lPCardService.isExist(lPCard.getStrCardID)){
+          lPCardService.addLPCard(lpCardBuiler.build())
+        }else{
+          lPCardService.updateLPCard(lpCardBuiler.build())
+        }
+      }
+    }
+  }
 
 
 

@@ -30,24 +30,29 @@ object HallWebserviceApp
 
     val classes = List[Class[_]](
       //v62
-      Class.forName("nirvana.hall.v62.LocalV62Module"),
-      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
-      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
+//      Class.forName("nirvana.hall.v62.LocalV62Module"),
+//      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
+//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
       //v70
 //      Class.forName("nirvana.hall.v70.LocalV70Module"),
 //      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
+
+//      Class.forName("nirvana.hall.v70.gz.LocalV70Module"),
+//      Class.forName("nirvana.hall.v70.gz.LocalV70ServiceModule"),
+//      Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
+//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.webservice.HallWebserviceSurveyModule"),
+
       //公用
       Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
       Class.forName("stark.webservice.StarkWebServiceModule"),
       Class.forName("nirvana.hall.webservice.HallWebserviceSymbol"),
-      Class.forName("nirvana.hall.webservice.HallWebserviceModule"),
+      Class.forName("nirvana.hall.webservice.HallWebserviceModule")
 
-
-      Class.forName("nirvana.hall.webservice.HallWebserviceHaiXinV62Module")
 
     )
 

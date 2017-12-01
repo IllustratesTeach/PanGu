@@ -6,12 +6,15 @@ import java.util.Date
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
-import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger}
+import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, SysUser}
+import nirvana.hall.v70.gz.sync.ProtobufConverter
+import nirvana.hall.v70.gz.sys.UserService
+import nirvana.hall.v70.internal.Gafis70Constants
 
 /**
   * Created by songpeng on 2017/6/29.
   */
-class CaseInfoServiceImpl extends CaseInfoService{
+class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
   /**
     * 新增案件信息
@@ -19,7 +22,23 @@ class CaseInfoServiceImpl extends CaseInfoService{
     * @param caseInfo
     * @return
     */
-  override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = ???
+  override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
+    val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisCase.inputpsn = user.get.pkId
+    gafisCase.createUnitCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
+    if(modUser.nonEmpty){
+      gafisCase.modifiedpsn = modUser.get.pkId
+    }
+
+    gafisCase.deletag = Gafis70Constants.DELETAG_USE
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_SURVEY.toString
+    gafisCase.save()
+  }
 
   /**
     * 删除案件信息
@@ -35,7 +54,25 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     * @param caseInfo
     * @return
     */
-  override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = ???
+  override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
+    val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
+    ProtobufConverter.convertCase2GafisCase(caseInfo, gafisCase)
+
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
+    if (user.isEmpty){//找不到对应的用户，使用管理员用户
+      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+    }
+    gafisCase.inputpsn = user.get.pkId
+    gafisCase.createUnitCode = user.get.departCode
+    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
+    if(modUser.nonEmpty){
+      gafisCase.modifiedpsn = modUser.get.pkId
+    }
+
+    gafisCase.deletag = Gafis70Constants.DELETAG_USE
+    gafisCase.caseSource = caseInfo.getStrDataSource
+    gafisCase.save()
+  }
 
   /**
     * 获取案件信息
@@ -117,6 +154,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     magicSet(caseInfo.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
     magicSet(caseInfo.assistDate, textBuilder.setStrXieChaDate)
     magicSet(caseInfo.assistBonus, textBuilder.setStrPremium)
+    magicSet(caseInfo.caseBriefDetail, textBuilder.setStrBriefCase)
     textBuilder.setNCaseState(caseInfo.assistSign)
     textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
     //案件状态字典不符fpt标准，暂时忽略该项信息

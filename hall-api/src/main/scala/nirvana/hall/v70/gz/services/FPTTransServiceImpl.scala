@@ -18,9 +18,9 @@ class FPTTransServiceImpl(fPT5Service: FPT5Service) extends FPTTransService{
 
     exportType.getNumber match{
       case ExportType.TP_VALUE =>
-        fPT5File.fingerprintPackage.add(fPT5Service.getFingerprintPackage(cardId))
+        fPT5File.fingerprintPackage :+ (fPT5Service.getFingerprintPackage(cardId))
       case ExportType.LP_VALUE =>
-        fPT5File.latentPackage.add(fPT5Service.getLatentPackage(cardId))
+        fPT5File.latentPackage :+ (fPT5Service.getLatentPackage(cardId))
       case ExportType.QUERY_VALUE =>
       case ExportType.CANDLIST_VALUE =>
       case ExportType.HIT_VALUE =>

@@ -245,6 +245,10 @@ message	Case
 		optional string	strXieChaDate = 22;         //协查日期
 		optional string	strXieChaRequestUnitName = 23;  //协查单位名称
 		optional string	strXieChaRequestUnitCode = 24;  //协查单位代码
+		//Fpt5.0新加
+		optional string	strBriefCase = 25;  //简要案情
+		optional string	strExtractorIdCard = 26;  //提取人员_公民身份号码
+		optional string	strExtractorTel = 27;  //提取人员_联系电话
 	}
 
 	required string	strCaseID = 1;          //案件编号
@@ -257,6 +261,8 @@ message	Case
 	optional AdminfoData admData = 7;		//操作信息
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 8;   //数据来源类型
+    //Fpt5.0新加
+    optional string	strSurveyId = 9;   //现场勘验编号
 }
 
 message	LPCard
@@ -295,6 +301,8 @@ message	LPCard
 	optional AdminfoData admData = 4;
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 5;   //数据来源类型
+    //Fpt5.0新加
+    optional string	strPhysicalId = 6;   //现场物证编号
 }
 
 message	TLLTHitLog

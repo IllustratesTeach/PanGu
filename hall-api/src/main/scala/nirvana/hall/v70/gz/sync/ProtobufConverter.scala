@@ -64,7 +64,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseClassCode3 = text.getStrCaseType3
     gafisCase.suspiciousAreaCode2 = text.getStrSuspArea2Code
     gafisCase.suspiciousAreaCode3 = text.getStrSuspArea3Code
-    gafisCase.bonus = text.getStrPremium
+    //gafisCase.bonus = text.getStrPremium
     gafisCase.assistStatus = text.getNXieChaState.toString
     gafisCase.receptionNo = ""
 

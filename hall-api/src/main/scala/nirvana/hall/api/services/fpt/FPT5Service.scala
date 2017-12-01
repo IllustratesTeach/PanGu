@@ -32,6 +32,6 @@ trait FPT5Service {
     * 现场指纹导入
     * @param latentPackage
     */
-  def addLatentPackage(latentPackage:LatentPackage):Unit
+  def addLatentPackage(latentPackage:LatentPackage,dbId: Option[String] = None):Unit
 
 }
