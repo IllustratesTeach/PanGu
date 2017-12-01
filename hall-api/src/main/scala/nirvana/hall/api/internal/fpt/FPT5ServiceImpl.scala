@@ -46,11 +46,16 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
             blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
           }
+        case ImageType.IMAGETYPE_PALM =>
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+          if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+          }
         case _ =>
       }
     }
-    //FPT5Converter.convertTPCard2FingerprintPackage(tpCard.build)
-    null
+    FPT5Converter.convertTPCard2FingerprintPackage(tpCard.build)
   }
 
   /**
@@ -77,7 +82,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     * @param dbId
     */
   override def addFingerprintPackage(fingerprintPackage: FingerprintPackage, dbId: Option[String]): Unit = {
-      //tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
+      tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
   }
 
   /**
@@ -110,41 +115,41 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     * @return
     */
   private def  getTpCardBuilder(fingerprintPackage: FingerprintPackage) = {
-//    val tpCardBuilder = FPT5Converter.convertFingerprintPackage2TPCard(fingerprintPackage).toBuilder
-//    //图像转换和特征提取
-//    val iter = tpCardBuilder.getBlobBuilderList.iterator()
-//    while(iter.hasNext){
-//      val blob = iter.next()
-//      if(blob.getType == ImageType.IMAGETYPE_FINGER){
-//        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-//        if(gafisImage.stHead.bIsCompressed > 0){
-//          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-//          val mntData = try{
-//            extractByGAFISIMG(originalImage, false)
-//          }catch{
-//            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
-//          }
-//
-//          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-//          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-//
-//          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-//          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
-//            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
-//            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
-//          }else{
-//            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
-//            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-//          }
-//        }else{
-//          val mntData = extractByGAFISIMG(gafisImage, false)
-//          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-//          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-//          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-//          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-//        }
-//      }
-//    }
-//    tpCardBuilder
+    val tpCardBuilder = FPT5Converter.convertFingerprintPackage2TPCard(fingerprintPackage).toBuilder
+    //图像转换和特征提取
+    val iter = tpCardBuilder.getBlobBuilderList.iterator()
+    while(iter.hasNext){
+      val blob = iter.next()
+      if(blob.getType == ImageType.IMAGETYPE_FINGER){
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
+        if(gafisImage.stHead.bIsCompressed > 0){
+          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+          val mntData = try{
+            extractByGAFISIMG(originalImage, false)
+          }catch{
+            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+          }
+
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+
+          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+          }else{
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+          }
+        }else{
+          val mntData = extractByGAFISIMG(gafisImage, false)
+          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+        }
+      }
+    }
+    tpCardBuilder
   }
 }
