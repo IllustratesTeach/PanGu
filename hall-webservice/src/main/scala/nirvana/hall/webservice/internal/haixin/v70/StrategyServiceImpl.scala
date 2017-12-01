@@ -627,4 +627,13 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * @return
     */
   override def getRemoteResponseStatusAndOrasidByPersonId(personId: String): Option[mutable.HashMap[String, Any]] = ???
+
+  /**
+    * 获取错误信息集合
+    *
+    * @param personid  公安部标准的23位唯一码，人员编号
+    * @param oper_type 操作类型
+    * @return
+    */
+  override def getErrorInfoList(userid:String,unitcode:String,personid:String,oper_type : Int)  = ???
 }

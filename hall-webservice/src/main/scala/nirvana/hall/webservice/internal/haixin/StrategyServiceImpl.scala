@@ -740,4 +740,32 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     }
     count
   }
+
+  /**
+    * 获取错误信息集合
+    *
+    * @param personid  公安部标准的23位唯一码，人员编号
+    * @param oper_type 操作类型
+    * @return
+    */
+  override def getErrorInfoList(userid:String,unitcode:String,personid:String,oper_type : Int) : ListBuffer[mutable.HashMap[String,Any]] = {
+    val listBuffer = new mutable.ListBuffer[mutable.HashMap[String,Any]]
+    val sql = s"SELECT to_char(t1.createtime,'yyyy-mm-dd hh24:mi:ss') time,t2.exceptioninfo " +
+      s"FROM HALL_GAFIS_IA_FINGER t1,HALL_GAFIS_IA_FINGER_EXCEPTION t2 " +
+      s"WHERE t1.uuid = t2.ia_finger_pkid AND t1.userid = ? and t1.unitcode = ? and t1.personid = ? AND t1.OPER_TYPE = ? order by t1.createtime desc "
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,userid)
+      ps.setString(2,unitcode)
+      ps.setString(3,personid)
+      ps.setInt(4,oper_type)
+    }{rs=>
+      while (rs.next()){
+        val mapBuffer = new scala.collection.mutable.HashMap[String,Any]
+        mapBuffer += ("time" -> rs.getString("time"))
+        mapBuffer += ("exception" -> rs.getString("exceptioninfo"))
+        listBuffer.append(mapBuffer)
+      }
+    }
+    listBuffer
+  }
 }

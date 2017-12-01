@@ -22,7 +22,7 @@ import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.haixin.vo.{HitConfig, ListItem}
+import nirvana.hall.webservice.internal.haixin.vo.{ErrorInfo, ErrorInfoItem, HitConfig, ListItem}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.io.{FileUtils, IOUtils}
@@ -666,5 +666,54 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       status = rs.getInt("status")
     }
     status
+  }
+
+  /**
+    * 接口11:获取错误详细信息
+    * @param userid 用户id
+    * @param unitcode 单位代码
+    * @param funType 接口方法类型
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @return
+    */
+  override def getErrorInfo(userid:String,unitcode:String,funType:Int,personid : String) : DataHandler = {
+    var dataHandler:DataHandler = null
+
+    val uuid = UUID.randomUUID().toString.replace("-","")
+    try{
+      val paramMap = new scala.collection.mutable.HashMap[String,Any]
+      paramMap.put("userid",userid)
+      paramMap.put("unitcode",unitcode)
+      paramMap.put("funType",funType)
+      paramMap.put("personid",personid)
+
+      strategyService.inputParamIsNullOrEmpty(paramMap)
+      strategyService.checkUserIsVaild(userid,unitcode)
+
+      val listBuffer = strategyService.getErrorInfoList(userid,unitcode,personid,funType)
+      val errorInfoList = new util.ArrayList[ErrorInfoItem]
+      if(listBuffer.length > 0){
+        listBuffer.foreach{
+          m =>
+            val errorInfoItem = new ErrorInfoItem
+            errorInfoItem.time = m.get("time").get.toString
+            errorInfoItem.exception = m.get("exception").get.toString
+            errorInfoList.add(errorInfoItem)
+        }
+      }
+      val errorInfo = new ErrorInfo
+      errorInfo.Item = errorInfoList
+      dataHandler = new DataHandler(new ByteArrayDataSource(XmlLoader.toXml(errorInfo).getBytes))
+      strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY
+        ,userid,unitcode
+        ,IAConstant.SEARCH_SUCCESS
+        ,IAConstant.GET_ERROR_INFO
+        ,personid,IAConstant.EMPTY_ORASID.toString,null,None)
+    }catch{
+      case ex:Throwable =>
+        strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
+          ,IAConstant.SEARCH_FAIL,IAConstant.GET_ERROR_INFO,personid,IAConstant.EMPTY_ORASID.toString,null,Some(ex))
+    }
+    dataHandler
   }
 }

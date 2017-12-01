@@ -138,4 +138,11 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     FileUtils.writeByteArrayToFile(new File("D:\\170919\\10101\\" + 10101 + ".FPT"), IOUtils.toByteArray(dataHandler.getInputStream))
   }
 
+  @Test
+  def test_get_error_info(): Unit ={
+    val service = getService[WsHaiXinFingerService]
+    val dataHandler = service.getErrorInfo("0101","3701",1,"R3200000008882007120003")
+    FileUtils.writeByteArrayToFile(new File("/Users/zqLuo/Desktop/errorInfoTest.xml"), IOUtils.toByteArray(dataHandler.getInputStream))
+  }
+
 }

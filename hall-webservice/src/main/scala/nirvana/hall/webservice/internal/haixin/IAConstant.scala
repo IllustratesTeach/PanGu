@@ -51,6 +51,7 @@ object IAConstant {
   final val SET_PALM = 8
   final val GET_PALM_STATUS = 9
   final val SET_PALM_AGAIN = 10
+  final val GET_ERROR_INFO = 11
 
   /**
     * 操作类型常量
