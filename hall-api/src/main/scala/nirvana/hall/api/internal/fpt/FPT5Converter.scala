@@ -65,11 +65,12 @@ object FPT5Converter {
     fingerprintPackage.collectInfoMsg.chopPersonTel = ""  //"123213123"  //捺印人员_联系电话
     fingerprintPackage.collectInfoMsg.chopDateTime =  "2017-10-11T10:00:01"   //捺印时间  tpCard.getText.getStrPrintDate
     //先初始化捺印指纹包信息
-    val fingers = new Fingers()
-    val knuckleprints = new Knuckleprints()
-    val palms = new Palms()
-    val fourprints = new Fourprints()
-    val fullpalms = new Fullpalms()
+    val fingerMsgs = new mutable.ArrayBuffer[FingerMsg]()
+    val knuckleprintMsgs = new mutable.ArrayBuffer[KnuckleprintMsg]()
+    val palmMsgs = new mutable.ArrayBuffer[PalmMsg]()
+    val fourprintMsgs = new mutable.ArrayBuffer[FourprintMsg]()
+    val fullpalmMsgs = new mutable.ArrayBuffer[FullpalmMsg]()
+    val faceImageMsgs = new mutable.ArrayBuffer[FaceImage]()
     val iter = tpCard.getBlobList.iterator
     while (iter.hasNext) {
       val blob = iter.next()
@@ -77,34 +78,59 @@ object FPT5Converter {
         //指纹
         case ImageType.IMAGETYPE_FINGER =>
           if(!blob.getBPlain){
-            fingers.fingerMsg.add(getFingerMsg(blob))
+            fingerMsgs += getFingerMsg(blob)
           }else{
-            fingers.fingerMsg.add(getFingerMsg(blob))
+            fingerMsgs += getFingerMsg(blob)
           }
         //指节纹
         case ImageType.IMAGETYPE_KNUCKLEPRINTS =>
-          knuckleprints.knuckleprintMsg.add(getKnuckleprintMsg(blob))
+          knuckleprintMsgs += getKnuckleprintMsg(blob)
         //掌纹
         case ImageType.IMAGETYPE_PALM =>
-          palms.palmMsg.add(getPalmMsg(blob))
+          palmMsgs += getPalmMsg(blob)
         //四联指
         case ImageType.IMAGETYPE_FOURPRINT =>
-          fourprints.fourprintMsg.add(getPalmFourPrintMsg(blob))
+          fourprintMsgs += getPalmFourPrintMsg(blob)
         //全掌
         case ImageType.IMAGETYPE_FULLPALM =>
-          fullpalms.fullpalmMsg.add(getFullPalmMsg(blob))
+          fullpalmMsgs += getFullPalmMsg(blob)
         //人像
         case ImageType.IMAGETYPE_FACE =>
-          fingerprintPackage.faceImages.faceImage.add(getFaceImage(blob))
+          faceImageMsgs += getFaceImage(blob)
         case _ =>
       }
     }
     //判断捺印指纹包大小,如果有指纹信息再进行赋值
-    if(fingers.fingerMsg.size() > 0) fingerprintPackage.fingers = fingers
-    if(knuckleprints.knuckleprintMsg.size() > 0) fingerprintPackage.knuckleprints = knuckleprints
-    if(palms.palmMsg.size() > 0) fingerprintPackage.palms = palms
-    if(fourprints.fourprintMsg.size() > 0) fingerprintPackage.fourprints = fourprints
-    if(fullpalms.fullpalmMsg.size() > 0) fingerprintPackage.fullpalms = fullpalms
+    if( fingerMsgs.size > 0 ) {
+      val fingers = new Fingers()
+      fingers.fingerMsg = fingerMsgs.toArray
+      fingerprintPackage.fingers = fingers
+    }
+    if(knuckleprintMsgs.size > 0){
+      val knuckleprints = new Knuckleprints()
+      knuckleprints.knuckleprintMsg = knuckleprintMsgs.toArray
+      fingerprintPackage.knuckleprints = knuckleprints
+    }
+    if(palmMsgs.size > 0){
+      val palms = new Palms()
+      palms.palmMsg = palmMsgs.toArray
+      fingerprintPackage.palms = palms
+    }
+    if(fourprintMsgs.size > 0){
+      val fourprints = new Fourprints()
+      fourprints.fourprintMsg = fourprintMsgs.toArray
+      fingerprintPackage.fourprints = fourprints
+    }
+    if(fullpalmMsgs.size > 0) {
+      val fullpalms = new Fullpalms()
+      fullpalms.fullpalmMsg = fullpalmMsgs.toArray
+      fingerprintPackage.fullpalms = fullpalms
+    }
+    if(faceImageMsgs.size > 0 ){
+      val faceImages = new FaceImages()
+      faceImages.faceImage = faceImageMsgs.toArray
+      fingerprintPackage.faceImages = faceImages
+    }
     fingerprintPackage
   }
 
@@ -651,8 +677,8 @@ object FPT5Converter {
     * @param featureCount
     * @return
     */
-  private def convertFeature2FingerMinutiaSet(feature: String, featureCount: Int): util.ArrayList[Minutia] = {
-    val buffer = new util.ArrayList[Minutia]()
+  private def convertFeature2FingerMinutiaSet(feature: String, featureCount: Int): Array[Minutia] = {
+    val buffer = new mutable.ArrayBuffer[Minutia]()
     for (i <- 0 until featureCount) {
       val index = i * 9
       val mnts = feature.substring(index, index + 9)
@@ -660,9 +686,9 @@ object FPT5Converter {
       mnt.fingerFeaturePointXCoordinate = if(FPT5Utils.isNull(mnts.substring(0, 3))) 0 else mnts.substring(0, 3).toInt
       mnt.fingerFeaturePointYCoordinate = if(FPT5Utils.isNull(mnts.substring(3, 6))) 0 else mnts.substring(3, 6).toInt
       mnt.fingerFeatureDirection = if(FPT5Utils.isNull(mnts.substring(6, 9))) 0 else mnts.substring(6, 9).toInt
-      buffer.add(mnt)
+      buffer += mnt
     }
-    buffer
+    buffer.toArray
   }
 
   private def convertFingerMinutiaSet2Feature(minutias:util.ArrayList[Minutia]):String = {
