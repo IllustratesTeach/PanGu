@@ -4,7 +4,7 @@ import java.nio.ByteOrder
 
 import nirvana.hall.c.services.gfpt5lib
 import nirvana.hall.c.services.gfpt5lib.fpt5util._
-import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentFingerFeatureMsg, LatentPalmFeatureMsg, PalmMsg, _}
+import nirvana.hall.c.services.gfpt5lib.{LatentFingerFeatureMsg, LatentPalmFeatureMsg, PalmMsg, _}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
@@ -362,58 +362,42 @@ object FPT5MntConverter {
     mntDisp
   }
 
-
-
-
-
-
-
   /**
     * gafis特征转FPT5特征(捺印指纹)
     */
-  def convertGafisMnt2FingerTData(gafisMnt: GAFISIMAGESTRUCT): FingerMsg ={
-    convertTFingerMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt))
+  def convertGafisMnt2FingerMsg(gafisMnt: GAFISIMAGESTRUCT, fingerMsg: FingerMsg = new FingerMsg): FingerMsg ={
+    convertTFingerMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt), fingerMsg)
   }
 
   /**
     * gafis特征转FPT5特征(捺印掌纹)
     */
-  def convertGafisMnt2PalmTData(gafisMnt: GAFISIMAGESTRUCT): PalmMsg ={
-    convertTPalmMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt))
+  def convertGafisMnt2PalmMsg(gafisMnt: GAFISIMAGESTRUCT, palmMsg: PalmMsg = new PalmMsg): PalmMsg ={
+    convertTPalmMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt), palmMsg)
   }
 
   /**
     * gafis特征转FPT5特征(现场指纹)
     */
-  def convertGafisMnt2FingerLData(gafisMnt: GAFISIMAGESTRUCT): LatentFingerFeatureMsg ={
-    convertLFingerMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt))
+  def convertGafisMnt2LatentFingerFeatureMsg(gafisMnt: GAFISIMAGESTRUCT, latentFeatureMsg: LatentFingerFeatureMsg = new LatentFingerFeatureMsg): LatentFingerFeatureMsg ={
+    convertLFingerMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt), latentFeatureMsg)
   }
 
   /**
     * gafis特征转FPT5特征(现场掌纹)
     */
-  def convertGafisMnt2PalmLData(gafisMnt: GAFISIMAGESTRUCT): LatentPalmFeatureMsg ={
-    convertLPalmMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt))
+  def convertGafisMnt2LatentPalmFeatureMsg(gafisMnt: GAFISIMAGESTRUCT, latentPalmFeatureMsg: LatentPalmFeatureMsg = new LatentPalmFeatureMsg): LatentPalmFeatureMsg ={
+    convertLPalmMntDisp2FPTMnt(gafisMnt2DisMnt(gafisMnt), latentPalmFeatureMsg)
   }
-
-
 
   /**
     * 捺印指纹MNTDISPSTRUCT转换FPT特征
     * @param mntDisp
     * @return
     */
-  private def convertTFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT): FingerMsg={
-    val fingerMsg = new FingerMsg
-    //设置图像宽高
-    fingerMsg.fingerImageHorizontalDirectionLength = mntDisp.nHeight
-    fingerMsg.fingerImageVerticalDirectionLength = mntDisp.nWidth
-    fingerMsg.fingerImageRatio = mntDisp.nResolution
-
-    fingerMsg.fingerPositionCode = mntDisp.stFg.FingerIdx.toString
+  private def convertTFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT, fingerMsg: FingerMsg): FingerMsg={
     fingerMsg.fingerPatternMasterCode = mntDisp.stFg.rp.toString
     fingerMsg.fingerPatternSlaveCode = mntDisp.stFg.vrp.toString
-
 
     fingerMsg.fingerFeatureDirection = UTIL_Direction_MntDisp2FPT(mntDisp).toInt
     if(mntDisp.stFg.upcore.bIsExist > 0) {
@@ -483,14 +467,12 @@ object FPT5MntConverter {
     * @param mntDisp
     * @return
     */
-  private def convertTPalmMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT): PalmMsg={
-    val palmMsg = new PalmMsg
+  private def convertTPalmMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT, palmMsg: PalmMsg): PalmMsg={
     //设置图像宽高
     palmMsg.palmImageVerticalDirectionLength = mntDisp.nHeight
     palmMsg.palmImageHorizontalDirectionLength = mntDisp.nWidth
     palmMsg.palmImageRatio = mntDisp.nResolution
 
-    palmMsg.palmPostionCode = mntDisp.stPm.nPalmIndex.toString
 
     if(mntDisp.stPm.nPatternDeltaCnt.toInt >0){
       var deltaArray = new ArrayBuffer[Delta]
@@ -534,8 +516,7 @@ object FPT5MntConverter {
     * @param mntDisp
     * @return
     */
-  private def convertLFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT):LatentFingerFeatureMsg = {
-    val latentFingerFeatureMsg = new LatentFingerFeatureMsg
+  private def convertLFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT, latentFingerFeatureMsg: LatentFingerFeatureMsg):LatentFingerFeatureMsg = {
     latentFingerFeatureMsg.fingerFeatureDirection = UTIL_Direction_MntDisp2FPT(mntDisp).toInt
     latentFingerFeatureMsg.fingerFeatureDirectionRange = 0
     if(mntDisp.stFg.upcore.bIsExist > 0) {
@@ -605,8 +586,7 @@ object FPT5MntConverter {
     * @param mntDisp
     * @return
     */
-  private def convertLPalmMntDisp2FPTMnt(mntDisp:MNTDISPSTRUCT):LatentPalmFeatureMsg = {
-    val latentPalmFeatureMsg = new LatentPalmFeatureMsg
+  private def convertLPalmMntDisp2FPTMnt(mntDisp:MNTDISPSTRUCT, latentPalmFeatureMsg: LatentPalmFeatureMsg):LatentPalmFeatureMsg = {
 
     if(mntDisp.stPm.nPatternDeltaCnt.toInt >0){
       var deltaArray = new ArrayBuffer[LatentPalmDelta]

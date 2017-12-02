@@ -183,6 +183,9 @@ message	TPCard
 		//6-7同步数据追加信息
 		optional string	strHuKouPlaceCode = 39;			//户籍地代码
 		optional string	strHuKouPlaceTail = 40;			//户籍地址
+
+		optional string	strPrinterPhone = 41;                //捺印人联系电话
+		optional string	strPrinterIdCardNo = 42;                //捺印人身份证号
 	}
 
 	message	TPCardBlob
@@ -214,6 +217,7 @@ message	TPCard
 	optional string strCredentialsCode = 10;//常用证件代码
 	optional string strPrinterIdCardId = 11;//捺印人身份证号
 	optional string strPrinterTel = 12;//捺印人联系电话
+	optional string captureInfoReasonCode = 13;//采集原因代码,多个以逗号隔开
 
 }
 

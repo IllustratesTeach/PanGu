@@ -529,11 +529,11 @@ class FPT5File {
     @XmlType(name = "FaceImage")
     class FaceImage{
         @XmlElement(name = "rxzplxdm")
-        var personPictureTypeCode:String = _
+        var personPictureTypeCode:String = _ //人像照片类型代码
         @XmlElement(name = "rx_dzwjgs")
-        var personPictureFileLayout:String = _
+        var personPictureFileLayout:String = _ //人像_电子文件格式
         @XmlElement(name = "rx_txsj")
-        var personPictureImageData:Array[Byte] = _
+        var personPictureImageData:Array[Byte] = _ //人像_图像数据
     }
     //--------------------人像相关end-----------------------//
     //-------------------------捺印部分--END------------------------------------//
@@ -595,7 +595,7 @@ class FPT5File {
         @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "caseClassSet")
-        val caseClassSet:CaseClassSet = new CaseClassSet
+        var caseClassSet:CaseClassSet = _
         @XmlElement(name = "ssjzrmby")
         var money:String = _ //损失价值人民币
         @XmlElement(name = "asjfsdd_xzqhdm")
@@ -771,7 +771,7 @@ class FPT5File {
         @XmlElement(name = "palmImageMsg")
         var latentPalmImageMsg:Array[LatentPalmImageMsg] = _
         @XmlElement(name = "palmFeatureMsg")
-        var LatentPalmFeatureMsg:Array[LatentPalmFeatureMsg] = _
+        var latentPalmFeatureMsg:Array[LatentPalmFeatureMsg] = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

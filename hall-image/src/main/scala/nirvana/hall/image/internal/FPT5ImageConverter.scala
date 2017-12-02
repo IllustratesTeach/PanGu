@@ -1,6 +1,7 @@
 package nirvana.hall.image.internal
 
 import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gfpt5lib.{FingerMsg, LatentFingerImageMsg, LatentPalmImageMsg, PalmMsg}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 
@@ -16,6 +17,58 @@ object FPT5ImageConverter {
     var latentFingerImageVerticalDirectionLength :String
     var latentFingerImageRatio:String
     var fingerPositionCode:String
+  }
+
+  /**
+    * gafis指纹图像转为fpt5 FingerMsg
+    * @param gafisImage GAFISIMAGESTRUCT
+    * @param fingerMsg FingerMsg
+    * @return
+    */
+  def convertGAFISIMAGESTRUCT2FingerMsg(gafisImage: GAFISIMAGESTRUCT, fingerMsg: FingerMsg = new FingerMsg): FingerMsg={
+    fingerMsg.fingerPositionCode = gafisImage.stHead.nFingerIndex.toString //指位
+    fingerMsg.fingerImageHorizontalDirectionLength = gafisImage.stHead.nWidth //指纹图像水平方向长度
+    fingerMsg.fingerImageVerticalDirectionLength = gafisImage.stHead.nHeight //指纹图像垂直方向长度
+    fingerMsg.fingerImageRatio = gafisImage.stHead.nResolution //指纹图像分辨率
+    fingerMsg.fingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod) //指纹图像压缩方法描述
+    fingerMsg.fingerImageData = gafisImage.bnData
+
+    fingerMsg
+  }
+  /**
+    * gafis掌纹图像转为fpt5 PalmMsg
+    * @param gafisImage GAFISIMAGESTRUCT
+    * @param palmMsg PalmMsg
+    * @return
+    */
+  def convertGAFISIMAGESTRUCT2PalmMsg(gafisImage: GAFISIMAGESTRUCT, palmMsg: PalmMsg = new PalmMsg): PalmMsg={
+    palmMsg.palmPostionCode = gafisImage.stHead.nFingerIndex.toString
+    palmMsg.palmImageHorizontalDirectionLength = gafisImage.stHead.nWidth //指纹图像水平方向长度
+    palmMsg.palmImageVerticalDirectionLength = gafisImage.stHead.nHeight //指纹图像垂直方向长度
+    palmMsg.palmImageRatio = gafisImage.stHead.nResolution //指纹图像分辨率
+    palmMsg.palmImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod) //指纹图像压缩方法描述
+    palmMsg.palmImageData = gafisImage.bnData
+
+    palmMsg
+  }
+
+  def convertGAFISIMAGESTRUCT2LatentFingerImageMsg(gafisImage: GAFISIMAGESTRUCT, latentImageMsg: LatentFingerImageMsg = new LatentFingerImageMsg): LatentFingerImageMsg={
+    latentImageMsg.latentFingerImageHorizontalDirectionLength = gafisImage.stHead.nWidth //现场指纹_图像水平方向长度
+    latentImageMsg.latentFingerImageVerticalDirectionLength = gafisImage.stHead.nHeight //现场指纹_图像垂直方向长度
+    latentImageMsg.latentFingerImageRatio = gafisImage.stHead.nBits //现场指纹_图像分辨率
+    latentImageMsg.latentFingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)//现场指纹_图像压缩方法描述
+    latentImageMsg.latentFingerImageData = gafisImage.bnData //现场指纹_图像数据
+
+    latentImageMsg
+  }
+  def convertGAFISIMAGESTRUCT2LatentPalmImageMsg(gafisImage: GAFISIMAGESTRUCT, palmMsg: LatentPalmImageMsg = new LatentPalmImageMsg): LatentPalmImageMsg={
+    palmMsg.latentPalmImageHorizontalDirectionLength = gafisImage.stHead.nWidth //指纹图像水平方向长度
+    palmMsg.latentPalmImageVerticalDirectionLength = gafisImage.stHead.nHeight //指纹图像垂直方向长度
+    palmMsg.latentPalmImageRatio = gafisImage.stHead.nResolution //指纹图像分辨率
+    palmMsg.latentPalmImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod) //指纹图像压缩方法描述
+    palmMsg.latentPalmImageData = gafisImage.bnData
+
+    palmMsg
   }
 
   def convert2GafisImage(latentFingerImageMsg: FPTFingerData, isLatent: Boolean = false,isPalm:Boolean = false): GAFISIMAGESTRUCT={
