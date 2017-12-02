@@ -6,12 +6,11 @@ import javax.sql.DataSource
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.api.services.sync._
-import nirvana.hall.api.services.{AssistCheckRecordService, ExceptRelationService, FPTFilterService, SyncInfoLogManageService}
+import nirvana.hall.api.services._
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal._
 import nirvana.hall.v62.internal.sync._
 import nirvana.hall.v62.services.GetPKIDServiceImpl
-import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.annotations.{EagerLoad, ServiceId}
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
