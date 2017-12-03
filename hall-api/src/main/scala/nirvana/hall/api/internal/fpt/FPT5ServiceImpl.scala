@@ -36,13 +36,8 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     while (iter.hasNext){
       val blob = iter.next()
       blob.getType match {
-        case ImageType.IMAGETYPE_FINGER =>
-          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-          if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
-            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
-          }
-        case ImageType.IMAGETYPE_PALM =>
+        case ImageType.IMAGETYPE_FINGER | ImageType.IMAGETYPE_PALM | ImageType.IMAGETYPE_KNUCKLEPRINTS
+                |ImageType.IMAGETYPE_FOURPRINT | ImageType.IMAGETYPE_FULLPALM =>
           val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
           if(gafisImage.stHead.nCompressMethod != glocdef.GAIMG_CPRMETHOD_WSQ){
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
@@ -53,6 +48,17 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     }
     FPT5Converter.convertTPCard2FingerprintPackage(tpCard.build)
   }
+
+  /**
+    * 捺印FPT5.0导入
+    * @param fingerprintPackage
+    * @param dbId
+    */
+  override def addFingerprintPackage(fingerprintPackage: FingerprintPackage, dbId: Option[String]): Unit = {
+      tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
+  }
+
+
 
   /**
     * 获取现场信息
@@ -71,18 +77,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
   }
 
   /**
-    * 捺印指纹导入
-    *
-    * @param fingerprintPackage
-    * @param dbId
-    */
-  override def addFingerprintPackage(fingerprintPackage: FingerprintPackage, dbId: Option[String]): Unit = {
-      tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
-  }
-
-  /**
     * 现场指纹导入
-    *
     * @param latentPackage
     */
   override def addLatentPackage(latentPackage: LatentPackage, dbId: Option[String]): Unit = {
@@ -100,6 +95,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
         val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
         blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
       }
+
       if(lPCard.getBlob.getType.equals(ImageType.IMAGETYPE_PALM)){
         if(!lPPalmService.isExist(lPCard.getStrCardID)){
           lPPalmService.addLPCard(lpCardBuiler.build())
@@ -141,38 +137,37 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
   private def  getTpCardBuilder(fingerprintPackage: FingerprintPackage) = {
     val tpCardBuilder = FPT5Converter.convertFingerprintPackage2TPCard(fingerprintPackage).toBuilder
     //图像转换和特征提取
-    val iter = tpCardBuilder.getBlobBuilderList.iterator()
-    while(iter.hasNext){
-      val blob = iter.next()
-      if(blob.getType == ImageType.IMAGETYPE_FINGER){
-        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(blob.getStImageBytes.toByteArray)
-        if(gafisImage.stHead.bIsCompressed > 0){
-          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-          val mntData = try{
-            extractByGAFISIMG(originalImage, false)
-          }catch{
-            case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
-          }
+    tpCardBuilder.getBlobBuilderList.foreach{
+      t =>
+        if(t.getType == ImageType.IMAGETYPE_FINGER | t.getType == ImageType.IMAGETYPE_PALM){
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(t.getStImageBytes.toByteArray)
+          if(gafisImage.stHead.bIsCompressed > 0){
+            val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+            val mntData = try{
+              extractByGAFISIMG(originalImage, false)
+            }catch{
+              case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+            }
 
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+            //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
 
-          val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
-          if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
-            ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
-            blob.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+            val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
+            if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
+              ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
+              t.setStImageBytes(ByteString.copyFrom(gafisImage.toByteArray()))
+            }else{
+              val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
+              t.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+            }
           }else{
-            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(originalImage)
-            blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
+            val mntData = extractByGAFISIMG(gafisImage, false)
+            t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+            //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
+            t.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
           }
-        }else{
-          val mntData = extractByGAFISIMG(gafisImage, false)
-          blob.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-          //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-          val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
-          blob.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
         }
-      }
     }
     tpCardBuilder
   }

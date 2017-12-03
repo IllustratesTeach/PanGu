@@ -158,10 +158,11 @@ object fpt5util {
 
     (fca.toShort,D_fca.toShort)
   }
-  def UTIL_Direction_MntDisp2FPT(mntDisp: MNTDISPSTRUCT): String ={
-    val nFPTAngle = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.fca)
 
-    "%03d%02d".format(nFPTAngle, mntDisp.stCm.D_fca)
+  case class FeatureDirection(direction:Int,range:Int)
+  def UTIL_Direction_MntDisp2FPT(mntDisp: MNTDISPSTRUCT): FeatureDirection ={
+    val nFPTAngle = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.fca)
+    new FeatureDirection(nFPTAngle,mntDisp.stCm.D_fca)
   }
 
   /**
@@ -332,31 +333,14 @@ object fpt5util {
     var fingerFeatureQuality:Int
   }
 
-  /**
-    * 细节特征点转换
-    * @param pstmnt
-    * @param nmntCnt
-    */
-  def UTIL_Minutia_FPT2MntDisp(minutiaList:Array[Minutia], pstmnt:Array[AFISMNTPOINTSTRUCT], nmntCnt:Int)
-  {
-    var pstmnt:AFISMNTPOINTSTRUCT = null
-      minutiaList.foreach{
-      t =>
-        pstmnt = new AFISMNTPOINTSTRUCT
-        UTIL_Minutia_OneFPT2MntDisp(t.fingerFeaturePointXCoordinate.toShort
-          ,t.fingerFeaturePointYCoordinate.toShort
-          ,t.fingerFeatureDirection
-          ,t.fingerFeatureQuality.toShort,pstmnt)
-    }
-  }
-
-  def UTIL_Minutia_OneFPT2MntDisp(mntX:Short, mntY:Short,mntDirection:Int,mntQuality:Short,stmnt:AFISMNTPOINTSTRUCT)
+  def UTIL_Minutia_OneFPT2MntDisp(mntX:Short, mntY:Short,mntDirection:Int,mntQuality:Short,stmnt:AFISMNTPOINTSTRUCT):AFISMNTPOINTSTRUCT =
   {
     stmnt.x = mntX
     stmnt.y = mntY
     val zString = mntDirection
     stmnt.z = UTIL_Angle_FPT2MntDisp(zString)
     stmnt.nReliability = 1
+    stmnt
   }
 
   case class FeaturePointInfo(x:Int,y:Int,z:Int)
@@ -393,4 +377,14 @@ object fpt5util {
 
     pszFPTMnt
   }
+
+  /**
+    * 生成现场物证编号
+    * 规则是‘F+现勘号后22位+4位物证分类代码+3位顺序号',历史数据如无现勘编号，前23位用'F0000000000000000000000'占位
+    * 三位顺序号在方法外生成，因为需要访问数据库
+    * @param surveyId
+    * @return
+    */
+  def gerenateLatentPhysicalIdTake(physicalTypeCode:String,surveyId:String = ""):String
+        ="F0000000000000000000000" + physicalTypeCode
 }

@@ -612,7 +612,7 @@ class FPT5File {
     @XmlType(name = "LatentFingers")
     class LatentFingers{
         @XmlElement(name = "fingerImageMsg")
-        var latentFingerImageMsg:Array[LatentFingerImageMsg] = _
+        var latentFingerImageMsg:LatentFingerImageMsg = _
         @XmlElement(name = "fingerFeatureMsg")
         var latentFingerFeatureMsg:Array[LatentFingerFeatureMsg] = _
     }
@@ -769,7 +769,7 @@ class FPT5File {
     @XmlType(name = "LatentPalms")
     class LatentPalms{
         @XmlElement(name = "palmImageMsg")
-        var latentPalmImageMsg:Array[LatentPalmImageMsg] = _
+        var latentPalmImageMsg:LatentPalmImageMsg = _
         @XmlElement(name = "palmFeatureMsg")
         var latentPalmFeatureMsg:Array[LatentPalmFeatureMsg] = _
     }
