@@ -326,21 +326,14 @@ object fpt5util {
       else return 1
     }
   }
-  type Minutia = {
-    var fingerFeaturePointXCoordinate:Int
-    var fingerFeaturePointYCoordinate:Int
-    var fingerFeatureDirection:Int
-    var fingerFeatureQuality:Int
-  }
 
-  def UTIL_Minutia_OneFPT2MntDisp(mntX:Short, mntY:Short,mntDirection:Int,mntQuality:Short,stmnt:AFISMNTPOINTSTRUCT):AFISMNTPOINTSTRUCT =
+  def UTIL_Minutia_OneFPT2MntDisp(mntX:Short, mntY:Short,mntDirection:Int,mntQuality:Short,stmnt:AFISMNTPOINTSTRUCT) =
   {
     stmnt.x = mntX
     stmnt.y = mntY
     val zString = mntDirection
     stmnt.z = UTIL_Angle_FPT2MntDisp(zString)
     stmnt.nReliability = 1
-    stmnt
   }
 
   case class FeaturePointInfo(x:Int,y:Int,z:Int)
