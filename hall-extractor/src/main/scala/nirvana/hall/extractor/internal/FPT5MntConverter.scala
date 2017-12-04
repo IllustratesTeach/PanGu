@@ -293,14 +293,13 @@ object FPT5MntConverter {
     if ( ntemp > 0 ) {
       var minutiaArray = new ArrayBuffer[gfpt5lib.Minutia]
       var minutia:gfpt5lib.Minutia = null
-      mntDisp.stCm.mnt.foreach{
-        t =>
-          minutia = new gfpt5lib.Minutia
-          minutia.fingerFeaturePointXCoordinate = t.x
-          minutia.fingerFeaturePointYCoordinate = t.y
-          minutia.fingerFeatureDirection = t.z
-          minutia.fingerFeatureQuality = t.nFlag.toInt
-          minutiaArray += minutia
+      for (i <- 0 until ntemp){
+        minutia = new gfpt5lib.Minutia
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
+        minutia.fingerFeatureDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeatureQuality = mntDisp.stCm.mnt(i).nFlag.toInt
+        minutiaArray += minutia
       }
       fingerMsg.fingerMinutiaSet.minutia = minutiaArray.toArray
     }
@@ -408,14 +407,13 @@ object FPT5MntConverter {
     if ( ntemp > 0 ) {
       var minutiaArray = new ArrayBuffer[gfpt5lib.LatentMinutia]
       var minutia:gfpt5lib.LatentMinutia = null
-      mntDisp.stCm.mnt.foreach{
-        t =>
-          minutia = new gfpt5lib.LatentMinutia
-          minutia.fingerFeaturePointXCoordinate = t.x
-          minutia.fingerFeaturePointYCoordinate = t.y
-          minutia.fingerFeaturePointDirection = t.z
-          minutia.fingerFeaturePointQuality = t.nFlag.toInt
-          minutiaArray += minutia
+      for (i <- 0 until ntemp){
+        minutia = new gfpt5lib.LatentMinutia
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
+        minutiaArray += minutia
       }
       latentFingerFeatureMsg.LatentMinutiaSet.latentMinutia = minutiaArray.toArray
     }
