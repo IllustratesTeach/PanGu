@@ -275,7 +275,9 @@ object FPT5Converter {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(fingerprintPackage.descriptiveMsg.fingerPalmCardId)
-    tpCard.setStrMisPersonID(fingerprintPackage.descriptiveMsg.casePersonid)
+    tpCard.setStrMisPersonID(fingerprintPackage.descriptiveMsg.originalSystemCasePersonId)
+    tpCard.setStrJingZongPersonId(fingerprintPackage.descriptiveMsg.jingZongPersonId)
+    tpCard.setStrCasePersonID(fingerprintPackage.descriptiveMsg.casePersonid)
     textBuilder.setStrName(fingerprintPackage.descriptiveMsg.name)
     if(StringUtils.isNotEmpty(fingerprintPackage.descriptiveMsg.alias)
       && StringUtils.isNotBlank(fingerprintPackage.descriptiveMsg.alias)){
@@ -536,12 +538,13 @@ object FPT5Converter {
   def convertLatentPackage2Case(latentPackage: LatentPackage): Case = {
     val caseInfo = Case.newBuilder()
     val textBuilder = caseInfo.getTextBuilder
+    caseInfo.setStrCaseID(latentPackage.caseMsg.originalSystemCaseId)
     caseInfo.setStrJingZongCaseId(latentPackage.caseMsg.caseId) //警综案事件编号
     caseInfo.setStrSurveyId(latentPackage.caseMsg.latentSurveyId) //现场勘验编号
     caseInfo.setNCaseFingerCount(latentPackage.latentFingers.length) //现场指纹个数
     latentPackage.latentFingers.foreach(
-      latentFingers => caseInfo.addStrFingerID(latentFingers.latentFingerImageMsg.latentPhysicalId)
-    )//现场指纹卡号 -是不是就是现场物证编号啊？？？？？？
+      latentFingers => caseInfo.addStrFingerID(latentFingers.latentFingerImageMsg.originalSystemLatentFingerPalmId)
+    )
     textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString) //案件类别
     textBuilder.setStrCaseType2(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
     textBuilder.setStrCaseType3(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
@@ -568,10 +571,10 @@ object FPT5Converter {
         if(t.latentFingerImageMsg !=null){
           val lpCard = LPCard.newBuilder()
           val blobBuilder = lpCard.getBlobBuilder
-          lpCard.setStrCardID(t.latentFingerImageMsg.originalSystemLatentFingerPalmId)//????怎么存这是个大问题
+          lpCard.setStrCardID(t.latentFingerImageMsg.originalSystemLatentFingerPalmId)
           val textBuilder = lpCard.getTextBuilder
-          textBuilder.setStrCaseId(latentPackage.caseMsg.caseId)
-          textBuilder.setStrSeq(t.latentFingerImageMsg.latentPhysicalId.drop(28))
+          textBuilder.setStrCaseId(latentPackage.caseMsg.originalSystemCaseId)
+          textBuilder.setStrSeq(t.latentFingerImageMsg.originalSystemLatentFingerPalmId.substring(t.latentFingerImageMsg.originalSystemLatentFingerPalmId.length-2))// 取最后两位
           textBuilder.setStrRemainPlace(t.latentFingerImageMsg.latentFingerLeftPosition) //遗留部位
           textBuilder.setStrRidgeColor(t.latentFingerImageMsg.latentFingerMastoidProcessLineColorCode) //乳突线颜色
           textBuilder.setBDeadBody("1".equals(t.latentFingerImageMsg.latentFingerCorpseJudgeIdentify)) //未知名尸体标识
@@ -587,6 +590,7 @@ object FPT5Converter {
           t.latentFingerFeatureMsg.foreach{
             f =>
               lpCard.setStrCardID(f.originalSystemLatentFingerPalmId)
+              lpCard.setStrPhysicalId(f.latentPhysicalId)
               val gafisMnt = FPT5MntConverter.convertFingerLDataMnt2GafisMnt(t.latentFingerImageMsg,f,f.LatentMinutiaSet)
               blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
           }
@@ -601,8 +605,8 @@ object FPT5Converter {
           val textBuilder = lpCard.getTextBuilder
           val blobBuilder = lpCard.getBlobBuilder
           lpCard.setStrCardID(t.latentPalmImageMsg.latentPalmId)
-          textBuilder.setStrCaseId(latentPackage.caseMsg.caseId)
-          textBuilder.setStrSeq(t.latentPalmImageMsg.latentPalmPhysicalId.drop(28))
+          textBuilder.setStrCaseId(latentPackage.caseMsg.originalSystemCaseId)
+          textBuilder.setStrSeq(t.latentPalmImageMsg.latentPalmId.substring(t.latentPalmImageMsg.latentPalmId.length-2))
           textBuilder.setStrRemainPlace(t.latentPalmImageMsg.latentPalmLeftPostion) //遗留部位
           textBuilder.setStrRidgeColor(t.latentPalmImageMsg.latentPalmMastoidProcessLineColorCode) //乳突线颜色
           textBuilder.setBDeadBody("1".equals(t.latentPalmImageMsg.latentPalmCorpseJudgeIdentify)) //未知名尸体标识
