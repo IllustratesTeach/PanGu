@@ -267,6 +267,7 @@ message	Case
     optional string	strDataSource = 8;   //数据来源类型
     //Fpt5.0新加
     optional string	strSurveyId = 9;   //现场勘验编号
+	optional string strJingZongCaseId = 10;//警综案事件编号-新数据必须提供，该编号的数据来源为现勘系统
 }
 
 message	LPCard
@@ -305,8 +306,7 @@ message	LPCard
 	optional AdminfoData admData = 4;
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 5;   //数据来源类型
-    //Fpt5.0新加
-    optional string	strPhysicalId = 6;   //现场物证编号
+	optional string strPhysicalId = 6;   //现场物证编号
 }
 
 message	TLLTHitLog
