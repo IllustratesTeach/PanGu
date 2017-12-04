@@ -4,46 +4,128 @@ import nirvana.hall.c.services.kernel.mnt_checker_def
 import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
 
 /**
-  *
-  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
-  * @since 2016-03-17
+  * fpt5字典数据转换工具类
   */
 object fpt5util {
 
   /**
-    * GAFIS6.2系统中的协查级别使用的是FPT标准3（Version3）标准，其代码为：0 - 未知；1 - A级；2 - B级；3 - C级；4 - B级紧急
-    * 而最新协查级别为公安部FTP标准4（Version4），其代码：1 - A级；2 - B级紧急；3 - B级；4 - C级；9 - 其他；
-    * 为了与最新的标准一致，在fpt导入导出时，对协查级别进行转换，转换原则为：
-    *	1、导出时，协查级别转换成Version4标准，并且在fpt文件的第一类逻辑记录的备注里面增
-    *		加标记"<FPX_Level Version = "4" />"，除非m_bReserveFPX_Level = 1
-    * 2、导入时，如果导入的是非东方金指生成的fpt文件，则其中的协查级别自动被认为是Version4，
-    *		把其转换成Version3标准，如果是东方金指生成的fpt文件，则检查第一类逻辑记录的备注中有
-    *		没有FPX_Level Version标记，如果有并且其值为4，则转换成Version3标准，如果没有或者其值
-    *		为3，则认为就是Version3标准，不用转换
-    *	3、不管是导入还是导出，如果m_bReserveFPX_Level=1，则不对协查级别进行转换
-    *
-    *	／**
     *	  yuchen 2017-11-30
     *	注：结合公安部FPT5.0标准，按照6。2的结构以及FPT4util中特征转换，进行了针对FPT5的重写，大体思路不变。
     */
 
-  /**
-    * 目的特征数据的表示方式
-    */
-  final val UTIL_FPT4MNT_TOUNKNOWN = 0
-  final val UTIL_FPT4MNT_TOMNTDISP = 1
+  //指纹数据代码第4部分：被捺印指纹人员类别代码
+  val PERSON_TYPE_CRIMINAL = "01" //经人民法院审判定罪的罪犯
+  val PERSON_TYPE_REHABILITATE = "02" //依法被收容教养的人员
+  val PERSON_TYPE_ADMINISTRATIVE_PENALTY = "03" //依法被行政拘留或者因实施违反治安管理或者出入境管理为被依法予以其他行政处罚的人员，但是被当场作出治安管理处罚的除外
+  val PERSON_TYPE_WITHDRAWAL = "04" //依法被强制戒毒的人员
+  val PERSON_TYPE_DETENTION_EDUCATION = "05" //依法被收容教育的人员
+  val PERSON_TYPE_SUSPECT = "06" //依法被拘传、取保候审、监视居住、拘留或者逮捕的犯罪嫌疑人
+  val PERSON_TYPE_INTERROGATE = "07" //依法被继续盘问的人员
+  val PERSON_TYPE_ABOVE_COUNTY_RATIFY_GATHER = "08" //公安机关因办理案（事）件需要，经县级以上公安机关负责人批准采集指掌纹信息的人员
+  val PERSON_TYPE_PUBLIC_SECURITY = "21" //保安员申请人
+  val PERSON_TYPE_OTHER = "99" //其他
 
-  /**
-    * 纹型类型
-    */
-  final val UTIL_FPT4_PATTERNTYPE_ARCH = 1		// 弓型纹
-  final val UTIL_FPT4_PATTERNTYPE_LEFTLOOP = 2		// 左箕型纹
-  final val UTIL_FPT4_PATTERNTYPE_RIGHTLOOP = 3		// 右箕型纹
-  final val UTIL_FPT4_PATTERNTYPE_WHORL = 4		// 斗型纹
-  final val UTIL_FPT4_PATTERNTYPE_NOTEXIST = 5		// 缺指
-  final val UTIL_FPT4_PATTERNTYPE_UNKNOWN = 6		// 未知
-  final val UTIL_FPT4_PATTERNTYPE_OTHER = 9		// 其它
+  //指纹数据代码 第1部分：指纹指位代码
+  val FINGER_ROLL_R_THUMB	= "01";	//滚动右拇
+  val FINGER_ROLL_R_INDEX	= "02";	//滚动右食
+  val FINGER_ROLL_R_MIDDLE	= "03";	//滚动右中
+  val FINGER_ROLL_R_RING	= "04";	//滚动右环
+  val FINGER_ROLL_R_LITTLE	= "05";	//滚动右小
+  val FINGER_ROLL_L_THUMB	= "06";	//滚动左姆
+  val FINGER_ROLL_L_INDEX	= "07";	//滚动左食
+  val FINGER_ROLL_L_MIDDLE	= "08";	//滚动左中
+  val FINGER_ROLL_L_RING	= "09";	//滚动左环
+  val FINGER_ROLL_L_LITTLE	= "10";	//滚动左小
+  val FINGER_PLAIN_R_THUMB	= "11";	//平面右拇
+  val FINGER_PLAIN_R_INDEX	= "12";	//平面右食
+  val FINGER_PLAIN_R_MIDDLE	= "13";	//平面右中
+  val FINGER_PLAIN_R_RING	= "14";	//平面右环
+  val FINGER_PLAIN_R_LITTLE	= "15";	//平面右小
+  val FINGER_PLAIN_L_THUMB	= "16";	//平面左姆
+  val FINGER_PLAIN_L_INDEX	= "17";	//平面左食
+  val FINGER_PLAIN_L_MIDDLE	= "18";	//平面左中
+  val FINGER_PLAIN_L_RING	= "19";	//平面左环
+  val FINGER_PLAIN_R_FOUR_BLOCK	= "20";	//平面右手四连指
+  val FINGER_PLAIN_L_FOUR_BLOCK	= "20";	//平面左手四连指
+  val FINGER_PLAIN_DOUBLE_THUMB	= "20";	//平面左右手拇指
+  val FINGER_PLAIN_UNKNOWN = "20";	//不确定指位
 
+  //指纹数据代码第8部分：指纹特征提取方式缩略规则
+  val EXTRACT_METHOD_A = "A" //自动提取
+  val EXTRACT_METHOD_U = "U" //自动提取且需要人工编辑
+  val EXTRACT_METHOD_E = "E" //自动提取且已经人工编辑
+  val EXTRACT_METHOD_M = "M" //人工抽取
+  val EXTRACT_METHOD_O = "O" //其他
+
+  //公安信息代码第XXX部分：指掌纹缺失情况代码
+  val FINGER_LOST_NORMAL = "0"  //正常
+  val FINGER_LOST_INCOMPLETE = "1"  //残缺
+  val FINGER_LOST_SYS_NO_GATHER = "2"  //系统设置不采集
+  val FINGER_LOST_INJURED = "3"  //受伤未采集
+  val FINGER_LOST_OTHER = "9"  //其他缺失情况
+
+  //指纹数据代码第2部分：指纹纹型代码
+  val PATTERN_TYPE_ARCH = "1"		// 弓型纹
+  val PATTERN_TYPE_LEFTLOOP = "2"		// 左箕型纹
+  val PATTERN_TYPE_RIGHTLOOP = "3"		// 右箕型纹
+  val PATTERN_TYPE_WHORL = "4"		// 斗型纹
+  val PATTERN_TYPE_NOTEXIST = "5"		// 缺指
+  val PATTERN_TYPE_UNKNOWN = "6"		// 未知
+  val PATTERN_TYPE_OTHER = "9"		// 其它
+
+  //指纹数据代码第9部分：掌纹掌位代码
+  val PALM_R_PLAIN = "" //右手平面掌纹
+  val PALM_L_PLAIN = "" //左手平面掌纹
+  val PALM_R_SIDE = "" //右手侧面掌纹
+  val PALM_L_SIDE = "" //左手侧面掌纹
+  val PALM_R_FULL = "" //右手平面全掌纹
+  val PALM_L_FULL = "" //左手平面全掌纹
+  val PALM_UNKNOWN = "" //不确定掌纹
+
+  //人像照片类型代码
+  val FACE_FRONT = "1" //正面像
+  val FACE_LEFT = "2" //左侧像
+  val FACE_RIGHT = "3"  //右侧像
+  val FACE_OTHER = "9"  //右侧像
+
+  //指纹数据代码第3部分：乳突线颜色代码
+  val RIDGE_COLOR_WHITE = "1" //白色
+  val RIDGE_COLOR_BLACK = "2" //黑色
+  val RIDGE_COLOR_OTHER = "9" //其他
+
+  //掌纹三角位置类型代码
+  val PALM_TRIANGLE_TYPE_UNKNOWN = "" //未知位置三角
+  val PALM_TRIANGLE_TYPE_R_WRIST = "" //右手腕部三角
+  val PALM_TRIANGLE_TYPE_R_INDEX_ROOT = "" //右手食指指根三角
+  val PALM_TRIANGLE_TYPE_R_MIDDLE_ROOT = "" //右手中指指根三角
+  val PALM_TRIANGLE_TYPE_R_RING_ROOT = "" //右手环指指根三角
+  val PALM_TRIANGLE_TYPE_R_LITTLE_ROOT = "" //右手小指指根三角
+  val PALM_TRIANGLE_TYPE_L_WRIST = "" //左手腕部三角
+  val PALM_TRIANGLE_TYPE_L_INDEX_ROOT = "" //左手食指指根三角
+  val PALM_TRIANGLE_TYPE_L_MIDDLE_ROOT = "" //左手中指指根三角
+  val PALM_TRIANGLE_TYPE_L_RING_ROOT = "" //左手环指指根三角
+  val PALM_TRIANGLE_TYPE_L_LITTLE_ROOT = "" //左手小指指根三角
+
+  //指纹数据代码第7部分：指纹比对状态代码
+  val QUERY_STATUS_WAIT = "1" //待查
+  val QUERY_STATUS_CHANEL = "2" //撤销
+  val QUERY_STATUS_MATCHED = "3" //比中
+  val QUERY_STATUS_OTHER = "9" //其他
+
+  //指掌纹比对任务类型代码
+  val QUERY_TYPE_TT = "0" //查重
+  val QUERY_TYPE_TL = "1" //正查
+  val QUERY_TYPE_LT = "2" //倒查
+  val QUERY_TYPE_LL = "3" //串查
+  val QUERY_TYPE_UNKNOWN = "9" //其他
+
+  //指掌纹查重比中类型代码
+  val TT_MATCHED_NORMAL = "A" //十指正常比中，所有指位都是确认同一
+  val TT_MATCHED_SAME_CARD = "B" //这两个次的数据是通过复制或者简单裁剪、旋转或者重新扫描等方式录入的，是同一张卡,是上一种情况的特例
+  val TT_MATCHED_PART = "C" //A某些指位是明确比中了，但是其他指位因为质量问题等，不确定是否比中，各个指位比中情况有确认同一或者不确定是否同一两种
+                            //B不同人捺印，某些指位出现确定不同一，并且不是这个人的其他指位指纹的重复，但是其他指位是确认同一或者不确定是否同一
+  val TT_MATCHED_ECTOPIA = "D" //左右手弄反了，不同指位的指纹确认同一
+  val TT_MATCHED_MIRROR = "E" //镜像比中
 
 
   /**
@@ -56,25 +138,6 @@ object fpt5util {
   final val UTIL_COREDELTA_TYPE_MINUTIA = 5
 
 
-
-  /**
-    * 去掉字符串左侧（或）和右侧的空格
-    */
-  final val UTIL_FPT4LIB_STRTRIM_STYLE_LEFT = 0x1
-  final val UTIL_FPT4LIB_STRTRIM_STYLE_RIGHT = 0x2
-  final val UTIL_FPT4LIB_STRTRIM_STYLE_TWOSIDE = 0x3
-
-  def UTIL_FPT4LIB_StrTrimSpace(pszString:String, nTrimStyle:Int):String= {
-    var ret = pszString
-    if ( (nTrimStyle & UTIL_FPT4LIB_STRTRIM_STYLE_LEFT) > 0)  {
-      ret = ret.replaceAll("^\\s*", "");
-    }
-    if ( (nTrimStyle & UTIL_FPT4LIB_STRTRIM_STYLE_RIGHT) > 0) {
-      ret = ret.replaceAll("\\s*$", "");
-    }
-
-    ret
-  }
 
   /**
     * 初始化特征结构 xgw
