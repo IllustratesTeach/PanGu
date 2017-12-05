@@ -516,6 +516,7 @@ object FPT5Converter {
       FPT5ImageConverter.convertGAFISIMAGESTRUCT2LatentPalmImageMsg(gafisImage, latentPalmImageMsg)
       if(palm.getBlob.getStMnt.nonEmpty){//判断是否有特征
         val latentPalmFeatureMsg = new LatentPalmFeatureMsg
+        latentPalmFeatureMsg.latentPalmDeltaSet = new LatentPalmDeltaSet
         val gafisMnt = new GAFISIMAGESTRUCT().fromByteArray(palm.getBlob.getStMntBytes.toByteArray)
         FPT5MntConverter.convertGafisMnt2LatentPalmFeatureMsg(gafisMnt, latentPalmFeatureMsg)
         latentPalmFeatureMsg.latentPalmNo = palm.getStrCardID //现场掌纹_现场指掌纹编号
