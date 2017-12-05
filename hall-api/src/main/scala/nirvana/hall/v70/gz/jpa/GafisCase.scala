@@ -116,13 +116,21 @@ class GafisCase extends ActiveRecord {
   var assistStatus: java.lang.String = _
   @Column(name = "RECEPTION_NO", length = 6)
   var receptionNo: java.lang.String = _
+  @Column(name = "EXTRACTOR_IDCARDNO", length = 18)
+  var extractorIdcardNo: java.lang.String = _
+  @Column(name = "EXTRACTOR_PHONE", length = 18)
+  var extractorPhone: java.lang.String = _
+  @Column(name = "SCENE_SURVEY_ID", length = 18)
+  var sceneSurveyId: java.lang.String = _
+
+
 
   def this(caseId: java.lang.String) {
     this()
     this.caseId = caseId
   }
 
-  def this(caseId: java.lang.String, cardId: java.lang.String, caseClassCode: java.lang.String, caseOccurDate: java.util.Date, caseOccurPlaceCode: java.lang.String, caseOccurPlaceDetail: java.lang.String, caseBriefDetail: java.lang.String, isMurder: java.lang.String, amount: java.lang.String, extractUnitCode: java.lang.String, extractUnitName: java.lang.String, extractDate: java.util.Date, extractor: java.lang.String, suspiciousAreaCode: java.lang.String, caseState: java.lang.String, caseNature: java.lang.String, remark: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, brokenStatus: java.lang.Short, caseSource: java.lang.String, createUnitCode: java.lang.String, assistLevel: java.lang.String, caseNatureOld: java.lang.String, isChecked: java.lang.Character, fptExtractUnitCode: java.lang.String, fptExtractUnitName: java.lang.String, sid: java.math.BigDecimal, assistBonus: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistSign: java.lang.String, assistRevokeSign: java.lang.String, caseSystemId: java.lang.String, caseClassCode2: java.lang.String, caseClassCode3: java.lang.String, suspiciousAreaCode2: java.lang.String, suspiciousAreaCode3: java.lang.String, assistStatus: java.lang.String, receptionNo: java.lang.String) {
+  def this(caseId: java.lang.String, cardId: java.lang.String, caseClassCode: java.lang.String, caseOccurDate: java.util.Date, caseOccurPlaceCode: java.lang.String, caseOccurPlaceDetail: java.lang.String, caseBriefDetail: java.lang.String, isMurder: java.lang.String, amount: java.lang.String, extractUnitCode: java.lang.String, extractUnitName: java.lang.String, extractDate: java.util.Date, extractor: java.lang.String, suspiciousAreaCode: java.lang.String, caseState: java.lang.String, caseNature: java.lang.String, remark: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, brokenStatus: java.lang.Short, caseSource: java.lang.String, createUnitCode: java.lang.String, assistLevel: java.lang.String, caseNatureOld: java.lang.String, isChecked: java.lang.Character, fptExtractUnitCode: java.lang.String, fptExtractUnitName: java.lang.String, sid: java.math.BigDecimal, assistBonus: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistSign: java.lang.String, assistRevokeSign: java.lang.String, caseSystemId: java.lang.String, caseClassCode2: java.lang.String, caseClassCode3: java.lang.String, suspiciousAreaCode2: java.lang.String, suspiciousAreaCode3: java.lang.String, assistStatus: java.lang.String, receptionNo: java.lang.String, extractorIdcardNo: java.lang.String, extractorPhone: java.lang.String, sceneSurveyId: java.lang.String) {
     this()
     this.caseId = caseId
     this.cardId = cardId
@@ -168,6 +176,9 @@ class GafisCase extends ActiveRecord {
     this.suspiciousAreaCode3 = suspiciousAreaCode3
     this.assistStatus = assistStatus
     this.receptionNo = receptionNo
+    this.extractorIdcardNo = extractorIdcardNo
+    this.extractorPhone = extractorPhone
+    this.sceneSurveyId = sceneSurveyId
 
   }
 

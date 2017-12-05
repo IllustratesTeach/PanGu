@@ -149,6 +149,9 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
   def convertGafisCaseFinger2LPCard(caseFinger: GafisCaseFinger, caseFingerMnt: GafisCaseFingerMnt): LPCard = {
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(caseFinger.fingerId)
+    //5.0新加
+    lpCard.setStrPhysicalId(caseFinger.physicalEvidenceNo)
+
     val textBuilder = lpCard.getTextBuilder
     magicSet(caseFinger.caseId, textBuilder.setStrCaseId)
     magicSet(caseFinger.seqNo, textBuilder.setStrSeq)

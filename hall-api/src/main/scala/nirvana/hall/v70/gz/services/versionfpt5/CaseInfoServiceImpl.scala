@@ -134,6 +134,9 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
     caseBuilder.setStrDataSource(caseInfo.caseSource)
+    //FPT5.0 新加
+    caseBuilder.setStrJingZongCaseId(caseInfo.caseSystemId)
+    caseBuilder.setStrSurveyId(caseInfo.sceneSurveyId)
 
     val textBuilder = caseBuilder.getTextBuilder
     magicSet(caseInfo.caseClassCode, textBuilder.setStrCaseType1)
@@ -147,7 +150,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
     magicSet(caseInfo.extractUnitCode, textBuilder.setStrExtractUnitCode)
     magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
-    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
+    magicSet(caseInfo.extractDate.substring(0,4)+"-"+caseInfo.extractDate.substring(4,6)+"-"+caseInfo.extractDate.substring(6), textBuilder.setStrExtractDate)
     magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
     magicSet(caseInfo.suspiciousAreaCode, textBuilder.setStrSuspArea1Code)
     textBuilder.setNSuperviseLevel(caseInfo.assistLevel)
@@ -155,7 +158,12 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     magicSet(caseInfo.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
     magicSet(caseInfo.assistDate, textBuilder.setStrXieChaDate)
     magicSet(caseInfo.assistBonus, textBuilder.setStrPremium)
+    //FPT5.0 新加
     magicSet(caseInfo.caseBriefDetail, textBuilder.setStrBriefCase)
+    magicSet(caseInfo.extractorIdcardNo, textBuilder.setStrExtractorIdCard)
+    magicSet(caseInfo.extractorPhone, textBuilder.setStrExtractorTel)
+
+
     textBuilder.setNCaseState(caseInfo.assistSign)
     textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
     //案件状态字典不符fpt标准，暂时忽略该项信息
