@@ -20,7 +20,7 @@ class BaseHallMatcherTestCase {
   def setup: Unit ={
     val classes = List[Class[_]](
       Class.forName("nirvana.hall.matcher.TestHallMatcherModule"),
-      Class.forName("nirvana.hall.matcher.HallMatcherGzServiceModule"),
+      Class.forName("nirvana.hall.matcher.HallMatcherGafis6ServiceModule"),
       Class.forName("nirvana.hall.matcher.HallMatcherDataSourceModule")
     )
     registry = RegistryBuilder.buildAndStartupRegistry(classes: _*)

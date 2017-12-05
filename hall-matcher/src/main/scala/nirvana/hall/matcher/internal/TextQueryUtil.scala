@@ -37,7 +37,7 @@ object TextQueryUtil extends LoggerSupport{
     getColDataById(caseid, COL_NAME_CASEID, COL_NAME_CID_PRE, COL_NAME_CID_DEPT, COL_NAME_CID_DATE)
   }
 
-  private def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
+  def getPersonidGroupQuery(personidBeg: String, personidEnd: String): GroupQuery={
     if(personidBeg.indexOf("*") >=0 || personidBeg.indexOf("?") >= 0
       || personidEnd.indexOf("*") >= 0 || personidEnd.indexOf("?") >= 0){
       getCardidGroupQueryOfKeyword(personidBeg, personidEnd, false)
@@ -45,7 +45,7 @@ object TextQueryUtil extends LoggerSupport{
       getCardidGroupQueryOfRange(personidBeg, personidEnd, false)
     }
   }
-  private def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
+  def getCaseidGroupQuery(caseidBeg: String, caseidEnd: String): GroupQuery={
     if(caseidBeg.indexOf("*") >=0 || caseidBeg.indexOf("?") >= 0
       || caseidEnd.indexOf("*") >= 0 || caseidEnd.indexOf("?") >= 0){
       getCardidGroupQueryOfKeyword(caseidBeg, caseidEnd, true)
@@ -160,7 +160,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param dateColName 日期COL_NAME
     * @return
     */
-  def getColDataById(cardid: String, colName: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
+  private def getColDataById(cardid: String, colName: String, preColName: String, deptColName: String, dateColName: String): Seq[ColData] ={
     val colDataArr = ArrayBuffer[ColData]()
     //cardid转为小写
     colDataArr += ColData.newBuilder().setColName(colName).setColType(ColType.KEYWORD).setColValue(ByteString.copyFrom(cardid.toLowerCase().getBytes())).build()
@@ -206,7 +206,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param isLatent true:现场
     * @return
     */
-  def getCardidGroupQueryOfRange(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
+  private def getCardidGroupQueryOfRange(cardidBeg: String, cardidEnd: String, isLatent: Boolean): GroupQuery={
     var preColName = COL_NAME_PID_PRE
     var deptColName = COL_NAME_PID_DEPT
     var dateColName = COL_NAME_PID_DATE
@@ -372,8 +372,7 @@ object TextQueryUtil extends LoggerSupport{
     }
   }
 
-  def convertQrycondition2TextQueryData(qrycondition: Array[Byte]): TextQueryData ={
-    val textQuery = TextQueryData.newBuilder()
+  def convertQrycondition2TextQueryData(qrycondition: Array[Byte], textQueryBuilder:TextQueryData.Builder = TextQueryData.newBuilder()): TextQueryData ={
     val itemPkg = new GBASE_ITEMPKG_OPSTRUCT
     itemPkg.fromByteArray(qrycondition)
     itemPkg.items.foreach{item =>
@@ -381,6 +380,7 @@ object TextQueryUtil extends LoggerSupport{
         case TextQueryConstants.GAFIS_KEYLIST_GetName =>
         case TextQueryConstants.GAFIS_TEXTSQL_GetName=>
           val xml = new String(item.bnRes, AncientConstants.GBK_ENCODING).trim
+          //使用Dom4j解析xml
           val dom = DocumentHelper.parseText(xml)
           val root = dom.getRootElement
           val iter = root.elementIterator()
@@ -388,13 +388,13 @@ object TextQueryUtil extends LoggerSupport{
             val element =  iter.next().asInstanceOf[Element]
             val tid = element.attribute("TID").getValue
             val textSql = element.getText.trim
-            convertTextSql2TextQueryData(textSql)
+            convertTextSql2TextQueryData(textSql, textQueryBuilder)
           }
         case other =>
       }
     }
 
-    textQuery.build()
+    textQueryBuilder.build()
   }
 
   /**
@@ -402,8 +402,7 @@ object TextQueryUtil extends LoggerSupport{
     * @param textSql
     * @return
     */
-  private def convertTextSql2TextQueryData(textSql: String): TextQueryData ={
-    val textQuery = TextQueryData.newBuilder()
+  def convertTextSql2TextQueryData(textSql: String, textQueryBuilder:TextQueryData.Builder = TextQueryData.newBuilder()): TextQueryData ={
     val sql = textSql.split("\\) AND \\(")
     sql.foreach{ item =>
       item.split(" AND ").foreach{f =>
@@ -423,22 +422,67 @@ object TextQueryUtil extends LoggerSupport{
           }*/
           //先根据字段来处理
           column match {
-            case //COLUMN_CARDID |
-              TextQueryConstants.COL_NAME6_NAME |
-              TextQueryConstants.COL_NAME6_CREATEUSERNAME |
-              TextQueryConstants.COL_NAME6_ADDRESSTAIL |
-              TextQueryConstants.COL_NAME6_CASECLASS1CODE |
-              TextQueryConstants.COL_NAME6_SEXCODE |
-              TextQueryConstants.COL_NAME6_RACECODE =>
+            //Keyword
+            case TextQueryConstants.COL_NAME6_CARDID |
+                 TextQueryConstants.COL_NAME6_NAME |
+                 TextQueryConstants.COL_NAME6_NAMEPINYIN |
+                 TextQueryConstants.COL_NAME6_ALIAS |
+                 TextQueryConstants.COL_NAME6_SEXCODE |
+                 TextQueryConstants.COL_NAME6_SHENFENID |
+                 TextQueryConstants.COL_NAME6_RACECODE |
+                 TextQueryConstants.COL_NAME6_MISPERSONID |
+                 TextQueryConstants.COL_NAME6_CASECLASS1CODE |
+                 TextQueryConstants.COL_NAME6_CASECLASS2CODE |
+                 TextQueryConstants.COL_NAME6_CASECLASS3CODE |
+                 TextQueryConstants.COL_NAME6_ADDRESSCODE |
+                 TextQueryConstants.COL_NAME6_ADDRESSTAIL |
+                 TextQueryConstants.COL_NAME6_HUKOUPLACECODE |
+                 TextQueryConstants.COL_NAME6_HUKOUPLACECODE |
+                 TextQueryConstants.COL_NAME6_PERSONSTATE |
+                 TextQueryConstants.COL_NAME6_PRINTERUNITNAMETAIL |
+                 TextQueryConstants.COL_NAME6_PRINTERUNITCODE |
+                 TextQueryConstants.COL_NAME6_PRINTERNAME |
+                 TextQueryConstants.COL_NAME6_CREATEUSERNAME |
+                 TextQueryConstants.COL_NAME6_UPDATEUSERNAME |
+                 TextQueryConstants.COL_NAME6_CREATORUNITCODE |
+                 TextQueryConstants.COL_NAME6_UPDATORUNITCODE |
+                 TextQueryConstants.COL_NAME6_MICBUPDATORUSERNAME |
+                 TextQueryConstants.COL_NAME6_MICBUPDATORUNITCODE |
+                 TextQueryConstants.COL_NAME6_FINGERID |
+                 TextQueryConstants.COL_NAME6_CREATEUSERNAME |
+                 TextQueryConstants.COL_NAME6_UPDATEUSERNAME |
+                 TextQueryConstants.COL_NAME6_REMAINPLACE |
+                 TextQueryConstants.COL_NAME6_CAPTUREMETHOD |
+                 TextQueryConstants.COL_NAME6_CREATORUNITCODE |
+                 TextQueryConstants.COL_NAME6_BROKENUSER |
+                 TextQueryConstants.COL_NAME6_BROKENUNITCODE |
+                 TextQueryConstants.COL_NAME6_HITPERSONSTATE |
+                 TextQueryConstants.COL_NAME6_MISCONNECTCASEID |
+                 TextQueryConstants.COL_NAME6_PERSONID |
+                 TextQueryConstants.COL_NAME6_GROUPNAME |
+                 TextQueryConstants.COL_NAME6_MISCONNECTCASEID |
+                 TextQueryConstants.COL_NAME6_CASEOCCURPLACETAIL |
+                 TextQueryConstants.COL_NAME6_CASEOCCURPLACECODE |
+                 TextQueryConstants.COL_NAME6_EXTRACTUNITNAMETAIL |
+                 TextQueryConstants.COL_NAME6_EXTRACTUNITCODE |
+                 TextQueryConstants.COL_NAME6_EXTRACTOR1 |
+                 TextQueryConstants.COL_NAME6_SUPERVISELEVEL =>
               val keywordQuery = KeywordQuery.newBuilder()
               keywordQuery.setValue(value)
-              textQuery.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+              textQueryBuilder.addQueryBuilder().setName(column).setExtension(KeywordQuery.query, keywordQuery.build())
+            case TextQueryConstants.COL_NAME6_BIRTHDATE |
+                 TextQueryConstants.COL_NAME6_PRINTDATE |
+                 TextQueryConstants.COL_NAME6_CASEOCCURDATE |
+                 TextQueryConstants.COL_NAME6_BROKENDATE =>
+              logger.info("textquery unsupport column " + column)
+            case other =>
+              logger.info("textquery unsupport column " + column)
           }
 
         }
       }
     }
 
-    textQuery.build()
+    textQueryBuilder.build()
   }
 }
