@@ -778,7 +778,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     */
   override def getPersonInfo(idcard: String) : util.ArrayList[PersonInfoItem] = {
     val personInfoItemList = new util.ArrayList[PersonInfoItem]()
-    val sql = s"SELECT T.personid,T.cardid,t.name,t.addresstail addressdetail,t.hukouplacetail doordetail, sex.name sex," +
+    val sql = s"SELECT T.mispersonid personid,T.cardid,t.name,t.addresstail addressdetail,t.hukouplacetail doordetail, sex.name sex," +
     s"unit.name gatherunitname, t.printername gatherusername, t.printdate gatherdate, caseclass.name gatherreason " +
     s"  FROM NORMALTP_TPCARDINFO T " +
     s"LEFT JOIN ADMIN_SEX SEX ON T.SEXCODE = SEX.CODE " +
