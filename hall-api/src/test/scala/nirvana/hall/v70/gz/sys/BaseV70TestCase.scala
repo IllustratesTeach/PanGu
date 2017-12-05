@@ -5,18 +5,15 @@ import javax.persistence.EntityManagerFactory
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.fpt.FPTServiceImpl
-import nirvana.hall.api.internal.fpt.FPT5ServiceImpl
 import nirvana.hall.api.internal.remote.HallImageRemoteServiceImpl
-import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl}
+import nirvana.hall.api.internal.{AuthServiceImpl, FeatureExtractorImpl, JniLoaderUtil}
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.gz.services.FPTTransServiceImpl
 import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
@@ -49,6 +46,10 @@ class BaseV70TestCase {
     val entityManagerFactory= getService[EntityManagerFactory]
     val emHolder= new EntityManagerHolder(entityManagerFactory.createEntityManager())
     TransactionSynchronizationManager.bindResource(entityManagerFactory, emHolder)
+
+    //fpt处理需要加载jni
+    JniLoaderUtil.loadExtractorJNI()
+    JniLoaderUtil.loadImageJNI()
   }
   @After
   def down: Unit ={
