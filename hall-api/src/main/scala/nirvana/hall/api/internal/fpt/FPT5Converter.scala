@@ -478,6 +478,12 @@ object FPT5Converter {
       val latentFeatureMsg = new LatentFingerFeatureMsg
         val gafisMnt = new GAFISIMAGESTRUCT().fromByteArray(lpcard.getBlob.getStMntBytes.toByteArray)
         FPT5MntConverter.convertGafisMnt2LatentFingerFeatureMsg(gafisMnt, latentFeatureMsg)
+        latentFeatureMsg.originalSystemLatentFingerPalmId = lpcard.getStrCardID
+        if(StringUtils.isNotEmpty(lpcard.getStrPhysicalId) && StringUtils.isNotBlank(lpcard.getStrPhysicalId)){
+          latentFeatureMsg.latentPhysicalId = lpcard.getStrPhysicalId //现场物证编号
+        }else{
+          latentFeatureMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
+        }
         //TODO 指位和纹型转换, 指纹方向
         lpcard.getBlob.getFgpList.foreach{fgp=>
 //          latentImageMsg.latentFingerAnalysisPostionBrief = fgp
@@ -546,9 +552,20 @@ object FPT5Converter {
     latentPackage.latentFingers.foreach(
       latentFingers => caseInfo.addStrFingerID(latentFingers.latentFingerImageMsg.originalSystemLatentFingerPalmId)
     )
-    textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString) //案件类别
-    textBuilder.setStrCaseType2(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
-    textBuilder.setStrCaseType3(latentPackage.caseMsg.caseClassSet.caseTypeCode.toString)
+    if(null != latentPackage.caseMsg.caseClassSet){
+      latentPackage.caseMsg.caseClassSet.caseTypeCode.size match{
+        case 1  =>
+          textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode(0).toString)
+        case 2  =>
+          textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode(0).toString)
+          textBuilder.setStrCaseType2(latentPackage.caseMsg.caseClassSet.caseTypeCode(1).toString)
+        case 3  =>
+          textBuilder.setStrCaseType1(latentPackage.caseMsg.caseClassSet.caseTypeCode(0).toString) //案件类别
+          textBuilder.setStrCaseType2(latentPackage.caseMsg.caseClassSet.caseTypeCode(1).toString)
+          textBuilder.setStrCaseType3(latentPackage.caseMsg.caseClassSet.caseTypeCode(2).toString)
+        case _  =>
+      }
+    }
     textBuilder.setStrMoneyLost(latentPackage.caseMsg.money) //涉案金额
     textBuilder.setStrCaseOccurPlaceCode(latentPackage.caseMsg.caseOccurAdministrativeDivisionCode) //案发地点代码
     textBuilder.setStrCaseOccurPlace(latentPackage.caseMsg.caseOccurAddress) //案发地址详情
