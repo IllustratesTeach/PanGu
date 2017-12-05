@@ -82,7 +82,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     */
   override def addLatentPackage(latentPackage: LatentPackage, dbId: Option[String]): Unit = {
     val caseInfo = FPT5Converter.convertLatentPackage2Case(latentPackage)
-    if(!caseInfoService.isExist(latentPackage.caseMsg.caseId)){
+    if(!caseInfoService.isExist(caseInfo.getStrCaseID)){
       caseInfoService.addCaseInfo(caseInfo)
     }
     val lPCardList = FPT5Converter.convertLatentPackage2LPCard(latentPackage)
