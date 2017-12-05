@@ -6,7 +6,7 @@ import java.util.Date
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
-import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, SysUser}
+import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm, SysUser}
 import nirvana.hall.v70.gz.sync.ProtobufConverter
 import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
@@ -86,7 +86,8 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
       throw new RuntimeException("记录不存在!");
     }
     val fingers = GafisCaseFinger.select(GafisCaseFinger.fingerId).where(GafisCaseFinger.caseId === caseId).toList.asInstanceOf[List[String]]
-    convertGafisCase2Case(gafisCase.get,fingers)
+    val palms = GafisCasePalm.select(GafisCasePalm.palmId).where(GafisCasePalm.caseId === caseId).toList.asInstanceOf[List[String]]
+    convertGafisCase2Case(gafisCase.get,fingers,palms)
   }
 
   /**
@@ -129,7 +130,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
   def magicSet(value:String,fun:String=>Any){
     if(isNonBlank(value)){ fun(value)}
   }
-  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
+  def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String],palms: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
     caseBuilder.setStrDataSource(caseInfo.caseSource)
@@ -163,6 +164,9 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     if(fingerIds != null)
       fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
     caseBuilder.setNCaseFingerCount(caseBuilder.getStrFingerIDCount)
+
+    if(palms != null)
+      palms.foreach(p => caseBuilder.addStrPalmID(p))
 
     caseBuilder.build()
   }
