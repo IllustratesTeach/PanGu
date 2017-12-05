@@ -1,15 +1,13 @@
 package nirvana.hall.v70.gz
 
-import nirvana.hall.api.internal.fpt.FPT5ServiceImpl
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.fpt.FPT5Service
-import nirvana.hall.api.services.sync.{FetchMatchRelationService, LogicDBJudgeService, _}
+import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.gz.services._
 import nirvana.hall.v70.gz.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
-import nirvana.hall.v70.internal.{CaseInfoServiceImpl => _, LPCardServiceImpl => _, TPCardServiceImpl => _}
 import nirvana.hall.v70.internal.sync.{FetchCaseInfoServiceImpl, FetchLPCardServiceImpl, FetchLPPalmServiceImpl, FetchMatchRelationServiceImpl, FetchQueryServiceImpl, FetchTPCardServiceImpl}
+import nirvana.hall.v70.internal.{CaseInfoServiceImpl => _, LPCardServiceImpl => _, TPCardServiceImpl => _}
 import nirvana.hall.v70.services.GetPKIDServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -24,12 +22,10 @@ object LocalV70ServiceModule {
     binder.bind(classOf[DictService], classOf[DictServiceImpl])
     //api 接口实现类
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
-
     //由于依赖关系,这里暂时复用v70，如果有需要单独实现
     binder.bind(classOf[CaseInfoService], classOf[CaseInfoServiceImpl])
     binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
     binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
-    binder.bind(classOf[FPT5Service],classOf[FPT5ServiceImpl])
     binder.bind(classOf[FPTTransService],classOf[FPTTransServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
     binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])

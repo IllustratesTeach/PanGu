@@ -45,17 +45,4 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryGet7to6Service], classOf[QueryGet7to6ServiceImpl]).eagerLoad()
   }
 
-//  @Contribute(classOf[ProtobufRequestHandler])
-//  def provideProtobufFilter(configuration: OrderedConfiguration[ProtobufRequestFilter]): Unit = {
-//    configuration.addInstance("LoginRequestFilter", classOf[LoginRequestFilter])
-//    configuration.addInstance("SyncDictRequestFilter", classOf[SyncDictRequestFilter])
-//    configuration.addInstance("DictListRequestFilter", classOf[DictListRequestFilter])
-//    configuration.addInstance("QueryPersonRequestFilter", classOf[QueryPersonRequestFilter])
-//    configuration.addInstance("AddPersonInfoRequestFilter", classOf[AddPersonInfoRequestFilter])
-//    configuration.addInstance("UpdatePersonRequestFilter", classOf[UpdatePersonRequestFilter])
-//    configuration.addInstance("AddPortraitRequestFilter", classOf[AddPortraitRequestFilter])
-//    configuration.addInstance("QueryPortraitRequestFilter", classOf[QueryPortraitRequestFilter])
-//    configuration.addInstance("AddFingerRequestFilter", classOf[AddFingerRequestFilter])
-//    configuration.addInstance("QueryFingerRequestFilter", classOf[QueryFingerRequestFilter])
-//  }
 }
