@@ -50,7 +50,7 @@ object FPT5ImageConverter {
   def convertGAFISIMAGESTRUCT2LatentFingerImageMsg(gafisImage: GAFISIMAGESTRUCT, latentImageMsg: LatentFingerImageMsg = new LatentFingerImageMsg): LatentFingerImageMsg={
     latentImageMsg.latentFingerImageHorizontalDirectionLength = gafisImage.stHead.nWidth //现场指纹_图像水平方向长度
     latentImageMsg.latentFingerImageVerticalDirectionLength = gafisImage.stHead.nHeight //现场指纹_图像垂直方向长度
-    latentImageMsg.latentFingerImageRatio = gafisImage.stHead.nBits //现场指纹_图像分辨率
+    latentImageMsg.latentFingerImageRatio = gafisImage.stHead.nResolution //现场指纹_图像分辨率
     latentImageMsg.latentFingerImageCompressMethodDescript = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)//现场指纹_图像压缩方法描述
     latentImageMsg.latentFingerImageData = gafisImage.bnData //现场指纹_图像数据
 
