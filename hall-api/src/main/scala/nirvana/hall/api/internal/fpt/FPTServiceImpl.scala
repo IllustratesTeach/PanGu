@@ -1,6 +1,7 @@
 package nirvana.hall.api.internal.fpt
 
 import com.google.protobuf.ByteString
+import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, ExceptRelationService, LPCardService, TPCardService}
@@ -24,6 +25,8 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      lPCardService: LPCardService,
                      exceptRelationService: ExceptRelationService,
                      extractor: FeatureExtractor) extends FPTService{
+  JniLoaderUtil.loadExtractorJNI()
+  JniLoaderUtil.loadImageJNI()
 
   override def getLogic02Rec(cardId: String, dbId: Option[String]): Logic02Rec = {
     if(tPCardService.isExist(cardId)){

@@ -1,23 +1,20 @@
 package nirvana.hall.api.internal.fpt
 
-
-
 import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gfpt4lib.{FPT4File, fpt4code}
+import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{FaceImage, LatentPalmImageMsg, _}
-import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.extractor.internal.{FPT5MntConverter, FPTMntConverter}
-import nirvana.hall.image.internal.{FPT5ImageConverter, FPTImageConverter}
+import nirvana.hall.extractor.internal.FPT5MntConverter
+import nirvana.hall.image.internal.FPT5ImageConverter
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
 import nirvana.hall.protocol.api.FPTProto.{LPCard, _}
 import org.apache.commons.lang.StringUtils
 
+import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.collection.mutable._
-import scala.collection.JavaConversions._
 
 
 /**
