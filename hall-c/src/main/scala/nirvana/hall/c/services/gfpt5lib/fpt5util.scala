@@ -315,7 +315,7 @@ object fpt5util {
     * ，12-13位为方向范围
     * ，14位表示可靠度（1-3可靠度依次递减）。无有效值的数据用ASCII码空格（SP）填写，采用GB/T 1988-1998
     */
-  case class CoreDelta(x:Int,y:Int,nRadius:Int,szSP3:Int,szSP2:Int,nReliability:Int)
+  case class CoreDelta(x:Int,y:Int,nRadius:Int,szSP3:String,szSP2:String,nReliability:Int)
 
   def UTIL_CoreDelta_MntDisp2FPT(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): CoreDelta={
     var szSP3 = "   " //3个空格SP
@@ -331,7 +331,7 @@ object fpt5util {
     //TODO 位置半径校验，暂时对不符合要求（两位整数）默认设置30
     if(nRadius > 100 || nRadius < 0)
       nRadius = 30
-    new CoreDelta(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3.toInt, szSP2.toInt, nReliability)
+    new CoreDelta(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
   }
 
   /**

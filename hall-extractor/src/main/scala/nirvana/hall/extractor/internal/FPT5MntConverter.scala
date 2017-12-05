@@ -252,8 +252,8 @@ object FPT5MntConverter {
       fingerMsg.fingerCenterPointFeatureXCoordinate = centerPointInfo.x
       fingerMsg.fingerCenterPointFeatureYCoordinate = centerPointInfo.y
       fingerMsg.fingerCenterPointFeatureCoordinateRange = centerPointInfo.nRadius
-      fingerMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3
-      fingerMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2
+      fingerMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3.toInt
+      fingerMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2.toInt
       fingerMsg.fingerCenterPointFeatureReliabilityLevel = centerPointInfo.nReliability
     }
     if(mntDisp.stFg.lowcore.bIsExist > 0){
@@ -262,8 +262,8 @@ object FPT5MntConverter {
       fingerMsg.fingerSlaveCenterFeatureXCoordinate = slaveCenterPointInfo.x
       fingerMsg.fingerSlaveCenterFeatureYCoordinate = slaveCenterPointInfo.y
       fingerMsg.fingerSlaveCenterFeatureCoordinateRange = slaveCenterPointInfo.nRadius
-      fingerMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3
-      fingerMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2
+      fingerMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3.toInt
+      fingerMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2.toInt
       fingerMsg.fingerSlaveCenterFeatureReliabilityLevel = slaveCenterPointInfo.nReliability
     }
       if(mntDisp.stFg.ldelta.bIsExist > 0){
@@ -272,8 +272,6 @@ object FPT5MntConverter {
         fingerMsg.fingerLeftTriangleFeatureXCoordinate = LeftTriangleInfo.x
         fingerMsg.fingerLeftTriangleFeatureYCoordinate = LeftTriangleInfo.y
         fingerMsg.fingerLeftTriangleFeatureCoordinateRange = LeftTriangleInfo.nRadius
-        fingerMsg.fingerLeftTriangleFeatureDirection = LeftTriangleInfo.szSP3
-        fingerMsg.fingerLeftTriangleFeatureDirectionRange = LeftTriangleInfo.szSP2
         fingerMsg.fingerLeftTriangleFeatureReliabilityLevel = LeftTriangleInfo.nReliability
       }
       if(mntDisp.stFg.rdelta.bIsExist > 0){
@@ -282,8 +280,6 @@ object FPT5MntConverter {
         fingerMsg.fingerRightTriangleFeatureXCoordinate = rightTriangleInfo.x
         fingerMsg.fingerRightTriangleFeatureYCoordinate = rightTriangleInfo.y
         fingerMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangleInfo.nRadius
-        fingerMsg.fingerRightTriangleFeatureDirection = rightTriangleInfo.szSP3
-        fingerMsg.fingerRightTriangleFeatureDirectionRange = rightTriangleInfo.szSP2
         fingerMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangleInfo.nReliability
       }
 
@@ -366,8 +362,8 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerCenterPointFeatureXCoordinate = centerPointInfo.x
       latentFingerFeatureMsg.fingerCenterPointFeatureYCoordinate = centerPointInfo.y
       latentFingerFeatureMsg.fingerCenterPointFeatureCoordinateRange = centerPointInfo.nRadius
-      latentFingerFeatureMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3
-      latentFingerFeatureMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2
+      latentFingerFeatureMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3.toInt
+      latentFingerFeatureMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2.toInt
       latentFingerFeatureMsg.fingerCenterPointFeatureReliabilityLevel = centerPointInfo.nReliability
     }
     if(mntDisp.stFg.lowcore.bIsExist > 0){
@@ -376,8 +372,8 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerSlaveCenterFeatureXCoordinate = slaveCenterPointInfo.x
       latentFingerFeatureMsg.fingerSlaveCenterFeatureYCoordinate = slaveCenterPointInfo.y
       latentFingerFeatureMsg.fingerSlaveCenterFeatureCoordinateRange = slaveCenterPointInfo.nRadius
-      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3
-      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2
+      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3.toInt
+      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2.toInt
       latentFingerFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel = slaveCenterPointInfo.nReliability
     }
     if(mntDisp.stFg.ldelta.bIsExist > 0){
@@ -386,8 +382,6 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerLeftTriangleFeatureXCoordinate = LeftTriangleInfo.x
       latentFingerFeatureMsg.fingerLeftTriangleFeatureYCoordinate = LeftTriangleInfo.y
       latentFingerFeatureMsg.fingerLeftTriangleFeatureCoordinateRange = LeftTriangleInfo.nRadius
-      latentFingerFeatureMsg.fingerLeftTriangleFeatureDirection = LeftTriangleInfo.szSP3
-      latentFingerFeatureMsg.fingerLeftTriangleFeatureDirectionRange = LeftTriangleInfo.szSP2
       latentFingerFeatureMsg.fingerLeftTriangleFeatureReliabilityLevel = LeftTriangleInfo.nReliability
     }
     if(mntDisp.stFg.rdelta.bIsExist > 0){
@@ -396,8 +390,6 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerRightTriangleFeatureXCoordinate = rightTriangleInfo.x
       latentFingerFeatureMsg.fingerRightTriangleFeatureYCoordinate = rightTriangleInfo.y
       latentFingerFeatureMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangleInfo.nRadius
-      latentFingerFeatureMsg.fingerRightTriangleFeatureDirection = rightTriangleInfo.szSP3
-      latentFingerFeatureMsg.fingerRightTriangleFeatureDirectionRange = rightTriangleInfo.szSP2
       latentFingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangleInfo.nReliability
     }
 
