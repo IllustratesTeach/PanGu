@@ -1,4 +1,4 @@
-package nirvana.hall.webservice.services.fpt
+package nirvana.hall.webservice.services.xingzhuan
 
 import javax.activation.DataHandler
 import javax.jws.{WebMethod, WebService}
@@ -8,7 +8,7 @@ import javax.jws.{WebMethod, WebService}
   * 指掌纹信息应用服务技术规范(5.0) 接口服务
   */
 //TODO 设定 serviceName,targetNamespace
-@WebService(serviceName = "", targetNamespace = "")
+@WebService(serviceName = "FingerPalmAppServer", targetNamespace = "http://www.egfit.com/")
 trait FingerPalmAppServer {
 
   /**

@@ -49,7 +49,7 @@ object HallWebserviceApp
       //公用
       Class.forName("monad.rpc.LocalRpcModule"),
       Class.forName("nirvana.hall.api.LocalProtobufModule"),
-      Class.forName("stark.webservice.StarkWebServiceModule"),
+//      Class.forName("stark.webservice.StarkWebServiceModule"), //Tapestry会自动加载StarkWebServiceModule
       Class.forName("nirvana.hall.webservice.HallWebserviceSymbol"),
       Class.forName("nirvana.hall.webservice.HallWebserviceModule")
 
