@@ -109,9 +109,9 @@ object FPTMntConverter {
     fingerTData.featureCount = fptMnt.featureCount
     fingerTData.feature = fptMnt.feature
     fingerTData.extractMethod= "A"
-    fingerTData.imgHorizontalLength = fptMnt.imgHorizontalLength
-    fingerTData.imgVerticalLength = fptMnt.imgVerticalLength
-    fingerTData.dpi = fptMnt.dpi
+    fingerTData.imgHorizontalLength = "640"//fptMnt.imgHorizontalLength
+    fingerTData.imgVerticalLength = "640"//fptMnt.imgVerticalLength
+    fingerTData.dpi = "500"//fptMnt.dpi
 
     fingerTData
   }
