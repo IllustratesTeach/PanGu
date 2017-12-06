@@ -3,12 +3,13 @@ package nirvana.hall.v70.gz.services.versionfpt5
 import java.util.{Date, UUID}
 import javax.persistence.EntityManager
 
+import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.LPPalmService
-import nirvana.hall.protocol.api.FPTProto.LPCard
+import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v70.gz.Constant
 import nirvana.hall.v70.gz.jpa.{GafisCasePalm, GafisCasePalmMnt, SysUser}
-import nirvana.hall.v70.gz.sync.ProtobufConverter
+import nirvana.hall.v70.gz.sync._
 import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
 import org.springframework.transaction.annotation.Transactional
@@ -65,7 +66,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
   override def getLPCard(palmId: String, dbId: Option[String]): LPCard = {
     val casePalm = GafisCasePalm.find(palmId)
     val casePalmMnt = GafisCasePalmMnt.where(GafisCasePalmMnt.palmId === palmId).and(GafisCasePalmMnt.isMainMnt === "1").headOption.get
-    ProtobufConverter.convertGafisCasePalm2LPCard(casePalm, casePalmMnt)
+    convertGafisCasePalm2LPCard(casePalm, casePalmMnt)
   }
 
   /**
@@ -122,5 +123,64 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
     GafisCasePalm.findOption(cardId).nonEmpty
+  }
+
+  /**
+    * 现场指纹转为protobuf
+    *
+    * @param casePalm
+    * @param casePalmMnt
+    * @return
+    */
+  def convertGafisCasePalm2LPCard(casePalm: GafisCasePalm, casePalmMnt: GafisCasePalmMnt): LPCard = {
+    val lpCard = LPCard.newBuilder()
+    lpCard.setStrCardID(casePalm.palmId)
+    //5.0新加
+    lpCard.setStrPhysicalId(casePalm.physicalEvidenceNo)
+
+    val textBuilder = lpCard.getTextBuilder
+    magicSet(casePalm.seqNo, textBuilder.setStrSeq)
+    if ("1".equals(casePalm.isCorpse))
+      textBuilder.setBDeadBody(true)
+    magicSet(casePalm.corpseNo, textBuilder.setStrDeadPersonNo)
+    magicSet(casePalm.remainPlace, textBuilder.setStrRemainPlace)
+    magicSet(casePalm.ridgeColor, textBuilder.setStrRidgeColor)
+    textBuilder.setNXieChaState(casePalm.isAssist)
+    textBuilder.setNBiDuiState(casePalm.matchStatus)
+
+    val blobBuilder = lpCard.getBlobBuilder
+    blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+    blobBuilder.setStImageBytes(ByteString.copyFrom(casePalm.palmImg))
+    //特征
+    if(casePalmMnt.palmMnt != null)
+      blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
+    magicSet(casePalmMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
+    //指位
+    casePalm.fgp match {
+      case "11" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_RIGHT)
+      case "12" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_LEFT)
+      case "13" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+      case "14" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+      case "15" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_FULL_PALM_RIGHT)
+      case "16" =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_FULL_PALM_LEFT)
+      case _ =>
+        blobBuilder.setPalmFgp(PalmFgp.PALM_UNKNOWN)
+    }
+//
+//    if (isNonBlank(casePalm.fgp))
+//      0.until(casePalm.fgp.length)
+//        .filter("1" == casePalm.fgp.charAt(_))
+//        .foreach(i => blobBuilder.addFgp(FingerFgp.valueOf(i + 1)))
+    //纹型
+    if (isNonBlank(casePalm.pattern))
+      casePalm.pattern.split(",").foreach(f => blobBuilder.addRp(PatternType.valueOf(f)))
+
+    lpCard.build()
   }
 }

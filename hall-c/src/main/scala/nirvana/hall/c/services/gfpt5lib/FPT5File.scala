@@ -902,7 +902,7 @@ class FPT5File {
         @XmlElement(name = "xczhw_zhwfx_jyqk")
         var latentPalmAnalysisBrief:String = _
         @XmlElement(name = "coreLikePatternSet")
-        var latentPalmCoreLikePatternSet:LatentPalmCoreLikePatternSet = new LatentPalmCoreLikePatternSet
+        var latentPalmCoreLikePatternSet:LatentPalmCoreLikePatternSet = _
         @XmlElement(name = "deltaSet")
         var latentPalmDeltaSet:LatentPalmDeltaSet = _
         @XmlElement(name = "minutiaSet")

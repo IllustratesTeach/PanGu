@@ -1824,7 +1824,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element type="xs:dateTime" name="tqsj" minOccurs="1" maxOccurs="1" >
+      <xs:element type="xs:date" name="tqsj" minOccurs="1" maxOccurs="1" >
         <xs:annotation>
           <xs:documentation>提取时间</xs:documentation>
         </xs:annotation>
@@ -2001,7 +2001,7 @@
         </xs:element>
         <xs:element name="xczw_txysffms" minOccurs="1" maxOccurs="1" >
           <xs:annotation>
-            <xs:documentation>现场指纹_图像分辨率</xs:documentation>
+            <xs:documentation>现场指纹_图像压缩方法描述</xs:documentation>
           </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">

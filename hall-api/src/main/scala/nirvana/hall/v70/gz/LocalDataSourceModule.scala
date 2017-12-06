@@ -7,10 +7,10 @@ import javax.sql.DataSource
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.v70.config.HallV70Config
+import org.apache.tapestry5.ioc.Configuration
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
-import stark.migration._
 
 /**
  * 针对数据的操作
@@ -18,28 +18,6 @@ import stark.migration._
  * @since 2015-10-06
  */
 object LocalDataSourceModule {
-  /*
-  @EagerLoad
-  def buildPlatformTransactionManager(dataSource: DataSource):PlatformTransactionManager = {
-    new DataSourceTransactionManager(dataSource)
-  }
-  def buildTransactionInterceptor(@Local transactionManager: PlatformTransactionManager): TransactionInterceptor = {
-    val transactionAttributeSource: AnnotationTransactionAttributeSource = new AnnotationTransactionAttributeSource
-    val transactionInterceptor: TransactionInterceptor = new TransactionInterceptor(transactionManager, transactionAttributeSource)
-    transactionInterceptor.afterPropertiesSet()
-    transactionInterceptor
-  }
-
-  @Match(Array("*"))
-  def adviseTransactional(receiver: MethodAdviceReceiver,
-                          @Local transactionInterceptor: TransactionInterceptor) {
-    for (m <- receiver.getInterface.getMethods) {
-      if (receiver.getMethodAnnotation(m, classOf[Transactional]) != null) {
-        receiver.adviseMethod(m, new TransactionAdvice(transactionInterceptor, m))
-      }
-    }
-  }
-  */
   @EagerLoad
   def buildDataSource(config: HallV70Config, hub: RegistryShutdownHub, logger: Logger): DataSource = {
     val hikariConfig = new HikariConfig();
@@ -98,5 +76,9 @@ object LocalDataSourceModule {
     //migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
 
     dataSource
+  }
+  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
+    configuration.add("nirvana.hall.v70.gz.jpa")
+    configuration.add("nirvana.hall.api.jpa")
   }
 }

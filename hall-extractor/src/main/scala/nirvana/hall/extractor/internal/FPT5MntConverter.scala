@@ -426,18 +426,17 @@ object FPT5MntConverter {
       var delta:LatentPalmDelta = null
       var deltaDirectionArray  = new ArrayBuffer[LatentPalmDeltaDirection]
       var deltaDirection:LatentPalmDeltaDirection = null
-      mntDisp.stPm.PatternDelta.foreach{
-        t =>
-          delta = new LatentPalmDelta
-          delta.latentPalmTrianglePointFeatureXCoordinate = t.x
-          delta.latentPalmTrianglePointFeatureYCoordinate = t.y
-          delta.latentPalmTrianglePointFeatureRange = t.z
-          deltaDirection = new LatentPalmDeltaDirection
-          deltaDirection.latentPalmTrianglePointFeatureDirection = t.nRadius
-          deltaDirection.latentPalmTrianglePointFeatureDirectionRange = t.nzVarRange
-          deltaDirectionArray += deltaDirection
-          delta.latentPalmDeltaDirection = deltaDirectionArray.toArray
-          deltaArray += delta
+      for(i <- 0 until mntDisp.stPm.nPatternDeltaCnt){
+        delta = new LatentPalmDelta
+        delta.latentPalmTrianglePointFeatureXCoordinate = mntDisp.stPm.PatternDelta(i).x
+        delta.latentPalmTrianglePointFeatureYCoordinate = mntDisp.stPm.PatternDelta(i).y
+        delta.latentPalmTrianglePointFeatureRange = UTIL_Angle_MntDisp2FPT(mntDisp.stPm.PatternDelta(i).z)
+        deltaDirection = new LatentPalmDeltaDirection
+        deltaDirection.latentPalmTrianglePointFeatureDirection = mntDisp.stPm.PatternDelta(i).nRadius
+        deltaDirection.latentPalmTrianglePointFeatureDirectionRange = mntDisp.stPm.PatternDelta(i).nzVarRange
+        deltaDirectionArray += deltaDirection
+        delta.latentPalmDeltaDirection = deltaDirectionArray.toArray
+        deltaArray += delta
       }
       latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta = deltaArray.toArray
     }
@@ -445,13 +444,12 @@ object FPT5MntConverter {
     if(mntDisp.stPm.nPatternCoreCnt.toInt > 0){
       var minutiaArray = new ArrayBuffer[gfpt5lib.LatentPalmMinutia]
       var minutia:gfpt5lib.LatentPalmMinutia = null
-      mntDisp.stPm.PatternCore.foreach{
-        t =>
-          minutia = new gfpt5lib.LatentPalmMinutia
-          minutia.fingerFeaturePointXCoordinate = t.x
-          minutia.fingerFeaturePointYCoordinate = t.y
-          minutia.fingerFeaturePointDirection = t.z
-          minutiaArray += minutia
+      for(i <- 0 until mntDisp.stPm.nPatternCoreCnt){
+        minutia = new gfpt5lib.LatentPalmMinutia
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stPm.PatternCore(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stPm.PatternCore(i).y
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stPm.PatternCore(i).z)
+        minutiaArray += minutia
       }
       latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia = minutiaArray.toArray
     }
