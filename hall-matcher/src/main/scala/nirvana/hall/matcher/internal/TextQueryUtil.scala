@@ -62,7 +62,8 @@ object TextQueryUtil extends LoggerSupport{
 
   /**
     * 根据人员编号或者案件编号的key值从json取值，两个区间，使用GroupQuery包裹
-    * @param json
+    * @param json textSql
+    * @param isLatent 是否是现场
     * @return
     */
   private def getCardidGroupQueryByJSONObject(json: JSONObject, isLatent: Boolean): GroupQuery={
@@ -72,6 +73,7 @@ object TextQueryUtil extends LoggerSupport{
     var endKey2 = PERSONID_END2
     var occurKey1 = PERSONID_OCCUR1
     var occurKey2 = PERSONID_OCCUR2
+    var deptKey = COL_NAME_PID_DEPT //由于MUST_NOT不能单独使用，需要添加一个全集配合使用，用来取全集的Key, 这里使用编号部门是由于该数据项是数字，查询效率高
     if(isLatent){
       begKey1 = CASEID_BEG1
       endKey1 = CASEID_END1
@@ -79,6 +81,7 @@ object TextQueryUtil extends LoggerSupport{
       endKey2 = CASEID_END2
       occurKey1 = CASEID_OCCUR1
       occurKey2 = CASEID_OCCUR2
+      deptKey = COL_NAME_CID_DEPT
     }
     val groupQuery1 = getGroupQueryByJSONObject(json, begKey1, endKey1, isLatent)
     val groupQuery2 = getGroupQueryByJSONObject(json, begKey2, endKey2, isLatent)
@@ -92,7 +95,7 @@ object TextQueryUtil extends LoggerSupport{
           if(TextQueryConstants.OCCUR_MUST_NOT.equals(pidOccur1)){
             occur = Occur.MUST_NOT
             //由于MUST_NOT不能单独使用，这里添加一个全集
-            groupQuery.addClauseQueryBuilder().setName(COL_NAME_PID_DEPT).setExtension(LongRangeQuery.query, LongRangeQuery.newBuilder().setMin(0).build())
+            groupQuery.addClauseQueryBuilder().setName(deptKey).setExtension(LongRangeQuery.query, LongRangeQuery.newBuilder().setMin(0).setMinInclusive(true).build())
           }
         }
         groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery1).setOccur(occur)
@@ -104,7 +107,7 @@ object TextQueryUtil extends LoggerSupport{
           if(TextQueryConstants.OCCUR_MUST_NOT.equals(pidOccur2)){
             occur = Occur.MUST_NOT
             //由于MUST_NOT不能单独使用，这里添加一个全集
-            groupQuery.addClauseQueryBuilder().setName(COL_NAME_PID_DEPT).setExtension(LongRangeQuery.query, LongRangeQuery.newBuilder().setMin(0).build())
+            groupQuery.addClauseQueryBuilder().setName(deptKey).setExtension(LongRangeQuery.query, LongRangeQuery.newBuilder().setMin(0).setMinInclusive(true).build())
           }
         }
         groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery2).setOccur(occur)
