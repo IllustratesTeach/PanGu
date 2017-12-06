@@ -132,7 +132,9 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
   def convertGafisPerson2TPCard(person: GafisPerson, photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard = {
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
-    tpCard.setStrPersonID(person.personid)
+    tpCard.setStrMisPersonID(person.personid)
+    tpCard.setStrJingZongPersonId(person.jingZongPersonId)
+    tpCard.setStrCasePersonID(person.casePersonid)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
@@ -214,9 +216,15 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
     //掌纹数据
     if (palmList != null) {
-      palmList.foreach { palm =>
+      //指纹数据
+      val mntMap = palmList.filter(_.groupId == 0).map(f => (f.fgp, f.gatherData)).toMap[(Short), Array[Byte]]
+      palmList.filter(_.groupId == 1)foreach { palm =>
         val blobBuilder = tpCard.addBlobBuilder()
         blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
+        val mnt = mntMap.get(palm.fgp)
+        mnt.foreach { blob =>
+          blobBuilder.setStMntBytes(ByteString.copyFrom(blob))
+        }
         palm.fgp match {
           case 11 =>
             blobBuilder.setType(ImageType.IMAGETYPE_PALM)
