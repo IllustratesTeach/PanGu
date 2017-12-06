@@ -186,6 +186,8 @@ object FPT5MntConverter {
             scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
         }
         scoreDeltaStruts.nClass = d.palmTrianglePostionTypeCode.toByte
+        scoreDeltaStruts.bEdited = 1
+        scoreDeltaStruts.bIsExist = 1
         scoreDeltaStrutsArray += scoreDeltaStruts
     }
     mntDisp.stPm.nPatternDeltaCnt = scoreDeltaStrutsArray.size.toByte
@@ -200,6 +202,7 @@ object FPT5MntConverter {
           ,t.fingerFeaturePointYCoordinate.toShort
           ,t.fingerFeaturePointDirection
           ,t.fingerFeaturePointQuality.toShort,pstmnt)
+        pstmnt.nFlag = 1
         AFISMNTPOINTSTRUCTList += pstmnt
     }
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
