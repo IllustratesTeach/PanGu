@@ -148,6 +148,7 @@ object FPT5MntConverter {
           ,t.fingerFeaturePointQuality.toShort,pstmnt)
         AFISMNTPOINTSTRUCTList += pstmnt
     }
+    mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
     mntDisp
@@ -178,7 +179,7 @@ object FPT5MntConverter {
         scoreDeltaStruts = new AFISCOREDELTASTRUCT
         scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
         scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
-        scoreDeltaStruts.z = d.latentPalmTrianglePointFeatureRange.toShort
+        scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
         d.latentPalmDeltaDirection.foreach{
           t =>
             scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
@@ -186,8 +187,9 @@ object FPT5MntConverter {
         }
         scoreDeltaStruts.nClass = d.palmTrianglePostionTypeCode.toByte
         scoreDeltaStrutsArray += scoreDeltaStruts
-        mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
     }
+    mntDisp.stPm.nPatternDeltaCnt = scoreDeltaStrutsArray.size.toByte
+    mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
     var pstmnt:AFISMNTPOINTSTRUCT = null
@@ -200,6 +202,7 @@ object FPT5MntConverter {
           ,t.fingerFeaturePointQuality.toShort,pstmnt)
         AFISMNTPOINTSTRUCTList += pstmnt
     }
+    mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
 
@@ -441,17 +444,23 @@ object FPT5MntConverter {
       latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta = deltaArray.toArray
     }
 
-    if(mntDisp.stPm.nPatternCoreCnt.toInt > 0){
+    val latentPalmMinutiaSet = new LatentPalmMinutiaSet
+    val nMaxMnt:Int = 1800/9
+    var ntemp:Int = mntDisp.stCm.nMntCnt
+    if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
+    if (ntemp > 0) {
       var minutiaArray = new ArrayBuffer[gfpt5lib.LatentPalmMinutia]
-      var minutia:gfpt5lib.LatentPalmMinutia = null
-      for(i <- 0 until mntDisp.stPm.nPatternCoreCnt){
+      var minutia: gfpt5lib.LatentPalmMinutia = null
+      for (i <- 0 until ntemp) {
         minutia = new gfpt5lib.LatentPalmMinutia
-        minutia.fingerFeaturePointXCoordinate = mntDisp.stPm.PatternCore(i).x
-        minutia.fingerFeaturePointYCoordinate = mntDisp.stPm.PatternCore(i).y
-        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stPm.PatternCore(i).z)
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
         minutiaArray += minutia
       }
-      latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia = minutiaArray.toArray
+      latentPalmMinutiaSet.latentPalmMinutia = minutiaArray.toArray
+      latentPalmFeatureMsg.latentPalmMinutiaSet = latentPalmMinutiaSet
     }
     latentPalmFeatureMsg.latentPalmFeatureExtractMethodCode = fpt4code.EXTRACT_METHOD_M
     latentPalmFeatureMsg

@@ -5,6 +5,7 @@ import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v70.gz.Constant
@@ -27,7 +28,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     */
   @Transactional
   override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
-    val casePalm= ProtobufConverter.convertLPCard2GafisCasePalm(lpCard)
+    val casePalm= convertLPCard2GafisCasePalm(lpCard)
     val casePalmMnt = ProtobufConverter.convertLPCard2GafisCasePalmMnt(lpCard)
     val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
     val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
@@ -78,7 +79,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
   @Transactional
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val casePalm = GafisCasePalm.find(lpCard.getStrCardID)
-    ProtobufConverter.convertLPCard2GafisCasePalm(lpCard, casePalm)
+    convertLPCard2GafisCasePalm(lpCard, casePalm)
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(casePalm.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
@@ -182,5 +183,47 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
       casePalm.pattern.split(",").foreach(f => blobBuilder.addRp(PatternType.valueOf(f)))
 
     lpCard.build()
+  }
+
+  /**
+    * 现场掌纹protobuf转为GafisPalm
+    *
+    * @param lpCard
+    * @param casePalm
+    * @return
+    */
+  def convertLPCard2GafisCasePalm(lpCard: LPCard, casePalm: GafisCasePalm = new GafisCasePalm()): GafisCasePalm = {
+    casePalm.palmId = lpCard.getStrCardID
+    //5.0新加
+    casePalm.physicalEvidenceNo = lpCard.getStrPhysicalId
+    val text = lpCard.getText
+    casePalm.caseId = text.getStrCaseId
+    casePalm.seqNo = text.getStrSeq
+    casePalm.remainPlace = text.getStrRemainPlace
+    casePalm.ridgeColor = text.getStrRidgeColor
+    casePalm.isCorpse = if(text.getBDeadBody) "1" else "0"
+    casePalm.corpseNo = text.getStrDeadPersonNo
+    casePalm.isAssist = text.getNXieChaState.toString
+    casePalm.matchStatus = text.getNBiDuiState.toString
+    casePalm.developMethod = text.getStrCaptureMethod
+    casePalm.remark = text.getStrComment
+
+    //操作信息
+    val admData = lpCard.getAdmData
+    if(admData != null){
+      casePalm.inputpsn = admData.getCreator
+      casePalm.modifiedpsn = admData.getUpdator
+      casePalm.creatorUnitCode = admData.getCreateUnitCode
+      if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
+        casePalm.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }
+      if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
+        casePalm.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
+      }
+    }
+
+    val blob = lpCard.getBlob
+    casePalm.palmImg = blob.getStImageBytes.toByteArray
+    casePalm
   }
 }
