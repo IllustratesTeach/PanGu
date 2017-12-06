@@ -335,7 +335,10 @@ class GafisPerson extends ActiveRecord {
   var reuseStatus: java.lang.String = _
   @Column(name = "OLD_PERSONID", length = 23)
   var oldPersonid: java.lang.String = _
-
+  @Column(name = "PSIS_NO", length = 32)
+  var jingZongPersonId: java.lang.String = _
+  @Column(name = "XZ_PERSON_ID", length = 32)
+  var casePersonid: java.lang.String = _
 
   def this(personid: java.lang.String) {
     this()
