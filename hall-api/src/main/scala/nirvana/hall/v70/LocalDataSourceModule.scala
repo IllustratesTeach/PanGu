@@ -7,6 +7,7 @@ import javax.sql.DataSource
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.v70.config.HallV70Config
+import org.apache.tapestry5.ioc.Configuration
 import org.apache.tapestry5.ioc.annotations.EagerLoad
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub
 import org.slf4j.Logger
@@ -98,5 +99,9 @@ object LocalDataSourceModule {
     migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
 
     dataSource
+  }
+  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
+    configuration.add("nirvana.hall.v70.jpa")
+    configuration.add("nirvana.hall.api.jpa")
   }
 }
