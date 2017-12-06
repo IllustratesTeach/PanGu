@@ -471,6 +471,9 @@ object FPT5Converter {
       latentImageMsg.latentFingerConnectFingerEndPhysicalId = lpcard.getText.getStrEnd //现场指纹_连指结束_现场物证编号
       latentImageMsg.latentFingerComparisonStatusCode = lpcard.getText.getNBiDuiState.toString //现场指纹_指纹比对状态代码
       latentImageMsg.latentFingerCustomInfo = lpcard.getText.getStrComment.getBytes() //现场指纹_自定义信息
+      latentImageMsg.latentFingerAnalysisPostionBrief = "1234567890"
+      latentImageMsg.latentFingerPatternAnalysisBrief = "1234567"
+
       val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lpcard.getBlob.getStImageBytes.toByteArray)
       FPT5ImageConverter.convertGAFISIMAGESTRUCT2LatentFingerImageMsg(gafisImage, latentImageMsg)
       if (lpcard.getBlob.getStMnt.nonEmpty) {//判断是否有特征
@@ -483,6 +486,9 @@ object FPT5Converter {
         }else{
           latentFeatureMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
         }
+        latentFeatureMsg.latentFeatureGroupIdentifier = "520000110000123"
+        latentFeatureMsg.fingerAnalysisPostionBrief = "1234567890"
+        latentFeatureMsg.fingerPatternAnalysisBrief = "1234567"
         //TODO 指位和纹型转换, 指纹方向
         lpcard.getBlob.getFgpList.foreach{fgp=>
           //          latentImageMsg.latentFingerAnalysisPostionBrief = fgp
