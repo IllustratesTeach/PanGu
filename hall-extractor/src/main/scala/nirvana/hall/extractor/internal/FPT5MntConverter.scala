@@ -313,36 +313,43 @@ object FPT5MntConverter {
     if(mntDisp.stPm.nPatternDeltaCnt.toInt >0){
       var deltaArray = new ArrayBuffer[Delta]
       var delta:Delta = null
-      var deltaDirectionArray  = new ArrayBuffer[DeltaDirection]
       var deltaDirection:DeltaDirection = null
-      mntDisp.stPm.PatternDelta.foreach{
-        t =>
-          delta = new Delta
-          delta.palmTrianglePointFeatureXCoordinate = t.x
-          delta.palmTrianglePointFeatureYCoordinate = t.y
-          delta.palmTrianglePointFeatureCoodinateRange = t.z
-          deltaDirection = new DeltaDirection
-          deltaDirection.palmTrianglePointFeatureDirection = t.nRadius
-          deltaDirection.palmTrianglePointFeatureDirectionRange = t.nzVarRange
-          deltaDirectionArray += deltaDirection
-          delta.deltaDirection = deltaDirectionArray.toArray
-          deltaArray += delta
+      val deltaSet = new DeltaSet
+      for(i <- 0 until mntDisp.stPm.nPatternDeltaCnt){
+        val t = mntDisp.stPm.PatternDelta(i)
+        var deltaDirectionArray  = new ArrayBuffer[DeltaDirection]
+        delta = new Delta
+        delta.palmTrianglePointFeatureXCoordinate = t.x
+        delta.palmTrianglePointFeatureYCoordinate = t.y
+        delta.palmTrianglePointFeatureCoodinateRange = t.z
+        deltaDirection = new DeltaDirection
+        deltaDirection.palmTrianglePointFeatureDirection = t.nRadius
+        deltaDirection.palmTrianglePointFeatureDirectionRange = t.nzVarRange
+        deltaDirectionArray += deltaDirection
+        delta.deltaDirection = deltaDirectionArray.toArray
+        deltaArray += delta
       }
-      palmMsg.deltaSet.delta = deltaArray.toArray
+      deltaSet.delta = deltaArray.toArray
+      palmMsg.deltaSet = deltaSet
     }
 
-    if(mntDisp.stPm.nPatternCoreCnt.toInt > 0){
+    val palmMinutiaSet = new PalmMinutiaSet
+    val nMaxMnt:Int = 1800/9
+    var ntemp:Int = mntDisp.stCm.nMntCnt
+    if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
+    if (ntemp > 0) {
       var minutiaArray = new ArrayBuffer[gfpt5lib.PalmMinutia]
-      var minutia:gfpt5lib.PalmMinutia = null
-      mntDisp.stPm.PatternCore.foreach{
-        t =>
-          minutia = new gfpt5lib.PalmMinutia
-          minutia.fingerFeaturePointXCoordinate = t.x
-          minutia.fingerFeaturePointYCoordinate = t.y
-          minutia.fingerFeatureDirection = t.z
-          minutiaArray += minutia
+      var minutia: gfpt5lib.PalmMinutia = null
+      for (i <- 0 until ntemp) {
+        minutia = new gfpt5lib.PalmMinutia
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
+        minutia.fingerFeatureDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeatureQuality = mntDisp.stCm.mnt(i).nFlag.toInt
+        minutiaArray += minutia
       }
-      palmMsg.palmMinutiaSet.palmMinutia = minutiaArray.toArray
+      palmMinutiaSet.palmMinutia = minutiaArray.toArray
+      palmMsg.palmMinutiaSet = palmMinutiaSet
     }
     palmMsg
   }
