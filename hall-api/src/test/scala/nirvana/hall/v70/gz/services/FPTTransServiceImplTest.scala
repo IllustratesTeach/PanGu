@@ -7,7 +7,7 @@ import monad.support.services.XmlLoader
 import nirvana.hall.api.services.FPTTransService
 import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.protocol.api.FPTTrans.ExportType
-import nirvana.hall.v70.gz.sys.BaseV70TestCase
+import nirvana.hall.v70.internal.BaseV70TestCase
 import org.apache.commons.io.FileUtils
 import org.junit.{Assert, Test}
 

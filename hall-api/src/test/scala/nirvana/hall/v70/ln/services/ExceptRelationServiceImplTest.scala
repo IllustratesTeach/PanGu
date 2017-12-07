@@ -3,7 +3,7 @@ package nirvana.hall.v70.ln.services
 import java.io.FileOutputStream
 
 import nirvana.hall.api.services.ExceptRelationService
-import nirvana.hall.v70.ln.BaseV70TestCase
+import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.Test
 
 /**
