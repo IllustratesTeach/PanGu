@@ -394,13 +394,13 @@ class FPT5File {
         @XmlElement(name = "zhw_zzhwtztqfsdm")
         var palmFeatureExtractionMethodCode:String = _
         @XmlElement(name = "coreLikePatternSet")
-        var coreLikePatternSet = new CoreLikePatternSet
+        var coreLikePatternSet:CoreLikePatternSet = _
         @XmlElement(name = "deltaSet")
-        var deltaSet = new DeltaSet
+        var deltaSet:DeltaSet = _
         @XmlElement(name = "deltaDirection")
-        var deltaDirection = new DeltaDirection
+        var deltaDirection:DeltaDirection = _
         @XmlElement(name = "minutiaSet")
-        var palmMinutiaSet = new PalmMinutiaSet
+        var palmMinutiaSet:PalmMinutiaSet = _
         @XmlElement(name = "zhw_zdyxx")
         var palmCustomInfo:Array[Byte] = _
         @XmlElement(name = "zhw_txspfxcd")
