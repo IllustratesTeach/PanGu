@@ -28,7 +28,7 @@ class GafisCase extends ActiveRecord {
   var caseId: java.lang.String = _
   @Column(name = "CARD_ID", length = 23)
   var cardId: java.lang.String = _
-  @Column(name = "CASE_CLASS_CODE", length = 6)
+  @Column(name = "CASE_CLASS_CODE", length = 8)
   var caseClassCode: java.lang.String = _
   @Temporal(TemporalType.DATE)
   @Column(name = "CASE_OCCUR_DATE", length = 8)
@@ -104,9 +104,9 @@ class GafisCase extends ActiveRecord {
   var assistRevokeSign: java.lang.String = _
   @Column(name = "CASE_SYSTEM_ID", length = 32)
   var caseSystemId: java.lang.String = _
-  @Column(name = "CASE_CLASS_CODE2", length = 6)
+  @Column(name = "CASE_CLASS_CODE2", length = 8)
   var caseClassCode2: java.lang.String = _
-  @Column(name = "CASE_CLASS_CODE3", length = 6)
+  @Column(name = "CASE_CLASS_CODE3", length = 8)
   var caseClassCode3: java.lang.String = _
   @Column(name = "SUSPICIOUS_AREA_CODE2", length = 6)
   var suspiciousAreaCode2: java.lang.String = _

@@ -21,11 +21,10 @@ object FPT5MntConverter {
     * fpt现场指纹特征转换为6.2xgw特征
     * @param fingerImageMsg 单枚现场指纹的图像信息
     * @param fingerFeatureMsg 单枚现场指纹的特征信息
-    * @param minutiaSet 单枚现场指纹的特征点集合
     * @return
     */
-  def convertFingerLDataMnt2GafisMnt(fingerImageMsg:LatentFingerImageMsg,fingerFeatureMsg: LatentFingerFeatureMsg,minutiaSet:LatentMinutiaSet): GAFISIMAGESTRUCT={
-    val mntDisp = convertFingerLDataMnt2MntDisp(fingerImageMsg,fingerFeatureMsg,minutiaSet)
+  def convertFingerLDataMnt2GafisMnt(fingerImageMsg:LatentFingerImageMsg,fingerFeatureMsg: LatentFingerFeatureMsg): GAFISIMAGESTRUCT={
+    val mntDisp = convertFingerLDataMnt2MntDisp(fingerImageMsg,fingerFeatureMsg)
     //此处结构传入到JNI层需要采用低字节序
     val dispBytes = mntDisp.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     val bytes: Array[Byte] = new Array[Byte](640)
@@ -54,13 +53,10 @@ object FPT5MntConverter {
     * fpt现场掌纹特征转6.2xgw特征
     * @param latentPalmImageMsg 单枚现场掌纹的图像信息
     * @param latentPalmFeatureMsg 单枚现场掌纹的特征信息
-    * @param minutiaSet  单枚现场掌纹的特征点集合
     * @return
     */
-  def convertPalmLDataMnt2GafisMnt(latentPalmImageMsg:LatentPalmImageMsg,latentPalmFeatureMsg: LatentPalmFeatureMsg,minutiaSet:LatentPalmMinutiaSet):GAFISIMAGESTRUCT={
-    if(minutiaSet.latentPalmMinutia.isEmpty)
-      return null
-    val mntDisp = convertPalmLDataMnt2MntDisp(latentPalmImageMsg,latentPalmFeatureMsg,minutiaSet)
+  def convertPalmLDataMnt2GafisMnt(latentPalmImageMsg:LatentPalmImageMsg,latentPalmFeatureMsg: LatentPalmFeatureMsg):GAFISIMAGESTRUCT={
+    val mntDisp = convertPalmLDataMnt2MntDisp(latentPalmImageMsg,latentPalmFeatureMsg)
     //此处结构传入到JNI层需要采用低字节序
     val dispBytes = mntDisp.toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     val bytes: Array[Byte] = new Array[Byte](640) //捺印掌纹大小是多少？？？
@@ -92,10 +88,9 @@ object FPT5MntConverter {
     * fpt现场指纹特征转换为MNTDISPSTRUCT
     * @param fingerImageMsg 现场指纹信息
     * @param fingerFeatureMsg 现场指纹特征信息
-    * @param minutiaSet 单枚现场掌纹特征点集合
     * @return
     */
-  private def convertFingerLDataMnt2MntDisp(fingerImageMsg:LatentFingerImageMsg,fingerFeatureMsg: LatentFingerFeatureMsg,minutiaSet:LatentMinutiaSet): MNTDISPSTRUCT={
+  private def convertFingerLDataMnt2MntDisp(fingerImageMsg:LatentFingerImageMsg,fingerFeatureMsg: LatentFingerFeatureMsg): MNTDISPSTRUCT={
     val mntDisp = new MNTDISPSTRUCT
     mntDisp.bIsLatent = 1
     mntDisp.bIsPalm = 0
@@ -139,7 +134,7 @@ object FPT5MntConverter {
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
     var pstmnt:AFISMNTPOINTSTRUCT = null
-    minutiaSet.latentMinutia.foreach{
+    fingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach{
       t =>
         pstmnt = new AFISMNTPOINTSTRUCT
         UTIL_Minutia_OneFPT2MntDisp(t.fingerFeaturePointXCoordinate.toShort
@@ -148,6 +143,7 @@ object FPT5MntConverter {
           ,t.fingerFeaturePointQuality.toShort,pstmnt)
         AFISMNTPOINTSTRUCTList += pstmnt
     }
+    mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
     mntDisp
@@ -159,10 +155,9 @@ object FPT5MntConverter {
     * 现场掌纹fpt特征转换MNTDISPSTRUCT
     * 现场掌纹包括：折返点（目前金指没有）；三角点、特征点
     * @param latentPalmImageMsg 单个掌纹信息
-    * @param minutiaSet 单个掌纹特征点集合
     * @return
     */
-  private def convertPalmLDataMnt2MntDisp(latentPalmImageMsg:LatentPalmImageMsg,latentPalmFeatureMsg: LatentPalmFeatureMsg,minutiaSet:LatentPalmMinutiaSet): MNTDISPSTRUCT={
+  private def convertPalmLDataMnt2MntDisp(latentPalmImageMsg:LatentPalmImageMsg,latentPalmFeatureMsg: LatentPalmFeatureMsg): MNTDISPSTRUCT={
     val mntDisp = new MNTDISPSTRUCT
     mntDisp.bIsLatent = 1
     mntDisp.bIsPalm = 1
@@ -178,28 +173,33 @@ object FPT5MntConverter {
         scoreDeltaStruts = new AFISCOREDELTASTRUCT
         scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
         scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
-        scoreDeltaStruts.z = d.latentPalmTrianglePointFeatureRange.toShort
+        scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
         d.latentPalmDeltaDirection.foreach{
           t =>
             scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
             scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
         }
         scoreDeltaStruts.nClass = d.palmTrianglePostionTypeCode.toByte
+        scoreDeltaStruts.bEdited = 1
+        scoreDeltaStruts.bIsExist = 1
         scoreDeltaStrutsArray += scoreDeltaStruts
-        mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
     }
+    mntDisp.stPm.nPatternDeltaCnt = scoreDeltaStrutsArray.size.toByte
+    mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
     var pstmnt:AFISMNTPOINTSTRUCT = null
-    minutiaSet.latentPalmMinutia.foreach{
+    latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.foreach{
       t =>
         pstmnt = new AFISMNTPOINTSTRUCT
         UTIL_Minutia_OneFPT2MntDisp(t.fingerFeaturePointXCoordinate.toShort
           ,t.fingerFeaturePointYCoordinate.toShort
           ,t.fingerFeaturePointDirection
           ,t.fingerFeaturePointQuality.toShort,pstmnt)
+        pstmnt.nFlag = 1
         AFISMNTPOINTSTRUCTList += pstmnt
     }
+    mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
 
@@ -441,17 +441,23 @@ object FPT5MntConverter {
       latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta = deltaArray.toArray
     }
 
-    if(mntDisp.stPm.nPatternCoreCnt.toInt > 0){
+    val latentPalmMinutiaSet = new LatentPalmMinutiaSet
+    val nMaxMnt:Int = 1800/9
+    var ntemp:Int = mntDisp.stCm.nMntCnt
+    if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
+    if (ntemp > 0) {
       var minutiaArray = new ArrayBuffer[gfpt5lib.LatentPalmMinutia]
-      var minutia:gfpt5lib.LatentPalmMinutia = null
-      for(i <- 0 until mntDisp.stPm.nPatternCoreCnt){
+      var minutia: gfpt5lib.LatentPalmMinutia = null
+      for (i <- 0 until ntemp) {
         minutia = new gfpt5lib.LatentPalmMinutia
-        minutia.fingerFeaturePointXCoordinate = mntDisp.stPm.PatternCore(i).x
-        minutia.fingerFeaturePointYCoordinate = mntDisp.stPm.PatternCore(i).y
-        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stPm.PatternCore(i).z)
+        minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
+        minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
         minutiaArray += minutia
       }
-      latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia = minutiaArray.toArray
+      latentPalmMinutiaSet.latentPalmMinutia = minutiaArray.toArray
+      latentPalmFeatureMsg.latentPalmMinutiaSet = latentPalmMinutiaSet
     }
     latentPalmFeatureMsg.latentPalmFeatureExtractMethodCode = fpt4code.EXTRACT_METHOD_M
     latentPalmFeatureMsg

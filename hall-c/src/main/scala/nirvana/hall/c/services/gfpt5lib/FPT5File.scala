@@ -1264,9 +1264,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
