@@ -2,7 +2,8 @@ package nirvana.hall.extractor.internal
 
 import java.nio.ByteOrder
 
-import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gfpt4lib.{fpt4code, fpt4util}
+import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.gfpt5lib
 import nirvana.hall.c.services.gfpt5lib.fpt5util._
 import nirvana.hall.c.services.gfpt5lib.{LatentFingerFeatureMsg, LatentPalmFeatureMsg, PalmMsg, _}
@@ -98,50 +99,51 @@ object FPT5MntConverter {
     mntDisp.nHeight = fingerImageMsg.latentFingerImageVerticalDirectionLength.toShort
     mntDisp.nWidth = fingerImageMsg.latentFingerImageHorizontalDirectionLength.toShort
 
-    GfAlg_MntDispMntInitial(mntDisp)
+    fpt4util.GfAlg_MntDispMntInitial(mntDisp)
 
     //现场的分析指位和纹型
     mntDisp.stFg.FingerCode = fingerImageMsg.latentFingerAnalysisPostionBrief
     mntDisp.stFg.RpCode = UTIL_LatPattern_FPT2MntDisp(fingerImageMsg.latentFingerPatternAnalysisBrief)
 
-    val fca=UTIL_Direction_FPT2MntDisp(fingerImageMsg.latentFingerFeatureDirection.toString)
+    val fca = UTIL_Direction_FPT2MntDisp(fingerImageMsg.latentFingerFeatureDirection.toString)
     mntDisp.stCm.fca = fca._1
     mntDisp.stCm.D_fca = fca._2
-    UTIL_CoreDelta_FPT2MntDisp(fingerFeatureMsg.fingerCenterPointFeatureXCoordinate
-      , fingerFeatureMsg.fingerCenterPointFeatureYCoordinate
+
+    val centerPointCoreDelta = CoreDelta(fingerFeatureMsg.fingerCenterPointFeatureXCoordinate
+      ,fingerFeatureMsg.fingerCenterPointFeatureYCoordinate
       ,fingerFeatureMsg.fingerCenterPointFeatureCoordinateRange
       ,fingerFeatureMsg.fingerCenterPointFeatureDirection
       ,fingerFeatureMsg.fingerCenterPointFeatureDirectionRange
-      ,fingerFeatureMsg.fingerCenterPointFeatureReliabilityLevel,mntDisp.stFg.upcore,UTIL_COREDELTA_TYPE_UPCORE)
-    UTIL_CoreDelta_FPT2MntDisp(fingerFeatureMsg.fingerSlaveCenterFeatureXCoordinate
-      , fingerFeatureMsg.fingerSlaveCenterFeatureYCoordinate
+      ,fingerFeatureMsg.fingerCenterPointFeatureReliabilityLevel)
+    convertCoreDelta2AFISCOREDELTASTRUCT(centerPointCoreDelta, mntDisp.stFg.upcore,UTIL_COREDELTA_TYPE_UPCORE)
+
+    val slaveCenterCoreDelta = CoreDelta(fingerFeatureMsg.fingerSlaveCenterFeatureXCoordinate
+      ,fingerFeatureMsg.fingerSlaveCenterFeatureYCoordinate
       ,fingerFeatureMsg.fingerSlaveCenterFeatureCoordinateRange
       ,fingerFeatureMsg.fingerSlaveCenterFeatureDirection
       ,fingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange
-      ,fingerFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel,mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_VICECORE)
-    UTIL_CoreDelta_FPT2MntDisp(fingerFeatureMsg.fingerLeftTriangleFeatureXCoordinate
-      , fingerFeatureMsg.fingerLeftTriangleFeatureYCoordinate
+      ,fingerFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel)
+    convertCoreDelta2AFISCOREDELTASTRUCT(slaveCenterCoreDelta, mntDisp.stFg.lowcore,UTIL_COREDELTA_TYPE_VICECORE)
+
+    val leftTriangleCoreDelta = CoreDelta(fingerFeatureMsg.fingerLeftTriangleFeatureXCoordinate
+      ,fingerFeatureMsg.fingerLeftTriangleFeatureYCoordinate
       ,fingerFeatureMsg.fingerLeftTriangleFeatureCoordinateRange
       ,fingerFeatureMsg.fingerLeftTriangleFeatureDirection
       ,fingerFeatureMsg.fingerLeftTriangleFeatureDirectionRange
-      ,fingerFeatureMsg.fingerLeftTriangleFeatureReliabilityLevel,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
-    UTIL_CoreDelta_FPT2MntDisp(fingerFeatureMsg.fingerRightTriangleFeatureXCoordinate
-      , fingerFeatureMsg.fingerRightTriangleFeatureYCoordinate
+      ,fingerFeatureMsg.fingerLeftTriangleFeatureReliabilityLevel)
+    convertCoreDelta2AFISCOREDELTASTRUCT(leftTriangleCoreDelta, mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
+
+    val rightTriangleCoreDelta = CoreDelta(fingerFeatureMsg.fingerRightTriangleFeatureXCoordinate
+      ,fingerFeatureMsg.fingerRightTriangleFeatureYCoordinate
       ,fingerFeatureMsg.fingerRightTriangleFeatureCoordinateRange
       ,fingerFeatureMsg.fingerRightTriangleFeatureDirection
       ,fingerFeatureMsg.fingerRightTriangleFeatureDirectionRange
-      ,fingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
+      ,fingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel)
+    convertCoreDelta2AFISCOREDELTASTRUCT(rightTriangleCoreDelta, mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
-    var pstmnt:AFISMNTPOINTSTRUCT = null
-    fingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach{
-      t =>
-        pstmnt = new AFISMNTPOINTSTRUCT
-        UTIL_Minutia_OneFPT2MntDisp(t.fingerFeaturePointXCoordinate.toShort
-          ,t.fingerFeaturePointYCoordinate.toShort
-          ,t.fingerFeaturePointDirection
-          ,t.fingerFeaturePointQuality.toShort,pstmnt)
-        AFISMNTPOINTSTRUCTList += pstmnt
+    fingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach{ minutia =>
+        AFISMNTPOINTSTRUCTList += convertMinutia2AFISMNTPOINTSTRUCT(minutia)
     }
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
@@ -189,15 +191,8 @@ object FPT5MntConverter {
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
     var pstmnt:AFISMNTPOINTSTRUCT = null
-    latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.foreach{
-      t =>
-        pstmnt = new AFISMNTPOINTSTRUCT
-        UTIL_Minutia_OneFPT2MntDisp(t.fingerFeaturePointXCoordinate.toShort
-          ,t.fingerFeaturePointYCoordinate.toShort
-          ,t.fingerFeaturePointDirection
-          ,t.fingerFeaturePointQuality.toShort,pstmnt)
-        pstmnt.nFlag = 1
-        AFISMNTPOINTSTRUCTList += pstmnt
+    latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.foreach{ minutia =>
+        AFISMNTPOINTSTRUCTList += convertMinutia2AFISMNTPOINTSTRUCT(minutia)
     }
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
@@ -243,32 +238,32 @@ object FPT5MntConverter {
     fingerMsg.fingerPatternMasterCode = mntDisp.stFg.rp.toString
     fingerMsg.fingerPatternSlaveCode = mntDisp.stFg.vrp.toString
 
-    val util_featureDir = UTIL_Direction_MntDisp2FPT(mntDisp)
-    fingerMsg.fingerFeatureDirection = util_featureDir.direction
-    fingerMsg.fingerFeatureDirectionRange = util_featureDir.range
+    val featureDirection = convertMntDisp2FeatureDirection(mntDisp)
+    fingerMsg.fingerFeatureDirection = featureDirection._1
+    fingerMsg.fingerFeatureDirectionRange = featureDirection._2
     if(mntDisp.stFg.upcore.bIsExist > 0) {
       //中心点
-      val centerPointInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
+      val centerPointInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
       fingerMsg.fingerCenterPointFeatureXCoordinate = centerPointInfo.x
       fingerMsg.fingerCenterPointFeatureYCoordinate = centerPointInfo.y
       fingerMsg.fingerCenterPointFeatureCoordinateRange = centerPointInfo.nRadius
-      fingerMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3.toInt
-      fingerMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2.toInt
+      fingerMsg.fingerCenterPointFeatureDirection = centerPointInfo.featureDirection
+      fingerMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.featureDirectionRange
       fingerMsg.fingerCenterPointFeatureReliabilityLevel = centerPointInfo.nReliability
     }
     if(mntDisp.stFg.lowcore.bIsExist > 0){
       //副中心
-      val slaveCenterPointInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
+      val slaveCenterPointInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
       fingerMsg.fingerSlaveCenterFeatureXCoordinate = slaveCenterPointInfo.x
       fingerMsg.fingerSlaveCenterFeatureYCoordinate = slaveCenterPointInfo.y
       fingerMsg.fingerSlaveCenterFeatureCoordinateRange = slaveCenterPointInfo.nRadius
-      fingerMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3.toInt
-      fingerMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2.toInt
+      fingerMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.featureDirection
+      fingerMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.featureDirectionRange
       fingerMsg.fingerSlaveCenterFeatureReliabilityLevel = slaveCenterPointInfo.nReliability
     }
       if(mntDisp.stFg.ldelta.bIsExist > 0){
         //左三角
-        val LeftTriangleInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
+        val LeftTriangleInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
         fingerMsg.fingerLeftTriangleFeatureXCoordinate = LeftTriangleInfo.x
         fingerMsg.fingerLeftTriangleFeatureYCoordinate = LeftTriangleInfo.y
         fingerMsg.fingerLeftTriangleFeatureCoordinateRange = LeftTriangleInfo.nRadius
@@ -276,7 +271,7 @@ object FPT5MntConverter {
       }
       if(mntDisp.stFg.rdelta.bIsExist > 0){
         //右三角
-        val rightTriangleInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_RDELTA)
+        val rightTriangleInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_RDELTA)
         fingerMsg.fingerRightTriangleFeatureXCoordinate = rightTriangleInfo.x
         fingerMsg.fingerRightTriangleFeatureYCoordinate = rightTriangleInfo.y
         fingerMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangleInfo.nRadius
@@ -293,8 +288,8 @@ object FPT5MntConverter {
         minutia = new gfpt5lib.Minutia
         minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
         minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
-        minutia.fingerFeatureDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
-        minutia.fingerFeatureQuality = mntDisp.stCm.mnt(i).nFlag.toInt
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
         minutiaArray += minutia
       }
       fingerMsg.fingerMinutiaSet.minutia = minutiaArray.toArray
@@ -302,7 +297,6 @@ object FPT5MntConverter {
     fingerMsg.fingerFeatureExtractionMethodCode = fpt4code.EXTRACT_METHOD_A
     fingerMsg
   }
-
 
   /**
     * 捺印掌纹MNTDISPSTRUCT转换FPT特征
@@ -344,8 +338,8 @@ object FPT5MntConverter {
         minutia = new gfpt5lib.PalmMinutia
         minutia.fingerFeaturePointXCoordinate = mntDisp.stCm.mnt(i).x
         minutia.fingerFeaturePointYCoordinate = mntDisp.stCm.mnt(i).y
-        minutia.fingerFeatureDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
-        minutia.fingerFeatureQuality = mntDisp.stCm.mnt(i).nFlag.toInt
+        minutia.fingerFeaturePointDirection = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.mnt(i).z)
+        minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
         minutiaArray += minutia
       }
       palmMinutiaSet.palmMinutia = minutiaArray.toArray
@@ -360,32 +354,32 @@ object FPT5MntConverter {
     * @return
     */
   private def convertLFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT, latentFingerFeatureMsg: LatentFingerFeatureMsg):LatentFingerFeatureMsg = {
-    val util_Direction = UTIL_Direction_MntDisp2FPT(mntDisp)
-    latentFingerFeatureMsg.fingerFeatureDirection = util_Direction.direction
-    latentFingerFeatureMsg.fingerFeatureDirectionRange = util_Direction.range
+    val featureDirection = convertMntDisp2FeatureDirection(mntDisp)
+    latentFingerFeatureMsg.fingerFeatureDirection = featureDirection._1
+    latentFingerFeatureMsg.fingerFeatureDirectionRange = featureDirection._2
     if(mntDisp.stFg.upcore.bIsExist > 0) {
       //中心点
-      val centerPointInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
+      val centerPointInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.upcore, UTIL_COREDELTA_TYPE_UPCORE)
       latentFingerFeatureMsg.fingerCenterPointFeatureXCoordinate = centerPointInfo.x
       latentFingerFeatureMsg.fingerCenterPointFeatureYCoordinate = centerPointInfo.y
       latentFingerFeatureMsg.fingerCenterPointFeatureCoordinateRange = centerPointInfo.nRadius
-      latentFingerFeatureMsg.fingerCenterPointFeatureDirection = centerPointInfo.szSP3.toInt
-      latentFingerFeatureMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.szSP2.toInt
+      latentFingerFeatureMsg.fingerCenterPointFeatureDirection = centerPointInfo.featureDirection
+      latentFingerFeatureMsg.fingerCenterPointFeatureDirectionRange = centerPointInfo.featureDirectionRange
       latentFingerFeatureMsg.fingerCenterPointFeatureReliabilityLevel = centerPointInfo.nReliability
     }
     if(mntDisp.stFg.lowcore.bIsExist > 0){
       //副中心
-      val slaveCenterPointInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
+      val slaveCenterPointInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.lowcore, UTIL_COREDELTA_TYPE_VICECORE)
       latentFingerFeatureMsg.fingerSlaveCenterFeatureXCoordinate = slaveCenterPointInfo.x
       latentFingerFeatureMsg.fingerSlaveCenterFeatureYCoordinate = slaveCenterPointInfo.y
       latentFingerFeatureMsg.fingerSlaveCenterFeatureCoordinateRange = slaveCenterPointInfo.nRadius
-      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.szSP3.toInt
-      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.szSP2.toInt
+      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirection = slaveCenterPointInfo.featureDirection
+      latentFingerFeatureMsg.fingerSlaveCenterFeatureDirectionRange = slaveCenterPointInfo.featureDirectionRange
       latentFingerFeatureMsg.fingerSlaveCenterFeatureReliabilityLevel = slaveCenterPointInfo.nReliability
     }
     if(mntDisp.stFg.ldelta.bIsExist > 0){
       //左三角
-      val LeftTriangleInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
+      val LeftTriangleInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
       latentFingerFeatureMsg.fingerLeftTriangleFeatureXCoordinate = LeftTriangleInfo.x
       latentFingerFeatureMsg.fingerLeftTriangleFeatureYCoordinate = LeftTriangleInfo.y
       latentFingerFeatureMsg.fingerLeftTriangleFeatureCoordinateRange = LeftTriangleInfo.nRadius
@@ -393,7 +387,7 @@ object FPT5MntConverter {
     }
     if(mntDisp.stFg.rdelta.bIsExist > 0){
       //右三角
-      val rightTriangleInfo = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_RDELTA)
+      val rightTriangleInfo = convertAFISCOREDELTASTRUCT2CoreDelta(mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_RDELTA)
       latentFingerFeatureMsg.fingerRightTriangleFeatureXCoordinate = rightTriangleInfo.x
       latentFingerFeatureMsg.fingerRightTriangleFeatureYCoordinate = rightTriangleInfo.y
       latentFingerFeatureMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangleInfo.nRadius
@@ -479,7 +473,7 @@ object FPT5MntConverter {
     val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
     NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)//1???
 
-    val mntDisp = new MNTDISPSTRUCT
-    mntDisp.fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
+    val mntDisp = new MNTDISPSTRUCT().fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
+    mntDisp
   }
 }

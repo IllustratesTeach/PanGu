@@ -197,9 +197,9 @@ class FPT5File {
         @XmlElement(name = "zwtzd_tzyzb")
         var fingerFeaturePointYCoordinate:Int = _
         @XmlElement(name = "zwtzd_tzfx")
-        var fingerFeatureDirection:Int = _
+        var fingerFeaturePointDirection:Int = _
         @XmlElement(name = "zwtzd_tzzl")
-        var fingerFeatureQuality:Int = _
+        var fingerFeaturePointQuality:Int = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -365,9 +365,9 @@ class FPT5File {
         @XmlElement(name = "zhwtzd_tzyzb")
         var fingerFeaturePointYCoordinate:Int = _
         @XmlElement(name = "zhwtzd_tzfx")
-        var fingerFeatureDirection:Int = _
+        var fingerFeaturePointDirection:Int = _
         @XmlElement(name = "zhwtzd_tzzl")
-        var fingerFeatureQuality:Int = _
+        var fingerFeaturePointQuality:Int = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

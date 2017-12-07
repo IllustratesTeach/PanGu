@@ -1,7 +1,7 @@
 package nirvana.hall.c.services.gfpt5lib
 
-import nirvana.hall.c.services.kernel.mnt_checker_def
-import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
+import nirvana.hall.c.services.gfpt4lib.fpt4util._
+import nirvana.hall.c.services.kernel.mnt_checker_def._
 
 /**
   * fpt5字典数据转换工具类
@@ -128,127 +128,6 @@ object fpt5util {
   val TT_MATCHED_MIRROR = "E" //镜像比中
 
 
-  /**
-    * 中心点、三角
-    */
-  final val UTIL_COREDELTA_TYPE_UPCORE = 1
-  final val UTIL_COREDELTA_TYPE_VICECORE = 2
-  final val UTIL_COREDELTA_TYPE_LDELTA = 3
-  final val UTIL_COREDELTA_TYPE_RDELTA = 4
-  final val UTIL_COREDELTA_TYPE_MINUTIA = 5
-
-
-
-  /**
-    * 初始化特征结构 xgw
-    * @param pmnt
-    */
-  def GfAlg_MntDispMntInitial(pmnt:MNTDISPSTRUCT): Unit ={
-    import nirvana.hall.c.services.kernel.mnt_def._
-    if (pmnt.bIsPalm == 0) {
-      if (pmnt.bIsLatent == 0) {
-        pmnt.nMax2PtLC = LINECOUNTSIZE.toShort
-        pmnt.nMaxEA = BLKMNTSIZE.toShort
-        pmnt.nMaxMnt = FTPMNTSIZE.toShort
-        pmnt.nMaxMntRegion = MNTPOSSIZE.toShort
-      } else {
-        pmnt.nMax2PtLC = LINECOUNTSIZE.toShort
-        pmnt.nMaxEA = BLKMNTSIZE.toShort
-        pmnt.nMaxMnt = FLPMNTSIZE.toShort
-        pmnt.nMaxMntRegion = MNTPOSSIZE.toShort
-      }
-    } else {
-      if (pmnt.bIsLatent == 0) {
-        pmnt.nMax2PtLC = LINECOUNTSIZE.toShort
-        pmnt.nMaxEA = BLKMNTSIZE.toShort
-        pmnt.nMaxMnt = PTPMNTSIZE.toShort
-        pmnt.nMaxMntRegion = MNTPOSSIZE.toShort
-      } else {
-        pmnt.nMax2PtLC = LINECOUNTSIZE.toShort
-        pmnt.nMaxEA = BLKMNTSIZE.toShort
-        pmnt.nMaxMnt = PLPMNTSIZE.toShort
-        pmnt.nMaxMntRegion = MNTPOSSIZE.toShort
-      }
-    }
-  }
-
-  def convertStringAsInt(string:String): Int={
-    if(string == null || string.trim.isEmpty) 0 else string.trim.toInt
-  }
-
-  /**
-    * 现场纹型转换
-    * @param pattern
-    * @return
-    */
-  def UTIL_LatPattern_FPT2MntDisp(pattern:String)=
-  {
-    pattern.trim.take(4).map(ch=>(ch - '0').asInstanceOf[Byte]).toArray
-    /*
-    val RpCode= Array[Byte](4)
-    RpCode(0) = pattern.charAt(0) - '0';	//!< 弓型纹
-    RpCode(1) = pszValue[1] - '0';	//!< 左箕纹
-    RpCode(2) = pszValue[2] - '0';	//!< 右箕纹
-    RpCode(3) = pszValue[3] - '0';	//!< 斗型纹
-    */
-    //ByteBuffer.wrap(bytes).getInt
-  }
-  def UTIL_LatPattern_MntDisp2FPT(rpCode: Array[Byte]): String={
-    var pattern = ""
-    rpCode.foreach{nValue =>
-      if(nValue == 1){
-        pattern += "1"
-      }else{
-        pattern += "0"
-      }
-    }
-
-    pattern
-  }
-
-  /**
-    * 指纹方向转换
-    * @param direction
-    * @return
-    */
-  def UTIL_Direction_FPT2MntDisp(direction:String):(Short,Short)=
-  {
-    if(direction.length!=5)
-      return (UTIL_Angle_FPT2MntDisp(0),0)
-
-    val fca = UTIL_Angle_FPT2MntDisp(direction.take(3).trim().toInt)
-    val D_fca = direction.drop(3).trim().toInt
-
-    (fca.toShort,D_fca.toShort)
-  }
-
-  case class FeatureDirection(direction:Int,range:Int)
-  def UTIL_Direction_MntDisp2FPT(mntDisp: MNTDISPSTRUCT): FeatureDirection ={
-    val nFPTAngle = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.fca)
-    new FeatureDirection(nFPTAngle,mntDisp.stCm.D_fca)
-  }
-
-  /**
-    * 角度转换
-    * @param p_nFPTAngle
-    * @return
-    */
-  def UTIL_Angle_FPT2MntDisp(p_nFPTAngle:Int):Short= // [0, 360) --> [-90, 270)
-  {
-    var nFPTAngle = p_nFPTAngle
-    nFPTAngle += 90
-    while ( nFPTAngle >= 270 ) nFPTAngle -= 360
-    while ( nFPTAngle < -90 ) nFPTAngle += 360
-
-    nFPTAngle.toShort
-  }
-  def UTIL_Angle_MntDisp2FPT(fca: Short): Int ={
-    var nFPT = fca - 90
-    while (nFPT < 0) nFPT += 360
-    while (nFPT >= 360) nFPT -= 360
-
-    nFPT
-  }
 
   /**
     * 中心，三角转换
@@ -256,182 +135,98 @@ object fpt5util {
     * 9-11位为方向，12-13位为方向范围，
     * 14位表示可靠度（1-3可靠度依次递减）。
     * 无有效值的数据用ASCII码空格（SP）填写，采用GB/T 1988-1998
-    *
-    * @param stCoreDelta
-    * @param nType
     */
-  def UTIL_CoreDelta_FPT2MntDisp(szCoreDeltaX:Int
-                                 , szCoreDeltaY:Int
-                                 ,szCoreDeltaNRadius:Int
-                                 ,szCoreDeltaDirection:Int
-                                 ,szCoreDeltaDirectionRange:Int
-                                 ,szCoreDeltaReliability:Int
-                                 ,stCoreDelta:AFISCOREDELTASTRUCT, nType:Int):Unit=
-  {
-
-    stCoreDelta.x = szCoreDeltaX.toShort
-
-    stCoreDelta.y = szCoreDeltaY.toShort
-
-    stCoreDelta.nRadius = szCoreDeltaNRadius.toByte
-
-    // 9-11位为方向
-    stCoreDelta.z = UTIL_Angle_FPT2MntDisp(szCoreDeltaDirection)
-
-    // 12-13位为方向范围
-    stCoreDelta.nzVarRange = szCoreDeltaDirectionRange.toByte
+  def convertCoreDelta2AFISCOREDELTASTRUCT(coreDelta: CoreDelta,stCoreDelta:AFISCOREDELTASTRUCT, nType:Int):Unit= {
+    stCoreDelta.x = coreDelta.x.toShort
+    stCoreDelta.y = coreDelta.y.toShort
+    stCoreDelta.nRadius = coreDelta.nRadius.toByte
+    // 方向
+    stCoreDelta.z = UTIL_Angle_FPT2MntDisp(coreDelta.featureDirection)
+    //方向范围
+    stCoreDelta.nzVarRange = coreDelta.featureDirectionRange.toByte
 
     // 14位表示可靠度（1-3可靠度依次递减）
-    stCoreDelta.nReliability = UTIL_Reliability_FPT2MntDisp(szCoreDeltaReliability.toInt, nType).toByte
+    stCoreDelta.nReliability = UTIL_Reliability_FPT2MntDisp(coreDelta.nRadius, nType).toByte
 
     stCoreDelta.bIsExist = 1
 
     nType match
     {
       case UTIL_COREDELTA_TYPE_UPCORE=>
-        stCoreDelta.nClass = mnt_checker_def.DELTACLASS_CORE.toByte
+        stCoreDelta.nClass = DELTACLASS_CORE.toByte
       case UTIL_COREDELTA_TYPE_VICECORE=>
-        stCoreDelta.nClass = mnt_checker_def.DELTACLASS_VICECORE.toByte
+        stCoreDelta.nClass = DELTACLASS_VICECORE.toByte
       case UTIL_COREDELTA_TYPE_LDELTA=>
-        stCoreDelta.nClass = mnt_checker_def.DELTACLASS_LEFT.toByte
+        stCoreDelta.nClass = DELTACLASS_LEFT.toByte
       case UTIL_COREDELTA_TYPE_RDELTA=>
-        stCoreDelta.nClass = mnt_checker_def.DELTACLASS_RIGHT.toByte
+        stCoreDelta.nClass = DELTACLASS_RIGHT.toByte
       case other=>
-        stCoreDelta.nClass = mnt_checker_def.DELTACLASS_UNKNOWN.toByte
+        stCoreDelta.nClass = DELTACLASS_UNKNOWN.toByte
     }
   }
 
   /**
-    * 指纹中心点_特征X坐标
-      指纹中心点_特征Y坐标
-      指纹中心点_特征坐标范围
-      指纹中心点_特征方向
-      指纹中心点_特征方向范围
-      指纹中心点_特征可靠度
-    *  1-3位为x坐标
-    * ，4-6位为y坐标
-    * ，7-8位为坐标范围
-    * ，9-11位为方向
-    * ，12-13位为方向范围
-    * ，14位表示可靠度（1-3可靠度依次递减）。无有效值的数据用ASCII码空格（SP）填写，采用GB/T 1988-1998
+    * 特征方向转换
+    * @param mntDisp 显示特征
+    * @return （特征方向, 特征方向-范围）
     */
-  case class CoreDelta(x:Int,y:Int,nRadius:Int,szSP3:String,szSP2:String,nReliability:Int)
+  def convertMntDisp2FeatureDirection(mntDisp: MNTDISPSTRUCT): (Int, Int)={
+    val nFPTAngle = UTIL_Angle_MntDisp2FPT(mntDisp.stCm.fca)
+    (nFPTAngle,mntDisp.stCm.D_fca)
+  }
 
-  def UTIL_CoreDelta_MntDisp2FPT(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): CoreDelta={
-    var szSP3 = "   " //3个空格SP
-    var szSP2 = "  " //2个空格SP
+  /**
+    *
+    * @param x 指纹中心点_特征X坐标
+    * @param y 指纹中心点_特征Y坐标
+    * @param nRadius  指纹中心点_特征坐标范围
+    * @param featureDirection 指纹中心点_特征方向
+    * @param featureDirectionRange 指纹中心点_特征方向范围
+    * @param nReliability 指纹中心点_特征可靠度（1-3可靠度依次递减）
+    */
+  case class CoreDelta(x:Int,y:Int,nRadius:Int,featureDirection: Int,featureDirectionRange: Int,nReliability:Int)
+
+  /**
+    * 中心点转换
+    * @param stCoreDelta 6.2中心点结构AFISCOREDELTASTRUCT
+    * @param nType 中心点类型
+    * @return
+    */
+  def convertAFISCOREDELTASTRUCT2CoreDelta(stCoreDelta:AFISCOREDELTASTRUCT, nType:Int): CoreDelta={
+    var featureDirection = 0
+    var featureDirectionRange = 0
     if ( nType == UTIL_COREDELTA_TYPE_UPCORE || UTIL_COREDELTA_TYPE_VICECORE == nType){
-      val nDir = UTIL_Angle_MntDisp2FPT(stCoreDelta.z)
-      val nScope = stCoreDelta.nzVarRange
-      szSP3 = "%03d".format(nDir)
-      szSP2 = "%02d".format(nScope)
+      featureDirection = UTIL_Angle_MntDisp2FPT(stCoreDelta.z)
+      featureDirectionRange = stCoreDelta.nzVarRange
     }
     val nReliability = UTIL_Reliability_MntDisp2FPT(stCoreDelta.nReliability, nType)
     var nRadius = stCoreDelta.nRadius
     //TODO 位置半径校验，暂时对不符合要求（两位整数）默认设置30
     if(nRadius > 100 || nRadius < 0)
       nRadius = 30
-    new CoreDelta(stCoreDelta.x, stCoreDelta.y, nRadius, szSP3, szSP2, nReliability)
+    CoreDelta(stCoreDelta.x, stCoreDelta.y, nRadius, featureDirection, featureDirectionRange, nReliability)
   }
 
-  /**
-    * 副中心导出到FPT文件时特征方向和角度调整
-    * @param stViceCore
-    * @param nCore 中心的方向
-    * @param nzVarRange 中心的方向范围
-    */
-  def UTIL_ViceCoreMntDispCheckBefore2FPT(stViceCore: AFISCOREDELTASTRUCT, nCore: Short, nzVarRange: Byte) {
-    if(nCore == 999) {
-      stViceCore.z = 180.toShort
-      stViceCore.nzVarRange = 90
-      return 1
-    }
-    stViceCore.z = (nCore - 180).toShort
-    if(stViceCore.z < -90) {
-      stViceCore.z = (stViceCore.z + 360).toShort
-    }
-    if(nzVarRange < 45) stViceCore.nzVarRange = 45
-    else stViceCore.nzVarRange = nzVarRange
-
-    return 1
+  type Minutia = {
+    var fingerFeaturePointXCoordinate: Int
+    var fingerFeaturePointYCoordinate: Int
+    var fingerFeaturePointDirection: Int
+    var fingerFeaturePointQuality: Int
   }
-
   /**
-    * 可靠度转换
-    * @param nFPT
-    * @param nType
+    * 细节特征转换
+    * @param mnt Minutia
     * @return
     */
-  def UTIL_Reliability_FPT2MntDisp(nFPT:Int, nType:Int):Int=
-  {
-    if ( nType != UTIL_COREDELTA_TYPE_MINUTIA )
-    {
-      if ( nFPT < 1 ) return 2
-      else if ( nFPT <= 2 ) return 0
-      else return 1
-    }
-    else
-    {
-      if ( ( nFPT < 1 ) || ( nFPT > 2 ) ) return 0
-      else return 1
-    }
-  }
-  def UTIL_Reliability_MntDisp2FPT(nDisp: Int, nType: Int): Int={
-    if ( nType != UTIL_COREDELTA_TYPE_MINUTIA )
-    {
-      if ( nDisp == 0 ) return 1
-      else if ( nDisp == 1 ) return 3
-      else return 0
-    }
-    else
-    {
-      if ( nDisp == 0 ) return 3
-      else return 1
-    }
-  }
+  def convertMinutia2AFISMNTPOINTSTRUCT(mnt: Minutia): AFISMNTPOINTSTRUCT = {
+    val stmnt = new AFISMNTPOINTSTRUCT
+    stmnt.x = mnt.fingerFeaturePointXCoordinate.toShort
+    stmnt.y = mnt.fingerFeaturePointYCoordinate.toShort
+    stmnt.z = UTIL_Angle_FPT2MntDisp(mnt.fingerFeaturePointDirection)
+    stmnt.nReliability = 1 // mnt.fingerFeaturePointQuality.toByte
+    stmnt.nFlag = 1
 
-  def UTIL_Minutia_OneFPT2MntDisp(mntX:Short, mntY:Short,mntDirection:Int,mntQuality:Short,stmnt:AFISMNTPOINTSTRUCT) =
-  {
-    stmnt.x = mntX
-    stmnt.y = mntY
-    val zString = mntDirection
-    stmnt.z = UTIL_Angle_FPT2MntDisp(zString)
-    stmnt.nReliability = 1
-  }
-
-  case class FeaturePointInfo(x:Int,y:Int,z:Int)
-  /**
-    * FeaturePointInfo包括，x坐标、y坐标和方向各3位
-    * @param stmnt
-    * @return
-    */
-  def UTIL_Minutia_OneMntDisp2FPT(stmnt:AFISMNTPOINTSTRUCT): FeaturePointInfo ={
-    new FeaturePointInfo(stmnt.x, stmnt.y, UTIL_Angle_MntDisp2FPT(stmnt.z))
-  }
-
-
-  /**
-    * 指纹特征点_特征X坐标	zwtzd_tzxzb	数值型
-      指纹特征点_特征Y坐标	zwtzd_tzyzb	数值型
-      指纹特征点_特征方向	zwtzd_tzfx	数值型
-      指纹特征点_特征质量	zwtzd_tzzl	数值型
-    * @param pstMnt
-    * @param nmntCnt
-    * @return
-    */
-
-  def UTIL_Minutia_MntDisp2FPT(pstMnt: Seq[AFISMNTPOINTSTRUCT], nmntCnt: Int): String={
-    var pszFPTMnt = ""
-    (0 until nmntCnt).foreach(i => pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(pstMnt(i)))
-
-    pstMnt.foreach{mnt =>
-      pszFPTMnt += UTIL_Minutia_OneMntDisp2FPT(mnt)
-    }
-
-    //无有效值的数据用ASCII码空格（SP）填写, 总长度1800
-    while (pszFPTMnt.length < 1800) pszFPTMnt += " "
-
-    pszFPTMnt
+    stmnt
   }
 
   /**
