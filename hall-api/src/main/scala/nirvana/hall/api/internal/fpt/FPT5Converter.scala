@@ -617,7 +617,7 @@ object FPT5Converter {
             f =>
               lpCard.setStrCardID(f.originalSystemLatentFingerPalmId)
               lpCard.setStrPhysicalId(f.latentPhysicalId)
-              val gafisMnt = FPT5MntConverter.convertFingerLDataMnt2GafisMnt(t.latentFingerImageMsg,f,f.LatentMinutiaSet)
+              val gafisMnt = FPT5MntConverter.convertFingerLDataMnt2GafisMnt(t.latentFingerImageMsg,f)
               blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
           }
           lpCardList += lpCard.build
@@ -648,7 +648,7 @@ object FPT5Converter {
             f =>
               lpCard.setStrCardID(f.latentPalmNo)
               lpCard.setStrPhysicalId(f.latentPalmPhysicalId)
-              val gafisMnt = FPT5MntConverter.convertPalmLDataMnt2GafisMnt(t.latentPalmImageMsg,f,f.latentPalmMinutiaSet)
+              val gafisMnt = FPT5MntConverter.convertPalmLDataMnt2GafisMnt(t.latentPalmImageMsg,f)
               blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
           }
           lpCardList += lpCard.build
