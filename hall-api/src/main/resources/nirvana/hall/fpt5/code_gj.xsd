@@ -1,0 +1,1118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="code_gj">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="">
+				<xs:annotation>
+					<xs:documentation>空值</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="004">
+				<xs:annotation>
+					<xs:documentation>阿富汗</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008">
+				<xs:annotation>
+					<xs:documentation>阿尔巴尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="010">
+				<xs:annotation>
+					<xs:documentation>南极洲</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="012">
+				<xs:annotation>
+					<xs:documentation>阿尔及利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="016">
+				<xs:annotation>
+					<xs:documentation>美属萨摩亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="020">
+				<xs:annotation>
+					<xs:documentation>安道尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="024">
+				<xs:annotation>
+					<xs:documentation>安哥拉</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="028">
+				<xs:annotation>
+					<xs:documentation>安提瓜和巴布达</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="032">
+				<xs:annotation>
+					<xs:documentation>阿根廷</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="036">
+				<xs:annotation>
+					<xs:documentation>澳大利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="040">
+				<xs:annotation>
+					<xs:documentation>奥利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="044">
+				<xs:annotation>
+					<xs:documentation>巴哈马</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="048">
+				<xs:annotation>
+					<xs:documentation>巴林</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="050">
+				<xs:annotation>
+					<xs:documentation>孟加拉国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="052">
+				<xs:annotation>
+					<xs:documentation>巴巴多斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="056">
+				<xs:annotation>
+					<xs:documentation>比利时</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="060">
+				<xs:annotation>
+					<xs:documentation>百慕大</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="064">
+				<xs:annotation>
+					<xs:documentation>不丹</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="068">
+				<xs:annotation>
+					<xs:documentation>玻利维亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="072">
+				<xs:annotation>
+					<xs:documentation>博茨瓦纳</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="074">
+				<xs:annotation>
+					<xs:documentation>布维岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="076">
+				<xs:annotation>
+					<xs:documentation>巴西</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="084">
+				<xs:annotation>
+					<xs:documentation>伯利兹</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="086">
+				<xs:annotation>
+					<xs:documentation>英属印度洋领土</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="090">
+				<xs:annotation>
+					<xs:documentation>斯罗门群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="092">
+				<xs:annotation>
+					<xs:documentation>英属维尔京群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="096">
+				<xs:annotation>
+					<xs:documentation>文莱</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="100">
+				<xs:annotation>
+					<xs:documentation>保加利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="104">
+				<xs:annotation>
+					<xs:documentation>缅甸</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="108">
+				<xs:annotation>
+					<xs:documentation>布隆迪</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="112">
+				<xs:annotation>
+					<xs:documentation>白俄罗斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="116">
+				<xs:annotation>
+					<xs:documentation>柬埔寨</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="120">
+				<xs:annotation>
+					<xs:documentation>喀麦隆</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="124">
+				<xs:annotation>
+					<xs:documentation>加拿大</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="132">
+				<xs:annotation>
+					<xs:documentation>佛得角</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="136">
+				<xs:annotation>
+					<xs:documentation>开曼群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="140">
+				<xs:annotation>
+					<xs:documentation>中非</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="144">
+				<xs:annotation>
+					<xs:documentation>斯里兰卡</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="148">
+				<xs:annotation>
+					<xs:documentation>乍得</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="152">
+				<xs:annotation>
+					<xs:documentation>智利</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="156">
+				<xs:annotation>
+					<xs:documentation>中国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="158">
+				<xs:annotation>
+					<xs:documentation>台湾省</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="162">
+				<xs:annotation>
+					<xs:documentation>圣诞岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="166">
+				<xs:annotation>
+					<xs:documentation>可可（基林）群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="170">
+				<xs:annotation>
+					<xs:documentation>哥伦比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="174">
+				<xs:annotation>
+					<xs:documentation>科摩罗</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="178">
+				<xs:annotation>
+					<xs:documentation>刚果</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="180">
+				<xs:annotation>
+					<xs:documentation>扎伊尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="184">
+				<xs:annotation>
+					<xs:documentation>库克群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="188">
+				<xs:annotation>
+					<xs:documentation>哥斯达黎加</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="192">
+				<xs:annotation>
+					<xs:documentation>古巴</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="196">
+				<xs:annotation>
+					<xs:documentation>塞浦路斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="200">
+				<xs:annotation>
+					<xs:documentation>捷克斯洛伐克</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="204">
+				<xs:annotation>
+					<xs:documentation>贝宁</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="208">
+				<xs:annotation>
+					<xs:documentation>丹麦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="212">
+				<xs:annotation>
+					<xs:documentation>多米尼加</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="214">
+				<xs:annotation>
+					<xs:documentation>多米尼加共和国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="218">
+				<xs:annotation>
+					<xs:documentation>厄瓜多尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="222">
+				<xs:annotation>
+					<xs:documentation>萨尔瓦多</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="226">
+				<xs:annotation>
+					<xs:documentation>赤道几亚内</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="230">
+				<xs:annotation>
+					<xs:documentation>埃塞俄比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="234">
+				<xs:annotation>
+					<xs:documentation>法罗</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="238">
+				<xs:annotation>
+					<xs:documentation>福克兰群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="242">
+				<xs:annotation>
+					<xs:documentation>斐济</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="246">
+				<xs:annotation>
+					<xs:documentation>芬兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="250">
+				<xs:annotation>
+					<xs:documentation>法国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="254">
+				<xs:annotation>
+					<xs:documentation>法属圭亚那</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="258">
+				<xs:annotation>
+					<xs:documentation>法属波利尼西亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="260">
+				<xs:annotation>
+					<xs:documentation>法属南部领土</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="262">
+				<xs:annotation>
+					<xs:documentation>吉布提</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="266">
+				<xs:annotation>
+					<xs:documentation>加蓬</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="270">
+				<xs:annotation>
+					<xs:documentation>冈比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="278">
+				<xs:annotation>
+					<xs:documentation>德意志民主共和国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="280">
+				<xs:annotation>
+					<xs:documentation>德意志联邦共和国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="288">
+				<xs:annotation>
+					<xs:documentation>加纳</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="292">
+				<xs:annotation>
+					<xs:documentation>直布罗陀</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="296">
+				<xs:annotation>
+					<xs:documentation>基里巴斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="300">
+				<xs:annotation>
+					<xs:documentation>希腊</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="304">
+				<xs:annotation>
+					<xs:documentation>格陵兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="308">
+				<xs:annotation>
+					<xs:documentation>格林纳达</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="312">
+				<xs:annotation>
+					<xs:documentation>瓜德罗普</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="316">
+				<xs:annotation>
+					<xs:documentation>关岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="320">
+				<xs:annotation>
+					<xs:documentation>危地马拉</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="324">
+				<xs:annotation>
+					<xs:documentation>几内亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="328">
+				<xs:annotation>
+					<xs:documentation>圭亚那</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="332">
+				<xs:annotation>
+					<xs:documentation>海地</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="334">
+				<xs:annotation>
+					<xs:documentation>赫德岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="336">
+				<xs:annotation>
+					<xs:documentation>梵蒂冈</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="340">
+				<xs:annotation>
+					<xs:documentation>洪都拉斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="344">
+				<xs:annotation>
+					<xs:documentation>香港</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="348">
+				<xs:annotation>
+					<xs:documentation>匈牙利</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="352">
+				<xs:annotation>
+					<xs:documentation>冰岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="356">
+				<xs:annotation>
+					<xs:documentation>印度</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="360">
+				<xs:annotation>
+					<xs:documentation>印度尼西亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="364">
+				<xs:annotation>
+					<xs:documentation>伊郎</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="368">
+				<xs:annotation>
+					<xs:documentation>伊拉克</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="372">
+				<xs:annotation>
+					<xs:documentation>爱尔兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="374">
+				<xs:annotation>
+					<xs:documentation>巴勒斯坦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="376">
+				<xs:annotation>
+					<xs:documentation>以色列</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="380">
+				<xs:annotation>
+					<xs:documentation>意大利</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="384">
+				<xs:annotation>
+					<xs:documentation>象牙海岸</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="388">
+				<xs:annotation>
+					<xs:documentation>牙买加</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="392">
+				<xs:annotation>
+					<xs:documentation>日本</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="396">
+				<xs:annotation>
+					<xs:documentation>约翰斯顿岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="400">
+				<xs:annotation>
+					<xs:documentation>约旦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="404">
+				<xs:annotation>
+					<xs:documentation>肯尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="408">
+				<xs:annotation>
+					<xs:documentation>朝鲜</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="410">
+				<xs:annotation>
+					<xs:documentation>南朝鲜</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="414">
+				<xs:annotation>
+					<xs:documentation>科威特</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="418">
+				<xs:annotation>
+					<xs:documentation>老挝</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="422">
+				<xs:annotation>
+					<xs:documentation>黎巴嫩</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="426">
+				<xs:annotation>
+					<xs:documentation>莱索托</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="430">
+				<xs:annotation>
+					<xs:documentation>利比里亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="434">
+				<xs:annotation>
+					<xs:documentation>利比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="438">
+				<xs:annotation>
+					<xs:documentation>列支敦士登</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="442">
+				<xs:annotation>
+					<xs:documentation>卢森堡</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="446">
+				<xs:annotation>
+					<xs:documentation>澳门</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="450">
+				<xs:annotation>
+					<xs:documentation>马达加斯加</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="454">
+				<xs:annotation>
+					<xs:documentation>马拉维</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="458">
+				<xs:annotation>
+					<xs:documentation>马来西亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="462">
+				<xs:annotation>
+					<xs:documentation>马尔代夫</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="466">
+				<xs:annotation>
+					<xs:documentation>马里</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="470">
+				<xs:annotation>
+					<xs:documentation>马耳他</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="474">
+				<xs:annotation>
+					<xs:documentation>马提尼克</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="478">
+				<xs:annotation>
+					<xs:documentation>毛里塔尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="480">
+				<xs:annotation>
+					<xs:documentation>毛里求斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="484">
+				<xs:annotation>
+					<xs:documentation>墨西哥</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="488">
+				<xs:annotation>
+					<xs:documentation>中途岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="492">
+				<xs:annotation>
+					<xs:documentation>摩纳哥</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="496">
+				<xs:annotation>
+					<xs:documentation>蒙古</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="500">
+				<xs:annotation>
+					<xs:documentation>蒙特塞拉特</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="504">
+				<xs:annotation>
+					<xs:documentation>摩洛哥</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="508">
+				<xs:annotation>
+					<xs:documentation>莫桑比克</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="512">
+				<xs:annotation>
+					<xs:documentation>阿曼</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="516">
+				<xs:annotation>
+					<xs:documentation>纳米比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="520">
+				<xs:annotation>
+					<xs:documentation>瑙鲁</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="524">
+				<xs:annotation>
+					<xs:documentation>尼泊尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="528">
+				<xs:annotation>
+					<xs:documentation>荷兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="532">
+				<xs:annotation>
+					<xs:documentation>荷属安的列斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="536">
+				<xs:annotation>
+					<xs:documentation>中间地带</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="540">
+				<xs:annotation>
+					<xs:documentation>新喀里多尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="548">
+				<xs:annotation>
+					<xs:documentation>瓦努阿图</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="554">
+				<xs:annotation>
+					<xs:documentation>新西兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="558">
+				<xs:annotation>
+					<xs:documentation>尼加拉瓜</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="562">
+				<xs:annotation>
+					<xs:documentation>尼日尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="566">
+				<xs:annotation>
+					<xs:documentation>尼日利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="570">
+				<xs:annotation>
+					<xs:documentation>纽埃</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="574">
+				<xs:annotation>
+					<xs:documentation>诺福克岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="578">
+				<xs:annotation>
+					<xs:documentation>挪威</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="582">
+				<xs:annotation>
+					<xs:documentation>太平洋群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="586">
+				<xs:annotation>
+					<xs:documentation>巴基斯坦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="590">
+				<xs:annotation>
+					<xs:documentation>巴拿马</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="598">
+				<xs:annotation>
+					<xs:documentation>巴布亚新几内亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="600">
+				<xs:annotation>
+					<xs:documentation>巴拉圭</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="604">
+				<xs:annotation>
+					<xs:documentation>秘鲁</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="608">
+				<xs:annotation>
+					<xs:documentation>菲律宾</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="612">
+				<xs:annotation>
+					<xs:documentation>皮特凯恩群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="616">
+				<xs:annotation>
+					<xs:documentation>波兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="620">
+				<xs:annotation>
+					<xs:documentation>葡萄牙</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="624">
+				<xs:annotation>
+					<xs:documentation>几内亚比绍</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="626">
+				<xs:annotation>
+					<xs:documentation>东帝汶</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="630">
+				<xs:annotation>
+					<xs:documentation>波多黎各</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="634">
+				<xs:annotation>
+					<xs:documentation>卡塔尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="638">
+				<xs:annotation>
+					<xs:documentation>留尼汪</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="642">
+				<xs:annotation>
+					<xs:documentation>罗马尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="646">
+				<xs:annotation>
+					<xs:documentation>卢旺达</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="654">
+				<xs:annotation>
+					<xs:documentation>圣赫勒拿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659">
+				<xs:annotation>
+					<xs:documentation>圣克里斯托弗和尼维斯联邦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="660">
+				<xs:annotation>
+					<xs:documentation>安圭拉</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="662">
+				<xs:annotation>
+					<xs:documentation>圣卢西亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="666">
+				<xs:annotation>
+					<xs:documentation>圣皮埃尔和密克隆</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="670">
+				<xs:annotation>
+					<xs:documentation>圣文森特和格林纳丁斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="674">
+				<xs:annotation>
+					<xs:documentation>圣马力诺</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="678">
+				<xs:annotation>
+					<xs:documentation>圣多美和普林西比</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="682">
+				<xs:annotation>
+					<xs:documentation>沙特阿拉伯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="686">
+				<xs:annotation>
+					<xs:documentation>塞内加尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="690">
+				<xs:annotation>
+					<xs:documentation>塞舌尔</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="694">
+				<xs:annotation>
+					<xs:documentation>塞拉利昂</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="702">
+				<xs:annotation>
+					<xs:documentation>新加坡</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="704">
+				<xs:annotation>
+					<xs:documentation>越南</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="706">
+				<xs:annotation>
+					<xs:documentation>索马里</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="710">
+				<xs:annotation>
+					<xs:documentation>南非</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="716">
+				<xs:annotation>
+					<xs:documentation>津巴布韦</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="720">
+				<xs:annotation>
+					<xs:documentation>也门民主人民共和国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="724">
+				<xs:annotation>
+					<xs:documentation>西班牙</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="732">
+				<xs:annotation>
+					<xs:documentation>西撒哈拉</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="736">
+				<xs:annotation>
+					<xs:documentation>苏丹</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="740">
+				<xs:annotation>
+					<xs:documentation>苏里南</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="744">
+				<xs:annotation>
+					<xs:documentation>斯瓦巴德群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="748">
+				<xs:annotation>
+					<xs:documentation>斯威士兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="752">
+				<xs:annotation>
+					<xs:documentation>瑞典</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="756">
+				<xs:annotation>
+					<xs:documentation>瑞士</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="760">
+				<xs:annotation>
+					<xs:documentation>叙利亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="764">
+				<xs:annotation>
+					<xs:documentation>泰国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="768">
+				<xs:annotation>
+					<xs:documentation>多哥</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="772">
+				<xs:annotation>
+					<xs:documentation>托克劳</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="776">
+				<xs:annotation>
+					<xs:documentation>汤加</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="780">
+				<xs:annotation>
+					<xs:documentation>特立尼达和多巴哥</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="784">
+				<xs:annotation>
+					<xs:documentation>阿拉伯联合酋长国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="788">
+				<xs:annotation>
+					<xs:documentation>突尼斯</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="792">
+				<xs:annotation>
+					<xs:documentation>土耳其</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="796">
+				<xs:annotation>
+					<xs:documentation>特克斯和凯科斯群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="798">
+				<xs:annotation>
+					<xs:documentation>图瓦卢</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="800">
+				<xs:annotation>
+					<xs:documentation>乌干达</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="804">
+				<xs:annotation>
+					<xs:documentation>乌克兰</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="810">
+				<xs:annotation>
+					<xs:documentation>苏联</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="818">
+				<xs:annotation>
+					<xs:documentation>埃及</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="826">
+				<xs:annotation>
+					<xs:documentation>英国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="834">
+				<xs:annotation>
+					<xs:documentation>坦桑尼亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="840">
+				<xs:annotation>
+					<xs:documentation>美国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="849">
+				<xs:annotation>
+					<xs:documentation>美属太平洋群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="850">
+				<xs:annotation>
+					<xs:documentation>美属维尔京群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="854">
+				<xs:annotation>
+					<xs:documentation>布基纳法索</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="858">
+				<xs:annotation>
+					<xs:documentation>乌拉圭</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="862">
+				<xs:annotation>
+					<xs:documentation>委内瑞拉</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="872">
+				<xs:annotation>
+					<xs:documentation>威克岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="876">
+				<xs:annotation>
+					<xs:documentation>瓦利斯和富图纳群岛</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="882">
+				<xs:annotation>
+					<xs:documentation>西萨摩亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="886">
+				<xs:annotation>
+					<xs:documentation>阿拉伯也门共和国</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="890">
+				<xs:annotation>
+					<xs:documentation>南斯拉夫</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="894">
+				<xs:annotation>
+					<xs:documentation>赞比亚</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="code_lymssm">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="XZ">
+				<xs:annotation>
+					<xs:documentation>刑专系统</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="JZ">
+				<xs:annotation>
+					<xs:documentation>警综平台</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AFIS">
+				<xs:annotation>
+					<xs:documentation>指掌纹自动识别系统</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CJ">
+				<xs:annotation>
+					<xs:documentation>采集系统</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="XK">
+				<xs:annotation>
+					<xs:documentation>现勘系统</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="QT">
+				<xs:annotation>
+					<xs:documentation>其他系统</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

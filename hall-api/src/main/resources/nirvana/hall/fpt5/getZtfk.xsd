@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="code_typeget.xsd"/>
+	<xs:include schemaLocation="code_status.xsd"/>
+	<xs:element name="statusType">
+		<xs:annotation>
+			<xs:documentation>获取状态反馈</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="type">
+					<xs:annotation>
+						<xs:documentation>任务类型</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="code_typeget">
+							<xs:length value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

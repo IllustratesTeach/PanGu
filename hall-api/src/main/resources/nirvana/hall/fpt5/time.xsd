@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by wzb (wzb) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="time">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1]))((20|21|22|23|[0-1]\d)([0-5]\d[0-5]\d))"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
