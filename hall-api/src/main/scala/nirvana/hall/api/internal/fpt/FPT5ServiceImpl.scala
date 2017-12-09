@@ -6,7 +6,7 @@ import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService, TPCardService}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
-import nirvana.hall.c.services.gfpt5lib.{FingerprintPackage, LatentPackage}
+import nirvana.hall.c.services.gfpt5lib._
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
@@ -85,9 +85,9 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     */
   override def addLatentPackage(latentPackage: LatentPackage, dbId: Option[String]): Unit = {
     val caseInfo = FPT5Converter.convertLatentPackage2Case(latentPackage)
-//    if(!caseInfoService.isExist(caseInfo.getStrCaseID)){
-//      caseInfoService.addCaseInfo(caseInfo)
-//    }
+    if(!caseInfoService.isExist(caseInfo.getStrCaseID)){
+      caseInfoService.addCaseInfo(caseInfo)
+    }
     val lPCardList = FPT5Converter.convertLatentPackage2LPCard(latentPackage)
     lPCardList.foreach{lPCard =>
       val lpCardBuiler = lPCard.toBuilder
@@ -151,7 +151,6 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
             }catch{
               case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
             }
-
             t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
             //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
 
@@ -170,8 +169,49 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
             t.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
           }
+
         }
     }
     tpCardBuilder
   }
+
+  override def getLatentTaskPackage(taskId: String): LatenttaskPackage = ???
+
+  override def addLatentTaskPackage(latenttaskPackage: LatenttaskPackage): Unit = ???
+
+  override def getPrintTaskPackage(taskId: String): PrinttaskPackage = ???
+
+  override def addPrintTaskPackage(printtaskPackage: PrinttaskPackage): Unit = ???
+
+  override def getLTResultPackage(taskId: String): LtResultPackage = ???
+
+  override def addLTResultPackage(ltResultPackage: LtResultPackage): Unit = ???
+
+  override def getTlResultPackage(taskId: String): TlResultPackage = ???
+
+  override def addTlResultPackage(tlResultPackage: TlResultPackage): Unit = ???
+
+  override def getTTResultPackage(taskId: String): TtResultPackage = ???
+
+  override def addTTResultPackage(ttResultPackage: TtResultPackage): Unit = ???
+
+  override def getLLResultPackage(taskId: String): LlResultPackage = ???
+
+  override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
+
+  override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = ???
+
+  override def addLTHitResultPackage(ltHitResultPackage: LtHitResultPackage): Unit = ???
+
+  override def getTtHitResultPackage(oraSid: String): TtHitResultPackage = ???
+
+  override def addTtHitResultPackage(ttHitResultPackage: TtHitResultPackage): Unit = ???
+
+  override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = ???
+
+  override def addLlHitResultPackage(llHitResultPackage: LlHitResultPackage): Unit = ???
+
+  override def getCancelLatentPackage(originSystemCaseId: String): cancelLatentPackage = ???
+
+  override def addCancelLatentPackage(cancelLatentPackage: cancelLatentPackage): Unit = ???
 }

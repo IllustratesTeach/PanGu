@@ -923,7 +923,7 @@ class FPT5File {
     class LatenttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
-        @XmlElement(name = "zzwbdrwlxdm")
+        @XmlElement(name = "zzhwbdrwlxdm")
         var taskTypeCode:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemDescript:String = _
@@ -937,12 +937,12 @@ class FPT5File {
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
