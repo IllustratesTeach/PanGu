@@ -327,7 +327,7 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "DeltaSet")
     class DeltaSet{
-        @XmlElement(name = "deltaSet")
+        @XmlElement(name = "delta")
         var delta:Array[Delta] = _
     }
 
