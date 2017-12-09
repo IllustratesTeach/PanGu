@@ -969,7 +969,7 @@ class FPT5File {
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:FingerprintPackage = new FingerprintPackage
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -1002,9 +1002,9 @@ class FPT5File {
         @XmlElement(name = "xczzwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage]= _
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[LTResultMsg] = new util.ArrayList[LTResultMsg]
+        var resultMsg:Array[LTResultMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LTResultMsg")
@@ -1026,7 +1026,7 @@ class FPT5File {
         @XmlElement(name = "bdjg_zzwdm")
         var resultFingerPalmPostionCode:String = _ //比对结果指掌位代码
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -1055,9 +1055,9 @@ class FPT5File {
         @XmlElement(name = "zzwkbh")
         var cardId:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[TLResultMsg] = new util.ArrayList[TLResultMsg]
+        var resultMsg:Array[TLResultMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TLResultMsg")
@@ -1083,7 +1083,7 @@ class FPT5File {
         @XmlElement(name = "bdjg_zzwdm")
         var resultFingerPalmPostionCode:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
@@ -1116,9 +1116,9 @@ class FPT5File {
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[TTResultMsg] = new util.ArrayList[TTResultMsg]
+        var resultMsg:Array[TTResultMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TTResultMsg")
@@ -1140,7 +1140,7 @@ class FPT5File {
         @XmlElement(name = "zzwccbzlxdm")
         var ttHitTypeCode:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -1175,9 +1175,9 @@ class FPT5File {
         @XmlElement(name = "xczzwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[LLResultMsg] = new util.ArrayList[LLResultMsg]
+        var resultMsg:Array[LLResultMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LLResultMsg")
@@ -1201,7 +1201,7 @@ class FPT5File {
         @XmlElement(name = "bdjg_xczzwkbh")
         var resultLatentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
@@ -1325,9 +1325,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageSource:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackageSource:Array[FingerprintPackage] = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageDesc:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackageDesc:Array[FingerprintPackage] = _
     }
 
 
@@ -1392,9 +1392,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackageSource:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackageSource:Array[LatentPackage] = _
         @XmlElement(name = "latentPackage")
-        var latentPackageDesc:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackageDesc:Array[LatentPackage] = _
     }
 
 
