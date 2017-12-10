@@ -123,6 +123,7 @@ object XmlLoader {
     val context = JAXBContext.newInstance(obj.getClass)
     val marshaller = context.createMarshaller()
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+    marshaller.setProperty(Marshaller.JAXB_ENCODING, encoding)
     val out = new ByteArrayOutputStream
     marshaller.marshal(obj, out)
     new String(out.toByteArray, encoding)
