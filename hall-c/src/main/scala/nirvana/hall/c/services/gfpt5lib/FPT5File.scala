@@ -36,9 +36,9 @@ class FPT5File {
     var fingerprintPackage: Array[FingerprintPackage] = _
     @XmlElement(name = "latentPackage")
     var latentPackage: Array[LatentPackage] = _
-    @XmlElement(name = "LatentTaskPackage")
+    @XmlElement(name = "latentTaskPackage")
     var latentTaskPackage: Array[LatenttaskPackage] = _
-    @XmlElement(name = "PrintTaskPackage")
+    @XmlElement(name = "printTaskPackage")
     var printTaskPackage: Array[PrinttaskPackage] = _
     @XmlElement(name = "LTResultPackage")
     var ltResultPackage: Array[LtResultPackage] = _
@@ -933,7 +933,7 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
@@ -954,7 +954,7 @@ class FPT5File {
     class PrinttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
-        @XmlElement(name = "zzwbdrwlxdm")
+        @XmlElement(name = "zzhwbdrwlxdm")
         var taskTypeCode:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemDescript:String = _
@@ -964,7 +964,7 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
