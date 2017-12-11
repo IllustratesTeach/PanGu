@@ -18,6 +18,10 @@ import scala.collection.mutable.ArrayBuffer
 
 object FPT5MntConverter {
 
+  //单个指纹最大支持240个特征
+  private val FINGER_FEATURE_MAX_COUNT = 240
+  //单个掌纹最大支持2400个特征
+  private val PALM_FEATURE_MAX_COUNT = 2400
 
   /**
     * fpt现场指纹特征转换为6.2xgw特征
@@ -146,6 +150,7 @@ object FPT5MntConverter {
     fingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach{ minutia =>
         AFISMNTPOINTSTRUCTList += convertMinutia2AFISMNTPOINTSTRUCT(minutia)
     }
+    mntDisp.nMaxMnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
@@ -197,6 +202,7 @@ object FPT5MntConverter {
     latentPalmFeatureMsg.latentPalmMinutiaSet.latentPalmMinutia.foreach{ minutia =>
         AFISMNTPOINTSTRUCTList += convertMinutia2AFISMNTPOINTSTRUCT(minutia)
     }
+    mntDisp.nMaxMnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.mnt = AFISMNTPOINTSTRUCTList.toArray
 
@@ -281,7 +287,7 @@ object FPT5MntConverter {
         fingerMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangleInfo.nReliability
       }
 
-    val nMaxMnt:Int = 1800/9
+    val nMaxMnt:Int = FINGER_FEATURE_MAX_COUNT
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if ( ntemp > 0 ) {
@@ -331,7 +337,7 @@ object FPT5MntConverter {
     }
 
     val palmMinutiaSet = new PalmMinutiaSet
-    val nMaxMnt:Int = 1800/9
+    val nMaxMnt:Int = PALM_FEATURE_MAX_COUNT
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if (ntemp > 0) {
@@ -397,7 +403,7 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangleInfo.nReliability
     }
 
-    val nMaxMnt:Int = 1800/9
+    val nMaxMnt:Int = FINGER_FEATURE_MAX_COUNT
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if ( ntemp > 0 ) {

@@ -242,6 +242,7 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.nMaxMnt = fptMnt.featureCount.toShort //最大特征个数
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fptMnt.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
@@ -278,6 +279,7 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_UPCORE)
 
     mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.nMaxMnt = fptMnt.featureCount.toShort
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fptMnt.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
@@ -327,7 +329,7 @@ object FPTMntConverter {
       fptMnt.rightTriangle = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.rdelta, UTIL_COREDELTA_TYPE_RDELTA)
     }
 
-    val nMaxMnt:Int = 1800/9
+    val nMaxMnt:Int = 1800/9 //FPT4支持的最大特征个数
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if ( ntemp > 0 ) {
