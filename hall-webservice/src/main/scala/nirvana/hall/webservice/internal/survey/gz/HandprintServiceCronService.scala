@@ -8,11 +8,12 @@ import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
-import nirvana.hall.webservice.services.survey.HandprintService
+//import nirvana.hall.webservice.services.survey.HandprintService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
+//import stark.webservice.services.StarkWebServiceClient
 
 
 /**
@@ -24,11 +25,11 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-    url,
-    targetNamespace,
-    classOf[HandprintService].getSimpleName,
-    classOf[HandprintService].getSimpleName + "HttpPort")
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
 
   /**
     * 定时器，调用海鑫现勘接口
@@ -57,12 +58,14 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
   }
 
   private def doWork: Unit ={
-    val hxdate = client.getSystemDateTime
+    val handprintService = new HandprintService
+    val handprintServicePortType = handprintService.getHandprintServiceHttpPort
+    val hxdate =handprintServicePortType.getSystemDateTime()
     info("海鑫当前时间：---"+hxdate)
     val checkVal = surveyRecordService.isSleep(new SimpleDateFormat(Constant.DATETIME_FORMAT).parse(hxdate).getTime())
     if(!checkVal._1){
       //获取数量
-      val num = client.getOriginalDataCount(userId
+      val num = handprintServicePortType.getOriginalDataCount(userId
         , password
         , unitCode
         , Constant.EMPTY
@@ -79,44 +82,45 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,sur
           ,"endTime:"+ checkVal._2.endTime)
         ,num.toString
         ,Constant.EMPTY)
+      info("获取现堪的数量：---"+num)
       if (num > 0) {
-        //获取现勘号列表
-        val dataList = new String(client.getOriginalDataList(userId
-          , password
-          , unitCode
-          , Constant.EMPTY
-          , checkVal._2.startTime
-          , checkVal._2.endTime
-          , 1
-          , num))
-        surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_LIST
-          ,Constant.EMPTY
-          ,Constant.EMPTY
-          ,CommonUtil.appendParam("userId:"+userId
-            ,"password:"+password
-            ,"unitCode:"+unitCode
-            ,"kNo:"
-            ,"startTime:"+ checkVal._2.startTime
-            ,"endTime:"+ checkVal._2.endTime
-            ,"startNum:" + 1
-            ,"endNum:" + num)
-          ,dataList
-          ,Constant.EMPTY)
-        val original = XmlLoader.parseXML[OriginalList](dataList)
-        val kNoList = original.K.iterator
-        var kNoObj:ListNode = null
-        while(kNoList.hasNext){
-          kNoObj = kNoList.next
-          surveyRecordService.saveSurveySnoRecord(kNoObj.K_No
-            ,kNoObj.S_No
-            ,kNoObj.card_type
-            ,kNoObj.CASE_NAME)
-          if(!surveyRecordService.isKno(kNoObj.K_No)){
-            surveyRecordService.saveSurveyKnoRecord(kNoObj.K_No)
+            //获取现勘号列表
+            val dataList = new String(handprintServicePortType.getOriginalDataList(userId
+              , password
+              , unitCode
+              , Constant.EMPTY
+              , checkVal._2.startTime
+              , checkVal._2.endTime
+              , 1
+              , num))
+            surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_LIST
+              ,Constant.EMPTY
+              ,Constant.EMPTY
+              ,CommonUtil.appendParam("userId:"+userId
+                ,"password:"+password
+                ,"unitCode:"+unitCode
+                ,"kNo:"
+                ,"startTime:"+ checkVal._2.startTime
+                ,"endTime:"+ checkVal._2.endTime
+                ,"startNum:" + 1
+                ,"endNum:" + num)
+              ,dataList
+              ,Constant.EMPTY)
+            val original = XmlLoader.parseXML[OriginalList](dataList)
+            val kNoList = original.K.iterator
+            var kNoObj:ListNode = null
+            while(kNoList.hasNext){
+              kNoObj = kNoList.next
+              surveyRecordService.saveSurveySnoRecord(kNoObj.K_NO
+                ,kNoObj.S_NO
+                ,kNoObj.CARD_TYPE
+                ,kNoObj.CASE_NAME)
+              if(!surveyRecordService.isKno(kNoObj.K_NO)){
+                surveyRecordService.saveSurveyKnoRecord(kNoObj.K_NO)
+              }
+            }
           }
+          surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,Constant.DATETIME_FORMAT).getTime))
         }
-      }
-      surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,Constant.DATETIME_FORMAT).getTime))
-    }
   }
 }

@@ -64,8 +64,8 @@ class SysUser extends ActiveRecord {
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "LAST_LOGIN_DATE", length = 23)
   var lastLoginDate: java.util.Date = _
-  @Column(name = "LOGIN_TIME_CONTROL", length = 1)
-  var loginTimeControl: java.lang.String = _
+//  @Column(name = "LOGIN_TIME_CONTROL", length = 1)
+//  var loginTimeControl: java.lang.String = _
 
 
   def this(pkId: java.lang.String, loginName: java.lang.String) {
@@ -96,7 +96,7 @@ class SysUser extends ActiveRecord {
     this.departStartDate = departStartDate
     this.userStatus = userStatus
     this.lastLoginDate = lastLoginDate
-    this.loginTimeControl = loginTimeControl
+//    this.loginTimeControl = loginTimeControl
   }
 
 

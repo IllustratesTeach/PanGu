@@ -1,6 +1,5 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-
 import java.io.{ByteArrayInputStream, File}
 import java.util.Date
 
@@ -11,12 +10,13 @@ import nirvana.hall.c.services.AncientData.AncientDataException
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.c.services.gfpt4lib.FPTFile.FPTParseException
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
+//import nirvana.hall.webservice.services.survey.HandprintService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.commons.io.FileUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
+//import stark.webservice.services.StarkWebServiceClient
 
 
 /**
@@ -32,11 +32,13 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-    url,
-    targetNamespace,
-    classOf[HandprintService].getSimpleName,
-    classOf[HandprintService].getSimpleName + "HttpPort")
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
+  val handprintService = new HandprintService
+  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
 
   /**
     * 定时器，调用海鑫现勘接口
@@ -72,12 +74,14 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
 
   def doWork {
-    surveyRecordService.getXkcodebyState(Constant.INIT, BATCH_SIZE).foreach {
+    val xkCodeList = surveyRecordService.getXkcodebyState(Constant.INIT, BATCH_SIZE)
+    info("现堪号列表长度：------"+xkCodeList.length)
+    xkCodeList.foreach {
       kNo =>
         if(saveCaseTextInfo(kNo)){
           surveyRecordService.getSurveySnoRecord(kNo).foreach {
             m =>
-              getPFTPackage(kNo, m.get("sno").toString, m.get("cardType").toString)
+              getPFTPackage(kNo, m.get("sno").get.toString, m.get("cardtype").get.toString)
               getReceprtionNO(kNo)
           }
         }
@@ -91,15 +95,16 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     */
   private def saveCaseTextInfo(kNo:String):Boolean= {
     var bStr = false
-    val caseNo = client.getCaseNo (userId, password, kNo)
+    val caseNo = handprintServicePortType.getCaseNo (userId, password, kNo)
     surveyRecordService.saveSurveyLogRecord (Constant.GET_CASE_NO
-      , Constant.EMPTY
+      , kNo
       , Constant.EMPTY
       , CommonUtil.appendParam ("userId:" + userId, "password:" + password, "kNo:" + kNo)
       , caseNo
       , Constant.EMPTY)
+    info("现堪编号："+kNo+"-----查询的案件编号："+caseNo)
     if (! CommonUtil.isNullOrEmpty (caseNo) ) {
-      val caseInfo = client.getOriginalData (userId
+      val caseInfo = handprintServicePortType.getOriginalData (userId
         , password
         , kNo
         , Constant.EMPTY
@@ -117,16 +122,20 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
       surveyRecordService.saveSurveycaseInfo (kNo, new String (caseInfo))
       surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_SUCCESS, kNo)
       bStr = true
+    }else{
+      //没有案件编号更新xkCode状态为-1
+      surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_FAIL, kNo)
     }
     bStr
   }
 
   private def getPFTPackage(kNo:String,sNo:String,cardType:String): Unit ={
-    val fpt = client.getOriginalData(userId,password,kNo,sNo,cardType)
-    val path = hallWebserviceConfig.localTenprintPath + kNo+sNo + ".FPT"
+    val fpt = handprintServicePortType.getOriginalData(userId,password,kNo,sNo,cardType)
+    val path = hallWebserviceConfig.localTenprintPath+"/" + kNo+sNo + ".FPT"
+    info("FPT路径：---"+path)
     surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA
-                                            ,Constant.EMPTY
-                                            ,Constant.EMPTY
+                                            ,kNo
+                                            ,sNo
                                             ,CommonUtil.appendParam("userId:" + userId
                                                                   , "password:" + password
                                                                   , "kNo:" + kNo
@@ -167,7 +176,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     */
   private def getReceprtionNO(kNo:String) = {
 
-    val receprtionNO = client.getReceptionNo(userId,password,kNo)
+    val receprtionNO = handprintServicePortType.getReceptionNo(userId,password,kNo)
     surveyRecordService.saveSurveyLogRecord(Constant.GET_RECEPTION_NO,kNo
       ,Constant.EMPTY
       ,CommonUtil.appendParam("userId:"+userId,"password:"+password,"kNo:"+kNo)
@@ -181,7 +190,8 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   }
 
   private def callFBUseCondition(kNo:String,sNo:String,cardType:String,exceptionInfo:String): Unit ={
-    val responses = client.FBUseCondition(userId,password,kNo,sNo,"",cardType,Constant.FPT_PARSE_FAIL)
+    val responses = handprintServicePortType.fbUseCondition(userId,password,kNo,sNo,"",cardType,Constant.FPT_PARSE_FAIL)
+    info("callFBUseCondition返回信息：---"+responses)
     surveyRecordService.saveSurveyLogRecord(Constant.FBUSECONDITION
       ,kNo
       ,sNo

@@ -241,7 +241,7 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
-    mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.stCm.nMntCnt = if(fptMnt.featureCount.length>0) fptMnt.featureCount.toShort else 0
     mntDisp.nMaxMnt = fptMnt.featureCount.toShort //最大特征个数
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
@@ -278,7 +278,7 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_UPCORE)
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_UPCORE)
 
-    mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.stCm.nMntCnt = if(fptMnt.featureCount.length>0) fptMnt.featureCount.toShort else 0
     mntDisp.nMaxMnt = fptMnt.featureCount.toShort
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)

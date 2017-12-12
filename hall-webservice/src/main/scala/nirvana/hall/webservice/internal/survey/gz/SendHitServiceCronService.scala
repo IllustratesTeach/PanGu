@@ -10,10 +10,11 @@ import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.ExceptRelationService
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
+//import nirvana.hall.webservice.services.survey.HandprintService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
+//import stark.webservice.services.StarkWebServiceClient
 
 
 /**
@@ -25,11 +26,13 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-    url,
-    targetNamespace,
-    classOf[HandprintService].getSimpleName,
-    classOf[HandprintService].getSimpleName + "HttpPort")
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
+  val handprintService = new HandprintService
+  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
 
   final var BATCH_SIZE = 10
 
@@ -64,19 +67,21 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
     var path: String = null
     surveyRecordService.getSurveyHit(BATCH_SIZE).foreach {
       hitResult =>
-        if(! surveyRecordService.isKno(hitResult.get("kno").toString)){
-          hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY,hitResult.get("orasid").toString)
-          path = hallWebserviceConfig.localTenprintPath + hitResult.get("kno").toString + hitResult.get("sno").toString + ".FPT"
+        if(! surveyRecordService.isKno(hitResult.get("kno").get.toString)){
+//          hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY,"12768")
+//          path = hallWebserviceConfig.localLatentPath + "/" + "5227250100002014080002" + "04" + ".FPT"
+          hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY, hitResult.get("orasid").get.toString)
+          path = hallWebserviceConfig.localLatentPath + "/" + hitResult.get("kno").get.toString + hitResult.get("sno").get.toString + ".FPT"
           if(hallWebserviceConfig.saveFPTFlag.equals("1")){
             FileUtils.writeByteArrayToFile(new File(path), IOUtils.toByteArray(hitfpt.getInputStream))
           }
 
-          val matchcode = client.FBMatchCondition(userId
+          val matchcode = handprintServicePortType.fbMatchCondition(userId
             ,password
             ,IOUtils.toByteArray(hitfpt.getInputStream))
           info("FBMatchCondition 反馈返回值： " + matchcode)
 
-          surveyRecordService.updateSurveyHitState(matchcode,hitResult.get("uuid").toString)
+          surveyRecordService.updateSurveyHitState(matchcode,hitResult.get("uuid").get.toString)
 
           surveyRecordService.saveSurveyLogRecord(Constant.FBMatchCondition
             ,Constant.EMPTY

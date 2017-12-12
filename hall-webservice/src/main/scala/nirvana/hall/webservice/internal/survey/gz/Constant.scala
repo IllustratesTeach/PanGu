@@ -11,6 +11,7 @@ object Constant {
 
   final val SURVEY_CODE_INIT = 0
   final val SURVEY_CODE_KNO_SUCCESS = 1
+  final val SURVEY_CODE_KNO_FAIL = -1
   final val SURVEY_CODE_CASEID_ERROR = -2
   final val SURVEY_CODE_CASEID_SUCCESS = 2
 

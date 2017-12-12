@@ -6,17 +6,18 @@ import javax.xml.bind.annotation._
 /**
   * Created by ssj on 2017/11/16.
   */
-@XmlRootElement(name = "List")
+@XmlRootElement(name = "LIST")
 @XmlAccessorType(XmlAccessType.FIELD)
 class OriginalList{
   var K = new util.ArrayList[ListNode]()
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 class ListNode{
-  var K_No :String = _
-  var S_No :String = _
-  var card_type :String = _
+  var K_NO :String = _
+  var S_NO :String = _
+  var CARD_TYPE :String = _
   var CASE_NAME :String = _
+  var IP : String = _
 }
 
 

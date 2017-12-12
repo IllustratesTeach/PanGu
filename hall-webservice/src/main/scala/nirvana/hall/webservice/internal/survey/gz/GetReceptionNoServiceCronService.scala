@@ -1,16 +1,16 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-
 import java.util.Date
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
+//import nirvana.hall.webservice.services.survey.HandprintService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
+//import stark.webservice.services.StarkWebServiceClient
 
 /**
   * Created by ssj on 2017/11/14.
@@ -21,11 +21,13 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
   val userId = hallWebserviceConfig.handprintService.user
   val password = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-    url,
-    targetNamespace,
-    classOf[HandprintService].getSimpleName,
-    classOf[HandprintService].getSimpleName + "HttpPort")
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
+  val handprintService = new HandprintService
+  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
 
   val BATCH_SIZE=10
   /**
@@ -56,10 +58,10 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
   def doWork {
     surveyRecordService.getXkcodebyState(Constant.SURVEY_CODE_CASEID_ERROR, BATCH_SIZE).foreach {
       kNo =>
-        val receptionid = client.getReceptionNo(userId, password, kNo)
+        val receptionid = handprintServicePortType.getReceptionNo(userId, password, kNo)
         info("getReceptionNo -- 接警编号：" + receptionid)
         surveyRecordService.saveSurveyLogRecord (Constant.GET_RECEPTION_NO
-          , Constant.EMPTY
+          , kNo
           , Constant.EMPTY
           , CommonUtil.appendParam ("userId:" + userId, "password:" + password, "kNo:" + kNo)
           , receptionid
