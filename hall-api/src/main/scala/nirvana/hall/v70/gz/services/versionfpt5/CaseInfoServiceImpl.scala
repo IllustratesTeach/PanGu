@@ -150,7 +150,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
     magicSet(caseInfo.extractUnitCode, textBuilder.setStrExtractUnitCode)
     magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
-    magicSet(caseInfo.extractDate.substring(0,4)+"-"+caseInfo.extractDate.substring(4,6)+"-"+caseInfo.extractDate.substring(6), textBuilder.setStrExtractDate)
+    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
     magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
     magicSet(caseInfo.suspiciousAreaCode, textBuilder.setStrSuspArea1Code)
     textBuilder.setNSuperviseLevel(caseInfo.assistLevel)
