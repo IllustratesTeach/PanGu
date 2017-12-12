@@ -1211,6 +1211,8 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LtHitResultPackage")
     class LtHitResultPackage{
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "xczw_asjbh")
@@ -1219,11 +1221,11 @@ class FPT5File {
         var latentFingerOriginalSystemCaseId:String = _
         @XmlElement(name = "xczw_xckybh")
         var latentFingerLatentSurveyId:String = _
-        @XmlElement(name = "xczw_ysxt_xczzwbh")
+        @XmlElement(name = "xczw_ysxt_xczzhwbh")
         var latentFingerOriginalSystemFingerId:String = _
         @XmlElement(name = "xczw_xcwzbh")
         var latentFingerLatentPhysicalId:String = _
-        @XmlElement(name = "xczw_xczzwkbh")
+        @XmlElement(name = "xczw_xczzhwkbh")
         var latentFingerCardId:String = _
         @XmlElement(name = "nyzw_ysxt_asjxgrybh")
         var fingerPrintOriginalSystemPersonId:String = _
@@ -1231,11 +1233,11 @@ class FPT5File {
         var fingerPrintJingZongPersonId:String = _
         @XmlElement(name = "nyzw_asjxgrybh")
         var fingerPrintPersonId:String = _
-        @XmlElement(name = "nyzw_zzwkbh")
+        @XmlElement(name = "nyzw_zzhwkbh")
         var fingerPrintCardId:String = _
-        @XmlElement(name = "nyzw_zzwdm")
+        @XmlElement(name = "nyzw_zzhwdm")
         var fingerPrintPostionCode:String = _
-        @XmlElement(name = "nyzw_zzwbdffdm")
+        @XmlElement(name = "nyzw_zzhwbdffdm")
         var fingerPrintComparisonMethodCode:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
@@ -1276,9 +1278,11 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtHitResultPackage")
     class TtHitResultPackage{
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
-        @XmlElement(name = "zzwccbzlxdm")
+        @XmlElement(name = "zzhwccbzlxdm")
         var ttHitTypeCode:String = _
         @XmlElement(name = "ysxt_asjxgrybh")
         var originalPersonId:String = _
@@ -1286,7 +1290,7 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
@@ -1296,7 +1300,7 @@ class FPT5File {
         var resultjingZongPersonId:String = _
         @XmlElement(name = "bzjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bzjg_zzwkbh")
+        @XmlElement(name = "bzjg_zzhwkbh")
         var resultCardId:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
@@ -1337,8 +1341,8 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LlHitResultPackage")
     class LlHitResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "ysxt_asjbh")
@@ -1347,11 +1351,11 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var cardId:String = _
         @XmlElement(name = "bzjg_ysxt_asjbh")
         var resultOriginalSystemCaseId:String = _
@@ -1363,7 +1367,7 @@ class FPT5File {
         var resultOriginalSystemLatentPersonId:String = _
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bzjg_xczzwkbh")
+        @XmlElement(name = "bzjg_xczzhwkbh")
         var resultCardId:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
