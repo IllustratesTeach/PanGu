@@ -995,22 +995,30 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
         var latentPackage:Array[LatentPackage]= _
-        @XmlElement(name = "resultMsg")
-        var resultMsg:Array[LTResultMsg] = _
+        @XmlElement(name = "resultMsgSet")
+        var ltResultMsgSet:LTResultMsgSet = _
     }
+
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LTResultMsg")
+    @XmlType(name = "LTResultMsgSet")
+    class LTResultMsgSet {
+        @XmlElement(name = "resultMsg")
+        var resultMsg: Array[LTResultMsg] = _ //比对结果集合
+    }
+
+
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "ResultMsg")
     class LTResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -1021,9 +1029,9 @@ class FPT5File {
         var resultJingZongPersonId:String = _
         @XmlElement(name = "bdjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bdjg_zzwkbh")
+        @XmlElement(name = "bdjg_zzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "bdjg_zzwdm")
+        @XmlElement(name = "bdjg_zzhwdm")
         var resultFingerPalmPostionCode:String = _ //比对结果指掌位代码
         @XmlElement(name = "fingerprintPackage")
         var fingerprintPackage:Array[FingerprintPackage] = _
@@ -1052,18 +1060,22 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "fingerprintPackage")
         var fingerprintPackage:Array[FingerprintPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var tlResultMsgSet:TLResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "TLResultMsgSet")
+    class TLResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:Array[TLResultMsg] = _
+        var resultMsg: Array[TLResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TLResultMsg")
     class TLResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -1074,13 +1086,13 @@ class FPT5File {
         var resultCaseId:String = _
         @XmlElement(name = "bdjg_xckybh")
         var resultLatentSurveyId:String = _
-        @XmlElement(name = "bdjg_ysxt_xczzwbh")
+        @XmlElement(name = "bdjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentFingerPalmId:String = _
         @XmlElement(name = "bdjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bdjg_xczzwkbh")
+        @XmlElement(name = "bdjg_xczzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "bdjg_zzwdm")
+        @XmlElement(name = "bdjg_zzhwdm")
         var resultFingerPalmPostionCode:String = _
         @XmlElement(name = "latentPackage")
         var latentPackage:Array[LatentPackage] = _
@@ -1093,8 +1105,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtResultPackage")
     class TtResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -1111,20 +1121,24 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
         @XmlElement(name = "fingerprintPackage")
         var fingerprintPackage:Array[FingerprintPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var ttResultMsgSet:TtResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "TtResultMsgSet")
+    class TtResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:Array[TTResultMsg] = _
+        var resultMsg: Array[TTResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TTResultMsg")
     class TTResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -1135,9 +1149,9 @@ class FPT5File {
         var resultJingZongPersonId:String = _
         @XmlElement(name = "bdjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bdjg_zzwkbh")
+        @XmlElement(name = "bdjg_zzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "zzwccbzlxdm")
+        @XmlElement(name = "zzhwccbzlxdm")
         var ttHitTypeCode:String = _
         @XmlElement(name = "fingerprintPackage")
         var fingerprintPackage:Array[FingerprintPackage] = _
@@ -1150,8 +1164,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LlResultPackage")
     class LlResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -1168,22 +1180,26 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
         var latentPackage:Array[LatentPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var llResultMsgSet:LlResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LlResultMsgSet")
+    class LlResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:Array[LLResultMsg] = _
+        var resultMsg: Array[LLResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LLResultMsg")
     class LLResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -1196,9 +1212,9 @@ class FPT5File {
         var resultLatentSurveyId:String = _
         @XmlElement(name = "bdjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bdjg_ysxt_xczzwbh")
+        @XmlElement(name = "bdjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentFingerId:String = _
-        @XmlElement(name = "bdjg_xczzwkbh")
+        @XmlElement(name = "bdjg_xczzhwkbh")
         var resultLatentCardId:String = _
         @XmlElement(name = "latentPackage")
         var latentPackage:Array[LatentPackage] = _
