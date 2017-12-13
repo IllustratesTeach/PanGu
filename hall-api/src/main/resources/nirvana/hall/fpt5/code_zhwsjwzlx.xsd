@@ -3,11 +3,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:simpleType name="code_zhwsjwzlx">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="">
-				<xs:annotation>
-					<xs:documentation>空值</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
+			
 			<xs:enumeration value="00">
 				<xs:annotation>
 					<xs:documentation>未知位置三角</xs:documentation>

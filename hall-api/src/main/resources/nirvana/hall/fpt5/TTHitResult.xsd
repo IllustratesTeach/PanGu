@@ -13,7 +13,6 @@
 	<xs:include schemaLocation="code_zjzl.xsd"/>
 	<xs:include schemaLocation="code_xzqh.xsd"/>
 	<xs:include schemaLocation="code_rxzplxdm.xsd"/>
-	
 	<xs:include schemaLocation="date.xsd"/>
 	<xs:include schemaLocation="code_ajlb.xsd"/>
 	<xs:include schemaLocation="sfzh.xsd"/>
@@ -106,7 +105,7 @@
 								</xs:annotation>
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
+										<xs:maxLength value="23"/>
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>
@@ -156,7 +155,7 @@
 								</xs:annotation>
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
+										<xs:maxLength value="23"/>
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>

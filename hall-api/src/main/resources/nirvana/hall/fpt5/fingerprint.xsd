@@ -931,7 +931,7 @@
 																				</xs:annotation>
 																				<xs:simpleType>
 																					<xs:restriction base="code_zhwsjwzlx">
-																						<xs:maxLength value="1"/>
+																						<xs:maxLength value="2"/>
 																					</xs:restriction>
 																				</xs:simpleType>
 																			</xs:element>

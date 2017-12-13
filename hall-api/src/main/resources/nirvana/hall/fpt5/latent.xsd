@@ -13,7 +13,6 @@
 	<xs:include schemaLocation="code_zjzl.xsd"/>
 	<xs:include schemaLocation="code_xzqh.xsd"/>
 	<xs:include schemaLocation="code_rxzplxdm.xsd"/>
-	
 	<xs:include schemaLocation="date.xsd"/>
 	<xs:include schemaLocation="code_ajlb.xsd"/>
 	<xs:include schemaLocation="sfzh.xsd"/>
@@ -416,7 +415,7 @@
 												</xs:all>
 											</xs:complexType>
 										</xs:element>
-										<xs:element name="fingerFeatureMsg" maxOccurs="unbounded">
+										<xs:element name="fingerFeatureMsg" minOccurs="0" maxOccurs="unbounded">
 											<xs:complexType>
 												<xs:sequence>
 													<xs:element name="ysxt_xczzhwbh" minOccurs="0">
@@ -751,7 +750,7 @@
 															</xs:restriction>
 														</xs:simpleType>
 													</xs:element>
-													<xs:element name="minutiaSet" minOccurs="1">
+													<xs:element name="minutiaSet" minOccurs="0">
 														<xs:complexType>
 															<xs:sequence>
 																<xs:element name="minutia" maxOccurs="240">
@@ -800,19 +799,19 @@
 																					</xs:restriction>
 																				</xs:simpleType>
 																			</xs:element>
-																			<xs:element name="xczw_zdyxx" minOccurs="0">
-																				<xs:annotation>
-																					<xs:documentation>现场指纹_自定义信息</xs:documentation>
-																				</xs:annotation>
-																				<xs:simpleType>
-																					<xs:restriction base="xs:string"/>
-																				</xs:simpleType>
-																			</xs:element>
 																		</xs:sequence>
 																	</xs:complexType>
 																</xs:element>
 															</xs:sequence>
 														</xs:complexType>
+													</xs:element>
+													<xs:element name="xczw_zdyxx" minOccurs="0">
+														<xs:annotation>
+															<xs:documentation>现场指纹_自定义信息</xs:documentation>
+														</xs:annotation>
+														<xs:simpleType>
+															<xs:restriction base="xs:string"/>
+														</xs:simpleType>
 													</xs:element>
 												</xs:sequence>
 											</xs:complexType>
@@ -960,7 +959,7 @@
 												</xs:all>
 											</xs:complexType>
 										</xs:element>
-										<xs:element name="palmFeatureMsg" maxOccurs="unbounded">
+										<xs:element name="palmFeatureMsg" minOccurs="0" maxOccurs="unbounded">
 											<xs:complexType>
 												<xs:sequence>
 													<xs:element name="xczhw_xczzhwbh" minOccurs="0">
@@ -1173,7 +1172,7 @@
 																				</xs:annotation>
 																				<xs:simpleType>
 																					<xs:restriction base="code_zhwsjwzlx">
-																						<xs:maxLength value="1"/>
+																						<xs:maxLength value="2"/>
 																					</xs:restriction>
 																				</xs:simpleType>
 																			</xs:element>

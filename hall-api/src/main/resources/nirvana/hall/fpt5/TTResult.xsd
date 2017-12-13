@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	
 	<xs:include schemaLocation="time.xsd"/>
 	<xs:include schemaLocation="int.xsd"/>
 	<xs:include schemaLocation="float.xsd"/>
@@ -14,7 +13,6 @@
 	<xs:include schemaLocation="code_zjzl.xsd"/>
 	<xs:include schemaLocation="code_xzqh.xsd"/>
 	<xs:include schemaLocation="code_rxzplxdm.xsd"/>
-	
 	<xs:include schemaLocation="date.xsd"/>
 	<xs:include schemaLocation="code_ajlb.xsd"/>
 	<xs:include schemaLocation="sfzh.xsd"/>
@@ -33,7 +31,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="packageHead"></xs:element>
+				<xs:element ref="packageHead"/>
 				<xs:element name="TTResultPackage" minOccurs="0" maxOccurs="256">
 					<xs:annotation>
 						<xs:documentation>查重比对结果</xs:documentation>
@@ -127,7 +125,7 @@
 								</xs:annotation>
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
+										<xs:maxLength value="23"/>
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>

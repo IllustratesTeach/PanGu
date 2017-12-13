@@ -13,7 +13,6 @@
 	<xs:include schemaLocation="code_zjzl.xsd"/>
 	<xs:include schemaLocation="code_xzqh.xsd"/>
 	<xs:include schemaLocation="code_rxzplxdm.xsd"/>
-	
 	<xs:include schemaLocation="date.xsd"/>
 	<xs:include schemaLocation="sfzh.xsd"/>
 	<xs:include schemaLocation="packageHead.xsd"/>
