@@ -21,7 +21,7 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
    /** 获取比对任务  */
-  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag " +
+  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag, t.startkey1, t.endkey1, t.startkey2, t.endkey2 " +
   " from NORMALQUERY_QUERYQUE t where rowid in " +
   " (select rid from (select rowid rid from NORMALQUERY_QUERYQUE t1 where t1.status = 0 order by t1.priority desc, t1.ora_sid) tt where rownum <= ?)"
 
@@ -48,6 +48,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        catch {
          case e: Exception =>
            updateMatchStatusFail(oraSid, e.getMessage)
+           e.printStackTrace()
        }
      }
      matchTaskQueryResponse.build()
@@ -114,7 +115,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
      val endKey2 = rs.getString("endkey2")
      val textQueryDataBuilder = TextQueryData.newBuilder()
      if(startKey1 != null || endKey1 != null || startKey2 != null || endKey2 != null){
-       val isLatent = queryType match {
+       val destDBIsLatent = queryType match {
          case HallMatcherConstants.QUERY_TYPE_TT |
               HallMatcherConstants.QUERY_TYPE_LT =>
            false
@@ -122,7 +123,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
               HallMatcherConstants.QUERY_TYPE_LL =>
            true
        }
-       val groupQuery = getGroupQuery(startKey1, endKey1, startKey2, endKey2, isLatent)
+       val groupQuery = getGroupQuery(startKey1, endKey1, startKey2, endKey2, destDBIsLatent)
        textQueryDataBuilder.addQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery)
      }
 
