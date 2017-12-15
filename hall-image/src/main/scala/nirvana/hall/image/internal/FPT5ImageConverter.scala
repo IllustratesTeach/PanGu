@@ -17,9 +17,8 @@ object FPT5ImageConverter {
     * @return
     */
   def convertGAFISIMAGESTRUCT2FingerMsg(gafisImage: GAFISIMAGESTRUCT, fingerMsg: FingerMsg = new FingerMsg): FingerMsg={
-    fingerMsg.fingerPositionCode = if(gafisImage.stHead.bIsPlain.toInt==1)
-      (gafisImage.stHead.nFingerIndex.toInt + 10).toString
-    else gafisImage.stHead.nFingerIndex.toString//指位
+    val fingerPositionCode = gafisImage.stHead.nFingerIndex.toString
+    fingerMsg.fingerPositionCode = if(fingerPositionCode.matches("^([1-9])$")) ("0"+fingerPositionCode) else (fingerPositionCode)
     fingerMsg.fingerFeatureExtractionMethodCode = fpt4code.EXTRACT_METHOD_A //提取方式代码
     fingerMsg.fingerImageHorizontalDirectionLength = gafisImage.stHead.nWidth //指纹图像水平方向长度
     fingerMsg.fingerImageVerticalDirectionLength = gafisImage.stHead.nHeight //指纹图像垂直方向长度
