@@ -128,7 +128,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       val responseStatusAndOraSidMap = strategyService.getRemoteResponseStatusAndOrasidByPersonId(cardId)
       responseStatusAndOraSidMap match{
         case Some(t) =>
-          val oraSid = t.get("orasid").get.asInstanceOf[Long].toLong
+          val oraSid = t("orasid").asInstanceOf[Long].toLong
           if(oraSid > 0){
             val status = getStatusBySidSQL(oraSid)
             result = strategyService.getResponseStatusByGafisStatus_TT(status)
@@ -346,7 +346,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       case ex:Throwable =>
 
       strategyService.fingerBusinessFinishedHandler(uuid,IAConstant.EMPTY,userid,unitcode
-        ,IAConstant.SEARCH_FAIL,IAConstant.GET_FINGER_MATCH_DATA,IAConstant.EMPTY,IAConstant.EMPTY_ORASID.toString,null,Some(ex))
+        ,IAConstant.SEARCH_FAIL,IAConstant.GET_FINGER_MATCH_DATA,personid,IAConstant.EMPTY_ORASID.toString,null,Some(ex))
     }
     listDataHandler
   }
