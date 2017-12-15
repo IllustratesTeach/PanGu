@@ -38,8 +38,7 @@ object FPT5Converter {
     fingerprintPackage.descriptiveMsg.fingerPalmCardId = tpCard.getStrCardID   //指掌纹卡编号 系统自用
     val captureInfoReasonCode = new mutable.ArrayBuffer[String]//采集信息原因代码集合
     tpCard.getCaptureInfoReasonCode.split(",").foreach{code=>
-      //captureInfoReasonCode += code
-      captureInfoReasonCode += "01"
+      captureInfoReasonCode += code
     }
     fingerprintPackage.descriptiveMsg.collectingReasonSet.captureInfoReasonCode = captureInfoReasonCode.toArray // 采集信息原因代码
     fingerprintPackage.descriptiveMsg.name = tpCard.getText.getStrName   //姓名
@@ -143,6 +142,8 @@ object FPT5Converter {
     val gafisMnt = new GAFISIMAGESTRUCT().fromByteArray(blob.getStMntBytes.toByteArray())
     //gafis特征转换成FPT特征
     FPT5MntConverter.convertGafisMnt2FingerMsg(gafisMnt, fingerMsg)
+    fingerMsg.fingerCustomInfo = new Array[Byte](255)
+    fingerMsg.adactylismCauseCode = fpt5util.FINGER_LOST_NORMAL
     fingerMsg
   }
 
@@ -160,6 +161,7 @@ object FPT5Converter {
     FPT5MntConverter.convertGafisMnt2PalmMsg(gafisMnt, palmMsg)
 
     palmMsg.palmPostionCode = palmFgpPares2String(blob.getPalmfgp)
+    palmMsg.lackPalmCauseCode = fpt5util.FINGER_LOST_NORMAL
     palmMsg
   }
 
