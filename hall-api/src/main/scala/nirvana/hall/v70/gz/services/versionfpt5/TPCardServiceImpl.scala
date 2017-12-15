@@ -122,6 +122,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     */
   override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
     val person = GafisPerson.find(personId)
+    //val personCertificateList = GafisGatherCertificate.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
     val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
@@ -162,7 +163,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     magicSet(person.gatherusername, textBuilder.setStrPrinter)
     textBuilder.setStrPrintDate(person.gatherDate)
     magicSet(person.remark, textBuilder.setStrComment)
-
+    magicSet(person.chopPersonIdCard,textBuilder.setStrPrinterIdCardNo)
+    magicSet(person.chopPersonTel,textBuilder.setStrPrinterPhone)
     //协查信息
     textBuilder.setNXieChaFlag(person.assistSign)
     textBuilder.setNXieChaLevel(person.assistLevel)
