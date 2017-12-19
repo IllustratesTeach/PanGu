@@ -469,8 +469,6 @@ object FPT5Converter {
     latentImageMsg.latentFingerConnectFingerEndPhysicalId = lpcard.getText.getStrEnd //现场指纹_连指结束_现场物证编号
     latentImageMsg.latentFingerComparisonStatusCode = lpcard.getText.getNBiDuiState.toString //现场指纹_指纹比对状态代码
     latentImageMsg.latentFingerCustomInfo = lpcard.getText.getStrComment.getBytes() //现场指纹_自定义信息
-    latentImageMsg.latentFingerAnalysisPostionBrief = ""
-    latentImageMsg.latentFingerPatternAnalysisBrief = ""
 
     val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lpcard.getBlob.getStImageBytes.toByteArray)
     FPT5ImageConverter.convertGAFISIMAGESTRUCT2LatentFingerImageMsg(gafisImage, latentImageMsg)
@@ -488,19 +486,51 @@ object FPT5Converter {
       latentFeatureMsg.latentFeatureGroupIdentifier = ""
       latentFeatureMsg.fingerAnalysisPostionBrief = ""
       latentFeatureMsg.fingerPatternAnalysisBrief = ""
-      //TODO 指位和纹型转换, 指纹方向
-      lpcard.getBlob.getFgpList.foreach { fgp =>
-        //          latentImageMsg.latentFingerAnalysisPostionBrief = fgp
-      }
-      lpcard.getBlob.getRpList.foreach { pattern =>
-        //          latentImageMsg.latentFingerPatternAnalysisBrief = //现场指纹_纹型分析_简要情况
-      }
+      //指位和纹型转换
+      latentImageMsg.latentFingerAnalysisPostionBrief = convertFingerFgp2FPT5(lpcard.getBlob.getFgpList)
+      latentImageMsg.latentFingerPatternAnalysisBrief = convertPatternType2FPT5(lpcard.getBlob.getRpList)
+
       latentFingerFeatureMsg += latentFeatureMsg
     }
 
     latentFingers.latentFingerImageMsg = latentImageMsg
     latentFingers.latentFingerFeatureMsg = latentFingerFeatureMsg.toArray
     latentFingers
+  }
+
+  /**
+    * 分析指位转换为fpt5格式
+    * @param fgpList 分析指位列表proto
+    * @return 从左至右，每字符依次对应指位01-10，如果对应位为1表示有可能是这个指位，为0表示不可能是这个指位
+    */
+  def convertFingerFgp2FPT5(fgpList: Seq[FingerFgp]): String={
+    var str = ""
+    (1 to 10).foreach{i=>
+      if(fgpList.exists(p=> p.getNumber == i)){
+        str = "1"+str
+      }else{
+        str = "0"+str
+      }
+    }
+    str
+  }
+
+  /**
+    * 候选纹型转为fpt5格式
+    * @param patternType 分析纹型列表proto, 目前只有4种
+    * @return 从左至右每字符对应指纹纹型分类代码1到7，每字符有效值为1或0，1表示可能的分类，0表示不可能的分类
+    */
+  def convertPatternType2FPT5(patternType: Seq[PatternType]): String={
+    var str = ""
+    (1 to 7).foreach{i=>
+      if(patternType.exists(p=> p.getNumber == i)){
+        str = "1"+str
+      }else{
+        str = "0"+str
+      }
+    }
+
+    str
   }
 
   /**

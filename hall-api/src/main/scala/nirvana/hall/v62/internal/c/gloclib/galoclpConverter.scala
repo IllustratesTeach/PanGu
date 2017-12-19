@@ -7,14 +7,16 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGESTRUCT, GAFISMICSTRUCT, GATEXTITEMSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
 import nirvana.hall.protocol.api.FPTProto
-import nirvana.hall.protocol.api.FPTProto.{Case, ImageType, LPCard}
+import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v62.services.DictCodeConverter
 import org.apache.commons.lang.StringUtils
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
  *
@@ -156,8 +158,14 @@ object galoclpConverter extends LoggerSupport{
     val mic = card.getBlobBuilder
     gCard.pstMIC_Data.foreach{ item =>
       //特征
-      if(item.nMntLen > 0)
+      if(item.nMntLen > 0){
         mic.setStMntBytes(ByteString.copyFrom(item.pstMnt_Data))
+        //获取候选指位和纹型
+        val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(item.pstMnt_Data)
+        val mnt = new FINGERLATMNTSTRUCT().fromByteArray(gafisImage.bnData)
+        convertFingerCode2FingerFgpList(mnt.FingerCode).foreach(mic.addFgp)
+        convertRpCode2PatternType(mnt.RpCode).foreach(mic.addRp)
+      }
       //纹线
       if(item.nBinLen > 0)
         mic.setStBinBytes(ByteString.copyFrom(item.pstBin_Data))
@@ -197,6 +205,36 @@ object galoclpConverter extends LoggerSupport{
       card.getTextBuilder.setStrSeq(card.getStrCardID.substring(card.getStrCardID.length - 2))
     }
     card.build()
+  }
+
+  /**
+    * 候选指位转换
+    * @param fingerCode 候选指位（按位计算）前10位依次是指位1-10
+    * @return
+    */
+  private def convertFingerCode2FingerFgpList(fingerCode: Short): Seq[FingerFgp]={
+    val fgpList = new ArrayBuffer[FingerFgp]()
+    (6 until 16).map(i=> (i-5, (fingerCode & (1 << i)) > 0)).foreach{x=>
+      if(x._2){
+        fgpList += FingerFgp.valueOf(x._1)
+      }
+    }
+    fgpList
+  }
+
+  /**
+    * 候选纹型转换
+    * @param rpCode 候选纹型（按位计算）前4位依次是 弓，左，右，斗
+    * @return
+    */
+  private def convertRpCode2PatternType(rpCode: Byte): Seq[PatternType] ={
+    val patternTypeList = new ArrayBuffer[PatternType]()
+    (4 until 8).map(i=> (i-3, (rpCode & (1 << i)) > 0)).foreach{x=>
+      if(x._2){
+        patternTypeList += PatternType.valueOf(x._1)
+      }
+    }
+    patternTypeList
   }
 
   //convert protocol string list as gafis GAKEYSTRUCT
