@@ -56,6 +56,8 @@ class FPT5File {
     var llHitResultPackage: Array[LlHitResultPackage] = _
     @XmlElement(name = "cancellatentPackage")
     var cancelLatentPackage: Array[cancelLatentPackage] = _
+    @XmlElement(name = "cancellatentPackage")
+    var customdataPackage: Array[customDataPackage] = _
 
     /**
       * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
@@ -90,6 +92,17 @@ class FPT5File {
         @XmlElement(name = "fsr_lxdm")
         var sendPersonTel:String = _ //发送人联系电话
     }
+
+    /**
+      *
+      */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "customDataPackage")
+    class customDataPackage{
+        @XmlElement(name = "zdyxx")
+        var CustomInfo: String = _
+    }
+
 
     /**
       * 捺印
@@ -343,7 +356,7 @@ class FPT5File {
         @XmlElement(name = "deltaDirection")
         var deltaDirection:Array[DeltaDirection] =_
         @XmlElement(name = "zhwsjd_zhwsjwzlxdm")
-        var deltaPostionClassCode:Int = _
+        var deltaPostionClassCode:String = _
         @XmlElement(name = "zhwsjd_tzzl")
         var deltaFeatureQuality:Int = _
     }
@@ -818,7 +831,7 @@ class FPT5File {
         @XmlElement(name = "deltaDirection")
         var latentPalmDeltaDirection:Array[LatentPalmDeltaDirection] = _
         @XmlElement(name = "xczhw_zhwsjd_zhwsjwzlxdm")
-        var palmTrianglePostionTypeCode:Int = _
+        var palmTrianglePostionTypeCode:String = _
         @XmlElement(name = "xczhw_zhwsjd_tzzl")
         var latentPalmTrianglePointFeatureQuality:Int = _
     }
