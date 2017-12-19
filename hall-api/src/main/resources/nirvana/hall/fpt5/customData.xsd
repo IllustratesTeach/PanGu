@@ -1,145 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:include schemaLocation="time.xsd"/>
-	<xs:include schemaLocation="int.xsd"/>
-	<xs:include schemaLocation="float.xsd"/>
-	<xs:include schemaLocation="code_if.xsd"/>
-	<xs:include schemaLocation="code_lymssm.xsd"/>
-	<xs:include schemaLocation="code_qzqkdm.xsd"/>
-	<xs:include schemaLocation="code_xb.xsd"/>
-	<xs:include schemaLocation="code_gj.xsd"/>
-	<xs:include schemaLocation="code_mz.xsd"/>
-	<xs:include schemaLocation="code_zjzl.xsd"/>
-	<xs:include schemaLocation="code_xzqh.xsd"/>
-	<xs:include schemaLocation="code_rxzplxdm.xsd"/>
-	
-	<xs:include schemaLocation="date.xsd"/>
-	<xs:include schemaLocation="sfzh.xsd"/>
+	<xs:include schemaLocation="packageHead.xsd"/>
+	<xs:include schemaLocation="customDataPackage.xsd"/>
 	<xs:element name="package">
 		<xs:annotation>
 			<xs:documentation>包体</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="packageHead">
-					<xs:annotation>
-						<xs:documentation>包头</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:all>
-							<xs:element name="version" fixed="FPT0500">
-								<xs:annotation>
-									<xs:documentation>版本号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="7"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="createTime">
-								<xs:annotation>
-									<xs:documentation>创建时间</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="time">
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="originSystem">
-								<xs:annotation>
-									<xs:documentation>来源系统</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="code_lymssm">
-										<xs:maxLength value="128"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsdw_gajgjgdm">
-								<xs:annotation>
-									<xs:documentation>发送单位代码</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="12"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsdw_gajgmc">
-								<xs:annotation>
-									<xs:documentation>发送单位名称</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="100"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsdw_xtlx">
-								<xs:annotation>
-									<xs:documentation>发送单位系统类型</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="4"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsr_xm">
-								<xs:annotation>
-									<xs:documentation>发送人姓名</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="25"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsr_gmsfhm">
-								<xs:annotation>
-									<xs:documentation>发送人身份证号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="sfzh">
-										<xs:maxLength value="18"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="fsr_lxdm">
-								<xs:annotation>
-									<xs:documentation>发送人联系电话</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="30"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-						</xs:all>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="customDataPackage">
-					<xs:annotation>
-						<xs:documentation>自定义信息</xs:documentation>
-					</xs:annotation>
-					<xs:complexType>
-						<xs:all>
-							<xs:element name="zdyxx">
-								<xs:annotation>
-									<xs:documentation>自定义信息</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="ejz">
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-						</xs:all>
-					</xs:complexType>
-				</xs:element>
+				<xs:element ref="packageHead"/>
+				<xs:element ref="customDataPackage" minOccurs="0" maxOccurs="256"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
