@@ -772,7 +772,7 @@ class FPT5File {
         @XmlElement(name = "xczw_zwysj_tzkkd")
         var fingerRightTriangleFeatureReliabilityLevel:Int = _ //指纹右三角特征方向范围
         @XmlElement(name = "minutiaSet")
-        var LatentMinutiaSet = new LatentMinutiaSet
+        var latentMinutiaSet:LatentMinutiaSet = _
         @XmlElement(name = "xczw_zdyxx")
         var latentFingerCustomInfo:Array[Byte] = _
     }

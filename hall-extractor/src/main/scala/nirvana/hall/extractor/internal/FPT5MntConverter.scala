@@ -147,8 +147,10 @@ object FPT5MntConverter {
     convertCoreDelta2AFISCOREDELTASTRUCT(rightTriangleCoreDelta, mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
-    fingerFeatureMsg.LatentMinutiaSet.latentMinutia.foreach{ minutia =>
+    if(null != fingerFeatureMsg.latentMinutiaSet){
+      fingerFeatureMsg.latentMinutiaSet.latentMinutia.foreach{ minutia =>
         AFISMNTPOINTSTRUCTList += convertMinutia2AFISMNTPOINTSTRUCT(minutia)
+      }
     }
     mntDisp.nMaxMnt = AFISMNTPOINTSTRUCTList.size.toShort
     mntDisp.stCm.nMntCnt = AFISMNTPOINTSTRUCTList.size.toShort
@@ -411,6 +413,7 @@ object FPT5MntConverter {
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if ( ntemp > 0 ) {
+      val latentMinutiaSet = new LatentMinutiaSet
       var minutiaArray = new ArrayBuffer[gfpt5lib.LatentMinutia]
       var minutia:gfpt5lib.LatentMinutia = null
       for (i <- 0 until ntemp){
@@ -421,7 +424,8 @@ object FPT5MntConverter {
         minutia.fingerFeaturePointQuality = mntDisp.stCm.mnt(i).nFlag.toInt
         minutiaArray += minutia
       }
-      latentFingerFeatureMsg.LatentMinutiaSet.latentMinutia = minutiaArray.toArray
+      latentFingerFeatureMsg.latentMinutiaSet = latentMinutiaSet
+      latentFingerFeatureMsg.latentMinutiaSet.latentMinutia = minutiaArray.toArray
     }
     latentFingerFeatureMsg.latentFeatureExtractMethodCode = fpt4code.EXTRACT_METHOD_M
     latentFingerFeatureMsg
