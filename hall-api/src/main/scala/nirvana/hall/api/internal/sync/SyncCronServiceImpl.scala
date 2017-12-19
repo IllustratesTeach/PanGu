@@ -799,46 +799,22 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     * @param fgp
     * @return
     */
-  def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int): Long = {
-    //TODO 使用NET_GAFIS_QUERY_Update代替sql
-    val sql = s"SELECT t.candlist " +
-      s"FROM Normalquery_Queryque t " +
-      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
-    val candListResult = new ByteArrayOutputStream
-    var flag = -1L
-    JdbcDatabase.queryWithPsSetter(sql) { ps =>
-      ps.setInt(1,oraSid.toInt)
-      ps.setInt(2,taskType)
-      ps.setString(3,keyId)
-    } { rs =>
-      val candList = rs.getBytes("candlist")
-      val buffer = ChannelBuffers.wrappedBuffer(candList)
-      while(buffer.readableBytes() >=96){
-        val gaCand = new GAQUERYCANDSTRUCT
-        gaCand.fromStreamReader(buffer)
-        if(tCode.equals(gaCand.szKey) && fgp==gaCand.nIndex.toInt){
-          gaCand.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
-          gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte
-          gaCand.nFlag = gaqryque.GAQRYCAND_FLAG_BROKEN.toByte
+  def updateCandListStatus(oraSid:String,taskType:Int,keyId:String,tCode:String,fgp:Int):Unit = {
+    val queryStruts = queryService.getGAQUERYSTRUCT(oraSid.toLong)
+    queryStruts.pstCand_Data.foreach{
+      candList =>
+        if(tCode.equals(candList.szKey) && fgp==candList.nIndex.toInt){
+          candList.nCheckState = HallApiConstants.GAQRYCAND_CHKSTATE_MATCH.toByte
+          //gaCand.nStatus = gaqryque.GAQRYCAND_STATUS_FINISHED.toByte -- not must
+          if(taskType == QueryConstants.QUERY_TYPE_TT || taskType == QueryConstants.QUERY_TYPE_LL){
+            candList.nFlag = (gaqryque.GAQRYCAND_FLAG_RECHECKED.toByte | gaqryque.GAQRYCAND_FLAG_BROKEN.toByte).toByte
+          }
+          if(taskType == QueryConstants.QUERY_TYPE_TL || taskType == QueryConstants.QUERY_TYPE_LT){
+            candList.nFlag = (gaqryque.GAQRYCAND_FLAG_NEEDRECHECK.toByte | gaqryque.GAQRYCAND_FLAG_RECHECKED.toByte | gaqryque.GAQRYCAND_FLAG_BROKEN.toByte).toByte
+          }
         }
-        candListResult.write(gaCand.toByteArray())
-      }
-      flag = updateCandList(candListResult.toByteArray,oraSid,taskType,keyId)
     }
-    flag
-  }
-
-  private def updateCandList(candList:Array[Byte],oraSid:String,taskType:Int,keyId:String): Long ={
-    val updateSQL = s"UPDATE Normalquery_Queryque t " +
-      s"SET t.candlist =?,t.status =?  " +
-      s"WHERE t.ora_sid =? AND t.querytype =? AND t.keyid =?"
-    JdbcDatabase.update(updateSQL) { ps =>
-      ps.setBytes(1,candList)
-      ps.setInt(2,11)
-      ps.setInt(3,oraSid.toInt)
-      ps.setInt(4,taskType)
-      ps.setString(5,keyId)
-    }
+    queryService.updateCandListFromQueryQue(queryStruts)
   }
 
 }

@@ -66,4 +66,5 @@ object Gafis70Constants {
   val FACE_FRONT = "1"  //人像正面
   val FACE_RIGHT = "2"  //右侧
   val FACE_LEFT = "3"   //左侧
+  val FACE_UNKNOWN = "0" //未知
 }

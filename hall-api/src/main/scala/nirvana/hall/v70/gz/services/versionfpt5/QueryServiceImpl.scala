@@ -294,4 +294,5 @@ class QueryServiceImpl(entityManager: EntityManager, userService:UserService,imp
     GafisNormalqueryQueryque.find_by_oraSid(oraSid).head
   }
 
+  override def updateCandListFromQueryQue(gaQuery: GAQUERYSTRUCT, dbId: Option[String]): Unit = ???
 }

@@ -244,8 +244,8 @@ object FPT5MntConverter {
     * @return
     */
   private def convertTFingerMntDisp2FPTMnt(mntDisp: MNTDISPSTRUCT, fingerMsg: FingerMsg): FingerMsg={
-    fingerMsg.fingerPatternMasterCode = mntDisp.stFg.rp.toString
-    fingerMsg.fingerPatternSlaveCode = mntDisp.stFg.vrp.toString
+    fingerMsg.fingerPatternMasterCode = if(mntDisp.stFg.rp == 0) fpt5util.PATTERN_TYPE_OTHER else mntDisp.stFg.rp.toString
+    fingerMsg.fingerPatternSlaveCode = if(mntDisp.stFg.vrp == 0) fpt5util.PATTERN_TYPE_OTHER else mntDisp.stFg.vrp.toString
 
     val featureDirection = convertMntDisp2FeatureDirection(mntDisp)
     fingerMsg.fingerFeatureDirection = featureDirection._1
@@ -402,6 +402,10 @@ object FPT5MntConverter {
       latentFingerFeatureMsg.fingerRightTriangleFeatureCoordinateRange = rightTriangleInfo.nRadius
       latentFingerFeatureMsg.fingerRightTriangleFeatureReliabilityLevel = rightTriangleInfo.nReliability
     }
+
+    latentFingerFeatureMsg.fingerAnalysisPostionBrief = mntDisp.stFg.FingerCode
+    latentFingerFeatureMsg.fingerPatternAnalysisBrief = mntDisp.stFg.RpCode.toString
+
 
     val nMaxMnt:Int = FINGER_FEATURE_MAX_COUNT
     var ntemp:Int = mntDisp.stCm.nMntCnt

@@ -633,6 +633,7 @@ object ProtobufConverter extends LoggerSupport{
             Gafis70Constants.FACE_RIGHT
           case FaceFgp.FACE_LEFT=>
             Gafis70Constants.FACE_LEFT
+          case _ => Gafis70Constants.FACE_UNKNOWN
         }
         portrait.gatherData = blob.getStImageBytes.toByteArray
         portrait.personid = personId

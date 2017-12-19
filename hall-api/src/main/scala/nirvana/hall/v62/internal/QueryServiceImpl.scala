@@ -225,4 +225,7 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
     }
   }
 
+  override def updateCandListFromQueryQue(gaQuery:GAQUERYSTRUCT,dbId: Option[String] = None): Unit = {
+    facade.NET_GAFIS_QUERY_Update(getDBID(dbId), V62Facade.TID_QUERYQUE,gaQuery)
+  }
 }
