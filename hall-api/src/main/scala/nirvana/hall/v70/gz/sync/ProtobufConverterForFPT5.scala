@@ -470,7 +470,7 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
 
     person.personid = tpCard.getStrCardID
-    person.cardid = tpCard.getStrMisPersonID
+    person.cardid = tpCard.getStrCardID
     val text = tpCard.getText
 
     person.name = text.getStrName
@@ -493,6 +493,11 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
 
     person.nativeplaceCode = text.getStrRace
     person.nationCode = text.getStrNation
+    person.jingZongPersonId = tpCard.getStrJingZongPersonId
+    person.casePersonid = tpCard.getStrCasePersonID
+    person.chopPersonIdCard =  tpCard.getStrPrinterIdCardId
+    person.chopPersonTel = tpCard.getStrPrinterTel
+
 
     //数据校验
     if(person.idcardno.length > 18){
@@ -966,5 +971,11 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
           throw new IllegalArgumentException("unknown queryType:"+ queryType)
       }
     }
+  }
+  def convertTPCard2GafisGatherCertificate(tpCard: TPCard,personCertificate:GafisGatherCertificate = new GafisGatherCertificate()):GafisGatherCertificate = {
+    personCertificate.personId = tpCard.getStrPersonID
+    personCertificate.certificateType = tpCard.getText.getStrCertifType
+    personCertificate.certificateId = tpCard.getText.getStrCertifID
+    personCertificate
   }
 }
