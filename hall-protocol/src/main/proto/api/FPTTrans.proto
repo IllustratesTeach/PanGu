@@ -17,10 +17,12 @@ enum ResponseStatus {
 enum ExportType{
     TP = 1;
     LP = 2;
-    HIT = 3;
-    CANDLIST = 4;
-    QUERY = 5;
-    CANCEL = 6;
+    CASEFINGER = 3;
+    CASEPALM = 4;
+    HIT = 5;
+    CANDLIST = 6;
+    QUERY = 7;
+    CANCEL = 8;
 }
 
 enum FPTVersion{
@@ -61,7 +63,7 @@ message FPTExportRequest {
     extend monad.rpc.protocol.BaseCommand{
         optional FPTExportRequest cmd = 10802;
     }
-    required string cardid = 1;
+    repeated string cardid = 1;
     required ExportType type = 2;
 }
 /**
@@ -74,5 +76,5 @@ message FPTExportResponse {
     }
     required ResponseStatus status = 1;
     required string msg = 2;
-    required string data = 3;
+    repeated string data = 3;
 }
