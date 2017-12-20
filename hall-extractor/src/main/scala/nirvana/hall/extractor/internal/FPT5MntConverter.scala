@@ -190,7 +190,6 @@ object FPT5MntConverter {
               scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
               scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
           }
-          scoreDeltaStruts.nClass = d.palmTrianglePostionTypeCode.toByte
           scoreDeltaStruts.bEdited = 1
           scoreDeltaStruts.bIsExist = 1
           scoreDeltaStrutsArray += scoreDeltaStruts
