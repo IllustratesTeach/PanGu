@@ -11,7 +11,10 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.c.CodeHelper
 import nirvana.hall.v62.internal.c.gloclib.{gaqryqueConverter, gcolnames}
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Created by songpeng on 16/1/26.
@@ -227,5 +230,15 @@ class QueryServiceImpl(facade:V62Facade, config:HallV62Config) extends QueryServ
 
   override def updateCandListFromQueryQue(gaQuery:GAQUERYSTRUCT,dbId: Option[String] = None): Unit = {
     facade.NET_GAFIS_QUERY_Update(getDBID(dbId), V62Facade.TID_QUERYQUE,gaQuery)
+  }
+
+  override def getGAQUERYSTRUCTListByKeyId(keyId: String, dbId: Option[String]): Seq[GAQUERYSTRUCT] = {
+    val simpleQuery = findSimpleQuery(getDBID(dbId), Some("(KEYID='%s')".format(keyId)),256)
+    val list = new ArrayBuffer[GAQUERYSTRUCT]
+    simpleQuery.foreach{
+      t =>
+        list += getGAQUERYSTRUCT(CodeHelper.convertAsInt(t.nQueryID,2))
+    }
+    list.toSeq
   }
 }

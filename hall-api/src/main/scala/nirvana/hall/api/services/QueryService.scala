@@ -74,6 +74,8 @@ trait QueryService {
     */
   def getGAQUERYSTRUCT(oraSid: Long, dbId: Option[String] = None): GAQUERYSTRUCT
 
+  def getGAQUERYSTRUCTListByKeyId(keyId: String, dbId: Option[String] = None): Seq[GAQUERYSTRUCT]
+
 
   def updateCandListFromQueryQue(gaQuery:GAQUERYSTRUCT,dbId: Option[String] = None):Unit
 
