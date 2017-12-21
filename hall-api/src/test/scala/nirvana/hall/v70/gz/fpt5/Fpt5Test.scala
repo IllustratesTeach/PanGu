@@ -1,12 +1,19 @@
 package nirvana.hall.v70.gz.fpt5
 
 
-import java.io.{ByteArrayInputStream, File}
+import java.io.{ByteArrayInputStream, File, FileOutputStream}
+import javax.imageio.ImageIO
+import javax.imageio.spi.IIORegistry
 
+import com.google.protobuf.ByteString
 import nirvana.hall.api.services.fpt.FPT5Service
+import nirvana.hall.api.services.remote.HallImageRemoteService
+import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.c.services.gfpt5lib._
-import nirvana.hall.support.services.XmlLoader
+import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.support.services.{GAFISImageReaderSpi, XmlLoader}
 import nirvana.hall.v70.internal.BaseV70TestCase
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.commons.lang.StringUtils
@@ -128,13 +135,39 @@ class Fpt5Test extends BaseV70TestCase {
   @Test
   def test_fpt5_tpadd(): Unit = {
     val service = getService[FPT5Service]
-    val fPT5File = new FPT5File
+    val hallImageRemoteService = getService[HallImageRemoteService]
 
-    val originalList = XmlLoader.parseXML[FPT5File](new String(IOUtils.toByteArray(getClass.getResourceAsStream("/R5224010107772013070452.xml"))))
+    val originalList = new String(IOUtils.toByteArray(getClass.getResourceAsStream("/R4101000206002017075001.fptx")))
 
-    originalList.fingerprintPackage.foreach {
-      fingerprintPackage => service.addFingerprintPackage(fingerprintPackage)
+
+    val fpt  = XmlLoader.parseXML[FPT5File](originalList, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/fingerprint.xsd"))
+      , basePath = "/nirvana/hall/fpt5/")
+
+    fpt.fingerprintPackage.foreach {
+      fp => fp.fingers.fingerMsg.foreach{
+        p =>
+          val imgOrigin = fpt5PrintImgToGafisImg(p.fingerImageHorizontalDirectionLength.toShort
+            ,p.fingerImageVerticalDirectionLength.toShort
+          ,p.fingerImageRatio.toShort
+          ,p.fingerImageData)
+
+
+
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(p.fingerImageData)
+          val imgOrigin_ = hallImageRemoteService.decodeGafisImage(imgOrigin)
+
+          ByteString.copyFrom(imgOrigin_.toByteArray(AncientConstants.GBK_ENCODING))
+          val iioRegistry = IIORegistry.getDefaultInstance
+          iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
+          val img = ImageIO.read(new ByteArrayInputStream(imgOrigin_.toByteArray()))
+          val out = new FileOutputStream("/Users/yuchen/" + 1 + "1.bmp")
+          ImageIO.write(img, "bmp", out)
+          out.close
+
+
+      }
     }
+
   }
 
   @Test
@@ -275,17 +308,70 @@ class Fpt5Test extends BaseV70TestCase {
   @Test
   def test_fpt5_lpadd(): Unit = {
     val service = getService[FPT5Service]
+
+     val hallImageRemoteService = getService[HallImageRemoteService]
     val fPT5File = new FPT5File
 
-    val originalList = XmlLoader.parseXML[FPT5File](new String(IOUtils.toByteArray(getClass.getResourceAsStream("/lpadd.xml"))))
-    val obj = XmlLoader.parseXML[FPT5File](XmlLoader.toXml(originalList)
-      ,xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")))
+    val originalList = new String(IOUtils.toByteArray(getClass.getResourceAsStream("/A44011117055520171201001101001.fptx")))
 
-//    for(i <- 0 until originalList.latentPackage.size){
-//      service.addLatentPackage(originalList.latentPackage(i))
-//    }
-//    println(XmlLoader.toXml(originalList))
 
+    val fpt  = XmlLoader.parseXML[FPT5File](originalList, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd"))
+      , basePath = "/nirvana/hall/fpt5/")
+
+    fpt.latentPackage.foreach{
+      t => t.latentFingers.foreach{
+        lf =>
+//          val imgOrigin = fpt5LatentImgToGafisImg(lf.latentFingerImageMsg.latentFingerImageHorizontalDirectionLength.toShort
+//          ,lf.latentFingerImageMsg.latentFingerImageVerticalDirectionLength.toShort
+//          ,lf.latentFingerImageMsg.latentFingerImageRatio.toShort
+//          ,lf.latentFingerImageMsg.latentFingerImageData)
+
+          val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(lf.latentFingerImageMsg.latentFingerImageData)
+
+
+          val imgOrigin_ = hallImageRemoteService.decodeGafisImage(gafisImage)
+
+
+          ByteString.copyFrom(imgOrigin_.toByteArray(AncientConstants.GBK_ENCODING))
+          val iioRegistry = IIORegistry.getDefaultInstance
+          iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
+          val img = ImageIO.read(new ByteArrayInputStream(imgOrigin_.toByteArray()))
+          val out = new FileOutputStream("/Users/yuchen/" + 1 + "1.bmp")
+          ImageIO.write(img, "bmp", out)
+          out.close
+
+      }
+    }
+    println(XmlLoader.toXml(originalList))
+
+  }
+
+
+  private def fpt5LatentImgToGafisImg(width:Short,height:Short,dpi:Short,imgData:Array[Byte]): GAFISIMAGESTRUCT ={
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 0
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nWidth = width
+    gafisImg.stHead.nHeight = height
+    gafisImg.stHead.nBits = 8
+    gafisImg.stHead.nResolution = dpi
+    gafisImg.bnData = imgData
+    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+    gafisImg
+  }
+
+
+  private def fpt5PrintImgToGafisImg(width:Short,height:Short,dpi:Short,imgData:Array[Byte]): GAFISIMAGESTRUCT ={
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 1
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    gafisImg.stHead.nWidth = width
+    gafisImg.stHead.nHeight = height
+    gafisImg.stHead.nBits = 8
+    gafisImg.stHead.nResolution = dpi
+    gafisImg.bnData = imgData
+    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+    gafisImg
   }
 
   @Test
