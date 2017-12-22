@@ -200,4 +200,7 @@ class QueryServiceImpl(entityManager: EntityManager, userService:sys.UserService
 
   def convertGafisNormalqueryQueryque2GAQUERYSTRUCT(gafisNormalqueryQueryque: GafisNormalqueryQueryque): GAQUERYSTRUCT = ???
 
+  override def updateCandListFromQueryQue(gaQuery: GAQUERYSTRUCT, dbId: Option[String]): Unit = ???
+
+  override def getGAQUERYSTRUCTListByKeyId(keyId: String, dbId: Option[String]): List[GAQUERYSTRUCT] = ???
 }

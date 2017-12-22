@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="code_typesend.xsd"/>
+	<xs:include schemaLocation="code_status.xsd"/>
+	<xs:element name="statusChanges">
+		<xs:annotation>
+			<xs:documentation>发送状态反馈</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="type">
+					<xs:annotation>
+						<xs:documentation>任务类型</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="code_typesend">
+							<xs:length value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="task" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>任务</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="content" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>任务类型对应信息ID</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="status">
+								<xs:annotation>
+									<xs:documentation>状态（根据业务场景确定状态内容）</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:restriction base="code_status">
+										<xs:length value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

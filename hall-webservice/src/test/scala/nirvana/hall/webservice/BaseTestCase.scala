@@ -3,26 +3,12 @@ package nirvana.hall.webservice
 import javax.persistence.EntityManagerFactory
 
 import monad.support.services.XmlLoader
-import nirvana.hall.api.internal.FeatureExtractorImpl
-import nirvana.hall.api.internal.fpt.FPTServiceImpl
-import nirvana.hall.api.internal.remote._
-import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.remote._
-import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
-import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.services.GetPKIDServiceImpl
-import nirvana.hall.v62.services.service.GetPKIDService
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.haixin.{StrategyServiceImpl, WsHaiXinFingerServiceImpl}
-import nirvana.hall.webservice.internal.{SendQueryServiceImpl, TenPrinterExportServiceImpl}
-import nirvana.hall.webservice.internal.xingzhuan.{FetchFPTServiceImpl, LocalCheckinServiceImpl}
 import nirvana.hall.webservice.services.haixin.{StrategyService, WsHaiXinFingerService}
-import nirvana.hall.webservice.services.{SendQueryService, TenPrinterExportService}
-import nirvana.hall.webservice.services.xingzhuan.{FetchFPTService, LocalCheckinService}
-import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
+import org.apache.tapestry5.ioc.{Registry, RegistryBuilder, ServiceBinder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -42,13 +28,15 @@ class BaseTestCase {
   def setup: Unit ={
     val modules = Seq[String](
       //v62
-      "nirvana.hall.v62.LocalV62ServiceModule",
-      "nirvana.hall.v62.LocalV62DataSourceModule",
-      "nirvana.hall.webservice.TestV62Module",
+//      "nirvana.hall.v62.LocalV62ServiceModule",
+//      "nirvana.hall.v62.LocalV62DataSourceModule",
+//      "nirvana.hall.webservice.TestV62Module",
       //v70
-//      "nirvana.hall.webservice.TestV70Module",
-//      "nirvana.hall.v70.LocalV70ServiceModule",
-//      "nirvana.hall.v70.LocalDataSourceModule",
+      "nirvana.hall.webservice.TestV70Module",
+      "nirvana.hall.v70.LocalV70ServiceModule",
+      "nirvana.hall.v70.LocalDataSourceModule",
+      //api
+      "nirvana.hall.api.LocalApiServiceModule",
 
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.api.LocalProtobufModule",
@@ -75,17 +63,6 @@ object TestWebserviceModule{
     XmlLoader.parseXML[HallWebserviceConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/webservice/webservice.xsd")))
   }
   def bind(binder: ServiceBinder): Unit = {
-    //
-    binder.bind(classOf[CaseInfoRemoteService], classOf[CaseInfoRemoteServiceImpl])
-    binder.bind(classOf[LPPalmRemoteService], classOf[LPPalmRemoteServiceImpl])
-    binder.bind(classOf[LPCardRemoteService], classOf[LPCardRemoteServiceImpl])
-    binder.bind(classOf[TPCardRemoteService], classOf[TPCardRemoteServiceImpl])
-    binder.bind(classOf[QueryRemoteService], classOf[QueryRemoteServiceImpl])
-    binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
-    binder.bind(classOf[FirmDecoder],classOf[FirmDecoderImpl]).withId("FirmDecoder")
-    binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
-    binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
-    binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
     binder.bind(classOf[StrategyService], classOf[StrategyServiceImpl])
     binder.bind(classOf[WsHaiXinFingerService], classOf[WsHaiXinFingerServiceImpl]).withSimpleId()
     //=======刑专测试时，加载============//
@@ -100,17 +77,10 @@ object TestV62Module{
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test-v62.xml"),"utf8").mkString
     XmlLoader.parseXML[HallV62Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v62/v62.xsd")))
   }
-  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
-  }
 }
 object TestV70Module{
   def buildHallV70Config={
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test-v70.xml"),"utf8").mkString
     XmlLoader.parseXML[HallV70Config](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/v70/v70.xsd")))
-  }
-  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.v70.jpa")
-    configuration.add("nirvana.hall.api.jpa")
   }
 }

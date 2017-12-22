@@ -289,4 +289,7 @@ class QueryServiceImpl(entityManager: EntityManager,userService:UserService) ext
     gaQuery
   }
 
+  override def updateCandListFromQueryQue(gaQuery: GAQUERYSTRUCT, dbId: Option[String]): Unit = ???
+
+  override def getGAQUERYSTRUCTListByKeyId(keyId: String, dbId: Option[String]): List[GAQUERYSTRUCT] = ???
 }

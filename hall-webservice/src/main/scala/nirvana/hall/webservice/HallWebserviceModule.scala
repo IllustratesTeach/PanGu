@@ -9,7 +9,6 @@ import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
-import nirvana.hall.webservice.internal.survey.gz.HandprintServiceCronService
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
@@ -23,6 +22,5 @@ object HallWebserviceModule {
     binder.bind(classOf[ImageEncoder],classOf[ImageEncoderImpl]).withId("ImageEncoder")
     binder.bind(classOf[HallImageRemoteService], classOf[HallImageRemoteServiceImpl])
     binder.bind(classOf[FPTService], classOf[FPTServiceImpl])
-    binder.bind(classOf[HandprintServiceCronService],classOf[HandprintServiceCronService])//.eagerLoad()
   }
 }

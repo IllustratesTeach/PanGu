@@ -28,8 +28,8 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, dataSource: Data
     val syncDataType = syncDataRequest.getSyncDataType
     info("fetching data {} timestamp:{} size:{}", syncDataType,timestamp,size)
     val fetcher = syncDataType match {
-//      case SyncDataType.PERSON => new sync.PersonFetcher(hallMatcherConfig, dataSource)
-//      case SyncDataType.CASE => new sync.CaseFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.PERSON => new sync.PersonFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.CASE => new sync.CaseFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.TEMPLATE_FINGER => new sync.TemplateFingerFetcher(hallMatcherConfig, dataSource)
 //      case SyncDataType.TEMPLATE_PALM => new sync.TemplatePalmFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.LATENT_FINGER => new sync.LatentFingerFetcher(hallMatcherConfig, dataSource)

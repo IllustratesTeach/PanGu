@@ -6,7 +6,8 @@ import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.{HallApiConstants, HallApiErrorConstants}
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.sync.SyncErrorConstants
 import nirvana.hall.api.jpa.HallReadConfig
 import nirvana.hall.api.services.{MatchRelationService, QueryService, _}
 import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
@@ -81,7 +82,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, card_id, HallApiConstants.SYNC_TYPE_TPCARD+typ_add, ip, "1", "1")
           }
           if(status <=0){
-            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
+            throw new Exception(SyncErrorConstants.SYNC_UPDATE_TPCard_SEQ_FAIL+"cardId:{} "+card_id)
           }
       }
 
@@ -90,7 +91,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("TP-ResponseData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_TPCARD)
+          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_TPCARD)
       }
       true
     }else if(commandRequest.hasExtension(SyncLPCardRequest.cmd)){
@@ -138,7 +139,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid,card_id,HallApiConstants.SYNC_TYPE_LPCARD+typ_add,ip,"1","1")
           }
           if(status <=0){
-            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPCard_SEQ_FAIL+"cardId:{} "+card_id)
+            throw new Exception(SyncErrorConstants.SYNC_UPDATE_LPCard_SEQ_FAIL+"cardId:{} "+card_id)
           }
         }
 
@@ -147,7 +148,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("LP-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPCARD)
+          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPCARD)
       }
       true
     }else if(commandRequest.hasExtension(SyncLPPalmRequest.cmd)) {
@@ -195,7 +196,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, card_id, HallApiConstants.SYNC_TYPE_LPPALM+typ_add, ip, "1", "1")
           }
           if(status <=0){
-            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_LPalm_SEQ_FAIL+"cardId:{} "+card_id)
+            throw new Exception(SyncErrorConstants.SYNC_UPDATE_LPalm_SEQ_FAIL+"cardId:{} "+card_id)
           }
         }
 
@@ -204,7 +205,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("LP-Plam-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPPALM)
+          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_LPPALM)
       }
       true
     }else if(commandRequest.hasExtension(SyncCaseRequest.cmd)) {
@@ -251,7 +252,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
             syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid,card_id,HallApiConstants.SYNC_TYPE_CASEINFO+typ_add,ip,"1","1")
           }
           if(status <=0){
-            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_CASEInfo_SEQ_FAIL +"cardId:{} "+card_id)
+            throw new Exception(SyncErrorConstants.SYNC_UPDATE_CASEInfo_SEQ_FAIL +"cardId:{} "+card_id)
           }
         }
 
@@ -260,7 +261,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("CASE-ResponseData fail,uuid{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,card_id,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_CASEINFO)
+          syncInfoLogManageService.recordSyncDataLog(uuid, card_id, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_CASEINFO)
       }
       true
     }else if(commandRequest.hasExtension(SyncMatchTaskRequest.cmd)){
@@ -301,7 +302,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchTask-ResponseData fail,uuid{};match_task_keyid:{};错误堆栈信息:{};错误信息:{}",uuid,match_task_keyid,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_keyid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_keyid, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_TASK)
       }
       true
     } else if (commandRequest.hasExtension(SyncMatchResultRequest.cmd)) {
@@ -331,7 +332,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e: Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchResult-ResponseData fail,uuid{};match_task_orasid:{};错误堆栈信息:{};错误信息:{}", uuid, match_task_orasid, eInfo, e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid.toString, null, eInfo, 2, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
+          syncInfoLogManageService.recordSyncDataLog(uuid, match_task_orasid.toString, null, eInfo, 2, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RESULT)
       }
       true
     }else if(commandRequest.hasExtension(SyncMatchRelationRequest.cmd)){
@@ -368,7 +369,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           if(status >0){
             syncInfoLogManageService.recordSyncDataIdentifyLog(request.getUuid, pk_id, HallApiConstants.SYNC_TYPE_MATCH_RELATION + typ_add, ip, HallApiConstants.MESSAGE_RECEIVE, HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
           }else{
-            throw new Exception(HallApiErrorConstants.SYNC_UPDATE_MATCHRELATION_SEQ_FAIL + "pk_Id:{} " + pk_id)
+            throw new Exception(SyncErrorConstants.SYNC_UPDATE_MATCHRELATION_SEQ_FAIL + "pk_Id:{} " + pk_id)
           }
         }
         commandResponse.writeMessage(commandRequest, SyncMatchRelationResponse.cmd, responseBuilder.build())
@@ -376,7 +377,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
         case e:Exception =>
           val eInfo = ExceptionUtil.getStackTraceInfo(e)
           error("MatchRelation-ResponseData fail,uuid{};pk_id:{};错误堆栈信息:{};错误信息:{}",uuid,pk_id,eInfo,e.getMessage)
-          syncInfoLogManageService.recordSyncDataLog(uuid, pk_id, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, HallApiErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
+          syncInfoLogManageService.recordSyncDataLog(uuid, pk_id, null, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_RESPONSE_UNKNOWN + HallApiConstants.SYNC_TYPE_MATCH_RELATION)
       }
       true
     }else{

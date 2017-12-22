@@ -192,4 +192,8 @@ class QueryServiceImpl(entityManager: EntityManager, userService:UserService,imp
     * @return
     */
   override def getMatchResult(oraSid: Long, dbId: Option[String]): Option[MatchResult] = ???
+
+  override def updateCandListFromQueryQue(gaQuery: GAQUERYSTRUCT, dbId: Option[String]): Unit = ???
+
+  override def getGAQUERYSTRUCTListByKeyId(keyId: String, dbId: Option[String]): List[GAQUERYSTRUCT] = ???
 }

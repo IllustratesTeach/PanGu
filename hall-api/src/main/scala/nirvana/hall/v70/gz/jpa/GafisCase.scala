@@ -28,7 +28,7 @@ class GafisCase extends ActiveRecord {
   var caseId: java.lang.String = _
   @Column(name = "CARD_ID", length = 23)
   var cardId: java.lang.String = _
-  @Column(name = "CASE_CLASS_CODE", length = 6)
+  @Column(name = "CASE_CLASS_CODE", length = 8)
   var caseClassCode: java.lang.String = _
   @Temporal(TemporalType.DATE)
   @Column(name = "CASE_OCCUR_DATE", length = 8)
@@ -62,13 +62,13 @@ class GafisCase extends ActiveRecord {
   var remark: java.lang.String = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 14)
   var inputtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 14)
   var modifiedtime: java.util.Date = _
   @Column(name = "DELETAG", length = 1)
   var deletag: java.lang.String = _
@@ -104,13 +104,33 @@ class GafisCase extends ActiveRecord {
   var assistRevokeSign: java.lang.String = _
   @Column(name = "CASE_SYSTEM_ID", length = 32)
   var caseSystemId: java.lang.String = _
+  @Column(name = "CASE_CLASS_CODE2", length = 8)
+  var caseClassCode2: java.lang.String = _
+  @Column(name = "CASE_CLASS_CODE3", length = 8)
+  var caseClassCode3: java.lang.String = _
+  @Column(name = "SUSPICIOUS_AREA_CODE2", length = 6)
+  var suspiciousAreaCode2: java.lang.String = _
+  @Column(name = "SUSPICIOUS_AREA_CODE3", length = 6)
+  var suspiciousAreaCode3: java.lang.String = _
+  @Column(name = "ASSIST_STATUS", length = 6)
+  var assistStatus: java.lang.String = _
+  @Column(name = "RECEPTION_NO", length = 6)
+  var receptionNo: java.lang.String = _
+  @Column(name = "EXTRACTOR_IDCARDNO", length = 18)
+  var extractorIdcardNo: java.lang.String = _
+  @Column(name = "EXTRACTOR_PHONE", length = 18)
+  var extractorPhone: java.lang.String = _
+  @Column(name = "SCENE_SURVEY_ID", length = 18)
+  var sceneSurveyId: java.lang.String = _
+
+
 
   def this(caseId: java.lang.String) {
     this()
     this.caseId = caseId
   }
 
-  def this(caseId: java.lang.String, cardId: java.lang.String, caseClassCode: java.lang.String, caseOccurDate: java.util.Date, caseOccurPlaceCode: java.lang.String, caseOccurPlaceDetail: java.lang.String, caseBriefDetail: java.lang.String, isMurder: java.lang.String, amount: java.lang.String, extractUnitCode: java.lang.String, extractUnitName: java.lang.String, extractDate: java.util.Date, extractor: java.lang.String, suspiciousAreaCode: java.lang.String, caseState: java.lang.String, caseNature: java.lang.String, remark: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, brokenStatus: java.lang.Short, caseSource: java.lang.String, createUnitCode: java.lang.String, assistLevel: java.lang.String, caseNatureOld: java.lang.String, isChecked: java.lang.Character, fptExtractUnitCode: java.lang.String, fptExtractUnitName: java.lang.String, sid: java.math.BigDecimal, assistBonus: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistSign: java.lang.String, assistRevokeSign: java.lang.String, caseSystemId: java.lang.String) {
+  def this(caseId: java.lang.String, cardId: java.lang.String, caseClassCode: java.lang.String, caseOccurDate: java.util.Date, caseOccurPlaceCode: java.lang.String, caseOccurPlaceDetail: java.lang.String, caseBriefDetail: java.lang.String, isMurder: java.lang.String, amount: java.lang.String, extractUnitCode: java.lang.String, extractUnitName: java.lang.String, extractDate: java.util.Date, extractor: java.lang.String, suspiciousAreaCode: java.lang.String, caseState: java.lang.String, caseNature: java.lang.String, remark: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, brokenStatus: java.lang.Short, caseSource: java.lang.String, createUnitCode: java.lang.String, assistLevel: java.lang.String, caseNatureOld: java.lang.String, isChecked: java.lang.Character, fptExtractUnitCode: java.lang.String, fptExtractUnitName: java.lang.String, sid: java.math.BigDecimal, assistBonus: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistSign: java.lang.String, assistRevokeSign: java.lang.String, caseSystemId: java.lang.String, caseClassCode2: java.lang.String, caseClassCode3: java.lang.String, suspiciousAreaCode2: java.lang.String, suspiciousAreaCode3: java.lang.String, assistStatus: java.lang.String, receptionNo: java.lang.String, extractorIdcardNo: java.lang.String, extractorPhone: java.lang.String, sceneSurveyId: java.lang.String) {
     this()
     this.caseId = caseId
     this.cardId = cardId
@@ -150,6 +170,16 @@ class GafisCase extends ActiveRecord {
     this.assistSign = assistSign
     this.assistRevokeSign = assistRevokeSign
     this.caseSystemId = caseSystemId
+    this.caseClassCode2 = caseClassCode2
+    this.caseClassCode3 = caseClassCode3
+    this.suspiciousAreaCode2 = suspiciousAreaCode2
+    this.suspiciousAreaCode3 = suspiciousAreaCode3
+    this.assistStatus = assistStatus
+    this.receptionNo = receptionNo
+    this.extractorIdcardNo = extractorIdcardNo
+    this.extractorPhone = extractorPhone
+    this.sceneSurveyId = sceneSurveyId
+
   }
 
 

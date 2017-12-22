@@ -56,9 +56,17 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseState = text.getNCaseState.toString
     gafisCase.assistBonus = text.getStrPremium
     gafisCase.assistSign = text.getNXieChaState.toString
-    //    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
+    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
     gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
     gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
+    //新增
+    gafisCase.caseClassCode2 = text.getStrCaseType2
+    gafisCase.caseClassCode3 = text.getStrCaseType3
+    gafisCase.suspiciousAreaCode2 = text.getStrSuspArea2Code
+    gafisCase.suspiciousAreaCode3 = text.getStrSuspArea3Code
+    //gafisCase.bonus = text.getStrPremium
+    gafisCase.assistStatus = text.getNXieChaState.toString
+    gafisCase.receptionNo = ""
 
     //操作信息
     val admData = caseInfo.getAdmData
@@ -68,6 +76,8 @@ object ProtobufConverter extends LoggerSupport{
       gafisCase.createUnitCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         gafisCase.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
+      }else{
+        gafisCase.inputtime = new Date
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         gafisCase.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
@@ -154,8 +164,12 @@ object ProtobufConverter extends LoggerSupport{
       }
     }
 
+
     val blob = lpCard.getBlob
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray
+    for(i <- 0 until blob.getFgpCount){
+      blob.getFgp(i).getNumber.toString
+    }
     caseFinger
   }
 
@@ -168,6 +182,7 @@ object ProtobufConverter extends LoggerSupport{
   def convertLPCard2GafisCaseFingerMnt(lpCard: LPCard): GafisCaseFingerMnt = {
     val caseFingerMnt = new GafisCaseFingerMnt()
     caseFingerMnt.fingerId = lpCard.getStrCardID
+    caseFingerMnt.captureMethod
     val blob = lpCard.getBlob
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
     caseFingerMnt.fingerRidge = blob.getStBinBytes.toByteArray
@@ -530,13 +545,11 @@ object ProtobufConverter extends LoggerSupport{
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }else{
-        person.inputtime = new Date
+        person.inputtime = DateConverter.convertString2Date(new Date(), "yyyyMMddHHmmss")
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
-    }else{
-      person.inputtime = new Date
     }
 
     person
@@ -620,6 +633,7 @@ object ProtobufConverter extends LoggerSupport{
             Gafis70Constants.FACE_RIGHT
           case FaceFgp.FACE_LEFT=>
             Gafis70Constants.FACE_LEFT
+          case _ => Gafis70Constants.FACE_UNKNOWN
         }
         portrait.gatherData = blob.getStImageBytes.toByteArray
         portrait.personid = personId

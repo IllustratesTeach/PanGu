@@ -35,13 +35,13 @@ class GafisCaseFingerMnt extends ActiveRecord {
   var fingerRidge: Array[Byte] = _
   @Column(name = "IS_MAIN_MNT", length = 1)
   var isMainMnt: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 14)
   var modifiedtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 14)
   var inputtime: java.util.Date = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _

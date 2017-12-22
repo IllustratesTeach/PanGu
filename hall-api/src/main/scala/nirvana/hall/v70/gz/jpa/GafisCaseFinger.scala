@@ -41,9 +41,9 @@ class GafisCaseFinger extends ActiveRecord {
   var ridgeColor: java.lang.String = _
   @Column(name = "PATTERN", length = 20)
   var pattern: java.lang.String = _
-  @Column(name = "MITTENS_BEG_NO", length = 2)
+  @Column(name = "MITTENS_BEG_NO", length = 30)
   var mittensBegNo: java.lang.String = _
-  @Column(name = "MITTENS_END_NO", length = 2)
+  @Column(name = "MITTENS_END_NO", length = 30)
   var mittensEndNo: java.lang.String = _
   @Column(name = "THAN_STATUS", length = 2)
   var thanStatus: java.lang.String = _
@@ -83,13 +83,13 @@ class GafisCaseFinger extends ActiveRecord {
   var creatorUnitCode: java.lang.String = _
   @Column(name = "UPDATOR_UNIT_CODE", length = 12)
   var updatorUnitCode: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 14)
   var modifiedtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 14)
   var inputtime: java.util.Date = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
@@ -109,6 +109,8 @@ class GafisCaseFinger extends ActiveRecord {
   var fingerImgNosqlId: java.lang.String = _
   @Column(name = "SEQ")
   var seq: java.lang.Long = _
+  @Column(name = "PHYSICAL_EVIDENCE_NO", length = 32)
+  var physicalEvidenceNo: java.lang.String = _
 
 
   def this(fingerId: java.lang.String) {
@@ -116,7 +118,7 @@ class GafisCaseFinger extends ActiveRecord {
     this.fingerId = fingerId
   }
 
-  def this(fingerId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgpGroup: java.lang.Short, fgp: java.lang.String, ridgeColor: java.lang.String, pattern: java.lang.String, mittensBegNo: java.lang.String, mittensEndNo: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, fingerImg: Array[Byte], fingerCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, fingerCprNosqlId: java.lang.String, fingerImgNosqlId: java.lang.String, seq: java.lang.Long) {
+  def this(fingerId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgpGroup: java.lang.Short, fgp: java.lang.String, ridgeColor: java.lang.String, pattern: java.lang.String, mittensBegNo: java.lang.String, mittensEndNo: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, fingerImg: Array[Byte], fingerCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, fingerCprNosqlId: java.lang.String, fingerImgNosqlId: java.lang.String, seq: java.lang.Long, physicalEvidenceNo: java.lang.String) {
     this()
     this.fingerId = fingerId
     this.seqNo = seqNo
@@ -159,6 +161,7 @@ class GafisCaseFinger extends ActiveRecord {
     this.fingerCprNosqlId = fingerCprNosqlId
     this.fingerImgNosqlId = fingerImgNosqlId
     this.seq = seq
+    this.physicalEvidenceNo = physicalEvidenceNo
   }
 
 

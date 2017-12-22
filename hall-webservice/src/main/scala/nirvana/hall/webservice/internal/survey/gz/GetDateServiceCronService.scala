@@ -1,28 +1,44 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import javax.sql.DataSource
+import java.io.{ByteArrayInputStream, File}
+import java.util.Date
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
+import nirvana.hall.api.services.fpt.FPTService
+import nirvana.hall.c.services.AncientData.AncientDataException
+import nirvana.hall.c.services.gfpt4lib.FPTFile
+import nirvana.hall.c.services.gfpt4lib.FPTFile.FPTParseException
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
+//import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
+import org.apache.commons.io.FileUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+//import stark.webservice.services.StarkWebServiceClient
 
 
 /**
   * Created by ssj on 2017/11/13.
   */
-class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig, implicit val dataSource: DataSource) extends LoggerSupport{
-  val url = hallWebserviceConfig.union4pfmip.url
-  val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
-  val userId = hallWebserviceConfig.union4pfmip.user
-  val password = hallWebserviceConfig.union4pfmip.password
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService], url, targetNamespace)
+class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
+                                surveyRecordService: SurveyRecordService,
+                                fPTService: FPTService) extends LoggerSupport{
+  val BATCH_SIZE=10
+
+  val url = hallWebserviceConfig.handprintService.url
+  val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
+  val userId = hallWebserviceConfig.handprintService.user
+  val password = hallWebserviceConfig.handprintService.password
+  val unitCode = hallWebserviceConfig.handprintService.unitCode
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
+  val handprintService = new HandprintService
+  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
 
   /**
     * 定时器，调用海鑫现勘接口
@@ -37,43 +53,159 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig, impl
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    if(hallWebserviceConfig.union4pfmip.cron!= null){
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sync-cron", new Runnable {
+    if (hallWebserviceConfig.handprintService.cron != null) {
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
-          info("begin GetDateServiceCronService")
-          val caseNolist = getCaseNo()
-          if(caseNolist.size > 0){
-            for(i <- 0 until caseNolist.size){
-              val kno = caseNolist(i).get("kno").get.asInstanceOf[String]
-              //获取没有处理过的现勘编号的对应的案件编号
-              val caseid = client.getCaseNo(userId, password, kno)
-              info("hx  getCaseNo -- 案件编号：" + caseid)
-              if(caseid.equals("")||caseid == null){
-                return
-              }else{
-                //TODO 执行获取案件信息入库操作
-              }
-            }
-          }else{
-            info("没有需要获取的现勘数据...")
+          try{
+            info("begin GetDateServiceCronService Cron")
+            doWork
+            info("end GetDateServiceCronService Cron")
+          }catch{
+            case ex:Exception =>
+              error("GetDateServiceCronService-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
+              )
           }
-          info("end GetDateServiceCronService")
         }
       })
     }
   }
 
-  def getCaseNo() : ListBuffer[mutable.HashMap[String,Any]] ={
-    val sql = "select t.kno from survey_xkcode_record t where state=0"
-    val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
-    JdbcDatabase.queryWithPsSetter(sql){ ps =>
+
+
+  def doWork {
+    val xkCodeList = surveyRecordService.getXkcodebyState(Constant.INIT, BATCH_SIZE)
+    info("现堪号列表长度：------"+xkCodeList.length)
+    xkCodeList.foreach {
+      kNo =>
+        if(saveCaseTextInfo(kNo)){
+          surveyRecordService.getSurveySnoRecord(kNo).foreach {
+            m =>
+              getPFTPackage(kNo, m.get("sno").get.toString, m.get("cardtype").get.toString)
+              getReceprtionNO(kNo)
+          }
+        }
     }
-    { rs =>
-      var map = new scala.collection.mutable.HashMap[String,Any]
-      map += ("kno" -> rs.getString("kno"))
-      resultList.append(map)
-    }
-    resultList
   }
 
- }
+  /**
+    * 获得案件文字信息
+    * @param kNo
+    * return 是否有案件的文字信息,true-有；false-没有
+    */
+  private def saveCaseTextInfo(kNo:String):Boolean= {
+    var bStr = false
+    val caseNo = handprintServicePortType.getCaseNo (userId, password, kNo)
+    surveyRecordService.saveSurveyLogRecord (Constant.GET_CASE_NO
+      , kNo
+      , Constant.EMPTY
+      , CommonUtil.appendParam ("userId:" + userId, "password:" + password, "kNo:" + kNo)
+      , caseNo
+      , Constant.EMPTY)
+    info("现堪编号："+kNo+"-----查询的案件编号："+caseNo)
+    if (! CommonUtil.isNullOrEmpty (caseNo) ) {
+      val caseInfo = handprintServicePortType.getOriginalData (userId
+        , password
+        , kNo
+        , Constant.EMPTY
+        , Constant.GET_TEXT_INFO)
+      surveyRecordService.saveSurveyLogRecord (Constant.GET_ORIGINAL_DATA
+        , kNo
+        , Constant.EMPTY
+        , CommonUtil.appendParam ("userId:" + userId
+          , "password:" + password
+          , "kNo:" + kNo
+          , "sNo:"
+          , "cardType:" + Constant.GET_TEXT_INFO)
+        , new String (caseInfo)
+        , Constant.EMPTY)
+      surveyRecordService.saveSurveycaseInfo (kNo, new String (caseInfo))
+      surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_SUCCESS, kNo)
+      bStr = true
+    }else{
+      //没有案件编号更新xkCode状态为-1
+      surveyRecordService.updateXkcodeState (Constant.SURVEY_CODE_KNO_FAIL, kNo)
+    }
+    bStr
+  }
+
+  private def getPFTPackage(kNo:String,sNo:String,cardType:String): Unit ={
+    val fpt = handprintServicePortType.getOriginalData(userId,password,kNo,sNo,cardType)
+    val path = hallWebserviceConfig.localTenprintPath+"/" + kNo+sNo + ".FPT"
+    info("FPT路径：---"+path)
+    surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA
+                                            ,kNo
+                                            ,sNo
+                                            ,CommonUtil.appendParam("userId:" + userId
+                                                                  , "password:" + password
+                                                                  , "kNo:" + kNo
+                                                                  , "sNo:" + sNo
+                                                                  , "cardType:" + cardType)
+                                            ,path
+                                            ,Constant.EMPTY)
+    if(hallWebserviceConfig.saveFPTFlag.equals("1")){
+      FileUtils.writeByteArrayToFile(new File(path), fpt)
+    }
+    try{
+      cardType match {
+        case Constant.GET_FINGER_FPT =>
+          val fptFile = FPTFile.parseFromInputStream(new ByteArrayInputStream(fpt))
+          fptFile match {
+            case Right(fpt4) =>
+              fpt4.logic03Recs.foreach{ logic03Rec =>
+                fPTService.addLogic03Res(logic03Rec)
+              }
+              surveyRecordService.updateSnoState(Constant.SNO_SUCCESS,kNo,sNo)
+          }
+        case Constant.GET_PALM_FPT =>
+          FileUtils.writeByteArrayToFile(new File(path), fpt)
+          surveyRecordService.savePalmpath(kNo,sNo,path)
+          surveyRecordService.updateSnoState(Constant.SNO_SUCCESS,kNo,sNo)
+      }
+    }catch {
+      case ex:AncientDataException =>
+        callFBUseCondition(kNo,sNo,cardType,ExceptionUtil.getStackTraceInfo(ex))
+      case exx:FPTParseException =>
+        callFBUseCondition(kNo,sNo,cardType,ExceptionUtil.getStackTraceInfo(exx))
+    }
+  }
+
+  /**
+    *  获得接警编号
+    * @param kNo
+    */
+  private def getReceprtionNO(kNo:String) = {
+
+    val receprtionNO = handprintServicePortType.getReceptionNo(userId,password,kNo)
+    surveyRecordService.saveSurveyLogRecord(Constant.GET_RECEPTION_NO,kNo
+      ,Constant.EMPTY
+      ,CommonUtil.appendParam("userId:"+userId,"password:"+password,"kNo:"+kNo)
+      ,receprtionNO,Constant.EMPTY)
+    if(CommonUtil.isNullOrEmpty(receprtionNO)){
+      surveyRecordService.updateXkcodeState(Constant.SURVEY_CODE_CASEID_ERROR,kNo)
+    }else{
+      surveyRecordService.updateCasePeception(receprtionNO,kNo)
+      surveyRecordService.updateXkcodeState(Constant.SURVEY_CODE_CASEID_SUCCESS,kNo)
+    }
+  }
+
+  private def callFBUseCondition(kNo:String,sNo:String,cardType:String,exceptionInfo:String): Unit ={
+    val responses = handprintServicePortType.fbUseCondition(userId,password,kNo,sNo,"",cardType,Constant.FPT_PARSE_FAIL)
+    info("callFBUseCondition返回信息：---"+responses)
+    surveyRecordService.saveSurveyLogRecord(Constant.FBUSECONDITION
+      ,kNo
+      ,sNo
+      ,CommonUtil.appendParam("userId:" + userId
+        , "password:" + password
+        , "kNo:" + kNo
+        , "sNo:" + sNo
+        , "cardNo:"
+        , "cardType:" + cardType
+        ,"resultType:"+Constant.FPT_PARSE_FAIL)
+      ,responses
+      ,exceptionInfo)
+  }
+}
+
+
+

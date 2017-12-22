@@ -163,6 +163,11 @@
                     <xs:documentation>密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="unitcode" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>单位代码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 

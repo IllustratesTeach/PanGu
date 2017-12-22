@@ -2,8 +2,8 @@ package nirvana.hall.v70.services
 
 import javax.sql.DataSource
 
+import nirvana.hall.api.services.GetPKIDService
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.v70.services.service.GetPKIDService
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -29,4 +29,6 @@ class GetPKIDServiceImpl(implicit val dataSource: DataSource) extends GetPKIDSer
     }
     resultList
   }
+
+  override def getDatabyPKIDInfo(pkid: String): ListBuffer[mutable.HashMap[String, Any]] = ???
 }

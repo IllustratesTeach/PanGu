@@ -6,7 +6,6 @@ import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.ln.services._
 import nirvana.hall.v70.ln.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
 import nirvana.hall.v70.services.GetPKIDServiceImpl
-import nirvana.hall.v70.services.service.GetPKIDService
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**

@@ -67,7 +67,6 @@ class FeatureExtractorImpl extends FeatureExtractor{
   //TODO 支持是否提取纹线的问题
   override def extractByGAFISIMGBinary(is:InputStream, fingerPos: FingerPosition, featureType: FeatureType,newFeatureTry: NewFeatureTry=NewFeatureTry.V1): Option[(Array[Byte],Array[Byte])]= {
     val image = readByteArrayAsGAFISIMAGE(is)
-    val originalImgData = image.toByteArray()
     val imgHead = image.stHead
 
     val newFeature = newFeatureTry == NewFeatureTry.V2
@@ -89,6 +88,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
         throw new IllegalArgumentException("unsupported data type %s".format(other))
     }
 
+    val originalImgData = image.toByteArray()
     val mntBuffer = ChannelBuffers.buffer(imgHead.getDataSize + feature.getDataSize)
     //add head information
     //NOTICE don't use imageHead to original data

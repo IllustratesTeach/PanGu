@@ -1,7 +1,10 @@
 package nirvana.hall.v62.services
 
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.QueryService
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_ITEMSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
@@ -99,6 +102,35 @@ class QueryServiceImplTest extends BaseV62TestCase{
     val service = getService[QueryService]
     val statusId = service.getStatusBySid(327)
     Assert.assertEquals(7,statusId)
+  }
+
+  @Test
+  def test_getQueryStruts: Unit ={
+    val service = getService[QueryService]
+    val query = service.getGAQUERYSTRUCT(10)
+
+
+    val GAQRYCAND_FLAG_RECHECKED = 0x2	// has rechecked.
+    val GAQRYCAND_FLAG_BROKEN = 0x4	// matching with source.
+
+    println((GAQRYCAND_FLAG_RECHECKED.toByte | GAQRYCAND_FLAG_BROKEN.toByte).toByte)
+      //TL:307 LT:307 TT:306 LL:306
+    query.pstCand_Data.foreach{
+      t => if(t.szKey.equals("A201607120000000000000004")){
+        println(t.nCheckState + ";" + t.nStatus + ";" + t.nFlag)
+      }
+    }
+  }
+
+  @Test
+  def test_getGAQUERYSTRUCTListByKeyId: Unit ={
+    val service = getService[QueryService]
+    service.getGAQUERYSTRUCTListByKeyId("120000000888200607777701")
+
+    val list = List(1,2,3,4)
+    list.map(_ > 2).par.foreach(println(_))
+
+    (4 until 8).foreach(println(_))
   }
 
 }

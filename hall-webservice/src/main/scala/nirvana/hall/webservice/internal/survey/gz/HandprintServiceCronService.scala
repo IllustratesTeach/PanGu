@@ -3,28 +3,33 @@ package nirvana.hall.webservice.internal.survey.gz
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
-import javax.sql.DataSource
 
-import monad.support.services.LoggerSupport
-import nirvana.hall.support.services.JdbcDatabase
+import monad.support.services.{LoggerSupport, XmlLoader}
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
+//import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
+import nirvana.hall.webservice.survey.gz.client.HandprintService
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import stark.webservice.services.StarkWebServiceClient
-
-import scala.collection.mutable
+//import stark.webservice.services.StarkWebServiceClient
 
 
 /**
   * Created by ssj on 2017/11/9.
   */
-class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,implicit val dataSource: DataSource) extends LoggerSupport{
-  val url = hallWebserviceConfig.union4pfmip.url
-  val targetNamespace = hallWebserviceConfig.union4pfmip.targetNamespace
-  val userId = hallWebserviceConfig.union4pfmip.user
-  val password = hallWebserviceConfig.union4pfmip.password
-  val client = StarkWebServiceClient.createClient(classOf[HandprintService], url, targetNamespace)
+class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,surveyRecordService: SurveyRecordService) extends LoggerSupport{
+  val url = hallWebserviceConfig.handprintService.url
+  val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
+  val userId = hallWebserviceConfig.handprintService.user
+  val password = hallWebserviceConfig.handprintService.password
+  val unitCode = hallWebserviceConfig.handprintService.unitCode
+//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
+//    url,
+//    targetNamespace,
+//    classOf[HandprintService].getSimpleName,
+//    classOf[HandprintService].getSimpleName + "HttpPort")
 
   /**
     * 定时器，调用海鑫现勘接口
@@ -34,93 +39,88 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,imp
     */
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-    if(hallWebserviceConfig.union4pfmip.cron!= null){
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.union4pfmip.cron), "sync-cron", new Runnable {
+    if(hallWebserviceConfig.handprintService.cron!= null){
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
         override def run(): Unit = {
-          val config = getSurveyConfig()
-          val startTime = config.get("starttime").get.asInstanceOf[Date].getTime
-          val endTime = startTime + config.get("increments").get.asInstanceOf[String].toLong*60*1000  //increments 毫秒数
-          info("begin HandprintServiceCronService")
-
-          //获取海鑫系统时间
-          //val hxtime = new Date(client.getSystemDateTime).getTime
-          val hxtime = new Date().getTime
-          if (hxtime <= endTime) {
-            info("系统休眠...")
-          } else {
-            try {
-              //获取数量
-              val num = client.getOriginalDataCount(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"))
-              info("hx  getOriginalDataCount --" + num)
-              if (num > 0) {
-                //获取现勘号列表
-                val ss = client.getOriginalDataList(userId, password, "123456", "", dateToStr(new Date(startTime), "yyyy-MM-dd HH:mm:ss"), dateToStr(new Date(endTime), "yyyy-MM-dd HH:mm:ss"), 1, num)
-                info("hx  getOriginalDataCount --" + ss.toString)
-              }
-            } catch {
-              case e: Exception =>
-                error("HandprintServiceCronService-error:" + e.getMessage)
-            }
-            updateSurveyConfig(new Timestamp(endTime))
+          try {
+            info("begin HandprintServiceCronService Cron")
+            doWork
+            info("end HandprintServiceCronService Cron")
+          } catch {
+            case e: Exception =>
+              error("HandprintServiceCronService-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(e),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
+              )
           }
-          info("end HandprintServiceCronService")
         }
       })
     }
   }
 
-
-  /**
-    * 获取现勘时间配置信息
-    *
-    * @return
-    */
-  def getSurveyConfig(): mutable.HashMap[String,Any] =  {
-    val sql = s"SELECT * " +
-      s"FROM SURVEY_CONFIG t where t.flags = '1'"
-    var map = new scala.collection.mutable.HashMap[String,Any]
-    JdbcDatabase.queryWithPsSetter2(sql){ps=>
-    }{rs=>
-      if(rs.next()){
-        map += ("starttime" -> rs.getTimestamp("START_TIME"))
-        map += ("increments" -> rs.getString("INCREMENTS"))
-      }
-    }
-    map
+  private def doWork: Unit ={
+    val handprintService = new HandprintService
+    val handprintServicePortType = handprintService.getHandprintServiceHttpPort
+    val hxdate =handprintServicePortType.getSystemDateTime()
+    info("海鑫当前时间：---"+hxdate)
+    val checkVal = surveyRecordService.isSleep(new SimpleDateFormat(Constant.DATETIME_FORMAT).parse(hxdate).getTime())
+    if(!checkVal._1){
+      //获取数量
+      val num = handprintServicePortType.getOriginalDataCount(userId
+        , password
+        , unitCode
+        , Constant.EMPTY
+        , checkVal._2.startTime
+        , checkVal._2.endTime)
+      surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_COUNT
+        ,Constant.EMPTY
+        ,Constant.EMPTY
+        ,CommonUtil.appendParam("userId:"+userId
+          ,"password:"+password
+          ,"unitCode:"+unitCode
+          ,"kNo:"
+          ,"startTime:"+ checkVal._2.startTime
+          ,"endTime:"+ checkVal._2.endTime)
+        ,num.toString
+        ,Constant.EMPTY)
+      info("获取现堪的数量：---"+num)
+      if (num > 0) {
+            //获取现勘号列表
+            val dataList = new String(handprintServicePortType.getOriginalDataList(userId
+              , password
+              , unitCode
+              , Constant.EMPTY
+              , checkVal._2.startTime
+              , checkVal._2.endTime
+              , 1
+              , num))
+            surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA_LIST
+              ,Constant.EMPTY
+              ,Constant.EMPTY
+              ,CommonUtil.appendParam("userId:"+userId
+                ,"password:"+password
+                ,"unitCode:"+unitCode
+                ,"kNo:"
+                ,"startTime:"+ checkVal._2.startTime
+                ,"endTime:"+ checkVal._2.endTime
+                ,"startNum:" + 1
+                ,"endNum:" + num)
+              ,dataList
+              ,Constant.EMPTY)
+            val original = XmlLoader.parseXML[OriginalList](dataList)
+            val kNoList = original.K.iterator
+            var kNoObj:ListNode = null
+            while(kNoList.hasNext){
+              kNoObj = kNoList.next
+              surveyRecordService.saveSurveySnoRecord(kNoObj.K_NO
+                ,kNoObj.S_NO
+                ,kNoObj.CARD_TYPE
+                ,kNoObj.CASE_NAME)
+              if(!surveyRecordService.isKno(kNoObj.K_NO)){
+                surveyRecordService.saveSurveyKnoRecord(kNoObj.K_NO)
+              }
+            }
+          }
+          surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,Constant.DATETIME_FORMAT).getTime))
+        }
   }
-
-  /**
-    * 更新现勘时间配置表 开始时间字段
-    *
-    * @param endTime
-    * @return
-    */
-  def updateSurveyConfig(endTime : Timestamp): Unit =  {
-    val sql = s"update SURVEY_CONFIG " +
-      s"set START_TIME = ? "
-    JdbcDatabase.update(sql){ps=>
-      ps.setTimestamp(1,endTime)
-    }
-  }
-
-  /**
-    *  date to string
-    * @param dateDate
-    * @param format
-    * @return
-    */
-  def dateToStr(dateDate: Date, format: String): String = {
-    var dateString: String = null
-    try {
-      val formatter: SimpleDateFormat = new SimpleDateFormat(format)
-      dateString = formatter.format(dateDate)
-    }
-    catch {
-      case e: Exception => {
-        val formatter: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-        dateString = formatter.format(dateDate)
-      }
-    }
-    return dateString
-  }
- }
+}

@@ -1,0 +1,517 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://xckyservice.hisign.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="FPT50HandprintServiceService" targetNamespace="http://xckyservice.hisign.com/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://xckyservice.hisign.com/" elementFormDefault="unqualified" targetNamespace="http://xckyservice.hisign.com/" version="1.0">
+
+  <xs:element name="getCaseNo" type="tns:getCaseNo"/>
+
+  <xs:element name="getCaseNoResponse" type="tns:getCaseNoResponse"/>
+
+  <xs:element name="getFingerPrint" type="tns:getFingerPrint"/>
+
+  <xs:element name="getFingerPrintCount" type="tns:getFingerPrintCount"/>
+
+  <xs:element name="getFingerPrintCountResponse" type="tns:getFingerPrintCountResponse"/>
+
+  <xs:element name="getFingerPrintList" type="tns:getFingerPrintList"/>
+
+  <xs:element name="getFingerPrintListResponse" type="tns:getFingerPrintListResponse"/>
+
+  <xs:element name="getFingerPrintResponse" type="tns:getFingerPrintResponse"/>
+
+  <xs:element name="getReceptionNo" type="tns:getReceptionNo"/>
+
+  <xs:element name="getReceptionNoResponse" type="tns:getReceptionNoResponse"/>
+
+  <xs:element name="getSystemDateTime" type="tns:getSystemDateTime"/>
+
+  <xs:element name="getSystemDateTimeResponse" type="tns:getSystemDateTimeResponse"/>
+
+  <xs:element name="sendFBUseCondition" type="tns:sendFBUseCondition"/>
+
+  <xs:element name="sendFBUseConditionResponse" type="tns:sendFBUseConditionResponse"/>
+
+  <xs:element name="sendHitRevoke" type="tns:sendHitRevoke"/>
+
+  <xs:element name="sendHitRevokeResponse" type="tns:sendHitRevokeResponse"/>
+
+  <xs:element name="sendLLHitResult" type="tns:sendLLHitResult"/>
+
+  <xs:element name="sendLLHitResultResponse" type="tns:sendLLHitResultResponse"/>
+
+  <xs:element name="sendLTHitResult" type="tns:sendLTHitResult"/>
+
+  <xs:element name="sendLTHitResultResponse" type="tns:sendLTHitResultResponse"/>
+
+  <xs:element name="sendModiFingerPrint" type="tns:sendModiFingerPrint"/>
+
+  <xs:element name="sendModiFingerPrintResponse" type="tns:sendModiFingerPrintResponse"/>
+
+  <xs:element name="sendTTHitResult" type="tns:sendTTHitResult"/>
+
+  <xs:element name="sendTTHitResultResponse" type="tns:sendTTHitResultResponse"/>
+
+  <xs:complexType name="sendLLHitResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendLLHitResultResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrintList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="asjfsdd_xzqhdm" type="xs:string"/>
+      <xs:element minOccurs="0" name="zzhwlx" type="xs:string"/>
+      <xs:element minOccurs="0" name="xckybh" type="xs:string"/>
+      <xs:element minOccurs="0" name="kssj" type="xs:string"/>
+      <xs:element minOccurs="0" name="jssj" type="xs:string"/>
+      <xs:element name="ks" type="xs:int"/>
+      <xs:element name="js" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrintListResponse">
+    <xs:sequence>
+      <xs:element xmlns:ns1="http://www.w3.org/2005/05/xmlmime" minOccurs="0" name="return" ns1:expectedContentTypes="*/*" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendLTHitResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendLTHitResultResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendModiFingerPrint">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg3" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendModiFingerPrintResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getReceptionNo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="xckybh" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getReceptionNoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrint">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="xcwzbh" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrintResponse">
+    <xs:sequence>
+      <xs:element xmlns:ns2="http://www.w3.org/2005/05/xmlmime" minOccurs="0" name="return" ns2:expectedContentTypes="*/*" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCaseNo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="xckybh" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCaseNoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendTTHitResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendTTHitResultResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendHitRevoke">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendHitRevokeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendFBUseCondition">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="xcwzbh" type="xs:string"/>
+      <xs:element minOccurs="0" name="resultType" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sendFBUseConditionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrintCount">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="userID" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+      <xs:element minOccurs="0" name="asjfsdd_xzqhdm" type="xs:string"/>
+      <xs:element minOccurs="0" name="zzhwlx" type="xs:string"/>
+      <xs:element minOccurs="0" name="xckybh" type="xs:string"/>
+      <xs:element minOccurs="0" name="kssj" type="xs:string"/>
+      <xs:element minOccurs="0" name="jssj" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFingerPrintCountResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSystemDateTime">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getSystemDateTimeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sendFBUseCondition">
+    <wsdl:part element="tns:sendFBUseCondition" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendTTHitResultResponse">
+    <wsdl:part element="tns:sendTTHitResultResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrintResponse">
+    <wsdl:part element="tns:getFingerPrintResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendLLHitResultResponse">
+    <wsdl:part element="tns:sendLLHitResultResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendLTHitResultResponse">
+    <wsdl:part element="tns:sendLTHitResultResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrint">
+    <wsdl:part element="tns:getFingerPrint" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCaseNo">
+    <wsdl:part element="tns:getCaseNo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendHitRevokeResponse">
+    <wsdl:part element="tns:sendHitRevokeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrintListResponse">
+    <wsdl:part element="tns:getFingerPrintListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendLTHitResult">
+    <wsdl:part element="tns:sendLTHitResult" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getReceptionNo">
+    <wsdl:part element="tns:getReceptionNo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrintList">
+    <wsdl:part element="tns:getFingerPrintList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSystemDateTimeResponse">
+    <wsdl:part element="tns:getSystemDateTimeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSystemDateTime">
+    <wsdl:part element="tns:getSystemDateTime" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendModiFingerPrint">
+    <wsdl:part element="tns:sendModiFingerPrint" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendModiFingerPrintResponse">
+    <wsdl:part element="tns:sendModiFingerPrintResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendLLHitResult">
+    <wsdl:part element="tns:sendLLHitResult" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrintCount">
+    <wsdl:part element="tns:getFingerPrintCount" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendTTHitResult">
+    <wsdl:part element="tns:sendTTHitResult" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFingerPrintCountResponse">
+    <wsdl:part element="tns:getFingerPrintCountResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendFBUseConditionResponse">
+    <wsdl:part element="tns:sendFBUseConditionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCaseNoResponse">
+    <wsdl:part element="tns:getCaseNoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getReceptionNoResponse">
+    <wsdl:part element="tns:getReceptionNoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendHitRevoke">
+    <wsdl:part element="tns:sendHitRevoke" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="FPT50HandprintService">
+    <wsdl:operation name="sendLLHitResult">
+      <wsdl:input message="tns:sendLLHitResult" name="sendLLHitResult">
+    </wsdl:input>
+      <wsdl:output message="tns:sendLLHitResultResponse" name="sendLLHitResultResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrintList">
+      <wsdl:input message="tns:getFingerPrintList" name="getFingerPrintList">
+    </wsdl:input>
+      <wsdl:output message="tns:getFingerPrintListResponse" name="getFingerPrintListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendLTHitResult">
+      <wsdl:input message="tns:sendLTHitResult" name="sendLTHitResult">
+    </wsdl:input>
+      <wsdl:output message="tns:sendLTHitResultResponse" name="sendLTHitResultResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendModiFingerPrint">
+      <wsdl:input message="tns:sendModiFingerPrint" name="sendModiFingerPrint">
+    </wsdl:input>
+      <wsdl:output message="tns:sendModiFingerPrintResponse" name="sendModiFingerPrintResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getReceptionNo">
+      <wsdl:input message="tns:getReceptionNo" name="getReceptionNo">
+    </wsdl:input>
+      <wsdl:output message="tns:getReceptionNoResponse" name="getReceptionNoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrint">
+      <wsdl:input message="tns:getFingerPrint" name="getFingerPrint">
+    </wsdl:input>
+      <wsdl:output message="tns:getFingerPrintResponse" name="getFingerPrintResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCaseNo">
+      <wsdl:input message="tns:getCaseNo" name="getCaseNo">
+    </wsdl:input>
+      <wsdl:output message="tns:getCaseNoResponse" name="getCaseNoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendTTHitResult">
+      <wsdl:input message="tns:sendTTHitResult" name="sendTTHitResult">
+    </wsdl:input>
+      <wsdl:output message="tns:sendTTHitResultResponse" name="sendTTHitResultResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendHitRevoke">
+      <wsdl:input message="tns:sendHitRevoke" name="sendHitRevoke">
+    </wsdl:input>
+      <wsdl:output message="tns:sendHitRevokeResponse" name="sendHitRevokeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendFBUseCondition">
+      <wsdl:input message="tns:sendFBUseCondition" name="sendFBUseCondition">
+    </wsdl:input>
+      <wsdl:output message="tns:sendFBUseConditionResponse" name="sendFBUseConditionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrintCount">
+      <wsdl:input message="tns:getFingerPrintCount" name="getFingerPrintCount">
+    </wsdl:input>
+      <wsdl:output message="tns:getFingerPrintCountResponse" name="getFingerPrintCountResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSystemDateTime">
+      <wsdl:input message="tns:getSystemDateTime" name="getSystemDateTime">
+    </wsdl:input>
+      <wsdl:output message="tns:getSystemDateTimeResponse" name="getSystemDateTimeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FPT50HandprintServiceServiceSoapBinding" type="tns:FPT50HandprintService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sendLLHitResult">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendLLHitResult">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendLLHitResultResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrintList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getFingerPrintList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getFingerPrintListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendLTHitResult">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendLTHitResult">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendLTHitResultResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getReceptionNo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getReceptionNo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getReceptionNoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendModiFingerPrint">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendModiFingerPrint">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendModiFingerPrintResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCaseNo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCaseNo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCaseNoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrint">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getFingerPrint">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getFingerPrintResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendHitRevoke">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendHitRevoke">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendHitRevokeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendTTHitResult">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendTTHitResult">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendTTHitResultResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendFBUseCondition">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendFBUseCondition">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendFBUseConditionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFingerPrintCount">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getFingerPrintCount">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getFingerPrintCountResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSystemDateTime">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSystemDateTime">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSystemDateTimeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FPT50HandprintServiceService">
+    <wsdl:port binding="tns:FPT50HandprintServiceServiceSoapBinding" name="FPT50HandprintServicePort">
+      <soap:address location="http://localhost:6065/xckyservice_cxf/ws/FPT50HandprintService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

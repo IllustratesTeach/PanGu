@@ -5,10 +5,9 @@ import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.{ExceptRelationService, LPCardService, QueryService}
+import nirvana.hall.api.services.{ExceptRelationService, GetPKIDService, LPCardService, QueryService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
 import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.services.service.GetPKIDService
 import org.apache.axiom.attachments.ByteArrayDataSource
 import org.apache.commons.lang.StringUtils
 

@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="code_zjzl">
+		<xs:restriction base="xs:string">
+			
+			<xs:enumeration value="111">
+				<xs:annotation>
+					<xs:documentation>居民身份证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="112">
+				<xs:annotation>
+					<xs:documentation>临时居民身份证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="113">
+				<xs:annotation>
+					<xs:documentation>户口簿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="114">
+				<xs:annotation>
+					<xs:documentation>中国人民解放军军官证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="115">
+				<xs:annotation>
+					<xs:documentation>中国人民武装警察部队警官证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="116">
+				<xs:annotation>
+					<xs:documentation>暂住证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="117">
+				<xs:annotation>
+					<xs:documentation>出生医学证明</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="121">
+				<xs:annotation>
+					<xs:documentation>法官证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="123">
+				<xs:annotation>
+					<xs:documentation>警官证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="125">
+				<xs:annotation>
+					<xs:documentation>检察官证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="127">
+				<xs:annotation>
+					<xs:documentation>律师证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="129">
+				<xs:annotation>
+					<xs:documentation>记者证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="131">
+				<xs:annotation>
+					<xs:documentation>工作证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="133">
+				<xs:annotation>
+					<xs:documentation>学生证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="151">
+				<xs:annotation>
+					<xs:documentation>出人证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="153">
+				<xs:annotation>
+					<xs:documentation>临时出人证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="155">
+				<xs:annotation>
+					<xs:documentation>住宿证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="157">
+				<xs:annotation>
+					<xs:documentation>医疗证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="159">
+				<xs:annotation>
+					<xs:documentation>劳保证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="161">
+				<xs:annotation>
+					<xs:documentation>献血证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="163">
+				<xs:annotation>
+					<xs:documentation>保险单</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="191">
+				<xs:annotation>
+					<xs:documentation>会员证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="211">
+				<xs:annotation>
+					<xs:documentation>离休证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="213">
+				<xs:annotation>
+					<xs:documentation>退休证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="215">
+				<xs:annotation>
+					<xs:documentation>老年证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="217">
+				<xs:annotation>
+					<xs:documentation>残疾证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="219">
+				<xs:annotation>
+					<xs:documentation>结婚证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="221">
+				<xs:annotation>
+					<xs:documentation>离婚证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="223">
+				<xs:annotation>
+					<xs:documentation>独生子女证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="225">
+				<xs:annotation>
+					<xs:documentation>毕业证书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="227">
+				<xs:annotation>
+					<xs:documentation>肄业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="229">
+				<xs:annotation>
+					<xs:documentation>结业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="231">
+				<xs:annotation>
+					<xs:documentation>学位证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="233">
+				<xs:annotation>
+					<xs:documentation>军人通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="291">
+				<xs:annotation>
+					<xs:documentation>证明信</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="311">
+				<xs:annotation>
+					<xs:documentation>持枪证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="313">
+				<xs:annotation>
+					<xs:documentation>枪证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="315">
+				<xs:annotation>
+					<xs:documentation>枪支(弹药)携运许可证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="317">
+				<xs:annotation>
+					<xs:documentation>砍伐证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="319">
+				<xs:annotation>
+					<xs:documentation>准运证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="321">
+				<xs:annotation>
+					<xs:documentation>准购证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="323">
+				<xs:annotation>
+					<xs:documentation>粮油证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="325">
+				<xs:annotation>
+					<xs:documentation>购煤证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="327">
+				<xs:annotation>
+					<xs:documentation>购煤气证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="329">
+				<xs:annotation>
+					<xs:documentation>房屋产权证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="331">
+				<xs:annotation>
+					<xs:documentation>土地使用证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="333">
+				<xs:annotation>
+					<xs:documentation>车辆通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="335">
+				<xs:annotation>
+					<xs:documentation>机动车驾驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="337">
+				<xs:annotation>
+					<xs:documentation>机动车行驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="339">
+				<xs:annotation>
+					<xs:documentation>机动车登记证书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="341">
+				<xs:annotation>
+					<xs:documentation>机动车年检合格证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="343">
+				<xs:annotation>
+					<xs:documentation>春运临时检验合格证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="345">
+				<xs:annotation>
+					<xs:documentation>飞机驾驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="347">
+				<xs:annotation>
+					<xs:documentation>船舶驾驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="349">
+				<xs:annotation>
+					<xs:documentation>船舶行驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="351">
+				<xs:annotation>
+					<xs:documentation>自行车行驶证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="353">
+				<xs:annotation>
+					<xs:documentation>汽车号牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="355">
+				<xs:annotation>
+					<xs:documentation>拖拉机牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357">
+				<xs:annotation>
+					<xs:documentation>摩托车牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="359">
+				<xs:annotation>
+					<xs:documentation>船舶牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="361">
+				<xs:annotation>
+					<xs:documentation>三轮车牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="363">
+				<xs:annotation>
+					<xs:documentation>自行车牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="391">
+				<xs:annotation>
+					<xs:documentation>残疾人机动轮椅车牌</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="411">
+				<xs:annotation>
+					<xs:documentation>外交护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="412">
+				<xs:annotation>
+					<xs:documentation>公务护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="413">
+				<xs:annotation>
+					<xs:documentation>因公普通护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="414">
+				<xs:annotation>
+					<xs:documentation>普通护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="415">
+				<xs:annotation>
+					<xs:documentation>旅行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="416">
+				<xs:annotation>
+					<xs:documentation>入出境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="417">
+				<xs:annotation>
+					<xs:documentation>外国人出入境证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="418">
+				<xs:annotation>
+					<xs:documentation>外国人旅行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="419">
+				<xs:annotation>
+					<xs:documentation>海员证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="420">
+				<xs:annotation>
+					<xs:documentation>香港特别行政区护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="421">
+				<xs:annotation>
+					<xs:documentation>澳门特别行政区护照</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="423">
+				<xs:annotation>
+					<xs:documentation>澳门特别行政区旅行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="511">
+				<xs:annotation>
+					<xs:documentation>台湾居民来往大陆通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="512">
+				<xs:annotation>
+					<xs:documentation>台湾居民来往大陆通行证(一次有效)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="513">
+				<xs:annotation>
+					<xs:documentation>往来港澳通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="515">
+				<xs:annotation>
+					<xs:documentation>前往港澳通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="516">
+				<xs:annotation>
+					<xs:documentation>港澳同胞回乡证(通行卡)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="517">
+				<xs:annotation>
+					<xs:documentation>大陆居民往来台湾通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="518">
+				<xs:annotation>
+					<xs:documentation>因公往来香港澳门特别行政区通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="551">
+				<xs:annotation>
+					<xs:documentation>华侨回国定居证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="552">
+				<xs:annotation>
+					<xs:documentation>台湾居民定居证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="553">
+				<xs:annotation>
+					<xs:documentation>外国人永久居留证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="554">
+				<xs:annotation>
+					<xs:documentation>外国人居留证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="555">
+				<xs:annotation>
+					<xs:documentation>外国人临时居留证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="556">
+				<xs:annotation>
+					<xs:documentation>入籍证书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="557">
+				<xs:annotation>
+					<xs:documentation>出籍证书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="558">
+				<xs:annotation>
+					<xs:documentation>复籍证书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="611">
+				<xs:annotation>
+					<xs:documentation>外籍船员住宿证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="612">
+				<xs:annotation>
+					<xs:documentation>随船工作证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="620">
+				<xs:annotation>
+					<xs:documentation>海上值勤证(红色)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="621">
+				<xs:annotation>
+					<xs:documentation>海上值勤证(蓝色)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="631">
+				<xs:annotation>
+					<xs:documentation>出海船民证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="633">
+				<xs:annotation>
+					<xs:documentation>出海船舶户口簿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="634">
+				<xs:annotation>
+					<xs:documentation>出海船舶边防登记簿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="635">
+				<xs:annotation>
+					<xs:documentation>搭靠台轮许可证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="636">
+				<xs:annotation>
+					<xs:documentation>台湾居民登陆证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="637">
+				<xs:annotation>
+					<xs:documentation>台湾船员登陆证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="638">
+				<xs:annotation>
+					<xs:documentation>外国船员登陆证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="639">
+				<xs:annotation>
+					<xs:documentation>对台劳务人员登轮作业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="640">
+				<xs:annotation>
+					<xs:documentation>合资船船员登陆证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="641">
+				<xs:annotation>
+					<xs:documentation>合资船船员登轮作业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="642">
+				<xs:annotation>
+					<xs:documentation>粤港澳流动渔民证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="643">
+				<xs:annotation>
+					<xs:documentation>粤港澳临时流动渔民证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="644">
+				<xs:annotation>
+					<xs:documentation>粤港澳流动渔船户口簿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="645">
+				<xs:annotation>
+					<xs:documentation>航行港澳船舶证明书</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="646">
+				<xs:annotation>
+					<xs:documentation>往来港澳小型船舶查验簿</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="650">
+				<xs:annotation>
+					<xs:documentation>劳务人员登轮作业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="711">
+				<xs:annotation>
+					<xs:documentation>边境管理区通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="721">
+				<xs:annotation>
+					<xs:documentation>中朝鸭绿江、图们江水文作业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="722">
+				<xs:annotation>
+					<xs:documentation>朝中鸭绿江、图们江水文作业证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="723">
+				<xs:annotation>
+					<xs:documentation>中朝流筏固定代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="724">
+				<xs:annotation>
+					<xs:documentation>朝中流筏固定代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="725">
+				<xs:annotation>
+					<xs:documentation>中朝鸭绿江、图们江船员证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="726">
+				<xs:annotation>
+					<xs:documentation>朝中鸭绿江、图们江船员证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="727">
+				<xs:annotation>
+					<xs:documentation>中朝边境地区公安总代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="728">
+				<xs:annotation>
+					<xs:documentation>朝中边境地区公安总代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="729">
+				<xs:annotation>
+					<xs:documentation>中朝边境地区公安副总代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="730">
+				<xs:annotation>
+					<xs:documentation>朝中边境地区公安副总代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="731">
+				<xs:annotation>
+					<xs:documentation>中朝边境地区公安代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="732">
+				<xs:annotation>
+					<xs:documentation>朝中边境地区公安代表证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="733">
+				<xs:annotation>
+					<xs:documentation>中朝边境地区出入境通行证(甲、乙种本)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="734">
+				<xs:annotation>
+					<xs:documentation>朝中边境公务通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="735">
+				<xs:annotation>
+					<xs:documentation>朝中边境住民国境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="736">
+				<xs:annotation>
+					<xs:documentation>中蒙边境地区出入境通行证(甲、乙种本)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="737">
+				<xs:annotation>
+					<xs:documentation>蒙中边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="738">
+				<xs:annotation>
+					<xs:documentation>中缅边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="739">
+				<xs:annotation>
+					<xs:documentation>缅甸中国边境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="740">
+				<xs:annotation>
+					<xs:documentation>云南省边境地区境外边民入出境证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="741">
+				<xs:annotation>
+					<xs:documentation>中尼边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="742">
+				<xs:annotation>
+					<xs:documentation>尼中边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="743">
+				<xs:annotation>
+					<xs:documentation>中越边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="744">
+				<xs:annotation>
+					<xs:documentation>越中边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="745">
+				<xs:annotation>
+					<xs:documentation>中老边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="746">
+				<xs:annotation>
+					<xs:documentation>老中边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="747">
+				<xs:annotation>
+					<xs:documentation>中印边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="748">
+				<xs:annotation>
+					<xs:documentation>印中边境地区出入境通行证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="761">
+				<xs:annotation>
+					<xs:documentation>深圳市过境耕作证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="765">
+				<xs:annotation>
+					<xs:documentation>贸易证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="771">
+				<xs:annotation>
+					<xs:documentation>铁路员工证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="781">
+				<xs:annotation>
+					<xs:documentation>机组人员证</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="990">
+				<xs:annotation>
+					<xs:documentation>其他</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

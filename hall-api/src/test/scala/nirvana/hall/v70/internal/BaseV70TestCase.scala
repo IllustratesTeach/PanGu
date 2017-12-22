@@ -4,10 +4,8 @@ import javax.persistence.EntityManagerFactory
 
 import monad.support.services.XmlLoader
 import nirvana.hall.api.config.HallApiConfig
-import nirvana.hall.api.internal.AuthServiceImpl
-import nirvana.hall.api.services.AuthService
 import nirvana.hall.v70.config.HallV70Config
-import org.apache.tapestry5.ioc.{Configuration, Registry, RegistryBuilder, ServiceBinder}
+import org.apache.tapestry5.ioc.{Registry, RegistryBuilder}
 import org.junit.{After, Before}
 import org.springframework.orm.jpa.{EntityManagerFactoryUtils, EntityManagerHolder}
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -26,10 +24,19 @@ class BaseV70TestCase {
   @Before
   def setup: Unit ={
     val modules = Seq[String](
-      "stark.activerecord.StarkActiveRecordModule",
+      //贵州
+//      "nirvana.hall.v70.gz.LocalV70ServiceModule",
+//      "nirvana.hall.v70.gz.LocalDataSourceModule",
+      //辽宁
+//      "nirvana.hall.v70.ln.LocalV70ServiceModule",
+//      "nirvana.hall.v70.ln.LocalDataSourceModule",
+
+      //上海，南京
       "nirvana.hall.v70.LocalV70ServiceModule",
       "nirvana.hall.v70.LocalDataSourceModule",
+      "stark.activerecord.StarkActiveRecordModule",
       "nirvana.hall.api.LocalProtobufModule",
+      "nirvana.hall.api.LocalApiServiceModule",
       "monad.rpc.LocalRpcModule",
       "nirvana.hall.v70.internal.TestV70Module"
     ).map(Class.forName)
@@ -56,12 +63,5 @@ object TestV70Module{
   }
   def buildHallApiConfig={
     new HallApiConfig
-  }
-  def bind(binder: ServiceBinder): Unit = {
-    binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
-  }
-  def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.v70.jpa")
-    configuration.add("nirvana.hall.api.jpa")
   }
 }

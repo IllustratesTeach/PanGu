@@ -102,6 +102,12 @@ enum	PalmFgp
 	//7.0掌纹
 	PALM_RIGTH_SIDE = 9;//右侧掌纹
 	PALM_LEFT_SIDE = 10;//左侧掌纹
+
+	PALM_FOUR_PRINT_RIGHT = 11; //四连指右
+	PALM_FOUR_PRINT_LEFT = 12;//四连指左
+
+	PALM_FULL_PALM_RIGHT = 13;//全掌右
+	PALM_FULL_PALM_LEFT = 14;//全掌左
 }
 
 //脸位
@@ -122,6 +128,9 @@ enum	ImageType
 	IMAGETYPE_FACE		= 3;	//人像
 	IMAGETYPE_CARDIMG	= 4;	//文字框
 	IMAGETYPE_VOICE		= 5;	//声纹
+	IMAGETYPE_FOURPRINT = 6;	//四连指
+	IMAGETYPE_KNUCKLEPRINTS = 7;//指节纹
+	IMAGETYPE_FULLPALM = 8;//全掌
 
 }
 
@@ -174,6 +183,9 @@ message	TPCard
 		//6-7同步数据追加信息
 		optional string	strHuKouPlaceCode = 39;			//户籍地代码
 		optional string	strHuKouPlaceTail = 40;			//户籍地址
+
+		optional string	strPrinterPhone = 41;                //捺印人联系电话
+		optional string	strPrinterIdCardNo = 42;                //捺印人身份证号
 	}
 
 	message	TPCardBlob
@@ -199,6 +211,13 @@ message	TPCard
 	optional string strMisPersonID = 6;	 //重卡组号
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 7;   //数据来源类型
+	//FPT5.0追加
+	optional string strJingZongPersonId = 8;//警综人员编号--由警综平台标准化采集系统发号
+	optional string	strCasePersonID = 9;//案事件相关人员编号
+	optional string strCredentialsCode = 10;//常用证件代码
+	optional string strPrinterIdCardId = 11;//捺印人身份证号
+	optional string strPrinterTel = 12;//捺印人联系电话
+	optional string captureInfoReasonCode = 13;//采集原因代码,多个以逗号隔开
 
 }
 
@@ -230,6 +249,10 @@ message	Case
 		optional string	strXieChaDate = 22;         //协查日期
 		optional string	strXieChaRequestUnitName = 23;  //协查单位名称
 		optional string	strXieChaRequestUnitCode = 24;  //协查单位代码
+		//Fpt5.0新加
+		optional string	strBriefCase = 25;  //简要案情
+		optional string	strExtractorIdCard = 26;  //提取人员_公民身份号码
+		optional string	strExtractorTel = 27;  //提取人员_联系电话
 	}
 
 	required string	strCaseID = 1;          //案件编号
@@ -242,6 +265,9 @@ message	Case
 	optional AdminfoData admData = 7;		//操作信息
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 8;   //数据来源类型
+    //Fpt5.0新加
+    optional string	strSurveyId = 9;   //现场勘验编号
+	optional string strJingZongCaseId = 10;//警综案事件编号-新数据必须提供，该编号的数据来源为现勘系统
 }
 
 message	LPCard
@@ -280,6 +306,7 @@ message	LPCard
 	optional AdminfoData admData = 4;
 	// 双向同步需要读策略过滤数据类型
     optional string	strDataSource = 5;   //数据来源类型
+	optional string strPhysicalId = 6;   //现场物证编号
 }
 
 message	TLLTHitLog

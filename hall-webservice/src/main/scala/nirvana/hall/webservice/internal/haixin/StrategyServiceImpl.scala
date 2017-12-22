@@ -12,6 +12,7 @@ import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.internal.haixin.exception.CustomException._
+import nirvana.hall.webservice.internal.haixin.vo.PersonInfoItem
 import nirvana.hall.webservice.services.haixin.StrategyService
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
@@ -107,16 +108,17 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * 检验来源是否合法
     */
   override def checkCollectSrcIsVaild(collectSrc: String): Unit = {
-    val sql = s"SELECT t.id  " +
-      s"FROM HALL_GAFIS_IA_COLLECTSRC t " +
-      s"WHERE t.parentid = 1700 AND t.id = 1701 AND deleteflag = 1 "
+    var count = 0
+    val sql = s"SELECT COUNT(1) NUM FROM HALL_GAFIS_IA_COLLECTSRC t WHERE id=? AND deleteflag = 1 "
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1, collectSrc)
     }{rs=>
       while (rs.next()){
-        if(!rs.getString("id").equals(collectSrc)){
-          throw new CollectSrcIsNotVaildException("来源不合法:"+collectSrc)
-        }
+        count = rs.getString("NUM").toInt
       }
+    }
+    if(count <= 0){
+      throw new CollectSrcIsNotVaildException("来源不合法:"+collectSrc)
     }
   }
 
@@ -532,7 +534,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
 
     val sql = s"SELECT t.ora_sid,t.queryid " +
               s"FROM Normalquery_Queryque t " +
-              s"WHERE t.keyid = ? AND t.rmtflag = 2"
+              s"WHERE t.keyid = ? AND t.rmtflag = 2 AND (t.status = '7' OR t.status = '11')"
 
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
       ps.setString(1,personId)
@@ -738,5 +740,83 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       }
     }
     count
+  }
+
+  /**
+    * 获取错误信息集合
+    *
+    * @param personid  公安部标准的23位唯一码，人员编号
+    * @param oper_type 操作类型
+    * @return
+    */
+  override def getErrorInfoList(userid:String,unitcode:String,personid:String,oper_type : Int) : ListBuffer[mutable.HashMap[String,Any]] = {
+    val listBuffer = new mutable.ListBuffer[mutable.HashMap[String,Any]]
+    val sql = s"SELECT to_char(t1.createtime,'yyyy-mm-dd hh24:mi:ss') time,t2.exceptioninfo " +
+      s"FROM HALL_GAFIS_IA_FINGER t1,HALL_GAFIS_IA_FINGER_EXCEPTION t2 " +
+      s"WHERE t1.uuid = t2.ia_finger_pkid AND t1.userid = ? and t1.unitcode = ? and t1.personid = ? AND t1.OPER_TYPE = ? order by t1.createtime desc "
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,userid)
+      ps.setString(2,unitcode)
+      ps.setString(3,personid)
+      ps.setInt(4,oper_type)
+    }{rs=>
+      while (rs.next()){
+        val mapBuffer = new scala.collection.mutable.HashMap[String,Any]
+        mapBuffer += ("time" -> rs.getString("time"))
+        mapBuffer += ("exception" -> rs.getString("exceptioninfo"))
+        listBuffer.append(mapBuffer)
+      }
+    }
+    listBuffer
+  }
+
+  /**
+    * 获取人员信息
+    *
+    * @param idcard 身份证号
+    * @return
+    */
+  override def getPersonInfo(idcard: String) : util.ArrayList[PersonInfoItem] = {
+    val personInfoItemList = new util.ArrayList[PersonInfoItem]()
+    val sql = s"SELECT T.mispersonid personid,T.cardid,t.name,t.addresstail addressdetail,t.hukouplacetail doordetail, sex.name sex," +
+    s"unit.name gatherunitname, t.printername gatherusername, t.printdate gatherdate, caseclass.name gatherreason " +
+    s"  FROM NORMALTP_TPCARDINFO T " +
+    s"LEFT JOIN ADMIN_SEX SEX ON T.SEXCODE = SEX.CODE " +
+    s"LEFT JOIN ADMIN_CASECLASS CASECLASS ON T.CASECLASS1CODE = CASECLASS.CODE " +
+    s"LEFT JOIN ADMIN_UNIT UNIT ON T.PRINTERUNITCODE = UNIT.CODE " +
+    s"WHERE SHENFENID = ? "
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,idcard)
+    }{rs=>
+      while (rs.next()){
+        val personInfoItem = new PersonInfoItem
+        personInfoItem.personId = nvlString(rs.getString("personid"))
+        personInfoItem.cardId = nvlString(rs.getString("cardid"))
+        personInfoItem.name = nvlString(rs.getString("name"))
+        personInfoItem.addressDetail = nvlString(rs.getString("addressdetail"))
+        personInfoItem.doorDetail = nvlString(rs.getString("doordetail"))
+        personInfoItem.sex = nvlString(rs.getString("sex"))
+        personInfoItem.gatherUnitName = nvlString(rs.getString("gatherunitname"))
+        personInfoItem.gatherUserName = nvlString(rs.getString("gatherusername"))
+        personInfoItem.gatherDate = nvlString(rs.getString("gatherdate"))
+        personInfoItem.gatherReason = nvlString(rs.getString("gatherreason"))
+        personInfoItemList.add(personInfoItem)
+      }
+    }
+    personInfoItemList
+  }
+
+  /**
+    * 处理字符串，不为空返回原字符串，为空返回 ""
+    *
+    * @param str
+    * @return
+    */
+  override def nvlString(str: String) : String = {
+    if(StringUtils.isEmpty(str) ||StringUtils.isBlank(str)){
+      ""
+    }else{
+      str
+    }
   }
 }

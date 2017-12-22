@@ -34,7 +34,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   def delTPCard(cardId: String, dbId: Option[String]): Unit ={
-    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, dropTPCardNoHeadLetter(cardId))
+    facade.NET_GAFIS_FLIB_Del(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO, cardId)
   }
 
   /**
@@ -43,8 +43,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   override def updateTPCard(tPCard: TPCard, dbId: Option[String]): Unit = {
-    val tpCardHandled = tPCard.toBuilder.setStrCardID(dropTPCardNoHeadLetter(tPCard.getStrCardID)).build
-    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tpCardHandled)
+    val tpCard = galoctpConverter.convertProtoBuf2GTPCARDINFOSTRUCT(tPCard)
     facade.NET_GAFIS_FLIB_Update(config.templateTable.dbId.toShort, V62Facade.TID_TPCARDINFO,
       tPCard.getStrCardID, tpCard)
   }
@@ -55,7 +54,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
    * @return
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_TPCARDINFO, dropTPCardNoHeadLetter(cardId))
+    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_TPCARDINFO, cardId)
   }
 
   /**
@@ -71,10 +70,9 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     }
     val tp = new GTPCARDINFOSTRUCT
     facade.NET_GAFIS_FLIB_Get(tdbId, V62Facade.TID_TPCARDINFO,
-      dropTPCardNoHeadLetter(cardId), tp, null, 3)
+      cardId, tp, null, 3)
 
-    val tPCard = galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
-    tPCard.toBuilder.setStrCardID(appendTPCardNoHeadLetter(tPCard.getStrCardID)).build
+    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
   }
 
   /**

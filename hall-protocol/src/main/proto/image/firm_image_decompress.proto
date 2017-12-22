@@ -14,7 +14,12 @@ message FirmImageDecompressRequest {
   extend monad.rpc.protocol.BaseCommand {
     optional FirmImageDecompressRequest cmd = 10001;
   }
+  enum ImageDataType{
+    FPT = 1;//fpt数据
+    RAW = 2;//原始数据
+  }
   required bytes cpr_data = 1;
+  optional ImageDataType image_data_type = 2 [default = FPT];
 }
 
 /* response */

@@ -1,6 +1,7 @@
 package nirvana.hall.api.services
 
 
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
 import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
@@ -26,7 +27,7 @@ trait MatchRelationService {
 
   /**
     * 获取正查或倒查比中关系
-    * @param cardId
+    * @param cardId 现场指纹编号
     * @param isLatent
     * @return
     */
@@ -53,7 +54,6 @@ trait MatchRelationService {
     */
   def addMatchRelation(matchRelationInfo: MatchRelationInfo,dbId: Option[String] = None)
 
-
   /**
     * 更新比中关系
     * @param matchRelationInfo
@@ -63,4 +63,25 @@ trait MatchRelationService {
 
   def isExist(szBreakID:String,dbId: Option[String] = None):Boolean
 
+  /**
+    * 获取正查或倒查比中关系
+    * @param cardId 现场指纹编号
+    * @param isLatent 是否现场
+    * @return
+    */
+  def getLogic04Rec(cardId: String, isLatent: Boolean): Seq[Logic04Rec]
+
+  /**
+    * 获取重卡比中关系
+    * @param cardId
+    * @return
+    */
+  def getLogic05Rec(cardId: String): Seq[Logic05Rec]
+
+  /**
+    * 获取串查比中关系
+    * @param cardId
+    * @return
+    */
+  def getLogic06Rec(cardId: String): Seq[Logic06Rec]
 }

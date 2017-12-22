@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.internal.adapter.common.sync.{LatentPalmFetcher, TemplatePalmFetcher}
 import nirvana.hall.matcher.internal.adapter.daku.sync._
 import nirvana.hall.matcher.service.SyncDataService
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
@@ -32,6 +33,8 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor
       case SyncDataType.PERSON => new PersonFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.TEMPLATE_FINGER => new TemplateFingerFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.LATENT_FINGER => new LatentFingerFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.TEMPLATE_PALM => new TemplatePalmFetcher(hallMatcherConfig, dataSource)
+      case SyncDataType.LATENT_PALM => new LatentPalmFetcher(hallMatcherConfig, dataSource)
       case SyncDataType.CASE => new CaseFetcher(hallMatcherConfig, dataSource)
       case other => null
     }

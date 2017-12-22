@@ -19,6 +19,10 @@ object FgpConverter {
       case PalmFgp.PALM_THUMB_R_UP => glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP
       case PalmFgp.PALM_THUMB_L_LOW => glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW
       case PalmFgp.PALM_THUMB_L_UP => glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP
+      case PalmFgp.PALM_FOUR_PRINT_RIGHT =>
+      case PalmFgp.PALM_FOUR_PRINT_LEFT =>
+      case PalmFgp.PALM_FULL_PALM_RIGHT =>
+      case PalmFgp.PALM_FULL_PALM_LEFT =>
     }).asInstanceOf[Byte]
   }
   def convertGTPIO_ITEMINDEX2PalmFgp(index: Byte): PalmFgp={

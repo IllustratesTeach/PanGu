@@ -153,4 +153,27 @@ trait WsHaiXinFingerService {
                               ,@WebParam(name="palmtype") palmtype:Int
                               ,@WebParam(name="personid") personid:String
                               ,@WebParam(name="dh") dh: Array[Byte]):Int
+
+  /**
+    * 接口11:获取错误详细信息
+    * @param userid 用户id
+    * @param unitcode 单位代码
+    * @param funType 接口方法类型
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @return
+    */
+  @WebMethod def getErrorInfo(@WebParam(name="userid") userid:String
+                              ,@WebParam(name="unitcode") unitcode:String
+                              ,@WebParam(name="funType") funType:Int
+                              ,@WebParam(name="personid") personid:String):DataHandler
+  /**
+    * 接口12：获取人员信息
+    * @param userid
+    * @param unitcode
+    * @param idcard
+    * @return
+    */
+  @WebMethod def getPersonInfo(@WebParam(name="userid") userid:String
+                               ,@WebParam(name="unitcode") unitcode:String
+                               ,@WebParam(name="idcard") idcard:String) : DataHandler
 }

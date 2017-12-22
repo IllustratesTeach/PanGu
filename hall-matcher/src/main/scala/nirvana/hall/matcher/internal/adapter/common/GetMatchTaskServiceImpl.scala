@@ -176,7 +176,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     } { rs =>
       rs.getInt("ora_sid")
     }
-    if (!oraSidOption.isEmpty) {
+    if (oraSidOption.nonEmpty) {
       oraSidOption.get
     } else {
       0

@@ -3,7 +3,7 @@ package nirvana.hall.c.services.gfpt5lib
 import java.text.SimpleDateFormat
 import java.util
 import java.util.Date
-import javax.xml.bind.annotation._
+import javax.xml.bind.annotation.{XmlElement, _}
 
 /**
   * Created by yuchen on 2017/10/17.
@@ -32,32 +32,32 @@ class FPT5File {
 
     @XmlElement(name = "packageHead")
     var packageHead: PackageHead = new PackageHead
-    @XmlElement(name = "taskInfo")
-    var taskInfo: TaskInfo = new TaskInfo
     @XmlElement(name = "fingerprintPackage")
-    var fingerprintPackage: util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+    var fingerprintPackage: Array[FingerprintPackage] = _
     @XmlElement(name = "latentPackage")
-    var latentPackage: util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
-    @XmlElement(name = "LatentTaskPackage")
-    var latentTaskPackage: util.ArrayList[LatenttaskPackage] = new util.ArrayList[LatenttaskPackage]
-    @XmlElement(name = "PrintTaskPackage")
-    var printTaskPackage: util.ArrayList[PrinttaskPackage] = new util.ArrayList[PrinttaskPackage]
+    var latentPackage: Array[LatentPackage] = _
+    @XmlElement(name = "latentTaskPackage")
+    var latentTaskPackage: Array[LatenttaskPackage] = _
+    @XmlElement(name = "printTaskPackage")
+    var printTaskPackage: Array[PrinttaskPackage] = _
     @XmlElement(name = "LTResultPackage")
-    var ltResultPackage: util.ArrayList[LtResultPackage] = new util.ArrayList[LtResultPackage]
+    var ltResultPackage: Array[LtResultPackage] = _
     @XmlElement(name = "TLResultPackage")
-    var tlResultPackage: util.ArrayList[TlResultPackage] = new util.ArrayList[TlResultPackage]
+    var tlResultPackage: Array[TlResultPackage] = _
     @XmlElement(name = "TTResultPackage")
-    var ttResultPackage: util.ArrayList[TtResultPackage] = new util.ArrayList[TtResultPackage]
+    var ttResultPackage: Array[TtResultPackage] = _
     @XmlElement(name = "LLResultPackage")
-    var llResultPackage: util.ArrayList[LlResultPackage] = new util.ArrayList[LlResultPackage]
+    var llResultPackage: Array[LlResultPackage] = _
     @XmlElement(name = "LTHitResultPackage")
-    var ltHitResultPackage: util.ArrayList[LtHitResultPackage] = new util.ArrayList[LtHitResultPackage]
+    var ltHitResultPackage: Array[LtHitResultPackage] = _
     @XmlElement(name = "TTHitResultPackage")
-    var ttHitResultPackage: util.ArrayList[TtHitResultPackage] = new util.ArrayList[TtHitResultPackage]
+    var ttHitResultPackage: Array[TtHitResultPackage] = _
     @XmlElement(name = "LLHitResultPackage")
-    var llHitResultPackage: util.ArrayList[LlHitResultPackage] = new util.ArrayList[LlHitResultPackage]
+    var llHitResultPackage: Array[LlHitResultPackage] = _
     @XmlElement(name = "cancellatentPackage")
-    var cancelLatentPackage: util.ArrayList[cancelLatentPackage] = new util.ArrayList[cancelLatentPackage]
+    var cancelLatentPackage: Array[cancelLatentPackage] = _
+    @XmlElement(name = "cancellatentPackage")
+    var customdataPackage: Array[customDataPackage] = _
 
     /**
       * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
@@ -65,35 +65,13 @@ class FPT5File {
       * @return
       */
     def build(fpt5File: FPT5File): FPT5File = {
-        val taskInfo = new TaskInfo
-        taskInfo.fingerprintNum = fpt5File.fingerprintPackage.size
-        taskInfo.latentNum = fpt5File.latentPackage.size
-        taskInfo.LTHitResultNum = fpt5File.ltHitResultPackage.size
-        taskInfo.TTHitResultNum = fpt5File.ttHitResultPackage.size
-        taskInfo.LLHitResultNum = fpt5File.llHitResultPackage.size
-        taskInfo.latentTaskNum = fpt5File.latentTaskPackage.size
-        taskInfo.printTaskNum = fpt5File.printTaskPackage.size
-        taskInfo.LTResultNum = fpt5File.ltResultPackage.size
-        taskInfo.TLResultNum = fpt5File.tlResultPackage.size
-        taskInfo.TTResultNum = fpt5File.ttResultPackage.size
-        taskInfo.LLResultNum = fpt5File.llResultPackage.size
-        taskInfo.CancelLatentNum = fpt5File.cancelLatentPackage.size
-        taskInfo.sendUnitCode = EMPTY_STRING //发送单位代码
-        taskInfo.sendUnitName = EMPTY_STRING //发送单位名称
-        taskInfo.sendUnitSystemType = EMPTY_STRING //发送单位系统
-        taskInfo.sendPersonName = EMPTY_STRING //发送人姓名
-        taskInfo.sendPersonIdCard = EMPTY_STRING //发送人身份证号码
-        taskInfo.sendPersonTel = EMPTY_STRING //发送人联系电话
-        fpt5File.taskInfo = taskInfo
         fpt5File
     }
 }
 
 
-
-
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "PackageHead")
+    @XmlType(name = "packageHead")
     class PackageHead{
         @XmlElement(name = "version")
         var version: String = "FPT0500"
@@ -101,36 +79,6 @@ class FPT5File {
         var createTime: String = new SimpleDateFormat("YYYYMMddHHmmss").format(new Date)
         @XmlElement(name = "originSystem")
         var originSystem:String = _
-    }
-
-
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "TaskInfo")
-    class TaskInfo{
-        @XmlElement(name = "fingerprintNum")
-        var fingerprintNum:Int = _
-        @XmlElement(name = "latentNum")
-        var latentNum:Int = _
-        @XmlElement(name = "LTHitResultNum")
-        var LTHitResultNum:Int = _
-        @XmlElement(name = "TTHitResultNum")
-        var TTHitResultNum:Int = _
-        @XmlElement(name = "LLHitResultNum")
-        var LLHitResultNum:Int = _
-        @XmlElement(name = "latentTaskNum")
-        var latentTaskNum:Int = _
-        @XmlElement(name = "printTaskNum")
-        var printTaskNum:Int = _
-        @XmlElement(name = "LTResultNum")
-        var LTResultNum:Int = _
-        @XmlElement(name = "TLResultNum")
-        var TLResultNum:Int = _
-        @XmlElement(name = "TTResultNum")
-        var TTResultNum:Int = _
-        @XmlElement(name = "LLResultNum")
-        var LLResultNum:Int = _
-        @XmlElement(name = "CancelLatentNum")
-        var CancelLatentNum:Int = _
         @XmlElement(name = "fsdw_gajgjgdm")
         var sendUnitCode:String = _ //发送单位代码
         @XmlElement(name = "fsdw_gajgmc")
@@ -146,31 +94,42 @@ class FPT5File {
     }
 
     /**
+      *
+      */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "customDataPackage")
+    class customDataPackage{
+        @XmlElement(name = "zdyxx")
+        var CustomInfo: String = _
+    }
+
+
+    /**
       * 捺印
       */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "FingerprintPackage")
+    @XmlType(name = "fingerprintPackage")
     class FingerprintPackage{
-        @XmlElement(name = "descriptMsg")
-        var descriptMsg: DescriptMsg = new DescriptMsg
-        @XmlElement(name = "fingerprintMsg")
-        var fingerprintMsg:FingerprintMsg = new FingerprintMsg
+        @XmlElement(name = "descriptiveMsg")
+        var descriptiveMsg: DescriptMsg = _
+        @XmlElement(name = "collectInfoMsg")
+        var collectInfoMsg:CollectInfoMsg = _
         @XmlElement(name = "fingers")
-        var fingers:Fingers = new Fingers
+        var fingers:Fingers = _
         @XmlElement(name = "palms")
-        var palms:Palms = new Palms
+        var palms:Palms = _
         @XmlElement(name = "fourprints")
-        var fourprints:Fourprints = new Fourprints
+        var fourprints:Fourprints = _
         @XmlElement(name = "knuckleprints")
-        var knuckleprints:Knuckleprints = new Knuckleprints
+        var knuckleprints:Knuckleprints = _
         @XmlElement(name = "fullpalms")
-        var fullpalms:Fullpalms = new Fullpalms
-        @XmlElement(name = "portraits")
-        var portraits:Portraits = new Portraits
+        var fullpalms:Fullpalms = _
+        @XmlElement(name = "faceImages")
+        var faceImages:FaceImages = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "FingerprintMsg")
-    class FingerprintMsg{
+    @XmlType(name = "CollectInfoMsg")
+    class CollectInfoMsg{
         @XmlElement(name = "zwbdxtlxms")
         var fingerprintComparisonSysTypeDescript:String = _ //指纹比对系统类型描述
         @XmlElement(name = "nydw_gajgjgdm")
@@ -185,23 +144,9 @@ class FPT5File {
         var chopPersonTel:String =_ //捺印人联系电话
         @XmlElement(name = "nysj")
         var chopDateTime:String = _ //捺印时间
-        @XmlElement(name = "bz")
-        var memo:String = _ //备注
-        @XmlElement(name = "zw_sl")
-        var fingerNum:Int = _ //指纹数量
-        @XmlElement(name = "zhw_sl")
-        var palmNum:Int = _ //掌纹数量
-        @XmlElement(name = "slz_sl")
-        var fourFingerNum:Int = _ //四联指数量
-        @XmlElement(name = "zjw_sl")
-        var knuckleFingerNum:Int = _ //指节纹数量
-        @XmlElement(name = "qz_sl")
-        var fullPalmNum:Int = _ // 全掌数量
-        @XmlElement(name = "rx_sl")
-        var personPictureNum:Int = _ //人像数量
     }
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "DescriptMsg")
+    @XmlType(name = "descriptMsg")
     class DescriptMsg{
         @XmlElement(name = "ysxt_asjxgrybh")
         var originalSystemCasePersonId:String = _ //原始系统案事件相关人员编号
@@ -209,10 +154,10 @@ class FPT5File {
         var jingZongPersonId:String = _ //警综人员编号
         @XmlElement(name = "asjxgrybh")
         var casePersonid:String = _ //案事件人员编号
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var fingerPalmCardId:String = _ //指掌纹卡编号
-        @XmlElement(name = "bnyzwyydm")
-        var chopedCauseCode:String = _ //被捺印指纹原因代码
+        @XmlElement(name = "collectingReasonSet")
+        var collectingReasonSet = new CollectingReasonSet
         @XmlElement(name = "xm")
         var name:String = _
         @XmlElement(name = "bmch")
@@ -237,57 +182,113 @@ class FPT5File {
         var houseAdministrativeDivisionCode:String = _ //现住址行政区划代码
         @XmlElement(name = "xzz_dzmc")
         var houseAddress:String = _ //现住址地址
+        @XmlElement(name = "bz")
+        var memo:String = _
     }
 
 
     //--------------------指纹相关begin-------------------------//
     @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "CollectingReasonSet")
+    class CollectingReasonSet{
+        @XmlElement(name = "cjxxyydm")
+        var captureInfoReasonCode:Array[String] = _ //采集信息原因代码
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "FingerMinutiaSet")
+    class FingerMinutiaSet{
+        @XmlElement(name = "minutia")
+        var minutia:Array[Minutia] = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "Minutia")
+    class Minutia{
+        @XmlElement(name = "zwtzd_tzxzb")
+        var fingerFeaturePointXCoordinate:Int = _
+        @XmlElement(name = "zwtzd_tzyzb")
+        var fingerFeaturePointYCoordinate:Int = _
+        @XmlElement(name = "zwtzd_tzfx")
+        var fingerFeaturePointDirection:Int = _
+        @XmlElement(name = "zwtzd_tzzl")
+        var fingerFeaturePointQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Fingers")
     class Fingers{
-        @XmlElement(name = "rolling")
-        var rolling:Rolling = new Rolling
-        @XmlElement(name = "planar")
-        var planar:Planar = new Planar
-    }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "Rolling")
-    class Rolling{
         @XmlElement(name = "fingerMsg")
-        var fingerMsg = new util.ArrayList[FingerMsg]()
+        var fingerMsg:Array[FingerMsg] = _
     }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "Planar")
-    class Planar{
-        @XmlElement(name = "fingerMsg")
-        var fingerMsg = new util.ArrayList[FingerMsg]()
-    }
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "FingerMsg")
     class FingerMsg{
         @XmlElement(name = "zwzwdm")
         var fingerPositionCode:String = _
-        @XmlElement(name = "zzwtztqfsdm")
+        @XmlElement(name = "zzhwtztqfsdm")
         var fingerFeatureExtractionMethodCode:String  = _
-        @XmlElement(name = "qzyydm")
-        var adactylismCauseCode:String = _ //缺指原因代码
+        @XmlElement(name = "zzhwqsqkdm")
+        var adactylismCauseCode:String = _ //指掌纹缺失情况代码
         @XmlElement(name = "zwwxzfl_zwwxdm")
         var fingerPatternMasterCode:String = _ //指纹纹型主分类代码
         @XmlElement(name = "zwwxffl_zwwxdm")
         var fingerPatternSlaveCode:String = _  //指纹纹型副分类代码
-        @XmlElement(name = "zwfxms")
-        var fingerDirectionDescript:String = _ //指纹方向描述
-        @XmlElement(name = "zwzxd")
-        var fingerCenterPoint:String = _ //指纹中心点
-        @XmlElement(name = "zwfzx")
-        var fingerSlaveCenter:String = _ //指纹副中心
-        @XmlElement(name = "zwzsj")
-        var fingerLeftTriangle:String = _ //指纹左三角
-        @XmlElement(name = "zwysj")
-        var fingerRightTriangle:String = _
-        @XmlElement(name = "zwtzd_sl")
-        var fingerExtractionNum:Int = _
-        @XmlElement(name = "zwtzdxx")
-        var fingerExtractionInfo:String = _
+        @XmlElement(name = "zwfx_tzfx")
+        var fingerFeatureDirection:Int = _ //指纹方向-特征方向
+        @XmlElement(name = "zwfx_tzfxfw")
+        var fingerFeatureDirectionRange:Int = _ //指纹方向-特征方向-范围
+        @XmlElement(name = "zwzxd_tzxzb")
+        var fingerCenterPointFeatureXCoordinate:Int = _ //指纹中心点特征X坐标
+        @XmlElement(name = "zwzxd_tzyzb")
+        var fingerCenterPointFeatureYCoordinate:Int = _ //指纹中心点特征Y坐标
+        @XmlElement(name = "zwzxd_tzzbfw")
+        var fingerCenterPointFeatureCoordinateRange:Int = _ //指纹中心点特征坐标范围
+        @XmlElement(name = "zwzxd_tzfx")
+        var fingerCenterPointFeatureDirection:Int = _ //指纹中心点特征特征方向
+        @XmlElement(name = "zwzxd_tzfxfw")
+        var fingerCenterPointFeatureDirectionRange:Int = _ //指纹中心点特征特征方向范围
+        @XmlElement(name = "zwzxd_tzkkd")
+        var fingerCenterPointFeatureReliabilityLevel:Int = _ //指纹中心点可靠度
+        @XmlElement(name = "zwfzx_tzxzb")
+        var fingerSlaveCenterFeatureXCoordinate:Int = _ //指纹副中心特征X坐标
+        @XmlElement(name = "zwfzx_tzyzb")
+        var fingerSlaveCenterFeatureYCoordinate:Int = _ //指纹副中心特征Y坐标
+        @XmlElement(name = "zwfzx_tzzbfw")
+        var fingerSlaveCenterFeatureCoordinateRange:Int = _ //指纹副中心特征坐标范围
+        @XmlElement(name = "zwfzx_tzfx")
+        var fingerSlaveCenterFeatureDirection:Int = _ //指纹副中心特征方向
+        @XmlElement(name = "zwfzx_tzfxfw")
+        var fingerSlaveCenterFeatureDirectionRange:Int = _ //指纹副中心特征方向范围
+        @XmlElement(name = "zwfzx_tzkkd")
+        var fingerSlaveCenterFeatureReliabilityLevel:Int = _ //指纹副中心特征可靠度
+        @XmlElement(name = "zwzsj_tzxzb")
+        var fingerLeftTriangleFeatureXCoordinate:Int = _ //指纹左三角特征X坐标
+        @XmlElement(name = "zwzsj_tzyzb")
+        var fingerLeftTriangleFeatureYCoordinate:Int = _ //指纹左三角特征Y坐标
+        @XmlElement(name = "zwzsj_tzzbfw")
+        var fingerLeftTriangleFeatureCoordinateRange:Int = _ //指纹左三角特征坐标范围
+        @XmlElement(name = "zwzsj_tzfx")
+        var fingerLeftTriangleFeatureDirection:Int = _ //指纹左三角特征方向
+        @XmlElement(name = "zwzsj_tzfxfw")
+        var fingerLeftTriangleFeatureDirectionRange:Int = _ //指纹左三角特征方向范围
+        @XmlElement(name = "zwzsj_tzkkd")
+        var fingerLeftTriangleFeatureReliabilityLevel:Int = _ //指纹左三角特征方向范围
+        @XmlElement(name = "zwysj_tzxzb")
+        var fingerRightTriangleFeatureXCoordinate:Int = _ //指纹右三角特征X坐标
+        @XmlElement(name = "zwysj_tzyzb")
+        var fingerRightTriangleFeatureYCoordinate:Int = _ //指纹右三角特征Y坐标
+        @XmlElement(name = "zwysj_tzzbfw")
+        var fingerRightTriangleFeatureCoordinateRange:Int = _ //指纹右三角特征坐标范围
+        @XmlElement(name = "zwysj_tzfx")
+        var fingerRightTriangleFeatureDirection:Int = _ //指纹右三角特征方向
+        @XmlElement(name = "zwysj_tzfxfw")
+        var fingerRightTriangleFeatureDirectionRange:Int = _ //指纹右三角特征方向范围
+        @XmlElement(name = "zwysj_tzkkd")
+        var fingerRightTriangleFeatureReliabilityLevel:Int = _ //指纹右三角特征方向范围
+        @XmlElement(name = "minutiaSet")
+        var fingerMinutiaSet = new FingerMinutiaSet
         @XmlElement(name = "zw_zdyxx")
         var fingerCustomInfo:Array[Byte] = _
         @XmlElement(name = "zw_txspfxcd")
@@ -296,49 +297,123 @@ class FPT5File {
         var fingerImageVerticalDirectionLength:Int = _
         @XmlElement(name = "zw_txfbl")
         var fingerImageRatio:Int = _
-
-      /**
-        * 0000表示无压缩，其他值前2个字节数字代表系统产品生产的单位代码
-        * ，后2个字节数字代表系统产品的版本，从00开始递增，对于WSQ压缩方法
-        * ，前2个数字固定为14，后两个数字代表系统产品生产的单位代码
-        */
+        /**
+          * 0000表示无压缩，其他值前2个字节数字代表系统产品生产的单位代码，
+          * 后2个字节数字代表系统产品的版本，从00开始递增，对于WSQ压缩方法，
+          * 前2个数字固定为14，后两个数字代表系统产品生产的单位代码
+          */
         @XmlElement(name = "zw_txysffms")
         var fingerImageCompressMethodDescript:String = _
+        @XmlElement(name = "zw_txzl")
+        var fingerImageQuality:Int = _
         @XmlElement(name = "zw_txsj")
         var fingerImageData:Array[Byte] = _
     }
     //--------------------指纹相关end-------------------------//
 
-
-
     //--------------------掌纹相关begin-----------------------//
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "CoreLikePatternSet")
+    class CoreLikePatternSet{
+        @XmlElement(name = "coreLikePatternSet")
+        var coreLikePattern:Array[CoreLikePattern] =_
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "CoreLikePattern")
+    class CoreLikePattern{
+
+        @XmlElement(name = "zhwzfd_tzxzb")
+        var palmRetracingPointFeatureXCoordinate:Int = _ //掌纹折返点_特征X坐标
+        @XmlElement(name = "zhwzfd_tzyzb")
+        var palmRetracingPointFeatureYCoordinate:Int = _ //掌纹折返点_特征Y坐标
+        @XmlElement(name = "zhwzfd_tzzbfw")
+        var palmRetracingPointFeatureCoordinateRange:Int = _ //掌纹折返点_特征坐标范围
+        @XmlElement(name = "zhwzfd_tzfx")
+        var palmRetracingPointFeatureDirection:Int = _ //掌纹折返点_特征方向
+        @XmlElement(name = "zhwzfd_tzfxfw")
+        var palmRetracingPointFeatureDirectionRange:Int = _ //掌纹折返点_特征方向范围
+        @XmlElement(name = "zhwzfd_tzzl")
+        var palmRetracingPointFeatureQuality:Int = _ //掌纹折返点_特征方向范围
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "DeltaSet")
+    class DeltaSet{
+        @XmlElement(name = "delta")
+        var delta:Array[Delta] = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "Delta")
+    class Delta{
+        @XmlElement(name = "zhwsjd_tzxzb")
+        var palmTrianglePointFeatureXCoordinate:Int = _
+        @XmlElement(name = "zhwsjd_tzyzb")
+        var palmTrianglePointFeatureYCoordinate:Int = _
+        @XmlElement(name = "zhwsjd_tzzbfw")
+        var palmTrianglePointFeatureCoodinateRange:Int = _
+        @XmlElement(name = "deltaDirection")
+        var deltaDirection:Array[DeltaDirection] =_
+        @XmlElement(name = "zhwsjd_zhwsjwzlxdm")
+        var deltaPostionClassCode:String = _
+        @XmlElement(name = "zhwsjd_tzzl")
+        var deltaFeatureQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "DeltaDirection")
+    class DeltaDirection{
+        @XmlElement(name = "zhwsjd_tzfx")
+        var palmTrianglePointFeatureDirection:Int = _ //掌纹三角点_特征方向
+        @XmlElement(name = "zhwsjd_tzfxfw")
+        var palmTrianglePointFeatureDirectionRange:Int = _ //掌纹三角点_特征方向范围
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "PalmMinutia")
+    class PalmMinutia{
+        @XmlElement(name = "zhwtzd_tzxzb")
+        var fingerFeaturePointXCoordinate:Int = _
+        @XmlElement(name = "zhwtzd_tzyzb")
+        var fingerFeaturePointYCoordinate:Int = _
+        @XmlElement(name = "zhwtzd_tzfx")
+        var fingerFeaturePointDirection:Int = _
+        @XmlElement(name = "zhwtzd_tzzl")
+        var fingerFeaturePointQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "PalmMinutiaSet")
+    class PalmMinutiaSet{
+        @XmlElement(name = "minutia")
+        var palmMinutia:Array[PalmMinutia] = _
+    }
+
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Palms")
     class Palms{
         @XmlElement(name = "palmMsg")
-        var palmMsg = new util.ArrayList[PalmMsg]()
+        var palmMsg:Array[PalmMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "PalmMsg")
     class PalmMsg{
-        @XmlElement(name = "zhwzwdm")
+        @XmlElement(name = "zhwzhwdm")
         var palmPostionCode:String = _
-        @XmlElement(name = "qszwyydm")
+        @XmlElement(name = "zhw_zzhwqsqkdm")
         var lackPalmCauseCode:String = _ //缺掌原因代码
-        @XmlElement(name = "zzwtztqfsdm")
+        @XmlElement(name = "zhw_zzhwtztqfsdm")
         var palmFeatureExtractionMethodCode:String = _
-        @XmlElement(name = "zhwzfd_sl")
-        var palmRetracingPoint:Int = _ //掌纹折返点数量
-        @XmlElement(name = "zhwzfdxx")
-        var palmRetracingPointInfo:String = _ //掌纹折返点信息
-        @XmlElement(name = "zhwsjd_sl")
-        var palmTrianglePointNum:Int = _ //掌纹三角点数量
-        @XmlElement(name = "zhwsjdxx")
-        var palmTrianglePointInfo:String = _ //掌纹三角点信息
-        @XmlElement(name = "zhwtzd_sl")
-        var palmFeaturePointNum:Int = _ //掌纹特征点数量
-        @XmlElement(name = "zhwtzdxx")
-        var palmFeaturePointInfo:String = _ //掌纹特征点信息
+        @XmlElement(name = "coreLikePatternSet")
+        var coreLikePatternSet:CoreLikePatternSet = _
+        @XmlElement(name = "deltaSet")
+        var deltaSet:DeltaSet = _
+        @XmlElement(name = "deltaDirection")
+        var deltaDirection:DeltaDirection = _
+        @XmlElement(name = "minutiaSet")
+        var palmMinutiaSet:PalmMinutiaSet = _
         @XmlElement(name = "zhw_zdyxx")
         var palmCustomInfo:Array[Byte] = _
         @XmlElement(name = "zhw_txspfxcd")
@@ -353,29 +428,29 @@ class FPT5File {
         * 后2个字节数字代表系统产品的版本，从00开始递增，对于WSQ压缩方法，
         * 前2个数字固定为14，后两个数字代表系统产品生产的单位代码
         */
-      @XmlElement(name = "zhw_txysffms")
+        @XmlElement(name = "zhw_txysffms")
         var palmImageCompressMethodDescript:String = _
+        @XmlElement(name = "zhw_txzl")
+        var palmImageQuality:Int = _
         @XmlElement(name = "zhw_txsj")
         var palmImageData:Array[Byte] = _
 
     }
     //--------------------掌纹相关end-----------------------//
 
-
-
     //--------------------四联指相关begin-----------------------//
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Fourprints")
     class Fourprints{
         @XmlElement(name = "fourprintMsg")
-        var fourprintMsg = new util.ArrayList[FourprintMsg]()
+        var fourprintMsg:Array[FourprintMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "FourprintMsg")
     class FourprintMsg{
         @XmlElement(name = "slz_zwzwdm")
         var fourPrintPostionCode:String = _
-        @XmlElement(name = "slz_qzyydm")
+        @XmlElement(name = "slz_zzhwqsqkdm")
         var fourPrintLackFingerCauseCode:String = _
         @XmlElement(name = "slz_zdyxx")
         var fourPrintCustomInfo:Array[Byte] = _
@@ -387,26 +462,26 @@ class FPT5File {
         var fourPrintImageRatio:Int = _
         @XmlElement(name = "slz_txysffms")
         var fourPrintImageCompressMethodDescript:String = _
+        @XmlElement(name = "slz_txzl")
+        var fourPrintImageQuality:Int = _
         @XmlElement(name = "slz_txsj")
         var fourPrintImageData:Array[Byte] = _
     }
     //--------------------四联指相关end-----------------------//
-
-
 
     //--------------------指节纹相关begin-----------------------//
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Knuckleprints")
     class Knuckleprints{
         @XmlElement(name = "knuckleprintMsg")
-        var knuckleprintMsg = new util.ArrayList[KnuckleprintMsg]()
+        var knuckleprintMsg:Array[KnuckleprintMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "KnuckleprintMsg")
     class KnuckleprintMsg{
         @XmlElement(name = "zjw_zwzwdm")
         var knucklePrintPostionCode:String = _
-        @XmlElement(name = "zjw_qzyydm")
+        @XmlElement(name = "zjw_zzhwqsqkdm")
         var knucklePrintLackFingerCauseCode:String = _
         @XmlElement(name = "zjw_zdyxx")
         var knucklePrintCustomInfo:Array[Byte] = _
@@ -418,27 +493,26 @@ class FPT5File {
         var knucklePrintImageRatio:Int = _
         @XmlElement(name = "zjw_txysffms")
         var knucklePrintImageCompressMethodDescript:String = _
+        @XmlElement(name = "zjw_txzl")
+        var knucklePrintImageQuality:Int = _
         @XmlElement(name = "zjw_txsj")
         var knucklePrintImageData:Array[Byte] = _
     }
     //--------------------指节纹相关end-----------------------//
-
-
-
 
     //--------------------全掌相关begin-----------------------//
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Fullpalms")
     class Fullpalms{
         @XmlElement(name = "fullpalmMsg")
-        var fullpalmMsg = new util.ArrayList[FullpalmMsg]()
+        var fullpalmMsg:Array[FullpalmMsg] =_
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "FullpalmMsg")
     class FullpalmMsg{
-        @XmlElement(name = "qz_zwzwdm")
+        @XmlElement(name = "qz_zhwzhwdm")
         var fullPalmPostionCode:String = _
-        @XmlElement(name = "qz_qzyydm")
+        @XmlElement(name = "qz_zzhwqsqkdm")
         var fullPalmLackPalmCauseCode:String = _
         @XmlElement(name = "qz_zdyxx")
         var fullPalmCustomInfo:Array[Byte] = _
@@ -450,6 +524,8 @@ class FPT5File {
         var fullPalmImageRatio:Int = _
         @XmlElement(name = "qz_txysffms")
         var fullPalmImageCompressMethodDescript:String = _
+        @XmlElement(name = "qz_txzl")
+        var fullPalmImageQuality:Int = _
         @XmlElement(name = "qz_txsj")
         var fullPalmImageData:Array[Byte] = _
     }
@@ -457,21 +533,27 @@ class FPT5File {
 
     //--------------------人像相关end-----------------------//
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "Portraits")
-    class Portraits{
-        @XmlElement(name = "portraitsMsg")
-        var portraitsMsg = new util.ArrayList[PortraitsMsg]()
+    @XmlType(name = "FaceImages")
+    class FaceImages{
+        @XmlElement(name = "faceImage")
+        var faceImage:Array[FaceImage] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "PortraitsMsg")
-    class PortraitsMsg{
+    @XmlType(name = "FaceImage")
+    class FaceImage{
         @XmlElement(name = "rxzplxdm")
-        var personPictureTypeCode:String = _
+        var personPictureTypeCode:String = _ //人像照片类型代码
+        @XmlElement(name = "rx_dzwjgs")
+        var personPictureFileLayout:String = _ //人像_电子文件格式
         @XmlElement(name = "rx_txsj")
-        var personPictureImageData:Array[Byte] = _
+        var personPictureImageData:Array[Byte] = _ //人像_图像数据
     }
-//--------------------人像相关end-----------------------//
+    //--------------------人像相关end-----------------------//
+    //-------------------------捺印部分--END------------------------------------//
 
+
+
+    //-------------------------现场部分--BEGIN------------------------------------//
     /**
       * 现场
       */
@@ -479,37 +561,27 @@ class FPT5File {
     @XmlType(name = "LatentPackage")
     class LatentPackage{
         @XmlElement(name = "caseMsg")
-        var caseMsg:CaseMsg = new CaseMsg
+        var caseMsg:CaseMsg = _
+        @XmlElement(name = "collectInfoMsg")
+        var latentCollectInfoMsg:LatentCollectInfoMsg = _
         @XmlElement(name = "fingers")
-        var latentFingers:LatentFingers = new LatentFingers
+        var latentFingers:Array[LatentFingers] = _
         @XmlElement(name = "palms")
-        var latentPalms:LatentPalms = new LatentPalms
+        var latentPalms:Array[LatentPalms] = _
     }
+
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "CaseMsg")
-    class CaseMsg{
-        @XmlElement(name = "zwbdxtlxms")
-        var latentFingerprintComparisonSysTypeDescript:String = _
-        @XmlElement(name = "ysxt_asjbh")
-        var originalSystemCaseId:String = _
-        @XmlElement(name = "asjbh")
-        var caseId:String = _
-        @XmlElement(name = "xckybh")
-        var latentSurveyId:String = _
-        @XmlElement(name = "xczzwkbh")
-        var latentCardId:String = _
+    @XmlType(name = "CaseClassSet")
+    class CaseClassSet{
         @XmlElement(name = "ajlbdm")
-        var caseTypeCode:String = _ //案件类别代码 逗号分隔，最多10个
-        @XmlElement(name = "asjsscw_jermby")
-        var money:String = _
-        @XmlElement(name = "asjfsdd_xzqhdm")
-        var caseOccurAdministrativeDivisionCode:String = _
-        @XmlElement(name = "asjfsdd_dzmc")
-        var caseOccurAddress:String = _
-        @XmlElement(name = "jyaq")
-        var briefCase:String = _
-        @XmlElement(name = "sfma_pdbz")
-        var whetherKill:String = _
+        var caseTypeCode:Array[String] = _ //案件类别代码
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "collectInfoMsg")
+    class LatentCollectInfoMsg{
+        @XmlElement(name = "zwbdxtlxms")
+        var fingerprintComparisonSysTypeDescript:String = _ //指纹比对系统类型描述
         @XmlElement(name = "tqsj_gajgjgdm")
         var extractUnitCode:String = _
         @XmlElement(name = "tqsj_gajgmc")
@@ -522,36 +594,55 @@ class FPT5File {
         var extractPersonTel:String = _
         @XmlElement(name = "tqsj")
         var extractDateTime:String = _
-        @XmlElement(name = "xczw_sl")
-        var latentFingerNum:Int = _
-        @XmlElement(name = "xczhw_sl")
-        var latentPalmNum:Int = _
-
     }
 
-    //--------------------现场指纹相关begin-----------------------//
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "CaseMsg")
+    class CaseMsg{
+        @XmlElement(name = "ysxt_asjbh")
+        var originalSystemCaseId:String = _
+        @XmlElement(name = "asjbh")
+        var caseId:String = _
+        @XmlElement(name = "xckybh")
+        var latentSurveyId:String = _
+        @XmlElement(name = "xczzhwkbh")
+        var latentCardId:String = _
+        @XmlElement(name = "caseClassSet")
+        var caseClassSet:CaseClassSet = _
+        @XmlElement(name = "ssjzrmby")
+        var money:String = _ //损失价值人民币
+        @XmlElement(name = "asjfsdd_xzqhdm")
+        var caseOccurAdministrativeDivisionCode:String = _
+        @XmlElement(name = "asjfsdd_dzmc")
+        var caseOccurAddress:String = _
+        @XmlElement(name = "jyaq")
+        var briefCase:String = _
+        @XmlElement(name = "sfma_pdbz")
+        var whetherKill:String = _
+    }
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LatentFingers")
     class LatentFingers{
-        @XmlElement(name = "fingerMsg")
-        var latentfingerMsg = new util.ArrayList[LatentFingerMsg]()
+        @XmlElement(name = "fingerImageMsg")
+        var latentFingerImageMsg:LatentFingerImageMsg = _
+        @XmlElement(name = "fingerFeatureMsg")
+        var latentFingerFeatureMsg:Array[LatentFingerFeatureMsg] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LatentFingerMsg")
-    class LatentFingerMsg{
+    class LatentFingerImageMsg{
       /**
         * 新数据必须提供，规则是‘F+现勘号后22位+4位物证分类代码+3位顺序号'
         * ,历史数据如无现勘编号，前23位用'F0000000000000000000000'占位
         */
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerPalmId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczw_xczzwylbw")
+        @XmlElement(name = "xczw_xczzhwylbw")
         var latentFingerLeftPosition:String = _ //现场指纹遗留部位
-        @XmlElement(name = "xczw_zzwtztqfsdm")
-        var latentFingerFeatureExtractMethodCode:String = _
-        @XmlElement(name = "xczw_stzzw_pdbz")
+        @XmlElement(name = "xczw_stzzhw_pdbz")
         var latentFingerCorpseJudgeIdentify:String = _
         @XmlElement(name = "xczw_rtxysdm")
         var latentFingerMastoidProcessLineColorCode:String = _ //乳突线颜色代码
@@ -559,40 +650,16 @@ class FPT5File {
         var latentFingerConnectFingerBeginPhysicalId:String = _
         @XmlElement(name = "xczw_lzjs_xcwzbh")
         var latentFingerConnectFingerEndPhysicalId:String = _
-        @XmlElement(name = "xczw_zwbdztdm")
+        @XmlElement(name = "xczw_zzhwbdztdm")
         var latentFingerComparisonStatusCode:String = _
-        @XmlElement(name = "xczw_tzzhsl")
-        var latentFingerFeatureGroupNum:Int = _
-        @XmlElement(name = "xczwtzz")
-        var latentFingerFeatureGroup: util.ArrayList[Xczwtzz] = new util.ArrayList[Xczwtzz]
-    }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "Xczwtzz")
-    class Xczwtzz{
-        @XmlElement(name = "xczw_tzzhbsf")
-        var latentFingerFeatureGroupIdentify:String = _
-        @XmlElement(name = "xczw_tzzhms")
-        var latentFingerFeatureGroupDescript:String = _
-        @XmlElement(name = "xczw_fxzw_jyqk")
+        @XmlElement(name = "xczw_zhiwfx_jyqk")
         var latentFingerAnalysisPostionBrief:String = _
-        @XmlElement(name = "xczw_zwwxdm")
-        var latentFingerPatternCode:String = _
-        @XmlElement(name = "xczw_zwfxms")
-        var latentFingerDirectionDescript:String = _
-        @XmlElement(name = "xczw_zwzxd")
-        var latentFingerCenterPoint:String = _
-        @XmlElement(name = "xczw_zwfzx")
-        var latentFingerSlaveCenter:String = _
-        @XmlElement(name = "xczw_zwzsj")
-        var latentFingerLeftTriangle:String = _
-        @XmlElement(name = "xczw_zwysj")
-        var latentFingerRightTriangle:String = _
-        @XmlElement(name = "xczw_zwtzd_sl")
-        var latentFingerFeatureNum:Int = _
-        @XmlElement(name = "xczw_zwtzdxx")
-        var latentFingerFeatureInfo:String = _
-        @XmlElement(name = "xczw_zdyxx")
-        var latentFingerCustomInfo:Array[Byte] = _
+        @XmlElement(name = "xczw_wxfx_jyqk")
+        var latentFingerPatternAnalysisBrief:String = _
+        @XmlElement(name = "xczw_zwfx_tzfx")
+        var latentFingerFeatureDirection:Int = _
+        @XmlElement(name = "xczw_zwfx_tzfxfw")
+        var latentFingerFeatureDirectionRange:Int = _
         @XmlElement(name = "xczw_txspfxcd")
         var latentFingerImageHorizontalDirectionLength:Int = _
         @XmlElement(name = "xczw_txczfxcd")
@@ -603,64 +670,218 @@ class FPT5File {
         var latentFingerImageCompressMethodDescript:String = _
         @XmlElement(name = "xczw_txsj")
         var latentFingerImageData:Array[Byte] = _
+        @XmlElement(name = "xczw_zdyxx")
+        var latentFingerCustomInfo:Array[Byte] = _
     }
-    //--------------------现场指纹相关end-----------------------//
 
 
-    //--------------------现场掌纹相关begin-----------------------//
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "MinutiaSet")
+    class LatentMinutiaSet{
+        @XmlElement(name = "minutia")
+        var latentMinutia:Array[LatentMinutia] = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentMinutia")
+    class LatentMinutia{
+        @XmlElement(name = "xczw_zwtzd_tzxzb")
+        var fingerFeaturePointXCoordinate:Int = _
+        @XmlElement(name = "xczw_zwtzd_tzyzb")
+        var fingerFeaturePointYCoordinate:Int = _
+        @XmlElement(name = "xczw_zwtzd_tzfx")
+        var fingerFeaturePointDirection:Int = _
+        @XmlElement(name = "xczw_zwtzd_tzzl")
+        var fingerFeaturePointQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "FingerFeatureMsg")
+    class LatentFingerFeatureMsg{
+        /**
+          * 新数据必须提供，规则是‘F+现勘号后22位+4位物证分类代码+3位顺序号'
+          * ,历史数据如无现勘编号，前23位用'F0000000000000000000000'占位
+          */
+        @XmlElement(name = "ysxt_xczzhwbh")
+        var originalSystemLatentFingerPalmId:String = _
+        @XmlElement(name = "xcwzbh")
+        var latentPhysicalId:String = _
+        /**
+          * 刑侦部门机构代码（12位）+3位流水号
+          */
+        @XmlElement(name = "xczw_tzzhbsf")
+        var latentFeatureGroupIdentifier:String = _
+        @XmlElement(name = "xczw_tzzhmsxx")
+        var latentFeatureGroupDscriptInfo:String = _
+        @XmlElement(name = "xczw_zzhwtztqfsdm")
+        var latentFeatureExtractMethodCode:String = _
+        @XmlElement(name = "xczw_zhiwfx_jyqk")
+        var fingerAnalysisPostionBrief:String = _
+        @XmlElement(name = "xczw_wxfx_jyqk")
+        var fingerPatternAnalysisBrief:String = _
+        @XmlElement(name = "xczw_zwfx_tzfx")
+        var fingerFeatureDirection:Int = _ //指纹方向-特征方向
+        @XmlElement(name = "xczw_zwfx_tzfxfw")
+        var fingerFeatureDirectionRange:Int = _ //指纹方向-特征方向-范围
+        @XmlElement(name = "xczw_zwzxd_tzxzb")
+        var fingerCenterPointFeatureXCoordinate:Int = _ //指纹中心点特征X坐标
+        @XmlElement(name = "xczw_zwzxd_tzyzb")
+        var fingerCenterPointFeatureYCoordinate:Int = _ //指纹中心点特征Y坐标
+        @XmlElement(name = "xczw_zwzxd_tzzbfw")
+        var fingerCenterPointFeatureCoordinateRange:Int = _ //指纹中心点特征坐标范围
+        @XmlElement(name = "xczw_zwzxd_tzfx")
+        var fingerCenterPointFeatureDirection:Int = _ //指纹中心点特征特征方向
+        @XmlElement(name = "xczw_zwzxd_tzfxfw")
+        var fingerCenterPointFeatureDirectionRange:Int = _ //指纹中心点特征特征方向范围
+        @XmlElement(name = "xczw_zwzxd_tzkkd")
+        var fingerCenterPointFeatureReliabilityLevel:Int = _ //指纹中心点可靠度
+        @XmlElement(name = "xczw_zwfzx_tzxzb")
+        var fingerSlaveCenterFeatureXCoordinate:Int = _ //指纹副中心特征X坐标
+        @XmlElement(name = "xczw_zwfzx_tzyzb")
+        var fingerSlaveCenterFeatureYCoordinate:Int = _ //指纹副中心特征Y坐标
+        @XmlElement(name = "xczw_zwfzx_tzzbfw")
+        var fingerSlaveCenterFeatureCoordinateRange:Int = _ //指纹副中心特征坐标范围
+        @XmlElement(name = "xczw_zwfzx_tzfx")
+        var fingerSlaveCenterFeatureDirection:Int = _ //指纹副中心特征方向
+        @XmlElement(name = "xczw_zwfzx_tzfxfw")
+        var fingerSlaveCenterFeatureDirectionRange:Int = _ //指纹副中心特征方向范围
+        @XmlElement(name = "xczw_zwfzx_tzkkd")
+        var fingerSlaveCenterFeatureReliabilityLevel:Int = _ //指纹副中心特征可靠度
+        @XmlElement(name = "xczw_zwzsj_tzxzb")
+        var fingerLeftTriangleFeatureXCoordinate:Int = _ //指纹左三角特征X坐标
+        @XmlElement(name = "xczw_zwzsj_tzyzb")
+        var fingerLeftTriangleFeatureYCoordinate:Int = _ //指纹左三角特征Y坐标
+        @XmlElement(name = "xczw_zwzsj_tzzbfw")
+        var fingerLeftTriangleFeatureCoordinateRange:Int = _ //指纹左三角特征坐标范围
+        @XmlElement(name = "xczw_zwzsj_tzfx")
+        var fingerLeftTriangleFeatureDirection:Int = _ //指纹左三角特征方向
+        @XmlElement(name = "xczw_zwzsj_tzfxfw")
+        var fingerLeftTriangleFeatureDirectionRange:Int = _ //指纹左三角特征方向范围
+        @XmlElement(name = "xczw_zwzsj_tzkkd")
+        var fingerLeftTriangleFeatureReliabilityLevel:Int = _ //指纹左三角特征方向范围
+        @XmlElement(name = "xczw_zwysj_tzxzb")
+        var fingerRightTriangleFeatureXCoordinate:Int = _ //指纹右三角特征X坐标
+        @XmlElement(name = "xczw_zwysj_tzyzb")
+        var fingerRightTriangleFeatureYCoordinate:Int = _ //指纹右三角特征Y坐标
+        @XmlElement(name = "xczw_zwysj_tzzbfw")
+        var fingerRightTriangleFeatureCoordinateRange:Int = _ //指纹右三角特征坐标范围
+        @XmlElement(name = "xczw_zwysj_tzfx")
+        var fingerRightTriangleFeatureDirection:Int = _ //指纹右三角特征方向
+        @XmlElement(name = "xczw_zwysj_tzfxfw")
+        var fingerRightTriangleFeatureDirectionRange:Int = _ //指纹右三角特征方向范围
+        @XmlElement(name = "xczw_zwysj_tzkkd")
+        var fingerRightTriangleFeatureReliabilityLevel:Int = _ //指纹右三角特征方向范围
+        @XmlElement(name = "minutiaSet")
+        var latentMinutiaSet:LatentMinutiaSet = _
+        @XmlElement(name = "xczw_zdyxx")
+        var latentFingerCustomInfo:Array[Byte] = _
+    }
+
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LatentPalms")
     class LatentPalms{
-        @XmlElement(name = "palmMsg")
-        var latentpalmMsg = new util.ArrayList[LatentpalmMsg]()
+        @XmlElement(name = "palmImageMsg")
+        var latentPalmImageMsg:LatentPalmImageMsg = _
+        @XmlElement(name = "palmFeatureMsg")
+        var latentPalmFeatureMsg:Array[LatentPalmFeatureMsg] = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmCoreLikePatternSet")
+    class LatentPalmCoreLikePatternSet{
+        @XmlElement(name = "coreLikePattern")
+        var latentPalmCoreLikePattern:Array[LatentPalmCoreLikePattern] =_
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmCoreLikePattern")
+    class LatentPalmCoreLikePattern{
+        @XmlElement(name = "xczhw_zhwzfd_tzxzb")
+        var latentPalmRetracingPointFeatureXCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwzfd_tzyzb")
+        var latentPalmRetracingPointFeatureYCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwzfd_tzzbfw")
+        var latentPalmRetracingPointFeatureCoordinateRange:Int = _
+        @XmlElement(name = "xczhw_zhwzfd_tzfx")
+        var latentPalmRetracingPointFeatureDirection:Int = _
+        @XmlElement(name = "xczhw_zhwzfd_tzfxfw")
+        var latentPalmRetracingPointFeatureDirectionRange:Int = _
+        @XmlElement(name = "xczhw_zhwzfd_tzzl")
+        var latentPalmRetracingPointFeatureQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmDeltaSet")
+    class LatentPalmDeltaSet{
+        @XmlElement(name  = "delta")
+        var  latentPalmDelta:Array[LatentPalmDelta] = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmDelta")
+    class LatentPalmDelta{
+
+        @XmlElement(name = "xczhw_zhwsjd_tzxzb")
+        var latentPalmTrianglePointFeatureXCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwsjd_tzyzb")
+        var latentPalmTrianglePointFeatureYCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwsjd_tzzbfw")
+        var latentPalmTrianglePointFeatureRange:Int = _
+        @XmlElement(name = "deltaDirection")
+        var latentPalmDeltaDirection:Array[LatentPalmDeltaDirection] = _
+        @XmlElement(name = "xczhw_zhwsjd_zhwsjwzlxdm")
+        var palmTrianglePostionTypeCode:String = _
+        @XmlElement(name = "xczhw_zhwsjd_tzzl")
+        var latentPalmTrianglePointFeatureQuality:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmDeltaDirection")
+    class LatentPalmDeltaDirection{
+         @XmlElement(name  = "xczhw_zhwsjd_tzfx")
+         var latentPalmTrianglePointFeatureDirection:Int = _
+         @XmlElement(name = "xczhw_zhwsjd_tzfxfw")
+         var latentPalmTrianglePointFeatureDirectionRange:Int = _
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmMinutiaSet")
+    class LatentPalmMinutiaSet{
+        @XmlElement(name = "minutia")
+        var latentPalmMinutia:Array[LatentPalmMinutia] = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LatentpalmMsg")
-    class LatentpalmMsg {
+    @XmlType(name = "LatentPalmMinutia")
+    class LatentPalmMinutia{
+        @XmlElement(name = "xczhw_zhwtzd_tzxzb")
+        var fingerFeaturePointXCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwtzd_tzyzb")
+        var fingerFeaturePointYCoordinate:Int = _
+        @XmlElement(name = "xczhw_zhwtzd_tzfx")
+        var fingerFeaturePointDirection:Int = _
+        @XmlElement(name = "xczhw_zhwtzd_tzzl")
+        var fingerFeaturePointQuality:Int = _
+    }
 
-        @XmlElement(name = "xczhw_xczzwbh")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmImageMsg")
+    class LatentPalmImageMsg {
+
+        @XmlElement(name = "xczhw_xczzhwbh")
         var latentPalmId: String = _
         @XmlElement(name = "xczhw_xcwzbh")
         var latentPalmPhysicalId: String = _
-        @XmlElement(name = "xczhw_xczzwylbw")
+        @XmlElement(name = "xczhw_xczzhwylbw")
         var latentPalmLeftPostion: String = _
-        @XmlElement(name = "xczhw_zzwtztqfsdm")
-        var latentPalmFeatureExtractMethodCode: String = _
-        @XmlElement(name = "xczhw_stzzw_pdbz")
+        @XmlElement(name = "xczhw_stzzhw_pdbz")
         var latentPalmCorpseJudgeIdentify: String = _
         @XmlElement(name = "xczhw_rtxysdm")
         var latentPalmMastoidProcessLineColorCode: String = _
-        @XmlElement(name = "xczhw_zhwbdztdm")
+        @XmlElement(name = "xczhw_zzhwbdztdm")
         var latentPalmComparisonStatusCode: String = _
-        @XmlElement(name = "xczhw_tzzhsl")
-        var latentPalmFeatureGroupNum:Int = _
-        @XmlElement(name = "xczhwtzz")
-        var latentPalmFeatureGroup: util.ArrayList[Xczhwtzz] = new util.ArrayList[Xczhwtzz]
-    }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "Xczhwtzz")
-    class Xczhwtzz{
-
-        @XmlElement(name = "xczhw_tzzhbsf")
-        var latentPalmFeatureGroupIdentify:String = _
-        @XmlElement(name = "xczhw_tzzhms")
-        var latentPalmFeatureGroupDescript:String = _
-        @XmlElement(name = "xczhw_fxzhw_jyqk")
-        var latentPalmAnalysisPostionBrief:String = _
-        @XmlElement(name = "xczhw_zwzfd_sl")
-        var latentPalmRetracingPointNum:Int = _
-        @XmlElement(name = "xczhw_zwzfdxx")
-        var latentPalmRetracingPointInfo:String = _
-        @XmlElement(name = "xczhw_zwsjd_sl")
-        var latentPalmTrianglePointNum:Int = _
-        @XmlElement(name = "xczhw_zwsjdxx")
-        var latentPalmTrianglePointInfo:String = _
-        @XmlElement(name = "xczhw_zhwtzd_sl")
-        var latentPalmFeaturePointNum:Int = _
-        @XmlElement(name = "xczhw_zhwtzdxx")
-        var latentPalmFeaturePointInfo:String = _
-        @XmlElement(name = "xczhw_zdyxx")
-        var latentPalmCustomInfo:Array[Byte] = _
+        @XmlElement(name = "xczhw_zhwfx_jyqk")
+        var latentPalmPostionAnalysisBriefly:String = _
         @XmlElement(name = "xczhw_txspfxcd")
         var latentPalmImageHorizontalDirectionLength:Int = _
         @XmlElement(name = "xczhw_txczfxcd")
@@ -671,8 +892,40 @@ class FPT5File {
         var latentPalmImageCompressMethodDescript:String = _
         @XmlElement(name = "xczhw_txsj")
         var latentPalmImageData:Array[Byte] = _
+        @XmlElement(name = "xczhw_zdyxx")
+        var latentPalmCustomInfo:Array[Byte] = _
+
     }
-    //--------------------现场掌纹相关end-----------------------//
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LatentPalmFeatureMsg")
+    class LatentPalmFeatureMsg{
+        @XmlElement(name = "xczhw_xczzhwbh")
+        var latentPalmNo:String = _
+        @XmlElement(name = "xczhw_xcwzbh")
+        var latentPalmPhysicalId:String = _
+        @XmlElement(name = "xczhw_tzzhbsf")
+        var latentPalmFeatureGroupIdentifier:String = _
+        @XmlElement(name = "xczhw_tzzhmsxx")
+        var latentPalmFeatureDscriptInfo:String = _
+        @XmlElement(name = "xczhw_zzhwtztqfsdm")
+        var latentPalmFeatureExtractMethodCode:String = _
+        @XmlElement(name = "xczhw_zzhwbdztdm")
+        var latentPalmComparisonStatusCode:String = _
+        @XmlElement(name = "xczhw_zhwfx_jyqk")
+        var latentPalmAnalysisBrief:String = _
+        @XmlElement(name = "coreLikePatternSet")
+        var latentPalmCoreLikePatternSet:LatentPalmCoreLikePatternSet = _
+        @XmlElement(name = "deltaSet")
+        var latentPalmDeltaSet:LatentPalmDeltaSet = _
+        @XmlElement(name = "minutiaSet")
+        var latentPalmMinutiaSet:LatentPalmMinutiaSet = _
+        @XmlElement(name = "xczhw_zdyxx")
+        var latentPalmCustomInfo:Array[Byte] = _
+    }
+    //-------------------------现场部分--END------------------------------------//
+
+
 
 
     /**
@@ -683,7 +936,7 @@ class FPT5File {
     class LatenttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
-        @XmlElement(name = "zzwbdrwlxdm")
+        @XmlElement(name = "zzhwbdrwlxdm")
         var taskTypeCode:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemDescript:String = _
@@ -693,16 +946,16 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
@@ -714,7 +967,7 @@ class FPT5File {
     class PrinttaskPackage{
         @XmlElement(name = "rwbh")
         var taskId:String = _
-        @XmlElement(name = "zzwbdrwlxdm")
+        @XmlElement(name = "zzhwbdrwlxdm")
         var taskTypeCode:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemDescript:String = _
@@ -724,12 +977,12 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:FingerprintPackage = new FingerprintPackage
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -755,22 +1008,30 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
-        @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[LTResultMsg] = new util.ArrayList[LTResultMsg]
+        var latentPackage:Array[LatentPackage]= _
+        @XmlElement(name = "resultMsgSet")
+        var ltResultMsgSet:LTResultMsgSet = _
     }
+
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "LTResultMsg")
+    @XmlType(name = "LTResultMsgSet")
+    class LTResultMsgSet {
+        @XmlElement(name = "resultMsg")
+        var resultMsg: Array[LTResultMsg] = _ //比对结果集合
+    }
+
+
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "ResultMsg")
     class LTResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -781,12 +1042,12 @@ class FPT5File {
         var resultJingZongPersonId:String = _
         @XmlElement(name = "bdjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bdjg_zzwkbh")
+        @XmlElement(name = "bdjg_zzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "bdjg_zzwdm")
+        @XmlElement(name = "bdjg_zzhwdm")
         var resultFingerPalmPostionCode:String = _ //比对结果指掌位代码
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -812,18 +1073,22 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var tlResultMsgSet:TLResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "TLResultMsgSet")
+    class TLResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[TLResultMsg] = new util.ArrayList[TLResultMsg]
+        var resultMsg: Array[TLResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TLResultMsg")
     class TLResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -834,16 +1099,16 @@ class FPT5File {
         var resultCaseId:String = _
         @XmlElement(name = "bdjg_xckybh")
         var resultLatentSurveyId:String = _
-        @XmlElement(name = "bdjg_ysxt_xczzwbh")
+        @XmlElement(name = "bdjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentFingerPalmId:String = _
         @XmlElement(name = "bdjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bdjg_xczzwkbh")
+        @XmlElement(name = "bdjg_xczzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "bdjg_zzwdm")
+        @XmlElement(name = "bdjg_zzhwdm")
         var resultFingerPalmPostionCode:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
@@ -853,8 +1118,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtResultPackage")
     class TtResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -871,20 +1134,24 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var ttResultMsgSet:TtResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "TtResultMsgSet")
+    class TtResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[TTResultMsg] = new util.ArrayList[TTResultMsg]
+        var resultMsg: Array[TTResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TTResultMsg")
     class TTResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -895,12 +1162,12 @@ class FPT5File {
         var resultJingZongPersonId:String = _
         @XmlElement(name = "bdjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bdjg_zzwkbh")
+        @XmlElement(name = "bdjg_zzhwkbh")
         var resultCardId:String = _
-        @XmlElement(name = "zzwccbzlxdm")
+        @XmlElement(name = "zzhwccbzlxdm")
         var ttHitTypeCode:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -910,8 +1177,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LlResultPackage")
     class LlResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
         @XmlElement(name = "rwbh")
         var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
@@ -928,22 +1193,26 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
+        @XmlElement(name = "resultMsgSet")
+        var llResultMsgSet:LlResultMsgSet = _
+    }
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "LlResultMsgSet")
+    class LlResultMsgSet {
         @XmlElement(name = "resultMsg")
-        var resultMsg:util.ArrayList[LLResultMsg] = new util.ArrayList[LLResultMsg]
+        var resultMsg: Array[LLResultMsg] = _ //比对结果集合
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LLResultMsg")
     class LLResultMsg{
-        @XmlElement(name = "bdjg_sl")
-        var resultNum:Int = _
         @XmlElement(name = "bdjg_mc")
         var resultRanking:Int = _
         @XmlElement(name = "bdjg_df")
@@ -956,12 +1225,12 @@ class FPT5File {
         var resultLatentSurveyId:String = _
         @XmlElement(name = "bdjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bdjg_ysxt_xczzwbh")
+        @XmlElement(name = "bdjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentFingerId:String = _
-        @XmlElement(name = "bdjg_xczzwkbh")
+        @XmlElement(name = "bdjg_xczzhwkbh")
         var resultLatentCardId:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
     }
 
 
@@ -971,6 +1240,8 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LtHitResultPackage")
     class LtHitResultPackage{
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "xczw_asjbh")
@@ -979,11 +1250,11 @@ class FPT5File {
         var latentFingerOriginalSystemCaseId:String = _
         @XmlElement(name = "xczw_xckybh")
         var latentFingerLatentSurveyId:String = _
-        @XmlElement(name = "xczw_ysxt_xczzwbh")
+        @XmlElement(name = "xczw_ysxt_xczzhwbh")
         var latentFingerOriginalSystemFingerId:String = _
         @XmlElement(name = "xczw_xcwzbh")
         var latentFingerLatentPhysicalId:String = _
-        @XmlElement(name = "xczw_xczzwkbh")
+        @XmlElement(name = "xczw_xczzhwkbh")
         var latentFingerCardId:String = _
         @XmlElement(name = "nyzw_ysxt_asjxgrybh")
         var fingerPrintOriginalSystemPersonId:String = _
@@ -991,11 +1262,11 @@ class FPT5File {
         var fingerPrintJingZongPersonId:String = _
         @XmlElement(name = "nyzw_asjxgrybh")
         var fingerPrintPersonId:String = _
-        @XmlElement(name = "nyzw_zzwkbh")
+        @XmlElement(name = "nyzw_zzhwkbh")
         var fingerPrintCardId:String = _
-        @XmlElement(name = "nyzw_zzwdm")
+        @XmlElement(name = "nyzw_zzhwdm")
         var fingerPrintPostionCode:String = _
-        @XmlElement(name = "nyzw_zzwbdffdm")
+        @XmlElement(name = "nyzw_zzhwbdffdm")
         var fingerPrintComparisonMethodCode:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
@@ -1024,9 +1295,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackage:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackage:Array[LatentPackage] = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -1036,9 +1307,11 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtHitResultPackage")
     class TtHitResultPackage{
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
-        @XmlElement(name = "zzwccbzlxdm")
+        @XmlElement(name = "zzhwccbzlxdm")
         var ttHitTypeCode:String = _
         @XmlElement(name = "ysxt_asjxgrybh")
         var originalPersonId:String = _
@@ -1046,7 +1319,7 @@ class FPT5File {
         var jingZongPersonId:String = _
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
-        @XmlElement(name = "zzwkbh")
+        @XmlElement(name = "zzhwkbh")
         var cardId:String = _
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
@@ -1056,7 +1329,7 @@ class FPT5File {
         var resultjingZongPersonId:String = _
         @XmlElement(name = "bzjg_asjxgrybh")
         var resultPersonId:String = _
-        @XmlElement(name = "bzjg_zzwkbh")
+        @XmlElement(name = "bzjg_zzhwkbh")
         var resultCardId:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
@@ -1085,9 +1358,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageSource:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackageSource:Array[FingerprintPackage] = _
         @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageDesc:util.ArrayList[FingerprintPackage] = new util.ArrayList[FingerprintPackage]
+        var fingerprintPackageDesc:Array[FingerprintPackage] = _
     }
 
 
@@ -1097,8 +1370,8 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LlHitResultPackage")
     class LlHitResultPackage{
-        @XmlElement(name = "xxzjbh")
-        var xxzjbh:String = _
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "ysxt_asjbh")
@@ -1107,11 +1380,11 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var cardId:String = _
         @XmlElement(name = "bzjg_ysxt_asjbh")
         var resultOriginalSystemCaseId:String = _
@@ -1123,7 +1396,7 @@ class FPT5File {
         var resultOriginalSystemLatentPersonId:String = _
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
-        @XmlElement(name = "bzjg_xczzwkbh")
+        @XmlElement(name = "bzjg_xczzhwkbh")
         var resultCardId:String = _
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
@@ -1152,9 +1425,9 @@ class FPT5File {
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")
-        var latentPackageSource:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackageSource:Array[LatentPackage] = _
         @XmlElement(name = "latentPackage")
-        var latentPackageDesc:util.ArrayList[LatentPackage] = new util.ArrayList[LatentPackage]
+        var latentPackageDesc:Array[LatentPackage] = _
     }
 
 

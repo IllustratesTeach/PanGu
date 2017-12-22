@@ -2,7 +2,7 @@ package nirvana.hall.v70.gz.services
 
 import junit.framework.Assert
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.v70.gz.sys.BaseV70TestCase
+import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.Test
 
 /**

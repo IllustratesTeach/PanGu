@@ -5,6 +5,7 @@ import java.util
 import javax.activation.DataHandler
 
 import nirvana.hall.c.services.gfpt4lib.FPT4File.FPT4File
+import nirvana.hall.webservice.internal.haixin.vo.PersonInfoItem
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -177,4 +178,26 @@ trait StrategyService {
                                      ,oper_type:Int,palmid:String,palmtype:Int,personid:String,dataHandler: Array[Byte],throwAble:Option[Throwable]):Unit
 
   def getResponseStatusAndPlam(palmid:String,palmtype:Int): Int
+
+  /**
+    * 获取错误信息集合
+    * @param personid 公安部标准的23位唯一码，人员编号
+    * @param oper_type 操作类型
+    * @return
+    */
+  def getErrorInfoList(userid:String,unitcode:String,personid:String,oper_type : Int) : ListBuffer[mutable.HashMap[String,Any]]
+
+  /**
+    * 获取人员信息
+    * @param idcard 身份证号
+    * @return
+    */
+  def getPersonInfo(idcard: String) : util.ArrayList[PersonInfoItem]
+
+  /**
+    * 处理字符串，不为空返回原字符串，为空返回 ""
+    * @param str
+    * @return
+    */
+  def nvlString(str:String) : String
 }

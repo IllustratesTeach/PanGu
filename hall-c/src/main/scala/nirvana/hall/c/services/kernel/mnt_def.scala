@@ -183,8 +183,8 @@ object mnt_def {
     } // CORESTREAMLINE;
 
     class FINGERMNTSTRUCT extends AncientData {
-    var bePalm:Byte = _ ; //
-    var beLatent:Byte = _ ; //
+    var bePalm:Byte = 0 ; //
+    var beLatent:Byte = 0 ; //
     var resolution:Short = _ ; //	采集密度，缺省值为500	//
     var nWidth:Short = _ ; //	图象宽度				//
     var nHeight:Short = _ ; //	图象高度				//
@@ -301,8 +301,8 @@ object mnt_def {
   } // FINGERFEATURE;
 
   class FINGERLATMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
-  var beLatent:Byte = _ ; //
+  var bePalm:Byte = 0 ; //
+  var beLatent:Byte = 1 ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500
   var nWidth:Short = _ ; //	图象宽度
   var nHeight:Short = _ ; //	图象高度
@@ -311,8 +311,8 @@ object mnt_def {
   var nres:Short = _ ; //	存储密度，缺省值为200   SCALE=dpi/resolution
   var MntVersion:Byte = _ ; //	特征提取方法(以前版本为0)
 
-  var FingerCode:Short = _ ; //	候选指位（按位计算）
-  var RpCode:Byte = _ ; //	候选纹型（按位计算）
+  var FingerCode:Short = _ ; //	候选指位（按位计算）前10位依次是指位1-10
+  var RpCode:Byte = _ ; //	候选纹型（按位计算）前4位依次是 弓，左，右，斗
   @Length(10)
   var fgrp:Array[Byte] = _ ; //	联指纹型（按位计算）
   var Distore:Byte = _ ; /*  变形参数
@@ -403,7 +403,7 @@ object mnt_def {
   } // FINGERLATMNTSTRUCT;
 
   class PALMMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
+  var bePalm:Byte = 1 ; //
   var beLatent:Byte = _ ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500	//
   var nWidth:Short = _ ; //	图象宽度				//
@@ -482,8 +482,8 @@ var OPTrp:Byte = _ ;			//	外侧区纹型信息0：未知,1：存在,2：不存�
   } // PALMMNTSTRUCT;
 
   class PALMLATMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
-  var beLatent:Byte = _ ; //
+  var bePalm:Byte = 1 ; //
+  var beLatent:Byte = 1 ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500	//
   var nWidth:Short = _ ; //	图象宽度				//
   var nHeight:Short = _ ; //	图象高度				//

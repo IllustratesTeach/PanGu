@@ -109,9 +109,9 @@ object FPTMntConverter {
     fingerTData.featureCount = fptMnt.featureCount
     fingerTData.feature = fptMnt.feature
     fingerTData.extractMethod= "A"
-    fingerTData.imgHorizontalLength = fptMnt.imgHorizontalLength
-    fingerTData.imgVerticalLength = fptMnt.imgVerticalLength
-    fingerTData.dpi = fptMnt.dpi
+    fingerTData.imgHorizontalLength = "640"//fptMnt.imgHorizontalLength
+    fingerTData.imgVerticalLength = "640"//fptMnt.imgVerticalLength
+    fingerTData.dpi = "500"//fptMnt.dpi
 
     fingerTData
   }
@@ -241,7 +241,8 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_LDELTA)
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
-    mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.stCm.nMntCnt = if(fptMnt.featureCount.length>0) fptMnt.featureCount.toShort else 0
+    mntDisp.nMaxMnt = fptMnt.featureCount.toShort //最大特征个数
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fptMnt.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
@@ -277,7 +278,8 @@ object FPTMntConverter {
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.leftTriangle,mntDisp.stFg.ldelta,UTIL_COREDELTA_TYPE_UPCORE)
     UTIL_CoreDelta_FPT2MntDisp(fptMnt.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_UPCORE)
 
-    mntDisp.stCm.nMntCnt = fptMnt.featureCount.toShort
+    mntDisp.stCm.nMntCnt = if(fptMnt.featureCount.length>0) fptMnt.featureCount.toShort else 0
+    mntDisp.nMaxMnt = fptMnt.featureCount.toShort
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fptMnt.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)
@@ -327,7 +329,7 @@ object FPTMntConverter {
       fptMnt.rightTriangle = UTIL_CoreDelta_MntDisp2FPT(mntDisp.stFg.rdelta, UTIL_COREDELTA_TYPE_RDELTA)
     }
 
-    val nMaxMnt:Int = 1800/9
+    val nMaxMnt:Int = 1800/9 //FPT4支持的最大特征个数
     var ntemp:Int = mntDisp.stCm.nMntCnt
     if ( ntemp > nMaxMnt ) ntemp = nMaxMnt
     if ( ntemp > 0 ) {

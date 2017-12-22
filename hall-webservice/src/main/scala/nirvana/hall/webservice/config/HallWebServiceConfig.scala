@@ -53,6 +53,8 @@ class HandprintServiceConfig{
   var user: String = _
   @XmlElement(name = "password")
   var password: String = _
+  @XmlElement(name = "unitcode")
+  var unitCode:String = _
 }
 
 

@@ -5,11 +5,10 @@ import java.sql.Timestamp
 import java.util.UUID
 import javax.sql.DataSource
 
-import nirvana.hall.api.internal.AssistCheckConstant
 import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.support.services.JdbcDatabase
 
-import scala.collection.mutable.{ArrayBuffer, HashMap, ListBuffer}
+import scala.collection.mutable.{HashMap, ListBuffer}
 
 /**
   * Created by yuchen on 2017/4/21.

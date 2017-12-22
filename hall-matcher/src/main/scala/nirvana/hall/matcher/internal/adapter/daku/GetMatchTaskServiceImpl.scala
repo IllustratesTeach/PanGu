@@ -27,6 +27,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
    private val GET_SID_BY_PERSONID: String = "select t.sid as ora_sid from gafis_person t where t.personid=?"
    /** 获取sid根据卡号（现场指纹） */
    private val GET_SID_BY_CASE_FINGERID: String = "select t.sid as ora_sid from gafis_case_finger t where t.finger_id=?"
+   private val GET_SID_BY_CASE_PALMID: String = "select t.sid as ora_sid from gafis_case_palm t where t.palm_id=?"
    /**
     * 获取比对任务
     * @param matchTaskQueryRequest
@@ -58,25 +59,36 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
      val flag = rs.getInt("flag")
      val textSql = rs.getString("textsql")
      val topN = rs.getInt("maxcandnum")
-     if(flag == 2 || flag == 22){
-        throw new UnsupportedOperationException("unsupported palm query")
-     }
-     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, flag))
+     val isPalm = flag == 2 || flag == 22
+     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
      matchTaskBuilder.setTopN(if(topN <=0)  50 else topN);//最大候选队列默认50
      matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
      matchTaskBuilder.setPriority(rs.getInt("priority"))
-     val mic = rs.getBytes("mic")
-     queryType match {
-       case HallMatcherConstants.QUERY_TYPE_TT =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
-       case HallMatcherConstants.QUERY_TYPE_TL =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
-       case HallMatcherConstants.QUERY_TYPE_LT =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
-       case HallMatcherConstants.QUERY_TYPE_LL =>
-         matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+     if (isPalm) {
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.PALM_LL)
+       }
+     } else {
+       queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TT)
+         case HallMatcherConstants.QUERY_TYPE_TL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_TL)
+         case HallMatcherConstants.QUERY_TYPE_LT =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LT)
+         case HallMatcherConstants.QUERY_TYPE_LL =>
+           matchTaskBuilder.setMatchType(MatchType.FINGER_LL)
+       }
      }
 
+     val mic = rs.getBytes("mic")
      val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
      mics.foreach{ micStruct =>
        if(micStruct.bIsLatent == 1){
@@ -105,9 +117,9 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
            val value: String = json.getString("controlPursuitStatus")
            val colQuery = KeywordQuery.newBuilder
            colQuery.setValue(value)
-           queryBuilder.addQueryBuilder.setName("dataType").setExtension(KeywordQuery.query, colQuery.build)
+           queryBuilder.addQueryBuilder().setName("dataType").setExtension(KeywordQuery.query, colQuery.build)
            val dataInQuery = GroupQuery.newBuilder
-           dataInQuery.addClauseQueryBuilder.setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
+           dataInQuery.addClauseQueryBuilder().setName("dataIn").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue("2").build).setOccur(Occur.MUST_NOT)
          }
        }else if(queryType == HallMatcherConstants.QUERY_TYPE_TL){
          //只比参与比对的现场指纹
@@ -117,7 +129,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
        if(queryType == HallMatcherConstants.QUERY_TYPE_LT){
          if(json.has("personCategory")){//人员类型文字筛选
          val personCategory = json.getString("personCategory")
-           matchTaskBuilder.getLDataBuilder.getTextQueryBuilder.addQueryBuilder.setName("personCategory").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personCategory).build)
+           matchTaskBuilder.getLDataBuilder.getTextQueryBuilder.addQueryBuilder().setName("personCategory").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personCategory).build)
          }
        }
        //高级查询
@@ -129,19 +141,28 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
      matchTaskBuilder.build()
    }
 
-   private def getObjectIdByCardId(cardId: String, queryType: Int, flag: Int): Long={
-     var sql: String = ""
-     if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
-       sql = GET_SID_BY_PERSONID
-     } else {
-       sql = GET_SID_BY_CASE_FINGERID
-     }
-     JdbcDatabase.queryFirst[Long](sql){ps =>
-       ps.setString(1, cardId)
-     }{ rs =>
-       rs.getInt("ora_sid")
-     }.get
-   }
+  private def getObjectIdByCardId(cardId: String, queryType: Int, isPalm: Boolean): Long = {
+    var sql: String = ""
+    if (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL) {
+      sql = GET_SID_BY_PERSONID
+    } else {
+      if (isPalm) {
+        sql = GET_SID_BY_CASE_PALMID
+      } else {
+        sql = GET_SID_BY_CASE_FINGERID
+      }
+    }
+    val oraSidOption = JdbcDatabase.queryFirst[Long](sql) { ps =>
+      ps.setString(1, cardId)
+    } { rs =>
+      rs.getInt("ora_sid")
+    }
+    if (oraSidOption.nonEmpty) {
+      oraSidOption.get
+    } else {
+      0
+    }
+  }
 
    private def getMatchConfig(textSql:String): MatchConfig ={
      val builder = MatchConfig.newBuilder

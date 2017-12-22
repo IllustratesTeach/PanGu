@@ -1,12 +1,10 @@
 package nirvana.hall.api.internal.fpt
 
-import javax.sql.DataSource
-
 import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{CaseInfoService, LPCardService, ExceptRelationService, TPCardService}
+import nirvana.hall.api.services.{CaseInfoService, ExceptRelationService, LPCardService, TPCardService}
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -26,9 +24,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      caseInfoService: CaseInfoService,
                      lPCardService: LPCardService,
                      exceptRelationService: ExceptRelationService,
-                     extractor: FeatureExtractor,
-                     implicit val dataSource: DataSource) extends FPTService{
-  //fpt处理需要加载jni
+                     extractor: FeatureExtractor) extends FPTService{
   JniLoaderUtil.loadExtractorJNI()
   JniLoaderUtil.loadImageJNI()
 
@@ -98,7 +94,9 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
   @Transactional
   override def addLogic03Res(logic03Rec: Logic03Rec): Unit = {
     val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
-    caseInfoService.addCaseInfo(caseInfo)
+    if(!caseInfoService.isExist(logic03Rec.caseId)){
+      caseInfoService.addCaseInfo(caseInfo)
+    }
     val lPCardList = FPTConverter.convertLogic03Res2LPCard(logic03Rec)
     lPCardList.foreach{lPCard =>
       val lpCardBuiler = lPCard.toBuilder
@@ -109,10 +107,13 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
         val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
         blobBuilder.setStImageBytes(ByteString.copyFrom(originalImage.toByteArray()))
       }
-      lPCardService.addLPCard(lpCardBuiler.build())
+      if(!lPCardService.isExist(logic03Rec.cardId)){
+        lPCardService.addLPCard(lpCardBuiler.build())
+      }else{
+        lPCardService.updateLPCard(lpCardBuiler.build())
+      }
     }
   }
-
   @Transactional
   override def addLogic03ResForShangHai(logic03Rec: Logic03Rec): Unit = {
     val caseInfo = FPTConverter.convertLogic03Res2Case(logic03Rec)
@@ -171,7 +172,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
       case other => "9"
     }
     logic04Rec.matchUnitCode = gafisMatchInfo.registerOrg
-    logic04Rec.matchName = gafisMatchInfo.matchName
+    logic04Rec.matchUnitName = gafisMatchInfo.matchName
     logic04Rec.matcher = gafisMatchInfo.registerUser
     logic04Rec.matchDate = gafisMatchInfo.registerTime
     logic04Rec.head.fileLength = logic04Rec.toByteArray(AncientConstants.GBK_ENCODING).length.toString

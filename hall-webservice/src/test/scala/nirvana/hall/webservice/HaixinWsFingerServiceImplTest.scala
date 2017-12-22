@@ -22,7 +22,7 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
 
   @Test
   def test_setFinger: Unit ={
-    val dataHandler = new DataHandler(new FileDataSource(new File("D://R2100000000002017090207.fpt")))
+    val dataHandler = new DataHandler(new FileDataSource(new File("/Users/yuchen/fpt/R2100000000002017090207.fpt")))
     val service = getService[WsHaiXinFingerService]
     val result = service.setFinger("1701","0101","3701","R2100000000002017090207",dataHandler)
     Assert.assertEquals(1,result)
@@ -138,4 +138,17 @@ class HaixinWsFingerServiceImplTest extends BaseTestCase{
     FileUtils.writeByteArrayToFile(new File("D:\\170919\\10101\\" + 10101 + ".FPT"), IOUtils.toByteArray(dataHandler.getInputStream))
   }
 
+  @Test
+  def test_get_error_info(): Unit ={
+    val service = getService[WsHaiXinFingerService]
+    val dataHandler = service.getErrorInfo("0101","3701",1,"R3200000008882007120003")
+    FileUtils.writeByteArrayToFile(new File("/Users/zqLuo/Desktop/errorInfoTest.xml"), IOUtils.toByteArray(dataHandler.getInputStream))
+  }
+
+  @Test
+  def test_get_person_info(): Unit ={
+    val service = getService[WsHaiXinFingerService]
+    val dataHandler = service.getPersonInfo("0101","3701","123");
+    FileUtils.writeByteArrayToFile(new File("/Users/zqLuo/Desktop/personInfoTest.xml"), IOUtils.toByteArray(dataHandler.getInputStream))
+  }
 }

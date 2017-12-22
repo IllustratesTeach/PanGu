@@ -5,7 +5,8 @@ import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.image.services.FirmDecoder
+import nirvana.hall.image.services.{FPTImageDataType, FirmDecoder, RawImageDataType}
+import nirvana.hall.protocol.image.FirmImageDecompressProto.FirmImageDecompressRequest.ImageDataType
 import nirvana.hall.protocol.image.FirmImageDecompressProto.{FirmImageDecompressRequest, FirmImageDecompressResponse}
 
 /**
@@ -24,7 +25,14 @@ class FirmImageDecompressRequestFilter(firmDecoder: FirmDecoder) extends RpcServ
       if(gafisImg.stHead.nImgSize == 0)
         throw new IllegalArgumentException("image data length is zero.")
 
-      val originalImg = firmDecoder.decode(gafisImg)
+      //图像类型
+      val imageDataType = request.getImageDataType match {
+        case ImageDataType.FPT =>
+          FPTImageDataType
+        case ImageDataType.RAW =>
+          RawImageDataType
+      }
+      val originalImg = firmDecoder.decode(gafisImg, imageDataType)
       val firmResponseBuilder = FirmImageDecompressResponse.newBuilder()
       val output = ByteString.newOutput(originalImg.getDataSize)
       originalImg.writeToStreamWriter(output)

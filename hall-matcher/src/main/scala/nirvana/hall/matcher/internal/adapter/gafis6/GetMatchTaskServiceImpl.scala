@@ -7,11 +7,13 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.{DataConverter, GafisConverter}
+import nirvana.hall.matcher.internal.{DataConverter, GafisConverter, TextQueryUtil}
 import nirvana.hall.matcher.service.GetMatchTaskService
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.MatchTaskQueryProto.{MatchTask, MatchTaskQueryRequest, MatchTaskQueryResponse}
 import nirvana.protocol.NirvanaTypeDefinition.MatchType
+import nirvana.protocol.TextQueryProto.TextQueryData
+import nirvana.protocol.TextQueryProto.TextQueryData.GroupQuery
 import org.jboss.netty.buffer.ChannelBuffers
 
 /**
@@ -19,7 +21,7 @@ import org.jboss.netty.buffer.ChannelBuffers
   */
 class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
    /** 获取比对任务  */
-  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag " +
+  private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag, t.startkey1, t.endkey1, t.startkey2, t.endkey2 " +
   " from NORMALQUERY_QUERYQUE t where rowid in " +
   " (select rid from (select rowid rid from NORMALQUERY_QUERYQUE t1 where t1.status = 0 order by t1.priority desc, t1.ora_sid) tt where rownum <= ?)"
 
@@ -46,6 +48,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        catch {
          case e: Exception =>
            updateMatchStatusFail(oraSid, e.getMessage)
+           e.printStackTrace()
        }
      }
      matchTaskQueryResponse.build()
@@ -105,25 +108,38 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
            tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }
      }
-     //TODO 高级查询
-     //文本查询
-     /*val qrycondition = rs.getBytes("qrycondition")
-     val textQuery = GafisConverter.convertQrycondition2TextQueryData(qrycondition)
+     //条码区间查询
+     val startKey1 = rs.getString("startkey1")
+     val endKey1 = rs.getString("endkey1")
+     val startKey2 = rs.getString("startkey2")
+     val endKey2 = rs.getString("endkey2")
+     val textQueryDataBuilder = TextQueryData.newBuilder()
+     if(startKey1 != null || endKey1 != null || startKey2 != null || endKey2 != null){
+       val destDBIsLatent = queryType match {
+         case HallMatcherConstants.QUERY_TYPE_TT |
+              HallMatcherConstants.QUERY_TYPE_LT =>
+           false
+         case HallMatcherConstants.QUERY_TYPE_TL |
+              HallMatcherConstants.QUERY_TYPE_LL =>
+           true
+       }
+       val groupQuery = getGroupQuery(startKey1, endKey1, startKey2, endKey2, destDBIsLatent)
+       textQueryDataBuilder.addQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery)
+     }
 
+     //文本查询
+     val qrycondition = rs.getBytes("qrycondition")
+     if(qrycondition != null){
+       TextQueryUtil.convertQrycondition2TextQueryData(qrycondition, textQueryDataBuilder)
+     }
      queryType match {
        case HallMatcherConstants.QUERY_TYPE_TT |
-            HallMatcherConstants.QUERY_TYPE_LT =>
-         val iter = matchTaskBuilder.getTDataBuilderList.iterator()
-         while(iter.hasNext){
-           iter.next().setTextQuery(textQuery)
-         }
-       case HallMatcherConstants.QUERY_TYPE_LL |
             HallMatcherConstants.QUERY_TYPE_TL =>
-         val iter = matchTaskBuilder.getLDataBuilderList.iterator()
-         while(iter.hasNext){
-           iter.next().setTextQuery(textQuery)
-         }
-     }*/
+         matchTaskBuilder.getTDataBuilder.setTextQuery(textQueryDataBuilder)
+       case HallMatcherConstants.QUERY_TYPE_LT |
+            HallMatcherConstants.QUERY_TYPE_LL =>
+         matchTaskBuilder.getLDataBuilder.setTextQuery(textQueryDataBuilder)
+     }
 
      //更新status
      updateStatusMatching(oraSid)
@@ -147,7 +163,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
      }{ rs =>
        rs.getInt("ora_sid")
      }
-     if(! oraSidOption.isEmpty){
+     if(oraSidOption.nonEmpty){
        oraSidOption.get
      }else{
        0
@@ -177,4 +193,43 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
       ps.setString(2, match_id)
     }
   }
+
+  private def getGroupQuery(startKey1: String, endKey1: String, startKey2: String, endKey2: String, isLatent: Boolean): GroupQuery={
+    val groupQuery1 = getGroupQuery(startKey1, endKey1, isLatent)
+    val groupQuery2 = getGroupQuery(startKey2, endKey2, isLatent)
+    if(groupQuery1 != null || groupQuery2 != null){
+      val groupQuery = GroupQuery.newBuilder()
+      if(groupQuery1 != null){
+        groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery1)
+      }
+      if(groupQuery2 != null){
+        groupQuery.addClauseQueryBuilder().setName("id").setExtension(GroupQuery.query, groupQuery2)
+      }
+
+      groupQuery.build()
+    }else{
+      null
+    }
+  }
+
+  private def getGroupQuery(startKey: String, endKey: String, isLatent: Boolean): GroupQuery={
+    if(startKey == null && endKey == null){
+      return null
+    }
+    //这里赋值为空字符串，为了减少对null的判断
+    var keyBeg = startKey
+    var keyEnd = endKey
+    if(keyBeg == null)
+      keyBeg = ""
+    if(keyEnd == null)
+      keyEnd = ""
+
+    if(isLatent){
+      TextQueryUtil.getCaseidGroupQuery(keyBeg, keyEnd)
+    }else{
+      TextQueryUtil.getPersonidGroupQuery(keyBeg, keyEnd)
+    }
+  }
+
+
  }

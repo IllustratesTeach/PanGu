@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="packageHead.xsd"/>
+	<xs:include schemaLocation="fingerprintPackage.xsd"/>
+	<xs:include schemaLocation="customDataPackage.xsd"/>
+	<xs:element name="package">
+		<xs:annotation>
+			<xs:documentation>包体</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packageHead"/>
+				<xs:element ref="fingerprintPackage" minOccurs="1" maxOccurs="256"/>
+				<xs:element ref="customDataPackage" minOccurs="0" maxOccurs="256"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

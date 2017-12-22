@@ -47,6 +47,7 @@ object FPTLDataToMNTDISP {
     UTIL_CoreDelta_FPT2MntDisp(fingerLData.rightTriangle,mntDisp.stFg.rdelta,UTIL_COREDELTA_TYPE_RDELTA)
 
     mntDisp.stCm.nMntCnt = fingerLData.featureCount.toShort
+    mntDisp.nMaxMnt = fingerLData.featureCount.toShort
 
     mntDisp.stCm.mnt = new Array[AFISMNTPOINTSTRUCT](mntDisp.stCm.nMntCnt)
     UTIL_Minutia_FPT2MntDisp(fingerLData.feature,mntDisp.stCm.mnt, mntDisp.stCm.nMntCnt)

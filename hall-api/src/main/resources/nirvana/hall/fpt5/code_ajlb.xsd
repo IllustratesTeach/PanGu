@@ -1,0 +1,4819 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by wzb (wzb) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="code_ajlb">
+		<xs:restriction base="xs:string">
+			
+			<xs:enumeration value="01000000">
+				<xs:annotation>
+					<xs:documentation>危害国家安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000100">
+				<xs:annotation>
+					<xs:documentation>背叛国家案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000200">
+				<xs:annotation>
+					<xs:documentation>分裂国家案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000300">
+				<xs:annotation>
+					<xs:documentation>煽动分裂国家案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000400">
+				<xs:annotation>
+					<xs:documentation>武装叛乱、暴乱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000401">
+				<xs:annotation>
+					<xs:documentation>武装叛乱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000402">
+				<xs:annotation>
+					<xs:documentation>武装暴乱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000500">
+				<xs:annotation>
+					<xs:documentation>颠覆国家政权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000600">
+				<xs:annotation>
+					<xs:documentation>煽动颠覆国家政权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000700">
+				<xs:annotation>
+					<xs:documentation>资助危害国家安全犯罪活动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000800">
+				<xs:annotation>
+					<xs:documentation>投敌叛变案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01000900">
+				<xs:annotation>
+					<xs:documentation>叛逃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001000">
+				<xs:annotation>
+					<xs:documentation>间谍案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001100">
+				<xs:annotation>
+					<xs:documentation>为境外窃取、刺探、收买、非法提供国家秘密、情报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001101">
+				<xs:annotation>
+					<xs:documentation>为境外窃取国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001102">
+				<xs:annotation>
+					<xs:documentation>为境外窃取情报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001103">
+				<xs:annotation>
+					<xs:documentation>为境外刺探国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001104">
+				<xs:annotation>
+					<xs:documentation>为境外刺探情报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001105">
+				<xs:annotation>
+					<xs:documentation>为境外收买国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001106">
+				<xs:annotation>
+					<xs:documentation>为境外收买情报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001107">
+				<xs:annotation>
+					<xs:documentation>为境外非法提供国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001108">
+				<xs:annotation>
+					<xs:documentation>为境外非法提供情报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="01001200">
+				<xs:annotation>
+					<xs:documentation>资敌案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000000">
+				<xs:annotation>
+					<xs:documentation>危害公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000100">
+				<xs:annotation>
+					<xs:documentation>放火案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000200">
+				<xs:annotation>
+					<xs:documentation>决水案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000300">
+				<xs:annotation>
+					<xs:documentation>爆炸案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000400">
+				<xs:annotation>
+					<xs:documentation>投放危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000500">
+				<xs:annotation>
+					<xs:documentation>以危险方法危害公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000600">
+				<xs:annotation>
+					<xs:documentation>失火案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000700">
+				<xs:annotation>
+					<xs:documentation>过失决水案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000800">
+				<xs:annotation>
+					<xs:documentation>过失爆炸案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02000900">
+				<xs:annotation>
+					<xs:documentation>过失投放危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001000">
+				<xs:annotation>
+					<xs:documentation>过失以危险方法危害公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001100">
+				<xs:annotation>
+					<xs:documentation>破坏交通工具案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001200">
+				<xs:annotation>
+					<xs:documentation>破坏交通设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001300">
+				<xs:annotation>
+					<xs:documentation>破坏电力设备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001400">
+				<xs:annotation>
+					<xs:documentation>破坏易燃易爆设备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001500">
+				<xs:annotation>
+					<xs:documentation>过失损坏交通工具案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001600">
+				<xs:annotation>
+					<xs:documentation>过失损坏交通设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001700">
+				<xs:annotation>
+					<xs:documentation>过失损坏电力设备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001800">
+				<xs:annotation>
+					<xs:documentation>过失损坏易燃易爆设备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001900">
+				<xs:annotation>
+					<xs:documentation>组织、领导、参加恐怖组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001901">
+				<xs:annotation>
+					<xs:documentation>组织恐怖组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001902">
+				<xs:annotation>
+					<xs:documentation>领导恐怖组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02001903">
+				<xs:annotation>
+					<xs:documentation>参加恐怖组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002000">
+				<xs:annotation>
+					<xs:documentation>资助恐怖活动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002100">
+				<xs:annotation>
+					<xs:documentation>劫持航空器案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002200">
+				<xs:annotation>
+					<xs:documentation>劫持船只、汽车案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002201">
+				<xs:annotation>
+					<xs:documentation>劫持船只案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002202">
+				<xs:annotation>
+					<xs:documentation>劫持汽车案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002300">
+				<xs:annotation>
+					<xs:documentation>暴力危及飞行安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002400">
+				<xs:annotation>
+					<xs:documentation>破坏广播电视设施、公用电信设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002401">
+				<xs:annotation>
+					<xs:documentation>破坏广播电视设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002402">
+				<xs:annotation>
+					<xs:documentation>破坏公用电信设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002500">
+				<xs:annotation>
+					<xs:documentation>过失损坏广播电视设施、公用电信设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002501">
+				<xs:annotation>
+					<xs:documentation>过失损坏广播电视设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002502">
+				<xs:annotation>
+					<xs:documentation>过失损坏公用电信设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002600">
+				<xs:annotation>
+					<xs:documentation>非法制造、买卖、运输、邮寄、储存枪支、弹药、爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002601">
+				<xs:annotation>
+					<xs:documentation>非法制造枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002602">
+				<xs:annotation>
+					<xs:documentation>非法制造弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002603">
+				<xs:annotation>
+					<xs:documentation>非法制造爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002604">
+				<xs:annotation>
+					<xs:documentation>非法买卖枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002605">
+				<xs:annotation>
+					<xs:documentation>非法买卖弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002606">
+				<xs:annotation>
+					<xs:documentation>非法买卖爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002607">
+				<xs:annotation>
+					<xs:documentation>非法运输枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002608">
+				<xs:annotation>
+					<xs:documentation>非法运输弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002609">
+				<xs:annotation>
+					<xs:documentation>非法运输爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002610">
+				<xs:annotation>
+					<xs:documentation>非法邮寄枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002611">
+				<xs:annotation>
+					<xs:documentation>非法邮寄弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002612">
+				<xs:annotation>
+					<xs:documentation>非法邮寄爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002613">
+				<xs:annotation>
+					<xs:documentation>非法储存枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002614">
+				<xs:annotation>
+					<xs:documentation>非法储存弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002615">
+				<xs:annotation>
+					<xs:documentation>非法储存爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002700">
+				<xs:annotation>
+					<xs:documentation>非法制造、买卖、运输、储存危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002701">
+				<xs:annotation>
+					<xs:documentation>非法制造危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002702">
+				<xs:annotation>
+					<xs:documentation>非法买卖危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002703">
+				<xs:annotation>
+					<xs:documentation>非法运输危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002704">
+				<xs:annotation>
+					<xs:documentation>非法储存危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002800">
+				<xs:annotation>
+					<xs:documentation>违规制造、销售枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002801">
+				<xs:annotation>
+					<xs:documentation>违规制造枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002802">
+				<xs:annotation>
+					<xs:documentation>违规销售枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002900">
+				<xs:annotation>
+					<xs:documentation>盗窃、抢夺枪支、弹药、爆炸物、危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002901">
+				<xs:annotation>
+					<xs:documentation>盗窃枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002902">
+				<xs:annotation>
+					<xs:documentation>盗窃弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002903">
+				<xs:annotation>
+					<xs:documentation>盗窃爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002904">
+				<xs:annotation>
+					<xs:documentation>盗窃危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002905">
+				<xs:annotation>
+					<xs:documentation>抢夺枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002906">
+				<xs:annotation>
+					<xs:documentation>抢夺弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002907">
+				<xs:annotation>
+					<xs:documentation>抢夺爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02002908">
+				<xs:annotation>
+					<xs:documentation>抢夺危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003000">
+				<xs:annotation>
+					<xs:documentation>抢劫枪支、弹药、爆炸物、危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003001">
+				<xs:annotation>
+					<xs:documentation>抢劫枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003002">
+				<xs:annotation>
+					<xs:documentation>抢劫弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003003">
+				<xs:annotation>
+					<xs:documentation>抢劫爆炸物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003004">
+				<xs:annotation>
+					<xs:documentation>抢劫危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003100">
+				<xs:annotation>
+					<xs:documentation>非法持有、私藏枪支、弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003101">
+				<xs:annotation>
+					<xs:documentation>非法持有枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003102">
+				<xs:annotation>
+					<xs:documentation>非法持有弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003103">
+				<xs:annotation>
+					<xs:documentation>私藏枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003104">
+				<xs:annotation>
+					<xs:documentation>私藏弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003200">
+				<xs:annotation>
+					<xs:documentation>非法出租、出借枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003201">
+				<xs:annotation>
+					<xs:documentation>非法出租枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003202">
+				<xs:annotation>
+					<xs:documentation>非法出借枪支案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003300">
+				<xs:annotation>
+					<xs:documentation>丢失枪支不报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003400">
+				<xs:annotation>
+					<xs:documentation>非法携带枪支、弹药、管制刀具、危险物品危及公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003401">
+				<xs:annotation>
+					<xs:documentation>非法携带枪支危及公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003402">
+				<xs:annotation>
+					<xs:documentation>非法携带弹药危及公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003403">
+				<xs:annotation>
+					<xs:documentation>非法携带管制刀具危及公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003404">
+				<xs:annotation>
+					<xs:documentation>非法携带危险物品危及公共安全案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003500">
+				<xs:annotation>
+					<xs:documentation>重大飞行事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003600">
+				<xs:annotation>
+					<xs:documentation>铁路运营安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003700">
+				<xs:annotation>
+					<xs:documentation>交通肇事案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003800">
+				<xs:annotation>
+					<xs:documentation>危险驾驶案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02003900">
+				<xs:annotation>
+					<xs:documentation>重大责任事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004000">
+				<xs:annotation>
+					<xs:documentation>强令违章冒险作业案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004100">
+				<xs:annotation>
+					<xs:documentation>重大劳动安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004200">
+				<xs:annotation>
+					<xs:documentation>大型群众性活动重大安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004300">
+				<xs:annotation>
+					<xs:documentation>危险物品肇事案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004400">
+				<xs:annotation>
+					<xs:documentation>工程重大安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004500">
+				<xs:annotation>
+					<xs:documentation>教育设施重大安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004600">
+				<xs:annotation>
+					<xs:documentation>消防责任事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004700">
+				<xs:annotation>
+					<xs:documentation>不报、谎报安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004701">
+				<xs:annotation>
+					<xs:documentation>不报安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="02004702">
+				<xs:annotation>
+					<xs:documentation>谎报安全事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03000000">
+				<xs:annotation>
+					<xs:documentation>破坏社会主义市场经济秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010000">
+				<xs:annotation>
+					<xs:documentation>生产、销售伪劣商品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010100">
+				<xs:annotation>
+					<xs:documentation>生产、销售伪劣产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010101">
+				<xs:annotation>
+					<xs:documentation>生产伪劣产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010102">
+				<xs:annotation>
+					<xs:documentation>销售伪劣产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010200">
+				<xs:annotation>
+					<xs:documentation>生产、销售假药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010201">
+				<xs:annotation>
+					<xs:documentation>生产假药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010202">
+				<xs:annotation>
+					<xs:documentation>销售假药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010300">
+				<xs:annotation>
+					<xs:documentation>生产、销售劣药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010301">
+				<xs:annotation>
+					<xs:documentation>生产劣药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010302">
+				<xs:annotation>
+					<xs:documentation>销售劣药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010400">
+				<xs:annotation>
+					<xs:documentation>生产、销售不符合安全标准的食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010401">
+				<xs:annotation>
+					<xs:documentation>生产不符合安全标准的食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010402">
+				<xs:annotation>
+					<xs:documentation>销售不符合安全标准的食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010500">
+				<xs:annotation>
+					<xs:documentation>生产、销售有毒、有害食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010501">
+				<xs:annotation>
+					<xs:documentation>生产有毒食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010502">
+				<xs:annotation>
+					<xs:documentation>生产有害食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010503">
+				<xs:annotation>
+					<xs:documentation>销售有毒食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010504">
+				<xs:annotation>
+					<xs:documentation>销售有害食品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010600">
+				<xs:annotation>
+					<xs:documentation>生产、销售不符合标准的医用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010601">
+				<xs:annotation>
+					<xs:documentation>生产不符合标准的医用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010602">
+				<xs:annotation>
+					<xs:documentation>销售不符合标准的医用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010700">
+				<xs:annotation>
+					<xs:documentation>生产、销售不符合安全标准的产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010701">
+				<xs:annotation>
+					<xs:documentation>生产不符合安全标准的产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010702">
+				<xs:annotation>
+					<xs:documentation>销售不符合安全标准的产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010800">
+				<xs:annotation>
+					<xs:documentation>生产、销售伪劣农药、兽药、化肥、种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010801">
+				<xs:annotation>
+					<xs:documentation>生产伪劣农药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010802">
+				<xs:annotation>
+					<xs:documentation>生产伪劣兽药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010803">
+				<xs:annotation>
+					<xs:documentation>生产伪劣化肥案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010804">
+				<xs:annotation>
+					<xs:documentation>生产伪劣种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010805">
+				<xs:annotation>
+					<xs:documentation>销售伪劣农药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010806">
+				<xs:annotation>
+					<xs:documentation>销售伪劣兽药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010807">
+				<xs:annotation>
+					<xs:documentation>销售伪劣化肥案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010808">
+				<xs:annotation>
+					<xs:documentation>销售伪劣种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010900">
+				<xs:annotation>
+					<xs:documentation>生产、销售不符合卫生标准的化妆品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010901">
+				<xs:annotation>
+					<xs:documentation>生产不符合卫生标准的化妆品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03010902">
+				<xs:annotation>
+					<xs:documentation>销售不符合卫生标准的化妆品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020000">
+				<xs:annotation>
+					<xs:documentation>走私案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020100">
+				<xs:annotation>
+					<xs:documentation>走私武器、弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020101">
+				<xs:annotation>
+					<xs:documentation>走私武器案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020102">
+				<xs:annotation>
+					<xs:documentation>走私弹药案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020200">
+				<xs:annotation>
+					<xs:documentation>走私核材料案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020300">
+				<xs:annotation>
+					<xs:documentation>走私假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020400">
+				<xs:annotation>
+					<xs:documentation>走私文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020500">
+				<xs:annotation>
+					<xs:documentation>走私贵重金属案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020600">
+				<xs:annotation>
+					<xs:documentation>走私珍贵动物、珍贵动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020601">
+				<xs:annotation>
+					<xs:documentation>走私珍贵动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020602">
+				<xs:annotation>
+					<xs:documentation>走私珍贵动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020700">
+				<xs:annotation>
+					<xs:documentation>走私国家禁止进出口的货物、物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020701">
+				<xs:annotation>
+					<xs:documentation>走私国家禁止进出口的货物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020702">
+				<xs:annotation>
+					<xs:documentation>走私国家禁止进出口的物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020800">
+				<xs:annotation>
+					<xs:documentation>走私淫秽物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03020900">
+				<xs:annotation>
+					<xs:documentation>走私废物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03021000">
+				<xs:annotation>
+					<xs:documentation>走私普通货物、物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03021001">
+				<xs:annotation>
+					<xs:documentation>走私普通货物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03021002">
+				<xs:annotation>
+					<xs:documentation>走私普通物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030000">
+				<xs:annotation>
+					<xs:documentation>妨害对公司、企业的管理秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030100">
+				<xs:annotation>
+					<xs:documentation>虚报注册资本案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030200">
+				<xs:annotation>
+					<xs:documentation>虚假出资、抽逃出资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030201">
+				<xs:annotation>
+					<xs:documentation>虚假出资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030202">
+				<xs:annotation>
+					<xs:documentation>抽逃出资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030300">
+				<xs:annotation>
+					<xs:documentation>欺诈发行股票、债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030301">
+				<xs:annotation>
+					<xs:documentation>欺诈发行股票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030302">
+				<xs:annotation>
+					<xs:documentation>欺诈发行债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030400">
+				<xs:annotation>
+					<xs:documentation>违规披露、不披露重要信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030500">
+				<xs:annotation>
+					<xs:documentation>妨害清算案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030600">
+				<xs:annotation>
+					<xs:documentation>隐匿、故意销毁会计凭证、会计帐簿、财务会计报告案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030601">
+				<xs:annotation>
+					<xs:documentation>隐匿会计凭证、会计帐簿、财务会计报告案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030602">
+				<xs:annotation>
+					<xs:documentation>故意销毁会计凭证、会计帐簿、财务会计报告案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030700">
+				<xs:annotation>
+					<xs:documentation>虚假破产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030800">
+				<xs:annotation>
+					<xs:documentation>非国家工作人员受贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03030900">
+				<xs:annotation>
+					<xs:documentation>对非国家工作人员行贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031000">
+				<xs:annotation>
+					<xs:documentation>对外国公职人员、国际公共组织官员行贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031100">
+				<xs:annotation>
+					<xs:documentation>非法经营同类营业案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031200">
+				<xs:annotation>
+					<xs:documentation>为亲友非法牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031300">
+				<xs:annotation>
+					<xs:documentation>签订、履行合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031301">
+				<xs:annotation>
+					<xs:documentation>签订合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031302">
+				<xs:annotation>
+					<xs:documentation>履行合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031400">
+				<xs:annotation>
+					<xs:documentation>国有公司、企业、事业单位人员失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031500">
+				<xs:annotation>
+					<xs:documentation>国有公司、企业、事业单位人员滥用职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031600">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊低价折股、出售国有资产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031601">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊低价折股案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031602">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊低价出售国有资产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03031700">
+				<xs:annotation>
+					<xs:documentation>背信损害上市公司利益案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040000">
+				<xs:annotation>
+					<xs:documentation>破坏金融管理秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040100">
+				<xs:annotation>
+					<xs:documentation>伪造货币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040200">
+				<xs:annotation>
+					<xs:documentation>出售、购买、运输假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040201">
+				<xs:annotation>
+					<xs:documentation>出售假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040202">
+				<xs:annotation>
+					<xs:documentation>购买假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040203">
+				<xs:annotation>
+					<xs:documentation>运输假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040300">
+				<xs:annotation>
+					<xs:documentation>金融工作人员购买假币、以假币换取货币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040301">
+				<xs:annotation>
+					<xs:documentation>金融工作人员购买假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040302">
+				<xs:annotation>
+					<xs:documentation>金融工作人员以假币换取货币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040400">
+				<xs:annotation>
+					<xs:documentation>持有、使用假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040401">
+				<xs:annotation>
+					<xs:documentation>持有假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040402">
+				<xs:annotation>
+					<xs:documentation>使用假币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040500">
+				<xs:annotation>
+					<xs:documentation>变造货币案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040600">
+				<xs:annotation>
+					<xs:documentation>擅自设立金融机构案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040700">
+				<xs:annotation>
+					<xs:documentation>伪造、变造、转让金融机构经营许可证、批准文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040701">
+				<xs:annotation>
+					<xs:documentation>伪造金融机构经营许可证、批准文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040702">
+				<xs:annotation>
+					<xs:documentation>变造金融机构经营许可证、批准文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040703">
+				<xs:annotation>
+					<xs:documentation>转让金融机构经营许可证、批准文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040800">
+				<xs:annotation>
+					<xs:documentation>高利转贷案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040900">
+				<xs:annotation>
+					<xs:documentation>骗取贷款、票据承兑、金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040901">
+				<xs:annotation>
+					<xs:documentation>骗取贷款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040902">
+				<xs:annotation>
+					<xs:documentation>骗取票据承兑案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03040903">
+				<xs:annotation>
+					<xs:documentation>骗取金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041000">
+				<xs:annotation>
+					<xs:documentation>非法吸收公众存款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041100">
+				<xs:annotation>
+					<xs:documentation>伪造、变造金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041101">
+				<xs:annotation>
+					<xs:documentation>伪造金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041102">
+				<xs:annotation>
+					<xs:documentation>变造金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041200">
+				<xs:annotation>
+					<xs:documentation>妨害信用卡管理案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041300">
+				<xs:annotation>
+					<xs:documentation>窃取、收买、非法提供信用卡信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041301">
+				<xs:annotation>
+					<xs:documentation>窃取信用卡信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041302">
+				<xs:annotation>
+					<xs:documentation>收买信用卡信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041303">
+				<xs:annotation>
+					<xs:documentation>非法提供信用卡信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041400">
+				<xs:annotation>
+					<xs:documentation>伪造、变造国家有价证券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041500">
+				<xs:annotation>
+					<xs:documentation>伪造、变造股票、公司、企业债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041501">
+				<xs:annotation>
+					<xs:documentation>伪造股票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041502">
+				<xs:annotation>
+					<xs:documentation>变造股票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041503">
+				<xs:annotation>
+					<xs:documentation>伪造公司、企业债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041504">
+				<xs:annotation>
+					<xs:documentation>变造公司、企业债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041600">
+				<xs:annotation>
+					<xs:documentation>擅自发行股票、公司、企业债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041601">
+				<xs:annotation>
+					<xs:documentation>擅自发行股票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041602">
+				<xs:annotation>
+					<xs:documentation>擅自发行公司、企业债券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041700">
+				<xs:annotation>
+					<xs:documentation>内幕交易、泄露内幕信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041800">
+				<xs:annotation>
+					<xs:documentation>利用未公开信息交易案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03041900">
+				<xs:annotation>
+					<xs:documentation>编造并传播证券、期货交易虚假信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042000">
+				<xs:annotation>
+					<xs:documentation>诱骗投资者买卖证券、期货合约案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042001">
+				<xs:annotation>
+					<xs:documentation>诱骗投资者买卖证券案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042002">
+				<xs:annotation>
+					<xs:documentation>诱骗投资者买卖期货合约案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042100">
+				<xs:annotation>
+					<xs:documentation>操纵证券、期货市场案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042101">
+				<xs:annotation>
+					<xs:documentation>操纵证券市场案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042102">
+				<xs:annotation>
+					<xs:documentation>操纵期货市场案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042200">
+				<xs:annotation>
+					<xs:documentation>背信运用受托财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042300">
+				<xs:annotation>
+					<xs:documentation>违法运用资金案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042400">
+				<xs:annotation>
+					<xs:documentation>违法发放贷款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042500">
+				<xs:annotation>
+					<xs:documentation>吸收客户资金不入账案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042600">
+				<xs:annotation>
+					<xs:documentation>违规出具金融票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042601">
+				<xs:annotation>
+					<xs:documentation>违规出具保函案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042602">
+				<xs:annotation>
+					<xs:documentation>违规出具信用证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042603">
+				<xs:annotation>
+					<xs:documentation>违规出具汇票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042604">
+				<xs:annotation>
+					<xs:documentation>违规出具本票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042605">
+				<xs:annotation>
+					<xs:documentation>违规出具支票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042606">
+				<xs:annotation>
+					<xs:documentation>违规出具存单案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042607">
+				<xs:annotation>
+					<xs:documentation>违规出具资信证明案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042700">
+				<xs:annotation>
+					<xs:documentation>对违法票据承兑、付款、保证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042701">
+				<xs:annotation>
+					<xs:documentation>对违法票据承兑案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042702">
+				<xs:annotation>
+					<xs:documentation>对违法票据付款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042703">
+				<xs:annotation>
+					<xs:documentation>对违法票据保证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042800">
+				<xs:annotation>
+					<xs:documentation>逃汇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03042900">
+				<xs:annotation>
+					<xs:documentation>洗钱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03043000">
+				<xs:annotation>
+					<xs:documentation>骗购外汇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050000">
+				<xs:annotation>
+					<xs:documentation>金融诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050100">
+				<xs:annotation>
+					<xs:documentation>集资诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050200">
+				<xs:annotation>
+					<xs:documentation>贷款诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050300">
+				<xs:annotation>
+					<xs:documentation>票据诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050400">
+				<xs:annotation>
+					<xs:documentation>金融凭证诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050500">
+				<xs:annotation>
+					<xs:documentation>信用证诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050600">
+				<xs:annotation>
+					<xs:documentation>信用卡诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050700">
+				<xs:annotation>
+					<xs:documentation>有价证券诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03050800">
+				<xs:annotation>
+					<xs:documentation>保险诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060000">
+				<xs:annotation>
+					<xs:documentation>危害税收征管案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060100">
+				<xs:annotation>
+					<xs:documentation>逃税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060200">
+				<xs:annotation>
+					<xs:documentation>抗税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060300">
+				<xs:annotation>
+					<xs:documentation>逃避追缴欠税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060400">
+				<xs:annotation>
+					<xs:documentation>骗取出口退税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060500">
+				<xs:annotation>
+					<xs:documentation>虚开增值税专用发票、用于骗取出口退税、抵扣税款发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060600">
+				<xs:annotation>
+					<xs:documentation>虚开发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060700">
+				<xs:annotation>
+					<xs:documentation>伪造、出售伪造的增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060701">
+				<xs:annotation>
+					<xs:documentation>伪造增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060702">
+				<xs:annotation>
+					<xs:documentation>出售伪造的增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060800">
+				<xs:annotation>
+					<xs:documentation>非法出售增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060900">
+				<xs:annotation>
+					<xs:documentation>非法购买增值税专用发票、购买伪造的增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060901">
+				<xs:annotation>
+					<xs:documentation>非法购买增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03060902">
+				<xs:annotation>
+					<xs:documentation>购买伪造的增值税专用发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061000">
+				<xs:annotation>
+					<xs:documentation>非法制造、出售非法制造的用于骗取出口退税、抵扣税款发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061001">
+				<xs:annotation>
+					<xs:documentation>非法制造用于骗取出口退税、抵扣税款发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061002">
+				<xs:annotation>
+					<xs:documentation>出售非法制造的用于骗取出口退税、抵扣税款发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061100">
+				<xs:annotation>
+					<xs:documentation>非法制造、出售非法制造的发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061101">
+				<xs:annotation>
+					<xs:documentation>非法制造发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061102">
+				<xs:annotation>
+					<xs:documentation>出售非法制造的发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061200">
+				<xs:annotation>
+					<xs:documentation>非法出售用于骗取出口退税、抵扣税款发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061300">
+				<xs:annotation>
+					<xs:documentation>非法出售发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03061400">
+				<xs:annotation>
+					<xs:documentation>持有伪造的发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070000">
+				<xs:annotation>
+					<xs:documentation>侵犯知识产权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070100">
+				<xs:annotation>
+					<xs:documentation>假冒注册商标案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070200">
+				<xs:annotation>
+					<xs:documentation>销售假冒注册商标的商品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070300">
+				<xs:annotation>
+					<xs:documentation>非法制造、销售非法制造的注册商标标识案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070301">
+				<xs:annotation>
+					<xs:documentation>非法制造注册商标标识案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070302">
+				<xs:annotation>
+					<xs:documentation>销售非法制造的注册商标标识案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070400">
+				<xs:annotation>
+					<xs:documentation>假冒专利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070500">
+				<xs:annotation>
+					<xs:documentation>侵犯著作权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070600">
+				<xs:annotation>
+					<xs:documentation>销售侵权复制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03070700">
+				<xs:annotation>
+					<xs:documentation>侵犯商业秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080000">
+				<xs:annotation>
+					<xs:documentation>扰乱市场秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080100">
+				<xs:annotation>
+					<xs:documentation>损害商业信誉、商品声誉案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080101">
+				<xs:annotation>
+					<xs:documentation>损害商业信誉案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080102">
+				<xs:annotation>
+					<xs:documentation>损害商品声誉案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080200">
+				<xs:annotation>
+					<xs:documentation>虚假广告案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080300">
+				<xs:annotation>
+					<xs:documentation>串通投标案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080400">
+				<xs:annotation>
+					<xs:documentation>合同诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080500">
+				<xs:annotation>
+					<xs:documentation>组织、领导传销活动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080600">
+				<xs:annotation>
+					<xs:documentation>非法经营案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080601">
+				<xs:annotation>
+					<xs:documentation>非法经营烟草制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080602">
+				<xs:annotation>
+					<xs:documentation>非法经营出版物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080603">
+				<xs:annotation>
+					<xs:documentation>非法经营药品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080604">
+				<xs:annotation>
+					<xs:documentation>非法经营彩票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080605">
+				<xs:annotation>
+					<xs:documentation>非法买卖批文、许可证、证明案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080606">
+				<xs:annotation>
+					<xs:documentation>非法销售未上市公司股权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080607">
+				<xs:annotation>
+					<xs:documentation>非法经营证券投资咨询业务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080608">
+				<xs:annotation>
+					<xs:documentation>非法经营其他证券业务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080609">
+				<xs:annotation>
+					<xs:documentation>非法经营黄金期货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080610">
+				<xs:annotation>
+					<xs:documentation>非法经营外汇期货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080611">
+				<xs:annotation>
+					<xs:documentation>非法经营大宗商品期货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080612">
+				<xs:annotation>
+					<xs:documentation>非法经营保险业务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080613">
+				<xs:annotation>
+					<xs:documentation>非法买卖外汇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080614">
+				<xs:annotation>
+					<xs:documentation>非法经营网络炒汇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080615">
+				<xs:annotation>
+					<xs:documentation>非法买卖黄金案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080616">
+				<xs:annotation>
+					<xs:documentation>非法经营电讯业务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080617">
+				<xs:annotation>
+					<xs:documentation>非法经营食盐案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080618">
+				<xs:annotation>
+					<xs:documentation>非法从事支付结算业务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080619">
+				<xs:annotation>
+					<xs:documentation>利用POS机刷卡套现案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080620">
+				<xs:annotation>
+					<xs:documentation>传销案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080621">
+				<xs:annotation>
+					<xs:documentation>高利放贷案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080622">
+				<xs:annotation>
+					<xs:documentation>未经许可经营专营、专卖或限制买卖的其他业务、物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080623">
+				<xs:annotation>
+					<xs:documentation>非法倒卖银行票据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080624">
+				<xs:annotation>
+					<xs:documentation>非法生产、销售盐酸克仑特罗等药品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080625">
+				<xs:annotation>
+					<xs:documentation>非法添加盐酸克仑特罗等药品或销售添加此类药品的饲料案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080626">
+				<xs:annotation>
+					<xs:documentation>在灾害期间哄抬物价、牟取暴利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080627">
+				<xs:annotation>
+					<xs:documentation>擅自设立互联网上网服务场所或从事上网服务经营活动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080700">
+				<xs:annotation>
+					<xs:documentation>强迫交易案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080800">
+				<xs:annotation>
+					<xs:documentation>伪造、倒卖伪造的有价票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080801">
+				<xs:annotation>
+					<xs:documentation>伪造有价票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080802">
+				<xs:annotation>
+					<xs:documentation>倒卖伪造的有价票证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080900">
+				<xs:annotation>
+					<xs:documentation>倒卖车票、船票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080901">
+				<xs:annotation>
+					<xs:documentation>倒卖车票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03080902">
+				<xs:annotation>
+					<xs:documentation>倒卖船票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081000">
+				<xs:annotation>
+					<xs:documentation>非法转让、倒卖土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081001">
+				<xs:annotation>
+					<xs:documentation>非法转让土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081002">
+				<xs:annotation>
+					<xs:documentation>非法倒卖土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081100">
+				<xs:annotation>
+					<xs:documentation>提供虚假证明文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081200">
+				<xs:annotation>
+					<xs:documentation>出具证明文件重大失实案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="03081300">
+				<xs:annotation>
+					<xs:documentation>逃避商检案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000000">
+				<xs:annotation>
+					<xs:documentation>侵犯公民人身权利、民主权利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000100">
+				<xs:annotation>
+					<xs:documentation>故意杀人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000200">
+				<xs:annotation>
+					<xs:documentation>过失致人死亡案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000300">
+				<xs:annotation>
+					<xs:documentation>故意伤害案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000400">
+				<xs:annotation>
+					<xs:documentation>组织出卖人体器官案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000500">
+				<xs:annotation>
+					<xs:documentation>过失致人重伤案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000600">
+				<xs:annotation>
+					<xs:documentation>强奸案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000700">
+				<xs:annotation>
+					<xs:documentation>强制猥亵、侮辱妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000701">
+				<xs:annotation>
+					<xs:documentation>强制猥亵妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000702">
+				<xs:annotation>
+					<xs:documentation>强制侮辱妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000800">
+				<xs:annotation>
+					<xs:documentation>猥亵儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04000900">
+				<xs:annotation>
+					<xs:documentation>非法拘禁案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001000">
+				<xs:annotation>
+					<xs:documentation>绑架案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001100">
+				<xs:annotation>
+					<xs:documentation>拐卖妇女、儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001101">
+				<xs:annotation>
+					<xs:documentation>拐卖妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001102">
+				<xs:annotation>
+					<xs:documentation>拐卖儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001200">
+				<xs:annotation>
+					<xs:documentation>收买被拐卖的妇女、儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001201">
+				<xs:annotation>
+					<xs:documentation>收买被拐卖的妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001202">
+				<xs:annotation>
+					<xs:documentation>收买被拐卖的儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001300">
+				<xs:annotation>
+					<xs:documentation>聚众阻碍解救被收买的妇女、儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001301">
+				<xs:annotation>
+					<xs:documentation>聚众阻碍解救被收买的妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001302">
+				<xs:annotation>
+					<xs:documentation>聚众阻碍解救被收买的儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001400">
+				<xs:annotation>
+					<xs:documentation>诬告陷害案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001500">
+				<xs:annotation>
+					<xs:documentation>强迫劳动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001600">
+				<xs:annotation>
+					<xs:documentation>雇用童工从事危重劳动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001700">
+				<xs:annotation>
+					<xs:documentation>非法搜查案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001800">
+				<xs:annotation>
+					<xs:documentation>非法侵入住宅案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04001900">
+				<xs:annotation>
+					<xs:documentation>侮辱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002000">
+				<xs:annotation>
+					<xs:documentation>诽谤案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002100">
+				<xs:annotation>
+					<xs:documentation>刑讯逼供案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002200">
+				<xs:annotation>
+					<xs:documentation>暴力取证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002300">
+				<xs:annotation>
+					<xs:documentation>虐待被监管人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002400">
+				<xs:annotation>
+					<xs:documentation>煽动民族仇恨、民族歧视案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002500">
+				<xs:annotation>
+					<xs:documentation>出版歧视、侮辱少数民族作品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002600">
+				<xs:annotation>
+					<xs:documentation>非法剥夺公民宗教信仰自由案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002700">
+				<xs:annotation>
+					<xs:documentation>侵犯少数民族风俗习惯案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002800">
+				<xs:annotation>
+					<xs:documentation>侵犯通信自由案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002900">
+				<xs:annotation>
+					<xs:documentation>私自开拆、隐匿、毁弃邮件、电报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002901">
+				<xs:annotation>
+					<xs:documentation>私自开拆邮件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002902">
+				<xs:annotation>
+					<xs:documentation>私自开拆电报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002903">
+				<xs:annotation>
+					<xs:documentation>私自隐匿邮件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002904">
+				<xs:annotation>
+					<xs:documentation>私自隐匿电报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002905">
+				<xs:annotation>
+					<xs:documentation>私自毁弃邮件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04002906">
+				<xs:annotation>
+					<xs:documentation>私自毁弃电报案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003000">
+				<xs:annotation>
+					<xs:documentation>出售、非法提供公民个人信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003001">
+				<xs:annotation>
+					<xs:documentation>出售公民个人信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003002">
+				<xs:annotation>
+					<xs:documentation>非法提供公民个人信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003100">
+				<xs:annotation>
+					<xs:documentation>非法获取公民个人信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003200">
+				<xs:annotation>
+					<xs:documentation>报复陷害案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003300">
+				<xs:annotation>
+					<xs:documentation>打击报复会计、统计人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003301">
+				<xs:annotation>
+					<xs:documentation>打击报复会计人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003302">
+				<xs:annotation>
+					<xs:documentation>打击报复统计人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003400">
+				<xs:annotation>
+					<xs:documentation>破坏选举案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003500">
+				<xs:annotation>
+					<xs:documentation>暴力干涉婚姻自由案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003600">
+				<xs:annotation>
+					<xs:documentation>重婚案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003700">
+				<xs:annotation>
+					<xs:documentation>破坏军婚案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003800">
+				<xs:annotation>
+					<xs:documentation>虐待案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04003900">
+				<xs:annotation>
+					<xs:documentation>遗弃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04004000">
+				<xs:annotation>
+					<xs:documentation>拐骗儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04004100">
+				<xs:annotation>
+					<xs:documentation>组织残疾人、儿童乞讨案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04004101">
+				<xs:annotation>
+					<xs:documentation>组织残疾人乞讨案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04004102">
+				<xs:annotation>
+					<xs:documentation>组织儿童乞讨案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="04004200">
+				<xs:annotation>
+					<xs:documentation>组织未成年人进行违反治安管理活动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000000">
+				<xs:annotation>
+					<xs:documentation>侵犯财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000100">
+				<xs:annotation>
+					<xs:documentation>抢劫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000200">
+				<xs:annotation>
+					<xs:documentation>盗窃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000300">
+				<xs:annotation>
+					<xs:documentation>诈骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000400">
+				<xs:annotation>
+					<xs:documentation>抢夺案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000500">
+				<xs:annotation>
+					<xs:documentation>聚众哄抢案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000600">
+				<xs:annotation>
+					<xs:documentation>侵占案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000700">
+				<xs:annotation>
+					<xs:documentation>职务侵占案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000800">
+				<xs:annotation>
+					<xs:documentation>挪用资金案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05000900">
+				<xs:annotation>
+					<xs:documentation>挪用特定款物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05001000">
+				<xs:annotation>
+					<xs:documentation>敲诈勒索案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05001100">
+				<xs:annotation>
+					<xs:documentation>故意毁坏财物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05001200">
+				<xs:annotation>
+					<xs:documentation>破坏生产经营案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="05001300">
+				<xs:annotation>
+					<xs:documentation>拒不支付劳动报酬案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06000000">
+				<xs:annotation>
+					<xs:documentation>妨害社会管理秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010000">
+				<xs:annotation>
+					<xs:documentation>扰乱公共秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010100">
+				<xs:annotation>
+					<xs:documentation>妨害公务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010200">
+				<xs:annotation>
+					<xs:documentation>煽动暴力抗拒法律实施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010300">
+				<xs:annotation>
+					<xs:documentation>招摇撞骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010400">
+				<xs:annotation>
+					<xs:documentation>伪造、变造、买卖国家机关公文、证件、印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010401">
+				<xs:annotation>
+					<xs:documentation>伪造国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010402">
+				<xs:annotation>
+					<xs:documentation>伪造国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010403">
+				<xs:annotation>
+					<xs:documentation>伪造国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010404">
+				<xs:annotation>
+					<xs:documentation>变造国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010405">
+				<xs:annotation>
+					<xs:documentation>变造国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010406">
+				<xs:annotation>
+					<xs:documentation>变造国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010407">
+				<xs:annotation>
+					<xs:documentation>买卖国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010408">
+				<xs:annotation>
+					<xs:documentation>买卖国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010409">
+				<xs:annotation>
+					<xs:documentation>买卖国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010500">
+				<xs:annotation>
+					<xs:documentation>盗窃、抢夺、毁灭国家机关公文、证件、印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010501">
+				<xs:annotation>
+					<xs:documentation>盗窃国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010502">
+				<xs:annotation>
+					<xs:documentation>盗窃国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010503">
+				<xs:annotation>
+					<xs:documentation>盗窃国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010504">
+				<xs:annotation>
+					<xs:documentation>抢夺国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010505">
+				<xs:annotation>
+					<xs:documentation>抢夺国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010506">
+				<xs:annotation>
+					<xs:documentation>抢夺国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010507">
+				<xs:annotation>
+					<xs:documentation>毁灭国家机关公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010508">
+				<xs:annotation>
+					<xs:documentation>毁灭国家机关证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010509">
+				<xs:annotation>
+					<xs:documentation>毁灭国家机关印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010600">
+				<xs:annotation>
+					<xs:documentation>伪造公司、企业、事业单位、人民团体印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010601">
+				<xs:annotation>
+					<xs:documentation>伪造公司、企业印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010602">
+				<xs:annotation>
+					<xs:documentation>伪造事业单位印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010603">
+				<xs:annotation>
+					<xs:documentation>伪造人民团体印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010700">
+				<xs:annotation>
+					<xs:documentation>伪造、变造居民身份证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010701">
+				<xs:annotation>
+					<xs:documentation>伪造居民身份证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010702">
+				<xs:annotation>
+					<xs:documentation>变造居民身份证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010800">
+				<xs:annotation>
+					<xs:documentation>非法生产、买卖警用装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010801">
+				<xs:annotation>
+					<xs:documentation>非法生产警用装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010802">
+				<xs:annotation>
+					<xs:documentation>非法买卖警用装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06010900">
+				<xs:annotation>
+					<xs:documentation>非法获取国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011000">
+				<xs:annotation>
+					<xs:documentation>非法持有国家绝密、机密文件、资料、物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011001">
+				<xs:annotation>
+					<xs:documentation>非法持有国家绝密文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011002">
+				<xs:annotation>
+					<xs:documentation>非法持有国家机密文件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011003">
+				<xs:annotation>
+					<xs:documentation>非法持有国家绝密资料案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011004">
+				<xs:annotation>
+					<xs:documentation>非法持有国家机密资料案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011005">
+				<xs:annotation>
+					<xs:documentation>非法持有国家绝密物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011006">
+				<xs:annotation>
+					<xs:documentation>非法持有国家机密物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011100">
+				<xs:annotation>
+					<xs:documentation>非法生产、销售间谍专用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011101">
+				<xs:annotation>
+					<xs:documentation>非法生产间谍专用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011102">
+				<xs:annotation>
+					<xs:documentation>非法销售间谍专用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011200">
+				<xs:annotation>
+					<xs:documentation>非法使用窃听、窃照专用器材案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011300">
+				<xs:annotation>
+					<xs:documentation>非法侵入计算机信息系统案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011400">
+				<xs:annotation>
+					<xs:documentation>非法获取计算机信息系统数据、非法控制计算机信息系统案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011401">
+				<xs:annotation>
+					<xs:documentation>非法获取计算机信息系统数据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011402">
+				<xs:annotation>
+					<xs:documentation>非法控制计算机信息系统案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011500">
+				<xs:annotation>
+					<xs:documentation>提供侵入、非法控制计算机信息系统程序、工具案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011501">
+				<xs:annotation>
+					<xs:documentation>提供侵入计算机信息系统程序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011502">
+				<xs:annotation>
+					<xs:documentation>提供侵入计算机信息系统工具案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011503">
+				<xs:annotation>
+					<xs:documentation>提供非法控制计算机信息系统程序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011504">
+				<xs:annotation>
+					<xs:documentation>提供非法控制计算机信息系统工具案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011600">
+				<xs:annotation>
+					<xs:documentation>破坏计算机信息系统案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011700">
+				<xs:annotation>
+					<xs:documentation>扰乱无线电通讯管理秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011800">
+				<xs:annotation>
+					<xs:documentation>聚众扰乱社会秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06011900">
+				<xs:annotation>
+					<xs:documentation>聚众冲击国家机关案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012000">
+				<xs:annotation>
+					<xs:documentation>聚众扰乱公共场所秩序、交通秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012001">
+				<xs:annotation>
+					<xs:documentation>聚众扰乱公共场所秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012002">
+				<xs:annotation>
+					<xs:documentation>聚众扰乱交通秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012100">
+				<xs:annotation>
+					<xs:documentation>投放虚假危险物质案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012200">
+				<xs:annotation>
+					<xs:documentation>编造、故意传播虚假恐怖信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012201">
+				<xs:annotation>
+					<xs:documentation>编造虚假恐怖信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012202">
+				<xs:annotation>
+					<xs:documentation>故意传播虚假恐怖信息案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012300">
+				<xs:annotation>
+					<xs:documentation>聚众斗殴案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012400">
+				<xs:annotation>
+					<xs:documentation>寻衅滋事案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012500">
+				<xs:annotation>
+					<xs:documentation>组织、领导、参加黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012501">
+				<xs:annotation>
+					<xs:documentation>组织黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012502">
+				<xs:annotation>
+					<xs:documentation>领导黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012503">
+				<xs:annotation>
+					<xs:documentation>参加黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012600">
+				<xs:annotation>
+					<xs:documentation>入境发展黑社会组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012700">
+				<xs:annotation>
+					<xs:documentation>包庇、纵容黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012701">
+				<xs:annotation>
+					<xs:documentation>包庇黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012702">
+				<xs:annotation>
+					<xs:documentation>纵容黑社会性质组织案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012800">
+				<xs:annotation>
+					<xs:documentation>传授犯罪方法案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012900">
+				<xs:annotation>
+					<xs:documentation>非法集会、游行、示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012901">
+				<xs:annotation>
+					<xs:documentation>非法集会案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012902">
+				<xs:annotation>
+					<xs:documentation>非法游行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06012903">
+				<xs:annotation>
+					<xs:documentation>非法示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013000">
+				<xs:annotation>
+					<xs:documentation>非法携带武器、管制刀具、爆炸物参加集会、游行、示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013001">
+				<xs:annotation>
+					<xs:documentation>非法携带武器参加集会案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013002">
+				<xs:annotation>
+					<xs:documentation>非法携带武器参加游行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013003">
+				<xs:annotation>
+					<xs:documentation>非法携带武器参加示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013004">
+				<xs:annotation>
+					<xs:documentation>非法携带管制刀具参加集会案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013005">
+				<xs:annotation>
+					<xs:documentation>非法携带管制刀具参加游行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013006">
+				<xs:annotation>
+					<xs:documentation>非法携带管制刀具参加示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013007">
+				<xs:annotation>
+					<xs:documentation>非法携带爆炸物参加集会案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013008">
+				<xs:annotation>
+					<xs:documentation>非法携带爆炸物参加游行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013009">
+				<xs:annotation>
+					<xs:documentation>非法携带爆炸物参加示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013100">
+				<xs:annotation>
+					<xs:documentation>破坏集会、游行、示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013101">
+				<xs:annotation>
+					<xs:documentation>破坏集会案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013102">
+				<xs:annotation>
+					<xs:documentation>破坏游行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013103">
+				<xs:annotation>
+					<xs:documentation>破坏示威案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013200">
+				<xs:annotation>
+					<xs:documentation>侮辱国旗、国徽案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013201">
+				<xs:annotation>
+					<xs:documentation>侮辱国旗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013202">
+				<xs:annotation>
+					<xs:documentation>侮辱国徽案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013300">
+				<xs:annotation>
+					<xs:documentation>组织、利用会道门、邪教组织、利用迷信破坏法律实施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013301">
+				<xs:annotation>
+					<xs:documentation>组织、利用会道门破坏法律实施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013302">
+				<xs:annotation>
+					<xs:documentation>组织、利用邪教组织破坏法律实施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013303">
+				<xs:annotation>
+					<xs:documentation>利用邪教组织破坏法律实施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013400">
+				<xs:annotation>
+					<xs:documentation>组织、利用会道门、邪教组织、利用迷信致人死亡案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013401">
+				<xs:annotation>
+					<xs:documentation>组织、利用会道门致人死亡案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013402">
+				<xs:annotation>
+					<xs:documentation>组织、利用邪教组织致人死亡案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013403">
+				<xs:annotation>
+					<xs:documentation>利用迷信致人死亡案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013500">
+				<xs:annotation>
+					<xs:documentation>聚众淫乱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013600">
+				<xs:annotation>
+					<xs:documentation>引诱未成年人聚众淫乱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013700">
+				<xs:annotation>
+					<xs:documentation>盗窃、侮辱尸体案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013701">
+				<xs:annotation>
+					<xs:documentation>盗窃尸体案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013702">
+				<xs:annotation>
+					<xs:documentation>侮辱尸体案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013800">
+				<xs:annotation>
+					<xs:documentation>赌博案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06013900">
+				<xs:annotation>
+					<xs:documentation>开设赌场案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06014000">
+				<xs:annotation>
+					<xs:documentation>故意延误投递邮件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020000">
+				<xs:annotation>
+					<xs:documentation>妨害司法案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020100">
+				<xs:annotation>
+					<xs:documentation>伪证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020300">
+				<xs:annotation>
+					<xs:documentation>辩护人、诉讼代理人毁灭证据、伪造证据、妨害作证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020301">
+				<xs:annotation>
+					<xs:documentation>辩护人毁灭证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020302">
+				<xs:annotation>
+					<xs:documentation>辩护人伪造证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020303">
+				<xs:annotation>
+					<xs:documentation>辩护人妨害作证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020304">
+				<xs:annotation>
+					<xs:documentation>诉讼代理人毁灭证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020305">
+				<xs:annotation>
+					<xs:documentation>诉讼代理人伪造证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020306">
+				<xs:annotation>
+					<xs:documentation>诉讼代理人妨害作证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020400">
+				<xs:annotation>
+					<xs:documentation>妨害作证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020500">
+				<xs:annotation>
+					<xs:documentation>帮助毁灭、伪造证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020501">
+				<xs:annotation>
+					<xs:documentation>帮助毁灭证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020502">
+				<xs:annotation>
+					<xs:documentation>帮助伪造证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020600">
+				<xs:annotation>
+					<xs:documentation>打击报复证人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020700">
+				<xs:annotation>
+					<xs:documentation>扰乱法庭秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020800">
+				<xs:annotation>
+					<xs:documentation>窝藏、包庇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020801">
+				<xs:annotation>
+					<xs:documentation>窝藏案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020802">
+				<xs:annotation>
+					<xs:documentation>包庇案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06020900">
+				<xs:annotation>
+					<xs:documentation>拒绝提供间谍犯罪证据案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021000">
+				<xs:annotation>
+					<xs:documentation>掩饰、隐瞒犯罪所得、犯罪所得收益案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021001">
+				<xs:annotation>
+					<xs:documentation>掩饰、隐瞒犯罪所得</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021002">
+				<xs:annotation>
+					<xs:documentation>掩饰、隐瞒犯罪所得收益</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021100">
+				<xs:annotation>
+					<xs:documentation>拒不执行判决、裁定案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021101">
+				<xs:annotation>
+					<xs:documentation>拒不执行判决案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021102">
+				<xs:annotation>
+					<xs:documentation>拒不执行裁定案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021200">
+				<xs:annotation>
+					<xs:documentation>非法处置查封、扣押、冻结的财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021201">
+				<xs:annotation>
+					<xs:documentation>非法处置查封的财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021202">
+				<xs:annotation>
+					<xs:documentation>非法处置扣押的财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021203">
+				<xs:annotation>
+					<xs:documentation>非法处置冻结的财产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021300">
+				<xs:annotation>
+					<xs:documentation>破坏监管秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021400">
+				<xs:annotation>
+					<xs:documentation>脱逃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021500">
+				<xs:annotation>
+					<xs:documentation>劫夺被押解人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021600">
+				<xs:annotation>
+					<xs:documentation>组织越狱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021700">
+				<xs:annotation>
+					<xs:documentation>暴动越狱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06021800">
+				<xs:annotation>
+					<xs:documentation>聚众持械劫狱案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030000">
+				<xs:annotation>
+					<xs:documentation>妨害国（边）境管理案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030100">
+				<xs:annotation>
+					<xs:documentation>组织他人偷越国（边）境案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030200">
+				<xs:annotation>
+					<xs:documentation>骗取出境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030300">
+				<xs:annotation>
+					<xs:documentation>提供伪造、变造的出入境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030301">
+				<xs:annotation>
+					<xs:documentation>提供伪造的出入境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030302">
+				<xs:annotation>
+					<xs:documentation>提供变造的出入境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030400">
+				<xs:annotation>
+					<xs:documentation>出售出入境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030500">
+				<xs:annotation>
+					<xs:documentation>运送他人偷越国（边）境案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030600">
+				<xs:annotation>
+					<xs:documentation>偷越国（边）境案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030700">
+				<xs:annotation>
+					<xs:documentation>破坏界碑、界桩案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030701">
+				<xs:annotation>
+					<xs:documentation>破坏界碑案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030702">
+				<xs:annotation>
+					<xs:documentation>破坏界桩案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06030800">
+				<xs:annotation>
+					<xs:documentation>破坏永久性测量标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040000">
+				<xs:annotation>
+					<xs:documentation>妨害文物管理案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040100">
+				<xs:annotation>
+					<xs:documentation>故意损毁文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040200">
+				<xs:annotation>
+					<xs:documentation>故意损毁名胜古迹案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040300">
+				<xs:annotation>
+					<xs:documentation>过失损毁文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040400">
+				<xs:annotation>
+					<xs:documentation>非法向外国人出售、赠送珍贵文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040401">
+				<xs:annotation>
+					<xs:documentation>非法向外国人出售珍贵文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040402">
+				<xs:annotation>
+					<xs:documentation>非法向外国人赠送珍贵文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040500">
+				<xs:annotation>
+					<xs:documentation>倒卖文物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040600">
+				<xs:annotation>
+					<xs:documentation>非法出售、私赠文物藏品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040601">
+				<xs:annotation>
+					<xs:documentation>非法出售文物藏品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040602">
+				<xs:annotation>
+					<xs:documentation>非法私赠文物藏品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040700">
+				<xs:annotation>
+					<xs:documentation>盗掘古文化遗址、古墓葬案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040701">
+				<xs:annotation>
+					<xs:documentation>盗掘古文化遗址案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040702">
+				<xs:annotation>
+					<xs:documentation>盗掘古墓葬案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040800">
+				<xs:annotation>
+					<xs:documentation>盗掘古人类化石、古脊椎动物化石案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040801">
+				<xs:annotation>
+					<xs:documentation>盗掘古人类化石案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040802">
+				<xs:annotation>
+					<xs:documentation>盗掘古脊椎动物化石案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040900">
+				<xs:annotation>
+					<xs:documentation>抢夺、窃取国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040901">
+				<xs:annotation>
+					<xs:documentation>抢夺国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06040902">
+				<xs:annotation>
+					<xs:documentation>窃取国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06041000">
+				<xs:annotation>
+					<xs:documentation>擅自出卖、转让国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06041001">
+				<xs:annotation>
+					<xs:documentation>擅自出卖国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06041002">
+				<xs:annotation>
+					<xs:documentation>擅自转让国有档案案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050000">
+				<xs:annotation>
+					<xs:documentation>危害公共卫生案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050100">
+				<xs:annotation>
+					<xs:documentation>妨害传染病防治案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050200">
+				<xs:annotation>
+					<xs:documentation>传染病菌种、毒种扩散案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050201">
+				<xs:annotation>
+					<xs:documentation>传染病菌种扩散案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050202">
+				<xs:annotation>
+					<xs:documentation>毒种扩散案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050300">
+				<xs:annotation>
+					<xs:documentation>妨害国境卫生检疫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050400">
+				<xs:annotation>
+					<xs:documentation>非法组织卖血案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050500">
+				<xs:annotation>
+					<xs:documentation>强迫卖血案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050600">
+				<xs:annotation>
+					<xs:documentation>非法采集、供应血液、制作、供应血液制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050601">
+				<xs:annotation>
+					<xs:documentation>非法采集血液案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050602">
+				<xs:annotation>
+					<xs:documentation>非法供应血液案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050603">
+				<xs:annotation>
+					<xs:documentation>非法制作血液制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050604">
+				<xs:annotation>
+					<xs:documentation>非法供应血液制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050700">
+				<xs:annotation>
+					<xs:documentation>采集、供应血液、制作、供应血液制品事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050701">
+				<xs:annotation>
+					<xs:documentation>采集血液事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050702">
+				<xs:annotation>
+					<xs:documentation>供应血液事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050703">
+				<xs:annotation>
+					<xs:documentation>制作血液制品事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050704">
+				<xs:annotation>
+					<xs:documentation>供应血液制品事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050800">
+				<xs:annotation>
+					<xs:documentation>医疗事故案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06050900">
+				<xs:annotation>
+					<xs:documentation>非法行医案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06051000">
+				<xs:annotation>
+					<xs:documentation>非法进行节育手术案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06051100">
+				<xs:annotation>
+					<xs:documentation>妨害动植物防疫、检疫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06051101">
+				<xs:annotation>
+					<xs:documentation>妨害动植物防疫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06051102">
+				<xs:annotation>
+					<xs:documentation>妨害动植物检疫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060000">
+				<xs:annotation>
+					<xs:documentation>破坏环境资源保护案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060100">
+				<xs:annotation>
+					<xs:documentation>污染环境案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060200">
+				<xs:annotation>
+					<xs:documentation>非法处置进口的固体废物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060300">
+				<xs:annotation>
+					<xs:documentation>擅自进口固体废物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060400">
+				<xs:annotation>
+					<xs:documentation>非法捕捞水产品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060500">
+				<xs:annotation>
+					<xs:documentation>非法猎捕、杀害珍贵、濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060501">
+				<xs:annotation>
+					<xs:documentation>非法猎捕珍贵野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060502">
+				<xs:annotation>
+					<xs:documentation>非法猎捕濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060503">
+				<xs:annotation>
+					<xs:documentation>非法杀害珍贵野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060504">
+				<xs:annotation>
+					<xs:documentation>非法杀害濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060600">
+				<xs:annotation>
+					<xs:documentation>非法收购、运输、出售珍贵、濒危野生动物、珍贵、濒危野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060601">
+				<xs:annotation>
+					<xs:documentation>非法收购珍贵野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060602">
+				<xs:annotation>
+					<xs:documentation>非法收购濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060603">
+				<xs:annotation>
+					<xs:documentation>非法收购珍贵野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060604">
+				<xs:annotation>
+					<xs:documentation>非法收购濒危野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060605">
+				<xs:annotation>
+					<xs:documentation>非法运输珍贵野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060606">
+				<xs:annotation>
+					<xs:documentation>非法运输濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060607">
+				<xs:annotation>
+					<xs:documentation>非法运输珍贵野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060608">
+				<xs:annotation>
+					<xs:documentation>非法运输濒危野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060609">
+				<xs:annotation>
+					<xs:documentation>非法出售珍贵野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060610">
+				<xs:annotation>
+					<xs:documentation>非法出售濒危野生动物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060611">
+				<xs:annotation>
+					<xs:documentation>非法出售珍贵野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060612">
+				<xs:annotation>
+					<xs:documentation>非法出售濒危野生动物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060700">
+				<xs:annotation>
+					<xs:documentation>非法狩猎案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060800">
+				<xs:annotation>
+					<xs:documentation>非法占用农用地案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06060900">
+				<xs:annotation>
+					<xs:documentation>非法采矿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061000">
+				<xs:annotation>
+					<xs:documentation>破坏性采矿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061100">
+				<xs:annotation>
+					<xs:documentation>非法采伐、毁坏国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061101">
+				<xs:annotation>
+					<xs:documentation>非法采伐国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061102">
+				<xs:annotation>
+					<xs:documentation>毁坏国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061200">
+				<xs:annotation>
+					<xs:documentation>非法收购、运输、加工、出售国家重点保护植物、国家重点保护植物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061201">
+				<xs:annotation>
+					<xs:documentation>非法收购国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061202">
+				<xs:annotation>
+					<xs:documentation>非法收购国家重点保护植物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061203">
+				<xs:annotation>
+					<xs:documentation>非法运输国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061204">
+				<xs:annotation>
+					<xs:documentation>非法运输国家重点保护植物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061205">
+				<xs:annotation>
+					<xs:documentation>非法加工国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061206">
+				<xs:annotation>
+					<xs:documentation>非法加工国家重点保护植物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061207">
+				<xs:annotation>
+					<xs:documentation>非法出售国家重点保护植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061208">
+				<xs:annotation>
+					<xs:documentation>非法出售国家重点保护植物制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061300">
+				<xs:annotation>
+					<xs:documentation>盗伐林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061400">
+				<xs:annotation>
+					<xs:documentation>滥伐林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061500">
+				<xs:annotation>
+					<xs:documentation>非法收购、运输盗伐、滥伐的林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061501">
+				<xs:annotation>
+					<xs:documentation>非法收购盗伐的林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061502">
+				<xs:annotation>
+					<xs:documentation>非法收购滥伐的林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061503">
+				<xs:annotation>
+					<xs:documentation>运输盗伐的林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06061504">
+				<xs:annotation>
+					<xs:documentation>运输滥伐的林木案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070000">
+				<xs:annotation>
+					<xs:documentation>走私、贩卖、运输、制造毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070100">
+				<xs:annotation>
+					<xs:documentation>走私、贩卖、运输、制造毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070101">
+				<xs:annotation>
+					<xs:documentation>走私毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070102">
+				<xs:annotation>
+					<xs:documentation>贩卖毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070103">
+				<xs:annotation>
+					<xs:documentation>运输毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070104">
+				<xs:annotation>
+					<xs:documentation>制造毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070200">
+				<xs:annotation>
+					<xs:documentation>非法持有毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070300">
+				<xs:annotation>
+					<xs:documentation>包庇毒品犯罪分子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070400">
+				<xs:annotation>
+					<xs:documentation>窝藏、转移、隐瞒毒品、毒赃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070401">
+				<xs:annotation>
+					<xs:documentation>窝藏毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070402">
+				<xs:annotation>
+					<xs:documentation>窝藏毒赃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070403">
+				<xs:annotation>
+					<xs:documentation>转移毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070404">
+				<xs:annotation>
+					<xs:documentation>转移毒赃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070405">
+				<xs:annotation>
+					<xs:documentation>隐瞒毒品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070406">
+				<xs:annotation>
+					<xs:documentation>隐瞒毒赃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070500">
+				<xs:annotation>
+					<xs:documentation>走私制毒物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070600">
+				<xs:annotation>
+					<xs:documentation>非法买卖制毒物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070700">
+				<xs:annotation>
+					<xs:documentation>非法种植毒品原植物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070800">
+				<xs:annotation>
+					<xs:documentation>非法买卖、运输、携带、持有毒品原植物种子、幼苗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070801">
+				<xs:annotation>
+					<xs:documentation>非法买卖毒品原植物种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070802">
+				<xs:annotation>
+					<xs:documentation>非法买卖毒品原植物幼苗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070803">
+				<xs:annotation>
+					<xs:documentation>非法运输毒品原植物种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070804">
+				<xs:annotation>
+					<xs:documentation>非法运输毒品原植物幼苗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070805">
+				<xs:annotation>
+					<xs:documentation>非法携带毒品原植物种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070806">
+				<xs:annotation>
+					<xs:documentation>非法携带毒品原植物幼苗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070807">
+				<xs:annotation>
+					<xs:documentation>非法持有毒品原植物种子案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070808">
+				<xs:annotation>
+					<xs:documentation>非法持有毒品原植物幼苗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070900">
+				<xs:annotation>
+					<xs:documentation>引诱、教唆、欺骗他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070901">
+				<xs:annotation>
+					<xs:documentation>引诱他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070902">
+				<xs:annotation>
+					<xs:documentation>教唆他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06070903">
+				<xs:annotation>
+					<xs:documentation>欺骗他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06071000">
+				<xs:annotation>
+					<xs:documentation>强迫他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06071100">
+				<xs:annotation>
+					<xs:documentation>容留他人吸毒案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06071200">
+				<xs:annotation>
+					<xs:documentation>非法提供麻醉药品、精神药品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06071201">
+				<xs:annotation>
+					<xs:documentation>非法提供麻醉药品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06071202">
+				<xs:annotation>
+					<xs:documentation>非法提供精神药品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080000">
+				<xs:annotation>
+					<xs:documentation>组织、强迫、引诱、容留、介绍卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080100">
+				<xs:annotation>
+					<xs:documentation>组织卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080200">
+				<xs:annotation>
+					<xs:documentation>强迫卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080300">
+				<xs:annotation>
+					<xs:documentation>协助组织卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080400">
+				<xs:annotation>
+					<xs:documentation>引诱、容留、介绍卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080401">
+				<xs:annotation>
+					<xs:documentation>引诱卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080402">
+				<xs:annotation>
+					<xs:documentation>容留卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080403">
+				<xs:annotation>
+					<xs:documentation>介绍卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080500">
+				<xs:annotation>
+					<xs:documentation>引诱幼女卖淫案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080600">
+				<xs:annotation>
+					<xs:documentation>传播性病案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06080700">
+				<xs:annotation>
+					<xs:documentation>嫖宿幼女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090000">
+				<xs:annotation>
+					<xs:documentation>制作、贩卖、传播淫秽物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090100">
+				<xs:annotation>
+					<xs:documentation>制作、复制、出版、贩卖、传播淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090101">
+				<xs:annotation>
+					<xs:documentation>制作淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090102">
+				<xs:annotation>
+					<xs:documentation>复制淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090103">
+				<xs:annotation>
+					<xs:documentation>出版淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090104">
+				<xs:annotation>
+					<xs:documentation>贩卖淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090105">
+				<xs:annotation>
+					<xs:documentation>传播淫秽物品牟利案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090200">
+				<xs:annotation>
+					<xs:documentation>为他人提供书号出版淫秽书刊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090300">
+				<xs:annotation>
+					<xs:documentation>传播淫秽物品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090400">
+				<xs:annotation>
+					<xs:documentation>组织播放淫秽音像制品案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="06090500">
+				<xs:annotation>
+					<xs:documentation>组织淫秽表演案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000000">
+				<xs:annotation>
+					<xs:documentation>危害国防利益案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000100">
+				<xs:annotation>
+					<xs:documentation>阻碍军人执行职务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000200">
+				<xs:annotation>
+					<xs:documentation>阻碍军事行动案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000300">
+				<xs:annotation>
+					<xs:documentation>破坏武器装备、军事设施、军事通信案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000301">
+				<xs:annotation>
+					<xs:documentation>破坏武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000302">
+				<xs:annotation>
+					<xs:documentation>破坏军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000303">
+				<xs:annotation>
+					<xs:documentation>破坏军事通信案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000400">
+				<xs:annotation>
+					<xs:documentation>过失损坏武器装备、军事设施、军事通信案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000401">
+				<xs:annotation>
+					<xs:documentation>过失损坏武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000402">
+				<xs:annotation>
+					<xs:documentation>过失损坏军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000403">
+				<xs:annotation>
+					<xs:documentation>过失损坏军事通信案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000500">
+				<xs:annotation>
+					<xs:documentation>故意提供不合格武器装备、军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000501">
+				<xs:annotation>
+					<xs:documentation>故意提供不合格武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000502">
+				<xs:annotation>
+					<xs:documentation>故意提供不合格军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000600">
+				<xs:annotation>
+					<xs:documentation>过失提供不合格武器装备、军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000601">
+				<xs:annotation>
+					<xs:documentation>过失提供不合格武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000602">
+				<xs:annotation>
+					<xs:documentation>过失提供不合格军事设施案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000700">
+				<xs:annotation>
+					<xs:documentation>聚众冲击军事禁区案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000800">
+				<xs:annotation>
+					<xs:documentation>聚众扰乱军事管理区秩序案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07000900">
+				<xs:annotation>
+					<xs:documentation>冒充军人招摇撞骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001000">
+				<xs:annotation>
+					<xs:documentation>煽动军人逃离部队案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001100">
+				<xs:annotation>
+					<xs:documentation>雇用逃离部队军人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001200">
+				<xs:annotation>
+					<xs:documentation>接送不合格兵员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001300">
+				<xs:annotation>
+					<xs:documentation>伪造、变造、买卖武装部队公文、证件、印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001301">
+				<xs:annotation>
+					<xs:documentation>伪造武装部队公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001302">
+				<xs:annotation>
+					<xs:documentation>伪造武装部队证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001303">
+				<xs:annotation>
+					<xs:documentation>伪造武装部队印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001304">
+				<xs:annotation>
+					<xs:documentation>变造武装部队公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001305">
+				<xs:annotation>
+					<xs:documentation>变造武装部队证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001306">
+				<xs:annotation>
+					<xs:documentation>变造武装部队印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001307">
+				<xs:annotation>
+					<xs:documentation>买卖武装部队公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001308">
+				<xs:annotation>
+					<xs:documentation>买卖武装部队证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001309">
+				<xs:annotation>
+					<xs:documentation>买卖武装部队印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001400">
+				<xs:annotation>
+					<xs:documentation>盗窃、抢夺武装部队公文、证件、印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001401">
+				<xs:annotation>
+					<xs:documentation>盗窃武装部队公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001402">
+				<xs:annotation>
+					<xs:documentation>盗窃武装部队证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001403">
+				<xs:annotation>
+					<xs:documentation>盗窃武装部队印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001404">
+				<xs:annotation>
+					<xs:documentation>抢夺武装部队公文案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001405">
+				<xs:annotation>
+					<xs:documentation>抢夺武装部队证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001406">
+				<xs:annotation>
+					<xs:documentation>抢夺武装部队印章案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001500">
+				<xs:annotation>
+					<xs:documentation>非法生产、买卖武装部队制式服装案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001501">
+				<xs:annotation>
+					<xs:documentation>非法生产武装部队制式服装案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001502">
+				<xs:annotation>
+					<xs:documentation>非法买卖武装部队制式服装案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001600">
+				<xs:annotation>
+					<xs:documentation>伪造、盗窃、买卖、非法提供、非法使用武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001601">
+				<xs:annotation>
+					<xs:documentation>伪造武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001602">
+				<xs:annotation>
+					<xs:documentation>盗窃武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001603">
+				<xs:annotation>
+					<xs:documentation>买卖武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001604">
+				<xs:annotation>
+					<xs:documentation>非法提供武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001605">
+				<xs:annotation>
+					<xs:documentation>非法使用武装部队专用标志案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001700">
+				<xs:annotation>
+					<xs:documentation>战时拒绝、逃避征召、军事训练案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001701">
+				<xs:annotation>
+					<xs:documentation>战时拒绝征召案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001702">
+				<xs:annotation>
+					<xs:documentation>战时拒绝军事训练案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001703">
+				<xs:annotation>
+					<xs:documentation>战时逃避征召案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001704">
+				<xs:annotation>
+					<xs:documentation>战时逃避军事训练案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001800">
+				<xs:annotation>
+					<xs:documentation>战时拒绝、逃避服役案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001801">
+				<xs:annotation>
+					<xs:documentation>战时拒绝服役案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001802">
+				<xs:annotation>
+					<xs:documentation>战时逃避服役案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07001900">
+				<xs:annotation>
+					<xs:documentation>战时故意提供虚假敌情案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002000">
+				<xs:annotation>
+					<xs:documentation>战时造谣扰乱军心案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002100">
+				<xs:annotation>
+					<xs:documentation>战时窝藏逃离部队军人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002200">
+				<xs:annotation>
+					<xs:documentation>战时拒绝、故意延误军事订货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002201">
+				<xs:annotation>
+					<xs:documentation>战时拒绝军事订货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002202">
+				<xs:annotation>
+					<xs:documentation>战时故意延误军事订货案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="07002300">
+				<xs:annotation>
+					<xs:documentation>战时拒绝军事征用案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000000">
+				<xs:annotation>
+					<xs:documentation>贪污贿赂案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000100">
+				<xs:annotation>
+					<xs:documentation>贪污案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000200">
+				<xs:annotation>
+					<xs:documentation>挪用公款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000300">
+				<xs:annotation>
+					<xs:documentation>受贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000400">
+				<xs:annotation>
+					<xs:documentation>单位受贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000500">
+				<xs:annotation>
+					<xs:documentation>利用影响力受贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000600">
+				<xs:annotation>
+					<xs:documentation>行贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000700">
+				<xs:annotation>
+					<xs:documentation>对单位行贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000800">
+				<xs:annotation>
+					<xs:documentation>介绍贿赂案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08000900">
+				<xs:annotation>
+					<xs:documentation>单位行贿案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08001000">
+				<xs:annotation>
+					<xs:documentation>巨额财产来源不明案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08001100">
+				<xs:annotation>
+					<xs:documentation>隐瞒境外存款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08001200">
+				<xs:annotation>
+					<xs:documentation>私分国有资产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="08001300">
+				<xs:annotation>
+					<xs:documentation>私分罚没财物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000000">
+				<xs:annotation>
+					<xs:documentation>渎职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000100">
+				<xs:annotation>
+					<xs:documentation>滥用职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000200">
+				<xs:annotation>
+					<xs:documentation>玩忽职守案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000300">
+				<xs:annotation>
+					<xs:documentation>故意泄露国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000400">
+				<xs:annotation>
+					<xs:documentation>过失泄露国家秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000500">
+				<xs:annotation>
+					<xs:documentation>徇私枉法案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000600">
+				<xs:annotation>
+					<xs:documentation>民事、行政枉法裁判案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000601">
+				<xs:annotation>
+					<xs:documentation>民事枉法裁判案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000602">
+				<xs:annotation>
+					<xs:documentation>行政枉法裁判案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000700">
+				<xs:annotation>
+					<xs:documentation>执行判决、裁定失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000701">
+				<xs:annotation>
+					<xs:documentation>执行判决失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000702">
+				<xs:annotation>
+					<xs:documentation>执行裁定失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000800">
+				<xs:annotation>
+					<xs:documentation>执行判决、裁定滥用职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000801">
+				<xs:annotation>
+					<xs:documentation>执行判决滥用职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000802">
+				<xs:annotation>
+					<xs:documentation>执行裁定滥用职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09000900">
+				<xs:annotation>
+					<xs:documentation>枉法仲裁案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001000">
+				<xs:annotation>
+					<xs:documentation>私放在押人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001100">
+				<xs:annotation>
+					<xs:documentation>失职致使在押人员脱逃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001200">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊减刑、假释、暂予监外执行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001201">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊减刑案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001202">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊假释案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001203">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊暂予监外执行案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001300">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊不移交刑事案件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001400">
+				<xs:annotation>
+					<xs:documentation>滥用管理公司、证券职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001401">
+				<xs:annotation>
+					<xs:documentation>滥用管理公司职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001402">
+				<xs:annotation>
+					<xs:documentation>滥用管理证券职权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001500">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊不征、少征税款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001501">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊不征税款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001502">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊少征税款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001600">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊发售发票、抵扣税款、出口退税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001601">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊发售发票案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001602">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊抵扣税款案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001603">
+				<xs:annotation>
+					<xs:documentation>徇私舞弊出口退税案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001700">
+				<xs:annotation>
+					<xs:documentation>违法提供出口退税凭证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001800">
+				<xs:annotation>
+					<xs:documentation>国家机关工作人员签订、履行合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001801">
+				<xs:annotation>
+					<xs:documentation>国家机关工作人员签订合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001802">
+				<xs:annotation>
+					<xs:documentation>国家机关工作人员履行合同失职被骗案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09001900">
+				<xs:annotation>
+					<xs:documentation>违法发放林木采伐许可证案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002000">
+				<xs:annotation>
+					<xs:documentation>环境监管失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002100">
+				<xs:annotation>
+					<xs:documentation>食品监管渎职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002200">
+				<xs:annotation>
+					<xs:documentation>传染病防治失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002300">
+				<xs:annotation>
+					<xs:documentation>非法批准征用、占用土地案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002301">
+				<xs:annotation>
+					<xs:documentation>非法批准征用土地案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002302">
+				<xs:annotation>
+					<xs:documentation>非法占用土地案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002400">
+				<xs:annotation>
+					<xs:documentation>非法、低价出让国有土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002401">
+				<xs:annotation>
+					<xs:documentation>非法出让国有土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002402">
+				<xs:annotation>
+					<xs:documentation>低价出让国有土地使用权案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002500">
+				<xs:annotation>
+					<xs:documentation>放纵走私案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002600">
+				<xs:annotation>
+					<xs:documentation>商检徇私舞弊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002700">
+				<xs:annotation>
+					<xs:documentation>商检失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002800">
+				<xs:annotation>
+					<xs:documentation>动植物检疫徇私舞弊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09002900">
+				<xs:annotation>
+					<xs:documentation>动植物检疫失职案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003000">
+				<xs:annotation>
+					<xs:documentation>放纵制售伪劣商品犯罪行为案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003100">
+				<xs:annotation>
+					<xs:documentation>办理偷越国（边）境人员出入境证件案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003200">
+				<xs:annotation>
+					<xs:documentation>放行偷越国（边）境人员案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003300">
+				<xs:annotation>
+					<xs:documentation>不解救被拐卖、绑架妇女、儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003301">
+				<xs:annotation>
+					<xs:documentation>不解救被拐卖妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003302">
+				<xs:annotation>
+					<xs:documentation>不解救被绑架妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003303">
+				<xs:annotation>
+					<xs:documentation>不解救被拐卖儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003304">
+				<xs:annotation>
+					<xs:documentation>不解救被绑架儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003400">
+				<xs:annotation>
+					<xs:documentation>阻碍解救被拐卖、绑架妇女、儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003401">
+				<xs:annotation>
+					<xs:documentation>阻碍解救被拐卖妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003402">
+				<xs:annotation>
+					<xs:documentation>阻碍解救被绑架妇女案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003403">
+				<xs:annotation>
+					<xs:documentation>阻碍解救被拐卖儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003404">
+				<xs:annotation>
+					<xs:documentation>阻碍解救被绑架儿童案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003500">
+				<xs:annotation>
+					<xs:documentation>帮助犯罪分子逃避处罚案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003600">
+				<xs:annotation>
+					<xs:documentation>招收公务员、学生徇私舞弊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003601">
+				<xs:annotation>
+					<xs:documentation>招收公务员徇私舞弊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003602">
+				<xs:annotation>
+					<xs:documentation>招收学生徇私舞弊案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003700">
+				<xs:annotation>
+					<xs:documentation>失职造成珍贵文物损毁、流失案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003701">
+				<xs:annotation>
+					<xs:documentation>失职造成珍贵文物损毁案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="09003702">
+				<xs:annotation>
+					<xs:documentation>失职造成珍贵文物流失案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000000">
+				<xs:annotation>
+					<xs:documentation>军人违反职责案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000100">
+				<xs:annotation>
+					<xs:documentation>战时违抗命令案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000200">
+				<xs:annotation>
+					<xs:documentation>隐瞒、谎报军情案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000201">
+				<xs:annotation>
+					<xs:documentation>隐瞒军情案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000202">
+				<xs:annotation>
+					<xs:documentation>谎报军情案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000300">
+				<xs:annotation>
+					<xs:documentation>拒传、假传军令案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000301">
+				<xs:annotation>
+					<xs:documentation>拒传军令案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000302">
+				<xs:annotation>
+					<xs:documentation>假传军令案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000400">
+				<xs:annotation>
+					<xs:documentation>投降案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000500">
+				<xs:annotation>
+					<xs:documentation>战时临阵脱逃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000600">
+				<xs:annotation>
+					<xs:documentation>擅离、玩忽军事职守案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000601">
+				<xs:annotation>
+					<xs:documentation>擅离军事职守案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000602">
+				<xs:annotation>
+					<xs:documentation>玩忽军事职守案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000700">
+				<xs:annotation>
+					<xs:documentation>阻碍执行军事职务案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000800">
+				<xs:annotation>
+					<xs:documentation>指使部属违反职责案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10000900">
+				<xs:annotation>
+					<xs:documentation>违令作战消极案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001000">
+				<xs:annotation>
+					<xs:documentation>拒不救援友邻部队案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001100">
+				<xs:annotation>
+					<xs:documentation>军人叛逃案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001200">
+				<xs:annotation>
+					<xs:documentation>非法获取军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001300">
+				<xs:annotation>
+					<xs:documentation>为境外窃取、刺探、收买、非法提供军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001301">
+				<xs:annotation>
+					<xs:documentation>为境外窃取军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001302">
+				<xs:annotation>
+					<xs:documentation>为境外刺探军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001303">
+				<xs:annotation>
+					<xs:documentation>为境外收买军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001304">
+				<xs:annotation>
+					<xs:documentation>为境外非法提供军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001400">
+				<xs:annotation>
+					<xs:documentation>故意泄露军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001500">
+				<xs:annotation>
+					<xs:documentation>过失泄露军事秘密案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001600">
+				<xs:annotation>
+					<xs:documentation>战时造谣惑众案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001700">
+				<xs:annotation>
+					<xs:documentation>战时自伤案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001800">
+				<xs:annotation>
+					<xs:documentation>逃离部队案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10001900">
+				<xs:annotation>
+					<xs:documentation>武器装备肇事案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002000">
+				<xs:annotation>
+					<xs:documentation>擅自改变武器装备编配用途案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002100">
+				<xs:annotation>
+					<xs:documentation>盗窃、抢夺武器装备、军用物资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002101">
+				<xs:annotation>
+					<xs:documentation>盗窃武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002102">
+				<xs:annotation>
+					<xs:documentation>盗窃军用物资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002103">
+				<xs:annotation>
+					<xs:documentation>抢夺武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002104">
+				<xs:annotation>
+					<xs:documentation>抢夺军用物资案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002200">
+				<xs:annotation>
+					<xs:documentation>非法出卖、转让武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002201">
+				<xs:annotation>
+					<xs:documentation>非法出卖武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002202">
+				<xs:annotation>
+					<xs:documentation>非法转让武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002300">
+				<xs:annotation>
+					<xs:documentation>遗弃武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002400">
+				<xs:annotation>
+					<xs:documentation>遗失武器装备案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002500">
+				<xs:annotation>
+					<xs:documentation>擅自出卖、转让军队房地产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002501">
+				<xs:annotation>
+					<xs:documentation>擅自出卖房地产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002502">
+				<xs:annotation>
+					<xs:documentation>擅自转让军队房地产案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002600">
+				<xs:annotation>
+					<xs:documentation>虐待部属案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002700">
+				<xs:annotation>
+					<xs:documentation>遗弃伤病军人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002800">
+				<xs:annotation>
+					<xs:documentation>战时拒不救治伤病军人案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002900">
+				<xs:annotation>
+					<xs:documentation>战时残害居民、掠夺居民财物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002901">
+				<xs:annotation>
+					<xs:documentation>战时残害居民案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10002902">
+				<xs:annotation>
+					<xs:documentation>战时掠夺居民财物案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10003000">
+				<xs:annotation>
+					<xs:documentation>私放俘虏案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10003100">
+				<xs:annotation>
+					<xs:documentation>虐待俘虏案</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
