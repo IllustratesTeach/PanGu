@@ -183,8 +183,8 @@ object mnt_def {
     } // CORESTREAMLINE;
 
     class FINGERMNTSTRUCT extends AncientData {
-    var bePalm:Byte = _ ; //
-    var beLatent:Byte = _ ; //
+    var bePalm:Byte = 0 ; //
+    var beLatent:Byte = 0 ; //
     var resolution:Short = _ ; //	采集密度，缺省值为500	//
     var nWidth:Short = _ ; //	图象宽度				//
     var nHeight:Short = _ ; //	图象高度				//
@@ -301,8 +301,8 @@ object mnt_def {
   } // FINGERFEATURE;
 
   class FINGERLATMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
-  var beLatent:Byte = _ ; //
+  var bePalm:Byte = 0 ; //
+  var beLatent:Byte = 1 ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500
   var nWidth:Short = _ ; //	图象宽度
   var nHeight:Short = _ ; //	图象高度
@@ -483,7 +483,7 @@ var OPTrp:Byte = _ ;			//	外侧区纹型信息0：未知,1：存在,2：不存�
 
   class PALMLATMNTSTRUCT extends AncientData {
   var bePalm:Byte = 1 ; //
-  var beLatent:Byte = _ ; //
+  var beLatent:Byte = 1 ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500	//
   var nWidth:Short = _ ; //	图象宽度				//
   var nHeight:Short = _ ; //	图象高度				//
