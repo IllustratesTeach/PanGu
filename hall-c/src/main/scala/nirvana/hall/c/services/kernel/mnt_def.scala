@@ -311,8 +311,8 @@ object mnt_def {
   var nres:Short = _ ; //	存储密度，缺省值为200   SCALE=dpi/resolution
   var MntVersion:Byte = _ ; //	特征提取方法(以前版本为0)
 
-  var FingerCode:Short = _ ; //	候选指位（按位计算）
-  var RpCode:Byte = _ ; //	候选纹型（按位计算）
+  var FingerCode:Short = _ ; //	候选指位（按位计算）前10位依次是指位1-10
+  var RpCode:Byte = _ ; //	候选纹型（按位计算）前4位依次是 弓，左，右，斗
   @Length(10)
   var fgrp:Array[Byte] = _ ; //	联指纹型（按位计算）
   var Distore:Byte = _ ; /*  变形参数
