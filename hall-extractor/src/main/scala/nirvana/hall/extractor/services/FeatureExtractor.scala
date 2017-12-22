@@ -3,8 +3,9 @@ package nirvana.hall.extractor.services
 import java.io.InputStream
 
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
-import nirvana.hall.protocol.extract.ExtractProto.{NewFeatureTry, FingerPosition}
+import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
 
 /**
  * extract feature from image
@@ -41,4 +42,6 @@ trait FeatureExtractor {
    * @param oldMnt
    */
   def ConvertMntOldToNew(oldMnt:InputStream) : Option[Array[Byte]]
+
+  def GAFIS_MntStdToMntDisp(gafisMnt: GAFISIMAGESTRUCT) : MNTDISPSTRUCT
 }

@@ -3,12 +3,14 @@ package nirvana.hall.extractor.internal
 import java.awt.Image
 import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, ColorConvertOp, DataBufferByte}
-import java.io.{FileInputStream, File, ByteArrayInputStream, InputStream}
+import java.io.{ByteArrayInputStream, File, FileInputStream, InputStream}
+import java.nio.ByteOrder
 import javax.imageio.ImageIO
 import javax.imageio.spi.IIORegistry
 
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
+import nirvana.hall.c.services.kernel.mnt_checker_def.MNTDISPSTRUCT
 import nirvana.hall.c.services.kernel.mnt_def._
 import nirvana.hall.extractor.HallExtractorConstants
 import nirvana.hall.extractor.jni.{JniLoader, NativeExtractor}
@@ -32,6 +34,20 @@ class FeatureExtractorImpl extends FeatureExtractor{
   iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
 
   private val COLOR_GRAY_SPACE=  ColorSpace.getInstance(ColorSpace.CS_GRAY);
+
+
+  /**
+    * get mntDisp for java
+    * @param gafisMnt
+    * @return
+    */
+  override def GAFIS_MntStdToMntDisp(gafisMnt: GAFISIMAGESTRUCT) : MNTDISPSTRUCT = {
+    val mntDispBytes = (new MNTDISPSTRUCT).toByteArray(byteOrder=ByteOrder.LITTLE_ENDIAN)
+    NativeExtractor.GAFIS_MntStdToMntDisp(gafisMnt.bnData, mntDispBytes, 1)
+    val mntDisp = new MNTDISPSTRUCT
+    mntDisp.fromByteArray(mntDispBytes, byteOrder=ByteOrder.LITTLE_ENDIAN)
+    mntDisp
+  }
 
   /**
    * old feature converter to new feature
@@ -98,6 +114,7 @@ class FeatureExtractorImpl extends FeatureExtractor{
     imgHead.nFingerIndex = fingerPos.getNumber.toByte
     if(fingerPos.getNumber >0)
       imgHead.szName = HallExtractorConstants.MNT_NAMES(fingerPos.getNumber - 1)
+
     imgHead.writeToStreamWriter(mntBuffer)
 
     val mntData = mntBuffer.array()

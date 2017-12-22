@@ -2,16 +2,15 @@ package nirvana.hall.image.internal
 
 import java.awt.image.{BufferedImage, DataBufferByte}
 import java.awt.{AlphaComposite, Color, Font, RenderingHints}
-import java.io.{File, FileInputStream}
+import java.io.{ByteArrayInputStream, File, FileInputStream}
 import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
-import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.AncientData._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
 import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.c.services.gloclib.glocdef.{GAFIS7LOB_IMGHEADSTRUCT, GAFISIMAGESTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
@@ -68,7 +67,7 @@ class FirmDecoderImplTest extends BaseJniTest{
   }
   @Test
   def test_parse_fpt: Unit ={
-    val filePath = "C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\fpt\\20161209\\R9999912016100813114072.fpt"
+    val filePath = "C:\\Users\\wangjue\\Desktop\\gz_750W_nec\\3100002000012536J.FPT"
 
     //val filePath = "C:\\Users\\wangjue\\Desktop\\fail_FPT\\wgetFPT\\fpt\\R1111326224222286523227.fpt"
 
@@ -218,7 +217,8 @@ class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_decodeByGFS_1900{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
-    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
+    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\P5201001306002014089977_11.palm"))
+    //val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/1900-1.data"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
     gafisImg.transformForFPT()
     val dest = decoder.decode(gafisImg, RawImageDataType)
@@ -229,12 +229,49 @@ class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_decode{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
-    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
+    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\P5201001306002014089977_11.palm"))
+    //val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/t.cpr"))
     val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
 
     val dest = decoder.decode(gafisImg, RawImageDataType)
 
     Assert.assertNotNull(dest.bnData)
 
+  }
+
+
+  @Test
+  def test_decode_gafisimg_palm{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\掌纹人员\\P5201815200002014089983_11.data"))
+    /*val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\掌纹人员\\P5202035000002014089993_11_head7.data"))
+
+    val in = new ByteArrayInputStream(cprData)
+    in.skip(128)
+    val image = IOUtils.toByteArray(in)
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.nWidth = 2304.toShort
+    gafisImg.stHead.nHeight = 2304.toShort
+    gafisImg.stHead.nImageType = 2.toByte
+    gafisImg.stHead.bIsCompressed = 1.toByte
+    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_XGW.toByte
+    gafisImg.bnData = image
+    gafisImg.stHead.nImgSize = image.length
+    gafisImg.stHead.nCaptureMethod = 1.toByte
+    gafisImg.stHead.nResolution = 500.toShort
+    gafisImg.stHead.nBits = 8.toByte
+    gafisImg.stHead.bIsPlain = 1.toByte
+    gafisImg.stHead.nFingerIndex = 11.toByte
+    gafisImg.stHead.szName = "CardBinData3"*/
+
+
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.fromByteArray(cprData)
+
+    val dest = decoder.decodeRawImage(gafisImg)
+
+    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\palm_decompress\\decoder_not7.data"),dest.toByteArray())
+
+    Assert.assertTrue(dest.bnData.length > 0)
   }
 }

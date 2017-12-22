@@ -56,4 +56,11 @@ class BigDataStreamTest {
     BigDataForFileStream.main(array)
   }
 
+
+  @Test
+  def streamTestBJSJ (){
+    val array = Array("src/test/resources/test_spark_bjsj.xml")
+    BigDataForBjsjStream.main(array)
+  }
+
 }

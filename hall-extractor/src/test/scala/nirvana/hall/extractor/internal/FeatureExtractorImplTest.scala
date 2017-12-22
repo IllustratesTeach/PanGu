@@ -82,7 +82,7 @@ class FeatureExtractorImplTest extends BaseJniTest{
   @Test
   def test_extract_wsq: Unit ={
     //val img = IOUtils.toByteArray(getClass.getResourceAsStream("/testt.img"))
-    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\tjFPT\\crash\\2809_L_06_crash_img.img"))
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\P5201001306002014089977_11.palm"))
 
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.fromByteArray(img)
@@ -158,14 +158,17 @@ class FeatureExtractorImplTest extends BaseJniTest{
 
   @Test
   def test_extract_idcard_bmp: Unit ={
-    val imgData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\img.bmp"))
+
+    val imgData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\left_palm.bmp"))
     val in = ByteString.copyFrom(imgData).newInput()
     val extractor = new FeatureExtractorImpl
-    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.FingerTemplate,NewFeatureTry.V1)
+    val begin = System.currentTimeMillis();
+    val mntData = extractor.extractByGAFISIMGBinary(in,FingerPosition.FINGER_L_THUMB,FeatureType.PalmTemplate,NewFeatureTry.V1)
+    val end = System.currentTimeMillis()
     val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
-    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\idcard\\52242500000000000000000000007314\\mnt.mnt"),mnt.toByteArray())
-    val feature = new FINGERMNTSTRUCT
-    feature.fromByteArray(mnt.bnData)
+    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\left_palm.mnt"),mnt.toByteArray())
+
+    println(end-begin)
   }
 
 
