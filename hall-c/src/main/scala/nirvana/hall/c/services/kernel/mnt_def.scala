@@ -403,7 +403,7 @@ object mnt_def {
   } // FINGERLATMNTSTRUCT;
 
   class PALMMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
+  var bePalm:Byte = 1 ; //
   var beLatent:Byte = _ ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500	//
   var nWidth:Short = _ ; //	图象宽度				//
@@ -482,7 +482,7 @@ var OPTrp:Byte = _ ;			//	外侧区纹型信息0：未知,1：存在,2：不存�
   } // PALMMNTSTRUCT;
 
   class PALMLATMNTSTRUCT extends AncientData {
-  var bePalm:Byte = _ ; //
+  var bePalm:Byte = 1 ; //
   var beLatent:Byte = _ ; //
   var resolution:Short = _ ; //	采集密度，缺省值为500	//
   var nWidth:Short = _ ; //	图象宽度				//

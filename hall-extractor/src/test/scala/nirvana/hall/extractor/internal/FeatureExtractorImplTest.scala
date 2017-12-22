@@ -4,7 +4,7 @@ import java.io.{File, ByteArrayInputStream, InputStream}
 
 import com.google.protobuf.ByteString
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
-import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
+import nirvana.hall.c.services.kernel.mnt_def.{PALMMNTSTRUCT, FINGERMNTSTRUCT}
 import nirvana.hall.extractor.jni.BaseJniTest
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.{FingerPosition, NewFeatureTry}
@@ -54,6 +54,20 @@ class FeatureExtractorImplTest extends BaseJniTest{
     val mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
     val feature = new FINGERMNTSTRUCT
     feature.fromByteArray(mnt.bnData)
+  }
+  @Test
+  def test_extract_palm: Unit ={
+    val imgData = getClass.getResourceAsStream("/palm.bmp")
+
+    val extractor = new FeatureExtractorImpl
+    val mntData = extractor.extractByGAFISIMGBinary(imgData,FingerPosition.FINGER_L_THUMB,FeatureType.PalmTemplate,NewFeatureTry.V1)
+    var mnt = new GAFISIMAGESTRUCT().fromByteArray(mntData.get._1)
+    val feature = new PALMMNTSTRUCT
+    feature.fromByteArray(mnt.bnData)
+    Assert.assertEquals(1,feature.bePalm)
+    mnt = new GAFISIMAGESTRUCT().fromStreamReader(getClass.getResourceAsStream("/palm.mnt"))
+    feature.fromByteArray(mnt.bnData)
+    Assert.assertEquals(1,feature.bePalm)
   }
   @Test
   def test_extract_bmp: Unit ={
