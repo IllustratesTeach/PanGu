@@ -60,7 +60,7 @@ import javax.jws.{WebMethod, WebService}
 trait FPT50HandprintService {
 
   /**
-    *
+    * 获取待发送现场指掌纹数量服务
     * @param userID 请求方 ID , 请求方在请求服务系统上注册的唯一内部标识，必填。
     * @param password 请求方密码，请求方在请求服务系统上注册的识别密码，必填。
     * @param asjfsdd_xzqhdm 案事件发生地点_行政区划代码，必填。
@@ -120,7 +120,7 @@ trait FPT50HandprintService {
     * 1：反馈成功
     *
     */
-  @WebMethod def endFBUseCondition(userID: String, password: String, xcwzbh: String, resultType: String): String
+  @WebMethod def sendFBUseCondition(userID: String, password: String, xcwzbh: String, resultType: String): String
 
   /**
     * 获取现场服务器时间服务的接口
