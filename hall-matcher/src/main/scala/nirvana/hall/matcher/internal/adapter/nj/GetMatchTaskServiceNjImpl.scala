@@ -77,8 +77,8 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
         if(json.has("caseClasses")){
           val value = json.getString("caseClasses")
-          if(value.indexOf(",")>0){
-            val values = value.split("\\,")
+          if(value.indexOf("|")>0){
+            val values = value.split("\\|")
             val groupQuery = GroupQuery.newBuilder()
             values.foreach{value =>
               val keywordQuery = KeywordQuery.newBuilder()
@@ -198,8 +198,8 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
         if(json.has("caseClassCode")){
           val value = json.getString("caseClassCode")
-          if(value.indexOf(",")>0){
-            val values = value.split("\\,")
+          if(value.indexOf("|")>0){
+            val values = value.split("\\|")
             val groupQuery = GroupQuery.newBuilder()
             values.foreach{value =>
               val keywordQuery = KeywordQuery.newBuilder()
@@ -208,7 +208,7 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
               groupQuery.addClauseQueryBuilder().setName("caseClassCode2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
               groupQuery.addClauseQueryBuilder().setName("caseClassCode3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
             }
-            textQuery.addQueryBuilder().setName("caseClassCode").setExtension(GroupQuery.query, groupQuery.build());
+            textQuery.addQueryBuilder().setName("caseClass").setExtension(GroupQuery.query, groupQuery.build());
           } else {
             val groupQuery = GroupQuery.newBuilder()
             val keywordQuery = KeywordQuery.newBuilder()
@@ -216,11 +216,11 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             groupQuery.addClauseQueryBuilder().setName("caseClassCode").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
             groupQuery.addClauseQueryBuilder().setName("caseClassCode2").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
             groupQuery.addClauseQueryBuilder().setName("caseClassCode3").setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
-            textQuery.addQueryBuilder().setName("caseClassCode").setExtension(GroupQuery.query, groupQuery.build())
+            textQuery.addQueryBuilder().setName("caseClass").setExtension(GroupQuery.query, groupQuery.build())
           }
         }
         //时间段
-        val dateCols = Array("caseOccurDate", "extractDateST")
+        val dateCols = Array("caseOccurDate", "extractDate")
         dateCols.foreach{col =>
           if (json.has(col + "ST") && json.has(col + "ED")) {
             val longQuery = LongRangeQuery.newBuilder()
