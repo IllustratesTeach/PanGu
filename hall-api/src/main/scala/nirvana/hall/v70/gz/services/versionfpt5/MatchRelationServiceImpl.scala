@@ -16,6 +16,8 @@ import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.GafisCheckinInfo
 
+import scala.collection.mutable.ArrayBuffer
+
 
 
 class MatchRelationServiceImpl extends MatchRelationService{
@@ -212,9 +214,9 @@ class MatchRelationServiceImpl extends MatchRelationService{
     ltHitResultPackage.checkPersonIdCard = SysUser.find_by_pkId(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewUser).headOption.get.idcard
     ltHitResultPackage.checkPersonTel = SysUser.find_by_pkId(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewUser).headOption.get.phone
     ltHitResultPackage.checkDateTime = new SimpleDateFormat("yyyyMMdd").format(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewTime)
-
     ltHitResultPackage.memo = ""
-    null
+
+    val ltHitResultPackageArray = new ArrayBuffer[LtHitResultPackage]()
   }
 
   /**
