@@ -3,6 +3,7 @@ package nirvana.hall.v70.gz.services.versionfpt5
 import java.text.SimpleDateFormat
 
 import nirvana.hall.api.internal.DateConverter
+import nirvana.hall.api.internal.fpt.CodeConverterV70New
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
@@ -193,7 +194,7 @@ class MatchRelationServiceImpl extends MatchRelationService{
     ltHitResultPackage.fingerPrintJingZongPersonId = gafisPerson.jingZongPersonId
     ltHitResultPackage.fingerPrintPersonId = gafisPerson.casePersonid
     ltHitResultPackage.fingerPrintCardId = gafisPerson.personid
-    ltHitResultPackage.fingerPrintPostionCode = gafisCheckinInfo.fgp //TODO:代码转换
+    ltHitResultPackage.fingerPrintPostionCode = CodeConverterV70New.converFingerFgp("",gafisCheckinInfo.fgp) //TODO:代码转换
     gafisCheckinInfo.querytype.toString match {
       case fpt5util.QUERY_TYPE_TL => //捺印倒查(TL)
         ltHitResultPackage.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_TL
@@ -216,7 +217,9 @@ class MatchRelationServiceImpl extends MatchRelationService{
     ltHitResultPackage.checkDateTime = new SimpleDateFormat("yyyyMMdd").format(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewTime)
     ltHitResultPackage.memo = ""
 
-    val ltHitResultPackageArray = new ArrayBuffer[LtHitResultPackage]()
+    val ltHitResultPackageSeq = new ArrayBuffer[LtHitResultPackage]
+    ltHitResultPackageSeq += ltHitResultPackage
+    ltHitResultPackageSeq
   }
 
   /**
