@@ -4,6 +4,9 @@ package nirvana.hall.api.internal.fpt
   * Created by zqLuo
   */
 object CodeConverterV70New {
+
+  final val PLANE_FINGER = "1"
+  final val SCROLL_FINGER = "0"
   /**
     * 采集信息原因代码转换
     */

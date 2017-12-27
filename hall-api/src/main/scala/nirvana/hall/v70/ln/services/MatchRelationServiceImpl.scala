@@ -98,8 +98,7 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * 获取正查或倒查比中关系
     *
     * @param oraSid 任务号
-    * @param isLatent
     * @return
     */
-  override def getLtHitResultPackageByOraSid(oraSid: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
+  override def getLtHitResultPackageByOraSid(oraSid: String): Seq[LtHitResultPackage] = ???
 }

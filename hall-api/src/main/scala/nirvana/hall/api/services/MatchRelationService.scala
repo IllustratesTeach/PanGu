@@ -36,10 +36,9 @@ trait MatchRelationService {
   /**
     * 获取正查或倒查比中关系
     * @param oraSid 任务号
-    * @param isLatent
     * @return
     */
-  def getLtHitResultPackageByOraSid(oraSid: String, isLatent: Boolean): Seq[LtHitResultPackage]
+  def getLtHitResultPackageByOraSid(oraSid: String): Seq[LtHitResultPackage]
 
   /**
     * 获取串查比中关系
