@@ -41,6 +41,7 @@ object HallApiApp
 //      Class.forName("nirvana.hall.v62.proxy.LocalV62ProxyServiceModule"),
       //gz70
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//      Class.forName("nirvana.hall.v70.gz.LocalV70Module"),
 //      Class.forName("nirvana.hall.v70.gz.LocalV70ServiceModule"),
 //      Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
 //      Class.forName("nirvana.hall.api.LocalProtobufModule"),

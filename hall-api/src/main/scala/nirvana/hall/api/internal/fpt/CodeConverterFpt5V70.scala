@@ -1925,7 +1925,7 @@ object CodeConverterV70New {
     var converFgp:String = ""
     if (!strIsEmpty(fgp)){
       val fgpTemp = (nvlString(fgpCase) + nvlString(fgp)).toInt
-      converFgp = String.format("%02d", fgpTemp)
+      converFgp = "%02d".format(fgpTemp)
     }
     converFgp
   }

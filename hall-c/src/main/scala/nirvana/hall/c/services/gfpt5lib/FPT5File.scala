@@ -1240,8 +1240,6 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LtHitResultPackage")
     class LtHitResultPackage{
-        @XmlElement(name = "rwbh")
-        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "xczw_asjbh")
@@ -1294,10 +1292,6 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
-        @XmlElement(name = "latentPackage")
-        var latentPackage:Array[LatentPackage] = _
-        @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 

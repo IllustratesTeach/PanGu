@@ -7,7 +7,7 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{TPCardService, _}
+import nirvana.hall.api.services.{MatchRelationService, TPCardService, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LatentPackage, _}
 import nirvana.hall.c.services.gloclib.glocdef
@@ -32,6 +32,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       lPCardService: LPCardService,
                       lPPalmService: LPPalmService,
                       queryService: QueryServiceImpl,
+                      matchRelationService: MatchRelationService,
                       extractor: FeatureExtractor,
                       implicit val dataSource:DataSource) extends FPT5Service{
   JniLoaderUtil.loadExtractorJNI()

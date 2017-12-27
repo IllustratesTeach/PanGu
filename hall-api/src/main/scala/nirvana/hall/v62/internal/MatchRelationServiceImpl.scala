@@ -465,4 +465,13 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
       case other => "9"
     }
   }
+
+  /**
+    * 获取正查或倒查比中关系
+    *
+    * @param oraSid 任务号
+    * @param isLatent
+    * @return
+    */
+  override def getLtHitResultPackageByOraSid(oraSid: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
 }
