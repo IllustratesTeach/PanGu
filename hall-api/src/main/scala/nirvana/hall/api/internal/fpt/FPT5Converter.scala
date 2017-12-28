@@ -468,7 +468,7 @@ object FPT5Converter {
     if (StringUtils.isNotEmpty(lpcard.getStrPhysicalId) && StringUtils.isNotBlank(lpcard.getStrPhysicalId)) {
       latentImageMsg.latentPhysicalId = lpcard.getStrPhysicalId //现场物证编号
     } else {
-      latentImageMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
+      latentImageMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_FINGER) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
     }
     latentImageMsg.latentFingerLeftPosition = lpcard.getText.getStrRemainPlace //现场指纹_现场指掌纹遗留部位
     latentImageMsg.latentFingerCorpseJudgeIdentify = if (lpcard.getText.getBDeadBody) "1" else "0" //现场指纹_尸体指掌纹_判断标识
@@ -489,7 +489,7 @@ object FPT5Converter {
       if (StringUtils.isNotEmpty(lpcard.getStrPhysicalId) && StringUtils.isNotBlank(lpcard.getStrPhysicalId)) {
         latentFeatureMsg.latentPhysicalId = lpcard.getStrPhysicalId //现场物证编号
       } else {
-//        latentFeatureMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
+        latentFeatureMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_FINGER) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
       }
       latentFeatureMsg.latentFeatureGroupIdentifier = ""
       latentFeatureMsg.fingerAnalysisPostionBrief = ""
@@ -557,7 +557,7 @@ object FPT5Converter {
     if(StringUtils.isNotEmpty(palm.getStrPhysicalId) && StringUtils.isNotBlank(palm.getStrPhysicalId)){
       latentPalmImageMsg.latentPalmPhysicalId = palm.getStrPhysicalId //现场物证编号
     }else{
-      latentPalmImageMsg.latentPalmPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
+      latentPalmImageMsg.latentPalmPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_PALM) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
     }
     latentPalmImageMsg.latentPalmLeftPostion = palm.getText.getStrRemainPlace  //现场掌纹_现场指掌纹遗留部位
     latentPalmImageMsg.latentPalmCorpseJudgeIdentify = if(palm.getText.getBDeadBody) "1" else "0"  //现场掌纹_尸体指掌纹_判断标识
@@ -575,7 +575,7 @@ object FPT5Converter {
       if(StringUtils.isNotEmpty(palm.getStrPhysicalId) && StringUtils.isNotBlank(palm.getStrPhysicalId)){
         latentPalmFeatureMsg.latentPalmPhysicalId = palm.getStrPhysicalId //现场物证编号
       }else{
-        latentPalmFeatureMsg.latentPalmPhysicalId = fpt5util.gerenateLatentPhysicalIdTake("") //TODO:添加一个现场物证编号的三位顺序号的序列生成器
+        latentPalmFeatureMsg.latentPalmPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_PALM) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
       }
       latentPalmFeatureMsg.latentPalmFeatureGroupIdentifier = ""
       latentPalmFeatureMsg.latentPalmFeatureDscriptInfo = "" //现场掌纹_特征组合描述信息

@@ -130,6 +130,13 @@ object fpt5util {
   //常用证件类型默认值
   val DEFAULT_CERTIFICATE_TYPE = "111" //身份证
 
+  //物证分类与代码
+  val PHYSICAL_TYPE_CODE_FINGER = "1101" //指纹
+  val PHYSICAL_TYPE_CODE_KNUCKLEPRINT = "1102" //指节纹
+  val PHYSICAL_TYPE_CODE_PALM = "1103" //掌纹
+  val PHYSICAL_TYPE_CODE_GLOVE = "1104" //手套印
+  val PHYSICAL_TYPE_CODE_OTHER = "1199" //其他手印痕迹
+
   /**
     * 中心，三角转换
     * 1-3位为x坐标，4-6位为y坐标，7-8位为坐标范围，
@@ -233,10 +240,9 @@ object fpt5util {
   /**
     * 生成现场物证编号
     * 规则是‘F+现勘号后22位+4位物证分类代码+3位顺序号',历史数据如无现勘编号，前23位用'F0000000000000000000000'占位
-    * 三位顺序号在方法外生成，因为需要访问数据库
-    * @param surveyId
+    * 三位顺序号在方法外生成
     * @return
     */
-  def gerenateLatentPhysicalIdTake(physicalTypeCode:String,surveyId:String = ""):String
+  def gerenateLatentPhysicalIdTake(physicalTypeCode:String):String
         ="F0000000000000000000000" + physicalTypeCode + "%03d".format(new scala.util.Random().nextInt(999))
 }
