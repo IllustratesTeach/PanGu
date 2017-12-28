@@ -178,23 +178,27 @@ object FPT5MntConverter {
     GfAlg_MntDispMntInitial(mntDisp)
     var scoreDeltaStruts:AFISCOREDELTASTRUCT = null
     var scoreDeltaStrutsArray = new ArrayBuffer[AFISCOREDELTASTRUCT]
-    if(latentPalmFeatureMsg.latentPalmDeltaSet != null){
-      latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta.foreach{
-        d =>
-          scoreDeltaStruts = new AFISCOREDELTASTRUCT
-          scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
-          scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
-          scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
-          d.latentPalmDeltaDirection.foreach{
-            t =>
-              scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
-              scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
-          }
-          scoreDeltaStruts.bEdited = 1
-          scoreDeltaStruts.bIsExist = 1
-          scoreDeltaStrutsArray += scoreDeltaStruts
-      }
+    if(latentPalmFeatureMsg.latentPalmDeltaSet != null) {
+      if (null != latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta){
+        latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta.foreach {
+          d =>
+            scoreDeltaStruts = new AFISCOREDELTASTRUCT
+            scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
+            scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
+            scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
+            if (null != d.latentPalmDeltaDirection){
+              d.latentPalmDeltaDirection.foreach {
+                t =>
+                  scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
+                  scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
+              }
+        }
+            scoreDeltaStruts.bEdited = 1
+            scoreDeltaStruts.bIsExist = 1
+            scoreDeltaStrutsArray += scoreDeltaStruts
+        }
     }
+  }
     mntDisp.stPm.nPatternDeltaCnt = scoreDeltaStrutsArray.size.toByte
     mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
 
