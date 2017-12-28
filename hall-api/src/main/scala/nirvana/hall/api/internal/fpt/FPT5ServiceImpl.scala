@@ -429,7 +429,9 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
 
-  override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = ???
+  override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = {
+    matchRelationService.getLtHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addLTHitResultPackage(ltHitResultPackage: LtHitResultPackage): Unit = ???
 
@@ -437,7 +439,9 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def addTtHitResultPackage(ttHitResultPackage: TtHitResultPackage): Unit = ???
 
-  override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = ???
+  override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = {
+    matchRelationService.getLlHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addLlHitResultPackage(llHitResultPackage: LlHitResultPackage): Unit = ???
 

@@ -1240,6 +1240,8 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LtHitResultPackage")
     class LtHitResultPackage{
+        @XmlElement(name = "rwbh")
+        var taskId:String = _
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
         @XmlElement(name = "xczw_asjbh")
@@ -1386,8 +1388,8 @@ class FPT5File {
         var resultCaseId:String = _
         @XmlElement(name = "bzjg_xckybh")
         var resultLatentSurveyId:String = _
-        @XmlElement(name = "bzjg_ysxt_xczzwbh")
-        var resultOriginalSystemLatentPersonId:String = _
+        @XmlElement(name = "bzjg_ysxt_xczzhwbh")
+        var resultOriginalSystemLatentFingerId:String = _
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
         @XmlElement(name = "bzjg_xczzhwkbh")
@@ -1418,10 +1420,6 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
-        @XmlElement(name = "latentPackage")
-        var latentPackageSource:Array[LatentPackage] = _
-        @XmlElement(name = "latentPackage")
-        var latentPackageDesc:Array[LatentPackage] = _
     }
 
 

@@ -2,19 +2,14 @@ package nirvana.hall.v70.gz.services.versionfpt5
 
 import java.text.SimpleDateFormat
 
-import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.internal.fpt.CodeConverterV70New
 import nirvana.hall.api.services.MatchRelationService
-import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
+import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage, fpt5util}
-import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
-import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
-import nirvana.hall.protocol.fpt.MatchRelationProto._
-import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
+import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
+import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
 import nirvana.hall.v70.gz.jpa._
-import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.gz.jpa.GafisCheckinInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -101,13 +96,14 @@ class MatchRelationServiceImpl extends MatchRelationService{
     val gafisPerson = GafisPerson.where(GafisPerson.personid === gafisCheckinInfo.tcode).headOption.get
 
     val ltHitResultPackage = new LtHitResultPackage
+    ltHitResultPackage.taskId = gafisNormalqueryQueryque.oraSid.toString
     ltHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     ltHitResultPackage.latentFingerCaseId = gafisCase.caseSystemId
     ltHitResultPackage.latentFingerOriginalSystemCaseId = gafisCase.caseId
     ltHitResultPackage.latentFingerLatentSurveyId = gafisCase.sceneSurveyId
     ltHitResultPackage.latentFingerOriginalSystemFingerId = gafisCheckinInfo.code
     ltHitResultPackage.latentFingerLatentPhysicalId = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.code).headOption.get.physicalEvidenceNo
-    ltHitResultPackage.latentFingerCardId = gafisCase.caseId
+    ltHitResultPackage.latentFingerCardId = gafisCaseFinger.fingerId
     ltHitResultPackage.fingerPrintOriginalSystemPersonId  = gafisPerson.personid
     ltHitResultPackage.fingerPrintJingZongPersonId = gafisPerson.jingZongPersonId
     ltHitResultPackage.fingerPrintPersonId = gafisPerson.casePersonid
@@ -154,6 +150,61 @@ class MatchRelationServiceImpl extends MatchRelationService{
     */
   override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
 
+
+  /**
+    * 获取串查比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage] = {
+    val gafisNormalqueryQueryque = GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.oraSid === oraSid).headOption.get
+    val gafisCheckinInfo = GafisCheckinInfo.where(GafisCheckinInfo.queryUUID === gafisNormalqueryQueryque.pkId).headOption.get
+
+    val gafisCaseFingerSource = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.code).headOption.get
+    val gafisCaseFingerDest = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.tcode).headOption.get
+    val gafisCaseSource = GafisCase.where(GafisCase.caseId === gafisCaseFingerSource.caseId).headOption.get
+    val gafisCaseDest = GafisCase.where(GafisCase.caseId === gafisCaseFingerDest.caseId).headOption.get
+
+
+
+    val llHitResultPackage = new LlHitResultPackage
+    llHitResultPackage.taskId = oraSid
+    llHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+    llHitResultPackage.originalSystemCaseId = gafisCaseFingerSource.caseId
+    llHitResultPackage.caseId = gafisCaseSource.caseSystemId
+    llHitResultPackage.latentSurveyId = gafisCaseSource.sceneSurveyId
+    llHitResultPackage.originalSystemLatentFingerId = gafisCaseFingerSource.fingerId
+    llHitResultPackage.latentPhysicalId = gafisCaseFingerSource.physicalEvidenceNo
+    llHitResultPackage.cardId = gafisCaseSource.caseId
+
+    llHitResultPackage.resultOriginalSystemCaseId = gafisCaseFingerDest.caseId
+    llHitResultPackage.resultCaseId = gafisCaseDest.caseSystemId
+    llHitResultPackage.latentSurveyId = gafisCaseDest.sceneSurveyId
+    llHitResultPackage.resultOriginalSystemLatentFingerId = gafisCaseFingerDest.fingerId
+    llHitResultPackage.resultLatentPhysicalId = gafisCaseFingerDest.physicalEvidenceNo
+    llHitResultPackage.resultCardId = gafisCaseDest.caseId
+
+    llHitResultPackage.hitUnitCode = gafisCheckinInfo.registerOrg
+    llHitResultPackage.hitUnitName = SysDepart.find_by_code(gafisCheckinInfo.registerOrg).headOption.get.name
+    llHitResultPackage.hitPersonName = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.trueName
+    llHitResultPackage.hitPersonIdCard = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.idcard
+    llHitResultPackage.hitPersonTel = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.phone
+    llHitResultPackage.hitDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(gafisCheckinInfo.registerTime)
+
+    llHitResultPackage.checkUnitCode = gafisCheckinInfo.reviewOrg
+    llHitResultPackage.checkUnitName = SysDepart.find_by_code(gafisCheckinInfo.reviewOrg).headOption.get.name
+    llHitResultPackage.checkPersonName = SysUser.find_by_pkId(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewUser).headOption.get.trueName
+    llHitResultPackage.checkPersonIdCard = SysUser.find_by_pkId(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewUser).headOption.get.idcard
+    llHitResultPackage.checkPersonTel = SysUser.find_by_pkId(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewUser).headOption.get.phone
+    llHitResultPackage.checkDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(GafisCheckinReview.where(GafisCheckinReview.checkInId === gafisCheckinInfo.pkId).headOption.get.reviewTime)
+    llHitResultPackage.memo = ""
+
+    val llHitResultPackageSeq = new ArrayBuffer[LlHitResultPackage]
+    llHitResultPackageSeq += llHitResultPackage
+    llHitResultPackageSeq
+  }
+
   /**
     * 获取正查或倒查比中关系
     *
@@ -169,7 +220,7 @@ class MatchRelationServiceImpl extends MatchRelationService{
     * @param cardId
     * @return
     */
-  override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
+override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
 
   /**
     * 获取串查比中关系

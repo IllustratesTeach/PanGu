@@ -181,6 +181,14 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
   override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
 
   /**
+    * 获取串查比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage] = ???
+
+  /**
     * 获取正查或倒查比中关系
     *
     * @param cardId   现场指纹编号
@@ -195,7 +203,7 @@ class MatchRelationServiceImpl(fptService: FPTService) extends MatchRelationServ
     * @param cardId
     * @return
     */
-  override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
+override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
 
   /**
     * 获取串查比中关系

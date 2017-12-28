@@ -47,6 +47,8 @@ trait MatchRelationService {
     */
   def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage]
 
+  def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage]
+
   /**
     * 获取比对关系
     *
