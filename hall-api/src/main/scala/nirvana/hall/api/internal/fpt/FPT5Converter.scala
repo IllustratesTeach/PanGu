@@ -290,6 +290,7 @@ object FPT5Converter {
     textBuilder.setStrNation(fingerprintPackage.descriptiveMsg.nationality)
     textBuilder.setStrRace(fingerprintPackage.descriptiveMsg.nation)
     textBuilder.setStrCertifType(fingerprintPackage.descriptiveMsg.credentialsCode)
+    tpCard.setCaptureInfoReasonCode(fingerprintPackage.descriptiveMsg.collectingReasonSet.captureInfoReasonCode.mkString(","))
     //处理常用证件类型
     if(fingerprintPackage.descriptiveMsg.credentialsCode != fpt5util.DEFAULT_CERTIFICATE_TYPE){
       textBuilder.setStrCertifID(fingerprintPackage.descriptiveMsg.credentialsNo)
