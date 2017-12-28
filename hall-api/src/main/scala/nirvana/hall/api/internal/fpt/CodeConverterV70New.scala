@@ -1929,6 +1929,108 @@ object CodeConverterV70New {
     if (!strIsEmpty(fgp)){
       val fgpTemp = (nvlString(fgpCase) + nvlString(fgp)).toInt
       converFgp = "%02d".format(fgpTemp)
+      converFgp match {
+        case "01" =>
+          converFgp = "01"
+          //三面捺印右手拇指
+
+        case "02" =>
+          converFgp = "02"
+          //三面捺印右手食指
+
+        case "03" =>
+          converFgp = "03"
+          //三面捺印右手中指
+
+        case "04" =>
+          converFgp = "04"
+          //三面捺印右手环指
+
+        case "05" =>
+          converFgp = "05"
+          //三面捺印右手小指
+
+        case "06" =>
+          converFgp = "06"
+          //三面捺印左手拇指
+
+        case "07" =>
+          converFgp = "07"
+          //三面捺印左手食指
+
+        case "08" =>
+          converFgp = "08"
+          //三面捺印左手中指
+
+        case "09" =>
+          converFgp = "09"
+          //三面捺印左手环指
+
+        case "10" =>
+          converFgp = "10"
+          //三面捺印左手小指
+
+        case "11" =>
+          converFgp = "11"
+          //平面捺印右手拇指
+
+        case "12" =>
+          converFgp = "12"
+          //平面捺印右手食指
+
+        case "13" =>
+          converFgp = "13"
+          //平面捺印右手中指
+
+        case "14" =>
+          converFgp = "14"
+          //平面捺印右手环指
+
+        case "15" =>
+          converFgp = "15"
+          //平面捺印右手小指
+
+        case "16" =>
+          converFgp = "16"
+          //平面捺印左手拇指
+
+        case "17" =>
+          converFgp = "17"
+          //平面捺印左手食指
+
+        case "18" =>
+          converFgp = "18"
+          //平面捺印左手中指
+
+        case "19" =>
+          converFgp = "19"
+          //平面捺印左手环指
+
+        case "110" =>
+          converFgp = "20"
+          //平面捺印左手小指
+
+        case "21" =>
+          converFgp = "21"
+          //平面右手四连指
+
+        case "22" =>
+          converFgp = "22"
+          //平面左手四连指
+
+        case "23" =>
+          converFgp = "23"
+          //平面左右手拇指
+
+        case "99" =>
+          converFgp = "99"
+          //不确定指位
+
+        case _ =>
+          converFgp = "99"
+          //若匹配不到，返回不确定指位
+
+      }
     }
     converFgp
   }
@@ -1937,7 +2039,7 @@ object CodeConverterV70New {
     * 指掌纹特征提取方式代码转换
     */
   def converExtractMethod(code: String): String = {
-    var extractMethod:String = ""
+    var extractMethod = ""
     if (!strIsEmpty(code)){
       code match {
         case "A" =>
