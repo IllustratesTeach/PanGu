@@ -1353,10 +1353,6 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
-        @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageSource:Array[FingerprintPackage] = _
-        @XmlElement(name = "fingerprintPackage")
-        var fingerprintPackageDesc:Array[FingerprintPackage] = _
     }
 
 
