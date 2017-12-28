@@ -429,16 +429,33 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
 
+  /**
+    * 获得正查或倒查比中关系package
+    * @param oraSid
+    * @return
+    */
   override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = {
     matchRelationService.getLtHitResultPackageByOraSid(oraSid).head
   }
 
   override def addLTHitResultPackage(ltHitResultPackage: LtHitResultPackage): Unit = ???
 
-  override def getTtHitResultPackage(oraSid: String): TtHitResultPackage = ???
+  /**
+    * 获得查重比中关系package
+    * @param oraSid
+    * @return
+    */
+  override def getTtHitResultPackage(oraSid: String): TtHitResultPackage = {
+    matchRelationService.getTtHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addTtHitResultPackage(ttHitResultPackage: TtHitResultPackage): Unit = ???
 
+  /**
+    * 获得串查比中关系package
+    * @param oraSid
+    * @return
+    */
   override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = {
     matchRelationService.getLlHitResultPackageByOraSid(oraSid).head
   }

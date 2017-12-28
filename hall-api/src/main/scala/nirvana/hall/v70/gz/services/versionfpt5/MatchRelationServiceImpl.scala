@@ -70,7 +70,61 @@ class MatchRelationServiceImpl extends MatchRelationService{
     * @param cardId
     * @return
     */
-  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = ???
+  override def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage] = {
+    val ttHitResultPackageArray = new ArrayBuffer[TtHitResultPackage]
+    GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.keyid === cardId).foreach{
+      t =>
+        ttHitResultPackageArray += getTtHitResultPackageByOraSid(t.oraSid.toString).head
+    }
+    ttHitResultPackageArray
+  }
+
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage] = {
+    val gafisNormalQueryQueryque = GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.oraSid === oraSid).headOption.get
+    val gafisCheckInInfo = GafisCheckinInfo.where(GafisCheckinInfo.queryUUID === gafisNormalQueryQueryque.pkId).headOption.get
+    val gafisPersonSource = GafisPerson.where(GafisPerson.personid === gafisCheckInInfo.code).headOption.get
+    val gafisPersonDest = GafisPerson.where(GafisPerson.personid === gafisCheckInInfo.tcode).headOption.get
+
+    val ttHitResultPackage = new TtHitResultPackage
+    ttHitResultPackage.taskId = oraSid
+    ttHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+    ttHitResultPackage.ttHitTypeCode = fpt5util.TT_MATCHED_NORMAL
+    ttHitResultPackage.originalPersonId = gafisPersonSource.personid
+    ttHitResultPackage.jingZongPersonId = gafisPersonSource.jingZongPersonId
+    ttHitResultPackage.personId = gafisPersonSource.casePersonid
+    ttHitResultPackage.cardId = gafisPersonSource.personid
+    ttHitResultPackage.whetherFingerJudgmentMark = "1" //是否指纹 1--是 2--否
+    ttHitResultPackage.resultOriginalSystemPersonId = gafisPersonDest.personid
+    ttHitResultPackage.resultjingZongPersonId = gafisPersonDest.jingZongPersonId
+    ttHitResultPackage.resultPersonId = gafisPersonDest.casePersonid
+    ttHitResultPackage.resultCardId = gafisPersonDest.personid
+
+    ttHitResultPackage.hitUnitCode = gafisCheckInInfo.registerOrg
+    ttHitResultPackage.hitUnitName = SysDepart.find_by_code(gafisCheckInInfo.registerOrg).headOption.get.name
+    ttHitResultPackage.hitPersonName = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.trueName
+    ttHitResultPackage.hitPersonIdCard = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.idcard
+    ttHitResultPackage.hitPersonTel = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.phone
+    ttHitResultPackage.hitDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(gafisCheckInInfo.registerTime)
+
+    ttHitResultPackage.checkUnitCode = gafisCheckInInfo.registerOrg
+    ttHitResultPackage.checkUnitName = SysDepart.find_by_code(gafisCheckInInfo.registerOrg).headOption.get.name
+    ttHitResultPackage.checkPersonName = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.trueName
+    ttHitResultPackage.checkPersonIdCard = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.idcard
+    ttHitResultPackage.checkPersonTel = SysUser.find_by_pkId(gafisCheckInInfo.registerUser).headOption.get.phone
+    ttHitResultPackage.checkDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(gafisCheckInInfo.registerTime)
+    ttHitResultPackage.memo = ""
+
+    val ttHitResultPackageSeq = new ArrayBuffer[TtHitResultPackage]
+    ttHitResultPackageSeq += ttHitResultPackage
+    ttHitResultPackageSeq
+  }
 
   /**
     * 获取正查或倒查比中关系
@@ -78,7 +132,15 @@ class MatchRelationServiceImpl extends MatchRelationService{
     * @param isLatent
     * @return
     */
-  override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = ???
+  override def getLtHitResultPackage(cardId: String, isLatent: Boolean): Seq[LtHitResultPackage] = {
+
+    val ltHitResultPackageSeq = new ArrayBuffer[LtHitResultPackage]
+    GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.keyid === cardId).foreach{
+      t =>
+        ltHitResultPackageSeq += getLtHitResultPackageByOraSid(t.oraSid.toString).head
+    }
+    ltHitResultPackageSeq
+  }
 
 
   /**
@@ -148,7 +210,15 @@ class MatchRelationServiceImpl extends MatchRelationService{
     * @param cardId
     * @return
     */
-  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = ???
+  override def getLlHitResultPackage(cardId: String): Seq[LlHitResultPackage] = {
+
+    val llHitResultPackageSeq = new ArrayBuffer[LlHitResultPackage]
+    GafisNormalqueryQueryque.where(GafisNormalqueryQueryque.keyid === cardId).foreach{
+      t =>
+        llHitResultPackageSeq += getLlHitResultPackageByOraSid(t.oraSid.toString).head
+    }
+    llHitResultPackageSeq
+  }
 
 
   /**

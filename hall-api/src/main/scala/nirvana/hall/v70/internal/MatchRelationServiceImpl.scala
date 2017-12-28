@@ -212,4 +212,12 @@ override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
     * @return
     */
   override def getLogic06Rec(cardId: String): Seq[Logic06Rec] = ???
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage] = ???
 }

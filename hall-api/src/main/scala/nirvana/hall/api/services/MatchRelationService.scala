@@ -25,6 +25,14 @@ trait MatchRelationService {
     */
   def getTtHitResultPackage(cardId: String): Seq[TtHitResultPackage]
 
+
+  /**
+    * 获取重卡比中关系
+    * @param oraSid 任务号
+    * @return
+    */
+  def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage]
+
   /**
     * 获取正查或倒查比中关系
     * @param cardId 现场指纹编号

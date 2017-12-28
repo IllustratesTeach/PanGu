@@ -475,4 +475,12 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
   override def getLtHitResultPackageByOraSid(oraSid: String): Seq[LtHitResultPackage] = ???
 
   override def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage] = ???
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage] = ???
 }
