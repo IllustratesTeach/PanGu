@@ -1,12 +1,14 @@
 package nirvana.hall.v70.gz.services.versionfpt5
 
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.{Date, UUID}
 import javax.persistence.EntityManager
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
+import nirvana.hall.c.services.gfpt5lib.fpt5util
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.v70.gz.jpa._
 import nirvana.hall.v70.gz.sync._
@@ -50,9 +52,22 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       person.deletag = Gafis70Constants.DELETAG_USE
       person.fingershowStatus = 1.toShort
       person.isfingerrepeat = "0"
-      person.dataSources = tpCard.getStrDataSource
+      person.dataSources = "3"
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save
+
+      //保存人员证件信息
+      if(tpCard.getText.getStrCertifType.nonEmpty && tpCard.getText.getStrCertifType != fpt5util.DEFAULT_CERTIFICATE_TYPE){
+        val personCertificate = new GafisGatherCertificate()
+        personCertificate.personId = tpCard.getStrCardID
+        personCertificate.certificateType = tpCard.getText.getStrCertifType
+        personCertificate.certificateId = tpCard.getText.getStrCertifID
+        personCertificate.inputpsn = user.get.pkId
+        personCertificate.inputtime = new Date()
+        personCertificate.deletag = Gafis70Constants.DELETAG_USE
+        personCertificate.pkId = UUID.randomUUID().toString.replace("-","")
+        personCertificate.save()
+      }
 
       //保存指纹--包括平指、滚指、指节纹
       val fingerList = ProtobufConverterForFPT5.convertTPCard2GafisGatherFinger(tpCard)
@@ -122,7 +137,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     */
   override def getTPCard(personId: String, dbid: Option[String]): TPCard = {
     val person = GafisPerson.find(personId)
-    //val personCertificateList = GafisGatherCertificate.find(personId)
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
     val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
@@ -136,6 +150,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     tpCard.setStrMisPersonID(person.personid)
     tpCard.setStrJingZongPersonId(person.jingZongPersonId)
     tpCard.setStrCasePersonID(person.casePersonid)
+    tpCard.setCaptureInfoReasonCode(person.captureInfoReasonCode)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
@@ -161,8 +176,9 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
     magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
     magicSet(person.gatherusername, textBuilder.setStrPrinter)
-    textBuilder.setStrPrintDate(person.gatherDate)
+    textBuilder.setStrPrintDate(new SimpleDateFormat("yyyyMMddHHmmss").format(person.gatherDate))
     magicSet(person.remark, textBuilder.setStrComment)
+    magicSet(person.idcardno,textBuilder.setStrCertifID)
     magicSet(person.chopPersonIdCard,textBuilder.setStrPrinterIdCardNo)
     magicSet(person.chopPersonTel,textBuilder.setStrPrinterPhone)
     //协查信息

@@ -46,9 +46,9 @@ object FPT5Converter {
     fingerprintPackage.descriptiveMsg.alias = tpCard.getText.getStrAliasName    //别名/绰号
     fingerprintPackage.descriptiveMsg.sex = tpCard.getText.getNSex.toString  //性别代码
     fingerprintPackage.descriptiveMsg.birthday = tpCard.getText.getStrBirthDate //出生日期
-    fingerprintPackage.descriptiveMsg.nationality =  tpCard.getText.getStrRace //国籍代码
-    fingerprintPackage.descriptiveMsg.nation = tpCard.getText.getStrNation //民族代码
-    fingerprintPackage.descriptiveMsg.credentialsCode = tpCard.getText.getStrCertifType  //常用证件代码
+    fingerprintPackage.descriptiveMsg.nationality =  tpCard.getText.getStrNation  //国籍代码
+    fingerprintPackage.descriptiveMsg.nation =  tpCard.getText.getStrRace //民族代码
+    fingerprintPackage.descriptiveMsg.credentialsCode = fpt5util.DEFAULT_CERTIFICATE_TYPE //常用证件代码
     fingerprintPackage.descriptiveMsg.credentialsNo = tpCard.getText.getStrCertifID //证件号码
     fingerprintPackage.descriptiveMsg.houkouAdministrativeDivisionCode = tpCard.getText.getStrHuKouPlaceCode //户籍地址行政区划代码
     fingerprintPackage.descriptiveMsg.houkouAddress = tpCard.getText.getStrHuKouPlaceTail //户籍地址地址名称
@@ -278,7 +278,7 @@ object FPT5Converter {
     val textBuilder = tpCard.getTextBuilder
     tpCard.setStrCardID(fingerprintPackage.descriptiveMsg.originalSystemCasePersonId)
     tpCard.setStrMisPersonID(fingerprintPackage.descriptiveMsg.originalSystemCasePersonId)
-    tpCard.setStrJingZongPersonId(fingerprintPackage.descriptiveMsg.jingZongPersonId)
+    if(null != fingerprintPackage.descriptiveMsg.jingZongPersonId) tpCard.setStrJingZongPersonId(fingerprintPackage.descriptiveMsg.jingZongPersonId)
     tpCard.setStrCasePersonID(fingerprintPackage.descriptiveMsg.casePersonid)
     tpCard.setStrDataSource(Gafis70Constants.DATA_SOURCE_FPT)
     textBuilder.setStrName(fingerprintPackage.descriptiveMsg.name)
@@ -287,10 +287,15 @@ object FPT5Converter {
       textBuilder.setStrAliasName(fingerprintPackage.descriptiveMsg.alias)
     }
     textBuilder.setNSex(fingerprintPackage.descriptiveMsg.sex.toInt)
-    textBuilder.setStrNation(fingerprintPackage.descriptiveMsg.nation)
-    textBuilder.setStrRace(fingerprintPackage.descriptiveMsg.nationality)
+    textBuilder.setStrNation(fingerprintPackage.descriptiveMsg.nationality)
+    textBuilder.setStrRace(fingerprintPackage.descriptiveMsg.nation)
     textBuilder.setStrCertifType(fingerprintPackage.descriptiveMsg.credentialsCode)
-    textBuilder.setStrCertifID(fingerprintPackage.descriptiveMsg.credentialsNo)
+    //处理常用证件类型
+    if(fingerprintPackage.descriptiveMsg.credentialsCode != fpt5util.DEFAULT_CERTIFICATE_TYPE){
+      textBuilder.setStrCertifID(fingerprintPackage.descriptiveMsg.credentialsNo)
+    }else{
+      textBuilder.setStrIdentityNum(fingerprintPackage.descriptiveMsg.credentialsNo)
+    }
     textBuilder.setStrBirthDate(fingerprintPackage.descriptiveMsg.birthday)
     textBuilder.setStrIdentityNum(fingerprintPackage.descriptiveMsg.credentialsNo)
     textBuilder.setStrHuKouPlaceCode(fingerprintPackage.descriptiveMsg.houkouAdministrativeDivisionCode)

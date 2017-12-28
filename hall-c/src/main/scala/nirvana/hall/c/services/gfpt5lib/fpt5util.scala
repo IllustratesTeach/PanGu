@@ -127,7 +127,8 @@ object fpt5util {
   val TT_MATCHED_ECTOPIA = "D" //左右手弄反了，不同指位的指纹确认同一
   val TT_MATCHED_MIRROR = "E" //镜像比中
 
-
+  //常用证件类型默认值
+  val DEFAULT_CERTIFICATE_TYPE = "111" //身份证
 
   /**
     * 中心，三角转换
