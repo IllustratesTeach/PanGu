@@ -238,5 +238,5 @@ object fpt5util {
     * @return
     */
   def gerenateLatentPhysicalIdTake(physicalTypeCode:String,surveyId:String = ""):String
-        ="F0000000000000000000000" + physicalTypeCode
+        ="F0000000000000000000000" + physicalTypeCode + "%03d".format(new scala.util.Random().nextInt(999))
 }
