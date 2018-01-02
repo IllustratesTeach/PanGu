@@ -31,6 +31,7 @@ class V62Facade(defaultConfig:HallV62Config)
   with gnetfunc
   with netpmadm
   with netmisc
+  with ganetuser
   with AncientClientSupport
   with reqansop
   with LoggerSupport{

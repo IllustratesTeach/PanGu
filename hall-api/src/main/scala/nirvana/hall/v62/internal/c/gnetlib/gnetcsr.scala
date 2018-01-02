@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import nirvana.hall.c.services.ganumia.gadbrec
 import nirvana.hall.c.services.ganumia.gadbrec._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gloclib.gafisusr.GAFIS_USERSTRUCT
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp._
 import nirvana.hall.c.services.gloclib.galoctp.{GAFIS_DUPCARDSTRUCT, GAFIS_TPADMININFO_EX, GPERSONINFOSTRUCT, GTPCARDINFOSTRUCT}
@@ -688,5 +689,18 @@ trait gnetcsr {
     */
   def UTIL_GNETLIB_IsNewClientVersion(pAns: GNETANSWERHEADOBJECT): Boolean ={
     "$version=002$".equals(new String(pAns.bnData).trim)
+  }
+
+
+  protected def GAFIS_NETSCR_RecvUserInfo(channel:ChannelOperator,pAns:GNETANSWERHEADOBJECT,pstUser:GAFIS_USERSTRUCT) {
+
+    var bClearMicPt = 0
+
+    NETOP_RECVDATA(channel,pstUser)
+
+    if(pstUser.stBioData.nMicCount > 0) {
+      bClearMicPt = 1
+      pstUser.stBioData.pstMic_Data.foreach(GAFIS_NETSCR_RecvMICStruct(channel, _))
+    }
   }
 }
