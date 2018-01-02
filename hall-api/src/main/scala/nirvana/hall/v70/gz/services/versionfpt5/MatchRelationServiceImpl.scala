@@ -251,7 +251,7 @@ class MatchRelationServiceImpl extends MatchRelationService{
     llHitResultPackage.resultOriginalSystemCaseId = gafisCaseFingerDest.caseId
     llHitResultPackage.resultCaseId = gafisCaseDest.caseSystemId
     llHitResultPackage.latentSurveyId = gafisCaseDest.sceneSurveyId
-    llHitResultPackage.resultOriginalSystemLatentFingerId = gafisCaseFingerDest.fingerId
+    llHitResultPackage.resultOriginalSystemLatentPersonId = gafisCaseFingerDest.fingerId
     llHitResultPackage.resultLatentPhysicalId = gafisCaseFingerDest.physicalEvidenceNo
     llHitResultPackage.resultCardId = gafisCaseDest.caseId
 
