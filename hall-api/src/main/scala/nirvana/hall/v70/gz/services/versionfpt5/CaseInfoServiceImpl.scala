@@ -36,7 +36,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     }
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_SURVEY.toString
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_FPT
     gafisCase.save()
   }
 
