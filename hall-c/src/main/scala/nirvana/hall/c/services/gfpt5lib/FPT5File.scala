@@ -1,7 +1,6 @@
 package nirvana.hall.c.services.gfpt5lib
 
 import java.text.SimpleDateFormat
-import java.util
 import java.util.Date
 import javax.xml.bind.annotation.{XmlElement, _}
 
@@ -54,7 +53,7 @@ class FPT5File {
     var ttHitResultPackage: Array[TtHitResultPackage] = _
     @XmlElement(name = "LLHitResultPackage")
     var llHitResultPackage: Array[LlHitResultPackage] = _
-    @XmlElement(name = "cancellatentPackage")
+    @XmlElement(name = "cancelLatentPackage")
     var cancelLatentPackage: Array[cancelLatentPackage] = _
     @XmlElement(name = "cancellatentPackage")
     var customdataPackage: Array[customDataPackage] = _
@@ -1294,6 +1293,10 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
+        @XmlElement(name = "latentPackage")
+        var latentPackage:Array[LatentPackage] = _
+        @XmlElement(name = "fingerprintPackage")
+        var fingerprintPackage:Array[FingerprintPackage] = _
     }
 
 
@@ -1353,6 +1356,10 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
+        @XmlElement(name = "fingerprintPackage")
+        var fingerprintPackageSource:Array[FingerprintPackage] = _
+        @XmlElement(name = "fingerprintPackage")
+        var fingerprintPackageDesc:Array[FingerprintPackage] = _
     }
 
 
@@ -1384,8 +1391,8 @@ class FPT5File {
         var resultCaseId:String = _
         @XmlElement(name = "bzjg_xckybh")
         var resultLatentSurveyId:String = _
-        @XmlElement(name = "bzjg_ysxt_xczzhwbh")
-        var resultOriginalSystemLatentFingerId:String = _
+        @XmlElement(name = "bzjg_ysxt_xczzwbh")
+        var resultOriginalSystemLatentPersonId:String = _
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
         @XmlElement(name = "bzjg_xczzhwkbh")
@@ -1416,6 +1423,10 @@ class FPT5File {
         var checkDateTime:String = _
         @XmlElement(name = "bz")
         var memo:String = _
+        @XmlElement(name = "latentPackage")
+        var latentPackageSource:Array[LatentPackage] = _
+        @XmlElement(name = "latentPackage")
+        var latentPackageDesc:Array[LatentPackage] = _
     }
 
 
@@ -1431,11 +1442,11 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "bldw_gajgjgdm")
         var handleUnitCode:String = _
