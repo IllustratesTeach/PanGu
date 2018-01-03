@@ -20,7 +20,7 @@ object DataChecker extends LoggerSupport{
    */
   def checkSyncData(hallMatcherConfig: HallMatcherConfig, syncData: SyncData, isLatent: Boolean): Boolean ={
     if(syncData.getObjectId <= 0){
-      error("syncData objectId is 0")
+      error("syncData MinutiaType:{} objectId is 0", syncData.getMinutiaType)
       return false
     }
     /*数据长度校验*/

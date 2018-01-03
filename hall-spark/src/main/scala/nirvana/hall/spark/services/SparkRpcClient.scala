@@ -114,8 +114,8 @@ object SparkRpcClient extends RpcHttpClient{
 
   private def createHttpClient: CloseableHttpClient = {
     val defaultConfig: RequestConfig = RequestConfig.custom.
-      setConnectTimeout(5 * 1000). //连接超时设置
-      setSocketTimeout(10 * 1000). //读取时间设置
+      setConnectTimeout(50 * 1000). //连接超时设置
+      setSocketTimeout(100 * 1000). //读取时间设置
       build
     val httpClient = HttpClientBuilder.create
       .setDefaultRequestConfig(defaultConfig)
@@ -130,6 +130,6 @@ object SparkRpcClient extends RpcHttpClient{
   }
 }
 class CallRpcException(message:String) extends RuntimeException(message) {
-  override def getMessage: String = "fetch fpt file error ,"
+  override def getMessage: String = "fetch fpt file error ,"+message
 }
 

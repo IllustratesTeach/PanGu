@@ -33,6 +33,9 @@ class BjsjPalmBmpProvider extends ImageProvider{
     */
   override def requestImage(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]()}
 
+
+  override def requestImageByFID(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]()}
+
   /**
     * 请求图像数据为BMP,不需要解压缩，获取数据直接提特征并入库
     *

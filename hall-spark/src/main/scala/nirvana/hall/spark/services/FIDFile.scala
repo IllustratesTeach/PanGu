@@ -17,38 +17,6 @@ object FIDFile {
   val FS:Byte= 28
   val GS:Byte= 29
 
-  trait DynamicFingerData extends AncientData {
-    @IgnoreTransfer
-    private var logicEnd: Byte = FS
-
-    // GS
-    protected def getFingerDataCountString: String
-
-    protected def getFingerDataCount: Int = {
-      val sendFingerCount = getFingerDataCountString
-      if (sendFingerCount != null && sendFingerCount.nonEmpty)
-        sendFingerCount.toInt
-      else
-        0 //如果数据为空的时候,则返回0
-      //throw new AncientDataException("sendFingerCount field is "+sendFingerCount)
-    }
-
-    override def getDataSize: Int = {
-      var count = super.getDataSize
-      if (getFingerDataCount == 0)
-        count += 1
-      count
-    }
-
-    override def fromStreamReader(dataSource: StreamReader, encoding: Charset = AncientConstants.UTF8_ENCODING): this.type = {
-      super.fromStreamReader(dataSource, encoding)
-      if (getFingerDataCount == 0) {
-        logicEnd = dataSource.readByte()
-      }
-      this
-    }
-  }
-
   def parseFromInputStream(stream:InputStream, encoding: Charset = AncientConstants.GBK_ENCODING) : FIDFile = {
     val streamReader:StreamReader = stream
     try {
@@ -67,7 +35,7 @@ object FIDFile {
     }
   }
 
-  class FIDFile extends DynamicFingerData {
+  class FIDFile extends AncientData {
     @Length(3)
     var fileFlag : String = _               //文件标识符
     @Length(4)
@@ -76,6 +44,10 @@ object FIDFile {
     var fileLength : String = _             //文件长度
     @Length(4)
     var systemType : String = _             //系统类型
+    @Length(4)
+    var scannerType : String = _            //表示采集本文件信息的活体指纹采集仪类型
+    @Length(4)
+    var mosaicType : String = _             //表示采集本文件信息的活体指纹采集图像拼接软件类型
     @Length(8)
     var gaSerial : String = _               //采集仪GA认证标志序列号
     @Length(12)
@@ -165,7 +137,7 @@ object FIDFile {
     @Length(2)
     var fingerCount : String = _            //发送指纹个数
     @Length(2)
-    var palmCount : String = _             //发送掌纹个数
+    var palmCount : String = _              //发送掌纹个数
     @Length(2)
     var portraitCount : String = _          //发送人像个数
 
@@ -174,37 +146,6 @@ object FIDFile {
 
     @LengthRef("palmCount")
     var palms : Array[PalmData] = _
-
-    override protected def getFingerDataCountString: String = palmCount
-    /*
-
-    private def tryReadLogic(dataSource:StreamReader,encoding:Charset): Unit ={
-      if (palms == null) {
-        palms = Array[PalmData](new PalmData)
-      } else {
-        val tmp = palms
-        palms = new Array[PalmData](palms.length+1)
-        System.arraycopy(tmp,0,palms,0,tmp.length)
-        palms(tmp.length) = new PalmData
-      }
-      palmCount = palms.length.toString
-      palms.last.fromStreamReader(dataSource)
-    }
-
-    override def fromStreamReader(dataSource: StreamReader, encoding: Charset): FIDFile.this.type = {
-      super.fromStreamReader(dataSource, encoding)
-      if(palmCount == null || palmCount.isEmpty){
-        try {
-          0 until 100 foreach{i=>
-            tryReadLogic(dataSource,encoding)
-          }
-        }catch{
-          case NonFatal(e)=>
-          //do nothing
-        }
-      }
-      this
-    }*/
 
     @LengthRef("portraitCount")
     var portraits : Array[PortraitData] = _
@@ -264,7 +205,7 @@ object FIDFile {
     @Length(2)
     var sendNo : String = _                 //发送序号
     @Length(2)
-    var position : String = _               //位置编号
+    var fgp : String = _               //位置编号
     @Length(8)
     var customInfoLength: String = _        //自定义信息长度
     @LengthRef("customInfoLength")

@@ -29,6 +29,7 @@ import scala.util.control.NonFatal
 class FPTFromFTPServerProvider  extends ImageProvider {
 
   def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+  override def requestImageByFID(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]()}
 
   def requestImage(parameter:NirvanaSparkConfig,fileName:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
 
