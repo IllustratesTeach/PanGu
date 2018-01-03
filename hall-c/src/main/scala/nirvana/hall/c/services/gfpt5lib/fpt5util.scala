@@ -1,5 +1,6 @@
 package nirvana.hall.c.services.gfpt5lib
 
+import monad.support.services.XmlLoader
 import nirvana.hall.c.services.gfpt4lib.fpt4util._
 import nirvana.hall.c.services.kernel.mnt_checker_def._
 
@@ -245,4 +246,6 @@ object fpt5util {
     */
   def gerenateLatentPhysicalIdTake(physicalTypeCode:String):String
         ="F0000000000000000000000" + physicalTypeCode + "%03d".format(new scala.util.Random().nextInt(999))
+
+  def parseFPT5(fptx : String) : FPT5File = XmlLoader.parseXML[FPT5File](fptx)
 }
