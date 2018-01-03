@@ -7,7 +7,7 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{TPCardService, _}
+import nirvana.hall.api.services.{MatchRelationService, TPCardService, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LatentPackage, _}
 import nirvana.hall.c.services.gloclib.glocdef
@@ -32,6 +32,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       lPCardService: LPCardService,
                       lPPalmService: LPPalmService,
                       queryService: QueryServiceImpl,
+                      matchRelationService: MatchRelationService,
                       extractor: FeatureExtractor,
                       implicit val dataSource:DataSource) extends FPT5Service{
   JniLoaderUtil.loadExtractorJNI()
@@ -428,15 +429,36 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
 
-  override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = ???
+  /**
+    * 获得正查或倒查比中关系package
+    * @param oraSid
+    * @return
+    */
+  override def getLTHitResultPackage(oraSid: String): LtHitResultPackage = {
+    matchRelationService.getLtHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addLTHitResultPackage(ltHitResultPackage: LtHitResultPackage): Unit = ???
 
-  override def getTtHitResultPackage(oraSid: String): TtHitResultPackage = ???
+  /**
+    * 获得查重比中关系package
+    * @param oraSid
+    * @return
+    */
+  override def getTtHitResultPackage(oraSid: String): TtHitResultPackage = {
+    matchRelationService.getTtHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addTtHitResultPackage(ttHitResultPackage: TtHitResultPackage): Unit = ???
 
-  override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = ???
+  /**
+    * 获得串查比中关系package
+    * @param oraSid
+    * @return
+    */
+  override def getLlHitResultPackage(oraSid: String): LlHitResultPackage = {
+    matchRelationService.getLlHitResultPackageByOraSid(oraSid).head
+  }
 
   override def addLlHitResultPackage(llHitResultPackage: LlHitResultPackage): Unit = ???
 

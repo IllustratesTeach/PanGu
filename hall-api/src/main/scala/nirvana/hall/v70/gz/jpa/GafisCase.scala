@@ -103,7 +103,7 @@ class GafisCase extends ActiveRecord {
   @Column(name = "ASSIST_REVOKE_SIGN", length = 1)
   var assistRevokeSign: java.lang.String = _
   @Column(name = "CASE_SYSTEM_ID", length = 32)
-  var caseSystemId: java.lang.String = _
+  var caseSystemId: java.lang.String = _ //现场指纹案事件编号
   @Column(name = "CASE_CLASS_CODE2", length = 8)
   var caseClassCode2: java.lang.String = _
   @Column(name = "CASE_CLASS_CODE3", length = 8)
@@ -121,7 +121,7 @@ class GafisCase extends ActiveRecord {
   @Column(name = "EXTRACTOR_PHONE", length = 18)
   var extractorPhone: java.lang.String = _
   @Column(name = "SCENE_SURVEY_ID", length = 18)
-  var sceneSurveyId: java.lang.String = _
+  var sceneSurveyId: java.lang.String = _ //现场勘验编号
 
 
 

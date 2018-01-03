@@ -10,7 +10,7 @@ import scala.io.Source
 /**
   * Created by songpeng on 2017/12/10.
   */
-class FTP5FileTest {
+class FPT5FileTest {
 
   @Test
   def test_validFingerprintPackage: Unit ={

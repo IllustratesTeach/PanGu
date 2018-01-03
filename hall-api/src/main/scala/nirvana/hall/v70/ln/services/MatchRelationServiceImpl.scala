@@ -72,6 +72,22 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
   /**
     * 获取正查或倒查比中关系
     *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getLtHitResultPackageByOraSid(oraSid: String): Seq[LtHitResultPackage] = ???
+
+  /**
+    * 获取串查比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage] = ???
+
+  /**
+    * 获取正查或倒查比中关系
+    *
     * @param cardId   现场指纹编号
     * @param isLatent 是否现场
     * @return
@@ -84,7 +100,7 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * @param cardId
     * @return
     */
-  override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
+override def getLogic05Rec(cardId: String): Seq[Logic05Rec] = ???
 
   /**
     * 获取串查比中关系
@@ -93,4 +109,12 @@ override def getMatchRelation(breakId: String): MatchRelationInfo = ???
     * @return
     */
   override def getLogic06Rec(cardId: String): Seq[Logic06Rec] = ???
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage] = ???
 }

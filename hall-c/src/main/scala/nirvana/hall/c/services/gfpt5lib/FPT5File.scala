@@ -1,7 +1,6 @@
 package nirvana.hall.c.services.gfpt5lib
 
 import java.text.SimpleDateFormat
-import java.util
 import java.util.Date
 import javax.xml.bind.annotation.{XmlElement, _}
 
@@ -54,7 +53,7 @@ class FPT5File {
     var ttHitResultPackage: Array[TtHitResultPackage] = _
     @XmlElement(name = "LLHitResultPackage")
     var llHitResultPackage: Array[LlHitResultPackage] = _
-    @XmlElement(name = "cancellatentPackage")
+    @XmlElement(name = "cancelLatentPackage")
     var cancelLatentPackage: Array[cancelLatentPackage] = _
     @XmlElement(name = "cancellatentPackage")
     var customdataPackage: Array[customDataPackage] = _
@@ -1443,11 +1442,11 @@ class FPT5File {
         var caseId:String = _
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
-        @XmlElement(name = "ysxt_xczzwbh")
+        @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
-        @XmlElement(name = "xczzwkbh")
+        @XmlElement(name = "xczzhwkbh")
         var latentCardId:String = _
         @XmlElement(name = "bldw_gajgjgdm")
         var handleUnitCode:String = _

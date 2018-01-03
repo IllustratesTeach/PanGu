@@ -491,8 +491,8 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
     person.gatherDate = DateConverter.convertString2Date(text.getStrPrintDate, "yyyyMMddHHmmss")
     person.remark = text.getStrComment
 
-    person.nativeplaceCode = text.getStrRace
-    person.nationCode = text.getStrNation
+    person.nativeplaceCode = text.getStrNation
+    person.nationCode = text.getStrRace
     person.jingZongPersonId = tpCard.getStrJingZongPersonId
     person.casePersonid = tpCard.getStrCasePersonID
     person.chopPersonIdCard =  tpCard.getStrPrinterIdCardId
@@ -971,11 +971,5 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
           throw new IllegalArgumentException("unknown queryType:"+ queryType)
       }
     }
-  }
-  def convertTPCard2GafisGatherCertificate(tpCard: TPCard,personCertificate:GafisGatherCertificate = new GafisGatherCertificate()):GafisGatherCertificate = {
-    personCertificate.personId = tpCard.getStrPersonID
-    personCertificate.certificateType = tpCard.getText.getStrCertifType
-    personCertificate.certificateId = tpCard.getText.getStrCertifID
-    personCertificate
   }
 }

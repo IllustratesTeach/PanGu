@@ -178,25 +178,50 @@ object FPT5MntConverter {
     GfAlg_MntDispMntInitial(mntDisp)
     var scoreDeltaStruts:AFISCOREDELTASTRUCT = null
     var scoreDeltaStrutsArray = new ArrayBuffer[AFISCOREDELTASTRUCT]
-    if(latentPalmFeatureMsg.latentPalmDeltaSet != null){
-      latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta.foreach{
-        d =>
-          scoreDeltaStruts = new AFISCOREDELTASTRUCT
-          scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
-          scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
-          scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
-          d.latentPalmDeltaDirection.foreach{
-            t =>
-              scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
-              scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
-          }
-          scoreDeltaStruts.bEdited = 1
-          scoreDeltaStruts.bIsExist = 1
-          scoreDeltaStrutsArray += scoreDeltaStruts
-      }
+    if(latentPalmFeatureMsg.latentPalmDeltaSet != null) {
+      if (null != latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta){
+        latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta.foreach {
+          d =>
+            scoreDeltaStruts = new AFISCOREDELTASTRUCT
+            scoreDeltaStruts.x = d.latentPalmTrianglePointFeatureXCoordinate.toShort
+            scoreDeltaStruts.y = d.latentPalmTrianglePointFeatureYCoordinate.toShort
+            scoreDeltaStruts.z = UTIL_Angle_FPT2MntDisp(d.latentPalmTrianglePointFeatureRange.toShort)
+            if (null != d.latentPalmDeltaDirection){
+              d.latentPalmDeltaDirection.foreach {
+                t =>
+                  scoreDeltaStruts.nRadius = t.latentPalmTrianglePointFeatureDirection.toByte
+                  scoreDeltaStruts.nzVarRange = t.latentPalmTrianglePointFeatureDirectionRange.toByte
+              }
+        }
+            scoreDeltaStruts.bEdited = 1
+            scoreDeltaStruts.bIsExist = 1
+            scoreDeltaStrutsArray += scoreDeltaStruts
+        }
     }
+  }
     mntDisp.stPm.nPatternDeltaCnt = scoreDeltaStrutsArray.size.toByte
     mntDisp.stPm.PatternDelta = scoreDeltaStrutsArray.toArray
+
+    //折返点处理
+    var scoreLikeStruts:AFISCOREDELTASTRUCT = null
+    var scoreLikeStrutsArray = new ArrayBuffer[AFISCOREDELTASTRUCT]
+    if(latentPalmFeatureMsg.latentPalmCoreLikePatternSet != null){
+      latentPalmFeatureMsg.latentPalmCoreLikePatternSet.latentPalmCoreLikePattern.foreach{
+        coreLike =>
+          scoreLikeStruts = new AFISCOREDELTASTRUCT
+          scoreLikeStruts.x = coreLike.latentPalmRetracingPointFeatureXCoordinate.toShort
+          scoreLikeStruts.y = coreLike.latentPalmRetracingPointFeatureYCoordinate.toShort
+          scoreLikeStruts.z = UTIL_Angle_FPT2MntDisp(coreLike.latentPalmRetracingPointFeatureDirectionRange.toShort)
+          scoreLikeStruts.nzVarRange = coreLike.latentPalmRetracingPointFeatureDirectionRange.toByte
+          scoreLikeStruts.nRadius = coreLike.latentPalmRetracingPointFeatureDirection.toByte
+          scoreLikeStruts.bEdited = 1
+          scoreLikeStruts.bIsExist = 1
+          scoreLikeStrutsArray += scoreLikeStruts
+      }
+    }
+
+    mntDisp.stPm.nPatternCoreCnt = scoreLikeStrutsArray.size.toByte
+    mntDisp.stPm.PatternCore = scoreLikeStrutsArray.toArray
 
     var AFISMNTPOINTSTRUCTList = new ArrayBuffer[AFISMNTPOINTSTRUCT]
     var pstmnt:AFISMNTPOINTSTRUCT = null
@@ -456,6 +481,21 @@ object FPT5MntConverter {
       deltaArray += delta
       latentPalmFeatureMsg.latentPalmDeltaSet.latentPalmDelta = deltaArray.toArray
     }
+
+    //---据海鑫说：折返点就是中心点，所以导出FPT时，暂时现将中心点特征信息放到折返点对象中。
+    var latentPalmCoreLikePattern:LatentPalmCoreLikePattern = null
+    var latentPalmCoreLikePatternArray = new ArrayBuffer[LatentPalmCoreLikePattern]
+    for(i <- 0 until mntDisp.stPm.nPatternCoreCnt){
+      val patternCore = mntDisp.stPm.PatternCore(i)
+      latentPalmCoreLikePattern = new LatentPalmCoreLikePattern
+      latentPalmCoreLikePattern.latentPalmRetracingPointFeatureXCoordinate = patternCore.x
+      latentPalmCoreLikePattern.latentPalmRetracingPointFeatureYCoordinate = patternCore.y
+      latentPalmCoreLikePattern.latentPalmRetracingPointFeatureCoordinateRange = UTIL_Angle_MntDisp2FPT(patternCore.z)
+      latentPalmCoreLikePattern.latentPalmRetracingPointFeatureDirection = patternCore.nRadius
+      latentPalmCoreLikePattern.latentPalmRetracingPointFeatureDirectionRange = patternCore.nzVarRange
+      latentPalmCoreLikePatternArray += latentPalmCoreLikePattern
+    }
+    latentPalmFeatureMsg.latentPalmCoreLikePatternSet.latentPalmCoreLikePattern = latentPalmCoreLikePatternArray.toArray
 
     val latentPalmMinutiaSet = new LatentPalmMinutiaSet
     var minutiaArray = new ArrayBuffer[gfpt5lib.LatentPalmMinutia]

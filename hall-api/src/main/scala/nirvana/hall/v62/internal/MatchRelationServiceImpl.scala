@@ -3,13 +3,15 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService}
+import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService, TPCardService}
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
-import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
+import nirvana.hall.c.services.gfpt4lib.fpt4code
+import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage, fpt5util}
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.GAFIS_LPGROUPSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
+import nirvana.hall.c.services.gloclib.gaqryque
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse, MatchStatus}
 import nirvana.hall.protocol.fpt.MatchRelationProto._
@@ -25,7 +27,11 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/6/21.
  */
-class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService) extends MatchRelationService with LoggerSupport{
+class MatchRelationServiceImpl(v62Config: HallV62Config
+                               , facade: V62Facade
+                               , lPCardService: LPCardService
+                               , queryService: QueryService
+                              ,tPCardService:TPCardService) extends MatchRelationService with LoggerSupport{
   /**
     * 获取比对关系
     * 先根据查询队列表，读取到第一条查询的任务状态，如果状态是已复核，根据查询类型查询比中关系
@@ -226,13 +232,62 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
           ttHit.cardId = personId
           ttHit.resultCardId = personInfo.szCardID
           ttHit.memo = personInfo.szComment
-          //TODO 补全其他信息
           ttHitList += ttHit
         }
       }
 
     }
 
+    ttHitList
+  }
+
+  /**
+    * 获取重卡比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getTtHitResultPackageByOraSid(oraSid: String): Seq[TtHitResultPackage] = {
+    val queryStruct = queryService.getGAQUERYSTRUCT(oraSid.toLong)
+    val simpQry = queryStruct.stSimpQry
+    val sourceTpCard = tPCardService.getTPCard(simpQry.szKeyID)
+    val candList = queryStruct.pstCand_Data
+    val ttHitList = new ArrayBuffer[TtHitResultPackage]()
+    candList.foreach{
+      t =>
+        if(t.nCheckState == gaqryque.GAQRYCAND_CHKSTATE_MATCH.toByte
+              && t.nStatus == gaqryque.GAQRYCAND_CHKSTATE_UNCHECKED.toByte
+              && t.nFlag == (gaqryque.GAQRYCAND_FLAG_RECHECKED.toByte | gaqryque.GAQRYCAND_FLAG_BROKEN.toByte).toByte){
+          val destTpCard = tPCardService.getTPCard(t.szKey)
+          val ttHit = new TtHitResultPackage
+          ttHit.taskId = oraSid
+          ttHit.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+          ttHit.ttHitTypeCode = fpt5util.TT_MATCHED_NORMAL
+          ttHit.originalPersonId = sourceTpCard.getStrMisPersonID
+          ttHit.jingZongPersonId = sourceTpCard.getStrJingZongPersonId
+          ttHit.personId = sourceTpCard.getStrCasePersonID
+          ttHit.cardId = sourceTpCard.getStrCardID
+          ttHit.whetherFingerJudgmentMark = "1"//是否指纹 1--是 2--否
+          ttHit.resultOriginalSystemPersonId = destTpCard.getStrMisPersonID
+          ttHit.resultjingZongPersonId = destTpCard.getStrJingZongPersonId
+          ttHit.resultPersonId = destTpCard.getStrCasePersonID
+          ttHit.resultCardId = destTpCard.getStrCardID
+          ttHit.hitUnitCode = queryStruct.pstInfo_Data.szCheckerUnitCode
+          ttHit.hitUnitName = "" //TODO:待完成
+          ttHit.hitPersonName = "" //TODO:
+          ttHit.hitPersonIdCard = "" //TODO:
+          ttHit.hitPersonTel = "" //TODO:
+          ttHit.hitDateTime = DateConverter.convertAFISDateTime2String(queryStruct.stSimpQry.tCheckTime)
+          ttHit.checkUnitCode = queryStruct.pstInfo_Data.szReCheckerUnitCode
+          ttHit.checkUnitName = "" //TODO:待完成
+          ttHit.checkPersonName =  "" //TODO:待完成
+          ttHit.checkPersonIdCard =  "" //TODO:待完成
+          ttHit.checkPersonTel =  "" //TODO:待完成
+          ttHit.checkDateTime = DateConverter.convertAFISDateTime2String(queryStruct.stSimpQry.tReCheckDate)
+          ttHit.memo = ""
+          ttHitList += ttHit
+        }
+    }
     ttHitList
   }
 
@@ -465,4 +520,14 @@ class MatchRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCa
       case other => "9"
     }
   }
+
+  /**
+    * 获取正查或倒查比中关系
+    *
+    * @param oraSid 任务号
+    * @return
+    */
+  override def getLtHitResultPackageByOraSid(oraSid: String): Seq[LtHitResultPackage] = ???
+
+  override def getLlHitResultPackageByOraSid(oraSid: String): Seq[LlHitResultPackage] = ???
 }

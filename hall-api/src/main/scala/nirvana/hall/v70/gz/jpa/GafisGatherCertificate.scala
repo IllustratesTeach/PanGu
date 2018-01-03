@@ -19,7 +19,7 @@ import stark.activerecord.services.ActiveRecordInstance;
 object GafisGatherCertificate extends ActiveRecordInstance[GafisGatherCertificate]
 
 @Entity
-@Table(name = "GAFIS_GATHER_CETIFICATE"
+@Table(name = "GAFIS_GATHER_CERTIFICATE"
 )
 class GafisGatherCertificate extends ActiveRecord {
 
@@ -28,7 +28,7 @@ class GafisGatherCertificate extends ActiveRecord {
   var pkId: java.lang.String = _
   @Column(name = "PERSONID", length = 23)
   var personId: java.lang.String = _
-  @Column(name = "CERTIFICATETYPE", length = 2)
+  @Column(name = "CERTIFICATETYPE", length = 3)
   var certificateType: java.lang.String = _
   @Column(name = "CERTIFICATEID", length = 90)
   var certificateId: java.lang.String = _
