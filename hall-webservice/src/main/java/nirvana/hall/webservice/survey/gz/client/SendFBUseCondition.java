@@ -7,18 +7,19 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for getCaseNo complex type.
+ * <p>Java class for sendFBUseCondition complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="getCaseNo">
+ * &lt;complexType name="sendFBUseCondition">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="userID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="xckybh" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="xcwzbh" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="resultType" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,16 +29,18 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "getCaseNo", propOrder = {
+@XmlType(name = "sendFBUseCondition", propOrder = {
     "userID",
     "password",
-    "xckybh"
+    "xcwzbh",
+    "resultType"
 })
-public class GetCaseNo {
+public class SendFBUseCondition {
 
     protected String userID;
     protected String password;
-    protected String xckybh;
+    protected String xcwzbh;
+    protected String resultType;
 
     /**
      * Gets the value of the userID property.
@@ -88,27 +91,51 @@ public class GetCaseNo {
     }
 
     /**
-     * Gets the value of the xckybh property.
+     * Gets the value of the xcwzbh property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getXckybh() {
-        return xckybh;
+    public String getXcwzbh() {
+        return xcwzbh;
     }
 
     /**
-     * Sets the value of the xckybh property.
+     * Sets the value of the xcwzbh property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setXckybh(String value) {
-        this.xckybh = value;
+    public void setXcwzbh(String value) {
+        this.xcwzbh = value;
+    }
+
+    /**
+     * Gets the value of the resultType property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getResultType() {
+        return resultType;
+    }
+
+    /**
+     * Sets the value of the resultType property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setResultType(String value) {
+        this.resultType = value;
     }
 
 }

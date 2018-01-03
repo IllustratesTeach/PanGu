@@ -215,7 +215,7 @@
 									</xs:all>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="fingers" maxOccurs="1000">
+							<xs:element name="fingers" minOccurs="0" maxOccurs="1000">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="fingerImageMsg" maxOccurs="unbounded">

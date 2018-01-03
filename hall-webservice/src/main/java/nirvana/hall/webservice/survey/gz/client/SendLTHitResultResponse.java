@@ -4,21 +4,20 @@ package nirvana.hall.webservice.survey.gz.client;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for sendLTHitResultResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="sendLTHitResultResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="out" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,35 +27,36 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "out"
+@XmlType(name = "sendLTHitResultResponse", propOrder = {
+    "_return"
 })
-@XmlRootElement(name = "getPalmOriginalDataResponse")
-public class GetPalmOriginalDataResponse {
+public class SendLTHitResultResponse {
 
-    @XmlElement(required = true, nillable = true)
-    protected byte[] out;
+    @XmlElement(name = "return")
+    protected String _return;
 
     /**
-     * Gets the value of the out property.
+     * Gets the value of the return property.
      * 
      * @return
      *     possible object is
-     *     byte[]
+     *     {@link String }
+     *     
      */
-    public byte[] getOut() {
-        return out;
+    public String getReturn() {
+        return _return;
     }
 
     /**
-     * Sets the value of the out property.
+     * Sets the value of the return property.
      * 
      * @param value
      *     allowed object is
-     *     byte[]
+     *     {@link String }
+     *     
      */
-    public void setOut(byte[] value) {
-        this.out = value;
+    public void setReturn(String value) {
+        this._return = value;
     }
 
 }

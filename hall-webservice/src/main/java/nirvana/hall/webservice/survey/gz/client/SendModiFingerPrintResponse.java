@@ -4,21 +4,20 @@ package nirvana.hall.webservice.survey.gz.client;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for sendModiFingerPrintResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="sendModiFingerPrintResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Operation_result" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,37 +27,36 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "operationResult"
+@XmlType(name = "sendModiFingerPrintResponse", propOrder = {
+    "_return"
 })
-@XmlRootElement(name = "FBUseConditionResponse")
-public class FBUseConditionResponse {
+public class SendModiFingerPrintResponse {
 
-    @XmlElement(name = "Operation_result", required = true, nillable = true)
-    protected String operationResult;
+    @XmlElement(name = "return")
+    protected String _return;
 
     /**
-     * Gets the value of the operationResult property.
+     * Gets the value of the return property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getOperationResult() {
-        return operationResult;
+    public String getReturn() {
+        return _return;
     }
 
     /**
-     * Sets the value of the operationResult property.
+     * Sets the value of the return property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setOperationResult(String value) {
-        this.operationResult = value;
+    public void setReturn(String value) {
+        this._return = value;
     }
 
 }

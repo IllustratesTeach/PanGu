@@ -31,7 +31,7 @@ class MatchRelationServiceImpl extends MatchRelationService{
   override def isExist(szBreakID: String, dbId: Option[String]): Boolean = {
     var result=false
     if(GafisCheckinInfo.findOption(szBreakID).nonEmpty){
-        result=true
+      result=true
     }
     result
   }
@@ -158,14 +158,18 @@ class MatchRelationServiceImpl extends MatchRelationService{
     val gafisPerson = GafisPerson.where(GafisPerson.personid === gafisCheckinInfo.tcode).headOption.get
 
     val ltHitResultPackage = new LtHitResultPackage
-    ltHitResultPackage.taskId = gafisNormalqueryQueryque.oraSid.toString
+    var ora_sid = oraSid
+    while (ora_sid.length<23){
+      ora_sid = "0" + ora_sid
+    }
+    ltHitResultPackage.taskId = ora_sid
     ltHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     ltHitResultPackage.latentFingerCaseId = gafisCase.caseSystemId
     ltHitResultPackage.latentFingerOriginalSystemCaseId = gafisCase.caseId
     ltHitResultPackage.latentFingerLatentSurveyId = gafisCase.sceneSurveyId
     ltHitResultPackage.latentFingerOriginalSystemFingerId = gafisCheckinInfo.code
     ltHitResultPackage.latentFingerLatentPhysicalId = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.code).headOption.get.physicalEvidenceNo
-    ltHitResultPackage.latentFingerCardId = gafisCaseFinger.fingerId
+    ltHitResultPackage.latentFingerCardId = gafisCaseFinger.caseId
     ltHitResultPackage.fingerPrintOriginalSystemPersonId  = gafisPerson.personid
     ltHitResultPackage.fingerPrintJingZongPersonId = gafisPerson.jingZongPersonId
     ltHitResultPackage.fingerPrintPersonId = gafisPerson.casePersonid
@@ -239,7 +243,11 @@ class MatchRelationServiceImpl extends MatchRelationService{
 
 
     val llHitResultPackage = new LlHitResultPackage
-    llHitResultPackage.taskId = oraSid
+    var ora_sid = oraSid
+    while (ora_sid.length<23){
+      ora_sid = "0" + ora_sid
+    }
+    llHitResultPackage.taskId = ora_sid
     llHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     llHitResultPackage.originalSystemCaseId = gafisCaseFingerSource.caseId
     llHitResultPackage.caseId = gafisCaseSource.caseSystemId

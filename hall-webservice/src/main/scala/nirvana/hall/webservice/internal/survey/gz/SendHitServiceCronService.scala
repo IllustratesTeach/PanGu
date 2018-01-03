@@ -1,38 +1,42 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import java.io.File
+import java.io.{File, FileInputStream}
 import java.util.Date
 import javax.activation.DataHandler
 
 import org.apache.commons.io.{FileUtils, IOUtils}
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
-import nirvana.hall.api.services.ExceptRelationService
+import nirvana.hall.api.services.fpt.FPT5Service
+import nirvana.hall.c.services.gfpt5lib.{FPT5File, LlHitResultPackage, LtHitResultPackage}
+import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
-import nirvana.hall.webservice.survey.gz.client.HandprintService
-//import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-//import stark.webservice.services.StarkWebServiceClient
+import org.apache.tools.zip.ZipFile
+
+import scala.collection.mutable.ArrayBuffer
 
 
 /**
   * Created by ssj on 2017/11/21.
   */
-class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surveyRecordService: SurveyRecordService, exceptRelationService: ExceptRelationService) extends LoggerSupport{
+class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
+                                surveyRecordService: SurveyRecordService,
+                                fPT5Service: FPT5Service) extends LoggerSupport{
   val url = hallWebserviceConfig.handprintService.url
   val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
-  val userId = hallWebserviceConfig.handprintService.user
-  val password = hallWebserviceConfig.handprintService.password
+  val userID = hallWebserviceConfig.handprintService.user
+  val passwordStr = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-//    url,
-//    targetNamespace,
-//    classOf[HandprintService].getSimpleName,
-//    classOf[HandprintService].getSimpleName + "HttpPort")
-  val handprintService = new HandprintService
-  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
+  val password = DigestUtils.md5Hex(passwordStr)
+
+  val fpt50handprintServiceService = new FPT50HandprintServiceService
+  val fpt50handprintServicePort = fpt50handprintServiceService.getFPT50HandprintServicePort
 
   final var BATCH_SIZE = 10
 
@@ -63,36 +67,93 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig, surv
     }
   }
   def doWork {
-    var hitfpt: DataHandler = null
+    var hitLTPackage: LtHitResultPackage = null
+    var hitLLPackage: LlHitResultPackage = null
     var path: String = null
     surveyRecordService.getSurveyHit(BATCH_SIZE).foreach {
       hitResult =>
-        if(! surveyRecordService.isKno(hitResult.get("kno").get.toString)){
-//          hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY,"12768")
-//          path = hallWebserviceConfig.localLatentPath + "/" + "5227250100002014080002" + "04" + ".FPT"
-          hitfpt = exceptRelationService.exportMatchRelation(Constant.EMPTY, hitResult.get("orasid").get.toString)
-          path = hallWebserviceConfig.localLatentPath + "/" + hitResult.get("kno").get.toString + hitResult.get("sno").get.toString + ".FPT"
-          if(hallWebserviceConfig.saveFPTFlag.equals("1")){
-            FileUtils.writeByteArrayToFile(new File(path), IOUtils.toByteArray(hitfpt.getInputStream))
+        if(surveyRecordService.isSurvey(hitResult.get("xcwzbh").get.toString)){
+          path = hallWebserviceConfig.localHitResultPath + "/" + hitResult.get("orasid").get.toString + ".fptx"
+         //LT比中关系导出上报
+          if(hitResult.get("queryType").get.toString.equals("2")){
+            hitLTPackage = fPT5Service.getLTHitResultPackage(hitResult.get("orasid").get.toString)
+            val hitLTPackageSeq = new ArrayBuffer[LtHitResultPackage]
+            hitLTPackageSeq += hitLTPackage
+            val hitLTFPTFile =  getFPT5HitLTPackage(hitLTPackageSeq)               //创建LT FPT5 比中文件
+            val xmlStr = XmlLoader.toXml(hitLTFPTFile,"utf-8")
+            XmlLoader.parseXML[FPT5File](xmlStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/LTHitResult.xsd"))
+              , basePath = "/nirvana/hall/fpt5/")
+            sendHitResult(xmlStr ,path ,hitResult.get("uuid").get.toString ,hitResult.get("kno").get.toString)
           }
-
-          val matchcode = handprintServicePortType.fbMatchCondition(userId
-            ,password
-            ,IOUtils.toByteArray(hitfpt.getInputStream))
-          info("FBMatchCondition 反馈返回值： " + matchcode)
-
-          surveyRecordService.updateSurveyHitState(matchcode,hitResult.get("uuid").get.toString)
-
-          surveyRecordService.saveSurveyLogRecord(Constant.FBMatchCondition
-            ,Constant.EMPTY
-            ,Constant.EMPTY
-            ,CommonUtil.appendParam("userId:"+userId
-              ,"password:"+password
-              ,"unitCode:"+unitCode
-              ,"hitpath:"+ path)
-            ,matchcode
-            ,Constant.EMPTY)
+          //LL比中关系导出上报
+          if(hitResult.get("queryType").get.toString.equals("3")){
+            hitLLPackage = fPT5Service.getLlHitResultPackage(hitResult.get("orasid").get.toString)
+            val hitLLPackageSeq = new ArrayBuffer[LlHitResultPackage]
+            hitLLPackageSeq += hitLLPackage
+            val hitLLFPTFile =  getFPT5HitLLPackage(hitLLPackageSeq)              //创建LT FPT5 比中文件
+            val xmlStr = XmlLoader.toXml(hitLLFPTFile,"utf-8")
+            XmlLoader.parseXML[FPT5File](xmlStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/LLHitResult.xsd")) //比中关系xsd校验
+              , basePath = "/nirvana/hall/fpt5/")
+            sendHitResult(xmlStr ,path ,hitResult.get("uuid").get.toString ,hitResult.get("kno").get.toString)
+          }
         }
     }
+  }
+
+  /**
+    * 保存比中关系fptx及zip，上报比中关系，保存返回结果并更新SURVEY_HITRESULT_RECORD状态
+    * @param xmlStr
+    * @param path
+    * @param uuid
+    * @param kno
+    */
+  private def sendHitResult(xmlStr : String ,path : String ,uuid :String ,kno : String) :Unit = {
+    FileUtils.writeByteArrayToFile(new File(path), xmlStr.getBytes())   //保存比中fptx文件
+    FPT5Utils.zipFile(new File(path), path + ".zip")                     //比中关系压缩.fptx.zip
+    val zipFileInputStream = new FileInputStream(path + ".zip")
+    val matchcode = fpt50handprintServicePort.sendLLHitResult(userID       //比中关系上报
+      ,password
+      ,kno
+      ,IOUtils.toByteArray(zipFileInputStream))
+
+    surveyRecordService.updateSurveyHitState(matchcode ,uuid)
+
+    surveyRecordService.saveSurveyLogRecord(Constant.FBMatchCondition
+      ,Constant.EMPTY
+      ,Constant.EMPTY
+      ,CommonUtil.appendParam("userID:"+userID
+        ,"password:"+password
+        ,"xckybh:"+ kno
+        ,"hitpath:"+ path)
+      ,matchcode
+      ,Constant.EMPTY)
+  }
+
+  private def getFPT5HitLTPackage(hitLTPackageSeq : Seq[LtHitResultPackage]) : FPT5File = {
+    val fPT5File = new FPT5File
+    fPT5File.build(fPT5File)
+    fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
+    fPT5File.packageHead.sendUnitCode = "000000000000"
+    fPT5File.packageHead.sendUnitName = "aaa"
+    fPT5File.packageHead.sendPersonName = "yuchen"
+    fPT5File.packageHead.sendPersonIdCard = "120101198601031538"
+    fPT5File.packageHead.sendPersonTel = "3756473"
+    fPT5File.packageHead.sendUnitSystemType = "5555"
+    fPT5File.ltHitResultPackage = hitLTPackageSeq.toArray
+    fPT5File
+  }
+
+  private def getFPT5HitLLPackage(hitLLPackageSeq : Seq[LlHitResultPackage]) : FPT5File = {
+    val fPT5File = new FPT5File
+    fPT5File.build(fPT5File)
+    fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
+    fPT5File.packageHead.sendUnitCode = "000000000000"
+    fPT5File.packageHead.sendUnitName = "aaa"
+    fPT5File.packageHead.sendPersonName = "yuchen"
+    fPT5File.packageHead.sendPersonIdCard = "120101198601031538"
+    fPT5File.packageHead.sendPersonTel = "3756473"
+    fPT5File.packageHead.sendUnitSystemType = "5555"
+    fPT5File.llHitResultPackage = hitLLPackageSeq.toArray
+    fPT5File
   }
 }

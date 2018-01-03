@@ -3,24 +3,22 @@ package nirvana.hall.webservice.survey.gz.client;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for getReceptionNo complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="getReceptionNo">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="UserName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="Passwrod" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="KNo" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="userID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="xckybh" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -30,91 +28,87 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "userName",
-    "passwrod",
-    "kNo"
+@XmlType(name = "getReceptionNo", propOrder = {
+    "userID",
+    "password",
+    "xckybh"
 })
-@XmlRootElement(name = "getReceptionNo")
 public class GetReceptionNo {
 
-    @XmlElement(name = "UserName", required = true, nillable = true)
-    protected String userName;
-    @XmlElement(name = "Passwrod", required = true, nillable = true)
-    protected String passwrod;
-    @XmlElement(name = "KNo", required = true, nillable = true)
-    protected String kNo;
+    protected String userID;
+    protected String password;
+    protected String xckybh;
 
     /**
-     * Gets the value of the userName property.
+     * Gets the value of the userID property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getUserName() {
-        return userName;
+    public String getUserID() {
+        return userID;
     }
 
     /**
-     * Sets the value of the userName property.
+     * Sets the value of the userID property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setUserName(String value) {
-        this.userName = value;
+    public void setUserID(String value) {
+        this.userID = value;
     }
 
     /**
-     * Gets the value of the passwrod property.
+     * Gets the value of the password property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getPasswrod() {
-        return passwrod;
+    public String getPassword() {
+        return password;
     }
 
     /**
-     * Sets the value of the passwrod property.
+     * Sets the value of the password property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setPasswrod(String value) {
-        this.passwrod = value;
+    public void setPassword(String value) {
+        this.password = value;
     }
 
     /**
-     * Gets the value of the kNo property.
+     * Gets the value of the xckybh property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getKNo() {
-        return kNo;
+    public String getXckybh() {
+        return xckybh;
     }
 
     /**
-     * Sets the value of the kNo property.
+     * Sets the value of the xckybh property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setKNo(String value) {
-        this.kNo = value;
+    public void setXckybh(String value) {
+        this.xckybh = value;
     }
 
 }

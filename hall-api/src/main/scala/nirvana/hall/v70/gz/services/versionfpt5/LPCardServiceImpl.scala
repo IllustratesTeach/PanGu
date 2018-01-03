@@ -3,21 +3,25 @@ package nirvana.hall.v70.gz.services.versionfpt5
 import java.text.SimpleDateFormat
 import java.util.{Date, UUID}
 import javax.persistence.EntityManager
+import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
+import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v70.gz.Constant
 import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
 import nirvana.hall.v70.gz.sync.ProtobufConverter
 import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
 
+import scala.collection.mutable
+
 /**
   * Created by songpeng on 2017/6/29.
   */
-class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) extends LPCardService{
+class LPCardServiceImpl(entityManager: EntityManager, userService: UserService ,implicit val dataSource: DataSource) extends LPCardService{
   /**
     * 新增现场卡片
     *
@@ -30,6 +34,16 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
     val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
     caseFinger.sid = sid
+    var seqNo = getCardSeq(caseFinger.caseId)
+    if(Integer.parseInt(seqNo) >= Integer.parseInt(caseFinger.seqNo)){
+      seqNo = (Integer.parseInt(seqNo)+1).toString
+      if((Integer.parseInt(seqNo)+1).toString.length == 1){  //如果seqNo<10 前面补0
+        seqNo = "0" + (Integer.parseInt(seqNo)+1)
+      }
+      caseFinger.seqNo = seqNo
+      caseFinger.fingerId = caseFinger.caseId + seqNo
+      caseFingerMnt.fingerId = caseFinger.caseId + seqNo
+    }
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
@@ -69,7 +83,11 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     */
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val caseFinger = GafisCaseFinger.find(lpCard.getStrCardID)
+    val fingerId = caseFinger.fingerId
+    val seqNo = caseFinger.seqNo
     convertLPCard2GafisCaseFinger(lpCard, caseFinger)
+    caseFinger.fingerId = fingerId
+    caseFinger.seqNo = seqNo
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
@@ -88,6 +106,7 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     caseFinger.save()
 
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
+    caseFingerMnt.fingerId = fingerId
     //先删除，后插入
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
     caseFingerMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
@@ -227,5 +246,27 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
       blob.getFgp(i).getNumber.toString
     }
     caseFinger
+  }
+
+  def getCardSeq(cardId:String): String={
+    val sql = s"select seq_no from "+
+                s" (select seq_no from Gafis_Case_Finger f where f.case_id = ?"+
+                s" union"+
+                s" select seq_no from gafis_case_palm p where p.case_id = ?)"+
+              s" order by seq_no desc"
+    val resultList = new mutable.ListBuffer[String]
+    JdbcDatabase.queryWithPsSetter2(sql){ps=>
+      ps.setString(1,cardId)
+      ps.setString(2,cardId)
+    } {rs=>
+      while (rs.next()) {
+        resultList.append(rs.getString("seq_no"))
+      }
+    }
+    if(resultList.size>0){
+      resultList.head
+    }else{
+      "00"
+    }
   }
 }

@@ -5,29 +5,26 @@ import java.util.Date
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.survey.gz.client.HandprintService
-//import nirvana.hall.webservice.services.survey.HandprintService
+import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-//import stark.webservice.services.StarkWebServiceClient
 
 /**
   * Created by ssj on 2017/11/14.
   */
-class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConfig,surveyRecordService: SurveyRecordService) extends LoggerSupport{
+class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConfig,
+                                        surveyRecordService: SurveyRecordService) extends LoggerSupport{
   val url = hallWebserviceConfig.handprintService.url
   val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
-  val userId = hallWebserviceConfig.handprintService.user
-  val password = hallWebserviceConfig.handprintService.password
+  val userID = hallWebserviceConfig.handprintService.user
+  val passwordStr = hallWebserviceConfig.handprintService.password
   val unitCode = hallWebserviceConfig.handprintService.unitCode
-//  val client = StarkWebServiceClient.createClient(classOf[HandprintService],
-//    url,
-//    targetNamespace,
-//    classOf[HandprintService].getSimpleName,
-//    classOf[HandprintService].getSimpleName + "HttpPort")
-  val handprintService = new HandprintService
-  val handprintServicePortType = handprintService.getHandprintServiceHttpPort
+  val password = DigestUtils.md5Hex(passwordStr)
+
+  val fpt50handprintServiceService = new FPT50HandprintServiceService
+  val fpt50handprintServicePort = fpt50handprintServiceService.getFPT50HandprintServicePort
 
   val BATCH_SIZE=10
   /**
@@ -56,19 +53,19 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
     }
   }
   def doWork {
-    surveyRecordService.getXkcodebyState(Constant.SURVEY_CODE_CASEID_ERROR, BATCH_SIZE).foreach {
+    surveyRecordService.getSurveyRecordbyState(Constant.SURVEY_CODE_CASEID_ERROR, BATCH_SIZE).foreach {
       kNo =>
-        val receptionid = handprintServicePortType.getReceptionNo(userId, password, kNo)
-        info("getReceptionNo -- 接警编号：" + receptionid)
+        val receptionNO = fpt50handprintServicePort.getReceptionNo(userID,password,kNo)
+        info("getReceptionNo -- 接警编号：" + receptionNO)
         surveyRecordService.saveSurveyLogRecord (Constant.GET_RECEPTION_NO
           , kNo
           , Constant.EMPTY
-          , CommonUtil.appendParam ("userId:" + userId, "password:" + password, "kNo:" + kNo)
-          , receptionid
+          , CommonUtil.appendParam ("userID:" + userID, "password:" + password, "kNo:" + kNo)
+          , receptionNO
           , Constant.EMPTY)
-        if (! CommonUtil.isNullOrEmpty (receptionid) ) {
-          surveyRecordService.updateCasePeception(receptionid,kNo)
-          surveyRecordService.updateXkcodeState(Constant.SURVEY_CODE_CASEID_SUCCESS,kNo)
+        if (! CommonUtil.isNullOrEmpty (receptionNO) ) {
+          surveyRecordService.updateCasePeception(receptionNO,kNo)
+          surveyRecordService.updateRecordStateByKno(Constant.SURVEY_CODE_CASEID_SUCCESS,kNo)
         }
     }
   }

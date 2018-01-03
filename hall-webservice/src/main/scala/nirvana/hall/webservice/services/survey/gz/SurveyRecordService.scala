@@ -26,71 +26,57 @@ trait SurveyRecordService {
   def updateSurveyConfig(endTime : Timestamp): Unit
 
   /**
-    * 存入现勘现场数据入记录表操作
-    * @param kno
-    * @param sno
-    * @param cardtype
-    * @param casename
-    */
-  def saveSurveySnoRecord(kno:String,sno:String,cardtype:String,casename:String): Unit
-
-  /**
     * 判断现勘号再现勘记录表中是否存在
-    * @param kno
+    * @param xcwzbh
     * @return
     */
-  def isKno(kno:String): Boolean
+  def isSurvey(xcwzbh:String): Boolean
 
   /**
-    * 存储现勘号记录到现勘记录表中
+    * 存入现勘现场数据入记录表操作
+    * @param casename
     * @param kno
+    * @param xcwzbh
     */
-  def saveSurveyKnoRecord(kno:String): Unit
+  def saveSurveyRecord(casename:String,kno:String,xcwzbh:String): Unit
 
   /**
     * 存储调用接口后的请求和返回入库操作
     * @param interfacetype
     * @param kno
-    * @param Sno
+    * @param xcwzbh
     * @param requestmsg
     * @param responsemsg
     * @param error
     */
-  def saveSurveyLogRecord(interfacetype: String,kno: String,Sno: String,requestmsg: String,responsemsg: String,error: String): Unit
+  def saveSurveyLogRecord(interfacetype: String,kno: String,xcwzbh: String,requestmsg: String,responsemsg: String,error: String): Unit
 
   /**
     * 根据状态，获取不同的现勘号业务
     * @param state
     * @return
     */
-  def getXkcodebyState(state: Int,batchSize:Int) : ListBuffer[String]
-
-  /**
-    * 更新现勘表状态根据kno
-    * @param state
-    * @param kno
-    */
-  def updateXkcodeState(state: Int,kno : String): Unit
-
-  /**
-    * 新增案件信息xml存入记录表
-    * @param kno
-    * @param caseinfo
-    */
-  def saveSurveycaseInfo(kno: String ,caseinfo: String): Unit
+  def getSurveyRecordbyState(state: Int,batchSize:Int) : ListBuffer[String]
 
   /**
     * 根据现勘号查询对应的现勘现场数据
     * @param kno
     */
-  def getSurveySnoRecord(kno: String):  ListBuffer[mutable.HashMap[String,Any]]
+  def getWZBHbyKno(kno: String):  ListBuffer[mutable.HashMap[String,Any]]
 
   /**
-    * 更新现勘现场数据状态，根据sno
+    * 更新现勘现场数据状态，根据xcwzbh
     * @param state
-    * @param sno
+    * @param xcwzbh
     */
-  def updateSnoState(state: Int,kno: String,sno : String): Unit
+  def updateRecordStateByXCWZBH(state: Int,xcwzbh : String): Unit
+
+  /**
+    * 更新现勘现场数据状态，根据xcwzbh
+    * @param reception_state
+    * @param kno
+    */
+  def updateRecordStateByKno(reception_state: Int,kno : String): Unit
 
   /**
     * 增加palm路径到记录表中
@@ -103,7 +89,7 @@ trait SurveyRecordService {
   /**
     * 增加接警编号到case表 中
     */
-  def updateCasePeception(peception: String,kno: String): Unit
+  def updateCasePeception(receptionid: String,kno: String): Unit
 
   /**
     * 获取现勘比中数据列表

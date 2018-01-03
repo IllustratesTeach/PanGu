@@ -14,13 +14,16 @@ import nirvana.hall.api.config.HallImageRemoteConfigSupport
 @XmlRootElement(name = "hall_webservice")
 class HallWebserviceConfig
   extends LogFileSupport
-  with HallImageRemoteConfigSupport
-  with WebServerConfigSupport
-  with LocalStoreConfigSupport
-  with HeartbeatConfigSupport{
+    with HallImageRemoteConfigSupport
+    with WebServerConfigSupport
+    with LocalStoreConfigSupport
+    with HeartbeatConfigSupport{
 
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
+
+  @XmlElement(name = "survey_shh")
+  var survey_shh: Survey_shhConfig = new Survey_shhConfig
 
   @XmlElement(name = "handprintService")
   var handprintService:HandprintServiceConfig = new HandprintServiceConfig
@@ -39,6 +42,8 @@ class HallWebserviceConfig
   var saveFPTFlag:String = _
   @XmlElement(name = "template_finger_database_id")
   var templateFingerDBId:String = _
+  @XmlElement(name = "local_xkFinger_list_path")
+  var localXKFingerListPath:String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HandprintService")
@@ -85,7 +90,22 @@ class Union4pfmipConfig{
 
 
 
-
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Survey_shh")
+class Survey_shhConfig{
+  @XmlElement(name = "cron")
+  var cron: String = _
+  @XmlElement(name = "getSendMatchCron")
+  var getSendMatchCron: String = _
+  @XmlElement(name = "url")
+  var url: String = _
+  @XmlElement(name = "target_namespace")
+  var targetNamespace: String = _
+  @XmlElement(name = "user")
+  var user: String = _
+  @XmlElement(name = "password")
+  var password: String = _
+}
 
 
 @XmlAccessorType(XmlAccessType.FIELD)

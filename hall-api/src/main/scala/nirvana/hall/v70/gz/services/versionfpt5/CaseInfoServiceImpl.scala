@@ -36,7 +36,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     }
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_FPT
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_SURVEY.toString
     gafisCase.save()
   }
 
@@ -193,14 +193,14 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     val text = caseInfo.getText
     gafisCase.caseClassCode = text.getStrCaseType1
     gafisCase.suspiciousAreaCode = text.getStrSuspArea1Code
-    gafisCase.caseOccurDate = DateConverter.convertString2Date(text.getStrCaseOccurDate, "yyyyMMdd")
+    gafisCase.caseOccurDate = DateConverter.convertString2Date(text.getStrCaseOccurDate, "yyyyMMddHHmmss")
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
     gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
     //gafisCase.assistLevel = DictCode6Map7.assistLevel.get(text.getNSuperviseLevel)
     gafisCase.extractUnitCode = text.getStrExtractUnitCode
     gafisCase.extractUnitName = text.getStrExtractUnitName
     gafisCase.extractor = text.getStrExtractor
-    gafisCase.extractDate = DateConverter.convertString2Date( text.getStrExtractDate, "yyyyMMdd")
+    gafisCase.extractDate = DateConverter.convertString2Date( text.getStrExtractDate, "yyyyMMddHHmmss")
     gafisCase.amount = text.getStrMoneyLost
     gafisCase.isMurder = if(text.getBPersonKilled) "1" else "0"
     gafisCase.remark = text.getStrComment

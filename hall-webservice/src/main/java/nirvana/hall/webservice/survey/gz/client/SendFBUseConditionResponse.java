@@ -4,21 +4,20 @@ package nirvana.hall.webservice.survey.gz.client;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for sendFBUseConditionResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="sendFBUseConditionResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="data" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,35 +27,36 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "data"
+@XmlType(name = "sendFBUseConditionResponse", propOrder = {
+    "_return"
 })
-@XmlRootElement(name = "getOriginalDataFormallyResponse")
-public class GetOriginalDataFormallyResponse {
+public class SendFBUseConditionResponse {
 
-    @XmlElement(required = true, nillable = true)
-    protected byte[] data;
+    @XmlElement(name = "return")
+    protected String _return;
 
     /**
-     * Gets the value of the data property.
+     * Gets the value of the return property.
      * 
      * @return
      *     possible object is
-     *     byte[]
+     *     {@link String }
+     *     
      */
-    public byte[] getData() {
-        return data;
+    public String getReturn() {
+        return _return;
     }
 
     /**
-     * Sets the value of the data property.
+     * Sets the value of the return property.
      * 
      * @param value
      *     allowed object is
-     *     byte[]
+     *     {@link String }
+     *     
      */
-    public void setData(byte[] value) {
-        this.data = value;
+    public void setReturn(String value) {
+        this._return = value;
     }
 
 }

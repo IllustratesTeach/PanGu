@@ -1,24 +1,25 @@
 
 package nirvana.hall.webservice.survey.gz.client;
 
+import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for getFingerPrintResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="getFingerPrintResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Operation_result" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,37 +29,37 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "operationResult"
+@XmlType(name = "getFingerPrintResponse", propOrder = {
+    "_return"
 })
-@XmlRootElement(name = "insertOriginalDataResponse")
-public class InsertOriginalDataResponse {
+public class GetFingerPrintResponse {
 
-    @XmlElement(name = "Operation_result", required = true, nillable = true)
-    protected String operationResult;
+    @XmlElement(name = "return")
+    @XmlMimeType("*/*")
+    protected DataHandler _return;
 
     /**
-     * Gets the value of the operationResult property.
+     * Gets the value of the return property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link DataHandler }
      *     
      */
-    public String getOperationResult() {
-        return operationResult;
+    public DataHandler getReturn() {
+        return _return;
     }
 
     /**
-     * Sets the value of the operationResult property.
+     * Sets the value of the return property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link DataHandler }
      *     
      */
-    public void setOperationResult(String value) {
-        this.operationResult = value;
+    public void setReturn(DataHandler value) {
+        this._return = value;
     }
 
 }

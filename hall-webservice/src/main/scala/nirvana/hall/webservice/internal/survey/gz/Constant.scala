@@ -20,18 +20,19 @@ object Constant {
   final val INIT = 0
 
 
-  final val  GET_ORIGINAL_DATA_COUNT = "getOriginalDataCount"
-  final val  GET_ORIGINAL_DATA_LIST = "getOriginalDataList"
+  final val  GET_FINGER_PRINT_COUNT = "getFingerPrintCount"
+  final val  GET_FINGER_PRINT_LIST = "getFingerPrintList"
   final val  GET_CASE_NO = "getCaseNo"
-  final val  GET_ORIGINAL_DATA = "getOriginalData"
+  final val  GET_ORIGINAL_DATA = "getFingerPrint"
   final val  FBUSECONDITION = "FBUseCondition"
   final val  GET_RECEPTION_NO = "getReceptionNo"
   final val  FBMatchCondition = "FBMatchCondition"
 
-  final val  GET_TEXT_INFO = "T"
-  final val  GET_FINGER_FPT = "F"
-  final val  GET_PALM_FPT = "P"
+//  final val  GET_TEXT_INFO = "T"
+//  final val  GET_FINGER_FPT = "F"
+//  final val  GET_PALM_FPT = "P"
 
+  final val  FPT_PARSE_SUCCESS = "1"
   final val  FPT_PARSE_FAIL = "9"
   final val  IMAGE_UNQUALIFIED = "8"
 

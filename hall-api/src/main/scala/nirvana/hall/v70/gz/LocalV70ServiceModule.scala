@@ -1,7 +1,9 @@
 package nirvana.hall.v70.gz
 
+import nirvana.hall.api.internal.fpt.FPT5ServiceImpl
 import nirvana.hall.api.internal.fpt.exchange.FPTExchangeServiceImpl
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.support.internal.RpcHttpClientImpl
@@ -33,7 +35,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryServiceImpl],classOf[QueryServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService],classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[MatchRelationServiceImpl],classOf[MatchRelationServiceImpl])
-
+    binder.bind(classOf[FPT5Service], classOf[FPT5ServiceImpl])
     //同步
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])

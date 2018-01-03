@@ -36,6 +36,12 @@
                 </xs:annotation>
             </xs:element>
 
+            <xs:element type="survey_shhType" name="survey_shh" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>配置上海现勘Webservice服务器相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
             <xs:element type="XingZhuanSetting" name="XingZhuanSetting" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>配置是否根据任务自动发送查询相关参数</xs:documentation>
@@ -77,6 +83,11 @@
                     <xs:documentation>6.2中捺印逻辑库id</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="local_xkFinger_list_path" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>本地现勘数据列表zip路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="union4pfmipType">
@@ -107,19 +118,19 @@
                 </xs:annotation>
             </xs:element>
             <xs:element type="xs:string" name="dateLimit" minOccurs="0" maxOccurs="1">
-            <xs:annotation>
-            <xs:documentation>上报数据年限</xs:documentation>
-            </xs:annotation>
+                <xs:annotation>
+                    <xs:documentation>上报数据年限</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:element type="xs:string" name="TenPrintPrex" minOccurs="0" maxOccurs="1">
-            <xs:annotation>
-            <xs:documentation>十指指纹前缀(区分本地数据与外省数据）</xs:documentation>
-            </xs:annotation>
+                <xs:annotation>
+                    <xs:documentation>十指指纹前缀(区分本地数据与外省数据）</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:element type="xs:string" name="LatentPrex" minOccurs="0" maxOccurs="1">
-            <xs:annotation>
-            <xs:documentation>本地现场指纹案件号前缀(区分本地数据与外省数据）</xs:documentation>
-            </xs:annotation>
+                <xs:annotation>
+                    <xs:documentation>本地现场指纹案件号前缀(区分本地数据与外省数据）</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:element type="xs:string" name="send_checkin_cron" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -134,6 +145,40 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="survey_shhType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>比中关系上报定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="getSendMatchCron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获取现勘查询任务定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>URL配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="target_namespace" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>targetNamespace配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="user" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>用户名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>密码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
 
 
     <xs:complexType name="handprintServiceType">
