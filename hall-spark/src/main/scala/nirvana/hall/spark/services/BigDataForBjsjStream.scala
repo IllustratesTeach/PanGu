@@ -7,7 +7,7 @@ import monad.support.MonadSupportConstants
 import monad.support.services.XmlLoader
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.{Minutes, StreamingContext}
+import org.apache.spark.streaming.{Minutes, Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka.KafkaUtils
 
 import scala.io.Source
@@ -36,7 +36,9 @@ object BigDataForBjsjStream {
       .map(_._2) //only use message content
       .flatMap{x=>
       SysProperties.setConfig(parameter)
-      ImageProviderService.requestRemoteFileByBMP(parameter,x)
+      SparkFunctions.loadExtractorJNI()
+      SparkFunctions.loadImageJNI()
+      ImageProviderService.requestRemoteFileByFID(parameter,x)
     } //fetch files
       .foreachRDD{rdd=>
       //save records for partition

@@ -30,6 +30,11 @@ trait ImageProvider {
     */
   def requestImageByBMP(parameter:NirvanaSparkConfig,message:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
 
+
+  def requestImageByFID(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
+
+
+
   case class RequestRemoteFileError(streamEvent: StreamEvent,message:String,errorType:String = "R") extends StreamError(streamEvent) {
     override def getMessage: String = errorType+"|"+message
   }

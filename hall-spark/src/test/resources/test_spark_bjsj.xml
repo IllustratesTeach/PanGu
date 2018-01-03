@@ -6,11 +6,11 @@
   <kafka_server>10.1.7.204:9092</kafka_server>
   <kafka_topic_name>BJSJ</kafka_topic_name>
   <!-- 图像源数据提供的服务类 -->
-  <image_provider_class>nirvana.hall.spark.internal.BjsjPalmBmpProvider</image_provider_class>
+  <image_provider_class>nirvana.hall.spark.internal.FIDProvider</image_provider_class>
   <!-- 特征数据保存的服务类 -->
   <data_saver_class>nirvana.hall.spark.internal.GafisPartitionRecordsBjsjSave</data_saver_class>
   <hdfs_server>None</hdfs_server>
-  <partitions_num>4</partitions_num>
+  <partitions_num>1</partitions_num>
   <is_new_feature>false</is_new_feature>
   <is_extractor_bin>false</is_extractor_bin>
   <is_image_save>true</is_image_save>
@@ -19,9 +19,16 @@
   <database_list>
     <database name="gafis">
       <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <user>gafis</user>
+      <user>gafis_palm</user>
       <password>gafis</password>
       <url>jdbc:oracle:thin:@10.1.7.181:1521:gafisdb</url>
+      <max_pool_size>10</max_pool_size>
+    </database>
+    <database name="afis">
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <user>afis</user>
+      <password>helloafis</password>
+      <url>jdbc:oracle:thin:@10.1.7.180:1521:oragafis</url>
       <max_pool_size>10</max_pool_size>
     </database>
   </database_list>
