@@ -138,6 +138,11 @@ object fpt5util {
   val PHYSICAL_TYPE_CODE_GLOVE = "1104" //手套印
   val PHYSICAL_TYPE_CODE_OTHER = "1199" //其他手印痕迹
 
+
+  //用于FPT导出时，为是否指纹判断标识赋值时使用
+  val FINGER = 1 //是指纹
+  val NOT_FINGER = 0 //不是指纹
+
   /**
     * 中心，三角转换
     * 1-3位为x坐标，4-6位为y坐标，7-8位为坐标范围，

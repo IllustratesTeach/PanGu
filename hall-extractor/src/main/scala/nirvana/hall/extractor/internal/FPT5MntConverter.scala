@@ -495,8 +495,12 @@ object FPT5MntConverter {
       latentPalmCoreLikePattern.latentPalmRetracingPointFeatureDirectionRange = patternCore.nzVarRange
       latentPalmCoreLikePatternArray += latentPalmCoreLikePattern
     }
-    latentPalmFeatureMsg.latentPalmCoreLikePatternSet.latentPalmCoreLikePattern = latentPalmCoreLikePatternArray.toArray
 
+    if(latentPalmCoreLikePatternArray.nonEmpty){ 
+      val latentPalmCoreLikePatternSet = new LatentPalmCoreLikePatternSet 
+      latentPalmCoreLikePatternSet.latentPalmCoreLikePattern = latentPalmCoreLikePatternArray.toArray 
+      latentPalmFeatureMsg.latentPalmCoreLikePatternSet = latentPalmCoreLikePatternSet
+     }
     val latentPalmMinutiaSet = new LatentPalmMinutiaSet
     var minutiaArray = new ArrayBuffer[gfpt5lib.LatentPalmMinutia]
     var minutia: gfpt5lib.LatentPalmMinutia = null
