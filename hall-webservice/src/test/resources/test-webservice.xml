@@ -20,6 +20,14 @@
         <TenPrintPrex>37</TenPrintPrex>
         <LatentPrex>37</LatentPrex>
     </union4pfmip>
+    <handprintService>
+        <cron>0 * * * * ? *</cron>
+        <url>http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl</url>
+        <target_namespace>http://xckyservice.hisign.com/</target_namespace>
+        <user>AFIS_JZ</user>
+        <password>AFIS_JZ</password>
+        <unitcode>110000</unitcode>
+    </handprintService>
     <hall_image_url>http://192.168.1.214:9001</hall_image_url>
     <local_tenprint_path>support/fpt</local_tenprint_path>
     <local_latent_path>support/fpt</local_latent_path>

@@ -30,10 +30,6 @@
 
   <xs:element name="sendFBUseConditionResponse" type="tns:sendFBUseConditionResponse"/>
 
-  <xs:element name="sendHitRevoke" type="tns:sendHitRevoke"/>
-
-  <xs:element name="sendHitRevokeResponse" type="tns:sendHitRevokeResponse"/>
-
   <xs:element name="sendLLHitResult" type="tns:sendLLHitResult"/>
 
   <xs:element name="sendLLHitResultResponse" type="tns:sendLLHitResultResponse"/>
@@ -46,21 +42,18 @@
 
   <xs:element name="sendModiFingerPrintResponse" type="tns:sendModiFingerPrintResponse"/>
 
-  <xs:element name="sendTTHitResult" type="tns:sendTTHitResult"/>
-
-  <xs:element name="sendTTHitResultResponse" type="tns:sendTTHitResultResponse"/>
-
   <xs:complexType name="sendLLHitResult">
     <xs:sequence>
       <xs:element minOccurs="0" name="arg0" type="xs:string"/>
       <xs:element minOccurs="0" name="arg1" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg3" type="xs:base64Binary"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="sendLLHitResultResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -88,13 +81,14 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="arg0" type="xs:string"/>
       <xs:element minOccurs="0" name="arg1" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg3" type="xs:base64Binary"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="sendLTHitResultResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -155,34 +149,6 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="sendTTHitResult">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="sendTTHitResultResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="sendHitRevoke">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
-      <xs:element minOccurs="0" name="arg2" type="xs:base64Binary"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="sendHitRevokeResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="xs:base64Binary"/>
-    </xs:sequence>
-  </xs:complexType>
-
   <xs:complexType name="sendFBUseCondition">
     <xs:sequence>
       <xs:element minOccurs="0" name="userID" type="xs:string"/>
@@ -212,7 +178,7 @@
 
   <xs:complexType name="getFingerPrintCountResponse">
     <xs:sequence>
-      <xs:element name="return" type="xs:int"/>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -230,10 +196,6 @@
   </wsdl:types>
   <wsdl:message name="sendFBUseCondition">
     <wsdl:part element="tns:sendFBUseCondition" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="sendTTHitResultResponse">
-    <wsdl:part element="tns:sendTTHitResultResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getFingerPrintResponse">
@@ -254,10 +216,6 @@
   </wsdl:message>
   <wsdl:message name="getCaseNo">
     <wsdl:part element="tns:getCaseNo" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="sendHitRevokeResponse">
-    <wsdl:part element="tns:sendHitRevokeResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getFingerPrintListResponse">
@@ -300,10 +258,6 @@
     <wsdl:part element="tns:getFingerPrintCount" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="sendTTHitResult">
-    <wsdl:part element="tns:sendTTHitResult" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getFingerPrintCountResponse">
     <wsdl:part element="tns:getFingerPrintCountResponse" name="parameters">
     </wsdl:part>
@@ -318,10 +272,6 @@
   </wsdl:message>
   <wsdl:message name="getReceptionNoResponse">
     <wsdl:part element="tns:getReceptionNoResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="sendHitRevoke">
-    <wsdl:part element="tns:sendHitRevoke" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="FPT50HandprintService">
@@ -365,18 +315,6 @@
       <wsdl:input message="tns:getCaseNo" name="getCaseNo">
     </wsdl:input>
       <wsdl:output message="tns:getCaseNoResponse" name="getCaseNoResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="sendTTHitResult">
-      <wsdl:input message="tns:sendTTHitResult" name="sendTTHitResult">
-    </wsdl:input>
-      <wsdl:output message="tns:sendTTHitResultResponse" name="sendTTHitResultResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="sendHitRevoke">
-      <wsdl:input message="tns:sendHitRevoke" name="sendHitRevoke">
-    </wsdl:input>
-      <wsdl:output message="tns:sendHitRevokeResponse" name="sendHitRevokeResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="sendFBUseCondition">
@@ -463,24 +401,6 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="sendHitRevoke">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="sendHitRevoke">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="sendHitRevokeResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="sendTTHitResult">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="sendTTHitResult">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="sendTTHitResultResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="sendFBUseCondition">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="sendFBUseCondition">
@@ -511,7 +431,7 @@
   </wsdl:binding>
   <wsdl:service name="FPT50HandprintServiceService">
     <wsdl:port binding="tns:FPT50HandprintServiceServiceSoapBinding" name="FPT50HandprintServicePort">
-      <soap:address location="http://localhost:6065/xckyservice_cxf/ws/FPT50HandprintService"/>
+      <soap:address location="http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

@@ -5,6 +5,7 @@ import nirvana.hall.c.services.gfpt5lib.LatentPackage
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
+import org.apache.commons.codec.digest.DigestUtils
 import stark.webservice.services.StarkWebServiceClient
 
 import scala.io.Source
@@ -15,9 +16,9 @@ import scala.io.Source
   */
 class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) extends LoggerSupport{
   private val userID = hallWebserviceConfig.handprintService.user
-  private val password = hallWebserviceConfig.handprintService.password
+  private val password = DigestUtils.md5Hex(hallWebserviceConfig.handprintService.password)
   private val unitCode = hallWebserviceConfig.handprintService.unitCode
-  private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], hallWebserviceConfig.handprintService.url, hallWebserviceConfig.handprintService.targetNamespace)
+  private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], hallWebserviceConfig.handprintService.url, hallWebserviceConfig.handprintService.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
 
   /**
     * 获取待发送现场指掌纹数量服务

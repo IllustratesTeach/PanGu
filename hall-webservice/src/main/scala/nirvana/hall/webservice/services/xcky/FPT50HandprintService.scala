@@ -1,12 +1,13 @@
 package nirvana.hall.webservice.services.xcky
 
 import javax.activation.DataHandler
-import javax.jws.{WebMethod, WebService}
+import javax.jws.{WebMethod, WebParam, WebService}
 
 /**
   * Created by songpeng on 2017/12/22.
   * 现场勘验信息系统接口
-  * 2018年1月1日后，省级指掌纹自动识别系统中现场指掌纹信息的现场勘查编号、物证编号等必须与省级现场勘验系统保持一致，系统中的本地案件现场指掌纹信息（包括图片）只能从本地现场勘验系统获取，不得单独录入。省级指掌纹自动识别系统还要通过接口向省级现勘系统推送现场指掌纹正查及倒查比中关系信息、串查比中关系信息，确保指掌纹自动识别系统比中的案件线索及时推送。
+  * 2018年1月1日后，省级指掌纹自动识别系统中现场指掌纹信息的现场勘查编号、物证编号等必须与省级现场勘验系统保持一致，系统中的本地案件现场指掌纹信息（包括图片）只能从本地现场勘验系统获取，不得单独录入。
+  * 省级指掌纹自动识别系统还要通过接口向省级现勘系统推送现场指掌纹正查及倒查比中关系信息、串查比中关系信息，确保指掌纹自动识别系统比中的案件线索及时推送。
   * 省级刑专系统从省级现场勘验系统获取现场指掌纹信息的接口参考本规范执行
   * 省级现场勘验系统服务器IP地址
   *   省份	服务器IP地址
@@ -70,7 +71,13 @@ trait FPT50HandprintService {
     * @param jssj 结束时间yyyy-mm-dd HH:MM:SS，选填，缺省为当前时间
     * @return
     */
-  @WebMethod def getFingerPrintCount(userID: String, password: String, asjfsdd_xzqhdm: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String): String
+  @WebMethod def getFingerPrintCount(@WebParam(name = "userID") userID: String,
+                                     @WebParam(name = "password") password: String,
+                                     @WebParam(name = "asjfsdd_xzqhdm") asjfsdd_xzqhdm: String,
+                                     @WebParam(name = "zzhwlx") zzhwlx: String,
+                                     @WebParam(name = "xckybh") xckybh: String,
+                                     @WebParam(name = "kssj") kssj: String,
+                                     @WebParam(name = "jssj") jssj: String): String
 
   /**
     * 获取待发送现场指掌/纹列表查询服务接口
@@ -92,7 +99,15 @@ trait FPT50HandprintService {
     * </k>
     * </list>
     */
-  @WebMethod def getFingerPrintList(userID: String, password: String, asjfsdd_xzqhdm: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String, ks: Int, js: Int): DataHandler
+  @WebMethod def getFingerPrintList(@WebParam(name = "userID") userID: String,
+                                    @WebParam(name = "password") password: String,
+                                    @WebParam(name = "asjfsdd_xzqhdm") asjfsdd_xzqhdm: String,
+                                    @WebParam(name = "zzhwlx") zzhwlx: String,
+                                    @WebParam(name = "xckybh") xckybh: String,
+                                    @WebParam(name = "kssj") kssj: String,
+                                    @WebParam(name = "jssj") jssj: String,
+                                    @WebParam(name = "ks") ks: Int,
+                                    @WebParam(name = "js") js: Int): DataHandler
 
   /**
     * 获取现场指掌纹信息服务的接口
@@ -101,7 +116,9 @@ trait FPT50HandprintService {
     * @param xcwzbh 现场物证编号，必填
     * @return 现场指掌纹信息FPT5.0数据包。
     */
-  @WebMethod def getFingerPrint(userID: String, password: String, xcwzbh: String): DataHandler
+  @WebMethod def getFingerPrint(@WebParam(name = "userID") userID: String,
+                                @WebParam(name = "password") password: String,
+                                @WebParam(name = "xcwzbh") xcwzbh: String): DataHandler
 
   /**
     * 发送现场指掌纹状态服务的接口
@@ -120,14 +137,16 @@ trait FPT50HandprintService {
     * 1：反馈成功
     *
     */
-  @WebMethod def sendFBUseCondition(userID: String, password: String, xcwzbh: String, resultType: String): String
+  @WebMethod def sendFBUseCondition(@WebParam(name = "userID") userID: String,
+                                    @WebParam(name = "password") password: String,
+                                    @WebParam(name = "xcwzbh") xcwzbh: String,
+                                    @WebParam(name = "resultType") resultType: String): String
 
   /**
     * 获取现场服务器时间服务的接口
     * @return 返回时间格式：yyyy-mm-dd HH:MM:SS
     */
   @WebMethod def getSystemDateTime(): String
-
   /**
     * 获取现场案事件编号服务的接口
     * @param userID 请求方 ID , 请求方在请求服务系统上注册的唯一内部标识，必填。
@@ -135,7 +154,9 @@ trait FPT50HandprintService {
     * @param xckybh 现场勘验编号，必填。
     * @return 符合现场勘验编号的案事件编号
     */
-  @WebMethod def getCaseNo(userID: String, password: String, xckybh: String): String
+  @WebMethod def getCaseNo(@WebParam(name = "userID") userID: String,
+                           @WebParam(name = "password") password: String,
+                           @WebParam(name = "xckybh") xckybh: String): String
 
   /**
     * 获取现场接警号服务的接口
@@ -144,7 +165,9 @@ trait FPT50HandprintService {
     * @param xckybh 现场勘验编号，必填
     * @return 符合现场勘验编号的接警编号
     */
-  @WebMethod def getReceptionNo(userID: String, password: String, xckybh: String): String
+  @WebMethod def getReceptionNo(@WebParam(name = "userID") userID: String,
+                                @WebParam(name = "password") password: String,
+                                @WebParam(name = "xckybh") xckybh: String): String
 
   /**
     * 发送修改后现场指掌纹信息服务的接口
@@ -156,7 +179,10 @@ trait FPT50HandprintService {
     *         0：发送失败
     *         1：发送成功
     */
-  @WebMethod def sendModiFingerPrint (userID: String, password: String, xckybh: String, modiFingerPrint: DataHandler): String
+  @WebMethod def sendModiFingerPrint (@WebParam(name = "userID") userID: String,
+                                      @WebParam(name = "password") password: String,
+                                      @WebParam(name = "xckybh") xckybh: String,
+                                      @WebParam(name = "modiFingerPrint") modiFingerPrint: DataHandler): String
 
   /**
     * 发送现场指掌纹正查及倒查比中信息服务的接口
@@ -168,7 +194,10 @@ trait FPT50HandprintService {
     *         0：发送失败
     *         1：发送成功
     */
-  @WebMethod def sendLTHitResult(userID: String, password: String, xckybh: String, LTHitResultdh: DataHandler): String
+  @WebMethod def sendLTHitResult(@WebParam(name = "userID") userID: String,
+                                 @WebParam(name = "password") password: String,
+                                 @WebParam(name = "xckybh") xckybh: String,
+                                 @WebParam(name = "LTHitResultdh") LTHitResultdh: DataHandler): String
 
   /**
     * 发送现场指掌纹串查比中信息服务的接口
@@ -180,5 +209,8 @@ trait FPT50HandprintService {
     *         0：发送失败
     *         1：发送成功
     */
-  @WebMethod def sendLLHitResult(userID: String, password: String, xckybh: String, LLHitResultdh: DataHandler): String
+  @WebMethod def sendLLHitResult(@WebParam(name = "userID") userID: String,
+                                 @WebParam(name = "password") password: String,
+                                 @WebParam(name = "xckybh") xckybh: String,
+                                 @WebParam(name = "LLHitResult") LLHitResultdh: DataHandler): String
 }
