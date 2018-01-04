@@ -23,8 +23,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
-    val caseInfoHandled = caseInfo.toBuilder.setStrCaseID(dropCaseNoHeadLetter(caseInfo.getStrCaseID)).build
-    val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfoHandled)
+    val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
     facade.NET_GAFIS_CASE_Add(getDBID(dbId),
       V62Facade.TID_CASE, gCase)
   }
@@ -160,18 +159,5 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
     }else{
       dbId.get.toShort
     }
-  }
-
-  private def dropCaseNoHeadLetter(caseId:String):String ={
-    if(caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
-      caseId.toUpperCase.drop(1)
-    else caseId.toUpperCase
-  }
-
-  private def appendCaseNoHeadLetter(caseId:String):String = {
-    if(!caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
-      HallApiConstants.LPCARDNO_HEAD_LETTER.concat(caseId.toUpperCase)
-    else
-      caseId.toUpperCase
   }
 }
