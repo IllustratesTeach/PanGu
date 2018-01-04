@@ -192,6 +192,8 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     //特征
     if(caseFingerMnt.fingerMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(caseFingerMnt.fingerMnt))
+    textBuilder.setStrFeatureGroupIdentifier(caseFingerMnt.mntCombinationCode)
+    textBuilder.setStrFeatureGroupDscriptInfo(caseFingerMnt.mntCombinationMessage)
     magicSet(caseFingerMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
     //指位
     if (isNonBlank(caseFinger.fgp))

@@ -174,6 +174,8 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService, 
     //特征
     if(casePalmMnt.palmMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
+    textBuilder.setStrFeatureGroupIdentifier(casePalmMnt.mntCombinationCode)
+    textBuilder.setStrFeatureGroupDscriptInfo(casePalmMnt.mntCombinationMessage)
     magicSet(casePalmMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
     //指位
     casePalm.fgp match {

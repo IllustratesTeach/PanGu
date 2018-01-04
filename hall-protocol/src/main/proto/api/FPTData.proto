@@ -286,6 +286,9 @@ message	LPCard
 		optional string	strCaseId= 10;          //案件编号
 		optional string strCaptureMethod = 11;  //提取方式
 		optional string	strComment= 12;         //备注
+		//Fpt5.0新加
+		optional string	strFeatureGroupIdentifier= 13;         //特征组标识符
+		optional string	strFeatureGroupDscriptInfo= 14;         //特征组描述信息
 	}
 
 	message	LPCardBlob

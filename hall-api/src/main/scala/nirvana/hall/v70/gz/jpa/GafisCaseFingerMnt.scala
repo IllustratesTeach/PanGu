@@ -51,6 +51,10 @@ class GafisCaseFingerMnt extends ActiveRecord {
   var fingerMntNosqlId: java.lang.String = _
   @Column(name = "FINGER_RIDGE_NOSQL_ID", length = 10)
   var fingerRidgeNosqlId: java.lang.String = _
+  @Column(name = "MNT_COMBINATION_CODE", length = 15)
+  var mntCombinationCode: java.lang.String = _
+  @Column(name = "MNT_COMBINATION_MESSAGE", length = 128)
+  var mntCombinationMessage: java.lang.String = _
 
 
   def this(pkId: java.lang.String) {
@@ -58,7 +62,7 @@ class GafisCaseFingerMnt extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, fingerId: java.lang.String, captureMethod: java.lang.String, fingerMnt: Array[Byte], fingerRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, fingerMntNosqlId: java.lang.String, fingerRidgeNosqlId: java.lang.String) {
+  def this(pkId: java.lang.String, fingerId: java.lang.String, captureMethod: java.lang.String, fingerMnt: Array[Byte], fingerRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, fingerMntNosqlId: java.lang.String, fingerRidgeNosqlId: java.lang.String,mntCombinationCode: java.lang.String, mntCombinationMessage: java.lang.String) {
     this()
     this.pkId = pkId
     this.fingerId = fingerId
@@ -73,6 +77,8 @@ class GafisCaseFingerMnt extends ActiveRecord {
     this.deletag = deletag
     this.fingerMntNosqlId = fingerMntNosqlId
     this.fingerRidgeNosqlId = fingerRidgeNosqlId
+    this.mntCombinationCode = mntCombinationCode
+    this.mntCombinationMessage = mntCombinationMessage
   }
 
 

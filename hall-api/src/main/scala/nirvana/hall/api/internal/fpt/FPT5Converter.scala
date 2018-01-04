@@ -491,9 +491,10 @@ object FPT5Converter {
       } else {
         latentFeatureMsg.latentPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_FINGER) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
       }
-      latentFeatureMsg.latentFeatureGroupIdentifier = ""
-      latentFeatureMsg.fingerAnalysisPostionBrief = ""
-      latentFeatureMsg.fingerPatternAnalysisBrief = ""
+      latentFeatureMsg.latentFeatureGroupIdentifier = lpcard.getText.getStrFeatureGroupIdentifier
+      latentFeatureMsg.latentFeatureGroupDscriptInfo = lpcard.getText.getStrFeatureGroupDscriptInfo
+      latentFeatureMsg.fingerAnalysisPostionBrief = convertFingerFgp2FPT5(lpcard.getBlob.getFgpList)
+      latentFeatureMsg.fingerPatternAnalysisBrief = convertPatternType2FPT5(lpcard.getBlob.getRpList)
       //指位和纹型转换
       latentImageMsg.latentFingerAnalysisPostionBrief = convertFingerFgp2FPT5(lpcard.getBlob.getFgpList)
       latentImageMsg.latentFingerPatternAnalysisBrief = convertPatternType2FPT5(lpcard.getBlob.getRpList)
@@ -537,7 +538,21 @@ object FPT5Converter {
         str = "0"+str
       }
     }
+    str
+  }
 
+  /**
+    * 分析掌位转换为fpt5格式
+    * @param fgpList 分析掌位proto
+    * @return 从左至右，每字符依次对应指位左右掌，如果对应位为1表示有可能是这个掌位，为0表示不可能是这个掌位
+    */
+  def convertPalmFgp2FPT5(fgpList: PalmFgp): String={
+    var str = ""
+    if(fgpList.getNumber == 1){
+      str = "10"  //右掌
+    }else{
+      str = "01"  //左掌
+    }
     str
   }
 
@@ -564,7 +579,7 @@ object FPT5Converter {
     latentPalmImageMsg.latentPalmMastoidProcessLineColorCode = palm.getText.getStrRidgeColor //现场掌纹_乳突线颜色代码
     latentPalmImageMsg.latentPalmComparisonStatusCode = palm.getText.getNBiDuiState.toString  //现场掌纹_掌纹比对状态代码
     latentPalmImageMsg.latentPalmCustomInfo = palm.getText.getStrComment.getBytes()  //现场掌纹_自定义信息
-    latentPalmImageMsg.latentPalmPostionAnalysisBriefly = "31"
+    latentPalmImageMsg.latentPalmPostionAnalysisBriefly = convertPalmFgp2FPT5(palm.getBlob.getPalmFgp)
     FPT5ImageConverter.convertGAFISIMAGESTRUCT2LatentPalmImageMsg(gafisImage, latentPalmImageMsg)
     if(palm.getBlob.getStMnt.nonEmpty){//判断是否有特征
     val latentPalmFeatureMsg = new LatentPalmFeatureMsg
@@ -577,10 +592,10 @@ object FPT5Converter {
       }else{
         latentPalmFeatureMsg.latentPalmPhysicalId = fpt5util.gerenateLatentPhysicalIdTake(fpt5util.PHYSICAL_TYPE_CODE_PALM) //TODO:添加一个现场物证编号的三位顺序号的序列生成器
       }
-      latentPalmFeatureMsg.latentPalmFeatureGroupIdentifier = ""
-      latentPalmFeatureMsg.latentPalmFeatureDscriptInfo = "" //现场掌纹_特征组合描述信息
+      latentPalmFeatureMsg.latentPalmFeatureGroupIdentifier = palm.getText.getStrFeatureGroupIdentifier
+      latentPalmFeatureMsg.latentPalmFeatureDscriptInfo = palm.getText.getStrFeatureGroupDscriptInfo
       latentPalmFeatureMsg.latentPalmComparisonStatusCode = palm.getText.getNBiDuiState.toString //现场掌纹_指掌纹比对状态代码
-      latentPalmFeatureMsg.latentPalmAnalysisBrief = "31"
+      latentPalmFeatureMsg.latentPalmAnalysisBrief = convertPalmFgp2FPT5(palm.getBlob.getPalmFgp)
       //TODO 掌纹折返点, 掌位分析, 现场掌纹_特征组合描述, 特征组标识符
       latentPalmFeatureMsgList += latentPalmFeatureMsg
     }
@@ -592,7 +607,7 @@ object FPT5Converter {
   def convertLatentPackage2Case(latentPackage: LatentPackage): Case = {
     val caseInfo = Case.newBuilder()
     val textBuilder = caseInfo.getTextBuilder
-    caseInfo.setStrCaseID(latentPackage.caseMsg.caseId)
+    caseInfo.setStrCaseID(latentPackage.caseMsg.originalSystemCaseId)
     caseInfo.setStrJingZongCaseId(latentPackage.caseMsg.caseId) //警综案事件编号
     caseInfo.setStrSurveyId(latentPackage.caseMsg.latentSurveyId) //现场勘验编号
     if(null != latentPackage.latentFingers){
@@ -663,12 +678,15 @@ object FPT5Converter {
             if(null != t.latentFingerFeatureMsg) {
               t.latentFingerFeatureMsg.foreach {
                 f =>
+                  lpCard.setStrCardID(f.originalSystemLatentFingerPalmId)
                   lpCard.setStrPhysicalId(f.latentPhysicalId)
                   val gafisMnt = FPT5MntConverter.convertFingerLDataMnt2GafisMnt(t.latentFingerImageMsg, f)
                   blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
+                  textBuilder.setStrFeatureGroupIdentifier(f.latentFeatureGroupIdentifier)
+                  textBuilder.setStrFeatureGroupDscriptInfo(f.latentFeatureGroupDscriptInfo)
               }
+              lpCardList += lpCard.build
             }
-            lpCardList += lpCard.build
           }
       }
     }
@@ -701,6 +719,8 @@ object FPT5Converter {
                   lpCard.setStrPhysicalId(f.latentPalmPhysicalId)
                   val gafisMnt = FPT5MntConverter.convertPalmLDataMnt2GafisMnt(t.latentPalmImageMsg, f)
                   blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
+                  textBuilder.setStrFeatureGroupIdentifier(f.latentPalmFeatureGroupIdentifier)
+                  textBuilder.setStrFeatureGroupDscriptInfo(f.latentPalmFeatureDscriptInfo)
               }
             }
             lpCardList += lpCard.build

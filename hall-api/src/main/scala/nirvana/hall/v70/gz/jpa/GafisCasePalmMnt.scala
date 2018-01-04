@@ -48,13 +48,17 @@ class GafisCasePalmMnt extends ActiveRecord {
   var palmRidgeNosqlId: java.lang.String = _
   @Column(name = "DELETAG", length = 1)
   var deletag: java.lang.String = _
+  @Column(name = "MNT_COMBINATION_CODE", length = 15)
+  var mntCombinationCode: java.lang.String = _
+  @Column(name = "MNT_COMBINATION_MESSAGE", length = 128)
+  var mntCombinationMessage: java.lang.String = _
 
   def this(pkId: java.lang.String) {
     this()
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: Array[Byte], palmRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String, deletag:java.lang.String) {
+  def this(pkId: java.lang.String, palmId: java.lang.String, captureMethod: java.lang.String, palmMnt: Array[Byte], palmRidge: Array[Byte], isMainMnt: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, palmMntNosqlId: java.lang.String, palmRidgeNosqlId: java.lang.String, deletag:java.lang.String,mntCombinationCode: java.lang.String, mntCombinationMessage: java.lang.String) {
     this()
     this.pkId = pkId
     this.palmId = palmId
@@ -69,6 +73,8 @@ class GafisCasePalmMnt extends ActiveRecord {
     this.palmMntNosqlId = palmMntNosqlId
     this.palmRidgeNosqlId = palmRidgeNosqlId
     this.deletag = deletag
+    this.mntCombinationCode = mntCombinationCode
+    this.mntCombinationMessage = mntCombinationMessage
   }
 
 

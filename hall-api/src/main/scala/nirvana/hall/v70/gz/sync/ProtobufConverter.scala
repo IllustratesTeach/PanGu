@@ -184,11 +184,14 @@ object ProtobufConverter extends LoggerSupport{
     caseFingerMnt.fingerId = lpCard.getStrCardID
     caseFingerMnt.captureMethod
     val blob = lpCard.getBlob
+    val text = lpCard.getText
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
     caseFingerMnt.fingerRidge = blob.getStBinBytes.toByteArray
     caseFingerMnt.captureMethod = blob.getStrMntExtractMethod
     caseFingerMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     caseFingerMnt.inputtime = new Date()
+    caseFingerMnt.mntCombinationCode = text.getStrFeatureGroupIdentifier
+    caseFingerMnt.mntCombinationMessage = text.getStrFeatureGroupDscriptInfo
 
     caseFingerMnt
   }
@@ -293,11 +296,14 @@ object ProtobufConverter extends LoggerSupport{
   def convertLPCard2GafisCasePalmMnt(lpCard: LPCard, casePalmMnt: GafisCasePalmMnt = new GafisCasePalmMnt()): GafisCasePalmMnt = {
     casePalmMnt.palmId = lpCard.getStrCardID
     val blob = lpCard.getBlob
+    val text = lpCard.getText
     casePalmMnt.palmMnt = blob.getStMntBytes.toByteArray
     casePalmMnt.palmRidge = blob.getStBinBytes.toByteArray
     casePalmMnt.captureMethod = blob.getStrMntExtractMethod
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.inputtime = new Date()
+    casePalmMnt.mntCombinationCode = text.getStrFeatureGroupIdentifier
+    casePalmMnt.mntCombinationMessage = text.getStrFeatureGroupDscriptInfo
 
     casePalmMnt
   }
