@@ -68,6 +68,7 @@ object V62Facade{
   val TID_BREAKCASE:Short  = 4 //比中信息admin_breakcase
   val TID_PERSONINFO:Short = 3 //重卡信息normaltp_personinfo
   val TID_LPGROUP:Short    = 9 //现场
+  val TID_USER:Short       = 2
 
   //默认管理员库
   val DBID_ADMIN_DEFAULT: Short = 1

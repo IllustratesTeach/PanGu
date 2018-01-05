@@ -44,10 +44,10 @@ object FPT5Converter {
     fingerprintPackage.descriptiveMsg.collectingReasonSet.captureInfoReasonCode = captureInfoReasonCode.toArray // 采集信息原因代码
     fingerprintPackage.descriptiveMsg.name = tpCard.getText.getStrName   //姓名
     fingerprintPackage.descriptiveMsg.alias = tpCard.getText.getStrAliasName    //别名/绰号
-    fingerprintPackage.descriptiveMsg.sex = tpCard.getText.getNSex.toString  //性别代码
+    fingerprintPackage.descriptiveMsg.sex = CodeConverterV70New.converGender(tpCard.getText.getNSex.toString)  //性别代码
     fingerprintPackage.descriptiveMsg.birthday = tpCard.getText.getStrBirthDate //出生日期
-    fingerprintPackage.descriptiveMsg.nationality =  tpCard.getText.getStrNation  //国籍代码
-    fingerprintPackage.descriptiveMsg.nation =  tpCard.getText.getStrRace //民族代码
+    fingerprintPackage.descriptiveMsg.nationality =  CodeConverterV70New.converNativeplace(tpCard.getText.getStrNation)  //国籍代码
+    fingerprintPackage.descriptiveMsg.nation =  CodeConverterV70New.converNation(tpCard.getText.getStrRace) //民族代码
     fingerprintPackage.descriptiveMsg.credentialsCode = fpt5util.DEFAULT_CERTIFICATE_TYPE //常用证件代码
     fingerprintPackage.descriptiveMsg.credentialsNo = tpCard.getText.getStrCertifID //证件号码
     fingerprintPackage.descriptiveMsg.houkouAdministrativeDivisionCode = tpCard.getText.getStrHuKouPlaceCode //户籍地址行政区划代码
@@ -286,9 +286,9 @@ object FPT5Converter {
       && StringUtils.isNotBlank(fingerprintPackage.descriptiveMsg.alias)){
       textBuilder.setStrAliasName(fingerprintPackage.descriptiveMsg.alias)
     }
-    textBuilder.setNSex(fingerprintPackage.descriptiveMsg.sex.toInt)
-    textBuilder.setStrNation(fingerprintPackage.descriptiveMsg.nationality)
-    textBuilder.setStrRace(fingerprintPackage.descriptiveMsg.nation)
+    textBuilder.setNSex(CodeConverterV70Old.converGender(fingerprintPackage.descriptiveMsg.sex).toInt)
+    textBuilder.setStrNation(CodeConverterV70Old.converNativeplace(fingerprintPackage.descriptiveMsg.nationality))
+    textBuilder.setStrRace(CodeConverterV70Old.converNation(fingerprintPackage.descriptiveMsg.nation))
     textBuilder.setStrCertifType(fingerprintPackage.descriptiveMsg.credentialsCode)
     tpCard.setCaptureInfoReasonCode(fingerprintPackage.descriptiveMsg.collectingReasonSet.captureInfoReasonCode.mkString(","))
     //处理常用证件类型

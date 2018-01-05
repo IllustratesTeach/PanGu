@@ -1,5 +1,6 @@
 package nirvana.hall.api.internal.fpt
 
+import java.io.ByteArrayInputStream
 import java.text.SimpleDateFormat
 import javax.sql.DataSource
 
@@ -127,18 +128,27 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
 
 
-  private def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={
-    if(isLatent){
-      extractor.extractByGAFISIMG(originalImage, FingerPosition.FINGER_UNDET, FeatureType.FingerLatent)
-    }else{
-      val fingerIndex = originalImage.stHead.nFingerIndex
-      val fingerPos = if(fingerIndex > 10){
-        FingerPosition.valueOf(fingerIndex - 10)
+  private def extractByGAFISIMG(originalImage: GAFISIMAGESTRUCT, isLatent: Boolean,isPalm:Boolean = false): (GAFISIMAGESTRUCT, GAFISIMAGESTRUCT) ={
+
+    if(!isPalm){
+      if(isLatent){
+        extractor.extractByGAFISIMG(originalImage, FingerPosition.FINGER_UNDET, FeatureType.FingerLatent)
       }else{
-        FingerPosition.valueOf(fingerIndex)
+        val fingerIndex = originalImage.stHead.nFingerIndex
+        val fingerPos = if(fingerIndex > 10){
+          FingerPosition.valueOf(fingerIndex - 10)
+        }else{
+          FingerPosition.valueOf(fingerIndex)
+        }
+        extractor.extractByGAFISIMG(originalImage, fingerPos, FeatureType.FingerTemplate)
       }
-      extractor.extractByGAFISIMG(originalImage, fingerPos, FeatureType.FingerTemplate)
+    }else{
+      val ext = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(originalImage.toByteArray())
+        ,FingerPosition.FINGER_L_THUMB
+        ,FeatureType.PalmTemplate)
+      (new GAFISIMAGESTRUCT().fromByteArray(ext.get._1),new GAFISIMAGESTRUCT().fromByteArray(ext.get._2))
     }
+
   }
 
 
@@ -156,14 +166,14 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
           val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(t.getStImageBytes.toByteArray)
           if(gafisImage.stHead.bIsCompressed > 0){
             val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-            val mntData = try{
-              extractByGAFISIMG(originalImage, false)
-            }catch{
-              case ex:ArithmeticException => extractByGAFISIMG(originalImage, false)
+            if(t.getType == ImageType.IMAGETYPE_FINGER){
+              val mntData = extractByGAFISIMG(originalImage, false)
+              t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+            }else if(t.getType == ImageType.IMAGETYPE_PALM){
+              val mntData = extractByGAFISIMG(originalImage,false,true)
+              t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
             }
-            t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
             //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-
             val compressMethod = fpt4code.gafisCprCodeToFPTCode(gafisImage.stHead.nCompressMethod)
             if(compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_BY_GFS_CODE
               ||compressMethod == fpt4code.GAIMG_CPRMETHOD_WSQ_CODE){
@@ -173,13 +183,18 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
               t.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
             }
           }else{
-            val mntData = extractByGAFISIMG(gafisImage, false)
-            t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-            //          blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            if(t.getType == ImageType.IMAGETYPE_FINGER){
+              val mntData = extractByGAFISIMG(gafisImage, false)
+              t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+              //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            }else if(t.getType == ImageType.IMAGETYPE_PALM){
+              val mntData = extractByGAFISIMG(gafisImage,false,true)
+              t.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
+              //blob.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
+            }
             val wsqImg = hallImageRemoteService.encodeGafisImage2Wsq(gafisImage)
             t.setStImageBytes(ByteString.copyFrom(wsqImg.toByteArray()))
           }
-
         }
     }
     tpCardBuilder
