@@ -22,205 +22,198 @@
 	<xs:include schemaLocation="code_zhwzwdm.xsd"/>
 	<xs:include schemaLocation="code_rtxysdm.xsd"/>
 	<xs:include schemaLocation="code_zhwsjwzlx.xsd"/>
-	<xs:include schemaLocation="code_zzwccbzlxdm.xsd"/>	
-	<xs:element name="TTResultPackage" >
+	<xs:include schemaLocation="code_zzwccbzlxdm.xsd"/>
+	<xs:include schemaLocation="regex.xsd"/>
+	<xs:element name="TTResultPackage">
+		<xs:annotation>
+			<xs:documentation>查重比对结果</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="rwbh">
 					<xs:annotation>
-						<xs:documentation>查重比对结果</xs:documentation>
+						<xs:documentation>任务编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="zwbdxtlxms">
+					<xs:annotation>
+						<xs:documentation>指纹比对系统描述</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bddw_gajgjgdm">
+					<xs:annotation>
+						<xs:documentation>比对单位_公安机关机构代码</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bddw_gajgmc">
+					<xs:annotation>
+						<xs:documentation>比对单位_公安机关名称</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="50"/>
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="bdwcsj">
+					<xs:annotation>
+						<xs:documentation>比对完成时间</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="time">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ysxt_asjxgrybh">
+					<xs:annotation>
+						<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_jzrybh">
+							<xs:length value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="jzrybh" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>警综人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_jzrybh"/>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="asjxgrybh" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>案事件相关人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_asjxgrybh"/>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="zzhwkbh">
+					<xs:annotation>
+						<xs:documentation>指掌纹卡编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="sfzw_pdbz">
+					<xs:annotation>
+						<xs:documentation>是否指纹_判断标识</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="code_if">
+							<xs:length value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="resultMsgSet" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>比对结果集合</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-						<xs:all>
-							<xs:element name="rwbh">
+						<xs:sequence>
+							<xs:element name="resultMsg" maxOccurs="1000">
 								<xs:annotation>
-									<xs:documentation>任务编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="zwbdxtlxms">
-								<xs:annotation>
-									<xs:documentation>指纹比对系统描述</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="4"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="bddw_gajgjgdm">
-								<xs:annotation>
-									<xs:documentation>比对单位_公安机关机构代码</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="12"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="bddw_gajgmc">
-								<xs:annotation>
-									<xs:documentation>比对单位_公安机关名称</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="50"/>
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="bdwcsj">
-								<xs:annotation>
-									<xs:documentation>比对完成时间</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="time">
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="ysxt_asjxgrybh">
-								<xs:annotation>
-									<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="jzrybh" minOccurs="0">
-								<xs:annotation>
-									<xs:documentation>警综人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="asjxgrybh">
-								<xs:annotation>
-									<xs:documentation>案事件相关人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="zzhwkbh">
-								<xs:annotation>
-									<xs:documentation>指掌纹卡编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="sfzw_pdbz">
-								<xs:annotation>
-									<xs:documentation>是否指纹_判断标识</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="code_if">
-										<xs:length value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="resultMsgSet" minOccurs="0">
-								<xs:annotation>
-									<xs:documentation>比对结果集合</xs:documentation>
+									<xs:documentation>比对结果信息</xs:documentation>
 								</xs:annotation>
 								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="resultMsg" maxOccurs="1000">
+									<xs:all>
+										<xs:element name="bdjg_mc">
 											<xs:annotation>
-												<xs:documentation>比对结果信息</xs:documentation>
+												<xs:documentation>比对结果_名次</xs:documentation>
 											</xs:annotation>
-											<xs:complexType>
-												<xs:all>
-													<xs:element name="bdjg_mc">
-														<xs:annotation>
-															<xs:documentation>比对结果_名次</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="int">
-																<xs:maxLength value="12"/>
-																<xs:minLength value="1"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="bdjg_df">
-														<xs:annotation>
-															<xs:documentation>比对结果_得分</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="int">
-																<xs:maxLength value="12"/>
-																<xs:minLength value="1"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="bdjg_ysxt_asjxgrybh">
-														<xs:annotation>
-															<xs:documentation>比对结果_原始系统_案事件相关人员编号</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="xs:string">
-																<xs:length value="23"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="bdjg_jzrybh" minOccurs="0">
-														<xs:annotation>
-															<xs:documentation>比对结果_警综人员编号</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="xs:string">
-																<xs:maxLength value="23"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="bdjg_asjxgrybh">
-														<xs:annotation>
-															<xs:documentation>比对结果_案事件相关人员编号</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="xs:string">
-																<xs:length value="23"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="bdjg_zzhwkbh" minOccurs="0">
-														<xs:annotation>
-															<xs:documentation>比对结果_指掌纹卡编号</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="xs:string">
-																<xs:maxLength value="23"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-													<xs:element name="zzhwccbzlxdm">
-														<xs:annotation>
-															<xs:documentation>指掌纹查重比中类型代码</xs:documentation>
-														</xs:annotation>
-														<xs:simpleType>
-															<xs:restriction base="code_zzwccbzlxdm">
-																<xs:length value="1"/>
-															</xs:restriction>
-														</xs:simpleType>
-													</xs:element>
-												</xs:all>
-											</xs:complexType>
+											<xs:simpleType>
+												<xs:restriction base="int">
+													<xs:maxLength value="12"/>
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
 										</xs:element>
-									</xs:sequence>
+										<xs:element name="bdjg_df">
+											<xs:annotation>
+												<xs:documentation>比对结果_得分</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="int">
+													<xs:maxLength value="12"/>
+													<xs:minLength value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bdjg_ysxt_asjxgrybh">
+											<xs:annotation>
+												<xs:documentation>比对结果_原始系统_案事件相关人员编号</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="type_jzrybh">
+													<xs:length value="23"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bdjg_jzrybh" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>比对结果_警综人员编号</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="type_jzrybh"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bdjg_asjxgrybh" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>比对结果_案事件相关人员编号</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="type_asjxgrybh"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="bdjg_zzhwkbh" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>比对结果_指掌纹卡编号</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="23"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="zzhwccbzlxdm">
+											<xs:annotation>
+												<xs:documentation>指掌纹查重比中类型代码</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="code_zzwccbzlxdm">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:all>
 								</xs:complexType>
 							</xs:element>
-						</xs:all>
+						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

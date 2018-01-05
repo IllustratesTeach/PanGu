@@ -23,94 +23,90 @@
 	<xs:include schemaLocation="code_rtxysdm.xsd"/>
 	<xs:include schemaLocation="code_zhwsjwzlx.xsd"/>
 	<xs:include schemaLocation="code_zzwbdrwlxdm.xsd"/>
-	<xs:element name="printTaskPackage" >
+	<xs:include schemaLocation="regex.xsd"/>
+	<xs:element name="printTaskPackage">
+		<xs:annotation>
+			<xs:documentation>捺印指掌纹查询请求信息</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="rwbh">
 					<xs:annotation>
-						<xs:documentation>捺印指掌纹查询请求信息</xs:documentation>
+						<xs:documentation>任务编号</xs:documentation>
 					</xs:annotation>
-					<xs:complexType>
-						<xs:all>
-							<xs:element name="rwbh">
-								<xs:annotation>
-									<xs:documentation>任务编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="zzhwbdrwlxdm">
-								<xs:annotation>
-									<xs:documentation>指掌纹比对任务类型代码</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="code_zzwbdrwlxdm">
-										<xs:length value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="zwbdxtlxms">
-								<xs:annotation>
-									<xs:documentation>指纹比对系统描述</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="4"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="ysxt_asjxgrybh">
-								<xs:annotation>
-									<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="30"/>
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="jzrybh" minOccurs="0">
-								<xs:annotation>
-									<xs:documentation>警综人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="asjxgrybh">
-								<xs:annotation>
-									<xs:documentation>案事件相关人员编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:length value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="zzhwkbh" minOccurs="0">
-								<xs:annotation>
-									<xs:documentation>指掌纹卡编号</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:maxLength value="23"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-							<xs:element name="tjsj">
-								<xs:annotation>
-									<xs:documentation>提交时间</xs:documentation>
-								</xs:annotation>
-								<xs:simpleType>
-									<xs:restriction base="time">
-										<xs:minLength value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:element>
-						</xs:all>
-					</xs:complexType>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
 				</xs:element>
+				<xs:element name="zzhwbdrwlxdm">
+					<xs:annotation>
+						<xs:documentation>指掌纹比对任务类型代码</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="code_zzwbdrwlxdm">
+							<xs:length value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="zwbdxtlxms">
+					<xs:annotation>
+						<xs:documentation>指纹比对系统描述</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ysxt_asjxgrybh">
+					<xs:annotation>
+						<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_jzrybh">
+							<xs:length value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="jzrybh">
+					<xs:annotation>
+						<xs:documentation>警综人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_jzrybh"/>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="asjxgrybh" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>案事件相关人员编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="type_asjxgrybh"/>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="zzhwkbh" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>指掌纹卡编号</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="tjsj">
+					<xs:annotation>
+						<xs:documentation>提交时间</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="time">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

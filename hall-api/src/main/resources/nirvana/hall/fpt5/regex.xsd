@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="type_asjxgrybh">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="|(P[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="type_jzrybh">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="|(R[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="type_asjbh">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="|(A[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="type_xckybh">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="K[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="type_xcwzbh">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="F[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}110[1-4][0-9]{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
