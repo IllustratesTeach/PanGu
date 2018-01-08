@@ -35,7 +35,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[QueryServiceImpl],classOf[QueryServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService],classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[MatchRelationServiceImpl],classOf[MatchRelationServiceImpl])
-    binder.bind(classOf[FPT5Service], classOf[FPT5ServiceImpl])
     //同步
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])

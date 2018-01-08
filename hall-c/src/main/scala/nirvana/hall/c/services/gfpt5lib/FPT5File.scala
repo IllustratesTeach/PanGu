@@ -1462,7 +1462,23 @@ class FPT5File {
         var hitDateTime:String = _
     }
 
-
+/**
+  * 当前导入导出fpt人员信息
+  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "currentUserMessage")
+class currentUserMessage{
+    @XmlElement(name = "depart_code")
+    var sendUnitCode:String = _
+    @XmlElement(name = "depart_name")
+    var sendUnitName:String = _
+    @XmlElement(name = "true_name")
+    var sendPersonName:String = _
+    @XmlElement(name = "idcard")
+    var sendPersonIdCard:String = _
+    @XmlElement(name = "phone")
+    var sendPersonTel:String = _
+}
 
 
 

@@ -15,14 +15,14 @@ enum ResponseStatus {
 }
 
 enum ExportType{
-    TP = 1;
-    LP = 2;
-    CASEFINGER = 3;
-    CASEPALM = 4;
-    HIT = 5;
-    CANDLIST = 6;
-    QUERY = 7;
-    CANCEL = 8;
+    QUERY_TT = 0;
+    QUERY_TL = 1;
+    QUERY_LT = 2;
+    QUERY_LL = 3;
+    LP = 5;
+    LP_FINGER = 6;
+    TP = 7;
+
 }
 
 enum FPTVersion{
@@ -41,7 +41,8 @@ message FPTImportRequest {
     }
     required bytes data = 1;
     required string userId = 2;
-    required FPTVersion fptversion = 3;
+    required string originSystem = 3;
+    required FPTVersion fptversion = 4;
 }
 /**
  * FPT导入请求返回数据响应
@@ -64,7 +65,10 @@ message FPTExportRequest {
         optional FPTExportRequest cmd = 10802;
     }
     repeated string cardid = 1;
-    required ExportType type = 2;
+    required string userId = 2;
+    required string originSystem = 3;
+    required ExportType type = 4;
+    required string ifVerification = 5;
 }
 /**
  * FPT导出请求返回数据响应
@@ -75,6 +79,6 @@ message FPTExportResponse {
         optional FPTExportResponse cmd = 10803;
     }
     required ResponseStatus status = 1;
-    required string msg = 2;
+    repeated string msg = 2;
     repeated string data = 3;
 }

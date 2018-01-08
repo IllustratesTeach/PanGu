@@ -630,10 +630,10 @@ object FPT5Converter {
         case _  =>
       }
     }
-    if(null != latentPackage.caseMsg.money)textBuilder.setStrMoneyLost(latentPackage.caseMsg.money) //涉案金额
+    textBuilder.setStrMoneyLost(Option(latentPackage.caseMsg.money).getOrElse("")) //涉案金额
     textBuilder.setStrCaseOccurPlaceCode(latentPackage.caseMsg.caseOccurAdministrativeDivisionCode) //案发地点代码
     textBuilder.setStrCaseOccurPlace(latentPackage.caseMsg.caseOccurAddress) //案发地址详情
-    textBuilder.setStrBriefCase(latentPackage.caseMsg.briefCase) //简要案情
+    textBuilder.setStrBriefCase(Option(latentPackage.caseMsg.briefCase).getOrElse("")) //简要案情
     textBuilder.setBPersonKilled("1".equals(latentPackage.caseMsg.whetherKill)) //命案标识
     textBuilder.setStrExtractUnitCode(latentPackage.latentCollectInfoMsg.extractUnitCode) //提取单位代码
     textBuilder.setStrExtractUnitName(latentPackage.latentCollectInfoMsg.extractUnitName) //提取单位
@@ -666,7 +666,7 @@ object FPT5Converter {
               textBuilder.setStrStart(t.latentFingerImageMsg.latentFingerConnectFingerBeginPhysicalId) //联指开始序号
             }
             if (null != t.latentFingerImageMsg.latentFingerConnectFingerEndPhysicalId) {
-              textBuilder.setStrEnd(t.latentFingerImageMsg.latentFingerConnectFingerEndPhysicalId) //联指结束序号
+              textBuilder.setStrEnd(Option(t.latentFingerImageMsg.latentFingerConnectFingerEndPhysicalId).getOrElse("")) //联指结束序号
             }
 
             if (null != t.latentFingerImageMsg.latentFingerImageData && t.latentFingerImageMsg.latentFingerImageData.length > 0) {
@@ -683,7 +683,7 @@ object FPT5Converter {
                   val gafisMnt = FPT5MntConverter.convertFingerLDataMnt2GafisMnt(t.latentFingerImageMsg, f)
                   blobBuilder.setStMntBytes(ByteString.copyFrom(gafisMnt.toByteArray()))
                   textBuilder.setStrFeatureGroupIdentifier(f.latentFeatureGroupIdentifier)
-                  textBuilder.setStrFeatureGroupDscriptInfo(f.latentFeatureGroupDscriptInfo)
+                  textBuilder.setStrFeatureGroupDscriptInfo(Option(f.latentFeatureGroupDscriptInfo).getOrElse(""))
               }
               lpCardList += lpCard.build
             }

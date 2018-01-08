@@ -480,4 +480,19 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
   override def getCancelLatentPackage(originSystemCaseId: String): cancelLatentPackage = ???
 
   override def addCancelLatentPackage(cancelLatentPackage: cancelLatentPackage): Unit = ???
+
+  override def getCurrentUserMessage(userId:String): currentUserMessage = {
+    val currentUserMessage = new currentUserMessage()
+    val sql = s"select t.depart_code,d.name depart_name,t.true_name,t.idcard,t.phone from sys_user t left join sys_depart d on t.depart_code = d.code where pk_id = ? "
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,userId)
+    } { rs =>
+      currentUserMessage.sendPersonIdCard = rs.getString("idcard")
+      currentUserMessage.sendPersonName = rs.getString("true_name")
+      currentUserMessage.sendUnitCode = rs.getString("depart_code")
+      currentUserMessage.sendUnitName = rs.getString("depart_name")
+      currentUserMessage.sendPersonTel = rs.getString("phone")
+    }
+    currentUserMessage
+  }
 }
