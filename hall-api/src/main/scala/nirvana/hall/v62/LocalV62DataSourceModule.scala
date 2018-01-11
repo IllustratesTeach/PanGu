@@ -7,6 +7,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import net.sf.log4jdbc.ConnectionSpy
 import nirvana.hall.api.services.sync._
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal._
 import nirvana.hall.v62.internal.sync._
@@ -79,6 +80,7 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[LogicDBJudgeService], classOf[LogicDBJudgeServiceImpl])
     binder.bind(classOf[FPTFilterService],classOf[FPTFilterServiceImpl])
+    binder.bind(classOf[FPTExchangeService],classOf[FPTExchangeServiceImpl])
 
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={

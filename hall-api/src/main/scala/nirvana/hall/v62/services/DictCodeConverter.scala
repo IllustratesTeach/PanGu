@@ -37,8 +37,8 @@ object DictCodeConverter {
       "出生地code", textBuilder)
 
     //证件类型
-    convertCode(textBuilder.getStrCertifType, DictCode6Map7.certificatetype, textBuilder.setStrCertifType,
-      "证件类型", textBuilder.getStrComment, textBuilder.setStrComment)
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCertifType, textBuilder.getStrCertifType, 3,
+      "证件类型", textBuilder)
     //人员类型
     convertCode(textBuilder.getStrPersonType, DictCode6Map7.personType, textBuilder.setStrPersonType,
       "人员类型", textBuilder.getStrComment, textBuilder.setStrComment)

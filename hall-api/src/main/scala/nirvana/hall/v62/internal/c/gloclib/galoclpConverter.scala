@@ -60,6 +60,14 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "Comment",text.getStrComment)
       appendTextStruct(buffer, "CaptureMethod",text.getStrCaptureMethod)
 
+      //FPT5.0新增
+      appendTextStruct(buffer, "EvidenceNo",card.getStrPhysicalId) //现场物证编号
+      appendTextStruct(buffer, "UnionFingerStartEvidenceNo",text.getStrStart) //现场指纹_连指开始_现场物证编号
+      appendTextStruct(buffer, "UnionFingerEndEvidenceNo",text.getStrEnd) //现场指纹_连指结束_现场物证编号
+      appendTextStruct(buffer, "FingerPalmCompStateCode",text.getNBiDuiState.toString) //现场指纹_指掌纹比对状态代码
+      appendTextStruct(buffer, "FeatureGoupID",text.getStrFeatureGroupIdentifier) //现场指纹_特征组合标示符
+      appendTextStruct(buffer, "PalmDeltaPositionTypeCode",text.getStrFeatureGroupDscriptInfo) //现场指纹_特征组合描述信息
+
       data.pstText_Data = buffer.toArray
       data.nTextItemCount = buffer.size.asInstanceOf[Short]
     }
@@ -151,6 +159,19 @@ object galoclpConverter extends LoggerSupport{
             text.setStrCaptureMethod(textContent)
           case "Comment" =>
             text.setStrComment(textContent)
+            //FPT5.0新增
+          case "EvidenceNo" =>
+            card.setStrPhysicalId(textContent) //现场物证编号
+          case "UnionFingerStartEvidenceNo" =>
+            text.setStrStart(textContent) //现场指纹_连指开始_现场物证编号
+          case "UnionFingerEndEvidenceNo" =>
+            text.setStrEnd(textContent) //现场指纹_连指结束_现场物证编号
+          case "FingerPalmCompStateCode" =>
+            text.setNBiDuiState(textContent.toInt) //现场指纹_指掌纹比对状态代码
+          case "FeatureGoupID" =>
+            text.setStrFeatureGroupIdentifier(textContent) //现场指纹_特征组合标示符
+          case "PalmDeltaPositionTypeCode" =>
+            text.setStrFeatureGroupDscriptInfo(textContent) //现场指纹_特征组合描述信息
           case other =>
         }
       }
@@ -291,7 +312,7 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "ExtractUnitCode", text.getStrExtractUnitCode)
       appendTextStruct(buffer, "ExtractUnitNameTail", text.getStrExtractUnitName)
       appendTextStruct(buffer, "Extractor1", text.getStrExtractor)
-      appendTextStruct(buffer, "ExtractDate", text.getStrExtractDate)
+      appendTextStruct(buffer, "ExtractDate", text.getStrExtractDate.substring(0,8))
       appendTextStruct(buffer, "IllicitMoney", text.getStrMoneyLost)
       appendTextStruct(buffer, "Premium", text.getStrPremium)
       if(text.hasBPersonKilled)
@@ -308,6 +329,14 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "XieChaDate", text.getStrXieChaDate)
       appendTextStruct(buffer, "XieChaRequestUnitName", text.getStrXieChaRequestUnitName)
       appendTextStruct(buffer, "XieChaRequestUnitCode", text.getStrXieChaRequestUnitCode)
+
+      //FPT5.0新增
+      appendTextStruct(buffer, "XKID", protoCase.getStrSurveyId) //现场勘验编号
+      //appendTextStruct(buffer, "JQID", protoCase.getStrJingZongCaseId) //警综案事件编号
+      appendTextStruct(buffer, "ExtractorIDCard", text.getStrExtractorIdCard) //提取人身份证号码
+      appendTextStruct(buffer, "ExtractorContactNO", text.getStrExtractorTel ) //提取人电话
+      appendTextStruct(buffer, "CaseIncidentNo", protoCase.getStrJingZongCaseId) //案事件编号
+      appendTextStruct(buffer, "ExtractDateTime", text.getStrExtractDate) // 提取时间日期时间类型
 
       gafisCase.pstText_Data = buffer.toArray
       gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
@@ -389,6 +418,17 @@ object galoclpConverter extends LoggerSupport{
               caseInfo.getAdmDataBuilder.setCreator(textContent)
             case "UpdateUserName" =>
               caseInfo.getAdmDataBuilder.setUpdator(textContent)
+              //FPT5.0新增
+            case "ExtractorIDCard" =>
+              text.setStrExtractorIdCard(textContent) //提取人身份证号码
+            case "ExtractorContactNO" =>
+              text.setStrExtractorTel(textContent) //提取人电话
+            case "CaseIncidentNo" =>
+              caseInfo.setStrJingZongCaseId(textContent) //案事件编号
+            case "ExtractDateTime" =>
+              text.setStrExtractDate(textContent) //提取时间
+            case "XKID" =>
+              caseInfo.setStrSurveyId(textContent) //现场勘验编号
             case other =>
               warn("{} not mapped", other)
           }
