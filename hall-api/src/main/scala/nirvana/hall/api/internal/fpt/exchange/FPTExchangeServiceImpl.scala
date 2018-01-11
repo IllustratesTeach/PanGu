@@ -1,16 +1,22 @@
 package nirvana.hall.api.internal.fpt.exchange
 
+import java.text.SimpleDateFormat
 import javax.sql.DataSource
 
 import nirvana.hall.api.internal.fpt.vo.{FingerPrintTaskInfo, LatentTaskInfo}
-import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage}
+import nirvana.hall.c.services.gfpt5lib._
 import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
+import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.v70.gz.jpa.SysDepart
+import nirvana.hall.v70.gz.services.versionfpt5.QueryServiceImpl
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by yuchen on 2017/12/9.
   */
-class FPTExchangeServiceImpl(implicit dataSource: DataSource) extends FPTExchangeService{
+class FPTExchangeServiceImpl(implicit dataSource: DataSource,queryService: QueryServiceImpl) extends FPTExchangeService{
 
   override def getLatentTaskInfo(taskId:String): LatentTaskInfo = {
     var latentTaskInfo:LatentTaskInfo = null
@@ -500,4 +506,126 @@ class FPTExchangeServiceImpl(implicit dataSource: DataSource) extends FPTExchang
         ps.setString(27,llHitResultPackage.memo)
     }
   }
+
+  override def getLTResultPackage(taskId: String): (LtResultPackage,Option[MatchResult]) = {
+    val ltResultPackage = new LtResultPackage()
+    ltResultPackage.taskId = taskId
+    var orasid:Long = 0
+    val sql = s"select zwbdxtlxms," +
+      s"ysxt_asjbh," +
+      s"asjbh," +
+      s"xckybh," +
+      s"ysxt_xczzhwbh," +
+      s"xcwzbh," +
+      s"xczzhwkbh," +
+      s"ora_sid from fpt_lphit_request where rwbh = ? "
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,taskId)
+    }{rs=>
+      orasid =  rs.getString("ora_sid").toLong
+      val query = queryService.getQuery(orasid)
+      ltResultPackage.comparisonSystemTypeDescript = rs.getString("zwbdxtlxms")
+      ltResultPackage.originalSystemCaseId = rs.getString("ysxt_asjbh")
+      ltResultPackage.caseId = rs.getString("asjbh")
+      ltResultPackage.latentSurveyId = rs.getString("xckybh")
+      ltResultPackage.originalSystemLatentFingerId = rs.getNString("ysxt_xczzhwbh")
+      ltResultPackage.latentPhysicalId = rs.getString("xcwzbh")
+      ltResultPackage.latentCardId = rs.getString("xczzhwkbh")
+      ltResultPackage.comparisonUnitCode = query.userunitcode
+      ltResultPackage.comparisonUnitName = SysDepart.find(query.userunitcode).name
+      ltResultPackage.comparisonCompleteDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(query.finishtime)
+    }
+    val matchResult = queryService.getMatchResult(orasid)
+    (ltResultPackage,matchResult)
+  }
+
+  override def getTTResultPackage(taskId: String): (TtResultPackage, Option[MatchResult]) = {
+    val ttResultPackage = new TtResultPackage()
+    var orasid:Long = 0
+    ttResultPackage.taskId = taskId
+    val sql = s"select zwbdxtlxms," +
+      s"ysxt_asjxgrybh," +
+      s"jzrybh," +
+      s"asjxgrybh," +
+      s"zzhwkbh," +
+      s"ora_sid from fpt_tphit_request where rwbh = ? "
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,taskId)
+    }{rs=>
+      orasid = rs.getLong("ora_sid")
+      val query = queryService.getQuery(orasid)
+      ttResultPackage.comparisonSystemTypeDescript = rs.getString("zwbdxtlxms") //fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+      ttResultPackage.comparisonUnitCode = query.userunitcode
+      ttResultPackage.comparisonUnitName = SysDepart.find(query.userunitcode).name
+      ttResultPackage.comparisonCompleteDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(query.finishtime)
+      ttResultPackage.originalSystemPersonId = rs.getString("ysxt_asjxgrybh") //query.keyid //"A5200000000002017040001"
+      ttResultPackage.jingZongPersonId = rs.getString("jzrybh") //tpcard.getStrJingZongPersonId//"J5200000000002017040001"
+      ttResultPackage.personId = rs.getString("asjxgrybh") //tpcard.getStrCasePersonID //"P5200000000002017040001"
+      ttResultPackage.cardId = rs.getString("zzhwkbh") //tpcard.getStrCardID //query.keyid.substring(0,query.keyid.length-2)
+      ttResultPackage.whetherFingerJudgmentMark = "1"
+    }
+    val matchResult = queryService.getMatchResult(orasid)
+    (ttResultPackage,matchResult)
+  }
+
+  override def getLLResultPackage(taskId: String): (LlResultPackage, Option[MatchResult]) = {
+    val llResultPackage = new LlResultPackage()
+    llResultPackage.taskId = taskId
+    var orasid:Long = 0
+    val sql = s"select zwbdxtlxms,ysxt_asjbh,asjbh,xckybh,ysxt_xczzhwbh,xcwzbh,xczzhwkbh,ora_sid from fpt_lphit_request where rwbh = ? "
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,taskId)
+    } { rs =>
+      orasid = rs.getLong("ora_sid")
+      val query = queryService.getQuery(orasid)
+      llResultPackage.comparisonSystemTypeDescript = rs.getString("zwbdxtlxms")
+      llResultPackage.originalSystemCaseId = rs.getString("ysxt_asjbh")
+      llResultPackage.caseId = rs.getString("asjbh")
+      llResultPackage.latentSurveyId = rs.getString("xckybh")
+      llResultPackage.originalSystemLatentFingerId = rs.getString("ysxt_xczzhwbh")
+      llResultPackage.latentPhysicalId = rs.getString("xcwzbh")
+      llResultPackage.latentCardId = rs.getString("xczzhwkbh")
+      llResultPackage.comparisonUnitCode = query.userunitcode
+      llResultPackage.comparisonUnitName = SysDepart.find(query.userunitcode).name
+      llResultPackage.comparisonCompleteDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(query.finishtime)
+    }
+    val matchResult = queryService.getMatchResult(orasid)
+    (llResultPackage,matchResult)
+  }
+
+  override def getTlResultPackage(taskId: String): (TlResultPackage, Option[MatchResult]) = {
+    val tlResultPackage = new TlResultPackage()
+    var orasid:Long = 0
+    tlResultPackage.taskId = taskId
+    val sql = s"select zwbdxtlxms," +
+      s"ysxt_asjxgrybh," +
+      s"jzrybh," +
+      s"asjxgrybh," +
+      s"zzhwkbh," +
+      s"ora_sid from fpt_tphit_request where rwbh = ? "
+    JdbcDatabase.queryWithPsSetter(sql){ps=>
+      ps.setString(1,taskId)
+    }{rs=>
+      tlResultPackage.comparisonSystemTypeDescript = rs.getString("zwbdxtlxms")
+      tlResultPackage.originalSystemPersonId = rs.getString("ysxt_asjxgrybh")
+      tlResultPackage.jingZongPersonId = rs.getString("jzrybh")
+      tlResultPackage.personId = rs.getString("asjxgrybh")
+      tlResultPackage.cardId = rs.getString("zzhwkbh")
+      orasid =  rs.getString("ora_sid").toLong
+      val query = queryService.getQuery(orasid)
+      tlResultPackage.comparisonUnitCode = query.userunitcode
+      tlResultPackage.comparisonUnitName = SysDepart.find(query.userunitcode).name
+      tlResultPackage.comparisonCompleteDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(query.finishtime)
+    }
+    val matchResult = queryService.getMatchResult(orasid)
+    (tlResultPackage,matchResult)
+  }
+
+  override def addLTResultPackage(ltResultPackage: LtResultPackage): Unit = ???
+
+  override def addTTResultPackage(ttResultPackage: TtResultPackage): Unit = ???
+
+  override def addTlResultPackage(tlResultPackage: TlResultPackage): Unit = ???
+
+  override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
 }

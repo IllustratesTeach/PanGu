@@ -62,12 +62,31 @@ object galoctpConverter extends LoggerSupport{
       appendTextStruct(buffer, "PrinterUnitCode",text.getStrPrintUnitCode)
       appendTextStruct(buffer, "PrinterUnitNameTail",text.getStrPrintUnitName)
       appendTextStruct(buffer, "PrinterName",text.getStrPrinter)
-      appendTextStruct(buffer, "PrintDate",text.getStrPrintDate)
+      appendTextStruct(buffer, "PrintDate",text.getStrPrintDate.substring(0,8))
       appendTextStruct(buffer, "Comment",text.getStrComment)
       appendTextStruct(buffer, "Nationality",text.getStrNation)
       appendTextStruct(buffer, "RaceCode",text.getStrRace)
       appendTextStruct(buffer, "CertificateCode",text.getStrCertifID)
       appendTextStruct(buffer, "CertificateType",text.getStrCertifType)
+      //FPT5.0新增
+      appendTextStruct(buffer, "srcSysCaseRelatePersonNO",card.getStrMisPersonID)  //原始系统_案事件相关人员编号
+      appendTextStruct(buffer, "policeIntegratedPersonNO",card.getStrJingZongPersonId) //警综人员编号
+      appendTextStruct(buffer, "caseRelatePersonNO",card.getStrCasePersonID) //案事件相关人员编号
+      //采集原因代码
+      val captureInfoReasonCode = card.getCaptureInfoReasonCode.split(",")
+      captureInfoReasonCode.foreach{
+        code =>
+          if (captureInfoReasonCode.indexOf(code) == 0){
+            appendTextStruct(buffer, "personClassCode",code)
+          } else{
+            appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
+          }
+      }
+      appendTextStruct(buffer, "printerID",card.getStrPrinterIdCardId) //捺印人员身份证号码
+      appendTextStruct(buffer, "printerPhone",card.getStrPrinterTel) //捺印人员联系电话
+      appendTextStruct(buffer, "PrintDateTime",text.getStrPrintDate) //新增FPT5.0捺印时间
+      //TODO 指掌纹缺失情况代码
+      //TODO 掌纹三角点位置类型代码
       if(text.hasBHasCriminalRecord)
         appendTextStruct(buffer, "IsCriminalRecord",if(text.getBHasCriminalRecord) "1" else "0")
       appendTextStruct(buffer, "CriminalRecordDesc",text.getStrCriminalRecordDesc)
@@ -201,6 +220,8 @@ object galoctpConverter extends LoggerSupport{
       card.setStrMisPersonID(data.stAdmData.szPersonID)
     }
     val text = card.getTextBuilder
+    //采集原因代码
+    val array = scala.collection.mutable.ArrayBuffer[String]()
     data.pstText_Data.foreach{ item =>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
       if (bytes != null){
@@ -229,6 +250,7 @@ object galoctpConverter extends LoggerSupport{
               text.setStrAddr(textContent)
             case "PersonClassCode" =>
               text.setStrPersonType(textContent)
+              array += textContent
             case "CaseClass1Code" =>
               text.setStrCaseType1(textContent)
             case "CaseClass2Code" =>
@@ -243,7 +265,7 @@ object galoctpConverter extends LoggerSupport{
               text.setStrPrinter(textContent)
             case "PrintDate" =>
               if(textContent.matches("\\d{8}"))
-                text.setStrPrintDate(textContent)
+                text.setStrPrintDate(textContent+"000000")
             case "Comment" =>
               text.setStrComment(textContent)
             case "Nationality" =>
@@ -262,13 +284,34 @@ object galoctpConverter extends LoggerSupport{
               card.getAdmDataBuilder.setCreateUnitCode(textContent)
             case "UpdatorUnitCode" =>
               card.getAdmDataBuilder.setUpdateUnitCode(textContent)
+            //FPT5.0新增
+            case "SrcSysCaseRelatePersonNO" =>
+              card.setStrMisPersonID(textContent)  //原始系统_案事件相关人员编号
+            case "PoliceIntegratedPersonNO" =>
+              card.setStrJingZongPersonId(textContent) //警综人员编号
+            case "CaseRelatePersonNO" =>
+              card.setStrCasePersonID(textContent) //案事件相关人员编号
+            case "PersonClassCode2" =>
+              array += textContent
+            case "PersonClassCode3" =>
+              array += textContent
+            case "PersonClassCode4" =>
+              array += textContent
+            case "PersonClassCode5" =>
+              array += textContent
+            case "PrinterID" =>
+              text.setStrPrinterIdCardNo(textContent) //捺印人员身份证号码
+            case "PrinterPhone" =>
+             text.setStrPrinterPhone(textContent) //捺印人员联系电话
+            case "PrintDateTime" =>
+              text.setStrPrintDate(textContent) //真对FPT5.0捺印日期时间新增字段
             case other =>
               warn("{} not mapped", other)
           }
         }
       }
     }
-
+    card.setCaptureInfoReasonCode(array.mkString(","))
     //判断是否有图像数据
     if(data.nMicItemCount > 0){
       data.pstMIC_Data.foreach{ mic =>
