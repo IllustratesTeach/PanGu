@@ -1,7 +1,8 @@
 package nirvana.hall.v70.gz.sys
 
 import nirvana.hall.api.services.AuthService
-import nirvana.hall.v70.gz.jpa.SysUser
+import nirvana.hall.c.services.gfpt5lib.currentUserMessage
+import nirvana.hall.v70.gz.jpa.{SysDepart, SysUser}
 import org.apache.commons.codec.digest.DigestUtils
 
 /**
@@ -43,5 +44,18 @@ class UserServiceImpl(authService: AuthService) extends UserService {
    */
   override def findSysUserByLoginName(loginName: String): Option[SysUser] = {
     SysUser.where(SysUser.loginName === loginName).limit(1).headOption
+  }
+
+  //新增FPT5.0头文件用户信息
+  def getFPT5CurrentUserMessage(userId:String):currentUserMessage = {
+    val currentUserMessage = new currentUserMessage()
+    val user = SysUser.findOption(userId).get
+    val depart = SysDepart.findOption(user.departCode).get
+    currentUserMessage.sendPersonIdCard = user.idcard
+    currentUserMessage.sendPersonName = user.trueName
+    currentUserMessage.sendUnitCode = user.departCode
+    currentUserMessage.sendUnitName = depart.name
+    currentUserMessage.sendPersonTel = user.phone
+    currentUserMessage
   }
 }

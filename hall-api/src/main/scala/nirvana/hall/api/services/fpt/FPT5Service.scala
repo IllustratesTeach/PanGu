@@ -79,6 +79,5 @@ trait FPT5Service {
 
   def addCancelLatentPackage(cancelLatentPackage:cancelLatentPackage):Unit
 
-  def getCurrentUserMessage(userId:String):currentUserMessage
 
 }

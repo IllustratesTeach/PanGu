@@ -332,7 +332,7 @@ object galoclpConverter extends LoggerSupport{
 
       //FPT5.0新增
       appendTextStruct(buffer, "XKID", protoCase.getStrSurveyId) //现场勘验编号
-      //appendTextStruct(buffer, "JQID", protoCase.getStrJingZongCaseId) //警综案事件编号
+      appendTextStruct(buffer, "AJID", protoCase.getStrJingZongCaseId) //警综案事件编号
       appendTextStruct(buffer, "ExtractorIDCard", text.getStrExtractorIdCard) //提取人身份证号码
       appendTextStruct(buffer, "ExtractorContactNO", text.getStrExtractorTel ) //提取人电话
       appendTextStruct(buffer, "CaseIncidentNo", protoCase.getStrJingZongCaseId) //案事件编号
@@ -429,6 +429,8 @@ object galoclpConverter extends LoggerSupport{
               text.setStrExtractDate(textContent) //提取时间
             case "XKID" =>
               caseInfo.setStrSurveyId(textContent) //现场勘验编号
+            case "AJID" =>
+              caseInfo.setStrJingZongCaseId(textContent) //案事件编号
             case other =>
               warn("{} not mapped", other)
           }

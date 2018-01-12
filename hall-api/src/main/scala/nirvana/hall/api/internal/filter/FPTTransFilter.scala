@@ -3,7 +3,7 @@ package nirvana.hall.api.internal.filter
 
 import javax.servlet.http.HttpServletRequest
 
-import com.google.protobuf.{ProtocolStringList}
+import com.google.protobuf.ProtocolStringList
 import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
 import nirvana.hall.api.internal.ExceptionUtil
@@ -11,13 +11,15 @@ import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, FingerprintPackage, LatentPackage}
 import nirvana.hall.protocol.api.FPTTrans
 import nirvana.hall.protocol.api.FPTTrans.{ExportType, _}
-import nirvana.hall.support.services.{XmlLoader}
+import nirvana.hall.support.services.XmlLoader
+import nirvana.hall.v70.gz.sys.UserServiceImpl
+
 import scala.collection.mutable.ArrayBuffer
 /**
   * Created by yuchen on 2017/11/9.
   * 用于指纹系统7.0导出FPT
   */
-class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5Service) extends RpcServerMessageFilter {
+class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5Service,userService: UserServiceImpl) extends RpcServerMessageFilter {
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if (commandRequest.hasExtension(FPTImportRequest.cmd)) {
       val request = commandRequest.getExtension(FPTImportRequest.cmd)
@@ -102,7 +104,7 @@ class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5S
     val cardIdListIterator = cardIdList.iterator
     var fPT5File: FPT5File = null
     val xmlList = new ArrayBuffer[String]
-    val userMessage = fPT5Service.getCurrentUserMessage(userId)
+    val userMessage = userService.getFPT5CurrentUserMessage(userId)
     fPT5File = new FPT5File
     fPT5File.packageHead.originSystem = originSystem
     fPT5File.packageHead.sendUnitCode = userMessage.sendUnitCode
