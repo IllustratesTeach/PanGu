@@ -1,4 +1,4 @@
-package nirvana.hall.webservice.internal.xcky
+package nirvana.hall.webservice.internal.survey.gafis62
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gfpt5lib.LatentPackage

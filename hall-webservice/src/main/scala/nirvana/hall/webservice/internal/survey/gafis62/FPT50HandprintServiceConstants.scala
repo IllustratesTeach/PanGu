@@ -1,4 +1,4 @@
-package nirvana.hall.webservice.internal.xcky
+package nirvana.hall.webservice.internal.survey.gafis62
 
 import javax.xml.bind.annotation.{XmlAccessType, XmlAccessorType, XmlElement, XmlRootElement}
 
