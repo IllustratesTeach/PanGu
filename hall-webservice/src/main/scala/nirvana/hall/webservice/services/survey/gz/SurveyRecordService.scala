@@ -15,7 +15,12 @@ trait SurveyRecordService {
     * 根据时间判断是否应该休眠
     * @return
     */
-  def isSleep(haiXinServerTime:Long):(Boolean,TimeConfig)
+  def isSleep(haiXinServerTime:Long ,startTime: Long ,increments : String):(Boolean,TimeConfig)
+
+  /**
+    * 获取开始时间，时间间隔，行政区划代码列表
+    */
+  def getSurveyConfig() : ListBuffer[mutable.HashMap[String,Any]]
 
   /**
     * 更新现勘时间配置表 开始时间字段
@@ -23,7 +28,7 @@ trait SurveyRecordService {
     * @param endTime
     * @return
     */
-  def updateSurveyConfig(endTime : Timestamp): Unit
+  def updateSurveyConfig(endTime : Timestamp ,unitcode :String): Unit
 
   /**
     * 判断现勘号再现勘记录表中是否存在
@@ -65,18 +70,25 @@ trait SurveyRecordService {
   def getWZBHbyKno(kno: String):  ListBuffer[mutable.HashMap[String,Any]]
 
   /**
-    * 更新现勘现场数据状态，根据xcwzbh
+    * 更新现勘现场数据状态，根据uuid
     * @param state
-    * @param xcwzbh
+    * @param uuid
     */
-  def updateRecordStateByXCWZBH(state: Int,xcwzbh : String): Unit
+  def updateRecordStateByXCWZBH(state: Int, uuid : String): Unit
 
   /**
-    * 更新现勘现场数据状态，根据xcwzbh
-    * @param reception_state
+    * 更新现勘现场数据状态，根据kno
+    * @param state
     * @param kno
     */
-  def updateRecordStateByKno(reception_state: Int,kno : String): Unit
+  def updateSurveyRecordStateByKno(state: Int, kno : String): Unit
+
+  /**
+    * 更新现勘现场数据接警编号状态，根据kno
+    * @param receptionno_state
+    * @param kno
+    */
+  def updateRecordStateByKno(receptionno_state: Int,kno : String): Unit
 
   /**
     * 增加palm路径到记录表中

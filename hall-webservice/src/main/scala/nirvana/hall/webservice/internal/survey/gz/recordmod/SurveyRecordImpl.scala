@@ -27,20 +27,17 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   JniLoaderUtil.loadImageJNI
 
 
-  override def isSleep(haiXinServerTime:Long):(Boolean,TimeConfig) = {
+  override def isSleep(haiXinServerTime:Long ,startTime :Long ,increments :String):(Boolean,TimeConfig) = {
     var bStr = false
     val timeConfig = new TimeConfig
-    getSurveyConfig match {
-      case Some(t) =>
-        val endTime = t.get("starttime").get.asInstanceOf[Date].getTime + t.get("increments").get.asInstanceOf[String].toLong*60*1000
-        if(haiXinServerTime <= endTime){
-          bStr = true
-        }else{
-          timeConfig.startTime = DateConverter.convertDate2String(new Date(t.get("starttime").get.asInstanceOf[Date].getTime),Constant.DATETIME_FORMAT)
-          timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),Constant.DATETIME_FORMAT)
-        }
-      case _ => throw new Exception("time config empty or error")
+    val endTime = startTime + increments.toLong*60*1000
+    if(haiXinServerTime <= endTime){
+      bStr = true
+    }else{
+      timeConfig.startTime = DateConverter.convertDate2String(new Date(startTime),Constant.DATETIME_FORMAT)
+      timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),Constant.DATETIME_FORMAT)
     }
+//    throw new Exception("time config empty or error")
     (bStr,timeConfig)
   }
 
@@ -49,17 +46,20 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     *
     * @return
     */
-  private def getSurveyConfig(): Option[mutable.HashMap[String,Any]] =  {
+  def getSurveyConfig(): ListBuffer[mutable.HashMap[String,Any]] =  {
     val sql = "SELECT * FROM SURVEY_CONFIG t WHERE t.flags = '1'"
-    var map = new scala.collection.mutable.HashMap[String,Any]
+    val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
     }{rs=>
-      if(rs.next()){
+      while(rs.next()){
+        var map = new scala.collection.mutable.HashMap[String,Any]
         map += ("starttime" -> rs.getTimestamp("START_TIME"))
         map += ("increments" -> rs.getString("INCREMENTS"))
+        map += ("unitCode") -> rs.getString("UNITCODE")
+        resultList.append(map)
       }
     }
-    Some(map)
+    resultList
   }
 
   /**
@@ -68,10 +68,11 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     * @param endTime
     * @return
     */
-  def updateSurveyConfig(endTime : Timestamp): Unit =  {
-    val sql = s"UPDATE SURVEY_CONFIG SET START_TIME = ? ,UPDATE_TIME=sysdate"
+  def updateSurveyConfig(endTime : Timestamp ,unitcode :String): Unit =  {
+    val sql = s"UPDATE SURVEY_CONFIG SET START_TIME = ? ,UPDATE_TIME=sysdate where UNITCODE = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setTimestamp(1,endTime)
+      ps.setString(2,unitcode)
     }
   }
 
@@ -138,7 +139,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   def getSurveyRecordbyState(state: Int,batchSize:Int) : ListBuffer[String] ={
     val sql = "SELECT t.kno FROM survey_record t WHERE state=? AND ROWNUM <=? GROUP BY t.kno"
     val resultList = new mutable.ListBuffer[String]
-    JdbcDatabase.queryWithPsSetter(sql){ ps =>
+    JdbcDatabase.queryWithPsSetter2(sql){ ps =>
       ps.setInt(1,state)
       ps.setInt(2,batchSize)
     } {rs=>
@@ -161,6 +162,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     }{rs=>
       while (rs.next()){
         val map = new scala.collection.mutable.HashMap[String,Any]
+        map += ("uuid" -> rs.getString("UUID"))
         map += ("xcwzbh" -> rs.getString("PHYSICAL_EVIDENCE_NO"))
         resultList.append(map)
       }
@@ -172,25 +174,38 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   /**
     * 更新现勘现场数据状态，根据xcwzbh
     * @param state
-    * @param xcwzbh
+    * @param uuid
     */
-  def updateRecordStateByXCWZBH(state: Int,xcwzbh : String): Unit = {
-    val sql = s"UPDATE survey_record SET state = ?,updatetime = sysdate WHERE PHYSICAL_EVIDENCE_NO = ?"
+  def updateRecordStateByXCWZBH(state: Int,uuid : String): Unit = {
+    val sql = s"UPDATE survey_record SET state = ?,updatetime = sysdate WHERE UUID = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1,state)
-      ps.setString(2,xcwzbh)
+      ps.setString(2,uuid)
     }
   }
 
   /**
     * 更新现勘现场数据状态，根据kno
-    * @param reception_state
+    * @param state
     * @param kno
     */
-  def updateRecordStateByKno(reception_state: Int,kno : String): Unit = {
-    val sql = s"UPDATE survey_record SET reception_state = ?,updatetime = sysdate WHERE kno = ?"
+  def updateSurveyRecordStateByKno(state: Int,kno : String): Unit = {
+    val sql = s"UPDATE survey_record SET state = ?,updatetime = sysdate WHERE kno = ?"
     JdbcDatabase.update(sql){ps=>
-      ps.setInt(1,reception_state)
+      ps.setInt(1,state)
+      ps.setString(2,kno)
+    }
+  }
+
+  /**
+    * 更新现勘现场数据接警编号状态，根据kno
+    * @param receptionno_state
+    * @param kno
+    */
+  def updateRecordStateByKno(receptionno_state: Int,kno : String): Unit = {
+    val sql = s"UPDATE survey_record SET receptionno_state = ?,updatetime = sysdate WHERE kno = ?"
+    JdbcDatabase.update(sql){ps=>
+      ps.setInt(1,receptionno_state)
       ps.setString(2,kno)
     }
   }
