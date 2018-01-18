@@ -8,6 +8,7 @@
   <xs:element name="hall_v70" type="hallV70Type"/>
   <xs:complexType name="hallV70Type">
     <xs:sequence>
+      <xs:element type="serverType" name="app_server" minOccurs="1" maxOccurs="1"/>
       <xs:element type="databaseType" name="database" minOccurs="1" maxOccurs="1"/>
       <xs:element type="cronConfigType" name="cron" minOccurs="0" maxOccurs="1">
         <xs:annotation>
@@ -16,6 +17,17 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
+
+  <xs:complexType name="serverType">
+      <xs:sequence>
+      <xs:element name="user" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>用户名编号</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="cronConfigType">
     <xs:sequence>
       <xs:element type="cronType" name="sync_dict_cron" minOccurs="0" maxOccurs="1">

@@ -10,6 +10,7 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto._
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.gz.Constant
 import nirvana.hall.v70.gz.jpa.{GafisCasePalm, GafisCasePalmMnt, SysUser}
 import nirvana.hall.v70.gz.sync._
@@ -22,7 +23,7 @@ import scala.collection.mutable
 /**
   * 现场掌纹service实现
   */
-class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService, implicit val dataSource: DataSource) extends LPPalmService with LoggerSupport{
+class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManager, userService: UserService, implicit val dataSource: DataSource) extends LPPalmService with LoggerSupport{
 
   /**
     * 新增现场卡片
@@ -50,7 +51,7 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService, 
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(casePalm.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
     casePalm.inputpsn = user.get.pkId
     casePalm.inputtime = new Date
@@ -101,11 +102,11 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService, 
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(casePalm.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
     casePalm.inputpsn = user.get.pkId
     casePalm.creatorUnitCode= user.get.departCode
-    val modUser = userService.findSysUserByLoginName(casePalm.modifiedpsn)
+    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
     if(modUser.nonEmpty){
       casePalm.modifiedpsn = modUser.get.pkId
     }else{

@@ -12,11 +12,21 @@ import stark.activerecord.config.ActiveRecordConfigSupport
 @XmlType(name = "HallV70Config")
 @XmlRootElement(name = "hall_v70")
 class HallV70Config extends ActiveRecordConfigSupport {
+  @XmlElement(name = "app_server")
+  var server: ServerConfig = new ServerConfig()
   @XmlElement(name = "database")
   var db: DatabaseConfig = new DatabaseConfig()
   @XmlElement(name = "cron")
   var cron: CronConfig = new CronConfig
 }
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ServerConfig")
+class ServerConfig {
+  @XmlElement(name = "user")
+  var users: String = _
+}
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CronConfig")
 class CronConfig {

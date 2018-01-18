@@ -10,6 +10,7 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.gz.Constant
 import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
 import nirvana.hall.v70.gz.sync.ProtobufConverter
@@ -21,7 +22,7 @@ import scala.collection.mutable
 /**
   * Created by songpeng on 2017/6/29.
   */
-class LPCardServiceImpl(entityManager: EntityManager, userService: UserService ,implicit val dataSource: DataSource) extends LPCardService{
+class LPCardServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManager, userService: UserService ,implicit val dataSource: DataSource) extends LPCardService{
   /**
     * 新增现场卡片
     *
@@ -45,9 +46,9 @@ class LPCardServiceImpl(entityManager: EntityManager, userService: UserService ,
       caseFingerMnt.fingerId = caseFinger.caseId + seqNo
     }
     //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
+    var user = userService.findSysUserByLoginName(hallV70Config.server.users)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
     caseFinger.inputpsn = user.get.pkId
     caseFinger.inputtime = new Date
@@ -91,12 +92,12 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     //将用户名转为用户id
     var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
     caseFinger.inputpsn = user.get.pkId
     caseFinger.inputtime = new Date
     caseFinger.creatorUnitCode= user.get.departCode
-    val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
+    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
     if(modUser.nonEmpty){
       caseFinger.modifiedpsn = modUser.get.pkId
     }else{

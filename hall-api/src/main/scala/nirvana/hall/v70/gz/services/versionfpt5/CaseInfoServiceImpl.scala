@@ -7,6 +7,7 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm, SysUser}
 import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
@@ -14,7 +15,7 @@ import nirvana.hall.v70.internal.Gafis70Constants
 /**
   * Created by songpeng on 2017/6/29.
   */
-class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
+class CaseInfoServiceImpl(hallV70Config: HallV70Config,userService: UserService) extends CaseInfoService{
 
   /**
     * 新增案件信息
@@ -24,9 +25,9 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = convertCase2GafisCase(caseInfo)
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn) // gafisCase.inputpsn
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))//Gafis70Constants.INPUTPSN
     }
     gafisCase.inputpsn = user.get.pkId
     gafisCase.createUnitCode = user.get.departCode
@@ -60,11 +61,11 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
 
     var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
     gafisCase.inputpsn = user.get.pkId
     gafisCase.createUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
+    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
     if(modUser.nonEmpty){
       gafisCase.modifiedpsn = modUser.get.pkId
     }
