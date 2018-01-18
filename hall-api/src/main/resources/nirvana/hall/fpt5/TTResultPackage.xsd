@@ -107,7 +107,7 @@
 						<xs:restriction base="type_asjxgrybh"/>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="zzhwkbh">
+				<xs:element name="zzhwkbh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>指掌纹卡编号</xs:documentation>
 					</xs:annotation>

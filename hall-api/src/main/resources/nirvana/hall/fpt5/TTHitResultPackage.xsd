@@ -60,7 +60,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="ysxt_asjxgrybh" minOccurs="0">
+				<xs:element name="ysxt_asjxgrybh">
 					<xs:annotation>
 						<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
 					</xs:annotation>

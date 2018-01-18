@@ -92,13 +92,13 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="fsr_lxdm">
+				<xs:element name="fsr_lxdh">
 					<xs:annotation>
 						<xs:documentation>发送人联系电话</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
-							<xs:maxLength value="30"/>
+							<xs:maxLength value="18"/>
 							<xs:minLength value="1"/>
 						</xs:restriction>
 					</xs:simpleType>

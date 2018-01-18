@@ -57,7 +57,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="asjbh">
+				<xs:element name="asjbh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>案事件编号</xs:documentation>
 					</xs:annotation>
@@ -111,7 +111,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="bzjg_asjbh">
+				<xs:element name="bzjg_asjbh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>比中结果_案事件编号</xs:documentation>
 					</xs:annotation>

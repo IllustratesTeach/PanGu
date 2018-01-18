@@ -97,7 +97,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="asjbh">
+				<xs:element name="asjbh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>案事件编号</xs:documentation>
 					</xs:annotation>

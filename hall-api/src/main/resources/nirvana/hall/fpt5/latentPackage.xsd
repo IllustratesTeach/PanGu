@@ -146,7 +146,7 @@
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>
-							<xs:element name="tqsj_gajgjgdm">
+							<xs:element name="tqdw_gajgjgdm">
 								<xs:annotation>
 									<xs:documentation>提取单位_公安机关机构代码</xs:documentation>
 								</xs:annotation>
@@ -156,7 +156,7 @@
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>
-							<xs:element name="tqsj_gajgmc">
+							<xs:element name="tqdw_gajgmc">
 								<xs:annotation>
 									<xs:documentation>提取单位_公安机关名称</xs:documentation>
 								</xs:annotation>
@@ -217,7 +217,7 @@
 							<xs:element name="fingerImageMsg" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:all>
-										<xs:element name="ysxt_xczzhwbh">
+										<xs:element name="ysxt_xczzhwbh" minOccurs="0">
 											<xs:annotation>
 												<xs:documentation>原始系统_现场指掌纹编号</xs:documentation>
 											</xs:annotation>

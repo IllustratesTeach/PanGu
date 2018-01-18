@@ -54,7 +54,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="xczw_asjbh">
+				<xs:element name="xczw_asjbh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>现场指纹_案事件编号</xs:documentation>
 					</xs:annotation>

@@ -70,7 +70,7 @@
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
-				<xs:element name="jzrybh">
+				<xs:element name="jzrybh" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>警综人员编号</xs:documentation>
 					</xs:annotation>
@@ -93,6 +93,16 @@
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
 							<xs:maxLength value="23"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="sfzw_pdbz">
+					<xs:annotation>
+						<xs:documentation>是否指纹_判断标识</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="code_if">
+							<xs:length value="1"/>
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
