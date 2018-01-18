@@ -1,7 +1,8 @@
 package nirvana.hall.spark.internal
 
 
-import java.io.{File, ByteArrayInputStream}
+import java.io.{ByteArrayInputStream, File}
+
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.fpt4code._
 import nirvana.hall.c.services.gfpt4lib.{FPTFile, fpt4code}
@@ -15,7 +16,8 @@ import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
 import nirvana.hall.spark.services.SparkFunctions.{StreamEvent, _}
 import nirvana.hall.spark.services._
-import org.apache.commons.io.{FileUtils, IOUtils}
+import org.apache.commons.io.FileUtils
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
 
@@ -26,24 +28,29 @@ class FPTProvider extends ImageProvider {
 
   private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
 
-  def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
-  override def requestImageByFID(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]()}
+  override def requestImageByBMP(parameter:NirvanaSparkConfig,pkId:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)] = {null}
+  override def requestData(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)] = {ArrayBuffer[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]()}
 
-  def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
+  override def requestImage(parameter:NirvanaSparkConfig,filePathSuffix:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)] ={
     def fetchFPT(seq:Int): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
+      var event : StreamEvent = null
       try {
         var path = filePathSuffix
-        if (!filePathSuffix.startsWith("http")) path = imageFileServer.get + filePathSuffix
-        val data = SparkFunctions.httpClient.download(path)
-        val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
-
+        if (!filePathSuffix.startsWith("http") && !"None".equals(imageFileServer.get)) path = imageFileServer.get + filePathSuffix
         val buffer = ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]()
-        if (filePathSuffix.isEmpty) return buffer.toSeq
-        val filePath : String = imageFileServer.get + filePathSuffix
+        if (filePathSuffix.isEmpty) return buffer
+        val filePath : String = path
         var personId: String = null
+        var caseId : String = null
+        var seqNo : String = null
+        var cardId : String = null
+        event = StreamEvent(filePath, personId,  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,caseId,seqNo,cardId)
+        var data : Array[Byte] = Array.emptyByteArray
+        if ("None".equals(imageFileServer.get)) data = FileUtils.readFileToByteArray(new File(filePath))
+        else data = SparkFunctions.httpClient.download(filePath)
+        val fpt = FPTFile.parseFromInputStream(new ByteArrayInputStream(data), AncientConstants.GBK_ENCODING)
         fpt match {
           case Left(fpt3) =>
-            //assert(fpt3.fileLength.toInt == fpt3.getDataSize,"fpt3 fileLength != dataSize")
             val tpCounts = fpt3.tpCount
             var tpCount = 0
             if (tpCounts!=null && !"".equals(tpCounts))
@@ -59,6 +66,7 @@ class FPTProvider extends ImageProvider {
                 assert(fingerCount == tp.fingers.length)
                 personId = tp.personId
                 assert(personId != null, "person id is null")
+                event = StreamEvent(filePath, personId,  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,caseId,seqNo,cardId)
                 //save person base information
                 val hasPerson = GafisPartitionRecordsSaver.queryPersonById(personId)
                 if (hasPerson.isEmpty) {
@@ -79,24 +87,21 @@ class FPTProvider extends ImageProvider {
             }
             if (lpCount > 0) { //process latent FPT
               fpt3.logic2Recs.foreach { lp =>
-                val caseId = lp.caseId
+                caseId = lp.caseId
                 assert(caseId != null && !"".equals(caseId), "case id is null")
                 val latentCase = FptPropertiesConverter.fpt3ToLatentCaseConvert(lp)
-
                 lp.fingers.foreach{ lData=>
-                  var seqNo = lData.fingerNo.toInt.toString
-                  var cardId = lData.fingerId
-                  if (cardId == null || "".equals(cardId)) {
-                    if (seqNo != null && !"".equals(seqNo)) {
-                      if (seqNo.toInt < 10)
-                        seqNo = "0" + seqNo
-                      cardId = caseId + seqNo
-                    } else
-                      cardId = null
+                  seqNo = lData.fingerNo.toInt.toString
+                  cardId = lData.fingerId
+                  if (seqNo != null && !"".equals(seqNo)) {
+                    if (seqNo.toInt < 10)
+                      seqNo = "0" + seqNo
+                    cardId = caseId + seqNo
                   }
                   assert(cardId != null && !"".equals(cardId), "card id is null")
+                  event = StreamEvent(filePath, personId,  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,caseId,seqNo,cardId)
                   val latentFinger = FptPropertiesConverter.fpt3ToLatentFingerConvert(lData,filePath,caseId,cardId.trim,seqNo)
-                  if (lData != null && lData.featureCount.toInt > 0) {
+                  if (lData != null && !lData.feature.trim.isEmpty) {
                     val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(lData)
                     val feature = createImageLatentEvent(disp)
                     val GFSFEATURE = fpt4code.FPTFingerLDataToGafisImage(lData)
@@ -114,10 +119,6 @@ class FPTProvider extends ImageProvider {
               }
             }
           case Right(fpt4) =>
-            /*if (fpt4.fileLength.toInt != fpt4.getDataSize) {
-              println("fileLength="+fpt4.fileLength.toInt+"|dataSize="+fpt4.getDataSize+"|filePath="+filePath)
-            }
-            assert(fpt4.fileLength.toInt == fpt4.getDataSize,"fpt4 fileLength != dataSize")*/
             val tpCounts = fpt4.tpCount
             var tpCount = 0
             if (tpCounts!=null && !"".equals(tpCounts))
@@ -133,6 +134,7 @@ class FPTProvider extends ImageProvider {
                 assert(fingerCount == tp.fingers.length)
                 personId = tp.personId
                 assert(personId != null, "person id is null")
+                event = StreamEvent(filePath, personId,  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,caseId,seqNo,cardId)
                 //save person base information
                 val hasPerson = GafisPartitionRecordsFullSaver.queryPersonById(personId)
                 if (hasPerson.isEmpty) {
@@ -156,21 +158,18 @@ class FPTProvider extends ImageProvider {
                 val caseId = lp.caseId
                 assert(caseId != null && !"".equals(caseId), "case id is null")
                 val latentCase = FptPropertiesConverter.fpt4ToLatentCaseConvert(lp)
-
                 lp.fingers.foreach{ lData=>
                   var seqNo = lData.fingerNo.toInt.toString
                   var cardId = lData.fingerId
-                  if (cardId == null || "".equals(cardId)) {
-                    if (seqNo != null && !"".equals(seqNo)) {
-                      if (seqNo.toInt < 10)
-                        seqNo = "0" + seqNo
-                      cardId = caseId + seqNo
-                    } else
-                      cardId = null
+                  if (seqNo != null && !"".equals(seqNo)) {
+                    if (seqNo.toInt < 10)
+                      seqNo = "0" + seqNo
+                    cardId = caseId + seqNo
                   }
                   assert(cardId != null && !"".equals(cardId), "card id is null")
+                  event = StreamEvent(filePath, personId,  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,caseId,seqNo,cardId)
                   val latentFinger = FptPropertiesConverter.fpt4ToLatentFingerConvert(lData,filePath,caseId,cardId.trim,seqNo)
-                  if (lData != null && lData.featureCount.toInt > 0) {
+                  if (lData != null && !lData.feature.trim.isEmpty) {
                     val disp = FPTLDataToMNTDISP.convertFPT03ToMNTDISP(lData)
                     val feature = createImageLatentEvent(disp)
                     val GFSFEATURE = fpt4code.FPTFingerLDataToGafisImage(lData)
@@ -188,20 +187,19 @@ class FPTProvider extends ImageProvider {
               }
             }
         }
-        buffer.toSeq
+        buffer
       }catch{
         case e:CallRpcException=>
           //try 4 times to fetch fpt file
-          if(seq == 4)  reportException(e)  else fetchFPT(seq+1)
+          if(seq == 4)  reportException(e,event)  else fetchFPT(seq+1)
         case NonFatal(e)=>
-          reportException(e)
+          reportException(e,event)
       }
     }
-    def reportException(e: Throwable) = {
+    def reportException(e: Throwable ,event : StreamEvent) = {
       e.printStackTrace(System.err)
-      val event = StreamEvent(imageFileServer.get + filePathSuffix, "",  FeatureType.FingerTemplate, FingerPosition.FINGER_UNDET,"","","")
       reportError(parameter, RequestRemoteFileError(event, e.toString))
-      Nil
+      Seq((event, new GAFISIMAGESTRUCT))
     }
 
     fetchFPT(1)
@@ -212,10 +210,9 @@ class FPTProvider extends ImageProvider {
     val fgp = getFingerPosition(tData.fgp.toInt)
     val fgpCase = gafisImg.stHead.bIsPlain
     val isExists = list.exists(x=> x(0) == fgp.getNumber && x(1) == fgpCase)
-    if (!isExists) {
-      val event = new StreamEvent(filePath, personId, FeatureType.FingerTemplate, fgp, "", "", "")
-      (event, gafisImg)
-    } else null
+    val event = new StreamEvent(filePath, personId, FeatureType.FingerTemplate, fgp, "", "", "")
+    if (!isExists) (event, gafisImg)
+    else (event ,new GAFISIMAGESTRUCT)
   }
   def createImageLatentEvent(disp: MNTDISPSTRUCT): Array[Byte] = {
     SparkFunctions.loadExtractorJNI()

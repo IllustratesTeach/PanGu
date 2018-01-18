@@ -26,9 +26,25 @@ class PalmProcessTest extends BaseJniTest{
   @Test
   def test_extract_palm: Unit ={
     val extractor = new FeatureExtractorImpl
-    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\bmp\\P5200000000002017099991_12.bmp"))
+    val img = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\FPT5\\zhw.data"))
     val fgp = 12
-    val mnt = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(img),FingerPosition.FINGER_R_THUMB,FeatureType.PalmTemplate).get._1
+
+    val gafisImg = new GAFISIMAGESTRUCT
+    gafisImg.stHead.bIsCompressed = 0
+    gafisImg.stHead.nCompressMethod = 0.toByte
+    if (gafisImg.stHead.nCompressMethod == 0) //no compress
+      gafisImg.stHead.bIsCompressed = 0
+
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
+    gafisImg.stHead.nWidth = 2040.toShort
+    gafisImg.stHead.nHeight = 2040.toShort
+    gafisImg.stHead.nBits = 8
+    gafisImg.stHead.nResolution = 500.toShort
+    gafisImg.bnData = img
+    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+
+
+    val mnt = extractor.extractByGAFISIMGBinary(new ByteArrayInputStream(gafisImg.toByteArray()),FingerPosition.FINGER_R_THUMB,FeatureType.PalmTemplate).get._1
     val feature = new GAFISIMAGESTRUCT
     feature.fromByteArray(mnt)
     feature.stHead.szName = "PalmLMnt"
@@ -96,6 +112,19 @@ class PalmProcessTest extends BaseJniTest{
     FileUtils.writeByteArrayToFile(new File(saveDir+"\\"+fileName+"_"+szName+".fea"), feature.toByteArray())
     FileUtils.writeByteArrayToFile(new File(saveDir+"\\"+fileName+"_"+szName+".wsq"), wsq.toByteArray())
 
+  }
+
+  @Test
+  def test_palm_bmp_process: Unit ={
+    val extractor = new FeatureExtractorImpl
+    val decoder = new FirmDecoderImpl("support",null)
+    val encoder = new ImageEncoderImpl(decoder)
+    SparkFunctions.loadImageJNI()
+    val img = IOUtils.toByteArray(getClass.getResourceAsStream("/finger_not_exist.bmp"))
+    val gafisImg = extractor.readByteArrayAsGAFISIMAGE(new ByteArrayInputStream(img))
+    gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_FINGER.toByte
+    val wsq = encoder.encodeWSQ(gafisImg)
+    FileUtils.writeByteArrayToFile(new File("D:\\img.img"), wsq.toByteArray())
   }
 
 }

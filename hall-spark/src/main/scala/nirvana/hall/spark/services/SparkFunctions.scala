@@ -1,8 +1,10 @@
 package nirvana.hall.spark.services
 
-import java.net.URI
+import java.io._
+import java.net.{URI, URL}
 import java.util.Properties
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.zip.ZipInputStream
 
 import kafka.javaapi.producer.Producer
 import kafka.producer.{KeyedMessage, ProducerConfig}
@@ -10,8 +12,12 @@ import nirvana.hall.extractor.jni.JniLoader
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 import nirvana.hall.spark.config.NirvanaSparkConfig
+import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
+import org.slf4j.LoggerFactory
+
+import scala.util.control.NonFatal
 
 /**
  * utility function
@@ -20,6 +26,7 @@ import org.apache.hadoop.fs.{FileSystem, Path}
  * @since 2016-01-31
  */
 object SparkFunctions{
+  val logger = LoggerFactory getLogger getClass
   lazy val httpClient= SparkRpcClient
   private var errorKafkaServers:String = _
   private lazy val producer:Producer[String,String] = createErrorProducer
@@ -69,20 +76,70 @@ object SparkFunctions{
     errorKafkaServers = parameter.kafkaServer
     val event = streamError.event
     var message: KeyedMessage[String, String] = null
-    //分类待完善
-    if (!event.caseId.isEmpty()) {//latent
+    if (null != event.caseId) {//latent
       message = new KeyedMessage("ERROR", event.path,
-        "%s|%s|%s|%s|%s".format(event.path, event.caseId, event.cardId, streamError.getMessage,"latent"))
+        "%s|%s|%s|%s|%s".format(event.path, event.caseId, event.cardId, streamError.getMessage,"LATENT"))
 
+    } else if (null != event.personId) {
+      message = new KeyedMessage("ERROR", event.path,
+        "%s|%s|%s|%s|%s".format(event.path, event.personId, event.position, streamError.getMessage,"TEMPLATE"))
     } else {
       message = new KeyedMessage("ERROR", event.path,
-        "%s|%s|%s|%s|%s".format(event.path, event.personId, event.position, streamError.getMessage,"template"))
+        "%s|%s|%s|%s|%s".format(event.path, "", "", streamError.getMessage,"UNKNOWN"))
     }
-
-    producer.send(message)
+    if ("None".equals(errorKafkaServers)) logger.error(message.message)
+    else producer.send(message)
   }
 
-  def recordErrorToHBFS(parameter:NirvanaSparkConfig,streamError: StreamError) : Unit = {
+  def unzipByArray(zipFile : Array[Byte]) : Array[Byte] = {
+    var in : ZipInputStream = null
+    val out = new ByteArrayOutputStream()
+    try {
+      in = new ZipInputStream(new ByteArrayInputStream(zipFile))
+      in.getNextEntry
+      var n = 0
+      while (n != -1) {
+        if (n != 0) out.write(n)
+        n = in.read()
+      }
+      out.toByteArray
+    } catch {
+      case NonFatal(e) => throw e
+    } finally {
+      if (null != in) in.close()
+      if (null != out) in
+    }
+  }
+
+  def unzipByURL(path : String) : Array[Byte] = {
+    val url : URL = new URL(path)
+    var in : ZipInputStream = null
+    val out = new ByteArrayOutputStream()
+    try {
+      in = new ZipInputStream(url.openStream())
+      in.getNextEntry
+      var n = 0
+      while (n != -1) {
+        if (n != 0) out.write(n)
+        n = in.read()
+      }
+      out.toByteArray
+    } catch {
+      case NonFatal(e) => throw e
+    } finally {
+      if (null != in) in.close()
+      if (null != out) in
+    }
+  }
+
+
+
+  /**
+    * for test
+    * @param parameter
+    * @param streamError
+    */
+  def recordErrorToHDFS(parameter:NirvanaSparkConfig,streamError: StreamError) : Unit = {
     val hadoopConf = new Configuration()
     val hdfs = FileSystem.get(new URI(parameter.hdfsServer),hadoopConf)
     try {

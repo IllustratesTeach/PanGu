@@ -19,4 +19,12 @@ class FPT5Test {
     Assert.assertEquals(fptFile.packageHead.version,"FPT0500")
   }
 
+  @Test
+  def test_unzipFPTX: Unit ={
+    val zip = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\FPT5\\贵州fptx\\tp\\R5226010890002017120001.fptx.zip"))
+    //val unzip = SparkFunctions.unzipByURL("http://10.1.7.204/fpt/fpt5/R5226010890002017120001.fptx.zip")
+    val unzip = SparkFunctions.unzipByArray(zip)
+    println(unzip.length)
+  }
+
 }

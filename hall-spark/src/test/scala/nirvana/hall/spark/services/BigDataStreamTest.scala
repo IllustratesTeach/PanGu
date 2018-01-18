@@ -52,7 +52,7 @@ class BigDataStreamTest {
 
   @Test
   def streamTestTXT (){
-    val array = Array("src/test/resources/test_spark_file.xml","D:\\2010\\http_path\\fail.txt")
+    val array = Array("src/test/resources/test_spark_file.xml","C:\\Users\\wangjue\\Desktop\\测试平台\\spark\\template_fpt_path.txt")
     BigDataForFileStream.main(array)
   }
 

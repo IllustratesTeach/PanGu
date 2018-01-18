@@ -22,6 +22,15 @@ trait ImageProvider {
     */
   def requestImage(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,GAFISIMAGESTRUCT)]
 
+
+  /**
+    * 请求数据完整信息
+    * @param parameter
+    * @param message
+    * @return
+    */
+  def requestData(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
+
   /**
     * 请求图像数据为BMP,不需要解压缩，获取数据直接提特征并入库
     * @param parameter
@@ -31,7 +40,6 @@ trait ImageProvider {
   def requestImageByBMP(parameter:NirvanaSparkConfig,message:String): Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
 
 
-  def requestImageByFID(parameter:NirvanaSparkConfig,message:String): Seq[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]
 
 
 
