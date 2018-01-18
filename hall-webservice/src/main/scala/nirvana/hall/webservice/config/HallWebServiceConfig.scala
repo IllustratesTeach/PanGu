@@ -45,6 +45,10 @@ class HallWebserviceConfig
   @XmlElement(name = "local_xkFinger_list_path")
   var localXKFingerListPath:String = _
 }
+
+/**
+  * 现勘接口配置
+  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HandprintService")
 class HandprintServiceConfig{
@@ -60,6 +64,20 @@ class HandprintServiceConfig{
   var password: String = _
   @XmlElement(name = "unitcode")
   var unitCode:String = _
+  @XmlElement(name = "survey_config")
+  var surveyConfig: Array[SurveyConfig] = _
+}
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SurveyConfig")
+class SurveyConfig{
+  @XmlElement(name = "unit_code")
+  var unitCode:String = _
+  @XmlElement(name = "start_time")
+  var startTime:String = _
+  @XmlElement(name = "end_time")
+  var endTime:String = _
+  @XmlElement(name = "config")
+  var config:String = _
 }
 
 
