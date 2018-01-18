@@ -365,6 +365,32 @@ object gnopcode {
   final val OP_ADM_LFIC_FBINFO_UPDATE = 602
   final val OP_ADM_LFIC_FBINFO_DEL = 603
 
+  //***********************现勘对接 [700, 750]******************************
+
+  // SURVEY_RECORD 现勘记录 [700 - 709]
+  // 添加现勘数据到表
+  final val OP_ADM_SURVEY_RECORD_ADD = 700
+  // 获取现勘数据
+  final val OP_ADM_SURVEY_RECORD_LIST_GET = 701
+  // 更改现勘数据
+  final val OP_ADM_SURVEY_RECORD_UPDATE = 702
+
+  // SURVEY_CONFIG 现勘配置表 [710 - 719]
+  // 更新配置表数据
+  final val OP_ADM_SURVEY_CONFIG_UPDATE	=	710
+  // 添加配置表数据
+  final val OP_ADM_SURVEY_CONFIG_ADD = 711
+  // 获取配置表数据
+  final val OP_ADM_SURVEY_CONFIG_GET = 712
+
+  // SURVEY_HITRESULT_RECORD 现勘比中记录表 [720 - 729]
+  // 获取现勘比中信息
+  final val OP_ADM_SURVEY_HITRESULT_RECORD_GET = 720
+  // 添加比中信息
+  final val OP_ADM_SURVEY_HITRESULT_RECORD_ADD = 721
+  // 更新比中信息
+  final val OP_ADM_SURVEY_HITRESULT_RECORD_UPDATE = 722
+  //****************************************************************************
 
 
   /* OP_CLASS_BLOB */

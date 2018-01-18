@@ -1,0 +1,37 @@
+package nirvana.hall.webservice.services.survey
+
+import nirvana.hall.c.services.gloclib.survey.SURVEYRECORD
+
+/**
+  * Created by songpeng on 2018/1/16.
+  */
+trait SurveyRecordService {
+
+  /**
+    * 添加现堪记录
+    * @param surveyRecord
+    */
+  def addSurveyRecord(surveyRecord: SURVEYRECORD)
+
+  /**
+    * 更新现堪记录
+    * @param surveyRecord
+    */
+  def updateSurveyRecord(surveyRecord: SURVEYRECORD)
+
+  /**
+    * 获取现堪记录列表
+    * @param state 状态
+    * @param limit 数量
+    * @return
+    */
+  def getSurveyRecordListByState(state: Short, limit: Int): Seq[SURVEYRECORD]
+
+  /**
+    * 获取现堪记录列表
+    * @param jiejingState 接警状态
+    * @return
+    */
+  def getSurveyRecordListByJieJingState(jiejingState: Short): Seq[SURVEYRECORD]
+
+}

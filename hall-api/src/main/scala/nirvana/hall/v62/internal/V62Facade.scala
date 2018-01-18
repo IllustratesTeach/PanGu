@@ -20,6 +20,7 @@ class V62Facade(defaultConfig:HallV62Config)
   extends gnetcsr
   with V62QueryTableSupport
   with DataSyncSupport
+  with gnetsurvey
   with gnetblob
   with ganetqry
   with ganetdbp
@@ -70,6 +71,11 @@ object V62Facade{
   val TID_LPGROUP:Short    = 9 //现场
   val TID_USER:Short       = 2
 
+  //现勘接口记录表
+  val TID_SURVEYRECORDT:Short = 391
+  val TID_SURVEYCONFIG:Short = 392
+  val TID_SURVEYHITRESULTRECORD:Short = 393
+
   //默认管理员库
   val DBID_ADMIN_DEFAULT: Short = 1
   //默认捺印库
@@ -78,6 +84,8 @@ object V62Facade{
   val DBID_LP_DEFAULT: Short = 2
   //默认查询库
   val DBID_QRY_DEFAULT: Short = 20
+  //现勘数据库
+  val DBID_SURVEY: Short = 21
 
   /**
     * 动态获取服务器的地址，通过动态变量的上下文进行获取

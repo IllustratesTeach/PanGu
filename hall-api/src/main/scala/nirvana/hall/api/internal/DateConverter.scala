@@ -61,6 +61,21 @@ object DateConverter extends LoggerSupport{
 
     "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
   }
+  /**
+    * 将gafis日期转换为字符串 yyyy-MM-dd HH:mm:ss
+    * @param dateTime
+    * @return
+    */
+  def convertAFISDateTime2String2(dateTime: GAFIS_DATETIME): String = {
+    val year = DataConverter.switchShortEndian(dateTime.tDate.tYear)
+    val month = dateTime.tDate.tMonth + 1
+    val day = dateTime.tDate.tDay
+    val hour = dateTime.tTime.tHour
+    val min = dateTime.tTime.tMin
+    val sec = dateTime.tTime.convertAsJavaSecs()
+
+    "%04d-%02d-%02d %02d:%02d:%02d".format(year, month, day, hour, min, sec)
+  }
 
   /**
    * 将字符yyyyMMddHHmmss 转为gafis日期

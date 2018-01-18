@@ -2,7 +2,7 @@ package nirvana.hall.webservice.xcky
 
 import monad.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.xcky.{FPT50HandprintServiceClient, FPT50HandprintServiceConstants, FingerPrintListResponse}
+import nirvana.hall.webservice.internal.survey.gafis62.{FPT50HandprintServiceClient, FPT50HandprintServiceConstants, FingerPrintListResponse}
 import org.junit.{Assert, Test}
 
 import scala.io.Source
@@ -31,7 +31,17 @@ class FPT50HandprintServiceClientTest {
   }
   @Test
   def test_getLatentCount: Unit ={
-    val count = client.getLatentCount("", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","")
+    val count = client.getLatentCount("", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","","")
     Assert.assertTrue(count > 0)
+  }
+  @Test
+  def test_getLatentList: Unit ={
+    val list = client.getLatentList("110000", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","", "","", 0, 10)
+    Assert.assertTrue(list.nonEmpty)
+  }
+  @Test
+  def test_getLatentPackage: Unit ={
+    val latent = client.getLatentPackage("110000")
+    Assert.assertTrue(latent != null)
   }
 }
