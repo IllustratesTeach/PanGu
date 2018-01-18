@@ -63,7 +63,6 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
 
     gafisCase.modifiedtime = new Date
     gafisCase.modifiedpsn = modUser.get.pkId
-    gafisCase.updatorUnitCode = modUser.get.departCode
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = caseInfo.getStrDataSource
