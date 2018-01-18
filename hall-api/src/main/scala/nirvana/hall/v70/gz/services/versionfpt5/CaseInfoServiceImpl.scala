@@ -25,16 +25,13 @@ class CaseInfoServiceImpl(hallV70Config: HallV70Config,userService: UserService)
     */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = convertCase2GafisCase(caseInfo)
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn) // gafisCase.inputpsn
+    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
     if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))//Gafis70Constants.INPUTPSN
+      user = Option(SysUser.find(hallV70Config.server.users))
     }
+    gafisCase.inputtime = new Date
     gafisCase.inputpsn = user.get.pkId
     gafisCase.createUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
-    if(modUser.nonEmpty){
-      gafisCase.modifiedpsn = modUser.get.pkId
-    }
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_SURVEY.toString
@@ -59,16 +56,14 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     convertCase2GafisCase(caseInfo, gafisCase)
 
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))
-    }
-    gafisCase.inputpsn = user.get.pkId
-    gafisCase.createUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
+    var modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
     if(modUser.nonEmpty){
-      gafisCase.modifiedpsn = modUser.get.pkId
+      modUser = Option(SysUser.find(hallV70Config.server.users))
     }
+
+    gafisCase.modifiedtime = new Date
+    gafisCase.modifiedpsn = modUser.get.pkId
+    gafisCase.updatorUnitCode = modUser.get.departCode
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = caseInfo.getStrDataSource

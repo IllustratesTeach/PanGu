@@ -53,12 +53,6 @@ class LPCardServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     caseFinger.inputpsn = user.get.pkId
     caseFinger.inputtime = new Date
     caseFinger.creatorUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
-    if(modUser.nonEmpty){
-      caseFinger.modifiedpsn = modUser.get.pkId
-    }else{
-      caseFinger.modifiedpsn = ""
-    }
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
 
@@ -89,20 +83,13 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     convertLPCard2GafisCaseFinger(lpCard, caseFinger)
     caseFinger.fingerId = fingerId
     caseFinger.seqNo = seqNo
-    //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(caseFinger.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))
+    var modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
+    if(modUser.isEmpty){
+      modUser = Option(SysUser.find(hallV70Config.server.users))
     }
-    caseFinger.inputpsn = user.get.pkId
-    caseFinger.inputtime = new Date
-    caseFinger.creatorUnitCode= user.get.departCode
-    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
-    if(modUser.nonEmpty){
-      caseFinger.modifiedpsn = modUser.get.pkId
-    }else{
-      caseFinger.modifiedpsn = ""
-    }
+    caseFinger.modifiedtime = new Date
+    caseFinger.modifiedpsn = modUser.get.pkId
+    caseFinger.updatorUnitCode= modUser.get.departCode
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
 
@@ -111,7 +98,6 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     //先删除，后插入
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute
     caseFingerMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
-    caseFingerMnt.inputpsn = user.get.pkId
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
   }

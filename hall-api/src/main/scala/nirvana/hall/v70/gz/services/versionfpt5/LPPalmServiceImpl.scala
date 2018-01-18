@@ -56,12 +56,6 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     casePalm.inputpsn = user.get.pkId
     casePalm.inputtime = new Date
     casePalm.creatorUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(casePalm.modifiedpsn)
-    if(modUser.nonEmpty){
-      casePalm.modifiedpsn = modUser.get.pkId
-    }else{
-      casePalm.modifiedpsn = ""
-    }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
     casePalm.save()
 
@@ -99,19 +93,13 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     convertLPCard2GafisCasePalm(lpCard, casePalm)
     casePalm.palmId = palmId
     casePalm.seqNo = seqNo
-    //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(casePalm.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))
+    var modUser = userService.findSysUserByLoginName(casePalm.modifiedpsn)
+    if(modUser.isEmpty){
+      modUser = Option(SysUser.find(hallV70Config.server.users))
     }
-    casePalm.inputpsn = user.get.pkId
-    casePalm.creatorUnitCode= user.get.departCode
-    val modUser = userService.findSysUserByLoginName(hallV70Config.server.users)
-    if(modUser.nonEmpty){
-      casePalm.modifiedpsn = modUser.get.pkId
-    }else{
-      casePalm.modifiedpsn = ""
-    }
+    casePalm.modifiedtime = new Date
+    casePalm.modifiedpsn = modUser.get.pkId
+    casePalm.updatorUnitCode= modUser.get.departCode
     casePalm.deletag = Gafis70Constants.DELETAG_USE
     casePalm.save()
 
@@ -120,7 +108,6 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     //先删除，后插入
     GafisCasePalmMnt.delete.where(GafisCasePalmMnt.palmId === casePalm.palmId).execute
     casePalmMnt.pkId =  UUID.randomUUID().toString.replace("-",Constant.EMPTY)
-    casePalmMnt.inputpsn = user.get.pkId
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
 
