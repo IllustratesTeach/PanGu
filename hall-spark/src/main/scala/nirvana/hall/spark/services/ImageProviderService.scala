@@ -26,8 +26,8 @@ object ImageProviderService {
     providerClassName = parameter.imageProviderClass
     provider.requestImageByBMP(parameter,message)
   }
-  def requestRemoteFileByFID(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]= {
+  def requestRemoteData(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]= {
     providerClassName = parameter.imageProviderClass
-    provider.requestImageByFID(parameter,message)
+    provider.requestData(parameter,message)
   }
 }

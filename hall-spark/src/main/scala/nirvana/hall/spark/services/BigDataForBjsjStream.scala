@@ -38,7 +38,7 @@ object BigDataForBjsjStream {
       SysProperties.setConfig(parameter)
       SparkFunctions.loadExtractorJNI()
       SparkFunctions.loadImageJNI()
-      ImageProviderService.requestRemoteFileByFID(parameter,x)
+      ImageProviderService.requestRemoteData(parameter,x)
     } //fetch files
       .foreachRDD{rdd=>
       //save records for partition

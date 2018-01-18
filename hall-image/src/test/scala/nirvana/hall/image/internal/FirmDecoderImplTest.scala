@@ -2,8 +2,9 @@ package nirvana.hall.image.internal
 
 import java.awt.image.{BufferedImage, DataBufferByte}
 import java.awt.{AlphaComposite, Color, Font, RenderingHints}
-import java.io.{ByteArrayInputStream, File, FileInputStream}
+import java.io.{ByteArrayInputStream, File, FileInputStream, FileOutputStream}
 import javax.imageio.ImageIO
+import javax.imageio.spi.IIORegistry
 
 import com.google.protobuf.ByteString
 import monad.support.services.XmlLoader
@@ -15,6 +16,7 @@ import nirvana.hall.c.services.kernel.mnt_def.FINGERMNTSTRUCT
 import nirvana.hall.image.config.HallImageConfig
 import nirvana.hall.image.jni.BaseJniTest
 import nirvana.hall.image.services.RawImageDataType
+import nirvana.hall.support.services.GAFISImageReaderSpi
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.junit.{Assert, Test}
 
@@ -243,7 +245,7 @@ class FirmDecoderImplTest extends BaseJniTest{
   @Test
   def test_decode_gafisimg_palm{
     val decoder = new FirmDecoderImpl("support",new HallImageConfig)
-    val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\掌纹人员\\P5201815200002014089983_11.data"))
+    val imgData = getClass.getResourceAsStream("/R2100000100002016080603_PW_L.buf")
     /*val cprData = FileUtils.readFileToByteArray(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\掌纹人员\\P5202035000002014089993_11_head7.data"))
 
     val in = new ByteArrayInputStream(cprData)
@@ -266,12 +268,80 @@ class FirmDecoderImplTest extends BaseJniTest{
 
 
     val gafisImg = new GAFISIMAGESTRUCT
-    gafisImg.fromByteArray(cprData)
+    gafisImg.stHead.nWidth = 2304.toShort
+    gafisImg.stHead.nHeight = 2304.toShort
+    gafisImg.stHead.nImageType = 2.toByte
+    gafisImg.stHead.bIsCompressed = 1.toByte
+    gafisImg.stHead.nCompressMethod = 102.toByte
+    gafisImg.bnData = IOUtils.toByteArray(imgData)
+    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+    gafisImg.stHead.nCaptureMethod = 1.toByte
+    gafisImg.stHead.nResolution = 500.toShort
+    gafisImg.stHead.nBits = 8.toByte
+    gafisImg.stHead.bIsPlain = 1.toByte
+    gafisImg.stHead.nFingerIndex = 11.toByte
 
-    val dest = decoder.decodeRawImage(gafisImg)
+    val dest = decoder.decode(gafisImg)
 
-    FileUtils.writeByteArrayToFile(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\bjsj_palm\\palm_decompress\\decoder_not7.data"),dest.toByteArray())
+
+    val iioRegistry = IIORegistry.getDefaultInstance
+    iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
+    val img = ImageIO.read(new ByteArrayInputStream(dest.toByteArray()))
+    val out = new FileOutputStream("/Users/yuchen/HXPALM.bmp")
+    ImageIO.write(img, "bmp", out)
+    out.close
+
+    FileUtils.writeByteArrayToFile(new File("／Users/yuchen/uncompress.data"),dest.toByteArray())
 
     Assert.assertTrue(dest.bnData.length > 0)
+  }
+
+  @Test
+  def test_encode_gafisimg_palm_to_wsq(): Unit ={
+
+  }
+
+
+  @Test
+  def test_decode_gafisimg_1419{
+    val decoder = new FirmDecoderImpl("support",new HallImageConfig)
+    val cprData = IOUtils.toByteArray(getClass.getResourceAsStream("/finger_not_exist.data"))
+//    val gafisImg = new GAFISIMAGESTRUCT
+//    gafisImg.stHead.nWidth = 640.toShort
+//    gafisImg.stHead.nHeight = 640.toShort
+//    gafisImg.stHead.nImageType = 0.toByte
+//    gafisImg.stHead.bIsCompressed = 1.toByte
+//    gafisImg.stHead.nCompressMethod = glocdef.GAIMG_CPRMETHOD_WSQ.toByte
+//    gafisImg.bnData = cprData
+//    gafisImg.stHead.nImgSize = gafisImg.bnData.length
+//    gafisImg.stHead.nCaptureMethod = 1.toByte
+//    gafisImg.stHead.nResolution = 500.toShort
+//    gafisImg.stHead.nBits = 8.toByte
+////    gafisImg.stHead.bIsPlain = 1.toByte
+////    gafisImg.stHead.nFingerIndex = 11.toByte
+//    gafisImg.stHead.szName = "unknown"
+
+
+    val gafisImg = new GAFISIMAGESTRUCT().fromByteArray(cprData)
+
+    val dest = decoder.decode(gafisImg)
+
+    Assert.assertNotNull(dest.bnData)
+
+    //val dest = decoder.decode(gafisImg)
+
+
+
+    val iioRegistry = IIORegistry.getDefaultInstance
+    iioRegistry.registerServiceProvider(new GAFISImageReaderSpi)
+    val img = ImageIO.read(new ByteArrayInputStream(dest.toByteArray()))
+    val out = new FileOutputStream("/Users/yuchen/quezhi.bmp")
+    ImageIO.write(img, "bmp", out)
+    out.close
+
+    FileUtils.writeByteArrayToFile(new File("／Users/yuchen/quezhi.data"),dest.toByteArray())
+
+    Assert.assertNotNull(dest.bnData)
+
   }
 }

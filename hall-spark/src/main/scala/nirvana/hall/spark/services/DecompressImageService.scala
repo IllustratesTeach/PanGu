@@ -49,6 +49,7 @@ object DecompressImageService extends LoggerSupport{
     }
   }
   def requestDecompress(parameter:NirvanaSparkConfig,event:StreamEvent,compressedImg: GAFISIMAGESTRUCT):Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)]= {
+    if (compressedImg.bnData == null) return Some(event,new GAFISIMAGESTRUCT, new TemplateFingerConvert)
     if (event.personId != null && event.personId.length > 0) {
       SparkFunctions.loadImageJNI()
       val finger = FptPropertiesConverter.fptFingerDataToTemplateFingerConvert(event.personId,event.position.getNumber.toString,FingerConstants.GROUP_IMAGE,FingerConstants.LOBTYPE_DATA,compressedImg,event.path)
@@ -83,7 +84,7 @@ object DecompressImageService extends LoggerSupport{
         }
       }
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
-      Some((event, null, null))
+      Some((event, new GAFISIMAGESTRUCT, new TemplateFingerConvert))
     } else {
       doReportException(parameter, event,new IllegalAccessException("personId and caseId are null!"))
       None
@@ -128,8 +129,8 @@ object DecompressImageService extends LoggerSupport{
     //    @tailrec
     def doDecompress(seq: Int,compressMethod : String = glocdef.GAIMG_CPRMETHOD_WSQ.toString): Option[(StreamEvent, GAFISIMAGESTRUCT, TemplateFingerConvert)] = {
       try {
-        //第一次用WSQ解压，失败后转为自身压缩
-        compressedImg.stHead.nCompressMethod = compressMethod.toByte
+        //第一次用WSQ解压，失败后转为自身压缩, 弃用(发现NEC可用WSQ解压，但图像是倒立的)
+        //compressedImg.stHead.nCompressMethod = compressMethod.toByte
         request.setCprData(ByteString.copyFrom(compressedImg.toByteArray()))
         if (compressedImg.stHead.nWidth != 640 && compressedImg.stHead.nHeight != 640) {//if width or height is not 640 , convert to 640
           doReportException(parameter, event,new IllegalAccessException("width or height is not 640,actual width is "+ compressedImg.stHead.nWidth + " height is "+ compressedImg.stHead.nHeight +" fpt path is  "+event.path))
@@ -164,7 +165,7 @@ object DecompressImageService extends LoggerSupport{
         case e: CallRpcException =>
           if (seq == 4) doReportException(parameter,event,e) else doDecompress(seq + 1)
         case NonFatal(e) =>
-          if (seq == 4) doReportException(parameter,event,e,compressedImg.stHead.nCompressMethod.toString) else doDecompress(seq + 1,cMethod.toString)
+          if (seq == 4) doReportException(parameter,event,e,compressedImg.stHead.nCompressMethod.toString) else doDecompress(seq + 1,compressMethod)
       }
     }
     doDecompress(1)

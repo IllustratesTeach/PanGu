@@ -15,10 +15,11 @@ class GafisPartitionRecordsFullSaver extends PartitionRecordsSaver {
   import GafisPartitionRecordsFullSaver._
   override def savePartitionRecords(parameter: NirvanaSparkConfig)(records: Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]): Unit = {
     records.foreach{ case(event,image,mnt,bin) =>
-        if (image.gatherData!=null)
+        if (null != image.gatherData)
           saveTemplateFinger(image)
-        saveTemplateFingerMntAndBin(image,FingerConstants.GROUP_MNT,FingerConstants.LOBTYPE_MNT,mnt.toByteArray())//object,groupId,lobType,date
-        if (bin!=null && parameter.isExtractorBin)
+        if (null != mnt.bnData)
+          saveTemplateFingerMntAndBin(image,FingerConstants.GROUP_MNT,FingerConstants.LOBTYPE_MNT,mnt.toByteArray())//object,groupId,lobType,date
+        if (null != bin.bnData && parameter.isExtractorBin)
           saveTemplateFingerMntAndBin(image,FingerConstants.GROUP_BIN,FingerConstants.LOBTYPE_MNT,bin.toByteArray())
     }
   }
@@ -60,8 +61,8 @@ object GafisPartitionRecordsFullSaver {
               "ADDRESS,ADDRESSDETAIL,PERSON_CATEGORY,CASE_CLASSES,GATHERDEPARTCODE,GATHERDEPARTNAME,GATHERUSERNAME," +
               "GATHER_DATE,REMARK,NATIVEPLACE_CODE,NATION_CODE,ASSIST_LEVEL,ASSIST_BONUS,ASSIST_PURPOSE,ASSIST_REF_PERSON," +
               "ASSIST_REF_CASE,ASSIST_VALID_DATE,ASSIST_EXPLAIN,ASSIST_DEPT_CODE,ASSIST_DEPT_NAME,ASSIST_DATE,ASSIST_CONTACTS," +
-              "ASSIST_NUMBER,ASSIST_APPROVAL,ASSIST_SIGN,ISFINGERREPEAT,DATA_SOURCES,FINGERSHOW_STATUS,DELETAG,INPUTTIME,SEQ,SID) " +
-              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysDate,gafis_person_seq.nextval,gafis_person_sid_seq.nextval)"
+              "ASSIST_NUMBER,ASSIST_APPROVAL,ASSIST_SIGN,ISFINGERREPEAT,DATA_SOURCES,FINGERSHOW_STATUS,DELETAG,INPUTTIME,SEQ,SID,FPT_PATH) " +
+              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,sysDate,gafis_person_seq.nextval,gafis_person_sid_seq.nextval,?)"
 
     JdbcDatabase.update(saveFullPersonInfo) { ps =>
       ps.setString(1, person.personId)
@@ -102,6 +103,7 @@ object GafisPartitionRecordsFullSaver {
       ps.setInt(36, person.dataSource)
       ps.setInt(37, person.fingerShowStatus)
       ps.setString(38, person.delTag)
+      ps.setString(39, person.fptPath)
     }
   }
 
@@ -230,8 +232,8 @@ object GafisPartitionRecordsFullSaver {
 
   def saveLatentFinger(latentFingerConvert : LatentFingerConvert): Unit ={
     val saveLatentFingerSql = "INSERT INTO gafis_case_finger(case_id,seq_no,finger_id,remain_place,fgp,ridge_color,mittens_beg_no,mittens_end_no," +
-      "finger_img,Is_Corpse,corpse_no,Is_Assist,Inputtime,deletag,SID,seq) " +
-      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_SID_SEQ.Nextval)"
+      "finger_img,Is_Corpse,corpse_no,Is_Assist,Inputtime,deletag,SID,seq,FPT_PATH) " +
+      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_SID_SEQ.Nextval,?)"
     JdbcDatabase.update(saveLatentFingerSql){ ps =>
       ps.setString(1,latentFingerConvert.caseId)
       ps.setString(2,latentFingerConvert.seqNo)
@@ -245,6 +247,7 @@ object GafisPartitionRecordsFullSaver {
       ps.setString(10,latentFingerConvert.isCorpse)
       ps.setString(11,latentFingerConvert.corpseNo)
       ps.setString(12,latentFingerConvert.isAssist)
+      ps.setString(13,latentFingerConvert.fptPath)
     }
   }
 

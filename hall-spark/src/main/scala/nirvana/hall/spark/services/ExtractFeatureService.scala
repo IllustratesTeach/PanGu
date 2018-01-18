@@ -30,6 +30,7 @@ object ExtractFeatureService {
     override def getMessage: String = "E|"+message
   }
   def requestExtract(parameter:NirvanaSparkConfig,event:StreamEvent, originalImg : GAFISIMAGESTRUCT, fingerImg : TemplateFingerConvert):Option[(StreamEvent,TemplateFingerConvert,GAFISIMAGESTRUCT,GAFISIMAGESTRUCT)]= {
+    if (originalImg.bnData == null) return Some(event,new TemplateFingerConvert ,new GAFISIMAGESTRUCT ,new GAFISIMAGESTRUCT)
     if (event.personId != null && event.personId.length > 0) {
       try {
         val featureTryVersion = if (parameter.isNewFeature) ExtractProto.NewFeatureTry.V2 else ExtractProto.NewFeatureTry.V1
@@ -82,7 +83,7 @@ object ExtractFeatureService {
           None
       }
     } else if (event.caseId != null && event.caseId.length > 0){ //Latent type
-      Some((event, null,null,null))
+      Some((event, new TemplateFingerConvert,new GAFISIMAGESTRUCT,new GAFISIMAGESTRUCT))
     } else {
       SparkFunctions.reportError(parameter, ExtractError(event, "personId and caseId are null!"))
       None

@@ -45,26 +45,43 @@ object BigDataForFileStream {
         sc.textFile(listFile,parameter.partitionsNum)
       else
         sc.textFile(parameter.hdfsServer+listFile,parameter.partitionsNum)
-    listRDD.foreach{ rdd =>
-        val fileRDD = {
+
+      listRDD.foreachPartition{ partitionRdd =>
+        SysProperties.setConfig(parameter)
+        partitionRdd.foreach{ rdd =>
+          {
+            //SysProperties.setConfig(parameter)
+            ImageProviderService.requestRemoteFile(parameter,rdd.toString)
+          }.flatMap{x=>
+            //SysProperties.setConfig(parameter)
+            DecompressImageService.requestDecompress(parameter,x._1,x._2)
+          }.flatMap{x=>
+            //SysProperties.setConfig(parameter)
+            ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
+          }.foreach{ x=>
+            //SysProperties.setConfig(parameter)
+            PartitionRecordsSaverService.savePartitionRecords(parameter)(Iterator(x))
+          }
+          accum += 1
+        }
+      }
+
+      /*listRDD.foreach{ rdd =>
+        {
           SysProperties.setConfig(parameter)
           ImageProviderService.requestRemoteFile(parameter,rdd.toString)
-        }
-        val decompressImageRDD = fileRDD.flatMap{x=>
+        }.flatMap{x=>
           SysProperties.setConfig(parameter)
           DecompressImageService.requestDecompress(parameter,x._1,x._2)
-        }
-        val extractFeatureRDD = decompressImageRDD.flatMap{x=>
+        }.flatMap{x=>
           SysProperties.setConfig(parameter)
           ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
-        }
-        extractFeatureRDD.foreach{ x=>
+        }.foreach{ x=>
           SysProperties.setConfig(parameter)
           PartitionRecordsSaverService.savePartitionRecords(parameter)(Iterator(x))
         }
         accum += 1
-        println(rdd.toString+" : processed!"+"------------"+accum)
-      }
+      }*/
 
   }
 

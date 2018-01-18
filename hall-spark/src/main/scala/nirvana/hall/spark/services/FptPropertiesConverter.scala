@@ -5,10 +5,10 @@ import java.text.{ParsePosition, SimpleDateFormat}
 import java.util.Date
 
 import nirvana.hall.c.services.gfpt4lib.FPT3File.{FingerLData, Logic2Rec, Logic3Rec}
-import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic03Rec, Logic02Rec}
+import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic02Rec, Logic03Rec}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
-import nirvana.hall.c.services.gloclib.glocdef
-import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGEHEADSTRUCT, GAFISIMAGESTRUCT}
+import nirvana.hall.c.services.gfpt5lib.{FingerprintPackage, LatentFingerImageMsg, LatentFingers, LatentPackage}
+import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 
 /**
   * Created by wangjue on 2016/7/27.
@@ -107,6 +107,17 @@ object FptPropertiesConverter {
     person
   }
 
+  def fpt5ToPersonConvert(tp : FingerprintPackage, fptPath : String = ""): PersonConvert = {
+    //TODO FPT5人员信息完整转换
+    val person = new PersonConvert
+    val descriptiveMsg = tp.descriptiveMsg
+    val jzbh = descriptiveMsg.jingZongPersonId
+    val personId = descriptiveMsg.fingerPalmCardId
+    person.fptPath = fptPath
+    person.personId = personId
+    person
+  }
+
   def fptFingerDataToTemplateFingerConvert(personId : String, fgp : String, groupId : String, lobType : String, gafisImg : GAFISIMAGESTRUCT, path : String): TemplateFingerConvert = {
     val finger = new TemplateFingerConvert
     finger.personId = personId
@@ -167,6 +178,13 @@ object FptPropertiesConverter {
     latentCase
   }
 
+  def fpt5ToLatentCaseConvert(lp : LatentPackage): LatentCaseConvert ={
+    val latentCase = new LatentCaseConvert
+    latentCase.caseId = lp.caseMsg.originalSystemCaseId
+    latentCase.cardId = lp.caseMsg.latentCardId
+    //TODO 完整信息待完善
+    latentCase
+  }
 
   def fpt3ToLatentFingerConvert(lData : FingerLData, fptPath : String, caseId : String, cardId : String ,seqNo : String): LatentFingerConvert = {
     val latentFinger = new LatentFingerConvert
@@ -181,6 +199,19 @@ object FptPropertiesConverter {
     latentFinger.imgData = lData.imgData
     latentFinger.fptPath = fptPath
 
+    latentFinger
+  }
+
+  def fpt5ToLatentFingerConvert(lData : LatentFingerImageMsg, fptPath : String, caseId : String, cardId : String ,seqNo : String): LatentFingerConvert = {
+    //TODO 现场指纹细节待完善
+    val latentFinger = new LatentFingerConvert
+    latentFinger.caseId = caseId
+    latentFinger.seqNo = seqNo
+    latentFinger.fingerId = cardId
+    latentFinger.remainPlace = lData.latentFingerLeftPosition
+    latentFinger.fgp = lData.latentFingerAnalysisPostionBrief
+    latentFinger.ridgeColor = lData.latentFingerMastoidProcessLineColorCode
+    latentFinger.fptPath = fptPath
     latentFinger
   }
 
@@ -213,6 +244,8 @@ object FptPropertiesConverter {
       latentFingerFeature.captureMethod = captureMethod
     latentFingerFeature
   }
+
+
 
   class PersonConvert extends Serializable{
     var personId : String = _
