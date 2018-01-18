@@ -5,6 +5,9 @@
 -->
 
 <hall_v70>
+    <app_server>
+        <user>1</user>
+    </app_server>
     <database>
         <driver>oracle.jdbc.driver.OracleDriver</driver>
         <user>gafis</user>
