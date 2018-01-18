@@ -133,12 +133,12 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     val fPT5File = new FPT5File
     fPT5File.build(fPT5File)
     fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
-    fPT5File.packageHead.sendUnitCode = "000000000000"
-    fPT5File.packageHead.sendUnitName = "aaa"
-    fPT5File.packageHead.sendPersonName = "yuchen"
-    fPT5File.packageHead.sendPersonIdCard = "120101198601031538"
-    fPT5File.packageHead.sendPersonTel = "3756473"
-    fPT5File.packageHead.sendUnitSystemType = "5555"
+    fPT5File.packageHead.sendUnitCode = "520000050000"
+    fPT5File.packageHead.sendUnitName = "贵州省公安厅刑事侦查总队"
+    fPT5File.packageHead.sendPersonName = "system"
+    fPT5File.packageHead.sendPersonIdCard = "000000000000000000"
+    fPT5File.packageHead.sendPersonTel = "000"
+    fPT5File.packageHead.sendUnitSystemType = "1900"
     fPT5File.ltHitResultPackage = hitLTPackageSeq.toArray
     fPT5File
   }
@@ -147,12 +147,12 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     val fPT5File = new FPT5File
     fPT5File.build(fPT5File)
     fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
-    fPT5File.packageHead.sendUnitCode = "000000000000"
-    fPT5File.packageHead.sendUnitName = "aaa"
-    fPT5File.packageHead.sendPersonName = "yuchen"
-    fPT5File.packageHead.sendPersonIdCard = "120101198601031538"
-    fPT5File.packageHead.sendPersonTel = "3756473"
-    fPT5File.packageHead.sendUnitSystemType = "5555"
+    fPT5File.packageHead.sendUnitCode = "520000050000"
+    fPT5File.packageHead.sendUnitName = "贵州省公安厅刑事侦查总队"
+    fPT5File.packageHead.sendPersonName = "system"
+    fPT5File.packageHead.sendPersonIdCard = "000000000000000000"
+    fPT5File.packageHead.sendPersonTel = "000"
+    fPT5File.packageHead.sendUnitSystemType = "1900"
     fPT5File.llHitResultPackage = hitLLPackageSeq.toArray
     fPT5File
   }

@@ -14,6 +14,7 @@ object Constant {
   final val SURVEY_CODE_KNO_FAIL = -1
   final val SURVEY_CODE_CASEID_ERROR = -2
   final val SURVEY_CODE_CASEID_SUCCESS = 2
+  final val SURVEY_CODE_CASEID_REPEAT = 3 //未获取到数据包标识
 
   final val SNO_SUCCESS = 1
 

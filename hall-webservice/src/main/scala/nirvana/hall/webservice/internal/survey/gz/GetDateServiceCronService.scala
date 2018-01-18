@@ -34,7 +34,6 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
   val userID = hallWebserviceConfig.handprintService.user
   val passwordStr = hallWebserviceConfig.handprintService.password
-  val unitCode = hallWebserviceConfig.handprintService.unitCode
   val password = DigestUtils.md5Hex(passwordStr)
 
   val fpt50handprintServiceService = new FPT50HandprintServiceService()
@@ -82,7 +81,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           //获取现场物证编号列表
           surveyRecordService.getWZBHbyKno(kNo).foreach {
             m =>
-              if(getPFTPackage( m.get("xcwzbh").get.toString)){  //获取数据包并保存数据，判断数据保存是否正常并继续获取接警编号
+              if(getPFTPackage( m.get("xcwzbh").get.toString ,m.get("uuid").get.toString)){  //获取数据包并保存数据，判断数据保存是否正常并继续获取接警编号
                 getReceptionNo(kNo)
               }
           }
@@ -107,11 +106,13 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     info("现堪编号："+kNo+"-----查询的案件编号："+caseNo)
     if (! CommonUtil.isNullOrEmpty (caseNo) ) {
       bStr = true
+    }else{
+      surveyRecordService.updateSurveyRecordStateByKno(Constant.SURVEY_CODE_KNO_FAIL,kNo)
     }
     bStr
   }
 
-  private def getPFTPackage(xcwzbh:String): Boolean ={
+  private def getPFTPackage(xcwzbh:String ,uuid : String): Boolean ={
     var bStr = false
     val fpt = fpt50handprintServicePort.getFingerPrint(userID,password,xcwzbh)
     val path = hallWebserviceConfig.localLatentPath+"/" + xcwzbh
@@ -135,7 +136,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
       try{
         for(i <- 0 until fpt5File.latentPackage.size){
           fPT5Service.addLatentPackage(fpt5File.latentPackage(i))
-          surveyRecordService.updateRecordStateByXCWZBH(Constant.SNO_SUCCESS,xcwzbh)
+          surveyRecordService.updateRecordStateByXCWZBH(Constant.SNO_SUCCESS,uuid)
           sendFBUseCondition(xcwzbh,Constant.FPT_PARSE_SUCCESS,"")
         }
         bStr = true
@@ -146,6 +147,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           sendFBUseCondition(xcwzbh,Constant.FPT_PARSE_FAIL,ExceptionUtil.getStackTraceInfo(exx))
       }
     }else{
+      surveyRecordService.updateRecordStateByXCWZBH(Constant.SURVEY_CODE_CASEID_REPEAT,uuid)
       info("返回空数据包！")
       bStr = false
     }

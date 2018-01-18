@@ -1391,7 +1391,7 @@ class FPT5File {
         var resultCaseId:String = _
         @XmlElement(name = "bzjg_xckybh")
         var resultLatentSurveyId:String = _
-        @XmlElement(name = "bzjg_ysxt_xczzwbh")
+        @XmlElement(name = "bzjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentPersonId:String = _
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
