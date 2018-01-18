@@ -59,8 +59,8 @@ trait reqansop {
     pstAns.nReturnValueRes = ByteBuffer.allocate(4).putInt(nRetval.toInt).array()
   }
 
-  def NETANS_GetLongRetVal(pstAns:GNETANSWERHEADOBJECT)= {
-    pstAns.nReturnValue
+  def NETANS_GetLongRetVal(pstAns:GNETANSWERHEADOBJECT) = {
+    ByteBuffer.wrap(pstAns.nReturnValueRes).getInt()
   }
 
   def NETREQ_SetRetVal(pstReq:GNETREQUESTHEADOBJECT,nRetVal:Int) {
