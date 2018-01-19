@@ -22,7 +22,9 @@ trait SurveyHitResultRecordService {
   /**
     * 获取现勘比中信息
     * @param state 状态survey.SURVEY_STATE_xx
+    * @param limit 数量
     * @return
     */
-  def getSurveyHitResultRecordList(state: Byte): Seq[SURVEYHITRESULTRECORD]
+  def getSurveyHitResultRecordList(state: Byte, limit: Int): Seq[SURVEYHITRESULTRECORD]
+
 }

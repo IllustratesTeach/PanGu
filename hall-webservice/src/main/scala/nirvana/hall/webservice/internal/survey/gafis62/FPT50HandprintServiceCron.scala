@@ -1,5 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
+import javax.activation.DataHandler
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
@@ -195,22 +197,34 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
   def getReceptionNo: Unit ={
     //读取SURVEY_RECORD表没有接警编号的数据,获取接警编号并保存
     val recordList = surveyRecordService.getSurveyRecordListByJieJingState(survey.SURVEY_STATE_DEFAULT, 10)
-    recordList.foreach{record=>
-      fPT50HandprintServiceClient.getReceptionNo(record.szKNo)
-      record.nJieJingState = survey.SURVEY_STATE_SUCCESS
-      surveyRecordService.updateSurveyRecord(record)
+    if(recordList.nonEmpty){
+      recordList.foreach{record=>
+        fPT50HandprintServiceClient.getReceptionNo(record.szKNo)
+        record.nJieJingState = survey.SURVEY_STATE_SUCCESS
+        surveyRecordService.updateSurveyRecord(record)
+      }
+    }else{
+      getReceptionNo
     }
   }
 
+  /**
+    * 推送比对任务
+    */
   def sendHitResult: Unit ={
-    val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT)
-    hitResultList.foreach{hitResult=>
-      fPT50HandprintServiceClient.sendHitResult(hitResult)
-      hitResult.nState = survey.SURVEY_STATE_SUCCESS
-      surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+    val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT, 10)
+    if(hitResultList.nonEmpty){
+      hitResultList.foreach{hitResult=>
+        //TODO
+        val xckybh = ""
+        val hitResultDh: DataHandler = null
+        fPT50HandprintServiceClient.sendHitResult(xckybh, hitResult.nQueryType, hitResultDh)
+        hitResult.nState = survey.SURVEY_STATE_SUCCESS
+        surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+      }
+    }else{
+      sendHitResult
     }
-
-
   }
 
 }

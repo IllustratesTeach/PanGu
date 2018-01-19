@@ -29,7 +29,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade) extends SurveyHitRe
     * @param state 状态
     * @return
     */
-  override def getSurveyHitResultRecordList(state: Byte): Seq[SURVEYHITRESULTRECORD] = {
+  override def getSurveyHitResultRecordList(state: Byte, limit: Int): Seq[SURVEYHITRESULTRECORD] = {
     v62Facade.NET_GAFIS_SURVEYHITRESULTRECORD_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYHITRESULTRECORD, state)
   }
 }
