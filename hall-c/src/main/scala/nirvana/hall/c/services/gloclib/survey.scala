@@ -26,9 +26,9 @@ object survey {
   // 获取比中状态为0的记录
   final val SURVEY_HITRESULT_RECORD_CONDITION_ORASID:Byte = 0x00000010
 
-  final val SURVEYRECORD_STATE_DEFAULT: Byte= 0
-  final val SURVEYRECORD_STATE_SUCCESS: Byte = 1
-  final val SURVEYRECORD_STATE_FAIL: Byte = 2
+  final val SURVEY_STATE_DEFAULT: Byte= 0
+  final val SURVEY_STATE_SUCCESS: Byte = 1
+  final val SURVEY_STATE_FAIL: Byte = 2
 
   // 根据任务号获取记录
   class SURVEYRECORD extends AncientData {

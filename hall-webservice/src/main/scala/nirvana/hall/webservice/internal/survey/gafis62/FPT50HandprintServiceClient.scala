@@ -6,7 +6,9 @@ import javax.activation.DataHandler
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gfpt5lib.LatentPackage
+import nirvana.hall.c.services.gloclib.survey.SURVEYHITRESULTRECORD
 import nirvana.hall.support.services.XmlLoader
+import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
 import org.apache.commons.codec.digest.DigestUtils
@@ -113,6 +115,25 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     */
   def getCaseNo(xckybh: String): String ={
     fPT50HandprintService.getCaseNo(userID, password, xckybh)
+  }
+
+  /**
+    * 发送比中信息
+    * @param surveyHitResultRecord
+    */
+  def sendHitResult(surveyHitResultRecord: SURVEYHITRESULTRECORD): Unit ={
+    //TODO 根据指纹编号获取
+    val xckybh = ""
+
+    surveyHitResultRecord.nQueryType match {
+      case QueryConstants.QUERY_TYPE_TL | QueryConstants.QUERY_TYPE_LT =>
+        val hitResultDh:DataHandler = null
+        fPT50HandprintService.sendLTHitResult(userID, password, xckybh, hitResultDh)
+      case QueryConstants.QUERY_TYPE_LL =>
+        val hitResultDh:DataHandler = null
+        fPT50HandprintService.sendLLHitResult(userID, password, xckybh, hitResultDh)
+      case other =>
+    }
   }
 
   /**

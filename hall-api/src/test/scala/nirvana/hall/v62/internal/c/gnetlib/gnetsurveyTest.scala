@@ -25,11 +25,11 @@ class gnetsurveyTest {
   def test_NET_GAFIS_SURVEYRECORD_ADD(): Unit ={
     val record = new SURVEYRECORD
     record.szCaseName = "casename"
-    record.nState = survey.SURVEYRECORD_STATE_DEFAULT
+    record.nState = survey.SURVEY_STATE_DEFAULT
     record.szJieJingNo = "jiejing01"
     record.szKNo = "k00001"
     record.szPhyEvidenceNo = "phyevidenceno01"
-    facade.NET_GAFIS_SURVEYRECORD_ADD(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORDT,record)
+    facade.NET_GAFIS_SURVEYRECORD_ADD(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD,record)
   }
 
   @Test
@@ -41,13 +41,13 @@ class gnetsurveyTest {
     record.szKNo = "k00002"
     record.szPhyEvidenceNo = "phyevidenceno02"
     record.nState = 1
-    facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORDT,record)
+    facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD,record)
   }
 
   @Test
   def test_NET_GAFIS_SURVEYRECORD_LIST_GET(): Unit ={
-    val list = facade.NET_GAFIS_SURVEYRECORD_LIST_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORDT, survey.SURVEYRECORD_STATE_DEFAULT)
-    val list1 = facade.NET_GAFIS_SURVEYRECORD_LIST_GET_BY_JIEJINGSTATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORDT, survey.SURVEYRECORD_STATE_DEFAULT)
+    val list = facade.NET_GAFIS_SURVEYRECORD_LIST_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD, survey.SURVEY_STATE_DEFAULT)
+    val list1 = facade.NET_GAFIS_SURVEYRECORD_LIST_GET_BY_JIEJINGSTATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD, survey.SURVEY_STATE_DEFAULT)
     Assert.assertTrue(list.nonEmpty)
     Assert.assertTrue(list1.nonEmpty)
   }
@@ -107,7 +107,7 @@ class gnetsurveyTest {
 
   @Test
   def test_NET_GAFIS_SURVEYHITRESULTRECORD_Get(): Unit ={
-    val recordList = facade.NET_GAFIS_SURVEYHITRESULTRECORD_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYHITRESULTRECORD, survey.SURVEYRECORD_STATE_DEFAULT)
+    val recordList = facade.NET_GAFIS_SURVEYHITRESULTRECORD_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYHITRESULTRECORD, survey.SURVEY_STATE_DEFAULT)
     Assert.assertTrue(recordList.nonEmpty)
   }
 }

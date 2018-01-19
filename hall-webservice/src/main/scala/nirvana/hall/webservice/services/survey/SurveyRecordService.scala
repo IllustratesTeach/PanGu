@@ -21,17 +21,18 @@ trait SurveyRecordService {
 
   /**
     * 获取现堪记录列表
-    * @param state 状态
+    * @param state 状态survey.SURVEY_STATE_xx
     * @param limit 数量
     * @return
     */
-  def getSurveyRecordListByState(state: Short, limit: Int): Seq[SURVEYRECORD]
+  def getSurveyRecordListByState(state: Byte, limit: Int): Seq[SURVEYRECORD]
 
   /**
     * 获取现堪记录列表
-    * @param jiejingState 接警状态
+    * @param jiejingState 接警状态survey.SURVEY_STATE_xx
+    * @param limit 数量
     * @return
     */
-  def getSurveyRecordListByJieJingState(jiejingState: Short): Seq[SURVEYRECORD]
+  def getSurveyRecordListByJieJingState(jiejingState: Byte, limit: Int): Seq[SURVEYRECORD]
 
 }

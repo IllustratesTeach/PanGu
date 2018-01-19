@@ -7,9 +7,22 @@ import nirvana.hall.c.services.gloclib.survey.SURVEYHITRESULTRECORD
   */
 trait SurveyHitResultRecordService {
 
+  /**
+    * 添加现勘比中信息
+    * @param hitResult
+    */
   def addSurveyHitResultRecord(hitResult: SURVEYHITRESULTRECORD)
 
+  /**
+    * 获取现堪比中信息
+    * @param hitResult
+    */
   def updateSurveyHitResultRecord(hitResult: SURVEYHITRESULTRECORD)
 
-  def getSurveyHitResultRecordList(state: Short): Seq[SURVEYHITRESULTRECORD]
+  /**
+    * 获取现勘比中信息
+    * @param state 状态survey.SURVEY_STATE_xx
+    * @return
+    */
+  def getSurveyHitResultRecordList(state: Byte): Seq[SURVEYHITRESULTRECORD]
 }

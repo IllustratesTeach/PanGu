@@ -72,7 +72,7 @@ object V62Facade{
   val TID_USER:Short       = 2
 
   //现勘接口记录表
-  val TID_SURVEYRECORDT:Short = 391
+  val TID_SURVEYRECORD:Short = 391
   val TID_SURVEYCONFIG:Short = 392
   val TID_SURVEYHITRESULTRECORD:Short = 393
 

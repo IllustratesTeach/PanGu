@@ -28,7 +28,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
 
     if(hallWebserviceConfig.handprintService.cron!= null){
       //获取现场指纹列表定时
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentList")
@@ -40,7 +40,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //根据现勘列表获取现场指纹FPT5数据
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentPackage")
@@ -52,7 +52,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //获取接警编号
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getReceptionNo")
@@ -68,7 +68,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin sendHitResult")
-
+              sendHitResult
             info("end sendHitResult")
           } catch {
             case e: Exception =>
@@ -141,7 +141,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               surveyRecord.szCaseName = k.ajmc
               surveyRecord.szPhyEvidenceNo = k.xcwzbh
               surveyRecord.szJieJingNo = receptionNo
-              surveyRecord.nState = survey.SURVEYRECORD_STATE_DEFAULT
+              surveyRecord.nState = survey.SURVEY_STATE_DEFAULT
 
               surveyRecordService.addSurveyRecord(surveyRecord)
               nIndex += 1
@@ -170,7 +170,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     * 读取没有获取fpt数据的现堪记录，根据物证编号获取数据并保存
     */
   def getLatentPackage: Unit ={
-    val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEYRECORD_STATE_DEFAULT, 10)
+    val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
     recordList.foreach{record=>
       val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
       if(latentPackageOp.nonEmpty){
@@ -178,7 +178,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         fPT5Service.addLatentPackage(latentPackageOp.get)
 
         //更新状态
-        record.nState = survey.SURVEYRECORD_STATE_SUCCESS
+        record.nState = survey.SURVEY_STATE_SUCCESS
         surveyRecordService.updateSurveyRecord(record)
 
         fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ADD)
@@ -194,16 +194,21 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getReceptionNo: Unit ={
     //读取SURVEY_RECORD表没有接警编号的数据,获取接警编号并保存
-    val recordList = surveyRecordService.getSurveyRecordListByJieJingState(survey.SURVEYRECORD_STATE_DEFAULT)
+    val recordList = surveyRecordService.getSurveyRecordListByJieJingState(survey.SURVEY_STATE_DEFAULT, 10)
     recordList.foreach{record=>
       fPT50HandprintServiceClient.getReceptionNo(record.szKNo)
-      record.nJieJingState = survey.SURVEYRECORD_STATE_SUCCESS
+      record.nJieJingState = survey.SURVEY_STATE_SUCCESS
       surveyRecordService.updateSurveyRecord(record)
     }
   }
 
   def sendHitResult: Unit ={
-
+    val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT)
+    hitResultList.foreach{hitResult=>
+      fPT50HandprintServiceClient.sendHitResult(hitResult)
+      hitResult.nState = survey.SURVEY_STATE_SUCCESS
+      surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+    }
 
 
   }
