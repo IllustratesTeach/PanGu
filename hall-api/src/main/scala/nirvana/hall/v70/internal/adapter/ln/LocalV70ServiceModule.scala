@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal.adapter.ln
 import nirvana.hall.api.services._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
+import nirvana.hall.v70.internal.ExportRelationServiceImpl
 import nirvana.hall.v70.internal.adapter.ln.services._
 import nirvana.hall.v70.services.GetPKIDServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
@@ -23,7 +24,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
     binder.bind(classOf[QueryService], classOf[QueryServiceImpl])
     binder.bind(classOf[MatchRelationService], classOf[MatchRelationServiceImpl])
-    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+    binder.bind(classOf[ExportRelationService], classOf[ExportRelationServiceImpl])
 
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
   }

@@ -31,7 +31,7 @@ object LocalV70ServiceModule {
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
-    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
+    binder.bind(classOf[ExportRelationService], classOf[ExportRelationServiceImpl])
     //同步
     binder.bind(classOf[FetchTPCardService], classOf[FetchTPCardServiceImpl])
     binder.bind(classOf[FetchLPCardService], classOf[FetchLPCardServiceImpl])
