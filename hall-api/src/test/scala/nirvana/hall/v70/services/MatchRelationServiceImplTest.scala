@@ -3,7 +3,7 @@ package nirvana.hall.v70.services
 import java.io.{File, FileOutputStream}
 
 import junit.framework.Assert
-import nirvana.hall.api.services.{ExceptRelationService, MatchRelationService}
+import nirvana.hall.api.services.{ExportRelationService, MatchRelationService}
 import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchRelationGetRequest
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
@@ -55,7 +55,7 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
   @Test
   def test_exportMatchRelation(): Unit ={
 
-    val service = getService[ExceptRelationService]
+    val service = getService[ExportRelationService]
     val relation = service.exportMatchRelation("123","9536") //9536 tt //11017 tl //10816 lt //6322 ll
 
     val fileOutPutStream = new FileOutputStream("D://123.fpt")

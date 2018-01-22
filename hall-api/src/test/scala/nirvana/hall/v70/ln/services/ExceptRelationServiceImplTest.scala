@@ -2,7 +2,7 @@ package nirvana.hall.v70.ln.services
 
 import java.io.FileOutputStream
 
-import nirvana.hall.api.services.ExceptRelationService
+import nirvana.hall.api.services.ExportRelationService
 import nirvana.hall.v70.internal.BaseV70TestCase
 import org.junit.Test
 
@@ -14,7 +14,7 @@ class ExceptRelationServiceImplTest extends BaseV70TestCase{
   @Test
   def test_get: Unit ={
 
-    val service = getService[ExceptRelationService]
+    val service = getService[ExportRelationService]
     val relation = service.exportMatchRelation("0","12210")  //TT  10110  //LL  10513  //tl  8408  //lt  12210
     if(relation!= null){
       val fileOutPutStream = new FileOutputStream("D://123.fpt")

@@ -74,7 +74,6 @@ object LocalV62DataSourceModule {
     binder.bind(classOf[FetchQueryService], classOf[FetchQueryServiceImpl])
     //其他Service
     binder.bind(classOf[FetchMatchRelationService],classOf[FetchMatchRelationServiceImpl])
-    binder.bind(classOf[ExceptRelationService], classOf[ExceptRelationServiceImpl])
     binder.bind(classOf[AssistCheckRecordService],classOf[AssistCheckRecordServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService], classOf[SyncInfoLogManageServiceImpl])

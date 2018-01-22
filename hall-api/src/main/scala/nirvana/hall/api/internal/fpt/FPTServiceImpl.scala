@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
-import nirvana.hall.api.services.{CaseInfoService, ExceptRelationService, LPCardService, TPCardService}
+import nirvana.hall.api.services._
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -23,7 +23,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
                      tPCardService: TPCardService,
                      caseInfoService: CaseInfoService,
                      lPCardService: LPCardService,
-                     exceptRelationService: ExceptRelationService,
+                     exportRelationService: ExportRelationService,
                      extractor: FeatureExtractor) extends FPTService{
   JniLoaderUtil.loadExtractorJNI()
   JniLoaderUtil.loadImageJNI()
@@ -149,7 +149,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def getLogic04Rec(pkid: String,num:Int, dbId: Option[String]): Logic04Rec = {
 
-    val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
+    val gafisMatchInfo = exportRelationService.getSearchMatchRelation(pkid,num)
     val logic04Rec = new Logic04Rec
     logic04Rec.systemType = "1900"
     if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length-2).length==22){
@@ -193,7 +193,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def getLogic05Rec(pkid: String,num:Int, dbId: Option[String]): Logic05Rec = {
 
-    val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
+    val gafisMatchInfo = exportRelationService.getSearchMatchRelation(pkid,num)
 
     val logic05Rec = new Logic05Rec
     logic05Rec.systemType = "1900"
@@ -217,7 +217,7 @@ class FPTServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def getLogic06Rec(pkid: String,num:Int, dbId: Option[String]): Logic06Rec = {
 
-    val gafisMatchInfo = exceptRelationService.getSearchMatchRelation(pkid,num)
+    val gafisMatchInfo = exportRelationService.getSearchMatchRelation(pkid,num)
     val logic06Rec = new Logic06Rec
     logic06Rec.systemType = "1900"
     if(gafisMatchInfo.code.substring(0,gafisMatchInfo.code.length - 2).length==22){
