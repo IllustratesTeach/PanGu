@@ -4,7 +4,6 @@ import nirvana.hall.api.services._
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.ln.services._
-import nirvana.hall.v70.ln.sys.{DictService, DictServiceImpl, UserService, UserServiceImpl}
 import nirvana.hall.v70.services.GetPKIDServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -15,8 +14,6 @@ object LocalV70ServiceModule {
 
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[RpcHttpClient], classOf[RpcHttpClientImpl]).withId("RpcHttpClient")
-    binder.bind(classOf[UserService], classOf[UserServiceImpl])
-    binder.bind(classOf[DictService], classOf[DictServiceImpl])
     //api 接口实现类
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
 

@@ -1,7 +1,7 @@
 package nirvana.hall.v70.internal.sys
 
 import nirvana.hall.api.services.AuthService
-import nirvana.hall.v70.jpa.SysUser
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.services.sys.UserService
 import org.apache.commons.codec.digest.DigestUtils
 

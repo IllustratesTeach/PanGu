@@ -1,6 +1,6 @@
 package nirvana.hall.v70.gz.services.versionfpt5
 
-import java.text.SimpleDateFormat
+
 import java.util.{Date, UUID}
 import javax.persistence.EntityManager
 
@@ -10,10 +10,11 @@ import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gfpt5lib.fpt5util
 import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.gz.jpa._
 import nirvana.hall.v70.gz.sync._
-import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
+import nirvana.hall.v70.services.sys.UserService
 
 /**
   * Created by songpeng on 2017/5/26.
@@ -148,9 +149,9 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
     tpCard.setStrMisPersonID(person.personid)
-    tpCard.setStrJingZongPersonId(person.jingZongPersonId)
-    tpCard.setStrCasePersonID(person.casePersonid)
-    tpCard.setCaptureInfoReasonCode(person.captureInfoReasonCode)
+    tpCard.setStrJingZongPersonId("")
+    tpCard.setStrCasePersonID("")
+    tpCard.setCaptureInfoReasonCode("")
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
@@ -176,7 +177,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
     magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
     magicSet(person.gatherusername, textBuilder.setStrPrinter)
-    textBuilder.setStrPrintDate(new SimpleDateFormat("yyyyMMddHHmmss").format(person.gatherDate))
+    textBuilder.setStrPrintDate("")
     magicSet(person.remark, textBuilder.setStrComment)
     magicSet(person.idcardno,textBuilder.setStrCertifID)
     magicSet(person.chopPersonIdCard,textBuilder.setStrPrinterIdCardNo)

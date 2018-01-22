@@ -3,11 +3,12 @@ package nirvana.hall.v62.internal
 
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.{LPCardService, MatchRelationService, QueryService, TPCardService}
+import nirvana.hall.api.services._
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage, fpt5util}
+import nirvana.hall.c.services.gloclib.gafisusr.GAFIS_USERSTRUCT
 import nirvana.hall.c.services.gloclib.galoclog.GAFIS_VERIFYLOGSTRUCT
 import nirvana.hall.c.services.gloclib.galoclp.GAFIS_LPGROUPSTRUCT
 import nirvana.hall.c.services.gloclib.galoctp._
@@ -267,22 +268,33 @@ class MatchRelationServiceImpl(v62Config: HallV62Config
           ttHit.jingZongPersonId = sourceTpCard.getStrJingZongPersonId
           ttHit.personId = sourceTpCard.getStrCasePersonID
           ttHit.cardId = sourceTpCard.getStrCardID
-          ttHit.whetherFingerJudgmentMark = "1"//是否指纹 1--是 2--否
+          ttHit.whetherFingerJudgmentMark = fpt5util.FINGER.toString
           ttHit.resultOriginalSystemPersonId = destTpCard.getStrMisPersonID
           ttHit.resultjingZongPersonId = destTpCard.getStrJingZongPersonId
           ttHit.resultPersonId = destTpCard.getStrCasePersonID
           ttHit.resultCardId = destTpCard.getStrCardID
           ttHit.hitUnitCode = queryStruct.pstInfo_Data.szCheckerUnitCode
-          ttHit.hitUnitName = "" //TODO:待完成
-          ttHit.hitPersonName = "" //TODO:
-          ttHit.hitPersonIdCard = "" //TODO:
-          ttHit.hitPersonTel = "" //TODO:
+          //获取用户信息
+          val userStruct = new GAFIS_USERSTRUCT()
+          userStruct.stInfo.szName = queryStruct.stSimpQry.szCheckUserName
+          facade.NET_GAFIS_USER_GetUserInfo(V62Facade.DBID_ADMIN_DEFAULT, V62Facade.TID_USER, userStruct)
+
+          val hitUserInfo = userStruct.stInfo
+          ttHit.hitUnitName = "" //TODO:
+          ttHit.hitPersonName = hitUserInfo.szFullName
+          ttHit.hitPersonIdCard = hitUserInfo.szMail //C组最终决定将身份证号存mail属性里
+          ttHit.hitPersonTel = hitUserInfo.szPhone
           ttHit.hitDateTime = DateConverter.convertAFISDateTime2String(queryStruct.stSimpQry.tCheckTime)
           ttHit.checkUnitCode = queryStruct.pstInfo_Data.szReCheckerUnitCode
-          ttHit.checkUnitName = "" //TODO:待完成
-          ttHit.checkPersonName =  "" //TODO:待完成
-          ttHit.checkPersonIdCard =  "" //TODO:待完成
-          ttHit.checkPersonTel =  "" //TODO:待完成
+          ttHit.checkUnitName = "" //TODO:
+
+          userStruct.stInfo.szName = queryStruct.stSimpQry.szReCheckUserName
+          facade.NET_GAFIS_USER_GetUserInfo(V62Facade.DBID_ADMIN_DEFAULT, V62Facade.TID_USER, userStruct)
+
+          val reCheckUserInfo = userStruct.stInfo
+          ttHit.checkPersonName =  reCheckUserInfo.szFullName
+          ttHit.checkPersonIdCard =  reCheckUserInfo.szMail //C组最终决定将身份证号存mail属性里
+          ttHit.checkPersonTel =  reCheckUserInfo.szPhone
           ttHit.checkDateTime = DateConverter.convertAFISDateTime2String(queryStruct.stSimpQry.tReCheckDate)
           ttHit.memo = ""
           ttHitList += ttHit

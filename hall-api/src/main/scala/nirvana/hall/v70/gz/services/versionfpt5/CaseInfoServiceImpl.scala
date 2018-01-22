@@ -7,10 +7,11 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm, SysUser}
-import nirvana.hall.v70.gz.sys.UserService
+import nirvana.hall.v70.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm}
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.services.sys.UserService
 
 /**
   * Created by songpeng on 2017/6/29.

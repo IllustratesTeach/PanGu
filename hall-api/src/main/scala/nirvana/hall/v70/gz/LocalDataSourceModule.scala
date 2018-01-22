@@ -79,6 +79,7 @@ object LocalDataSourceModule {
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
     configuration.add("nirvana.hall.v70.gz.jpa")
+    configuration.add("nirvana.hall.v70.common.jpa")
     configuration.add("nirvana.hall.api.jpa")
   }
 }

@@ -18,11 +18,14 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gloclib.{galoctp, gaqryqueConverter}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.gz.jpa._
-import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import org.jboss.netty.buffer.ChannelBuffers
 import javax.sql.DataSource
+
+import nirvana.hall.v70.common.jpa.SysUser
+import nirvana.hall.v70.gz.jpa.{GafisCaseFingerMnt, GafisGatherFinger, GafisNormalqueryQueryque}
+import nirvana.hall.v70.services.sys.UserService
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 

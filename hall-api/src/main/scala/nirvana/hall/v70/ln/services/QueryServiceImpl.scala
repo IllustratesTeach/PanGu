@@ -14,16 +14,13 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchData
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
-import nirvana.hall.v70.ln.jpa.{GafisCaseFingerMnt, GafisGatherFinger, SysUser}
+import nirvana.hall.v70.ln.jpa.{GafisCaseFingerMnt, GafisGatherFinger}
 import nirvana.hall.v70.ln.sync.ProtobufConverter
-import nirvana.hall.v70.ln.sys
-import nirvana.hall.v70.ln.sys.UserService
-
+import nirvana.hall.v70.services.sys.UserService
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by songpeng on 16/1/26.

@@ -9,6 +9,7 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage, fpt5util}
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.gz.jpa._
 import nirvana.hall.v70.gz.jpa.GafisCheckinInfo
 

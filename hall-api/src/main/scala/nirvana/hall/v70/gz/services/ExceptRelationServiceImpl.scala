@@ -6,6 +6,7 @@ import javax.activation.DataHandler
 import nirvana.hall.api.services.{ExceptRelationService, GetPKIDService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.gz.jpa._
 import org.apache.axiom.attachments.ByteArrayDataSource
 

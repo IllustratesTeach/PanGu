@@ -4,6 +4,7 @@ import nirvana.hall.api.config.HallApiConfig
 import nirvana.hall.api.internal.ScalaUtils
 import nirvana.hall.protocol.sys.DictProto._
 import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.services.sys.DictService
 
 /**
  * Created by songpeng on 15/11/4.

@@ -2,14 +2,16 @@ package nirvana.hall.v70.gz.services
 
 import java.util.Date
 import javax.persistence.EntityManager
+
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.gz.jpa._
 import nirvana.hall.v70.gz.sync.ProtobufConverter
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
-import nirvana.hall.v70.gz.sys.UserService
+import nirvana.hall.v70.services.sys.UserService
 
 /**
   * Created by songpeng on 2017/5/26.
@@ -34,7 +36,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       //用户名获取用户ID
       var user = userService.findSysUserByLoginName(person.inputpsn)
       if (user.isEmpty){
-        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
+        user = Option(SysUser.find(Gafis70Constants.INPUTPSN).asInstanceOf)
       }
       person.inputpsn = user.get.pkId
       person.gatherOrgCode = user.get.departCode

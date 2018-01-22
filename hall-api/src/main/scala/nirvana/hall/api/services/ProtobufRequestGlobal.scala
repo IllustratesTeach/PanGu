@@ -1,9 +1,11 @@
 package nirvana.hall.api.services
 
-import nirvana.hall.v70.jpa.SysUser
+import nirvana.hall.v70.common.jpa.SysUser
+
 
 /**
  * protobuf request global
+ *
  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
  * @since 2015-06-01
  */

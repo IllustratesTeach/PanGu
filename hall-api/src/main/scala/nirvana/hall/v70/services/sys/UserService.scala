@@ -1,6 +1,6 @@
 package nirvana.hall.v70.services.sys
 
-import nirvana.hall.v70.jpa.SysUser
+import nirvana.hall.v70.common.jpa.SysUser
 import org.springframework.transaction.annotation.Transactional
 
 /**

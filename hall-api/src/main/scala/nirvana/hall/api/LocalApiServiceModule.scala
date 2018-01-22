@@ -9,6 +9,7 @@ import nirvana.hall.api.services.remote._
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.image.internal.{FirmDecoderImpl, ImageEncoderImpl}
 import nirvana.hall.image.services.{FirmDecoder, ImageEncoder}
+import nirvana.hall.v70.gz.services.ExceptRelationServiceImpl
 import org.apache.tapestry5.ioc.ServiceBinder
 import org.apache.tapestry5.services.Core
 
@@ -23,6 +24,8 @@ object LocalApiServiceModule {
     binder.bind(classOf[SystemService], classOf[SystemServiceImpl])
     binder.bind(classOf[AuthService], classOf[AuthServiceImpl])
     binder.bind(classOf[RequiresUserAdvisor], classOf[RequiresUserAdvisorImpl])
+
+    binder.bind(classOf[ExceptRelationService],classOf[ExceptRelationServiceImpl])
 
     //图像和特征处理相关Service
     binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])

@@ -6,11 +6,11 @@ import javax.persistence.EntityManager
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto.LPCard
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.gz.Constant
-import nirvana.hall.v70.gz.jpa.SysUser
 import nirvana.hall.v70.gz.sync.ProtobufConverter
-import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
 /**

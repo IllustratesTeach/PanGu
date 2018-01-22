@@ -1,8 +1,9 @@
 package nirvana.hall.v70.internal
 
-import nirvana.hall.api.services.{CaseInfoService}
+import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.sys.UserService

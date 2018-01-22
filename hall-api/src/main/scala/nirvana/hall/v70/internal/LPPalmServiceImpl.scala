@@ -3,8 +3,9 @@ package nirvana.hall.v70.internal
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{LPPalmService}
+import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto.LPCard
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.sys.UserService

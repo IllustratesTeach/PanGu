@@ -8,18 +8,20 @@ import monad.rpc.protocol.CommandProto.BaseCommand
 import monad.rpc.services.{CommandResponse, RpcServerMessageFilter, RpcServerMessageHandler}
 import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.services.fpt.FPT5Service
-import nirvana.hall.c.services.gfpt5lib.{FPT5File, FingerprintPackage, LatentPackage}
+import nirvana.hall.c.services.gfpt5lib.{FPT5File, FingerprintPackage, LatentPackage, currentUserMessage}
 import nirvana.hall.protocol.api.FPTTrans
 import nirvana.hall.protocol.api.FPTTrans.{ExportType, _}
 import nirvana.hall.support.services.XmlLoader
-import nirvana.hall.v70.gz.sys.UserServiceImpl
+import nirvana.hall.v70.common.jpa.SysUser
+import nirvana.hall.v70.gz.jpa.SysDepart
+import nirvana.hall.v70.services.sys.UserService
 
 import scala.collection.mutable.ArrayBuffer
 /**
   * Created by yuchen on 2017/11/9.
   * 用于指纹系统7.0导出FPT
   */
-class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5Service,userService: UserServiceImpl) extends RpcServerMessageFilter {
+class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5Service,userService: UserService) extends RpcServerMessageFilter {
   override def handle(commandRequest: BaseCommand, commandResponse: CommandResponse, handler: RpcServerMessageHandler): Boolean = {
     if (commandRequest.hasExtension(FPTImportRequest.cmd)) {
       val request = commandRequest.getExtension(FPTImportRequest.cmd)
@@ -104,7 +106,7 @@ class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5S
     val cardIdListIterator = cardIdList.iterator
     var fPT5File: FPT5File = null
     val xmlList = new ArrayBuffer[String]
-    val userMessage = userService.getFPT5CurrentUserMessage(userId)
+    val userMessage = getFPT5CurrentUserMessage(userId)
     fPT5File = new FPT5File
     fPT5File.packageHead.originSystem = originSystem
     fPT5File.packageHead.sendUnitCode = userMessage.sendUnitCode
@@ -162,6 +164,19 @@ class FPTTransFilter (httpServletRequest: HttpServletRequest, fPT5Service: FPT5S
     }
 
     xmlList.toSeq
+  }
+
+  //新增FPT5.0头文件用户信息
+  private def getFPT5CurrentUserMessage(userId:String):currentUserMessage = {
+    val currentUserMessage = new currentUserMessage()
+    val user = SysUser.findOption(userId).get
+    val depart = SysDepart.findOption(user.departCode).get
+    currentUserMessage.sendPersonIdCard = user.idcard
+    currentUserMessage.sendPersonName = user.trueName
+    currentUserMessage.sendUnitCode = user.departCode
+    currentUserMessage.sendUnitName = depart.name
+    currentUserMessage.sendPersonTel = user.phone
+    currentUserMessage
   }
 }
 

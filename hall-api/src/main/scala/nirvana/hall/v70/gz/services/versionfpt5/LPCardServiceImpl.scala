@@ -10,12 +10,13 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.support.services.JdbcDatabase
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.gz.Constant
-import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
+import nirvana.hall.v70.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
 import nirvana.hall.v70.gz.sync.ProtobufConverter
-import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.services.sys.UserService
 
 import scala.collection.mutable
 

@@ -4,9 +4,10 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.services.{TPCardService}
+import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisGatherPalm, _}
 import nirvana.hall.v70.services.sys.UserService

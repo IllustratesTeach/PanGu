@@ -5,7 +5,7 @@ import javax.persistence.EntityManager
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto.LPCard
-import nirvana.hall.v70.ln.sys.UserService
+import nirvana.hall.v70.services.sys.UserService
 
 /**
   * 现场掌纹service实现

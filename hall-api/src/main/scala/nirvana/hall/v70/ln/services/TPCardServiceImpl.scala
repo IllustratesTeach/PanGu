@@ -4,13 +4,14 @@ import java.util.Date
 import javax.persistence.EntityManager
 
 import nirvana.hall.api.services.TPCardService
-import nirvana.hall.v70.ln.sys.UserService
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.ln.jpa._
 import nirvana.hall.v70.ln.sync.ProtobufConverter
+import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
 /**
