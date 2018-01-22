@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by shishijie on 17/5/3.
  */
-trait ExceptRelationService {
+trait ExportRelationService {
 
   /**
     * 类型定义

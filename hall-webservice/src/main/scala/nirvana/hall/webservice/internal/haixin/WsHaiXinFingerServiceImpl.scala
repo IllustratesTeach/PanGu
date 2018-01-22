@@ -11,7 +11,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.{ExceptRelationService, QueryService, TPCardService}
+import nirvana.hall.api.services.{ExportRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
@@ -37,7 +37,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
                                 ,tpCardService: TPCardService
                                 ,queryService: QueryService
                                 ,extractor: FeatureExtractor
-                                ,exceptRelationService:ExceptRelationService
+                                ,exportRelationService:ExportRelationService
                                 ,hallWebserviceConfig: HallWebserviceConfig) extends WsHaiXinFingerService with LoggerSupport{
   /**
     * 接口01:捺印指纹信息录入
@@ -324,7 +324,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       listMapBuffer match {
         case Some(m) => m.foreach{ t =>
 
-          val dataHandler = exceptRelationService.exportMatchRelation(t.get("queryid").get.toString
+          val dataHandler = exportRelationService.exportMatchRelation(t.get("queryid").get.toString
             ,t.get("orasid").get.toString)
           if(Nil != dataHandler && null != dataHandler){
             listDataHandler.add(dataHandler)

@@ -5,7 +5,7 @@ import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.api.services.{ExceptRelationService, GetPKIDService, LPCardService, QueryService}
+import nirvana.hall.api.services._
 import nirvana.hall.c.services.gfpt4lib.FPT4File._
 import nirvana.hall.v62.config.HallV62Config
 import org.apache.axiom.attachments.ByteArrayDataSource
@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by songpeng on 16/6/21.
   */
-class ExceptRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService, getPKIDService: GetPKIDService, fptService: FPTService) extends ExceptRelationService with LoggerSupport{
+class ExportRelationServiceImpl(v62Config: HallV62Config, facade: V62Facade, lPCardService: LPCardService, queryService: QueryService, getPKIDService: GetPKIDService, fptService: FPTService) extends ExportRelationService with LoggerSupport{
 
   /**
     * 导出比对关系

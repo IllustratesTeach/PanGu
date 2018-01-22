@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal
 import java.text.SimpleDateFormat
 import javax.activation.DataHandler
 
-import nirvana.hall.api.services.{ExceptRelationService, GetPKIDService}
+import nirvana.hall.api.services.{ExportRelationService, GetPKIDService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
 import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger, SysDepart}
@@ -14,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by songpeng on 16/9/21.
  */
-class ExceptRelationServiceImpl(fptService: FPTService, getPKIDService: GetPKIDService) extends ExceptRelationService{
+class ExportRelationServiceImpl(fptService: FPTService, getPKIDService: GetPKIDService) extends ExportRelationService{
   /**
     * 导出比对关系
     *

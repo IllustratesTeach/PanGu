@@ -8,8 +8,8 @@ import nirvana.hall.c.services.gfpt5lib._
 import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.v70.gz.jpa.SysDepart
-import nirvana.hall.v70.gz.services.versionfpt5.QueryServiceImpl
+import nirvana.hall.v70.internal.adapter.gz.jpa.SysDepart
+import nirvana.hall.v70.internal.adapter.gz.services.versionfpt5.QueryServiceImpl
 
 import scala.collection.mutable.ArrayBuffer
 

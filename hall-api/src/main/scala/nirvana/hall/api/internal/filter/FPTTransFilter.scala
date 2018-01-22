@@ -13,7 +13,7 @@ import nirvana.hall.protocol.api.FPTTrans
 import nirvana.hall.protocol.api.FPTTrans.{ExportType, _}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.common.jpa.SysUser
-import nirvana.hall.v70.gz.jpa.SysDepart
+import nirvana.hall.v70.internal.adapter.gz.jpa.SysDepart
 import nirvana.hall.v70.services.sys.UserService
 
 import scala.collection.mutable.ArrayBuffer
