@@ -1,29 +1,14 @@
 package nirvana.hall.webservice.survey.gz
 
 
-import java.io.File
-import java.sql.Timestamp
-import java.util.Date
-
-import monad.support.services.XmlLoader
-import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.services.ExceptRelationService
-import nirvana.hall.api.services.fpt.FPTService
-import nirvana.hall.c.services.gfpt4lib.FPTFile
 import nirvana.hall.webservice.BaseTestCase
-import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
-import nirvana.hall.webservice.internal.survey.gz.{CommonUtil, Constant}
-import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
-import org.apache.axiom.attachments.ByteArrayDataSource
-import org.apache.commons.io.{FileUtils, IOUtils}
-import org.junit.{Assert, Test}
 
 /**
   * Created by ssj on 2017/11/16.
   */
 class SurveyServiceImpl70Test extends BaseTestCase{
 
-
+/*
   @Test
   def test_isSleep:Unit={
     val service = getService[SurveyRecordService]
@@ -204,7 +189,7 @@ class SurveyServiceImpl70Test extends BaseTestCase{
     val path = "D:\\" + "224915" + ".FPT"
     FileUtils.writeByteArrayToFile(new File(path), IOUtils.toByteArray(hitfpt.getInputStream))
   }
-
+*/
 
 
 }

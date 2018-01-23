@@ -1,4 +1,4 @@
-package nirvana.hall.webservice
+package nirvana.hall.webservice.bjwcsy
 
 import java.io.FileOutputStream
 
@@ -6,6 +6,7 @@ import nirvana.hall.api.services.AssistCheckRecordService
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gfpt4lib.FPTFile
+import nirvana.hall.webservice.BaseTestCase
 import nirvana.hall.webservice.services.bjwcsy.WsFingerService
 import org.junit.Test
 
