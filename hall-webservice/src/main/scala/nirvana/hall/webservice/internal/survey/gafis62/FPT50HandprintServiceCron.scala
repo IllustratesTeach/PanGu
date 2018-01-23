@@ -1,8 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
-import javax.activation.DataHandler
-
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
@@ -20,6 +19,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
                                 surveyConfigService: SurveyConfigService,
                                 surveyRecordService: SurveyRecordService,
                                 surveyHitResultRecordService: SurveyHitResultRecordService,
+                                matchRelationService: MatchRelationService,
                                 fPT5Service: FPT5Service) extends LoggerSupport{
 
   @PostInjection
@@ -178,12 +178,17 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       if(latentPackageOp.nonEmpty){
         //保存数据
         fPT5Service.addLatentPackage(latentPackageOp.get)
+        latentPackageOp.get.latentFingers.foreach{finger=>
+          if(record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)){
+            record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
+            //更新状态
+            record.nState = survey.SURVEY_STATE_SUCCESS
+            surveyRecordService.updateSurveyRecord(record)
 
-        //更新状态
-        record.nState = survey.SURVEY_STATE_SUCCESS
-        surveyRecordService.updateSurveyRecord(record)
+            fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ADD)
+          }
+        }
 
-        fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ADD)
       }else{
         fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
       }
@@ -215,12 +220,18 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT, 10)
     if(hitResultList.nonEmpty){
       hitResultList.foreach{hitResult=>
-        //TODO
-        val xckybh = ""
-        val hitResultDh: DataHandler = null
-        fPT50HandprintServiceClient.sendHitResult(xckybh, hitResult.nQueryType, hitResultDh)
-        hitResult.nState = survey.SURVEY_STATE_SUCCESS
-        surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+        val xckybh = surveyRecordService.getPhyEvidenceNoByFingerId(hitResult.szFingerID)
+        if (xckybh.nonEmpty) {
+          val hitResultDhOp = surveyHitResultRecordService.getDataHandlerOfLtOrLlHitResultPackage(hitResult)
+          if(hitResultDhOp.nonEmpty){
+            fPT50HandprintServiceClient.sendHitResult(xckybh.get, hitResult.nQueryType, hitResultDhOp.get)
+
+            hitResult.nState = survey.SURVEY_STATE_SUCCESS
+          }else{
+            hitResult.nState = survey.SURVEY_STATE_FAIL
+          }
+          surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+        }
       }
     }else{
       sendHitResult

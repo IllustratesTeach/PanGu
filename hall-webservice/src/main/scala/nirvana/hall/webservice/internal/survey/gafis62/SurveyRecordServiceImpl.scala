@@ -1,5 +1,6 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.survey.SURVEYRECORD
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.services.survey.SurveyRecordService
@@ -42,5 +43,27 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
     */
   override def getSurveyRecordListByJieJingState(jiejingState: Byte, limit: Int): Seq[SURVEYRECORD] = {
     v62Facade.NET_GAFIS_SURVEYRECORD_LIST_GET_BY_JIEJINGSTATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD, jiejingState, limit)
+  }
+
+  /**
+    * 获取物证编号
+    * @param fingerId 指纹编号
+    * @return
+    */
+  override def getPhyEvidenceNoByFingerId(fingerId: String): Option[String] = {
+    val statement = Option("(fingerid='%s')".format("123456"))
+    val mapper = Map("physicalevidenceno"->"szKey")
+    val result = v62Facade.queryV62Table[GAKEYSTRUCT](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      1)
+
+    if(result.nonEmpty){
+      Option(result.head.szKey)
+    }else{
+      None
+    }
   }
 }
