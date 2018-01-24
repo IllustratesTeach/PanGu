@@ -7,7 +7,7 @@ import nirvana.hall.api.internal.{DateConverter, JniLoaderUtil}
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService}
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.webservice.internal.survey.gz.Constant
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.internal.survey.gz.vo.{TimeConfig}
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 
@@ -34,8 +34,8 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     if(haiXinServerTime <= endTime){
       bStr = true
     }else{
-      timeConfig.startTime = DateConverter.convertDate2String(new Date(startTime),Constant.DATETIME_FORMAT)
-      timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),Constant.DATETIME_FORMAT)
+      timeConfig.startTime = DateConverter.convertDate2String(new Date(startTime),SurveyConstant.DATETIME_FORMAT)
+      timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),SurveyConstant.DATETIME_FORMAT)
     }
 //    throw new Exception("time config empty or error")
     (bStr,timeConfig)

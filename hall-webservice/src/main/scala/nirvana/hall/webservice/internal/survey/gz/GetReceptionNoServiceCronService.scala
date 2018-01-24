@@ -5,6 +5,7 @@ import java.util.Date
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import org.apache.commons.codec.digest.DigestUtils
@@ -45,7 +46,7 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
           }catch{
             case ex:Exception =>
               error("GetReceptionNoServiceCronService-error:{},currentTime:{}"
-                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
               )
           }
         }
@@ -53,19 +54,19 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
     }
   }
   def doWork {
-    surveyRecordService.getSurveyRecordbyState(Constant.SURVEY_CODE_CASEID_ERROR, BATCH_SIZE).foreach {
+    surveyRecordService.getSurveyRecordbyState(SurveyConstant.SURVEY_CODE_CASEID_ERROR, BATCH_SIZE).foreach {
       kNo =>
         val receptionNO = fpt50handprintServicePort.getReceptionNo(userID,password,kNo)
         info("getReceptionNo -- 接警编号：" + receptionNO)
-        surveyRecordService.saveSurveyLogRecord (Constant.GET_RECEPTION_NO
+        surveyRecordService.saveSurveyLogRecord (SurveyConstant.GET_RECEPTION_NO
           , kNo
-          , Constant.EMPTY
+          , SurveyConstant.EMPTY
           , CommonUtil.appendParam ("userID:" + userID, "password:" + password, "kNo:" + kNo)
           , receptionNO
-          , Constant.EMPTY)
+          , SurveyConstant.EMPTY)
         if (! CommonUtil.isNullOrEmpty (receptionNO) ) {
           surveyRecordService.updateCasePeception(receptionNO,kNo)
-          surveyRecordService.updateRecordStateByKno(Constant.SURVEY_CODE_CASEID_SUCCESS,kNo)
+          surveyRecordService.updateRecordStateByKno(SurveyConstant.SURVEY_CODE_CASEID_SUCCESS,kNo)
         }
     }
   }
