@@ -64,6 +64,10 @@ class HandprintServiceConfig{
   var password: String = _
   @XmlElement(name = "unitcode")
   var unitCode:String = _
+  @XmlElement(name = "is_delete_list_zip")
+  var isDeleteListZip:Boolean = false
+  @XmlElement(name = "is_delete_file_zip")
+  var isDeleteFileZip:Boolean = false
   @XmlElement(name = "survey_config")
   var surveyConfig: Array[SurveyConfig] = _
 }
