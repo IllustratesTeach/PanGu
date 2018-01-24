@@ -31,12 +31,12 @@ class FPT50HandprintServiceClientTest {
   }
   @Test
   def test_getLatentCount: Unit ={
-    val count = client.getLatentCount("", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","","")
+    val count = client.getLatentCount("130100", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","","")
     Assert.assertTrue(count > 0)
   }
   @Test
   def test_getLatentList: Unit ={
-    val list = client.getLatentList("110000", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","", "","", 0, 10)
+    val list = client.getLatentList("130100", FPT50HandprintServiceConstants.ZZHWLX_ALL, "","", "", 0, 10)
     Assert.assertTrue(list.nonEmpty)
   }
   @Test
