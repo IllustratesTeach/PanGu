@@ -51,7 +51,7 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
     * @return
     */
   override def getPhyEvidenceNoByFingerId(fingerId: String): Option[String] = {
-    val statement = Option("(fingerid='%s')".format("123456"))
+    val statement = Option("(fingerid='%s')".format(fingerId))
     val mapper = Map("physicalevidenceno"->"szKey")
     val result = v62Facade.queryV62Table[GAKEYSTRUCT](
       V62Facade.DBID_SURVEY,
