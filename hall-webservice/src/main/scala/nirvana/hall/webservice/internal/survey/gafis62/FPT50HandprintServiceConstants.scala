@@ -34,12 +34,12 @@ class FingerPrintListResponse {
 @XmlElement(name = "k")
 class FingerPrintListVo {
   /** 案件名称 */
-  @XmlElement(name = "ajmc")
+  @XmlElement(name = "AJMC")
   var ajmc: String = _
   /** 现场勘验编号 */
-  @XmlElement(name = "xckybh")
+  @XmlElement(name = "XCKYBH")
   var xckybh: String = _
   /** 现场物证编号 */
-  @XmlElement(name = "xcwzbh")
+  @XmlElement(name = "XCWZBH")
   var xcwzbh: String = _
 }

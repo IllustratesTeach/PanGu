@@ -29,34 +29,40 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
   /**
     * 获取待发送现场指掌纹数量服务
     * @param unitCode 单位代码
-    * @param zzhwlx 现场勘验编号，选填。
-    * @param xckybh 查询指掌纹类型，’P’代表掌纹，’F’代表指纹，’A’代表全部。必填。
+    * @param zzhwlx 查询指掌纹类型，’P’代表掌纹，’F’代表指纹，’A’代表全部。必填。
+    * @param xckybh 现场勘验编号，选填。
     * @param kssj 开始时间yyyy-mm-dd HH:MM:SS，选填，缺省为当月第一天开始时间。
     * @param jssj 结束时间yyyy-mm-dd HH:MM:SS，选填，缺省为当前时间
     * @return
     */
   def getLatentCount(unitCode: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String): Int={
+    info("getFingerPrintCount ,单位代码:{},查询指掌纹类型:{},现场勘验编号:{},开始时间:{},结束时间:{}",
+      unitCode, zzhwlx, xckybh, kssj, jssj)
     fPT50HandprintService.getFingerPrintCount(userID, password, unitCode, zzhwlx, xckybh, kssj, jssj).toInt
   }
 
   /**
     * 获取待发送现场指掌/纹列表查询服务接口
-    * @param unitCode 单位代码
     * @param asjfsdd_xzqhdm 案事件发生地点_行政区划代码，必填。
-    * @param zzhwlx 现场勘验编号，选填。
-    * @param xckybh 查询指掌纹类型，’P’代表掌纹，’F’代表指纹，’A’代表全部。必填。
+    * @param zzhwlx 查询指掌纹类型，’P’代表掌纹，’F’代表指纹，’A’代表全部。必填。
+    * @param xckybh 现场勘验编号，选填。
     * @param kssj 开始时间yyyy-mm-dd HH:MM:SS，选填，缺省为当月第一天开始时间。
     * @param jssj 结束时间yyyy-mm-dd HH:MM:SS，选填，缺省为当前时间
     * @param ks 记录开始位置，选填，缺省值为1。
     * @param js 记录结束位置，选填，缺省值为10。
     * @return FingerPrintListResponse
     */
-  def getLatentList(unitCode: String, asjfsdd_xzqhdm: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String, ks: Int, js: Int):Option[FingerPrintListResponse]={
-    val dataHandler = fPT50HandprintService.getFingerPrintList(userID, password, unitCode, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, ks, js)
+  def getLatentList(asjfsdd_xzqhdm: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String, ks: Int, js: Int):Option[FingerPrintListResponse]={
+    info("getLatentList 单位代码:{} 案事件发生地点_行政区划代码:{} 查询指掌纹类型:{} 现场勘验编号:{} 开始时间:{} 结束时间:{} 记录开始位置:{} 记录结束位置:{}", unitCode, asjfsdd_xzqhdm, zzhwlx,xckybh, kssj, jssj, ks, js)
+    val dataHandler = fPT50HandprintService.getFingerPrintList(userID, password, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, jssj, ks, js)
     if(dataHandler.getInputStream.available() > 0){
-      val fileName = (kssj+"-"+jssj).replaceAll(" ","")
+      val fileName = (kssj+"-"+jssj).replaceAll(" ","-").replaceAll(":","-")
       val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localXKFingerListPath, fileName)
-      val fingerPrintListStr = Source.fromInputStream(inputStream).toString()
+      if(hallWebserviceConfig.handprintService.isDeleteListZip){
+        //TODO 删除ZIP文件操作
+        print(hallWebserviceConfig.localXKFingerListPath + File.separator + fileName + ".zip")
+      }
+      val fingerPrintListStr = Source.fromInputStream(inputStream).mkString
       Option(XmlLoader.parseXML[FingerPrintListResponse](fingerPrintListStr))
     }else{
       warn("getLatentList unitCode:{} asjfsdd_xzqhdm:{} xckybh:{} kssj:{} jssj:{} ks:{} js:{} dataHandler is empty", unitCode, asjfsdd_xzqhdm, xckybh, kssj, jssj, ks, js)
@@ -79,10 +85,15 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     * @return 现场指掌纹信息FPT5.0数据包。LatentPackage
     */
   def getLatentPackage(xcwzbh: String):Option[LatentPackage]={
+    info("getLatentPackage{}")
     val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
     if(dataHandler.getInputStream.available() > 0){
       val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localLatentPath, xcwzbh)
-      val latentPackageStr = Source.fromInputStream(inputStream).toString()
+      if(hallWebserviceConfig.handprintService.isDeleteFileZip){
+        //TODO 删除ZIP文件操作
+        print(hallWebserviceConfig.localXKFingerListPath + File.pathSeparator + xcwzbh + ".zip")
+      }
+      val latentPackageStr = Source.fromInputStream(inputStream).mkString
       Option(XmlLoader.parseXML[LatentPackage](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
     }else{
       warn("getLatentPackage {} dataHandler is empty", xcwzbh)
@@ -123,6 +134,7 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     * @param hitResultDh 比中信息DataHandler
     */
   def sendHitResult(xckybh: String, queryType: Int, hitResultDh:DataHandler): Unit ={
+    info("发送比中信息:现勘编号{},查询类型{}",xckybh,queryType)
     queryType match {
       case QueryConstants.QUERY_TYPE_TL | QueryConstants.QUERY_TYPE_LT =>
         fPT50HandprintService.sendLTHitResult(userID, password, xckybh, hitResultDh)
@@ -140,9 +152,9 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     * @return 解压后的fileName.xml文件流
     */
   private def getInputStreamByDataHandler(dataHandler: DataHandler, unZipFilePath: String, fileName: String): InputStream ={
-    val zipFilePath = unZipFilePath + File.pathSeparator + fileName + ".zip"
-    val xmlFilePath = unZipFilePath + File.pathSeparator + fileName + ".xml"
-    dataHandler.writeTo(new FileOutputStream(zipFilePath))
+    val zipFilePath = unZipFilePath + File.separator + fileName + ".zip"
+    val xmlFilePath = unZipFilePath + File.separator + fileName + ".xml"
+    dataHandler.writeTo(new FileOutputStream(new File(zipFilePath)))
     FPT5Utils.unzipFile(new ZipFile(zipFilePath), xmlFilePath)
 
     new FileInputStream(xmlFilePath)

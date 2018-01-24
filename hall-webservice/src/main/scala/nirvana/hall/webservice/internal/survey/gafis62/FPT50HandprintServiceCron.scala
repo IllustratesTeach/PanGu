@@ -1,11 +1,15 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
+import java.util.Date
+
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
@@ -37,7 +41,10 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
             getLatentList
             info("end  getLatentList")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("getLatentList-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
@@ -61,7 +68,10 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
             getReceptionNo
             info("end getReceptionNo")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("getReceptionNo-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
@@ -73,7 +83,10 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               sendHitResult
             info("end sendHitResult")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("sendHitResult-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
@@ -103,11 +116,18 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getLatentList: Unit ={
     //TODO 添加日志，异常判断和处理，完善业务逻辑,目前是完全理想状态下的代码逻辑
-    //获取系统时间
-    val systemDateTime = fPT50HandprintServiceClient.getSystemDateTime()
-    info("系统时间{}",systemDateTime)
-    //获取配置信息列表，并循环获取数据
-    surveyConfigService.getSurveyConfigList().filter(_.nFlages == 1).foreach(getLatentListBySurveyConfig)
+    try{
+      //获取系统时间
+      val systemDateTime = fPT50HandprintServiceClient.getSystemDateTime()
+      info("系统时间{}",systemDateTime)
+      //获取配置信息列表，并循环获取数据
+      surveyConfigService.getSurveyConfigList().filter(_.nFlages == 1).foreach(getLatentListBySurveyConfig)
+    }catch {
+      case ex:Exception =>
+        error("getLatentList-error:{},currentTime:{}"
+          ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+        )
+    }
   }
 
   def getLatentListBySurveyConfig(surveyConfig: SURVEYCONFIG): Unit ={
@@ -120,7 +140,8 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       jssj = systemDateTime
     }
     //获取待发送现场指掌纹数量
-    val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, "", FPT50HandprintServiceConstants.ZZHWLX_ALL, kssj, jssj)
+    val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj)
+    info("latentCount number:",latentCount)
     if(latentCount.toInt > 0){
       var nIndex = surveyConfig.nSeq
       val step = 10
@@ -129,9 +150,9 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         var js = ks + step
         if(js > latentCount)
           js = latentCount
-
-        val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, "", FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
+        val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
         if(fingerPrintListResponse.nonEmpty){
+          info("单位代码{} 现场列表大小",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
           try {
             fingerPrintListResponse.get.list.foreach { k =>
               val xckybh = k.xckybh
@@ -149,8 +170,10 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               nIndex += 1
             }
           }catch {
-            case e: Exception=>
-              error(e.getMessage)
+            case ex: Exception=>
+              error("getLatentList-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }finally {
             surveyConfig.nSeq = nIndex
             surveyConfigService.updateSurveyConfig(surveyConfig)

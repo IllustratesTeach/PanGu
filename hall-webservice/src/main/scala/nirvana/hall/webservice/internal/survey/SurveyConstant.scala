@@ -1,10 +1,10 @@
-package nirvana.hall.webservice.internal.survey.gz
+package nirvana.hall.webservice.internal.survey
 
 /**
   * 标采与指纹系统对接变量设置
   * Created by ssj on 2017/11/17.
   */
-object Constant {
+object SurveyConstant {
 
   final val EMPTY = ""
   final val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
