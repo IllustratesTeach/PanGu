@@ -40,8 +40,8 @@ trait SurveyHitResultRecordService {
   def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD): Option[DataHandler]
 
   protected def getZipDataHandlerOfString(xml: String, fileName: String, path: String): DataHandler = {
-    val xmlFile = new File(path + File.pathSeparator + fileName + ".xml")
-    val zipFilePath = path + File.pathSeparator + fileName + ".zip"
+    val xmlFile = new File(path + File.separator + fileName + ".xml")
+    val zipFilePath = path + File.separator + fileName + ".zip"
     FileUtils.writeByteArrayToFile(xmlFile, xml.getBytes())
     FPT5Utils.zipFile(xmlFile, zipFilePath)
 
