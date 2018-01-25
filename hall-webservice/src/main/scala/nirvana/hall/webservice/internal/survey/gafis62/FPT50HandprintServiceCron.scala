@@ -217,7 +217,6 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
         }
       }
-    }else{
       getLatentPackage
     }
   }
@@ -234,7 +233,6 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         record.nJieJingState = survey.SURVEY_STATE_SUCCESS
         surveyRecordService.updateSurveyRecord(record)
       }
-    }else{
       getReceptionNo
     }
   }
@@ -259,7 +257,6 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
         }
       }
-    }else{
       sendHitResult
     }
   }
