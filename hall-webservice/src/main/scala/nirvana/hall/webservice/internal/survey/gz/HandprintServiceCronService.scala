@@ -1,6 +1,6 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import java.io.{ByteArrayInputStream, File, FileInputStream}
+import java.io.{File, FileInputStream}
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -9,6 +9,7 @@ import monad.support.services.{LoggerSupport, XmlLoader}
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.internal.survey.gz.vo.{ListNode, OriginalList}
 import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
@@ -18,8 +19,6 @@ import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 import org.apache.tools.zip.ZipFile
 
-import scala.io.Source
-import scala.util.Random
 
 
 /**
@@ -54,7 +53,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           } catch {
             case e: Exception =>
               error("HandprintServiceCronService-error:{},currentTime:{}"
-                ,ExceptionUtil.getStackTraceInfo(e),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
+                ,ExceptionUtil.getStackTraceInfo(e),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
               )
           }
         }
@@ -67,7 +66,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     info("海鑫当前时间：---"+hxdate)
     surveyRecordService.getSurveyConfig().foreach{
       m =>
-        val checkVal = surveyRecordService.isSleep(new SimpleDateFormat(Constant.DATETIME_FORMAT).parse(hxdate).getTime()
+        val checkVal = surveyRecordService.isSleep(new SimpleDateFormat(SurveyConstant.DATETIME_FORMAT).parse(hxdate).getTime()
                                                     , m.get("starttime").get.asInstanceOf[Date].getTime
                                                     , m.get("increments").get.toString)
         if(!checkVal._1){
@@ -76,12 +75,12 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
             , password
             , m.get("unitCode").get.toString
             , "A"
-            , Constant.EMPTY
+            , SurveyConstant.EMPTY
             , checkVal._2.startTime
             , checkVal._2.endTime)
-          surveyRecordService.saveSurveyLogRecord(Constant.GET_FINGER_PRINT_COUNT
-            ,Constant.EMPTY
-            ,Constant.EMPTY
+          surveyRecordService.saveSurveyLogRecord(SurveyConstant.GET_FINGER_PRINT_COUNT
+            ,SurveyConstant.EMPTY
+            ,SurveyConstant.EMPTY
             ,CommonUtil.appendParam("userID:"+userID
               ,"password:"+password
               ,"asjfsdd_xzqhdm:"+ m.get("unitCode").get.toString
@@ -90,7 +89,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
               ,"kssj:"+ checkVal._2.startTime
               ,"jssj:"+ checkVal._2.endTime)
             ,num
-            ,Constant.EMPTY)
+            ,SurveyConstant.EMPTY)
           info("获取现堪的数量：---"+num)
           if (num.toInt > 0) {
             //获取现勘号列表
@@ -98,7 +97,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
               , password
               , m.get("unitCode").get.toString
               , "A"
-              , Constant.EMPTY
+              , SurveyConstant.EMPTY
               , checkVal._2.startTime
               , checkVal._2.endTime
               , 1
@@ -111,9 +110,9 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
             FPT5Utils.unzipFile(new ZipFile(path + ".zip"), path + ".xml")
             val fileInputStream = new FileInputStream(path + ".xml")
             val dataListStr = new String(IOUtils.toByteArray(fileInputStream))
-            surveyRecordService.saveSurveyLogRecord(Constant.GET_FINGER_PRINT_LIST
-              ,Constant.EMPTY
-              ,Constant.EMPTY
+            surveyRecordService.saveSurveyLogRecord(SurveyConstant.GET_FINGER_PRINT_LIST
+              ,SurveyConstant.EMPTY
+              ,SurveyConstant.EMPTY
               ,CommonUtil.appendParam("userID:"+userID
                 ,"password:"+password
                 ,"asjfsdd_xzqhdm:"+ m.get("unitCode").get.toString
@@ -124,7 +123,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
                 ,"ks:" + 1
                 ,"js:" + num)
               , dataListStr
-              ,Constant.EMPTY)
+              ,SurveyConstant.EMPTY)
             val original = XmlLoader.parseXML[OriginalList](dataListStr)
             val kNoList = original.k.iterator
             var kNoObj:ListNode = null
@@ -135,7 +134,7 @@ class HandprintServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
                 ,kNoObj.XCWZBH)
             }
           }
-          surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,Constant.DATETIME_FORMAT).getTime) , m.get("unitCode").get.toString)
+          surveyRecordService.updateSurveyConfig(new Timestamp(DateConverter.convertString2Date(checkVal._2.endTime,SurveyConstant.DATETIME_FORMAT).getTime) , m.get("unitCode").get.toString)
         }
     }
   }
