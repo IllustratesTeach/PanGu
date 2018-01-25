@@ -11,7 +11,7 @@ import nirvana.hall.v62.internal.AncientClientSupport
   * Created by songpeng on 2018/1/16.
   */
 trait gnetsurvey {
-  this:AncientClientSupport with gnetcsr with reqansop=>
+  this:AncientClientSupport with reqansop=>
 
   def NET_GAFIS_SURVEYRECORD_ADD(nDBID:Short, nTableID:Short, surveyRecord: SURVEYRECORD, nOption: Int = 0):Unit=executeInChannel { channel =>
     NET_GAFIS_AddOrUpdate(nDBID, nTableID, OP_ADM_SURVEY_RECORD_ADD.toShort, surveyRecord, nOption)
