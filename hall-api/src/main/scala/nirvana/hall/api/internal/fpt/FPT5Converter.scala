@@ -641,7 +641,21 @@ object FPT5Converter {
     textBuilder.setStrExtractorIdCard(latentPackage.latentCollectInfoMsg.extractPersonIdCard) //提取人
     if(null != latentPackage.latentCollectInfoMsg.extractPersonTel)textBuilder.setStrExtractorTel(latentPackage.latentCollectInfoMsg.extractPersonTel) //提取人
     textBuilder.setStrExtractDate(latentPackage.latentCollectInfoMsg.extractDateTime) //提取时间
-
+    //6.2案件信息掌纹列表和指纹列表
+    if(Option(latentPackage.latentFingers).nonEmpty){
+      latentPackage.latentFingers.foreach{
+        finger =>
+          val fingerID = latentPackage.caseMsg.caseId + finger.latentFingerImageMsg.latentPhysicalId.substring(finger.latentFingerImageMsg.latentPhysicalId.length-2)
+          caseInfo.addStrFingerID(dropCaseNoHeadLetter(fingerID))
+      }
+    }
+    if(Option(latentPackage.latentPalms).nonEmpty){
+      latentPackage.latentPalms.foreach{
+        palm =>
+          val palmID = latentPackage.caseMsg.caseId + palm.latentPalmImageMsg.latentPalmPhysicalId.substring(palm.latentPalmImageMsg.latentPalmPhysicalId.length-2)
+          caseInfo.addStrPalmID(dropCaseNoHeadLetter(palmID))
+      }
+    }
     caseInfo.build()
   }
 
@@ -685,8 +699,8 @@ object FPT5Converter {
                   textBuilder.setStrFeatureGroupIdentifier(f.latentFeatureGroupIdentifier)
                   textBuilder.setStrFeatureGroupDscriptInfo(Option(f.latentFeatureGroupDscriptInfo).getOrElse(""))
               }
-              lpCardList += lpCard.build
             }
+            lpCardList += lpCard.build
           }
       }
     }
@@ -729,32 +743,50 @@ object FPT5Converter {
     }
     lpCardList
   }
-}
 
-/**
-  * 图像信息属性类
-  */
-class ImageProperty {
-    var compressMethod: String = _
-    var imageType: Byte = _
-    var width: Short = _
-    var height: Short = _
-    var resolution: Short = _
-    var bnData: Array[Byte] = _
-    var positionCode:Int = _
+  /**
+    * 去掉6.2案件号头字母A
+    * @param caseId
+    * @return
+    */
+  private def dropCaseNoHeadLetter(caseId: String): String = {
+    if (caseId.toUpperCase.startsWith("A"))
+      caseId.toUpperCase.drop(1)
+    else caseId.toUpperCase
   }
 
-/**
-  * 掌纹掌位代码
-  */
-object FPT5PalmFgp extends Enumeration{
-  type FPT5PalmFgp = Value
-  val PALMRIGHt = Value("31") //右手平面掌纹
-  val PALMLEFT = Value("32")  //左手平面掌纹
-  val PALMRIGHTSIDE = Value("33")  //右手侧面掌纹
-  val PALMLEFTSIDE = Value("34")  //左手侧面掌纹
-  val PALMFULLPALMRIGHT = Value("35") //右手平面全掌纹
-  val PALMFULLPALMLEFT = Value("36")  //左手平面全掌纹
-  val PALMUNKNOWN = Value("39")  //不确定掌纹
+  /**
+    * 增加6.2案件号头字母A
+    * @param caseId
+    * @return
+    */
+  private def appendCaseNoHeadLetter(caseId: String): String = {
+    if (!caseId.toUpperCase.startsWith("A"))
+      "A".concat(caseId.toUpperCase)
+    else
+      caseId.toUpperCase
+  }
+
+  /**
+    * 更新6.2的案件信息的现场指纹列表和掌纹列表
+    *
+    * @param newCaseInfo
+    * @param oldCaseInfo
+    * @return
+    */
+  def updateCaseFingerorPalmIDList(newCaseInfo: Case, oldCaseInfo: Case): Case = {
+    val caseBuilder = newCaseInfo.toBuilder
+    oldCaseInfo.getStrPalmIDList.foreach {
+      palmID =>
+        if (!caseBuilder.getStrPalmIDList.contains(palmID))
+          caseBuilder.addStrPalmID(palmID)
+    }
+    oldCaseInfo.getStrFingerIDList.foreach {
+      fingerID =>
+        if (!caseBuilder.getStrFingerIDList.contains(fingerID))
+          caseBuilder.addStrFingerID(fingerID)
+    }
+    caseBuilder.build()
+  }
 }
 

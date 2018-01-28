@@ -1,6 +1,5 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
@@ -23,7 +22,8 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
-    val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    val caseInfoHandled = caseInfo.toBuilder.setStrCaseID(galoclpConverter.dropCaseNoHeadLetter(caseInfo.getStrCaseID)).build
+    val gCase= galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfoHandled)
     facade.NET_GAFIS_CASE_Add(getDBID(dbId),
       V62Facade.TID_CASE, gCase)
   }
@@ -34,7 +34,8 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def updateCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
-    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfo)
+    val caseInfoHandled = caseInfo.toBuilder.setStrCaseID(galoclpConverter.dropCaseNoHeadLetter(caseInfo.getStrCaseID)).build
+    val gCase = galoclpConverter.convertProtobuf2GCASEINFOSTRUCT(caseInfoHandled)
     facade.NET_GAFIS_CASE_Update(getDBID(dbId), V62Facade.TID_CASE, gCase)
   }
 
@@ -44,9 +45,9 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def getCaseInfo(caseId: String, dbId: Option[String]): Case= {
-    val gCase = facade.NET_GAFIS_CASE_Get(getDBID(dbId), V62Facade.TID_CASE, caseId)
+    val gCase = facade.NET_GAFIS_CASE_Get(getDBID(dbId), V62Facade.TID_CASE, galoclpConverter.dropCaseNoHeadLetter(caseId))
     val caseInfo = galoclpConverter.convertGCASEINFOSTRUCT2Protobuf(gCase)
-
+    caseInfo.toBuilder.setStrCaseID(galoclpConverter.appendCaseNoHeadLetter(caseInfo.getStrCaseID)).build
     caseInfo
   }
 
@@ -57,7 +58,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    */
   override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = {
     facade.NET_GAFIS_CASE_Del(config.caseTable.dbId.toShort,
-      V62Facade.TID_CASE, caseId)
+      V62Facade.TID_CASE, galoclpConverter.dropCaseNoHeadLetter(caseId))
   }
 
   /**
@@ -66,7 +67,7 @@ class CaseInfoServiceImpl(facade:V62Facade,config:HallV62Config) extends CaseInf
    * @return
    */
   override def isExist(caseId: String, dbId: Option[String]): Boolean = {
-    facade.NET_GAFIS_CASE_Exist(getDBID(dbId), V62Facade.TID_CASE, caseId, 0)
+    facade.NET_GAFIS_CASE_Exist(getDBID(dbId), V62Facade.TID_CASE,galoclpConverter.dropCaseNoHeadLetter(caseId), 0)
   }
 
   /**

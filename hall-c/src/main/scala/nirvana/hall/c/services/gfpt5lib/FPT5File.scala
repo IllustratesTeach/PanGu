@@ -29,33 +29,75 @@ class FPT5File {
 
     final val EMPTY_STRING = ""
 
-    @XmlElement(name = "packageHead")
+  /**
+    * 头部信息
+    */
+  @XmlElement(name = "packageHead")
     var packageHead: PackageHead = new PackageHead
-    @XmlElement(name = "fingerprintPackage")
+  /**
+    * 捺印指掌纹信息
+    */
+  @XmlElement(name = "fingerprintPackage")
     var fingerprintPackage: Array[FingerprintPackage] = _
-    @XmlElement(name = "latentPackage")
+  /**
+    * 现场指掌纹信息
+    */
+  @XmlElement(name = "latentPackage")
     var latentPackage: Array[LatentPackage] = _
-    @XmlElement(name = "latentTaskPackage")
+  /**
+    * 现场指掌纹查询比对请求信息
+    */
+  @XmlElement(name = "latentTaskPackage")
     var latentTaskPackage: Array[LatenttaskPackage] = _
-    @XmlElement(name = "printTaskPackage")
+  /**
+    * 捺印指掌纹查询比对请求信息
+    */
+  @XmlElement(name = "printTaskPackage")
     var printTaskPackage: Array[PrinttaskPackage] = _
-    @XmlElement(name = "LTResultPackage")
+  /**
+    * 指掌纹正查比对结果信息
+    */
+  @XmlElement(name = "LTResultPackage")
     var ltResultPackage: Array[LtResultPackage] = _
-    @XmlElement(name = "TLResultPackage")
+  /**
+    * 指掌纹倒查比对结果信息
+    */
+  @XmlElement(name = "TLResultPackage")
     var tlResultPackage: Array[TlResultPackage] = _
-    @XmlElement(name = "TTResultPackage")
+  /**
+    * 指掌纹查重比对结果信息
+    */
+  @XmlElement(name = "TTResultPackage")
     var ttResultPackage: Array[TtResultPackage] = _
-    @XmlElement(name = "LLResultPackage")
+  /**
+    * 指掌纹串查比对结果信息
+    */
+  @XmlElement(name = "LLResultPackage")
     var llResultPackage: Array[LlResultPackage] = _
-    @XmlElement(name = "LTHitResultPackage")
+  /**
+    * 指掌纹正查和倒查比中信息
+    */
+  @XmlElement(name = "LTHitResultPackage")
     var ltHitResultPackage: Array[LtHitResultPackage] = _
-    @XmlElement(name = "TTHitResultPackage")
+  /**
+    * 指掌纹查重比中信息
+    */
+  @XmlElement(name = "TTHitResultPackage")
     var ttHitResultPackage: Array[TtHitResultPackage] = _
-    @XmlElement(name = "LLHitResultPackage")
+  /**
+    * 指掌纹串查比中信息
+    */
+  @XmlElement(name = "LLHitResultPackage")
     var llHitResultPackage: Array[LlHitResultPackage] = _
-    @XmlElement(name = "cancelLatentPackage")
+  /**
+    * 撤销现场指掌纹信息
+    */
+  @XmlElement(name = "cancelLatentPackage")
     var cancelLatentPackage: Array[cancelLatentPackage] = _
-    @XmlElement(name = "cancellatentPackage")
+  /**
+    * 自定义信息
+    */
+  @XmlElement(name = "cancellatentPackage")
     var customdataPackage: Array[customDataPackage] = _
 
     /**
@@ -68,36 +110,67 @@ class FPT5File {
     }
 }
 
-
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "packageHead")
     class PackageHead{
+        /**
+          * 版本号
+          */
         @XmlElement(name = "version")
         var version: String = "FPT0500"
-        @XmlElement(name = "createTime") //日期时间型,格式是”YYYYMMDDHH24MISS”
+        /**
+          * 日期时间型,格式是”YYYYMMDDHH24MISS”
+          */
+        @XmlElement(name = "createTime")
         var createTime: String = new SimpleDateFormat("YYYYMMddHHmmss").format(new Date)
+        /**
+          * 来源系统
+          */
         @XmlElement(name = "originSystem")
         var originSystem:String = _
+        /**
+          * 发送单位代码
+          */
         @XmlElement(name = "fsdw_gajgjgdm")
-        var sendUnitCode:String = _ //发送单位代码
+        var sendUnitCode:String = _
+        /**
+          * 发送单位名称
+          */
         @XmlElement(name = "fsdw_gajgmc")
-        var sendUnitName:String = _ //发送单位名称
+        var sendUnitName:String = _
+        /**
+          * 发送单位系统类型
+          */
         @XmlElement(name = "fsdw_xtlx")
-        var sendUnitSystemType:String = _ //发送单位系统类型
+        var sendUnitSystemType:String = _
+        /**
+          * 发送人姓名
+          */
         @XmlElement(name = "fsr_xm")
-        var sendPersonName:String = _ //发送人姓名
+        var sendPersonName:String = _
+        /**
+          * 发送人身份证号码
+          */
         @XmlElement(name = "fsr_gmsfhm")
-        var sendPersonIdCard:String = _ //发送人身份证号码
-        @XmlElement(name = "fsr_lxdm")
-        var sendPersonTel:String = _ //发送人联系电话
+        var sendPersonIdCard:String = _
+        /**
+          * 发送人联系电话
+          */
+        @XmlElement(name = "fsr_lxdh")
+        var sendPersonTel:String = _
     }
 
-    /**
-      *
-      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "customDataPackage")
     class customDataPackage{
+        /**
+          * 指纹比对系统描述
+          */
+        @XmlElement(name = "zwbdxtlxms")
+        var fingerprintComparisonSysTypeDescript: String = _
+        /**
+          * 自定义信息
+          */
         @XmlElement(name = "zdyxx")
         var CustomInfo: String = _
     }
@@ -129,58 +202,133 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "CollectInfoMsg")
     class CollectInfoMsg{
+        /**
+          * 指纹比对系统类型描述
+          */
         @XmlElement(name = "zwbdxtlxms")
-        var fingerprintComparisonSysTypeDescript:String = _ //指纹比对系统类型描述
+        var fingerprintComparisonSysTypeDescript:String = _
+        /**
+          * 捺印单位公安机关机构代码
+          */
         @XmlElement(name = "nydw_gajgjgdm")
-        var chopUnitCode:String = _ //捺印单位公安机关机构代码
+        var chopUnitCode:String = _
+        /**
+          * 捺印单位公安机关机构名称
+          */
         @XmlElement(name = "nydw_gajgmc")
-        var chopUnitName:String = _ //捺印单位公安机关机构名称
+        var chopUnitName:String = _
+        /**
+          * 捺印人姓名
+          */
         @XmlElement(name = "nyry_xm")
-        var chopPersonName:String = _ //捺印人姓名
+        var chopPersonName:String = _
+        /**
+          * 捺印人身份证号码
+          */
         @XmlElement(name = "nyry_gmsfhm")
-        var chopPersonIdCard:String = _ //捺印人身份证号码
+        var chopPersonIdCard:String = _
+        /**
+          * 捺印人联系电话
+          */
         @XmlElement(name = "nyry_lxdh")
-        var chopPersonTel:String =_ //捺印人联系电话
+        var chopPersonTel:String =_
+        /**
+          * 捺印时间
+          */
         @XmlElement(name = "nysj")
-        var chopDateTime:String = _ //捺印时间
+        var chopDateTime:String = _
     }
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "descriptMsg")
     class DescriptMsg{
+        /**
+          * 原始系统案事件相关人员编号
+          */
         @XmlElement(name = "ysxt_asjxgrybh")
-        var originalSystemCasePersonId:String = _ //原始系统案事件相关人员编号
+        var originalSystemCasePersonId:String = _
+        /**
+          * 警综人员编号
+          */
         @XmlElement(name = "jzrybh")
-        var jingZongPersonId:String = _ //警综人员编号
+        var jingZongPersonId:String = _
+        /**
+          * 案事件人员编号
+          */
         @XmlElement(name = "asjxgrybh")
-        var casePersonid:String = _ //案事件人员编号
+        var casePersonid:String = _
+        /**
+          * 指掌纹卡编号
+          */
         @XmlElement(name = "zzhwkbh")
-        var fingerPalmCardId:String = _ //指掌纹卡编号
+        var fingerPalmCardId:String = _
+        /**
+          * 采集信息原因代码
+          */
         @XmlElement(name = "collectingReasonSet")
         var collectingReasonSet = new CollectingReasonSet
+        /**
+          * 姓名
+          */
         @XmlElement(name = "xm")
         var name:String = _
+        /**
+          * 别名/绰号
+          */
         @XmlElement(name = "bmch")
         var alias:String = _
+        /**
+          * 性别代码
+          */
         @XmlElement(name = "xbdm")
         var sex:String = _
+        /**
+          * 出生日期
+          */
         @XmlElement(name = "csrq")
         var birthday:String = _
+        /**
+          * 国籍代码
+          */
         @XmlElement(name = "gjdm")
         var nationality:String = _
+        /**
+          * 民族代码
+          */
         @XmlElement(name = "mzdm")
         var nation:String = _
+        /**
+          * 常用证件代码
+          */
         @XmlElement(name = "cyzjdm")
-        var credentialsCode:String = _ //常用证件代码
+        var credentialsCode:String = _
+        /**
+          * 证件号码
+          */
         @XmlElement(name = "zjhm")
-        var credentialsNo:String = _ //证件号码
+        var credentialsNo:String = _
+        /**
+          * 户籍地址_行政区划代码
+          */
         @XmlElement(name = "hjdz_xzqhdm")
-        var houkouAdministrativeDivisionCode:String = _ //户籍地行政区划代码
+        var houkouAdministrativeDivisionCode:String = _
+        /**
+          * 户籍地址_地址名称
+          */
         @XmlElement(name = "hjdz_dzmc")
-        var houkouAddress:String = _ //户籍地地址名称
+        var houkouAddress:String = _
+        /**
+          * 现住址_行政区划代码
+          */
         @XmlElement(name = "xzz_xzqhdm")
-        var houseAdministrativeDivisionCode:String = _ //现住址行政区划代码
+        var houseAdministrativeDivisionCode:String = _
+        /**
+          * 现住址_地址名称
+          */
         @XmlElement(name = "xzz_dzmc")
-        var houseAddress:String = _ //现住址地址
+        var houseAddress:String = _
+        /**
+          * 备注
+          */
         @XmlElement(name = "bz")
         var memo:String = _
     }
@@ -190,8 +338,11 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "CollectingReasonSet")
     class CollectingReasonSet{
+        /**
+          * 采集信息原因代码
+          */
         @XmlElement(name = "cjxxyydm")
-        var captureInfoReasonCode:Array[String] = _ //采集信息原因代码
+        var captureInfoReasonCode:Array[String] = _
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -217,6 +368,9 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "Fingers")
     class Fingers{
+        /**
+          * 单枚指纹信息节点
+          */
         @XmlElement(name = "fingerMsg")
         var fingerMsg:Array[FingerMsg] = _
     }
@@ -224,82 +378,193 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "FingerMsg")
     class FingerMsg{
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzwdm")
         var fingerPositionCode:String = _
+        /**
+          * 指掌纹特征提取方式代码
+          */
         @XmlElement(name = "zzhwtztqfsdm")
         var fingerFeatureExtractionMethodCode:String  = _
+        /**
+          * 指掌纹缺失情况代码
+          */
         @XmlElement(name = "zzhwqsqkdm")
-        var adactylismCauseCode:String = _ //指掌纹缺失情况代码
+        var adactylismCauseCode:String = _
+        /**
+          * 指纹纹型主分类_指纹纹型代码
+          */
         @XmlElement(name = "zwwxzfl_zwwxdm")
-        var fingerPatternMasterCode:String = _ //指纹纹型主分类代码
+        var fingerPatternMasterCode:String = _
+        /**
+          * 指纹纹型副分类_指纹纹型代码
+          */
         @XmlElement(name = "zwwxffl_zwwxdm")
-        var fingerPatternSlaveCode:String = _  //指纹纹型副分类代码
+        var fingerPatternSlaveCode:String = _
+        /**
+          * 指纹方向_特征方向
+          */
         @XmlElement(name = "zwfx_tzfx")
         var fingerFeatureDirection:Int = _ //指纹方向-特征方向
+        /**
+          * 指纹方向_特征方向
+          */
         @XmlElement(name = "zwfx_tzfxfw")
         var fingerFeatureDirectionRange:Int = _ //指纹方向-特征方向-范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzxzb")
         var fingerCenterPointFeatureXCoordinate:Int = _ //指纹中心点特征X坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzyzb")
         var fingerCenterPointFeatureYCoordinate:Int = _ //指纹中心点特征Y坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzzbfw")
         var fingerCenterPointFeatureCoordinateRange:Int = _ //指纹中心点特征坐标范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzfx")
         var fingerCenterPointFeatureDirection:Int = _ //指纹中心点特征特征方向
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzfxfw")
         var fingerCenterPointFeatureDirectionRange:Int = _ //指纹中心点特征特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzxd_tzkkd")
         var fingerCenterPointFeatureReliabilityLevel:Int = _ //指纹中心点可靠度
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzxzb")
         var fingerSlaveCenterFeatureXCoordinate:Int = _ //指纹副中心特征X坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzyzb")
         var fingerSlaveCenterFeatureYCoordinate:Int = _ //指纹副中心特征Y坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzzbfw")
         var fingerSlaveCenterFeatureCoordinateRange:Int = _ //指纹副中心特征坐标范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzfx")
         var fingerSlaveCenterFeatureDirection:Int = _ //指纹副中心特征方向
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzfxfw")
         var fingerSlaveCenterFeatureDirectionRange:Int = _ //指纹副中心特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwfzx_tzkkd")
         var fingerSlaveCenterFeatureReliabilityLevel:Int = _ //指纹副中心特征可靠度
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzxzb")
         var fingerLeftTriangleFeatureXCoordinate:Int = _ //指纹左三角特征X坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzyzb")
         var fingerLeftTriangleFeatureYCoordinate:Int = _ //指纹左三角特征Y坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzzbfw")
         var fingerLeftTriangleFeatureCoordinateRange:Int = _ //指纹左三角特征坐标范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzfx")
         var fingerLeftTriangleFeatureDirection:Int = _ //指纹左三角特征方向
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzfxfw")
         var fingerLeftTriangleFeatureDirectionRange:Int = _ //指纹左三角特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwzsj_tzkkd")
         var fingerLeftTriangleFeatureReliabilityLevel:Int = _ //指纹左三角特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzxzb")
         var fingerRightTriangleFeatureXCoordinate:Int = _ //指纹右三角特征X坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzyzb")
         var fingerRightTriangleFeatureYCoordinate:Int = _ //指纹右三角特征Y坐标
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzzbfw")
         var fingerRightTriangleFeatureCoordinateRange:Int = _ //指纹右三角特征坐标范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzfx")
         var fingerRightTriangleFeatureDirection:Int = _ //指纹右三角特征方向
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzfxfw")
         var fingerRightTriangleFeatureDirectionRange:Int = _ //指纹右三角特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zwysj_tzkkd")
         var fingerRightTriangleFeatureReliabilityLevel:Int = _ //指纹右三角特征方向范围
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "minutiaSet")
         var fingerMinutiaSet = new FingerMinutiaSet
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zw_zdyxx")
         var fingerCustomInfo:Array[Byte] = _
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zw_txspfxcd")
         var fingerImageHorizontalDirectionLength:Int = _
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zw_txczfxcd")
         var fingerImageVerticalDirectionLength:Int = _
+        /**
+          * 指纹指位代码
+          */
         @XmlElement(name = "zw_txfbl")
         var fingerImageRatio:Int = _
         /**
           * 0000表示无压缩，其他值前2个字节数字代表系统产品生产的单位代码，
           * 后2个字节数字代表系统产品的版本，从00开始递增，对于WSQ压缩方法，
           * 前2个数字固定为14，后两个数字代表系统产品生产的单位代码
+          */
+        /**
+          * 指纹指位代码
           */
         @XmlElement(name = "zw_txysffms")
         var fingerImageCompressMethodDescript:String = _
@@ -581,9 +846,9 @@ class FPT5File {
     class LatentCollectInfoMsg{
         @XmlElement(name = "zwbdxtlxms")
         var fingerprintComparisonSysTypeDescript:String = _ //指纹比对系统类型描述
-        @XmlElement(name = "tqsj_gajgjgdm")
+        @XmlElement(name = "tqdw_gajgjgdm")
         var extractUnitCode:String = _
-        @XmlElement(name = "tqsj_gajgmc")
+        @XmlElement(name = "tqdw_gajgmc")
         var extractUnitName:String = _
         @XmlElement(name = "tqry_xm")
         var extractPerson:String = _
@@ -978,6 +1243,8 @@ class FPT5File {
         var personId:String = _
         @XmlElement(name = "zzhwkbh")
         var cardId:String = _
+        @XmlElement(name = "sfzw_pdbz")
+        var whetherFingerJudgmentMark:String = _
         @XmlElement(name = "tjsj")
         var submitDateTime:String = _
         @XmlElement(name = "fingerprintPackage")
@@ -1239,58 +1506,139 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LtHitResultPackage")
     class LtHitResultPackage{
+        /**
+          * 任务编号
+          */
         @XmlElement(name = "rwbh")
         var taskId:String = _
+        /**
+          * 指纹比对系统描述
+          */
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
+        /**
+          * 现场指纹_案事件编号
+          */
         @XmlElement(name = "xczw_asjbh")
         var latentFingerCaseId:String = _
+        /**
+          * 现场指纹_原始系统_案事件编号
+          */
         @XmlElement(name = "xczw_ysxt_asjbh")
         var latentFingerOriginalSystemCaseId:String = _
+        /**
+          * 现场指纹_现场勘验编号
+          */
         @XmlElement(name = "xczw_xckybh")
         var latentFingerLatentSurveyId:String = _
+        /**
+          * 现场指纹_原始系统_现场指掌纹编号
+          */
         @XmlElement(name = "xczw_ysxt_xczzhwbh")
         var latentFingerOriginalSystemFingerId:String = _
+        /**
+          * 现场指纹_现场物证编号
+          */
         @XmlElement(name = "xczw_xcwzbh")
         var latentFingerLatentPhysicalId:String = _
+        /**
+          * 现场指纹_现场指掌纹卡编号
+          */
         @XmlElement(name = "xczw_xczzhwkbh")
         var latentFingerCardId:String = _
+        /**
+          * 捺印指纹_原始系统_案事件相关人员编号
+          */
         @XmlElement(name = "nyzw_ysxt_asjxgrybh")
         var fingerPrintOriginalSystemPersonId:String = _
+        /**
+          * 捺印指纹_警综人员编号
+          */
         @XmlElement(name = "nyzw_jzrybh")
         var fingerPrintJingZongPersonId:String = _
+        /**
+          * 捺印指纹_案事件相关人员编号
+          */
         @XmlElement(name = "nyzw_asjxgrybh")
         var fingerPrintPersonId:String = _
+        /**
+          * 捺印指纹_指掌纹卡编号
+          */
         @XmlElement(name = "nyzw_zzhwkbh")
         var fingerPrintCardId:String = _
+        /**
+          * 捺印指纹_指掌位代码
+          */
         @XmlElement(name = "nyzw_zzhwdm")
         var fingerPrintPostionCode:String = _
+        /**
+          * 捺印指纹_指掌纹比对方法代码
+          */
         @XmlElement(name = "nyzw_zzhwbdffdm")
         var fingerPrintComparisonMethodCode:String = _
+        /**
+          * 比中单位_公安机关机构代码
+          */
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
+        /**
+          * 比中单位_公安机关名称
+          */
         @XmlElement(name = "bzdw_gajgmc")
         var hitUnitName:String = _
+        /**
+          * 比中人_姓名
+          */
         @XmlElement(name = "bzr_xm")
         var hitPersonName:String = _
+        /**
+          * 比中人_公民身份号码
+          */
         @XmlElement(name = "bzr_gmsfhm")
         var hitPersonIdCard:String = _
+        /**
+          * 比中人_联系电话
+          */
         @XmlElement(name = "bzr_lxdh")
         var hitPersonTel:String = _
+        /**
+          * 比中时间
+          */
         @XmlElement(name = "bzsj")
         var hitDateTime:String = _
+        /**
+          * 复核单位_公安机关机构代码
+          */
         @XmlElement(name = "fhdw_gajgjgdm")
         var checkUnitCode:String = _
+        /**
+          * 复核单位_公安机关名称
+          */
         @XmlElement(name = "fhdw_gajgmc")
         var checkUnitName:String = _
+        /**
+          * 复核人_姓名
+          */
         @XmlElement(name = "fhr_xm")
         var checkPersonName:String = _
+        /**
+          * 复核人_公民身份号码
+          */
         @XmlElement(name = "fhr_gmsfhm")
         var checkPersonIdCard:String = _
+        /**
+          * 复核人_联系电话
+          */
         @XmlElement(name = "fhr_lxdh")
         var checkPersonTel:String = _
+        /**
+          * 复核时间
+          */
         @XmlElement(name = "fhsj")
         var checkDateTime:String = _
+        /**
+          * 备注
+          */
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")
@@ -1306,54 +1654,129 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "TtHitResultPackage")
     class TtHitResultPackage{
+        /**
+          * 任务编号
+          */
         @XmlElement(name = "rwbh")
         var taskId:String = _
+        /**
+          * 指纹比对系统描述
+          */
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
+        /**
+          * 指掌纹查重比中类型代码
+          */
         @XmlElement(name = "zzhwccbzlxdm")
         var ttHitTypeCode:String = _
+        /**
+          * 原始系统_案事件相关人员编号
+          */
         @XmlElement(name = "ysxt_asjxgrybh")
         var originalPersonId:String = _
+        /**
+          * 警综人员编号
+          */
         @XmlElement(name = "jzrybh")
         var jingZongPersonId:String = _
+        /**
+          * 案事件相关人员编号
+          */
         @XmlElement(name = "asjxgrybh")
         var personId:String = _
+        /**
+          * 指掌纹卡编号
+          */
         @XmlElement(name = "zzhwkbh")
         var cardId:String = _
+        /**
+          * 是否指纹_判断标识
+          */
         @XmlElement(name = "sfzw_pdbz")
         var whetherFingerJudgmentMark:String = _
+        /**
+          * 比中结果_原始系统_案事件相关人员编号
+          */
         @XmlElement(name = "bzjg_ysxt_asjxgrybh")
         var resultOriginalSystemPersonId:String = _
+        /**
+          * 比中结果_警综人员编号
+          */
         @XmlElement(name = "bzjg_jzrybh")
         var resultjingZongPersonId:String = _
+        /**
+          * 比中结果_案事件相关人员编号
+          */
         @XmlElement(name = "bzjg_asjxgrybh")
         var resultPersonId:String = _
+        /**
+          * 比中结果_指掌纹卡编号
+          */
         @XmlElement(name = "bzjg_zzhwkbh")
         var resultCardId:String = _
+        /**
+          * 比中单位_公安机关机构代码
+          */
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
+        /**
+          * 比中单位_公安机关名称
+          */
         @XmlElement(name = "bzdw_gajgmc")
         var hitUnitName:String = _
+        /**
+          * 比中人_姓名
+          */
         @XmlElement(name = "bzr_xm")
         var hitPersonName:String = _
+        /**
+          * 比中人_公民身份号码
+          */
         @XmlElement(name = "bzr_gmsfhm")
         var hitPersonIdCard:String = _
+        /**
+          * 比中人_联系电话
+          */
         @XmlElement(name = "bzr_lxdh")
         var hitPersonTel:String = _
+        /**
+          * 比中时间
+          */
         @XmlElement(name = "bzsj")
         var hitDateTime:String = _
+        /**
+          * 复核单位_公安机关机构代码
+          */
         @XmlElement(name = "fhdw_gajgjgdm")
         var checkUnitCode:String = _
+        /**
+          * 复核单位_公安机关名称
+          */
         @XmlElement(name = "fhdw_gajgmc")
         var checkUnitName:String = _
+        /**
+          * 复核人_姓名
+          */
         @XmlElement(name = "fhr_xm")
         var checkPersonName:String = _
+        /**
+          * 复核人_公民身份号码
+          */
         @XmlElement(name = "fhr_gmsfhm")
         var checkPersonIdCard:String = _
+        /**
+          * 复核人_联系电话
+          */
         @XmlElement(name = "fhr_lxdh")
         var checkPersonTel:String = _
+        /**
+          * 复核时间
+          */
         @XmlElement(name = "fhsj")
         var checkDateTime:String = _
+        /**
+          * 备注
+          */
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "fingerprintPackage")
@@ -1369,58 +1792,139 @@ class FPT5File {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "LlHitResultPackage")
     class LlHitResultPackage{
+        /**
+          * 任务编号
+          */
         @XmlElement(name = "rwbh")
         var taskId:String = _
+        /**
+          * 指纹比对系统描述
+          */
         @XmlElement(name = "zwbdxtlxms")
         var comparisonSystemTypeDescript:String = _
+        /**
+          * 原始系统_案事件编号
+          */
         @XmlElement(name = "ysxt_asjbh")
         var originalSystemCaseId:String = _
+        /**
+          * 案事件编号
+          */
         @XmlElement(name = "asjbh")
         var caseId:String = _
+        /**
+          * 现场勘验编号
+          */
         @XmlElement(name = "xckybh")
         var latentSurveyId:String = _
+        /**
+          * 原始系统_现场指掌纹编号
+          */
         @XmlElement(name = "ysxt_xczzhwbh")
         var originalSystemLatentFingerId:String = _
+        /**
+          * 现场物证编号
+          */
         @XmlElement(name = "xcwzbh")
         var latentPhysicalId:String = _
+        /**
+          * 现场指掌纹卡编号
+          */
         @XmlElement(name = "xczzhwkbh")
         var cardId:String = _
+        /**
+          * 比中结果_原始系统_案事件编号
+          */
         @XmlElement(name = "bzjg_ysxt_asjbh")
         var resultOriginalSystemCaseId:String = _
+        /**
+          * 比中结果_案事件编号
+          */
         @XmlElement(name = "bzjg_asjbh")
         var resultCaseId:String = _
+        /**
+          * 比中结果_现场勘验编号
+          */
         @XmlElement(name = "bzjg_xckybh")
         var resultLatentSurveyId:String = _
+        /**
+          * 比中结果_原始系统_现场指掌纹编号
+          */
         @XmlElement(name = "bzjg_ysxt_xczzhwbh")
         var resultOriginalSystemLatentPersonId:String = _
+        /**
+          * 比中结果_现场物证编号
+          */
         @XmlElement(name = "bzjg_xcwzbh")
         var resultLatentPhysicalId:String = _
+        /**
+          * 比中结果_现场指掌纹卡编号
+          */
         @XmlElement(name = "bzjg_xczzhwkbh")
         var resultCardId:String = _
+        /**
+          * 比中单位_公安机关机构代码
+          */
         @XmlElement(name = "bzdw_gajgjgdm")
         var hitUnitCode:String = _
+        /**
+          * 比中单位_公安机关名称
+          */
         @XmlElement(name = "bzdw_gajgmc")
         var hitUnitName:String = _
+        /**
+          * 比中人_姓名
+          */
         @XmlElement(name = "bzr_xm")
         var hitPersonName:String = _
+        /**
+          * 比中人_公民身份号码
+          */
         @XmlElement(name = "bzr_gmsfhm")
         var hitPersonIdCard:String = _
+        /**
+          * 比中人_联系电话
+          */
         @XmlElement(name = "bzr_lxdh")
         var hitPersonTel:String = _
+        /**
+          * 比中时间
+          */
         @XmlElement(name = "bzsj")
         var hitDateTime:String = _
+        /**
+          * 复核单位_公安机关机构代码
+          */
         @XmlElement(name = "fhdw_gajgjgdm")
         var checkUnitCode:String = _
+        /**
+          * 复核单位_公安机关名称
+          */
         @XmlElement(name = "fhdw_gajgmc")
         var checkUnitName:String = _
+        /**
+          * 复核人_姓名
+          */
         @XmlElement(name = "fhr_xm")
         var checkPersonName:String = _
+        /**
+          * 复核人_公民身份号码
+          */
         @XmlElement(name = "fhr_gmsfhm")
         var checkPersonIdCard:String = _
+        /**
+          * 复核人_联系电话
+          */
         @XmlElement(name = "fhr_lxdh")
         var checkPersonTel:String = _
+        /**
+          * 复核时间
+          */
         @XmlElement(name = "fhsj")
         var checkDateTime:String = _
+        /**
+          * 备注
+          */
         @XmlElement(name = "bz")
         var memo:String = _
         @XmlElement(name = "latentPackage")

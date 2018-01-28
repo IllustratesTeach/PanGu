@@ -1,7 +1,6 @@
 package nirvana.hall.api.internal.fpt
 
 import java.io.ByteArrayInputStream
-import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
@@ -32,8 +31,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       lPPalmService: LPPalmService,
                       matchRelationService: MatchRelationService,
                       fptExchangeService: FPTExchangeService,
-                      extractor: FeatureExtractor,
-                      implicit val dataSource:DataSource) extends FPT5Service{
+                      extractor: FeatureExtractor) extends FPT5Service{
   JniLoaderUtil.loadExtractorJNI()
   JniLoaderUtil.loadImageJNI()
   /**
@@ -96,6 +94,9 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     val caseInfo = FPT5Converter.convertLatentPackage2Case(latentPackage)
     if(!caseInfoService.isExist(caseInfo.getStrCaseID)){
       caseInfoService.addCaseInfo(caseInfo)
+    }else{
+      val oldCaseInfo = caseInfoService.getCaseInfo(caseInfo.getStrCaseID)
+      caseInfoService.updateCaseInfo(FPT5Converter.updateCaseFingerorPalmIDList(caseInfo,oldCaseInfo))
     }
     val lPCardList = FPT5Converter.convertLatentPackage2LPCard(latentPackage)
     lPCardList.foreach{lPCard =>
