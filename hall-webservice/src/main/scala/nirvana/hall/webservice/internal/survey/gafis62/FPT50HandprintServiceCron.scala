@@ -165,6 +165,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               surveyRecord.szPhyEvidenceNo = k.xcwzbh
               surveyRecord.szJieJingNo = receptionNo
               surveyRecord.nState = survey.SURVEY_STATE_DEFAULT
+              surveyRecord.nJieJingState = survey.SURVEY_STATE_DEFAULT
 
               surveyRecordService.addSurveyRecord(surveyRecord)
               nIndex += 1
@@ -200,20 +201,26 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       recordList.foreach { record =>
         val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
         if (latentPackageOp.nonEmpty) {
-          //保存数据
-          fPT5Service.addLatentPackage(latentPackageOp.get)
-          latentPackageOp.get.latentFingers.foreach { finger =>
-            if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
-              record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
-              //更新状态
-              record.nState = survey.SURVEY_STATE_SUCCESS
-              surveyRecordService.updateSurveyRecord(record)
-
-              fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ADD)
+          var resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
+          if (null == latentPackageOp.get.caseMsg.caseId) {
+            //更新状态
+            warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
+            record.nState = survey.SURVEY_STATE_FAIL
+            resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
+          } else {
+            //保存数据
+            fPT5Service.addLatentPackage(latentPackageOp.get)
+            latentPackageOp.get.latentFingers.foreach { finger =>
+              if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
+                record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
+                //更新状态
+                record.nState = survey.SURVEY_STATE_SUCCESS
+              }
             }
           }
-
-        } else {
+          surveyRecordService.updateSurveyRecord(record)
+          fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, resultType)
+        }else{
           fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
         }
       }
