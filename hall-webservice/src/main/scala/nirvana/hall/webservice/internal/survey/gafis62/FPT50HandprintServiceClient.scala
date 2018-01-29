@@ -56,7 +56,7 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     info("getLatentList 单位代码:{} 案事件发生地点_行政区划代码:{} 查询指掌纹类型:{} 现场勘验编号:{} 开始时间:{} 结束时间:{} 记录开始位置:{} 记录结束位置:{}", unitCode, asjfsdd_xzqhdm, zzhwlx,xckybh, kssj, jssj, ks, js)
     val dataHandler = fPT50HandprintService.getFingerPrintList(userID, password, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, jssj, ks, js)
     if(dataHandler.getInputStream.available() > 0){
-      val fileName = (kssj+"-"+jssj).replaceAll(" ","-").replaceAll(":","-")
+      val fileName = (kssj+"-"+jssj+"-"+ks+"-"+js).replaceAll(" ","-").replaceAll(":","-")
       val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localXKFingerListPath, fileName)
       if(hallWebserviceConfig.handprintService.isDeleteListZip){
         //TODO 删除ZIP文件操作
