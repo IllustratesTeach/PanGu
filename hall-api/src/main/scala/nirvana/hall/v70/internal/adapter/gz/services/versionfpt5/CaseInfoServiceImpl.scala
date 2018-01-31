@@ -9,8 +9,8 @@ import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm}
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm}
 import nirvana.hall.v70.services.sys.UserService
 
 /**
@@ -26,10 +26,9 @@ class CaseInfoServiceImpl(hallV70Config: HallV70Config,userService: UserService)
     */
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = convertCase2GafisCase(caseInfo)
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))
-    }
+
+    val user = Option(SysUser.find(hallV70Config.server.users))
+
     gafisCase.inputtime = new Date
     gafisCase.inputpsn = user.get.pkId
     gafisCase.createUnitCode = user.get.departCode
@@ -57,10 +56,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     convertCase2GafisCase(caseInfo, gafisCase)
 
-    var modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
-    if(modUser.nonEmpty){
-      modUser = Option(SysUser.find(hallV70Config.server.users))
-    }
+    val modUser = Option(SysUser.find(hallV70Config.server.users))
 
     gafisCase.modifiedtime = new Date
     gafisCase.modifiedpsn = modUser.get.pkId
