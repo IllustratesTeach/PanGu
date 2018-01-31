@@ -11,6 +11,7 @@ import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
+import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
 
@@ -141,18 +142,18 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     }
     //获取待发送现场指掌纹数量
     val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj)
-    info("latentCount number:",latentCount)
+    info("latentCount number:{}",latentCount)
     if(latentCount.toInt > 0){
       var nIndex = surveyConfig.nSeq
-      val step = 10
-      Range(nIndex, latentCount, step).foreach{i =>
-        val ks = i + 1
+      val step = 9
+      Range(nIndex, latentCount,10).foreach{i =>
+        val ks = i
         var js = ks + step
         if(js > latentCount)
           js = latentCount
         val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
         if(fingerPrintListResponse.nonEmpty){
-          info("单位代码{} 现场列表大小",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
+          info("单位代码{} 现场列表大小{}",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
           try {
             fingerPrintListResponse.get.list.foreach { k =>
               val xckybh = k.xckybh
@@ -165,7 +166,9 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               surveyRecord.szPhyEvidenceNo = k.xcwzbh
               surveyRecord.szJieJingNo = receptionNo
               surveyRecord.nState = survey.SURVEY_STATE_DEFAULT
-              surveyRecord.nJieJingState = survey.SURVEY_STATE_DEFAULT
+              surveyRecord.nJieJingState = if(StringUtils.isNotEmpty(receptionNo) && StringUtils.isNotBlank(receptionNo))
+                survey.SURVEY_STATE_SUCCESS
+              else survey.SURVEY_STATE_DEFAULT
 
               surveyRecordService.addSurveyRecord(surveyRecord)
               nIndex += 1
@@ -183,7 +186,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       }
     }else{
       //没有获取到数据，设置开始时间为结束时间, 开始位置0，结束时间为空,下次任务会以系统时间为结束时间
-      surveyConfig.nSeq = 0
+      surveyConfig.nSeq = 1
       surveyConfig.szStartTime = jssj
       surveyConfig.szEndTime = ""
 
@@ -197,6 +200,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
+    info("获取recordlist数量{}",recordList)
     if (recordList.nonEmpty) {
       recordList.foreach { record =>
         val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
