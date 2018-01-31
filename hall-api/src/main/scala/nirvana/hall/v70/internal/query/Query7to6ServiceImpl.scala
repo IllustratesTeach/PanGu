@@ -3,11 +3,12 @@ package nirvana.hall.v70.internal.query
 import java.util.{Date, UUID}
 import javax.persistence.EntityManager
 
+import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.ExceptionUtil
-import nirvana.hall.api.services.SyncInfoLogManageService
 import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.internal.sync.SyncErrorConstants
+import nirvana.hall.api.services.SyncInfoLogManageService
 import nirvana.hall.protocol.api.QueryProto.{QuerySendRequest, QuerySendResponse}
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.config.HallV70Config
@@ -16,8 +17,7 @@ import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
-import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.apache.tapestry5.json.JSONObject
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -29,7 +29,7 @@ class Query7to6ServiceImpl(v70Config: HallV70Config, rpcHttpClient: RpcHttpClien
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, query7to6Service: Query7to6Service): Unit = {
     if(v70Config.cron.query7to6Cron != null){
-      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-70to62", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(v70Config.cron.query7to6Cron, StartAtDelay), "query-70to62", new Runnable {
         override def run(): Unit = {
           query7to6Service.doWork
         }

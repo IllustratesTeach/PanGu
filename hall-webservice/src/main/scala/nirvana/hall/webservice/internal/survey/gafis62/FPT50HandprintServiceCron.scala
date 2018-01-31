@@ -2,6 +2,7 @@ package nirvana.hall.webservice.internal.survey.gafis62
 
 import java.util.Date
 
+import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.MatchRelationService
@@ -13,7 +14,7 @@ import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
-import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 
 /**
   * Created by songpeng on 2017/12/24.
@@ -35,7 +36,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
 
     if(hallWebserviceConfig.handprintService.cron!= null){
       //获取现场指纹列表定时
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getLatentList", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentList")
@@ -50,7 +51,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //根据现勘列表获取现场指纹FPT5数据
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getLatentPackage", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentPackage")
@@ -62,7 +63,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //获取接警编号
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getReceptionNo", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getReceptionNo")
@@ -77,7 +78,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //推送比对任务
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "sync-cron-sendHitResult", new Runnable {
         override def run(): Unit = {
           try {
             info("begin sendHitResult")

@@ -1,9 +1,9 @@
 package nirvana.hall.api.internal.sync
 
-import java.io.ByteArrayOutputStream
 import java.util.UUID
 import javax.sql.DataSource
 
+import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.rpc.protocol.CommandProto.CommandStatus
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.HallApiConstants
@@ -14,19 +14,17 @@ import nirvana.hall.api.services._
 import nirvana.hall.api.services.remote.{CaseInfoRemoteService, LPCardRemoteService, LPPalmRemoteService, TPCardRemoteService}
 import nirvana.hall.api.services.sync.{FetchQueryService, LogicDBJudgeService, SyncCronService}
 import nirvana.hall.c.services.gloclib.gaqryque
-import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.protocol.api.FPTProto.{Case, MatchRelationInfo}
 import nirvana.hall.protocol.api.HallMatchRelationProto.MatchStatus
 import nirvana.hall.protocol.api.SyncDataProto._
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
-import nirvana.hall.support.services.{JdbcDatabase, RpcHttpClient}
+import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import org.apache.tapestry5.ioc.annotations.PostInjection
-import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 import org.apache.tapestry5.json.JSONObject
-import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -62,7 +60,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, syncCronService: SyncCronService): Unit = {
     if(apiConfig.sync.syncCron != null){
-      periodicExecutor.addJob(new CronSchedule(apiConfig.sync.syncCron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(apiConfig.sync.syncCron, StartAtDelay), "sync-cron", new Runnable {
         override def run(): Unit = {
           info("begin sync-cron")
           try{

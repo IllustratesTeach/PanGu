@@ -2,12 +2,13 @@ package nirvana.hall.v70.internal.query
 
 import java.util.{Date, UUID}
 
+import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.ExceptionUtil
 import nirvana.hall.api.internal.sync.SyncErrorConstants
-import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services._
+import nirvana.hall.api.services.remote._
 import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
@@ -15,7 +16,7 @@ import nirvana.hall.v70.internal.sync.ProtobufConverter
 import nirvana.hall.v70.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
-import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -42,7 +43,7 @@ class QueryGet7to6ServiceImpl(v70Config: HallV70Config,
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, queryGet7to6Service: QueryGet7to6Service): Unit = {
     if(v70Config.cron.query7to6Cron != null){
-      periodicExecutor.addJob(new CronSchedule(v70Config.cron.query7to6Cron), "query-get-70to62", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(v70Config.cron.query7to6Cron, StartAtDelay), "query-get-70to62", new Runnable {
         override def run(): Unit = {
           queryGet7to6Service.doWork
         }
