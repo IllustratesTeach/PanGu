@@ -5,7 +5,7 @@ import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.fpt.FPT5Utils
-import nirvana.hall.c.services.gfpt5lib.LatentPackage
+import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
@@ -85,7 +85,7 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     * @return 现场指掌纹信息FPT5.0数据包。LatentPackage
     */
   def getLatentPackage(xcwzbh: String):Option[LatentPackage]={
-    info("getLatentPackage{}")
+    info("getLatentPackage{}",xcwzbh)
     val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
     if(dataHandler.getInputStream.available() > 0){
       val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localLatentPath, xcwzbh)
@@ -94,7 +94,8 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
         print(hallWebserviceConfig.localXKFingerListPath + File.pathSeparator + xcwzbh + ".zip")
       }
       val latentPackageStr = Source.fromInputStream(inputStream).mkString
-      Option(XmlLoader.parseXML[LatentPackage](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
+      val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
+      Option(fPT5File.get.latentPackage(0))
     }else{
       warn("getLatentPackage {} dataHandler is empty", xcwzbh)
       None
