@@ -12,7 +12,7 @@ import scala.io.Source
   */
 class FPT50HandprintServiceClientTest {
 
-  val client = new FPT50HandprintServiceClient(buildHallWebserviceConfig)
+  val client = new FPT50HandprintServiceClient(buildHallWebserviceConfig.handprintService)
   def buildHallWebserviceConfig = {
     val content = Source.fromInputStream(getClass.getResourceAsStream("/test-webservice.xml"),"utf8").mkString
     XmlLoader.parseXML[HallWebserviceConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/webservice/webservice.xsd")))

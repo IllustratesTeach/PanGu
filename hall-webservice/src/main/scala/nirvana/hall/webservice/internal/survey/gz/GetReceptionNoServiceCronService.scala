@@ -21,7 +21,6 @@ class GetReceptionNoServiceCronService (hallWebserviceConfig: HallWebserviceConf
   val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
   val userID = hallWebserviceConfig.handprintService.user
   val passwordStr = hallWebserviceConfig.handprintService.password
-  val unitCode = hallWebserviceConfig.handprintService.unitCode
   val password = DigestUtils.md5Hex(passwordStr)
 
   val fpt50handprintServiceService = new FPT50HandprintServiceService

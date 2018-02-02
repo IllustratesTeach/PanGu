@@ -8,7 +8,7 @@ import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.config.HandprintServiceConfig
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipFile
@@ -20,11 +20,10 @@ import scala.io.Source
   * Created by songpeng on 2017/12/24.
   * 现堪接口FPT50HandprintService接口封装类
   */
-class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) extends LoggerSupport{
-  private val userID = hallWebserviceConfig.handprintService.user
-  private val password = DigestUtils.md5Hex(hallWebserviceConfig.handprintService.password)
-  private val unitCode = hallWebserviceConfig.handprintService.unitCode
-  private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], hallWebserviceConfig.handprintService.url, hallWebserviceConfig.handprintService.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig) extends LoggerSupport{
+  private val userID = handprintServiceConfig.user
+  private val password = DigestUtils.md5Hex(handprintServiceConfig.password)
+  private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
 
   /**
     * 获取待发送现场指掌纹数量服务
@@ -53,19 +52,19 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     * @return FingerPrintListResponse
     */
   def getLatentList(asjfsdd_xzqhdm: String, zzhwlx: String, xckybh: String, kssj: String, jssj: String, ks: Int, js: Int):Option[FingerPrintListResponse]={
-    info("getLatentList 单位代码:{} 案事件发生地点_行政区划代码:{} 查询指掌纹类型:{} 现场勘验编号:{} 开始时间:{} 结束时间:{} 记录开始位置:{} 记录结束位置:{}", unitCode, asjfsdd_xzqhdm, zzhwlx,xckybh, kssj, jssj, ks, js)
+    info("getLatentList 案事件发生地点_行政区划代码:{} 查询指掌纹类型:{} 现场勘验编号:{} 开始时间:{} 结束时间:{} 记录开始位置:{} 记录结束位置:{}", asjfsdd_xzqhdm, zzhwlx,xckybh, kssj, jssj, ks, js)
     val dataHandler = fPT50HandprintService.getFingerPrintList(userID, password, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, jssj, ks, js)
     if(dataHandler.getInputStream.available() > 0){
       val fileName = (kssj+"-"+jssj+"-"+ks+"-"+js).replaceAll(" ","-").replaceAll(":","-")
-      val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localXKFingerListPath, fileName)
-      if(hallWebserviceConfig.handprintService.isDeleteListZip){
+      val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir, fileName)
+      if(handprintServiceConfig.isDeleteListZip){
         //TODO 删除ZIP文件操作
-        print(hallWebserviceConfig.localXKFingerListPath + File.separator + fileName + ".zip")
+        print(handprintServiceConfig.localStoreDir + File.separator + fileName + ".zip")
       }
       val fingerPrintListStr = Source.fromInputStream(inputStream).mkString
       Option(XmlLoader.parseXML[FingerPrintListResponse](fingerPrintListStr))
     }else{
-      warn("getLatentList unitCode:{} asjfsdd_xzqhdm:{} xckybh:{} kssj:{} jssj:{} ks:{} js:{} dataHandler is empty", unitCode, asjfsdd_xzqhdm, xckybh, kssj, jssj, ks, js)
+      warn("getLatentList asjfsdd_xzqhdm:{} xckybh:{} kssj:{} jssj:{} ks:{} js:{} dataHandler is empty", asjfsdd_xzqhdm, xckybh, kssj, jssj, ks, js)
       None
     }
 
@@ -88,10 +87,10 @@ class FPT50HandprintServiceClient(hallWebserviceConfig: HallWebserviceConfig) ex
     info("getLatentPackage{}",xcwzbh)
     val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
     if(dataHandler.getInputStream.available() > 0){
-      val inputStream = getInputStreamByDataHandler(dataHandler, hallWebserviceConfig.localLatentPath, xcwzbh)
-      if(hallWebserviceConfig.handprintService.isDeleteFileZip){
+      val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir, xcwzbh)
+      if(handprintServiceConfig.isDeleteFileZip){
         //TODO 删除ZIP文件操作
-        print(hallWebserviceConfig.localXKFingerListPath + File.pathSeparator + xcwzbh + ".zip")
+        print(handprintServiceConfig.localStoreDir + File.pathSeparator + xcwzbh + ".zip")
       }
       val latentPackageStr = Source.fromInputStream(inputStream).mkString
       val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))

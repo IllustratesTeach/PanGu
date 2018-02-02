@@ -9,7 +9,8 @@ import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
-import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.webservice.config.{HallWebserviceConfig, SurveyConfig}
 import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.commons.lang.StringUtils
@@ -21,18 +22,15 @@ import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
   * 现场勘验系统接口定时服务
   */
 class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
-                                fPT50HandprintServiceClient: FPT50HandprintServiceClient,
                                 surveyConfigService: SurveyConfigService,
                                 surveyRecordService: SurveyRecordService,
                                 surveyHitResultRecordService: SurveyHitResultRecordService,
                                 matchRelationService: MatchRelationService,
                                 fPT5Service: FPT5Service) extends LoggerSupport{
 
+  val fPT50HandprintServiceClient = new FPT50HandprintServiceClient(hallWebserviceConfig.handprintService)
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
-
-    //初始化配置信息
-    initSurveyConfig
 
     if(hallWebserviceConfig.handprintService.cron!= null){
       //获取现场指纹列表定时
@@ -40,7 +38,15 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin getLatentList")
-            getLatentList
+            //根据配置里的62应用服务器地址，使用动态变量访问
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  initSurveyConfig(surveyV62ServiceConfig.surveyConfig)
+                  getLatentList
+                }
+              }
+            }
             info("end  getLatentList")
           } catch {
             case ex: Exception =>
@@ -55,7 +61,13 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin getLatentPackage")
-              getLatentPackage
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  getLatentPackage
+                }
+              }
+            }
             info("end  getLatentPackage")
           } catch {
             case e: Exception =>
@@ -67,7 +79,13 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin getReceptionNo")
-            getReceptionNo
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  getReceptionNo
+                }
+              }
+            }
             info("end getReceptionNo")
           } catch {
             case ex: Exception =>
@@ -82,7 +100,13 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin sendHitResult")
-              sendHitResult
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  sendHitResult
+                }
+              }
+            }
             info("end sendHitResult")
           } catch {
             case ex: Exception =>
@@ -95,11 +119,15 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     }
   }
 
-  def initSurveyConfig: Unit ={
-    if(hallWebserviceConfig.handprintService.surveyConfig != null){
-      val surveyConfigList = surveyConfigService.getSurveyConfigList()
-      hallWebserviceConfig.handprintService.surveyConfig.foreach{surveyConfig=>
-        if(!surveyConfigList.exists(p=>surveyConfig.unitCode.equals(p.szUnitCode))){
+  /**
+    * 初始化配置,如果本地有对应的单位代码则跳过，否则新增SurveyConfig配置
+    * @param surveyConfigList SurveyConfig配置列表
+    */
+  def initSurveyConfig(surveyConfigList: Seq[SurveyConfig]): Unit ={
+    if(surveyConfigList != null){
+      val surveyConfigList2 = surveyConfigService.getSurveyConfigList()
+      surveyConfigList.foreach{surveyConfig=>
+        if(!surveyConfigList2.exists(p=>surveyConfig.unitCode.equals(p.szUnitCode))){
           val config = new SURVEYCONFIG
           config.szUnitCode = surveyConfig.unitCode
           config.szStartTime = surveyConfig.startTime

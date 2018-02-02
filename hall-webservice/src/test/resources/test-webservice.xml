@@ -26,7 +26,20 @@
         <target_namespace>http://xckyservice.hisign.com/</target_namespace>
         <user>AFIS_JZ</user>
         <password>AFIS_JZ</password>
-        <unitcode>110000</unitcode>
+        <local_store_dir>support/fpt</local_store_dir>
+        <survey_v62_server>
+            <app_server>
+                <host>127.0.0.1</host>
+                <port>6898</port>
+                <user>afisadmin</user>
+                <password>helloafis</password>
+            </app_server>
+            <survey_config>
+                <unit_code>110000</unit_code>
+                <start_time>2018-01-01 00:00:00</start_time>
+                <end_time>2018-02-01 00:00:00</end_time>
+            </survey_config>
+        </survey_v62_server>
     </handprintService>
     <hall_image_url>http://192.168.1.214:9001</hall_image_url>
     <local_tenprint_path>support/fpt</local_tenprint_path>

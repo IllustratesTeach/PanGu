@@ -22,4 +22,25 @@
     <send_checkin_cron>30 * * * * ? *</send_checkin_cron>
     <upload_checkin_cron>30 * * * * ? *</upload_checkin_cron>
 </union4pfmip>
+    <handprintService>
+        <cron>0 * * * * ? *</cron>
+        <url>http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl</url>
+        <target_namespace>http://xckyservice.hisign.com/</target_namespace>
+        <user>AFIS_JZ</user>
+        <password>AFIS_JZ</password>
+        <local_store_dir>support/fpt</local_store_dir>
+        <survey_v62_server>
+            <app_server>
+                <host>127.0.0.1</host>
+                <port>6898</port>
+                <user>afisadmin</user>
+                <password>helloafis</password>
+            </app_server>
+            <survey_config>
+                <unit_code>110000</unit_code>
+                <start_time>2018-01-01 00:00:00</start_time>
+                <end_time>2018-02-01 00:00:00</end_time>
+            </survey_config>
+        </survey_v62_server>
+    </handprintService>
 </hall_webservice>

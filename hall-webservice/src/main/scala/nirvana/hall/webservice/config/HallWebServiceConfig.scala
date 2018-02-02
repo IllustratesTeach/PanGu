@@ -5,6 +5,7 @@ import javax.xml.bind.annotation._
 import monad.core.config.{HeartbeatConfigSupport, LocalStoreConfigSupport, LogFileSupport}
 import monad.support.services.WebServerConfigSupport
 import nirvana.hall.api.config.HallImageRemoteConfigSupport
+import nirvana.hall.v62.config.V62ServerConfig
 
 /**
   * Created by songpeng on 2017/4/24.
@@ -62,15 +63,25 @@ class HandprintServiceConfig{
   var user: String = _
   @XmlElement(name = "password")
   var password: String = _
-  @XmlElement(name = "unitcode")
-  var unitCode:String = _
+  @XmlElement(name = "local_store_dir")
+  var localStoreDir: String = _
   @XmlElement(name = "is_delete_list_zip")
   var isDeleteListZip:Boolean = false
   @XmlElement(name = "is_delete_file_zip")
   var isDeleteFileZip:Boolean = false
+  @XmlElement(name = "survey_v62_server")
+  var surveyV62ServiceConfig :Array[SurveyV62ServerConfig] = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SurveyV62ServerConfig")
+class SurveyV62ServerConfig{
+  @XmlElement(name = "app_server")
+  var v62ServerConfig = new V62ServerConfig
   @XmlElement(name = "survey_config")
   var surveyConfig: Array[SurveyConfig] = _
 }
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SurveyConfig")
 class SurveyConfig{

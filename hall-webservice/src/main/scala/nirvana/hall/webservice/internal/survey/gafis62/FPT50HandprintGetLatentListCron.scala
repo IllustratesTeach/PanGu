@@ -27,7 +27,7 @@ class FPT50HandprintGetLatentListCron(hallWebserviceConfig: HallWebserviceConfig
   def startUp(periodicExecutor: PeriodicExecutor): Unit ={
 
     //初始化配置信息
-    initSurveyConfig
+//    initSurveyConfig
 
     if(hallWebserviceConfig.handprintService.cron!= null) {
       //获取现场指纹列表定时
@@ -48,7 +48,7 @@ class FPT50HandprintGetLatentListCron(hallWebserviceConfig: HallWebserviceConfig
     }
   }
 
-  def initSurveyConfig: Unit ={
+  /*def initSurveyConfig: Unit ={
     if(hallWebserviceConfig.handprintService.surveyConfig != null){
       val surveyConfigList = surveyConfigService.getSurveyConfigList()
       hallWebserviceConfig.handprintService.surveyConfig.foreach{surveyConfig=>
@@ -64,7 +64,7 @@ class FPT50HandprintGetLatentListCron(hallWebserviceConfig: HallWebserviceConfig
         }
       }
     }
-  }
+  }*/
 
   /**
     * 获取现场指纹列表
