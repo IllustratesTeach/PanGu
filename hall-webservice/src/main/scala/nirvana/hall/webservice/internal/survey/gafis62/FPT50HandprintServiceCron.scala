@@ -229,32 +229,50 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
-    info("获取recordlist数量{}",recordList)
+    info("获取recordlist数量{}",recordList.length)
     if (recordList.nonEmpty) {
       recordList.foreach { record =>
-        val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
-        if (latentPackageOp.nonEmpty) {
-          var resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
-          if (null == latentPackageOp.get.caseMsg.caseId) {
-            //更新状态
-            warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
-            record.nState = survey.SURVEY_STATE_FAIL
-            resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
-          } else {
-            //保存数据
-            fPT5Service.addLatentPackage(latentPackageOp.get)
-            latentPackageOp.get.latentFingers.foreach { finger =>
-              if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
-                record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
-                //更新状态
-                record.nState = survey.SURVEY_STATE_SUCCESS
+        try {
+          val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
+          if (latentPackageOp.nonEmpty) {
+            var resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
+            if (null == latentPackageOp.get.caseMsg.caseId) {
+              //更新状态
+              warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
+              record.nState = survey.SURVEY_STATE_FAIL
+              resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
+            } else {
+              //保存数据
+              fPT5Service.addLatentPackage(latentPackageOp.get)
+              if (null != latentPackageOp.get.latentFingers) {
+                latentPackageOp.get.latentFingers.foreach { finger =>
+                  if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
+                    record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
+                    //更新状态
+                    record.nState = survey.SURVEY_STATE_SUCCESS
+                  }
+                }
+              }
+              if (null != latentPackageOp.get.latentPalms) {
+                latentPackageOp.get.latentPalms.foreach { palm =>
+                  if (record.szPhyEvidenceNo.equals(palm.latentPalmImageMsg.latentPalmPhysicalId)) {
+                    record.szFingerid = palm.latentPalmImageMsg.latentPalmId
+                    //更新状态
+                    record.nState = survey.SURVEY_STATE_SUCCESS
+                  }
+                }
               }
             }
+            surveyRecordService.updateSurveyRecord(record)
+            fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, resultType)
+          } else {
+            fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
           }
-          surveyRecordService.updateSurveyRecord(record)
-          fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, resultType)
-        }else{
-          fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
+      }catch {
+          case ex: Exception=>
+            error("fPT50HandprintServiceClient-getLatentPackage:{},currentTime:{}"
+              ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+            )
         }
       }
       getLatentPackage
