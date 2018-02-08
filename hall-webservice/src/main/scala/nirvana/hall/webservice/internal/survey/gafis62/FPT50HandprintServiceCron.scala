@@ -1,52 +1,73 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
-import javax.activation.DataHandler
+import java.util.Date
 
+import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
+import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
-import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.webservice.config.{HallWebserviceConfig, SurveyConfig}
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
+import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
-import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
+import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 
 /**
   * Created by songpeng on 2017/12/24.
   * 现场勘验系统接口定时服务
   */
 class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
-                                fPT50HandprintServiceClient: FPT50HandprintServiceClient,
                                 surveyConfigService: SurveyConfigService,
                                 surveyRecordService: SurveyRecordService,
                                 surveyHitResultRecordService: SurveyHitResultRecordService,
+                                matchRelationService: MatchRelationService,
                                 fPT5Service: FPT5Service) extends LoggerSupport{
 
+  val fPT50HandprintServiceClient = new FPT50HandprintServiceClient(hallWebserviceConfig.handprintService)
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
 
-    //初始化配置信息
-    initSurveyConfig
-
     if(hallWebserviceConfig.handprintService.cron!= null){
       //获取现场指纹列表定时
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getLatentList", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentList")
-            getLatentList
+            //根据配置里的62应用服务器地址，使用动态变量访问
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  initSurveyConfig(surveyV62ServiceConfig.surveyConfig)
+                  getLatentList
+                }
+              }
+            }
             info("end  getLatentList")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("getLatentList-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
       //根据现勘列表获取现场指纹FPT5数据
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getLatentPackage", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentPackage")
-              getLatentPackage
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  getLatentPackage
+                }
+              }
+            }
             info("end  getLatentPackage")
           } catch {
             case e: Exception =>
@@ -54,37 +75,59 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //获取接警编号
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "survey-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getReceptionNo", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getReceptionNo")
-            getReceptionNo
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  getReceptionNo
+                }
+              }
+            }
             info("end getReceptionNo")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("getReceptionNo-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
       //推送比对任务
-      periodicExecutor.addJob(new CronSchedule(hallWebserviceConfig.handprintService.cron), "sync-cron", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "sync-cron-sendHitResult", new Runnable {
         override def run(): Unit = {
           try {
             info("begin sendHitResult")
-              sendHitResult
+            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+                  sendHitResult
+                }
+              }
+            }
             info("end sendHitResult")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("sendHitResult-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
     }
   }
 
-  def initSurveyConfig: Unit ={
-    if(hallWebserviceConfig.handprintService.surveyConfig != null){
-      val surveyConfigList = surveyConfigService.getSurveyConfigList()
-      hallWebserviceConfig.handprintService.surveyConfig.foreach{surveyConfig=>
-        if(!surveyConfigList.exists(p=>surveyConfig.unitCode.equals(p.szUnitCode))){
+  /**
+    * 初始化配置,如果本地有对应的单位代码则跳过，否则新增SurveyConfig配置
+    * @param surveyConfigList SurveyConfig配置列表
+    */
+  def initSurveyConfig(surveyConfigList: Seq[SurveyConfig]): Unit ={
+    if(surveyConfigList != null){
+      val surveyConfigList2 = surveyConfigService.getSurveyConfigList()
+      surveyConfigList.foreach{surveyConfig=>
+        if(!surveyConfigList2.exists(p=>surveyConfig.unitCode.equals(p.szUnitCode))){
           val config = new SURVEYCONFIG
           config.szUnitCode = surveyConfig.unitCode
           config.szStartTime = surveyConfig.startTime
@@ -103,11 +146,18 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getLatentList: Unit ={
     //TODO 添加日志，异常判断和处理，完善业务逻辑,目前是完全理想状态下的代码逻辑
-    //获取系统时间
-    val systemDateTime = fPT50HandprintServiceClient.getSystemDateTime()
-    info("系统时间{}",systemDateTime)
-    //获取配置信息列表，并循环获取数据
-    surveyConfigService.getSurveyConfigList().filter(_.nFlages == 1).foreach(getLatentListBySurveyConfig)
+    try{
+      //获取系统时间
+      val systemDateTime = fPT50HandprintServiceClient.getSystemDateTime()
+      info("系统时间{}",systemDateTime)
+      //获取配置信息列表，并循环获取数据
+      surveyConfigService.getSurveyConfigList().filter(_.nFlages == 1).foreach(getLatentListBySurveyConfig)
+    }catch {
+      case ex:Exception =>
+        error("getLatentList-error:{},currentTime:{}"
+          ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+        )
+    }
   }
 
   def getLatentListBySurveyConfig(surveyConfig: SURVEYCONFIG): Unit ={
@@ -120,18 +170,19 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       jssj = systemDateTime
     }
     //获取待发送现场指掌纹数量
-    val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, "", FPT50HandprintServiceConstants.ZZHWLX_ALL, kssj, jssj)
+    val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj)
+    info("latentCount number:{}",latentCount)
     if(latentCount.toInt > 0){
       var nIndex = surveyConfig.nSeq
-      val step = 10
-      Range(nIndex, latentCount, step).foreach{i =>
-        val ks = i + 1
+      val step = 9
+      Range(nIndex, latentCount,10).foreach{i =>
+        val ks = i
         var js = ks + step
         if(js > latentCount)
           js = latentCount
-
-        val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, "", FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
+        val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
         if(fingerPrintListResponse.nonEmpty){
+          info("单位代码{} 现场列表大小{}",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
           try {
             fingerPrintListResponse.get.list.foreach { k =>
               val xckybh = k.xckybh
@@ -144,13 +195,18 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               surveyRecord.szPhyEvidenceNo = k.xcwzbh
               surveyRecord.szJieJingNo = receptionNo
               surveyRecord.nState = survey.SURVEY_STATE_DEFAULT
+              surveyRecord.nJieJingState = if(StringUtils.isNotEmpty(receptionNo) && StringUtils.isNotBlank(receptionNo))
+                survey.SURVEY_STATE_SUCCESS
+              else survey.SURVEY_STATE_DEFAULT
 
               surveyRecordService.addSurveyRecord(surveyRecord)
               nIndex += 1
             }
           }catch {
-            case e: Exception=>
-              error(e.getMessage)
+            case ex: Exception=>
+              error("getLatentList-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }finally {
             surveyConfig.nSeq = nIndex
             surveyConfigService.updateSurveyConfig(surveyConfig)
@@ -159,7 +215,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       }
     }else{
       //没有获取到数据，设置开始时间为结束时间, 开始位置0，结束时间为空,下次任务会以系统时间为结束时间
-      surveyConfig.nSeq = 0
+      surveyConfig.nSeq = 1
       surveyConfig.szStartTime = jssj
       surveyConfig.szEndTime = ""
 
@@ -171,24 +227,56 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
   /**
     * 读取没有获取fpt数据的现堪记录，根据物证编号获取数据并保存
     */
-  def getLatentPackage: Unit ={
+  def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
-    recordList.foreach{record=>
-      val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
-      if(latentPackageOp.nonEmpty){
-        //保存数据
-        fPT5Service.addLatentPackage(latentPackageOp.get)
-
-        //更新状态
-        record.nState = survey.SURVEY_STATE_SUCCESS
-        surveyRecordService.updateSurveyRecord(record)
-
-        fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ADD)
-      }else{
-        fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
+    info("获取recordlist数量{}",recordList.length)
+    if (recordList.nonEmpty) {
+      recordList.foreach { record =>
+        try {
+          val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
+          if (latentPackageOp.nonEmpty) {
+            var resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
+            if (null == latentPackageOp.get.caseMsg.caseId) {
+              //更新状态
+              warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
+              record.nState = survey.SURVEY_STATE_FAIL
+              resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
+            } else {
+              //保存数据
+              fPT5Service.addLatentPackage(latentPackageOp.get)
+              if (null != latentPackageOp.get.latentFingers) {
+                latentPackageOp.get.latentFingers.foreach { finger =>
+                  if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
+                    record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
+                    //更新状态
+                    record.nState = survey.SURVEY_STATE_SUCCESS
+                  }
+                }
+              }
+              if (null != latentPackageOp.get.latentPalms) {
+                latentPackageOp.get.latentPalms.foreach { palm =>
+                  if (record.szPhyEvidenceNo.equals(palm.latentPalmImageMsg.latentPalmPhysicalId)) {
+                    record.szFingerid = palm.latentPalmImageMsg.latentPalmId
+                    //更新状态
+                    record.nState = survey.SURVEY_STATE_SUCCESS
+                  }
+                }
+              }
+            }
+            surveyRecordService.updateSurveyRecord(record)
+            fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, resultType)
+          } else {
+            fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
+          }
+      }catch {
+          case ex: Exception=>
+            error("fPT50HandprintServiceClient-getLatentPackage:{},currentTime:{}"
+              ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+            )
+        }
       }
+      getLatentPackage
     }
-
   }
 
   /**
@@ -203,7 +291,6 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         record.nJieJingState = survey.SURVEY_STATE_SUCCESS
         surveyRecordService.updateSurveyRecord(record)
       }
-    }else{
       getReceptionNo
     }
   }
@@ -215,14 +302,19 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT, 10)
     if(hitResultList.nonEmpty){
       hitResultList.foreach{hitResult=>
-        //TODO
-        val xckybh = ""
-        val hitResultDh: DataHandler = null
-        fPT50HandprintServiceClient.sendHitResult(xckybh, hitResult.nQueryType, hitResultDh)
-        hitResult.nState = survey.SURVEY_STATE_SUCCESS
-        surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+        val xckybh = surveyRecordService.getPhyEvidenceNoByFingerId(hitResult.szFingerID)
+        if (xckybh.nonEmpty) {
+          val hitResultDhOp = surveyHitResultRecordService.getDataHandlerOfLtOrLlHitResultPackage(hitResult)
+          if(hitResultDhOp.nonEmpty){
+            fPT50HandprintServiceClient.sendHitResult(xckybh.get, hitResult.nQueryType, hitResultDhOp.get)
+
+            hitResult.nState = survey.SURVEY_STATE_SUCCESS
+          }else{
+            hitResult.nState = survey.SURVEY_STATE_FAIL
+          }
+          surveyHitResultRecordService.updateSurveyHitResultRecord(hitResult)
+        }
       }
-    }else{
       sendHitResult
     }
   }

@@ -39,6 +39,11 @@
           <xs:documentation>破案的数据库表</xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element type="databaseTableType" name="code_unit_table" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>单位代码数据库表</xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element type="databaseType" name="database" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>gafis6.2 oracle的数据库配置</xs:documentation>

@@ -109,6 +109,7 @@ object survey {
     var nQueryType: Byte = _
     //查询类型
     var nState: Byte = _ // 状态
+    var nHitFgp: Byte = _ //比中指位
   }
 
   //SURVEYHITRESULTRECORD, *PSURVEYHITRESULTRECORD

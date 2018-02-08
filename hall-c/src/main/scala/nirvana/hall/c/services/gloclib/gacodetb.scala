@@ -25,7 +25,7 @@ object gacodetb {
   @Length(24)
   var szInputCode:String = _ ;	// abbreviate form of szName. can be digit or alpha.
   @Length(136)
-  var szName:String = _ ;	// name, about 68 hanzi, two lines long enough
+  var szName:Array[Byte] = _ ;	// name, about 68 hanzi, two lines long enough
   } // GAFIS_CODE_ENTRYSTRUCT;	// length is 192 bytes
 
   class GAFIS_CODETABLE extends AncientData

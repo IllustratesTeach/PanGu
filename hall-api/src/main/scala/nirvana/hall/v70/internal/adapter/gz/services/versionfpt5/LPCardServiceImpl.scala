@@ -46,11 +46,9 @@ class LPCardServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
       caseFinger.fingerId = caseFinger.caseId + seqNo
       caseFingerMnt.fingerId = caseFinger.caseId + seqNo
     }
-    //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(hallV70Config.server.users)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(hallV70Config.server.users))
-    }
+
+    val user = Option(SysUser.find(hallV70Config.server.users))
+
     caseFinger.inputpsn = user.get.pkId
     caseFinger.inputtime = new Date
     caseFinger.creatorUnitCode = user.get.departCode
@@ -84,10 +82,9 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     convertLPCard2GafisCaseFinger(lpCard, caseFinger)
     caseFinger.fingerId = fingerId
     caseFinger.seqNo = seqNo
-    var modUser = userService.findSysUserByLoginName(caseFinger.modifiedpsn)
-    if(modUser.isEmpty){
-      modUser = Option(SysUser.find(hallV70Config.server.users))
-    }
+
+    val modUser = Option(SysUser.find(hallV70Config.server.users))
+
     caseFinger.modifiedtime = new Date
     caseFinger.modifiedpsn = modUser.get.pkId
     caseFinger.updatorUnitCode= modUser.get.departCode

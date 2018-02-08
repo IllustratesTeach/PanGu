@@ -208,9 +208,72 @@
                     <xs:documentation>密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="xs:string" name="unitcode" minOccurs="0" maxOccurs="1">
+            <xs:element type="xs:string" name="local_store_dir" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>单位代码</xs:documentation>
+                    <xs:documentation>数据存储路径(zip，xml)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:boolean" name="is_delete_list_zip" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>是否删除现勘列表压缩包</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:boolean" name="is_delete_file_zip" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>是否删除fptx文件压缩包</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="surveyV62ServerConfigType" name = "survey_v62_server" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>现勘6.2应用服务器配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="surveyV62ServerConfigType">
+        <xs:sequence>
+            <xs:element type="V62ServerType" name="app_server" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器的主机地址</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="surveyConfigType" name = "survey_config" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>现勘配置信息</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="V62ServerType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="host" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器的主机地址</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:integer" name="port" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器的端口</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:integer" name="connection_timeout_secs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器连接超时设置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:integer" name="read_timeout_secs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器读取数据超时设置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器的用户名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>6.2应用服务器的密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

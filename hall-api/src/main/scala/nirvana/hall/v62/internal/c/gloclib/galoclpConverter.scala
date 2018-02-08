@@ -2,6 +2,7 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.{ByteString, ProtocolStringList}
 import monad.support.services.LoggerSupport
+import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
@@ -282,7 +283,7 @@ object galoclpConverter extends LoggerSupport{
   def convertProtobuf2GCASEINFOSTRUCT(protoCase:Case):GCASEINFOSTRUCT = {
     //TODO 添加数据长度校验
     val gafisCase = new GCASEINFOSTRUCT
-    gafisCase.nItemFlag = (1 + 4 + 16).asInstanceOf[Byte]
+    gafisCase.nItemFlag = (1 + 2 + 4 + 8 + 16).asInstanceOf[Byte]
     gafisCase.szCaseID = protoCase.getStrCaseID
 
     gafisCase.pstFingerID_Data = convertAsKeyArray(protoCase.getStrFingerIDList)
@@ -462,5 +463,30 @@ object galoclpConverter extends LoggerSupport{
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
 
     caseInfo.build()
+  }
+
+  /**
+    * 去掉6.2案件号头字母A
+    *
+    * @param caseId
+    * @return
+    */
+  def dropCaseNoHeadLetter(caseId: String): String = {
+    if (caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
+      caseId.toUpperCase.drop(1)
+    else caseId.toUpperCase
+  }
+
+  /**
+    * 添加6.2案件号头字母A
+    *
+    * @param caseId
+    * @return
+    */
+  def appendCaseNoHeadLetter(caseId: String): String = {
+    if (!caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
+      HallApiConstants.LPCARDNO_HEAD_LETTER.concat(caseId.toUpperCase)
+    else
+      caseId.toUpperCase
   }
 }

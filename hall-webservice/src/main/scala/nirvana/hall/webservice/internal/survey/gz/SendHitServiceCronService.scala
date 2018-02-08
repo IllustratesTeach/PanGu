@@ -2,7 +2,6 @@ package nirvana.hall.webservice.internal.survey.gz
 
 import java.io.{File, FileInputStream}
 import java.util.Date
-import javax.activation.DataHandler
 
 import org.apache.commons.io.{FileUtils, IOUtils}
 import monad.support.services.LoggerSupport
@@ -12,12 +11,12 @@ import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, LlHitResultPackage, LtHitResultPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.{CronSchedule, PeriodicExecutor}
-import org.apache.tools.zip.ZipFile
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -32,7 +31,6 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   val targetNamespace = hallWebserviceConfig.handprintService.targetNamespace
   val userID = hallWebserviceConfig.handprintService.user
   val passwordStr = hallWebserviceConfig.handprintService.password
-  val unitCode = hallWebserviceConfig.handprintService.unitCode
   val password = DigestUtils.md5Hex(passwordStr)
 
   val fpt50handprintServiceService = new FPT50HandprintServiceService
@@ -58,7 +56,7 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           } catch {
             case e: Exception =>
               error("SendHitServiceCronService-error:{},currentTime:{}"
-                , ExceptionUtil.getStackTraceInfo(e), DateConverter.convertDate2String(new Date, Constant.DATETIME_FORMAT)
+                , ExceptionUtil.getStackTraceInfo(e), DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT)
               )
               surveyRecordService.saveSurveyLogRecord("","","","","",ExceptionUtil.getStackTraceInfo(e))
           }
@@ -118,15 +116,15 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
     surveyRecordService.updateSurveyHitState(matchcode ,uuid)
 
-    surveyRecordService.saveSurveyLogRecord(Constant.FBMatchCondition
-      ,Constant.EMPTY
-      ,Constant.EMPTY
+    surveyRecordService.saveSurveyLogRecord(SurveyConstant.FBMatchCondition
+      ,SurveyConstant.EMPTY
+      ,SurveyConstant.EMPTY
       ,CommonUtil.appendParam("userID:"+userID
         ,"password:"+password
         ,"xckybh:"+ kno
         ,"hitpath:"+ path)
       ,matchcode
-      ,Constant.EMPTY)
+      ,SurveyConstant.EMPTY)
   }
 
   private def getFPT5HitLTPackage(hitLTPackageSeq : Seq[LtHitResultPackage]) : FPT5File = {
