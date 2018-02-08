@@ -233,7 +233,7 @@ object GafisPartitionRecordsFullSaver {
   def saveLatentFinger(latentFingerConvert : LatentFingerConvert): Unit ={
     val saveLatentFingerSql = "INSERT INTO gafis_case_finger(case_id,seq_no,finger_id,remain_place,fgp,ridge_color,mittens_beg_no,mittens_end_no," +
       "finger_img,Is_Corpse,corpse_no,Is_Assist,Inputtime,deletag,SID,seq,FPT_PATH) " +
-      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_SID_SEQ.Nextval,?)"
+      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,'1',GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_FINGER_PALM_SEQ.Nextval,?)"
     JdbcDatabase.update(saveLatentFingerSql){ ps =>
       ps.setString(1,latentFingerConvert.caseId)
       ps.setString(2,latentFingerConvert.seqNo)

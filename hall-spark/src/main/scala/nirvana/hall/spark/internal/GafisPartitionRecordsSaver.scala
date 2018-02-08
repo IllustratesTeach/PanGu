@@ -179,8 +179,8 @@ object GafisPartitionRecordsSaver {
 
   //保存现场指纹信息
   def saveCaseFingerInfo(seqNo : String , fingerId : String , caseId : String , fptPath : String): Unit = {
-    val saveCaseFingerSql = "insert into GAFIS_CASE_FINGER(SEQ_NO,FINGER_ID,CASE_ID,Finger_Img,INPUTTIME,Deletag,Data_In,Data_Matcher,Sid,Fpt_Path)" +
-      "values(?,?,?,EMPTY_BLOB(),sysdate,1,2,1,GAFIS_CASE_SID_SEQ.NEXTVAL,?)"
+    val saveCaseFingerSql = "insert into GAFIS_CASE_FINGER(SEQ_NO,FINGER_ID,CASE_ID,Finger_Img,INPUTTIME,Deletag,Data_In,Data_Matcher,Sid,Seq,Fpt_Path)" +
+      "values(?,?,?,EMPTY_BLOB(),sysdate,1,2,1,GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_FINGER_PALM_SEQ.NEXTVAL,?)"
     JdbcDatabase.update(saveCaseFingerSql) { ps =>
       ps.setString(1, seqNo)
       ps.setString(2, fingerId)

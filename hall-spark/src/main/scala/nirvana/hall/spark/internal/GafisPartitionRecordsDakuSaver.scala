@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 class
 
 GafisPartitionRecordsDakuSaver extends PartitionRecordsSaver  {
-  import GafisPartitionRecordsFullSaver._
+  import GafisPartitionRecordsDakuSaver._
   override def savePartitionRecords(parameter: NirvanaSparkConfig)(records: Iterator[(StreamEvent, TemplateFingerConvert, GAFISIMAGESTRUCT, GAFISIMAGESTRUCT)]): Unit = {
     records.foreach{ case(event,image,mnt,bin) =>
       if (image.gatherData!=null)
@@ -143,8 +143,8 @@ object GafisPartitionRecordsDakuSaver {
   }
 
   def saveLatentFinger(latentFingerConvert : LatentFingerConvert): Unit ={
-    val saveCaseFingerSql = "insert into GAFIS_CASE_FINGER(SEQ_NO,FINGER_ID,CASE_ID,Finger_Img,INPUTTIME,Deletag,Data_In,Data_Matcher,Sid,Fpt_Path)" +
-      "values(?,?,?,?,sysdate,1,2,1,GAFIS_CASE_SID_SEQ.NEXTVAL,?)"
+    val saveCaseFingerSql = "insert into GAFIS_CASE_FINGER(SEQ_NO,FINGER_ID,CASE_ID,Finger_Img,INPUTTIME,Deletag,Data_In,Data_Matcher,Sid,Seq,Fpt_Path)" +
+      "values(?,?,?,?,sysdate,1,2,1,GAFIS_CASE_SID_SEQ.NEXTVAL,GAFIS_CASE_FINGER_PALM_SEQ.NEXTVAL,?)"
     JdbcDatabase.update(saveCaseFingerSql) { ps =>
       ps.setString(1, latentFingerConvert.seqNo)
       ps.setString(2, latentFingerConvert.fingerId)
@@ -164,10 +164,11 @@ object GafisPartitionRecordsDakuSaver {
 
   def saveLatnentFingerFeature(latentFingerFeatureConvert: LatentFingerFeatureConvert): Unit ={
     val saveLatentFingerFeatureSql = "INSERT INTO gafis_case_finger_mnt(pk_id,finger_id,finger_mnt,Is_Main_Mnt,Inputtime) " +
-      "VALUES(sys_guid(),?,?,'1',SYSDATE)"
+      "VALUES(sys_guid(),?,?,?,SYSDATE)"
     JdbcDatabase.update(saveLatentFingerFeatureSql){ ps =>
       ps.setString(1,latentFingerFeatureConvert.fingerId)
       ps.setBytes(2,latentFingerFeatureConvert.fingerMnt)
+      ps.setString(3,latentFingerFeatureConvert.isMainMnt)
     }
 
 

@@ -1,6 +1,14 @@
 package nirvana.hall.spark.services
 
-import org.junit.Test
+import java.io.File
+
+import monad.support.MonadSupportConstants
+import monad.support.services.XmlLoader
+import nirvana.hall.spark.config.NirvanaSparkConfig
+import nirvana.hall.spark.internal.{AfisDatabaseProvider, GafisDatabaseMigrationProvider, GafisPartitionRecordsMigrationSaver}
+import org.junit.{Assert, Test}
+
+import scala.io.Source
 
 /**
  * Created by wangjue on 2016/2/16.
@@ -52,7 +60,7 @@ class BigDataStreamTest {
 
   @Test
   def streamTestTXT (){
-    val array = Array("src/test/resources/test_spark_file.xml","C:\\Users\\wangjue\\Desktop\\测试平台\\spark\\template_fpt_path.txt")
+    val array = Array("src/test/resources/test_spark_file.xml","C:\\Users\\wangjue\\Desktop\\测试平台\\spark\\latent_fpt_path.txt")
     BigDataForFileStream.main(array)
   }
 
@@ -63,4 +71,41 @@ class BigDataStreamTest {
     BigDataForBjsjStream.main(array)
   }
 
+  @Test
+  def streamTestMigration (){
+    val array = Array("src/test/resources/test_spark_migration.xml")
+    BigDataForMigrationStream.main(array)
+  }
+
+
+  @Test
+  def test_findSuitablePersonId: Unit = {
+    val content = Source.fromFile(new File("src/test/resources/test_spark.xml"),MonadSupportConstants.UTF8_ENCODING).mkString
+    val config = XmlLoader.parseXML[NirvanaSparkConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/spark/nirvana-spark.xsd")))
+    SysProperties.setConfig(config)
+    GafisDatabaseMigrationProvider.findSuitablePersonId
+  }
+
+  @Test
+  def test_importTemplate: Unit = {
+    val content = Source.fromFile(new File("src/test/resources/test_spark.xml"),MonadSupportConstants.UTF8_ENCODING).mkString
+    val config = XmlLoader.parseXML[NirvanaSparkConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/spark/nirvana-spark.xsd")))
+    SysProperties.setConfig(config)
+    GafisDatabaseMigrationProvider.importTemplateFinger("P1201606231466652741170")
+  }
+
+  @Test
+  def test_importLatent: Unit = {
+    val content = Source.fromFile(new File("src/test/resources/test_spark_migration.xml"),MonadSupportConstants.UTF8_ENCODING).mkString
+    val config = XmlLoader.parseXML[NirvanaSparkConfig](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/spark/nirvana-spark.xsd")))
+    SysProperties.setConfig(config)
+    var i= 1
+    Source.fromFile(new File("C:\\Users\\wangjue\\Desktop\\测试平台\\小库\\LT_LATENT.log")).getLines().foreach{ t =>
+      val records = GafisDatabaseMigrationProvider.importProvider(t).toIterator
+      GafisPartitionRecordsMigrationSaver.savePartitionRecords(records)
+      println("index : " + i + " , " + t + " process done !")
+      i = i + 1
+    }
+
+  }
 }

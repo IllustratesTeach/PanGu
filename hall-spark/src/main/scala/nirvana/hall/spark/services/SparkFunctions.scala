@@ -107,7 +107,7 @@ object SparkFunctions{
       case NonFatal(e) => throw e
     } finally {
       if (null != in) in.close()
-      if (null != out) in
+      if (null != out) out.close()
     }
   }
 
@@ -128,7 +128,7 @@ object SparkFunctions{
       case NonFatal(e) => throw e
     } finally {
       if (null != in) in.close()
-      if (null != out) in
+      if (null != out) out.close()
     }
   }
 

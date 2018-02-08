@@ -39,7 +39,6 @@ object BigDataForFileStream {
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     conf.set("spark.driver.host",parameter.host)
     val sc = new SparkContext(conf)
-    var accum = sc.accumulator(0)
     val listRDD =
       if (parameter.hdfsServer == "None")
         sc.textFile(listFile,parameter.partitionsNum)
@@ -50,39 +49,16 @@ object BigDataForFileStream {
         SysProperties.setConfig(parameter)
         partitionRdd.foreach{ rdd =>
           {
-            //SysProperties.setConfig(parameter)
             ImageProviderService.requestRemoteFile(parameter,rdd.toString)
           }.flatMap{x=>
-            //SysProperties.setConfig(parameter)
             DecompressImageService.requestDecompress(parameter,x._1,x._2)
           }.flatMap{x=>
-            //SysProperties.setConfig(parameter)
             ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
           }.foreach{ x=>
-            //SysProperties.setConfig(parameter)
             PartitionRecordsSaverService.savePartitionRecords(parameter)(Iterator(x))
           }
-          accum += 1
         }
       }
-
-      /*listRDD.foreach{ rdd =>
-        {
-          SysProperties.setConfig(parameter)
-          ImageProviderService.requestRemoteFile(parameter,rdd.toString)
-        }.flatMap{x=>
-          SysProperties.setConfig(parameter)
-          DecompressImageService.requestDecompress(parameter,x._1,x._2)
-        }.flatMap{x=>
-          SysProperties.setConfig(parameter)
-          ExtractFeatureService.requestExtract(parameter,x._1,x._2,x._3)
-        }.foreach{ x=>
-          SysProperties.setConfig(parameter)
-          PartitionRecordsSaverService.savePartitionRecords(parameter)(Iterator(x))
-        }
-        accum += 1
-      }*/
-
   }
 
   def main(args: Array[String]): Unit = {
