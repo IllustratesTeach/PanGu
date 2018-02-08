@@ -70,7 +70,10 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
             }
             info("end  getLatentPackage")
           } catch {
-            case e: Exception =>
+            case ex: Exception =>
+              error("getLatentPackage-error:{},currentTime:{}"
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+              )
           }
         }
       })
@@ -132,7 +135,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           config.szUnitCode = surveyConfig.unitCode
           config.szStartTime = surveyConfig.startTime
           config.szEndTime = surveyConfig.endTime
-          config.nSeq = 0
+          config.nSeq = 1
           config.nFlages = 1 //启用
           config.szConfig = surveyConfig.config
           surveyConfigService.addSurveyConfig(config)
@@ -182,7 +185,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           js = latentCount
         val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, ks, js)
         if(fingerPrintListResponse.nonEmpty){
-          info("单位代码{} 现场列表大小{}",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
+          info("单位代码:{} 现场列表大小:{}",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
           try {
             fingerPrintListResponse.get.list.foreach { k =>
               val xckybh = k.xckybh
@@ -229,7 +232,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     */
   def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
-    info("获取recordlist数量{}",recordList.length)
+    info("获取recordlist数量:{}",recordList.size)
     if (recordList.nonEmpty) {
       recordList.foreach { record =>
         try {
@@ -244,19 +247,21 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
             } else {
               //保存数据
               fPT5Service.addLatentPackage(latentPackageOp.get)
-              if (null != latentPackageOp.get.latentFingers) {
+              info("入库成功，现场物证编号：" + record.szPhyEvidenceNo)
+
+              if(Option(latentPackageOp.get.latentFingers).nonEmpty){
                 latentPackageOp.get.latentFingers.foreach { finger =>
                   if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
-                    record.szFingerid = finger.latentFingerImageMsg.originalSystemLatentFingerPalmId
+                    record.szFingerid = latentPackageOp.get.caseMsg.caseId + finger.latentFingerImageMsg.latentPhysicalId.substring(finger.latentFingerImageMsg.latentPhysicalId.length-2)
                     //更新状态
                     record.nState = survey.SURVEY_STATE_SUCCESS
-                  }
+                }
                 }
               }
-              if (null != latentPackageOp.get.latentPalms) {
+              if (Option(latentPackageOp.get.latentPalms).nonEmpty) {
                 latentPackageOp.get.latentPalms.foreach { palm =>
                   if (record.szPhyEvidenceNo.equals(palm.latentPalmImageMsg.latentPalmPhysicalId)) {
-                    record.szFingerid = palm.latentPalmImageMsg.latentPalmId
+                    record.szFingerid = latentPackageOp.get.caseMsg.caseId + palm.latentPalmImageMsg.latentPalmPhysicalId.substring(palm.latentPalmImageMsg.latentPalmPhysicalId.length-2)
                     //更新状态
                     record.nState = survey.SURVEY_STATE_SUCCESS
                   }
@@ -318,5 +323,4 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
       sendHitResult
     }
   }
-
 }
