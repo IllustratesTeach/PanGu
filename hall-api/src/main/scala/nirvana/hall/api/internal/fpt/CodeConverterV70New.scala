@@ -6325,7 +6325,7 @@ object CodeConverterV70New {
         //虐待俘虏案
 
         case _ =>
-          caseClass = code
+          caseClass = ""
         //若匹配不到，返回原值
 
       }

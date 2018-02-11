@@ -4066,7 +4066,7 @@ object CodeConverterV70Old {
         //失职造成珍贵文物流失案
 
         case _ =>
-          caseClass = code
+          caseClass = ""
 
       }
     }
