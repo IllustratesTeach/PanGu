@@ -104,6 +104,22 @@ class GafisCasePalm extends ActiveRecord {
   var seq: java.lang.Long = _
   @Column(name = "PALM_GROUP_NO", length = 25)
   var palmGroupNo: java.lang.String = _
+  @Column(name="INPUT_USERNAME", length=60)
+  var inputUsername:java.lang.String =  _
+  @Column(name="MODIFY_USERNAME", length=60)
+  var modifyUsername:java.lang.String =  _
+  @Column(name="LT_USERNAME", length=60)
+  var ltUsername:java.lang.String =  _
+  @Column(name="LL_USERNAME", length=60)
+  var llUsername:java.lang.String =  _
+  @Column(name="MIC_UPDATE_USERNAME", length=60)
+  var micUpdateUsername:java.lang.String =  _
+  @Column(name="MIC_UPDATE_USERID", length=32)
+  var micUpdateUserid:java.lang.String =  _
+  @Column(name="MIC_UPDATE_UNITCODE", length=16)
+  var micUpdateUnitcode:java.lang.String =  _
+  @Column(name="APPROVE_STATUS", length=1)
+  var approveStatus:java.lang.String =  _
 
 
   def this(palmId: java.lang.String) {
@@ -111,7 +127,7 @@ class GafisCasePalm extends ActiveRecord {
     this.palmId = palmId
   }
 
-  def this(palmId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgp: java.lang.String, pattern: java.lang.String, ridgeColor: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, palmImg: Array[Byte], palmCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, palmImgNosqlId: java.lang.String, palmCprNosqlId: java.lang.String, seq: java.lang.Long, palmGroupNo: java.lang.String) {
+  def this(palmId: java.lang.String, seqNo: java.lang.String, caseId: java.lang.String, isCorpse: java.lang.String, corpseNo: java.lang.String, remainPlace: java.lang.String, fgp: java.lang.String, pattern: java.lang.String, ridgeColor: java.lang.String, thanStatus: java.lang.String, isAssist: java.lang.String, palmImg: Array[Byte], palmCpr: Array[Byte], ltCount: java.lang.Long, llCount: java.lang.Long, ltCountModMnt: java.lang.Long, llCountModMnt: java.lang.Long, editCount: java.lang.Long, ltDate: java.util.Date, llDate: java.util.Date, ltOperator: java.lang.String, llOperator: java.lang.String, creatorUnitCode: java.lang.String, updatorUnitCode: java.lang.String, modifiedtime: java.util.Date, modifiedpsn: java.lang.String, inputtime: java.util.Date, inputpsn: java.lang.String, deletag: java.lang.String, remark: java.lang.String, ltStatus: java.lang.String, llStatus: java.lang.String, sid: java.lang.Long, matchStatus: java.lang.String, developMethod: java.lang.String, palmImgNosqlId: java.lang.String, palmCprNosqlId: java.lang.String, seq: java.lang.Long, palmGroupNo: java.lang.String, inputUsername:java.lang.String,modifyUsername:java.lang.String,ltUsername:java.lang.String,llUsername:java.lang.String,micUpdateUsername:java.lang.String,micUpdateUserid:java.lang.String,micUpdateUnitcode:java.lang.String,approveStatus:java.lang.String) {
     this()
     this.palmId = palmId
     this.seqNo = seqNo
@@ -152,6 +168,14 @@ class GafisCasePalm extends ActiveRecord {
     this.palmCprNosqlId = palmCprNosqlId
     this.seq = seq
     this.palmGroupNo = palmGroupNo
+    this.inputUsername = inputUsername
+    this.modifyUsername = modifyUsername
+    this.ltUsername = ltUsername
+    this.llUsername = llUsername
+    this.micUpdateUsername = micUpdateUsername
+    this.micUpdateUserid = micUpdateUserid
+    this.micUpdateUnitcode = micUpdateUnitcode
+    this.approveStatus = approveStatus
   }
 
 

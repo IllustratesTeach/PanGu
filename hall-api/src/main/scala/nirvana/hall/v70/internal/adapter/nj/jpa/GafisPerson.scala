@@ -176,6 +176,36 @@ class GafisPerson extends ActiveRecord {
   var thanStateTl: java.lang.String = _
   @Column(name = "THAN_STATE_LT", length = 1)
   var thanStateLt: java.lang.String = _
+  @Column(name="INPUT_USERNAME", length=60)
+  var inputUsername:java.lang.String =  _
+  @Column(name="MODIFY_USERNAME", length=60)
+  var modifyUsername:java.lang.String =  _
+  @Column(name="TLDATE", length=8)
+  var tldate:java.util.Date =  _
+  @Column(name="TTDATE", length=8)
+  var ttdate:java.util.Date =  _
+  @Column(name="MODIFY_UNIT_CODE", length=50)
+  var modifyUnitCode:java.lang.String =  _
+  @Column(name="MIC_UPDATE_USERNAME", length=60)
+  var micUpdateUsername:java.lang.String =  _
+  @Column(name="MIC_UPDATE_USERID", length=32)
+  var micUpdateUserid:java.lang.String =  _
+  @Column(name="MIC_UPDATE_UNITCODE", length=16)
+  var micUpdateUnitcode:java.lang.String =  _
+  @Column(name="TLCOUNT", length=18)
+  var tlcount:java.lang.String  =  _
+  @Column(name="TTCOUNT", length=18)
+  var ttcount:java.lang.String =  _
+  @Column(name="EDIT_COUNT", length=18)
+  var editCount:java.lang.String =  _
+  @Column(name="TL_USERNAME", length=60)
+  var tlUsername:java.lang.String =  _
+  @Column(name="TT_USERNAME", length=60)
+  var ttUsername:java.lang.String =  _
+  @Column(name="TL_USER_ID", length=32)
+  var tlUserId:java.lang.String =  _
+  @Column(name="TT_USER_ID", length=32)
+  var ttUserId:java.lang.String =  _
 
 
   def this(personid: java.lang.String) {
@@ -183,7 +213,7 @@ class GafisPerson extends ActiveRecord {
     this.personid = personid
   }
 
-  def this(personid: java.lang.String, idcardno: java.lang.String, name: java.lang.String, spellname: java.lang.String, aliasname: java.lang.String, aliasspell: java.lang.String, sexCode: java.lang.String, nativeplaceCode: java.lang.String, nationCode: java.lang.String, birthdayst: java.util.Date, door: java.lang.String, doordetail: java.lang.String, address: java.lang.String, addressdetail: java.lang.String, gatherOrgCode: java.lang.String, ipaddress: java.lang.String, gatherDate: java.util.Date, gatherTypeId: java.lang.String, status: java.lang.String, fingerrepeatno: java.lang.String, annex: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, schedule: java.lang.String, approval: java.lang.String, personCategory: java.lang.String, auditor: java.lang.String, auditedtime: java.util.Date, gatherFingerMode: java.lang.String, caseClasses: java.lang.String, gatherFingerNum: java.lang.Long, fingerRemark: java.lang.String, gatherdepartcode: java.lang.String, gatheruserid: java.lang.String, gatherFingerTime: java.util.Date, caseBriefContents: java.lang.String, dataSources: java.lang.Long, cityCode: java.lang.String, sid: java.lang.Long, seq: java.lang.Long, cardid: java.lang.String, recordmark: java.lang.Character, recordsituation: java.lang.String, assistLevel: java.lang.String, assistBonus: java.lang.String, assistPurpose: java.lang.String, assistRefPerson: java.lang.String, assistRefCase: java.lang.String, assistValidDate: java.lang.String, assistExplain: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistContacts: java.lang.String, assistNumber: java.lang.String, assistApproval: java.lang.String, assistSign: java.lang.String, gatherdepartname: java.lang.String, gatherusername: java.lang.String, certificatetype: java.lang.String, certificateid: java.lang.String, personType: java.lang.String, caseClasses2: java.lang.String, caseClasses3: java.lang.String, psisNo: java.lang.String, remark: java.lang.String, caseFingerGroupNo: java.lang.String, thanStateTt: java.lang.String, thanStateTl: java.lang.String, thanStateLt: java.lang.String) {
+  def this(personid: java.lang.String, idcardno: java.lang.String, name: java.lang.String, spellname: java.lang.String, aliasname: java.lang.String, aliasspell: java.lang.String, sexCode: java.lang.String, nativeplaceCode: java.lang.String, nationCode: java.lang.String, birthdayst: java.util.Date, door: java.lang.String, doordetail: java.lang.String, address: java.lang.String, addressdetail: java.lang.String, gatherOrgCode: java.lang.String, ipaddress: java.lang.String, gatherDate: java.util.Date, gatherTypeId: java.lang.String, status: java.lang.String, fingerrepeatno: java.lang.String, annex: java.lang.String, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date, deletag: java.lang.String, schedule: java.lang.String, approval: java.lang.String, personCategory: java.lang.String, auditor: java.lang.String, auditedtime: java.util.Date, gatherFingerMode: java.lang.String, caseClasses: java.lang.String, gatherFingerNum: java.lang.Long, fingerRemark: java.lang.String, gatherdepartcode: java.lang.String, gatheruserid: java.lang.String, gatherFingerTime: java.util.Date, caseBriefContents: java.lang.String, dataSources: java.lang.Long, cityCode: java.lang.String, sid: java.lang.Long, seq: java.lang.Long, cardid: java.lang.String, recordmark: java.lang.Character, recordsituation: java.lang.String, assistLevel: java.lang.String, assistBonus: java.lang.String, assistPurpose: java.lang.String, assistRefPerson: java.lang.String, assistRefCase: java.lang.String, assistValidDate: java.lang.String, assistExplain: java.lang.String, assistDeptCode: java.lang.String, assistDeptName: java.lang.String, assistDate: java.lang.String, assistContacts: java.lang.String, assistNumber: java.lang.String, assistApproval: java.lang.String, assistSign: java.lang.String, gatherdepartname: java.lang.String, gatherusername: java.lang.String, certificatetype: java.lang.String, certificateid: java.lang.String, personType: java.lang.String, caseClasses2: java.lang.String, caseClasses3: java.lang.String, psisNo: java.lang.String, remark: java.lang.String, caseFingerGroupNo: java.lang.String, thanStateTt: java.lang.String, thanStateTl: java.lang.String, thanStateLt: java.lang.String ,inputUsername:java.lang.String, modifyUsername:java.lang.String, tldate:java.util.Date, ttdate:java.util.Date, modifyUnitCode:java.lang.String, micUpdateUsername:java.lang.String, micUpdateUserid:java.lang.String, micUpdateUnitcode:java.lang.String, tlcount:java.lang.String, ttcount:java.lang.String, editCount:java.lang.String, tlUsername:java.lang.String, ttUsername:java.lang.String, tlUserId:java.lang.String, ttUserId:java.lang.String) {
     this()
     this.personid = personid
     this.idcardno = idcardno
@@ -258,6 +288,21 @@ class GafisPerson extends ActiveRecord {
     this.thanStateTt = thanStateTt
     this.thanStateTl = thanStateTl
     this.thanStateLt = thanStateLt
+    this.inputUsername = inputUsername
+    this.modifyUsername = modifyUsername
+    this.tldate = tldate
+    this.ttdate = ttdate
+    this.modifyUnitCode = modifyUnitCode
+    this.micUpdateUsername = micUpdateUsername
+    this.micUpdateUserid = micUpdateUserid
+    this.micUpdateUnitcode = micUpdateUnitcode
+    this.tlcount = tlcount
+    this.ttcount = ttcount
+    this.editCount = editCount
+    this.tlUsername = tlUsername
+    this.ttUsername = ttUsername
+    this.tlUserId = tlUserId
+    this.ttUserId = ttUserId
   }
 
 

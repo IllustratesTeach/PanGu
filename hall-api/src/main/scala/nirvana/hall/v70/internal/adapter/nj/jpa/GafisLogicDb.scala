@@ -4,7 +4,7 @@ package nirvana.hall.v70.internal.adapter.nj.jpa
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table}
+import javax.persistence._
 
 import stark.activerecord.services.{ActiveRecord, ActiveRecordInstance}
 
@@ -34,13 +34,19 @@ class GafisLogicDb extends ActiveRecord {
   var logicRemark: java.lang.String = _
   @Column(name = "LOGIC_ISDEFAULTTAG", length = 1)
   var logicIsdefaulttag: java.lang.String = _
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="LOGIC_CREORUPD_DATE", length=8)
+  var logicCreorupdDate:java.util.Date =  _
+  @Lob
+  @Column(name="QUERYPARAMS")
+  var queryparams: Array[Byte] =  _
 
   def this(pkId: java.lang.String) {
     this()
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, logicCode: java.lang.String, logicName: java.lang.String, logicCategory: java.lang.String, logicDeltag: java.lang.String, logicRemark: java.lang.String, logicIsdefaulttag: java.lang.String) {
+  def this(pkId: java.lang.String, logicCode: java.lang.String, logicName: java.lang.String, logicCategory: java.lang.String, logicDeltag: java.lang.String, logicRemark: java.lang.String, logicIsdefaulttag: java.lang.String, logicCreorupdDate: java.util.Date, queryparams: Array[Byte]) {
     this()
     this.pkId = pkId
     this.logicCode = logicCode
@@ -49,6 +55,8 @@ class GafisLogicDb extends ActiveRecord {
     this.logicDeltag = logicDeltag
     this.logicRemark = logicRemark
     this.logicIsdefaulttag = logicIsdefaulttag
+    this.logicCreorupdDate = logicCreorupdDate
+    this.queryparams = queryparams
   }
 
 
