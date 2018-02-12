@@ -134,6 +134,12 @@ enum	ImageType
 
 }
 
+enum CaseSource
+{
+	SURVEY = 1;//来源于现勘系统
+	OTHER  = 0;//其他方式
+}
+
 message	TPCard
 {
 	message	TPCardText
@@ -268,6 +274,7 @@ message	Case
     //Fpt5.0新加
     optional string	strSurveyId = 9;   //现场勘验编号
 	optional string strJingZongCaseId = 10;//警综案事件编号-新数据必须提供，该编号的数据来源为现勘系统
+	optional int32 strCaseSource = 11;//案件来源，用于标注是否来源于现勘
 }
 
 message	LPCard

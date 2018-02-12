@@ -338,7 +338,7 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "ExtractorContactNO", text.getStrExtractorTel ) //提取人电话
       appendTextStruct(buffer, "CaseIncidentNo", protoCase.getStrJingZongCaseId) //案事件编号
       appendTextStruct(buffer, "ExtractDateTime", text.getStrExtractDate) // 提取时间日期时间类型
-
+      appendTextStruct(buffer, "CaseSource", protoCase.getStrCaseSource.toString) //案件来源
       gafisCase.pstText_Data = buffer.toArray
       gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
     }
@@ -432,6 +432,8 @@ object galoclpConverter extends LoggerSupport{
               caseInfo.setStrSurveyId(textContent) //现场勘验编号
             case "AJID" =>
               caseInfo.setStrJingZongCaseId(textContent) //案事件编号
+            case "CaseSource" =>
+              caseInfo.setStrCaseSource(textContent.toInt) //案件来源
             case other =>
               warn("{} not mapped", other)
           }
