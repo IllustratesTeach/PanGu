@@ -173,7 +173,7 @@ object FPT5MntConverter {
     mntDisp.bIsPalm = 1
     mntDisp.nResolution = latentPalmImageMsg.latentPalmImageRatio.toShort
     mntDisp.nHeight = latentPalmImageMsg.latentPalmImageVerticalDirectionLength.toShort
-    mntDisp.nWidth = latentPalmImageMsg.latentPalmImageVerticalDirectionLength.toShort
+    mntDisp.nWidth = latentPalmImageMsg.latentPalmImageHorizontalDirectionLength.toShort
 
     GfAlg_MntDispMntInitial(mntDisp)
     var scoreDeltaStruts:AFISCOREDELTASTRUCT = null

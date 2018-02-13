@@ -160,6 +160,9 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     //特征
     if(casePalmMnt.palmMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
+    //纹线
+    if(casePalmMnt.palmRidge != null)
+      blobBuilder.setStBinBytes(ByteString.copyFrom(casePalmMnt.palmRidge))
     textBuilder.setStrFeatureGroupIdentifier(casePalmMnt.mntCombinationCode)
     textBuilder.setStrFeatureGroupDscriptInfo(casePalmMnt.mntCombinationMessage)
     magicSet(casePalmMnt.captureMethod, blobBuilder.setStrMntExtractMethod)
