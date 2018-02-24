@@ -307,8 +307,8 @@ object FPT5Converter {
     textBuilder.setStrPrintUnitName(fingerprintPackage.collectInfoMsg.chopUnitName)
     textBuilder.setStrPrinter(fingerprintPackage.collectInfoMsg.chopPersonName)
     textBuilder.setStrPrintDate(fingerprintPackage.collectInfoMsg.chopDateTime)
-    tpCard.setStrPrinterIdCardId(fingerprintPackage.collectInfoMsg.chopPersonIdCard)
-    if(null != fingerprintPackage.collectInfoMsg.chopPersonTel)tpCard.setStrPrinterTel(fingerprintPackage.collectInfoMsg.chopPersonTel)
+    textBuilder.setStrPrinterIdCardNo(fingerprintPackage.collectInfoMsg.chopPersonIdCard)
+    if(null != fingerprintPackage.collectInfoMsg.chopPersonTel)textBuilder.setStrPrinterPhone(fingerprintPackage.collectInfoMsg.chopPersonTel)
     if(StringUtils.isNotEmpty(fingerprintPackage.descriptiveMsg.memo)
       && StringUtils.isNotBlank(fingerprintPackage.descriptiveMsg.memo)){
       textBuilder.setStrComment(fingerprintPackage.descriptiveMsg.memo)
@@ -607,7 +607,7 @@ object FPT5Converter {
   def convertLatentPackage2Case(latentPackage: LatentPackage): Case = {
     val caseInfo = Case.newBuilder()
     val textBuilder = caseInfo.getTextBuilder
-    caseInfo.setStrCaseID(latentPackage.caseMsg.originalSystemCaseId)
+    caseInfo.setStrCaseID(latentPackage.caseMsg.caseId)
     caseInfo.setStrJingZongCaseId(latentPackage.caseMsg.caseId) //警综案事件编号
     caseInfo.setStrSurveyId(latentPackage.caseMsg.latentSurveyId) //现场勘验编号
     if(null != latentPackage.latentFingers){

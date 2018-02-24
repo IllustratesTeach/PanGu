@@ -221,8 +221,6 @@ message	TPCard
 	optional string strJingZongPersonId = 8;//警综人员编号--由警综平台标准化采集系统发号
 	optional string	strCasePersonID = 9;//案事件相关人员编号
 	optional string strCredentialsCode = 10;//常用证件代码
-	optional string strPrinterIdCardId = 11;//捺印人身份证号
-	optional string strPrinterTel = 12;//捺印人联系电话
 	optional string captureInfoReasonCode = 13;//采集原因代码,多个以逗号隔开
 
 }

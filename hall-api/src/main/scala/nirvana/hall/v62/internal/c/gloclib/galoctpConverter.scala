@@ -82,8 +82,8 @@ object galoctpConverter extends LoggerSupport{
             appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
           }
       }
-      appendTextStruct(buffer, "printerID",card.getStrPrinterIdCardId) //捺印人员身份证号码
-      appendTextStruct(buffer, "printerPhone",card.getStrPrinterTel) //捺印人员联系电话
+      appendTextStruct(buffer, "printerID",text.getStrPrinterIdCardNo) //捺印人员身份证号码
+      appendTextStruct(buffer, "printerPhone",text.getStrPrinterPhone) //捺印人员联系电话
       appendTextStruct(buffer, "PrintDateTime",text.getStrPrintDate) //新增FPT5.0捺印时间
       //TODO 指掌纹缺失情况代码
       //TODO 掌纹三角点位置类型代码

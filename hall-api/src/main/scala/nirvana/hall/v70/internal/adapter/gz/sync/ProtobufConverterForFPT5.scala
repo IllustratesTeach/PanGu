@@ -495,8 +495,8 @@ object ProtobufConverterForFPT5 extends LoggerSupport{
     person.nationCode = text.getStrRace
     person.jingZongPersonId = tpCard.getStrJingZongPersonId
     person.casePersonid = tpCard.getStrCasePersonID
-    person.chopPersonIdCard =  tpCard.getStrPrinterIdCardId
-    person.chopPersonTel = tpCard.getStrPrinterTel
+    person.chopPersonIdCard =  text.getStrPrinterIdCardNo
+    person.chopPersonTel = text.getStrPrinterPhone
 
 
     //数据校验
