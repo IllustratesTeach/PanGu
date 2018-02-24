@@ -194,15 +194,15 @@ message	TPCard
 		optional string	strPrinterIdCardNo = 42;                //捺印人身份证号
 
 		//nj 7抓6数据同步追加信息
-        optional string	strTlDate = 43;                 //TL发送时间
-        optional string	strTtDate = 44;                 //TT发送时间
-        optional string	strMicUpdatorUsername = 45;     //特征更改用户
-        optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
-        optional string	strTtCount = 47;                //TT累计发送次数
-        optional string	strPsisNo = 48;                 //工作过程号--警务平台编号
-        optional string	strEditCount = 49;              //编辑次数
-        optional string	strSpellName = 50;              //姓名拼音
-        optional string	strTlCount = 51;                //TL累计发送次数
+		optional string	strTlDate = 43;                 //TL发送时间
+		optional string	strTtDate = 44;                 //TT发送时间
+		optional string	strMicUpdatorUsername = 45;     //特征更改用户
+		optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
+		optional string	strTtCount = 47;                //TT累计发送次数
+		optional string	strPsisNo = 48;                 //工作过程号--警务平台编号
+		optional string	strEditCount = 49;              //编辑次数
+		optional string	strSpellName = 50;              //姓名拼音
+		optional string	strTlCount = 51;                //TL累计发送次数
 	}
 
 	message	TPCardBlob
@@ -227,7 +227,7 @@ message	TPCard
 	optional AdminfoData admData = 5;	 //操作信息
 	optional string strMisPersonID = 6;	 //重卡组号
 	// 双向同步需要读策略过滤数据类型
-    optional string	strDataSource = 7;   //数据来源类型
+	optional string	strDataSource = 7;   //数据来源类型
 	//FPT5.0追加
 	optional string strJingZongPersonId = 8;//警综人员编号--由警综平台标准化采集系统发号
 	optional string	strCasePersonID = 9;//案事件相关人员编号
@@ -279,11 +279,15 @@ message	Case
 	optional CaseText	text = 6;
 	optional AdminfoData admData = 7;		//操作信息
 	// 双向同步需要读策略过滤数据类型
-    optional string	strDataSource = 8;   //数据来源类型
-    //Fpt5.0新加
-    optional string	strSurveyId = 9;   //现场勘验编号
+	optional string	strDataSource = 8;   //数据来源类型
+	//Fpt5.0新加
+	optional string	strSurveyId = 9;   //现场勘验编号
 	optional string strJingZongCaseId = 10;//警综案事件编号-新数据必须提供，该编号的数据来源为现勘系统
 	optional int32 strCaseSource = 11;//案件来源，用于标注是否来源于现勘
+	//hall同步7抓6新增
+	optional string	strMisConnectCaseId = 12;	//警务平台编号
+	optional int32	nBrokenStatus = 13;  //是否破案
+	optional int32	nThanStateLt = 14;  //正查比中状态；是否LT破案
 }
 
 message	LPCard
@@ -324,8 +328,20 @@ message	LPCard
 	optional LPCardBlob	blob = 3;
 	optional AdminfoData admData = 4;
 	// 双向同步需要读策略过滤数据类型
-    optional string	strDataSource = 5;   //数据来源类型
+	optional string	strDataSource = 5;   //数据来源类型
 	optional string strPhysicalId = 6;   //现场物证编号
+	//hall同步7抓6新增
+	optional string	strLtDate = 7;		//LT发送时间
+	optional string	strLlDate = 8;		//LL发送时间
+	optional int32	nSeqNo = 9;	//指纹序号
+	optional string	strLtUser = 10;		//LT发送用户
+	optional string	strLlUser = 11;		//LL发送用户
+	optional int32	nEditCount = 12;		//编辑次数
+	optional int32	nLtStatus = 13;			//查案比中状态：1：比中；0：未比中
+	optional int32	nLtCount = 14;       //累计查案次数
+	optional string	strMicbUpdatorUserName = 15;	//特征修改用户
+	optional string	strMicbUpdatorUnitCode = 16;	//特征修改单位
+	optional int32	nLlCount = 17;       //累计串查次数
 }
 
 message	TLLTHitLog
