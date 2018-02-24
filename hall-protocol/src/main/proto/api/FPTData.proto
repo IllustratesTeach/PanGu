@@ -192,6 +192,17 @@ message	TPCard
 
 		optional string	strPrinterPhone = 41;                //捺印人联系电话
 		optional string	strPrinterIdCardNo = 42;                //捺印人身份证号
+
+		//nj 7抓6数据同步追加信息
+        optional string	strTlDate = 43;                 //TL发送时间
+        optional string	strTtDate = 44;                 //TT发送时间
+        optional string	strMicUpdatorUsername = 45;     //特征更改用户
+        optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
+        optional string	strTtCount = 47;                //TT累计发送次数
+        optional string	strPsisNo = 48;                 //工作过程号--警务平台编号
+        optional string	strEditCount = 49;              //编辑次数
+        optional string	strSpellName = 50;              //姓名拼音
+        optional string	strTlCount = 51;                //TL累计发送次数
 	}
 
 	message	TPCardBlob
@@ -221,7 +232,7 @@ message	TPCard
 	optional string strJingZongPersonId = 8;//警综人员编号--由警综平台标准化采集系统发号
 	optional string	strCasePersonID = 9;//案事件相关人员编号
 	optional string strCredentialsCode = 10;//常用证件代码
-	optional string captureInfoReasonCode = 13;//采集原因代码,多个以逗号隔开
+	optional string captureInfoReasonCode = 11;//采集原因代码,多个以逗号隔开
 
 }
 
