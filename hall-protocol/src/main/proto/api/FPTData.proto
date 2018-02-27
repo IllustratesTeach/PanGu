@@ -190,19 +190,14 @@ message	TPCard
 		optional string	strHuKouPlaceCode = 39;			//户籍地代码
 		optional string	strHuKouPlaceTail = 40;			//户籍地址
 
-		optional string	strPrinterPhone = 41;                //捺印人联系电话
-		optional string	strPrinterIdCardNo = 42;                //捺印人身份证号
+		optional string	strPrinterPhone = 41;           //捺印人联系电话
+		optional string	strPrinterIdCardNo = 42;        //捺印人身份证号
 
 		//nj 7抓6数据同步追加信息
-		optional string	strTlDate = 43;                 //TL发送时间
-		optional string	strTtDate = 44;                 //TT发送时间
-		optional string	strMicUpdatorUsername = 45;     //特征更改用户
-		optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
-		optional string	strTtCount = 47;                //TT累计发送次数
-		optional string	strPsisNo = 48;                 //工作过程号--警务平台编号
-		optional string	strEditCount = 49;              //编辑次数
-		optional string	strSpellName = 50;              //姓名拼音
-		optional string	strTlCount = 51;                //TL累计发送次数
+		optional string	strPsisNo = 43;                 //工作过程号--警务平台编号
+		optional string	strSpellName = 44;              //姓名拼音
+        optional string	strMicUpdatorUsername = 45;     //特征更改用户
+        optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
 	}
 
 	message	TPCardBlob
@@ -234,7 +229,6 @@ message	TPCard
 	optional string	strCasePersonID = 9;//案事件相关人员编号
 	optional string strCredentialsCode = 10;//常用证件代码
 	optional string captureInfoReasonCode = 11;//采集原因代码,多个以逗号隔开
-
 }
 
 message	Case
@@ -310,6 +304,9 @@ message	LPCard
 		//Fpt5.0新加
 		optional string	strFeatureGroupIdentifier= 13;         //特征组标识符
 		optional string	strFeatureGroupDscriptInfo= 14;         //特征组描述信息
+		//nj 7抓6数据同步追加信息
+		optional string	strMicbUpdatorUserName = 15;	    //特征修改用户
+        optional string	strMicbUpdatorUnitCode = 16;	//特征修改单位
 	}
 
 	message	LPCardBlob
@@ -331,18 +328,9 @@ message	LPCard
 	// 双向同步需要读策略过滤数据类型
 	optional string	strDataSource = 5;   //数据来源类型
 	optional string strPhysicalId = 6;   //现场物证编号
-	//hall同步7抓6新增
-	optional string	strLtDate = 7;		//LT发送时间
-	optional string	strLlDate = 8;		//LL发送时间
-	optional int32	nSeqNo = 9;	//指纹序号
-	optional string	strLtUser = 10;		//LT发送用户
-	optional string	strLlUser = 11;		//LL发送用户
-	optional int32	nEditCount = 12;		//编辑次数
-	optional int32	nLtStatus = 13;			//查案比中状态：1：比中；0：未比中
-	optional int32	nLtCount = 14;       //累计查案次数
-	optional string	strMicbUpdatorUserName = 15;	//特征修改用户
-	optional string	strMicbUpdatorUnitCode = 16;	//特征修改单位
-	optional int32	nLlCount = 17;       //累计串查次数
+	//nj 7抓6数据同步追加信息
+	optional int32	nSeqNo = 7;	        //指纹序号
+	optional int32	nLtStatus = 8;			//查案比中状态：1：比中；0：未比中
 }
 
 message	TLLTHitLog
@@ -419,6 +407,18 @@ message AdminfoData {
 	optional string updateDatetime = 4;		//更新时间yyyyMMddHHmmss
 	optional string createUnitCode = 5;		//创建单位代码
 	optional string updateUnitCode = 6;		//更新单位代码
+	//nj 7抓6数据同步追加信息
+    optional string	strTlDate = 7;                  //TL发送时间
+    optional string	strTtDate = 8;                  //TT发送时间
+    optional int32	nTtCount = 9;                   //TT累计发送次数
+    optional int32	nTlCount = 10;                  //TL累计发送次数
+    optional string	strLtDate = 11;		            //LT发送时间
+    optional string	strLlDate = 12;		            //LL发送时间
+    optional string	strLtUser = 13;		            //LT发送用户
+    optional string	strLlUser = 14;		            //LL发送用户
+    optional int32	nEditCount = 15;		        //编辑次数
+    optional int32	nLtCount = 16;                  //LT累计查案次数
+    optional int32	nLlCount = 17;                  //LL累计串查次数
 }
 
 
