@@ -66,4 +66,8 @@ object glocdef {
   final val	GTPIO_ITEMINDEX_PALM_WHOLERIGHT	= 0x9	// 9		// not stored.
   final val	GTPIO_ITEMINDEX_PALM_WHOLELEFT	= 0xa	// 10		// not stored.
 
+  final val GTPIO_ITEMINDEX_PALM_RFOURFINGER = 0x15	//21 //右手四联指
+  final val GTPIO_ITEMINDEX_PALM_LFOURFINGER = 0x16 //22 //左手四联指
 }
+
+

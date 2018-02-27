@@ -19,10 +19,10 @@ object FgpConverter {
       case PalmFgp.PALM_THUMB_R_UP => glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP
       case PalmFgp.PALM_THUMB_L_LOW => glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW
       case PalmFgp.PALM_THUMB_L_UP => glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP
-      case PalmFgp.PALM_FOUR_PRINT_RIGHT =>
-      case PalmFgp.PALM_FOUR_PRINT_LEFT =>
-      case PalmFgp.PALM_FULL_PALM_RIGHT =>
-      case PalmFgp.PALM_FULL_PALM_LEFT =>
+      case PalmFgp.PALM_FOUR_PRINT_RIGHT => glocdef.GTPIO_ITEMINDEX_PALM_RFOURFINGER
+      case PalmFgp.PALM_FOUR_PRINT_LEFT => glocdef.GTPIO_ITEMINDEX_PALM_LFOURFINGER
+      case PalmFgp.PALM_FULL_PALM_RIGHT => glocdef.GTPIO_ITEMINDEX_PALM_WHOLERIGHT
+      case PalmFgp.PALM_FULL_PALM_LEFT => glocdef.GTPIO_ITEMINDEX_PALM_WHOLERIGHT
     }).asInstanceOf[Byte]
   }
   def convertGTPIO_ITEMINDEX2PalmFgp(index: Byte): PalmFgp={
@@ -32,9 +32,14 @@ object FgpConverter {
       case glocdef.GTPIO_ITEMINDEX_PALM_RFINGER => PalmFgp.PALM_FINGER_R
       case glocdef.GTPIO_ITEMINDEX_PALM_LFINGER => PalmFgp.PALM_FINGER_L
       case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBLOW => PalmFgp.PALM_THUMB_R_LOW
-      case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP=> PalmFgp.PALM_THUMB_R_UP
+      case glocdef.GTPIO_ITEMINDEX_PALM_RTHUMBUP => PalmFgp.PALM_THUMB_R_UP
       case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBLOW => PalmFgp.PALM_THUMB_L_LOW
-      case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP=> PalmFgp.PALM_THUMB_L_UP
+      case glocdef.GTPIO_ITEMINDEX_PALM_LTHUMBUP => PalmFgp.PALM_THUMB_L_UP
+      case glocdef.GTPIO_ITEMINDEX_PALM_RFOURFINGER => PalmFgp.PALM_FOUR_PRINT_RIGHT
+      case glocdef.GTPIO_ITEMINDEX_PALM_LFOURFINGER => PalmFgp.PALM_FOUR_PRINT_LEFT
+      case glocdef.GTPIO_ITEMINDEX_PALM_WHOLERIGHT => PalmFgp.PALM_FULL_PALM_RIGHT
+      case glocdef.GTPIO_ITEMINDEX_PALM_WHOLERIGHT => PalmFgp.PALM_FULL_PALM_LEFT
+
       case other => PalmFgp.PALM_UNKNOWN
     }
 
