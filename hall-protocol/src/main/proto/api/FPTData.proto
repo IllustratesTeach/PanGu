@@ -198,6 +198,7 @@ message	TPCard
 		optional string	strSpellName = 44;              //姓名拼音
         optional string	strMicUpdatorUsername = 45;     //特征更改用户
         optional string	strMicUpdatorUnitcode = 46;     //特征更改单位
+		optional string	strPersonClassCode = 47;             //人员类别代码
 	}
 
 	message	TPCardBlob
@@ -319,6 +320,7 @@ message	LPCard
 		optional string			strMntExtractMethod = 6;	//"A" 自动提取	"U"	需要人工编辑	"E"	自动提取但经过人工编辑	"M"	人工提取//GAFIS结构中无
 		optional string			stBin = 7;		//纹线数据
 		optional PalmFgp		palmFgp = 8;	//掌位
+		optional string			stCprImage = 9;    //压缩图像
 	}
 
 	required string		strCardID = 1;  //现场卡号
