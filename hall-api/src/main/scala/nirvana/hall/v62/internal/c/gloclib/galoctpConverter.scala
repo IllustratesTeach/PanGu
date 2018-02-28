@@ -305,6 +305,10 @@ object galoctpConverter extends LoggerSupport{
              text.setStrPrinterPhone(textContent) //捺印人员联系电话
             case "PrintDateTime" =>
               text.setStrPrintDate(textContent) //真对FPT5.0捺印日期时间新增字段
+            case "MicbUpdatorUserName" =>
+              text.setStrMicUpdatorUsername(textContent) //特征更改用户
+            case "MicbUpdatorUnitCode" =>
+              text.setStrMicUpdatorUnitcode(textContent) //特征更改单位
             case other =>
               warn("{} not mapped", other)
           }

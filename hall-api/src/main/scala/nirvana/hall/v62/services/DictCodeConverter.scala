@@ -43,6 +43,12 @@ object DictCodeConverter {
     convertCode(textBuilder.getStrPersonType, DictCode6Map7.personType, textBuilder.setStrPersonType,
       "人员类型", textBuilder.getStrComment, textBuilder.setStrComment)
 
+    //出生日期
+    checkNormalDateOfTPCardTextBuilder(textBuilder.setStrBirthDate, textBuilder.getStrBirthDate, 8,
+      "出生日期", textBuilder)
+    //采集日期
+    checkNormalDateOfTPCardTextBuilder(textBuilder.setStrPrintDate, textBuilder.getStrPrintDate, 8,
+      "采集日期", textBuilder)
   }
 
   /**
@@ -126,6 +132,23 @@ object DictCodeConverter {
       }
     }
   }
+
+  /**
+    * 校验8位字符串格式的时间是否满足长度和年月日的时间格式
+    * @param setter 赋值方法
+    * @param date 字符串时间
+    * @param len date字符串的长度
+    */
+  private def checkNormalDate(setter: String => Any, date: String, len: Int, tag: String, comment:String, commentSetter: String => Any): Unit ={
+    if(date != null && date.length > 0){
+      if(!date.matches("^(?:(?:(?:(?:(?:1[6-9]|[2-9]\\d)(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(?:0229))|(?:(?:(?:1[6-9]|[2-9]\\d)\\d{2})(?:(?:(?:0[13578]|1[02])31)|(?:(?:0[13-9]|1[0-2])(?:29|30))|(?:(?:0[1-9])|(?:1[0-2]))(?:0[1-9]|1\\d|2[0-8]))))$")
+        || date.length != len){
+        setter("")
+        commentSetter(comment +s"(${tag}:${date})")
+      }
+    }
+  }
+
   private def checkNormalCodeOfTPCardTextBuilder(setter: String => Any, code: String, len: Int, tag: String, textBuilder: TPCardText.Builder): Unit ={
     checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
@@ -134,6 +157,9 @@ object DictCodeConverter {
   }
   private def checkNormalCodeOfCaseTextBuilder(setter: String => Any, code: String, len: Int, tag: String, textBuilder: CaseText.Builder): Unit ={
     checkNormalCode(setter, code, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
+  }
+  private def checkNormalDateOfTPCardTextBuilder(setter: String => Any, date: String, len: Int, tag: String, textBuilder: TPCardText.Builder): Unit ={
+    checkNormalDate(setter, date, len, tag, textBuilder.getStrComment, textBuilder.setStrComment)
   }
 
   /**
