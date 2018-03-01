@@ -28,6 +28,21 @@ object DictCode6Map7 {
   var assistPurpose: Map[String,String]= _
   //协查有效期
   var assistValidDate: Map[String,String]= _
+  //南京数据同步字典转换
+  //案件类别
+  var NJcaseClasses: Map[String,String] = _
+  //区划代码
+  var NJareaClasses: Map[String,String] = _
+  //证件类型
+  var NJcertificatetype: Map[String,String]= _
+  //协查级别
+  var NJassistLevel: Map[String,String]= _
+  //人员类别
+  var NJpersonType: Map[String,String] = _
+  //民族
+  var NJnation: Map[String,String]= _
+  //前科标识
+  var NJcriminalRecord: Map[String,String]= _
 
   loadResource
 
@@ -42,6 +57,13 @@ object DictCode6Map7 {
     assistLevel = codeMapper.assistLevelList.map(mapper=> mapper.code6 -> mapper.code7).toMap
     assistPurpose = codeMapper.assistPurposeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
     assistValidDate = codeMapper.assistValidDateList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJcaseClasses = codeMapper.NJcaseClassesCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJareaClasses =  codeMapper.NJareaCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJcertificatetype = codeMapper.NJcertificatetypeCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJassistLevel = codeMapper.NJassistLevelCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJpersonType = codeMapper.NJpersonTypeCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJnation = codeMapper.NJnationCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
+    NJcriminalRecord = codeMapper.NJcriminalRecordCodeList.map(mapper=> mapper.code6 -> mapper.code7).toMap
   }
 }
 object DictCode7Map6 {
@@ -61,6 +83,21 @@ object DictCode7Map6 {
   var assistPurpose: Map[String,String]= _
   //协查有效期
   var assistValidDate: Map[String,String]= _
+  //南京数据同步字典转换
+  //案件类别
+  var NJcaseClasses: Map[String,String] = _
+  //区划代码
+  var NJareaClasses: Map[String,String] = _
+  //证件类型
+  var NJcertificatetype: Map[String,String]= _
+  //协查级别
+  var NJassistLevel: Map[String,String]= _
+  //人员类别
+  var NJpersonType: Map[String,String] = _
+  //民族
+  var NJnation: Map[String,String]= _
+  //前科标识
+  var NJcriminalRecord: Map[String,String]= _
 
   loadResource
 
@@ -75,6 +112,13 @@ object DictCode7Map6 {
     assistLevel = codeMapper.assistLevelList.map(mapper=> mapper.code7 -> mapper.code6).toMap
     assistPurpose = codeMapper.assistPurposeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
     assistValidDate = codeMapper.assistValidDateList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJcaseClasses = codeMapper.NJcaseClassesCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJareaClasses =  codeMapper.NJareaCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJcertificatetype = codeMapper.NJcertificatetypeCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJassistLevel = codeMapper.NJassistLevelCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJpersonType = codeMapper.NJpersonTypeCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJnation = codeMapper.NJnationCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
+    NJcriminalRecord = codeMapper.NJcriminalRecordCodeList.map(mapper=> mapper.code7 -> mapper.code6).toMap
   }
 }
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -105,6 +149,28 @@ class DICT_CODE_MAPPER{
   @XmlElementWrapper(name="assist_valid_date")
   @XmlElement(name = "mapper")
   var assistValidDateList= new util.ArrayList[Mapper]
+  //南京数据同步字典转换
+  @XmlElementWrapper(name="caseClassesCode")
+  @XmlElement(name = "mapper")
+  var NJcaseClassesCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="areaCode")
+  @XmlElement(name = "mapper")
+  var NJareaCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="certificatetypeCode")
+  @XmlElement(name = "mapper")
+  var NJcertificatetypeCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="assistLevelCode")
+  @XmlElement(name = "mapper")
+  var NJassistLevelCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="personTypeCode")
+  @XmlElement(name = "mapper")
+  var NJpersonTypeCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="nationCode")
+  @XmlElement(name = "mapper")
+  var NJnationCodeList= new util.ArrayList[Mapper]
+  @XmlElementWrapper(name="criminalRecordCode")
+  @XmlElement(name = "mapper")
+  var NJcriminalRecordCodeList= new util.ArrayList[Mapper]
 }
 @XmlRootElement(name="mapper")
 class Mapper{
