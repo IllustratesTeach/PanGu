@@ -307,7 +307,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     val hitResultList = surveyHitResultRecordService.getSurveyHitResultRecordList(survey.SURVEY_STATE_DEFAULT, 10)
     if(hitResultList.nonEmpty){
       hitResultList.foreach{hitResult=>
-        val xckybh = surveyRecordService.getPhyEvidenceNoByFingerId(hitResult.szFingerID)
+        val xckybh = surveyRecordService.getPhyEvidenceNoByFingerId("A" + hitResult.szFingerID)
         if (xckybh.nonEmpty) {
           val hitResultDhOp = surveyHitResultRecordService.getDataHandlerOfLtOrLlHitResultPackage(hitResult)
           if(hitResultDhOp.nonEmpty){

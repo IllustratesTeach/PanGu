@@ -3,10 +3,9 @@ package nirvana.hall.v70.internal.adapter.nj.service
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
-import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.internal.adapter.nj.sync.ProtobufConverter
+import nirvana.hall.v70.internal.adapter.nj.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,19 +22,10 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
   @Transactional
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = ProtobufConverter.convertCase2GafisCase(caseInfo)
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-    }
-    gafisCase.inputpsn = user.get.pkId
-    gafisCase.createUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
-    if(modUser.nonEmpty){
-      gafisCase.modifiedpsn = modUser.get.pkId
-    }
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.caseSource = caseInfo.getStrDataSource
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_HALLSYNC.toString
+
     gafisCase.save()
     val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
@@ -60,19 +50,8 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     ProtobufConverter.convertCase2GafisCase(caseInfo, gafisCase)
 
-    var user = userService.findSysUserByLoginName(gafisCase.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-    }
-    gafisCase.inputpsn = user.get.pkId
-    gafisCase.createUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(gafisCase.modifiedpsn)
-    if(modUser.nonEmpty){
-      gafisCase.modifiedpsn = modUser.get.pkId
-    }
-
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.caseSource = caseInfo.getStrDataSource
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_HALLSYNC.toString
     gafisCase.save()
 
     //删除原来的逻辑库
@@ -137,8 +116,6 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     * @param endfadate   结束时间（检索发案时间，时间格式YYYYMMDD）
     * @return
     */
-  override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = {
-    throw new UnsupportedOperationException
-  }
+  override def getFPT4Logic03RecList(ajno: String, ajlb: String, fadddm: String, mabs: String, xcjb: String, xcdwdm: String, startfadate: String, endfadate: String): Seq[Logic03Rec] = ???
 
 }

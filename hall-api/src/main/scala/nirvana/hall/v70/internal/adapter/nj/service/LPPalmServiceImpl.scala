@@ -5,10 +5,9 @@ import javax.persistence.EntityManager
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.LPPalmService
 import nirvana.hall.protocol.api.FPTProto.LPCard
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
-import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.internal.adapter.nj.sync.ProtobufConverter
+import nirvana.hall.v70.internal.adapter.nj.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,24 +29,12 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     val nativeQuery = entityManager.createNativeQuery("select gafis_case_sid_seq.nextval from dual")
     val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
     casePalm.sid = sid
-    //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(casePalm.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-    }
-    casePalm.inputpsn = user.get.pkId
-    casePalm.creatorUnitCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(casePalm.modifiedpsn)
-    if(modUser.nonEmpty){
-      casePalm.modifiedpsn = modUser.get.pkId
-    }else{
-      casePalm.modifiedpsn = ""
-    }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
     casePalm.save()
 
     casePalmMnt.pkId = CommonUtils.getUUID()
-    casePalmMnt.inputpsn = user.get.pkId
+    casePalmMnt.inputpsn = casePalm.inputpsn
+    casePalmMnt.inputtime = casePalm.inputtime
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
@@ -76,19 +63,6 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
     val casePalm = GafisCasePalm.find(lpCard.getStrCardID)
     ProtobufConverter.convertLPCard2GafisCasePalm(lpCard, casePalm)
-    //将用户名转为用户id
-    var user = userService.findSysUserByLoginName(casePalm.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-    }
-    casePalm.inputpsn = user.get.pkId
-    casePalm.creatorUnitCode= user.get.departCode
-    val modUser = userService.findSysUserByLoginName(casePalm.modifiedpsn)
-    if(modUser.nonEmpty){
-      casePalm.modifiedpsn = modUser.get.pkId
-    }else{
-      casePalm.modifiedpsn = ""
-    }
     casePalm.deletag = Gafis70Constants.DELETAG_USE
     casePalm.save()
 
@@ -96,7 +70,9 @@ class LPPalmServiceImpl(entityManager: EntityManager, userService: UserService) 
     //先删除，后插入
     GafisCasePalmMnt.delete.where(GafisCasePalmMnt.palmId === casePalm.palmId).execute
     casePalmMnt.pkId = CommonUtils.getUUID()
-    casePalmMnt.inputpsn = user.get.pkId
+    casePalmMnt.inputpsn = casePalm.inputpsn
+    casePalmMnt.inputtime = casePalm.inputtime
+    casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
 

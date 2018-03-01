@@ -67,4 +67,17 @@ object Gafis70Constants {
   val FACE_RIGHT = "2"  //右侧
   val FACE_LEFT = "3"   //左侧
   val FACE_UNKNOWN = "0" //未知
+
+  //南京默认采集类型
+  val NJ_GATHER_TYPE_ID_DEFAULT = "8a20fb6666baa8488884bab86f2d0066"
+  //南京数据来源，现勘对接
+  val DATA_SOURCE_HALLSYNC= 41.toShort
+  //南京数据同步默认字段
+  val NJ_Status = "2"
+  val NJ_Schedule = "2/2"
+  val NJ_Approval = "2"
+  val NJ_GatherFingerMode = "0"
+  val NJ_GatherFingerNum = "1"
+
+
 }
