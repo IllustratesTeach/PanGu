@@ -17,7 +17,7 @@
         <mapper code6="2" code7="22"/>
         <mapper code6="9" code7="99"/>
     </certificatetype>
-    //南京数据同步字典转换
+    <!--南京数据同步字典转换-->
     <caseClassesCode>
         <mapper code6="010499" code7="010400"/>
         <mapper code6="020302" code7="020300"/>
