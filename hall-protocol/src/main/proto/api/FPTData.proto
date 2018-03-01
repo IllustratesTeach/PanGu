@@ -349,8 +349,7 @@ message	LPCard
 	optional string	strDataSource = 5;   //数据来源类型
 	optional string strPhysicalId = 6;   //现场物证编号
 	//nj 7抓6数据同步追加信息
-	optional int32	nSeqNo = 7;	        //指纹序号
-	optional int32	nLtStatus = 8;			//查案比中状态：1：比中；0：未比中
+	optional int32 nLtStatus = 7;			//查案比中状态：1：比中；0：未比中
 }
 
 message	TLLTHitLog
