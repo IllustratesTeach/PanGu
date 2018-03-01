@@ -119,6 +119,21 @@ enum	FaceFgp
 	FACE_RIGHT		= 3;	// 脸部右侧像
 };
 
+//签名压缩图
+enum	SignatureCpr
+{
+	CriminalCpr	= 0;	// 嫌疑人签名压缩图（5）
+	PrinterCpr	= 1;	// 捺印人签名压缩图
+};
+
+//卡片信息
+enum	CardInfo
+{
+	CARDINFO1	= 1;	// 卡片信息1
+	CARDINFO2	= 2;	// 卡片信息2
+	CARDINFO3	= 3;	// 卡片信息3
+};
+
 //类型
 enum	ImageType
 {
@@ -131,6 +146,9 @@ enum	ImageType
 	IMAGETYPE_FOURPRINT = 6;	//四连指
 	IMAGETYPE_KNUCKLEPRINTS = 7;//指节纹
 	IMAGETYPE_FULLPALM = 8;//全掌
+	//nj 7抓6数据同步追加信息
+	IMAGETYPE_SIGNATURE = 9;//签名压缩图
+	IMAGETYPE_CARDINFO = 10;//卡片信息
 
 }
 
