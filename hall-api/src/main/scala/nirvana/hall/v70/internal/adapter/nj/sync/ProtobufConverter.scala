@@ -19,7 +19,7 @@ import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.services.DictCode6Map7
 import nirvana.hall.v70.internal.adapter.nj.jpa._
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants, TransSpellName}
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -40,40 +40,44 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseId = caseInfo.getStrCaseID
     gafisCase.cardId = caseInfo.getStrCaseID
     val text = caseInfo.getText
-    gafisCase.caseClassCode = text.getStrCaseType1
-    gafisCase.suspiciousAreaCode = text.getStrSuspArea1Code
-    gafisCase.caseOccurDate = text.getStrCaseOccurDate
-    gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
-    gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
-    gafisCase.assistLevel = DictCode6Map7.assistLevel.get(text.getNSuperviseLevel)
-    gafisCase.extractUnitCode = text.getStrExtractUnitCode
-    gafisCase.extractUnitName = text.getStrExtractUnitName
-    gafisCase.extractor = text.getStrExtractor
-    gafisCase.extractDate = text.getStrExtractDate
-    gafisCase.amount = text.getStrMoneyLost
-    gafisCase.isMurder = if(text.getBPersonKilled) "1" else "0"
     gafisCase.remark = text.getStrComment
-    gafisCase.caseState = text.getNCaseState.toString
+    gafisCase.caseClassCode = DictCode6Map7.caseClasses_nj(text.getStrCaseType1)
+    gafisCase.caseClassCode2 = DictCode6Map7.caseClasses_nj(text.getStrCaseType2)
+    gafisCase.caseClassCode3 = text.getStrCaseType3
+    gafisCase.caseOccurDate = text.getStrCaseOccurDate
+    gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
+    gafisCase.extractUnitCode = text.getStrExtractUnitCode
+    gafisCase.assistLevel = DictCode6Map7.assistLevel_nj.get(text.getNSuperviseLevel)
+    gafisCase.suspiciousAreaCode = DictCode6Map7.areaClasses_nj(text.getStrSuspArea1Code)
+    gafisCase.suspiciousAreaCode2 = DictCode6Map7.areaClasses_nj(text.getStrSuspArea2Code)
+    gafisCase.suspiciousAreaCode3 = DictCode6Map7.areaClasses_nj(text.getStrSuspArea3Code)
+    gafisCase.amount = text.getStrMoneyLost
+    gafisCase.extractor = text.getStrExtractor
+    gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
+    gafisCase.extractUnitName = text.getStrExtractUnitName
     gafisCase.assistBonus = text.getStrPremium
-    gafisCase.assistSign = text.getNXieChaState.toString
-    //    gafisCase.assistRevokeSign = text.getNCancelFlag.toString// TODO值太大
-    gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
-    gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
+    gafisCase.extractDate = text.getStrExtractDate
+    gafisCase.caseState = text.getNCaseState.toString
+
+    //nj 7抓6数据同步追加信息
+    gafisCase.psisNo = caseInfo.getStrMisConnectCaseId //警务平台编号
+    gafisCase.brokenStatus = caseInfo.getNBrokenStatus.toShort //是否破案
+    gafisCase.thanStateLt = caseInfo.getNThanStateLt.toString//正查比中状态；是否LT破案
 
     //操作信息
     val admData = caseInfo.getAdmData
     if(admData != null){
-      gafisCase.inputpsn = admData.getCreator
-      gafisCase.modifiedpsn = admData.getUpdator
-      gafisCase.createUnitCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         gafisCase.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         gafisCase.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
+      gafisCase.inputUsername = admData.getCreator
+      gafisCase.createUnitCode = admData.getCreateUnitCode
+      gafisCase.modifyUsername = admData.getUpdator
+      gafisCase.modifyUnitCode = admData.getUpdateUnitCode
     }
-
     gafisCase
   }
   def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
@@ -115,36 +119,46 @@ object ProtobufConverter extends LoggerSupport{
   def convertLPCard2GafisCaseFinger(lpCard: LPCard, caseFinger: GafisCaseFinger = new GafisCaseFinger()): GafisCaseFinger = {
     caseFinger.fingerId = lpCard.getStrCardID
     val text = lpCard.getText
-    //caseFinger.ltOperator = "8a8187175138054e0151381149490003"
-    caseFinger.seqNo = text.getStrSeq
-    caseFinger.remainPlace = text.getStrRemainPlace
-    caseFinger.ridgeColor = text.getStrRidgeColor
-    caseFinger.isCorpse = if(text.getBDeadBody) "1" else "0"
-    caseFinger.corpseNo = text.getStrDeadPersonNo
-    caseFinger.isAssist = text.getNXieChaState.toString
-    caseFinger.matchStatus = text.getNBiDuiState.toString
-    caseFinger.mittensBegNo = text.getStrStart
-    caseFinger.mittensEndNo = text.getStrEnd
-    caseFinger.caseId = text.getStrCaseId
-    caseFinger.developMethod = text.getStrCaptureMethod
     caseFinger.remark = text.getStrComment
+    caseFinger.seqNo = text.getStrSeq
+    caseFinger.ltStatus = lpCard.getNLtStatus.toString
+    caseFinger.caseId = text.getStrCaseId
+    caseFinger.ridgeColor = text.getStrRidgeColor
+    caseFinger.remainPlace = text.getStrRemainPlace
+    caseFinger.micUpdateUsername = text.getStrMicbUpdatorUserName
+    caseFinger.micUpdateUnitcode = text.getStrMicbUpdatorUnitCode
+    caseFinger.developMethod = text.getStrCaptureMethod
+    //TODO 候选指位
 
     //操作信息
     val admData = lpCard.getAdmData
     if(admData != null){
-      caseFinger.inputpsn = admData.getCreator
-      caseFinger.modifiedpsn = admData.getUpdator
-      caseFinger.creatorUnitCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         caseFinger.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         caseFinger.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
+      if(admData.getStrLtDate != null && admData.getStrLtDate.length == 14){
+        caseFinger.ltDate = DateConverter.convertString2Date(admData.getStrLtDate, "yyyyMMddHHmmss")
+      }
+      if(admData.getStrLlDate != null && admData.getStrLlDate.length == 14){
+        caseFinger.llDate = DateConverter.convertString2Date(admData.getStrLlDate, "yyyyMMddHHmmss")
+      }
+      caseFinger.ltUsername = admData.getStrLtUser
+      caseFinger.llUsername = admData.getStrLlUser
+      caseFinger.inputUsername = admData.getCreator
+      caseFinger.editCount = admData.getNEditCount.toLong
+      caseFinger.modifyUsername = admData.getUpdator
+      caseFinger.ltCount = admData.getNLtCount.toLong
+      caseFinger.creatorUnitCode = admData.getCreateUnitCode
+      caseFinger.micUpdateUnitcode = admData.getUpdateUnitCode
+      caseFinger.llCount = admData.getNLlCount.toLong
     }
 
     val blob = lpCard.getBlob
     caseFinger.fingerImg = blob.getStImageBytes.toByteArray
+    caseFinger.fingerCpr =  blob.getStCprImageBytes.toByteArray//现场压缩图
     caseFinger
   }
 
@@ -161,9 +175,6 @@ object ProtobufConverter extends LoggerSupport{
     caseFingerMnt.fingerMnt = blob.getStMntBytes.toByteArray
     caseFingerMnt.fingerRidge = blob.getStBinBytes.toByteArray
     caseFingerMnt.captureMethod = blob.getStrMntExtractMethod
-    caseFingerMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
-    caseFingerMnt.inputtime = new Date()
-
     caseFingerMnt
   }
 
@@ -220,33 +231,47 @@ object ProtobufConverter extends LoggerSupport{
   def convertLPCard2GafisCasePalm(lpCard: LPCard, casePalm: GafisCasePalm = new GafisCasePalm()): GafisCasePalm = {
     casePalm.palmId = lpCard.getStrCardID
     val text = lpCard.getText
-    casePalm.caseId = text.getStrCaseId
-    casePalm.seqNo = text.getStrSeq
-    casePalm.remainPlace = text.getStrRemainPlace
-    casePalm.ridgeColor = text.getStrRidgeColor
-    casePalm.isCorpse = if(text.getBDeadBody) "1" else "0"
-    casePalm.corpseNo = text.getStrDeadPersonNo
-    casePalm.isAssist = text.getNXieChaState.toString
-    casePalm.matchStatus = text.getNBiDuiState.toString
-    casePalm.developMethod = text.getStrCaptureMethod
     casePalm.remark = text.getStrComment
+    casePalm.seqNo = text.getStrSeq
+    casePalm.ltStatus = lpCard.getNLtStatus.toString
+    casePalm.caseId = text.getStrCaseId
+    casePalm.ridgeColor = text.getStrRidgeColor
+    casePalm.remainPlace = text.getStrRemainPlace
+    casePalm.micUpdateUsername = text.getStrMicbUpdatorUserName
+    casePalm.micUpdateUnitcode = text.getStrMicbUpdatorUnitCode
+    casePalm.developMethod = text.getStrCaptureMethod
+
+
 
     //操作信息
     val admData = lpCard.getAdmData
     if(admData != null){
-      casePalm.inputpsn = admData.getCreator
-      casePalm.modifiedpsn = admData.getUpdator
-      casePalm.creatorUnitCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         casePalm.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         casePalm.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
+      if(admData.getStrLtDate != null && admData.getStrLtDate.length == 14){
+        casePalm.ltDate = DateConverter.convertString2Date(admData.getStrLtDate, "yyyyMMddHHmmss")
+      }
+      if(admData.getStrLlDate != null && admData.getStrLlDate.length == 14){
+        casePalm.llDate = DateConverter.convertString2Date(admData.getStrLlDate, "yyyyMMddHHmmss")
+      }
+      casePalm.llUsername = admData.getStrLlUser
+      casePalm.inputUsername = admData.getCreator
+      casePalm.editCount = admData.getNEditCount.toLong
+      casePalm.ltCount = admData.getNLtCount.toLong
+      casePalm.ltUsername = admData.getStrLtUser
+      casePalm.modifyUsername = admData.getUpdator
+      casePalm.creatorUnitCode = admData.getCreateUnitCode
+      casePalm.micUpdateUnitcode = admData.getUpdateUnitCode
+      casePalm.llCount = admData.getNLlCount.toLong
     }
 
     val blob = lpCard.getBlob
     casePalm.palmImg = blob.getStImageBytes.toByteArray
+    casePalm.palmCpr =  blob.getStCprImageBytes.toByteArray//现场压缩图
     casePalm
   }
 
@@ -262,9 +287,6 @@ object ProtobufConverter extends LoggerSupport{
     casePalmMnt.palmMnt = blob.getStMntBytes.toByteArray
     casePalmMnt.palmRidge = blob.getStBinBytes.toByteArray
     casePalmMnt.captureMethod = blob.getStrMntExtractMethod
-    casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
-    casePalmMnt.inputtime = new Date()
-
     casePalmMnt
   }
   /**
@@ -419,66 +441,46 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
     person.personid = tpCard.getStrCardID
-    person.cardid = tpCard.getStrPersonID
-    person.fingerrepeatno = tpCard.getStrMisPersonID
+    person.cardid = tpCard.getStrCardID
+    person.fingerrepeatno = tpCard.getStrMisPersonID//人员信息编号(重卡)
     val text = tpCard.getText
+    person.remark = text.getStrComment//备注
+    person.idcardno = text.getStrIdentityNum//身份证号码
+    person.address = DictCode6Map7.areaClasses_nj(text.getStrAddrCode)//现住址代码(转码)
+    person.addressdetail = text.getStrAddr//现住址
+    person.doordetail = text.getStrHuKouPlaceTail//户口所在地--户籍地详细住址
+    person.gatherdepartname = text.getStrPrintUnitName//捺印人单位--采集单位名称
+    person.nationCode = DictCode6Map7.nation_nj(text.getStrRace)//民族(字典)
+    person.micUpdateUsername = text.getStrMicUpdatorUsername//特征更改用户
+    person.micUpdateUnitcode = text.getStrMicUpdatorUnitcode//特征更改单位
+    person.psisNo = text.getStrPsisNo //警务平台编号
+    person.sexCode = text.getNSex.toString//性别(字典)
+    person.personCategory = text.getStrPersonType//人员类型
+    person.name = text.getStrName//姓名
+    person.spellname = text.getStrSpellName//姓名拼音
+    person.aliasname = text.getStrAliasName//别名绰号
+    person.birthdayst = text.getStrBirthDate//出生日期起
+    person.caseClasses = DictCode6Map7.caseClasses_nj(text.getStrCaseType1)//案件类别
+    person.caseClasses2 = DictCode6Map7.caseClasses_nj(text.getStrCaseType2)
+    person.caseClasses3 = DictCode6Map7.caseClasses_nj(text.getStrCaseType3)
+    person.door = DictCode6Map7.areaClasses_nj(text.getStrHuKouPlaceCode)//户籍地代码(区域)
+    person.personType = DictCode6Map7.personType_nj(text.getStrPersonClassCode)//人员类别
+    person.gatherDate = text.getStrPrintDate//采集时间
+    person.gatherusername = text.getStrPrinter//采集人name
+    person.gatherdepartcode = text.getStrPrintUnitCode//采集单位
+    person.nativeplaceCode = text.getStrNation//籍贯国籍(字典)
+    person.certificatetype = DictCode6Map7.certificatetype_nj(text.getStrCertifType)//证件类型code_zjzl
+    person.certificateid = text.getStrCertifID//证件号码
+    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 0.toChar//前科库标识 1：有；0：无
+    person.recordsituation = text.getStrCriminalRecordDesc//前科劣迹情况
 
-    person.name = text.getStrName
-    person.spellname = TransSpellName.toHanyuPinyin(text.getStrName)
-    person.aliasname = text.getStrAliasName
-    person.sexCode = text.getNSex.toString
-    person.birthdayst = text.getStrBirthDate
-    person.idcardno = text.getStrIdentityNum
-    person.door = text.getStrHuKouPlaceCode
-    person.doordetail = text.getStrHuKouPlaceTail
-    person.address = text.getStrAddrCode
-    person.addressdetail = text.getStrAddr
-    person.personType = text.getStrPersonType
-    person.caseClasses = text.getStrCaseType1
-    person.caseClasses2 = text.getStrCaseType2
-    person.caseClasses3 = text.getStrCaseType3
-    person.gatherdepartcode = text.getStrPrintUnitCode
-    person.gatherdepartname = text.getStrPrintUnitName
-    person.gatherusername = text.getStrPrinter
-    person.gatherDate = text.getStrPrintDate
-    person.remark = text.getStrComment
-
-    person.nativeplaceCode = text.getStrNation
-    person.nationCode = text.getStrRace
-    person.certificatetype = text.getStrCertifType
-    person.certificateid = text.getStrCertifID
-    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
-
-    //    person.assistSign = text.getNXieChaFlag.toString
-    person.assistLevel = text.getNXieChaLevel.toString
-    //协查状态，根据协查级别确定是否是协查
-    if(text.getNXieChaLevel > 0){
-      person.assistSign = "1"
-    }else{
-      person.assistSign = "0"
-    }
-    person.assistBonus = text.getStrPremium
-    person.assistDate = text.getStrXieChaDate
-    person.assistDeptCode = text.getStrXieChaRequestUnitCode
-    person.assistDeptName = text.getStrXieChaRequestUnitName
-    person.assistPurpose = text.getStrXieChaForWhat
-    person.assistRefPerson = text.getStrRelPersonNo
-    person.assistRefCase = text.getStrRelCaseNo
-    person.assistContacts = text.getStrXieChaContacter
-    person.assistNumber = text.getStrXieChaTelNo
-    person.assistApproval = text.getStrShenPiBy
-
-    //数据校验
-    if(person.idcardno.length > 18){
-      person.idcardno = person.idcardno.substring(0, 18)
-    }
+//    if(person.idcardno.length > 18){
+//      person.idcardno = person.idcardno.substring(0, 18)
+//    }
 
     //操作信息
     val admData = tpCard.getAdmData
     if(admData != null){
-      person.inputpsn = admData.getCreator
-      person.modifiedpsn = admData.getUpdator
-      person.gatherOrgCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }else{
@@ -487,10 +489,20 @@ object ProtobufConverter extends LoggerSupport{
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
-    }else{
-      person.inputtime = new Date
+      if(admData.getStrTlDate != null && admData.getStrTlDate.length == 14){
+        person.tldate = DateConverter.convertString2Date(admData.getStrTlDate, "yyyyMMddHHmmss")
+      }
+      if(admData.getStrTtDate != null && admData.getStrTtDate.length == 14){
+        person.ttdate = DateConverter.convertString2Date(admData.getStrTtDate, "yyyyMMddHHmmss")
+      }
+      person.gatherOrgCode = admData.getCreateUnitCode
+      person.modifyUnitCode = admData.getUpdateUnitCode
+      person.ttcount = admData.getNTtCount.toString
+      person.inputUsername = admData.getCreator
+      person.editCount = admData.getNEditCount.toString
+      person.modifyUsername = admData.getUpdator
+      person.tlcount = admData.getNTlCount.toString
     }
-
     person
   }
 
@@ -543,6 +555,19 @@ object ProtobufConverter extends LoggerSupport{
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
 
           fingerList += bin
+        }
+        //原图
+        val originalData = blob.getStOriginalImageBytes
+        if(originalData.size() >0){
+          val original = new GafisGatherFinger()
+          original.personId = personId
+          original.gatherData = imageData.toByteArray
+          original.fgp = blob.getFgp.getNumber.toShort
+          original.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
+          original.groupId = Gafis70Constants.GROUP_ID_JPG
+          original.lobtype = Gafis70Constants.LOBTYPE_DATA
+
+          fingerList += original
         }
       }
     }

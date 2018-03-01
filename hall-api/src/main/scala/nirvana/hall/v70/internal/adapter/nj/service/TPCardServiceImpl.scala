@@ -7,10 +7,9 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.protocol.api.FPTProto.TPCard
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.internal.adapter.nj.sync.ProtobufConverter
-import nirvana.hall.v70.internal.adapter.nj.jpa.{GafisGatherPalm, _}
+import nirvana.hall.v70.internal.adapter.nj.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,24 +47,17 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
       val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
       person.sid = sid
-      //用户名获取用户ID
-      var user = userService.findSysUserByLoginName(person.inputpsn)
-      if (user.isEmpty){
-        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-      }
-      person.inputpsn = user.get.pkId
-      person.gatherOrgCode = user.get.departCode
-      val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
-      if(modUser.nonEmpty){
-        person.modifiedpsn = modUser.get.pkId
-      }else{
-        person.modifiedpsn = ""
-      }
-
       person.deletag = Gafis70Constants.DELETAG_USE
-      //person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
-      person.dataSources = tpCard.getStrDataSource.toLong
-      person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
+      person.dataSources =  Gafis70Constants.DATA_SOURCE_HALLSYNC.toLong
+      person.gatherTypeId = Gafis70Constants.NJ_GATHER_TYPE_ID_DEFAULT
+      person.status = Gafis70Constants.NJ_Status
+      person.schedule = Gafis70Constants.NJ_Schedule
+      person.approval = Gafis70Constants.NJ_Approval
+      person.gatherFingerMode = Gafis70Constants.NJ_GatherFingerMode
+      person.gatherFingerNum = Gafis70Constants.NJ_GatherFingerNum.toLong
+      person.cityCode = if(person.gatherdepartcode.length > 6)
+        person.gatherdepartcode.substring(0,5) else person.gatherdepartcode
+
       person.save()
       //保存逻辑库
       val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
@@ -141,20 +133,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     info("updateTPCard cardId:{}", tpCard.getStrCardID)
     val person = GafisPerson.find(tpCard.getStrCardID)
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
-
-    //用户名获取用户ID
-    var user = userService.findSysUserByLoginName(person.inputpsn)
-    if (user.isEmpty){//找不到对应的用户，使用管理员用户
-      user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-    }
-    person.inputpsn = user.get.pkId
-    person.gatherOrgCode = user.get.departCode
-    val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
-    if(modUser.nonEmpty){
-      person.modifiedpsn = modUser.get.pkId
-    }else{
-      person.modifiedpsn = ""
-    }
 
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
@@ -239,73 +217,5 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     * @param tpCard
     * @param dbId
     */
-  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = {
-    info("addTPCard cardId:{}", tpCard.getStrCardID)
-    //验证卡号是否已经存在
-    if(isExist(tpCard.getStrCardID)){
-      throw new RuntimeException("记录已存在")
-    }else{
-      //保存人员基本信息
-      val person = ProtobufConverter.convertTPCard2GafisPerson(tpCard)
-      val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
-      person.sid = sid
-      //用户名获取用户ID
-      var user = userService.findSysUserByLoginName(person.inputpsn)
-      if (user.isEmpty){
-        user = Option(SysUser.find(Gafis70Constants.INPUTPSN))
-      }
-      person.inputpsn = user.get.pkId
-      person.gatherOrgCode = user.get.departCode
-      val modUser = userService.findSysUserByLoginName(person.modifiedpsn)
-      if(modUser.nonEmpty){
-        person.modifiedpsn = modUser.get.pkId
-      }else{
-        person.modifiedpsn = ""
-      }
-
-      person.deletag = Gafis70Constants.DELETAG_USE
-      person.dataSources = Gafis70Constants.DATA_SOURCE_HXZC.toLong
-      person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
-      person.save()
-      //保存逻辑库
-      val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
-        //如果没有指定逻辑库，使用默认库
-        GafisLogicDb.where(GafisLogicDb.logicCategory === "0").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get
-      }else{
-        GafisLogicDb.find(dbId.get)
-      }
-      val logicDbFingerprint = new GafisLogicDbFingerprint()
-      logicDbFingerprint.pkId = CommonUtils.getUUID()
-      logicDbFingerprint.fingerprintPkid = person.personid
-      logicDbFingerprint.logicDbPkid = logicDb.pkId
-      logicDbFingerprint.save()
-      //保存指纹
-      val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
-      fingerList.foreach{finger =>
-        finger.pkId = CommonUtils.getUUID()
-        finger.inputtime = new Date()
-        finger.inputpsn = Gafis70Constants.INPUTPSN
-        finger.save()
-      }
-      //掌纹
-      val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
-      palmList.foreach{palm=>
-        palm.pkId = CommonUtils.getUUID()
-        palm.inputtime = new Date()
-        palm.inputpsn = Gafis70Constants.INPUTPSN
-        palm.save()
-      }
-      //保存人像
-      val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-      portraitList.foreach{ portrait =>
-        portrait.pkId = CommonUtils.getUUID()
-        portrait.inputpsn = Gafis70Constants.INPUTPSN
-        portrait.inputtime = new Date()
-        portrait.deletag = Gafis70Constants.DELETAG_USE
-        portrait.save()
-      }
-    }
-  }
+  override def addTPCardHXZC(tpCard: TPCard, dbId: Option[String]): Unit = ???
 }
