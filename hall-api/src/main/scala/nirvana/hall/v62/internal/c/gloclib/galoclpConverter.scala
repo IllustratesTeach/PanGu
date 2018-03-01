@@ -128,6 +128,7 @@ object galoclpConverter extends LoggerSupport{
     val card = LPCard.newBuilder()
     card.setStrCardID(gCard.szCardID)
     val text = card.getTextBuilder
+    val admData = card.getAdmDataBuilder
     if(StringUtils.isNotEmpty(gCard.stAdmData.szCaseID)||StringUtils.isNotBlank(gCard.stAdmData.szCaseID)){
       text.setStrCaseId(gCard.stAdmData.szCaseID)
     }else{
@@ -173,6 +174,15 @@ object galoclpConverter extends LoggerSupport{
             text.setStrFeatureGroupIdentifier(textContent) //现场指纹_特征组合标示符
           case "PalmDeltaPositionTypeCode" =>
             text.setStrFeatureGroupDscriptInfo(textContent) //现场指纹_特征组合描述信息
+           //hall7抓6 新增
+          case "MicbUpdatorUserName" =>
+            text.setStrMicbUpdatorUserName(textContent) //特征更改用户
+          case "MicbUpdatorUnitCode" =>
+            text.setStrMicbUpdatorUnitCode(textContent) //特征更改单位
+          case "CreatorUnitCode" =>
+            admData.setCreateUnitCode(textContent) //创建单位
+          case "UpdatorUnitCode" =>
+            admData.setUpdateUnitCode(textContent) //修改单位
           case other =>
         }
       }
@@ -213,12 +223,19 @@ object galoclpConverter extends LoggerSupport{
       }
     }
     //操作信息
-    val admData = card.getAdmDataBuilder
     val stAdmData = gCard.stAdmData
     admData.setCreator(stAdmData.szCUserName)
     admData.setUpdator(stAdmData.szMUserName)
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
+    admData.setStrLtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLLDate)) //LT发送时间
+    admData.setStrLlDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLLDate)) //LL发送时间
+    admData.setStrLtUser(stAdmData.szLTUserName)  //LT发送用户
+    admData.setStrLlUser(stAdmData.szLLUserName)  //LT发送用户
+    admData.setNLtCount(stAdmData.nAccuLTCount)   //LT累计发送次数
+    admData.setNLlCount(stAdmData.nAccuLLCount)   //LL累计发送次数
+    admData.setNEditCount(stAdmData.nEditCount.toInt)   //编辑次数
+    card.setNLtStatus(stAdmData.bIsLTBroken)      //查案比中状态：1：比中；0：未比中 ; 6.2:是否LT破案
     //数据字典校验
     DictCodeConverter.convertLPCardText6to7(card.getTextBuilder)
     //seqNo如果没有，截取指纹编号后两位
@@ -355,6 +372,7 @@ object galoclpConverter extends LoggerSupport{
     caseInfo.setNCaseFingerCount(gCase.nFingerCount)
     caseInfo.setStrCaseID(gCase.szCaseID)
     val text = caseInfo.getTextBuilder
+    val admData = caseInfo.getAdmDataBuilder
     text.setBPersonKilled(gCase.bHasPersonKilled == 49)
     text.setNCancelFlag(gCase.pstText_Data.length)
     gCase.pstText_Data.foreach{ item=>
@@ -434,6 +452,15 @@ object galoclpConverter extends LoggerSupport{
               caseInfo.setStrJingZongCaseId(textContent) //案事件编号
             case "CaseSource" =>
               caseInfo.setStrCaseSource(textContent.toInt) //案件来源
+             //hall7抓6新增
+            case "IsBroken" =>
+              caseInfo.setNBrokenStatus(textContent.toInt) //是否破案
+            case "IsLTBroken" =>
+              caseInfo.setNThanStateLt(textContent.toInt) //是否LT破案/正查比中状态
+            case "UpdateUserName" =>
+              admData.setCreator(textContent) //
+            case "UpdatorUnitCode" =>
+              admData.setCreateUnitCode(textContent) //
             case other =>
               warn("{} not mapped", other)
           }
@@ -451,7 +478,6 @@ object galoclpConverter extends LoggerSupport{
       }
     }
     //操作信息
-    val admData = caseInfo.getAdmDataBuilder
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(gCase.tCreateDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(gCase.tUpdateDateTime))
     //原始创建人信息
@@ -460,6 +486,7 @@ object galoclpConverter extends LoggerSupport{
       admData.setCreator(extractInfo.szOrgScanner)
       admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
     }
+    caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)  //警务平台编号
 
     //数据校验
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
