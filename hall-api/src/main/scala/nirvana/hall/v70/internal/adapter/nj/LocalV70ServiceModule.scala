@@ -5,7 +5,9 @@ import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.internal.adapter.nj.service._
+import nirvana.hall.v70.internal.adapter.nj.sys.{DictServiceImpl, UserServiceImpl}
 import nirvana.hall.v70.internal.sync.{FetchCaseInfoServiceImpl, FetchLPCardServiceImpl, FetchLPPalmServiceImpl, FetchMatchRelationServiceImpl, FetchQueryServiceImpl, FetchTPCardServiceImpl}
+import nirvana.hall.v70.services.sys.{DictService, UserService}
 import org.apache.tapestry5.ioc.ServiceBinder
 
 /**
@@ -15,6 +17,8 @@ object LocalV70ServiceModule {
 
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[RpcHttpClient], classOf[RpcHttpClientImpl]).withId("RpcHttpClient")
+    binder.bind(classOf[UserService], classOf[UserServiceImpl])
+    binder.bind(classOf[DictService], classOf[DictServiceImpl])
     //api 接口实现类
     binder.bind(classOf[TPCardService], classOf[TPCardServiceImpl])
     //南京版本的service实现类

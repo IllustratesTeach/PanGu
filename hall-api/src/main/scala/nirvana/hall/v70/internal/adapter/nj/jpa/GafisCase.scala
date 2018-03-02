@@ -70,7 +70,7 @@ class GafisCase extends ActiveRecord {
   var deletag: java.lang.String = _
   @Column(name = "BROKEN_STATUS", precision = 3, scale = 0)
   var brokenStatus: java.lang.Short = _
-  @Column(name = "CASE_SOURCE", length = 1)
+  @Column(name = "CASE_SOURCE", length = 2)
   var caseSource: java.lang.String = _
   @Column(name = "CREATE_UNIT_CODE", length = 12)
   var createUnitCode: java.lang.String = _

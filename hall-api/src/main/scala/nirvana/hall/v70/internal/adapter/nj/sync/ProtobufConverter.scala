@@ -56,7 +56,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
     gafisCase.extractUnitName = text.getStrExtractUnitName
     gafisCase.assistBonus = text.getStrPremium
-    gafisCase.extractDate = text.getStrExtractDate
+    gafisCase.extractDate = DateConverter.convertString2Date(text.getStrExtractDate, "yyyyMMdd")
     gafisCase.caseState = text.getNCaseState.toString
 
     //nj 7抓6数据同步追加信息
@@ -128,6 +128,7 @@ object ProtobufConverter extends LoggerSupport{
     caseFinger.micUpdateUsername = text.getStrMicbUpdatorUserName
     caseFinger.micUpdateUnitcode = text.getStrMicbUpdatorUnitCode
     caseFinger.developMethod = text.getStrCaptureMethod
+    caseFinger.seq = text.getStrSeq.asInstanceOf[Long]
     //TODO 候选指位
 
     //操作信息

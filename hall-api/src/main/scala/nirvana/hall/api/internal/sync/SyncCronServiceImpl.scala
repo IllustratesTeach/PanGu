@@ -122,7 +122,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncTPCardRequest.cmd, request.build())
       if(baseResponse.getStatus == CommandStatus.OK){
         val response = baseResponse.getExtension(SyncTPCardResponse.cmd)
-        var destDBID = Option(fetchConfig.destDbid)
+        val destDBID = Option(fetchConfig.destDbid)
         val iterator = response.getSyncTPCardList.iterator()
         while (iterator.hasNext) {
           val syncTPCard = iterator.next()
@@ -136,8 +136,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
             }
 
-            //逻辑分库处理
-            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
+            //逻辑分库处理 青岛使用
+            //destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {
@@ -212,7 +212,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       if(baseResponse.getStatus == CommandStatus.OK){
         info("LP-RequestData start")
         val response = baseResponse.getExtension(SyncLPCardResponse.cmd)
-        var destDBID = Option(fetchConfig.destDbid)
+        val destDBID = Option(fetchConfig.destDbid)
         val iterator = response.getSyncLPCardList.iterator()
         while (iterator.hasNext) {
           val syncLPCard = iterator.next()
@@ -237,8 +237,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             }
             //逻辑分库处理
             //此处的destDBID采用新标准，上面有个从数据库取出的默认值，实际并没有作用，只是为防止语法错
-            //逻辑分库处理
-            destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_LPCARD)
+            //逻辑分库处理 青岛使用
+            //destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_LPCARD)
             //验证本地是否存在
             if (lPCardService.isExist(cardId, destDBID)) {
               if (update) {//更新
