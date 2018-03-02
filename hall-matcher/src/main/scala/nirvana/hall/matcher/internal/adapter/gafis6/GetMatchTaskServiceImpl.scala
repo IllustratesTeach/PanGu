@@ -100,7 +100,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
          if(ldataBuilderMap.get(index).isEmpty){
            ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
          }
-         val ldata = ldataBuilderMap.get(index).get
+         val ldata = ldataBuilderMap(index)
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
          if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
@@ -108,7 +108,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
          if(tdataBuilderMap.get(index).isEmpty){
            tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
          }
-         val tdata = tdataBuilderMap.get(index).get.addMinutiaDataBuilder()
+         val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
          val mnt = micStruct.pstMnt_Data
          tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
@@ -142,12 +142,22 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
        TextQueryUtil.convertQrycondition2TextQueryData(qrycondition, textQueryDataBuilder)
      }
      queryType match {
-       case HallMatcherConstants.QUERY_TYPE_TT |
-            HallMatcherConstants.QUERY_TYPE_TL =>
-         matchTaskBuilder.getTDataBuilder.setTextQuery(textQueryDataBuilder)
-       case HallMatcherConstants.QUERY_TYPE_LT |
-            HallMatcherConstants.QUERY_TYPE_LL =>
-         matchTaskBuilder.getLDataBuilder.setTextQuery(textQueryDataBuilder)
+       case HallMatcherConstants.QUERY_TYPE_TT =>
+         tdataBuilderMap.foreach { f =>
+           f._2.setTextQuery(textQueryDataBuilder)
+         }
+       case HallMatcherConstants.QUERY_TYPE_TL =>
+         tdataBuilderMap.foreach { f =>
+           f._2.setTextQuery(textQueryDataBuilder)
+         }
+       case HallMatcherConstants.QUERY_TYPE_LT =>
+         ldataBuilderMap.foreach{ f =>
+           f._2.setTextQuery(textQueryDataBuilder)
+         }
+       case HallMatcherConstants.QUERY_TYPE_LL =>
+         ldataBuilderMap.foreach{ f=>
+           f._2.setTextQuery(textQueryDataBuilder)
+         }
      }
 
      //更新status
