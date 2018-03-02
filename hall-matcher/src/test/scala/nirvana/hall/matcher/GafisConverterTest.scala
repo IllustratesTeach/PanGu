@@ -2,6 +2,7 @@ package nirvana.hall.matcher
 
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gitempkg.GBASE_ITEMPKG_OPSTRUCT
+import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_KEYLISTSTRUCT
 import nirvana.hall.matcher.internal.{GafisConverter, TextQueryConstants}
@@ -40,8 +41,21 @@ class GafisConverterTest {
     var nIndex = 0
     mics.foreach { micStruct =>
       nIndex = micStruct.nIndex
+      println("index:"+micStruct.nIndex +" itemData:"+micStruct.nItemData)
     }
     Assert.assertEquals(nIndex, 2)
+  }
+
+  @Test
+  def test_candlist: Unit ={
+    val data = IOUtils.toByteArray(getClass.getResourceAsStream("/candlist-multi.dat"))
+    val buffer = ChannelBuffers.wrappedBuffer(data)
+    while(buffer.readableBytes() >= 96) {
+      val gaCand = new GAQUERYCANDSTRUCT
+      gaCand.fromStreamReader(buffer)
+      printf("key:%s srcKeyIndex:%d index:%d score:%d \n",gaCand.szKey, gaCand.nSrcKeyIndex, gaCand.nIndex, gaCand.nScore)
+    }
+
   }
 
   /**

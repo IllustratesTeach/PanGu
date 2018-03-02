@@ -113,18 +113,27 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       }
     }
 
+    val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
+    val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()
     val mic = rs.getBytes("mic")
     val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
     mics.foreach { micStruct =>
+      val index = micStruct.nIndex.toInt
       if (micStruct.bIsLatent == 1) {
-        val ldata = matchTaskBuilder.getLDataBuilder
+        if(ldataBuilderMap.get(index).isEmpty){
+          ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
+        }
+        val ldata = ldataBuilderMap(index)
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
           val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
           ldata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
         }
       } else {
-        val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+        if(tdataBuilderMap.get(index).isEmpty){
+          tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
+        }
+        val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
         var mnt = micStruct.pstMnt_Data
         //TT，TL查询老特征转新特征
@@ -143,13 +152,25 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     if (textSql != null) {
       queryType match {
         case HallMatcherConstants.QUERY_TYPE_TT =>
-          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          val textQueryData = getTextQueryDataOfTemplate(textSql)
+          tdataBuilderMap.foreach { f =>
+            f._2.setTextQuery(textQueryData)
+          }
         case HallMatcherConstants.QUERY_TYPE_TL =>
-          matchTaskBuilder.getTDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
+          val textQueryData = getTextQueryDataOfLatent(textSql)
+          tdataBuilderMap.foreach { f =>
+            f._2.setTextQuery(textQueryData)
+          }
         case HallMatcherConstants.QUERY_TYPE_LT =>
-          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfTemplate(textSql))
+          val textQueryData = getTextQueryDataOfTemplate(textSql)
+          ldataBuilderMap.foreach{ f =>
+            f._2.setTextQuery(textQueryData)
+          }
         case HallMatcherConstants.QUERY_TYPE_LL =>
-          matchTaskBuilder.getLDataBuilder.setTextQuery(getTextQueryDataOfLatent(textSql))
+          val textQueryData = getTextQueryDataOfLatent(textSql)
+          ldataBuilderMap.foreach{ f=>
+            f._2.setTextQuery(textQueryData)
+          }
       }
       //高级查询
       matchTaskBuilder.setConfig(DataConverter.getMatchConfig(textSql))

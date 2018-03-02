@@ -88,16 +88,25 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
        }
      }
 
+     val ldataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.LatentMatchData.Builder]()
+     val tdataBuilderMap = scala.collection.mutable.Map[Int, MatchTask.TemplateMatchData.Builder]()
      val mic = rs.getBytes("mic")
      val mics = GafisConverter.GAFIS_MIC_GetDataFromStream(ChannelBuffers.wrappedBuffer(mic))
      mics.foreach{ micStruct =>
+       val index = micStruct.nIndex.toInt
        if(micStruct.bIsLatent == 1){
-         val ldata = matchTaskBuilder.getLDataBuilder
+         if(ldataBuilderMap.get(index).isEmpty){
+           ldataBuilderMap.put(index, matchTaskBuilder.addLDataBuilder())
+         }
+         val ldata = ldataBuilderMap(index)
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
          if(micStruct.pstBin_Data.length > 0)
            ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
        }else{
-         val tdata = matchTaskBuilder.getTDataBuilder.addMinutiaDataBuilder()
+         if(tdataBuilderMap.get(index).isEmpty){
+           tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
+         }
+         val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)
          var mnt = micStruct.pstMnt_Data
          //TT，TL查询老特征转新特征
@@ -112,7 +121,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
        val json = JSONObject.fromObject(textSql)
        if(queryType == HallMatcherConstants.QUERY_TYPE_TT){
          //布控和追逃不比1.2亿
-         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
+         val queryBuilder = matchTaskBuilder.getTDataBuilder(0).getTextQueryBuilder
          if (json.has("controlPursuitStatus")) {
            val value: String = json.getString("controlPursuitStatus")
            val colQuery = KeywordQuery.newBuilder
@@ -123,13 +132,13 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
          }
        }else if(queryType == HallMatcherConstants.QUERY_TYPE_TL){
          //只比参与比对的现场指纹
-         val queryBuilder = matchTaskBuilder.getTDataBuilder.getTextQueryBuilder
+         val queryBuilder = matchTaskBuilder.getTDataBuilder(0).getTextQueryBuilder
          queryBuilder.addQueryBuilder().setName("dataMatcher").setExtension(KeywordQuery.query, KeywordQuery.newBuilder().setValue("1").build());
        }
        if(queryType == HallMatcherConstants.QUERY_TYPE_LT){
          if(json.has("personCategory")){//人员类型文字筛选
          val personCategory = json.getString("personCategory")
-           matchTaskBuilder.getLDataBuilder.getTextQueryBuilder.addQueryBuilder().setName("personCategory").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personCategory).build)
+           matchTaskBuilder.getLDataBuilder(0).getTextQueryBuilder.addQueryBuilder.setName("personCategory").setExtension(KeywordQuery.query, KeywordQuery.newBuilder.setValue(personCategory).build)
          }
        }
        //高级查询
