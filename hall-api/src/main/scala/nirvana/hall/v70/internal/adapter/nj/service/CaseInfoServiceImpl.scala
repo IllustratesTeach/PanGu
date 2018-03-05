@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
   */
 class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
+  val REPORT:String = "1"
   /**
     * 新增案件信息
     * @param caseInfo
@@ -25,6 +26,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
     gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_HALLSYNC.toString
+    gafisCase.dataStatus = REPORT
 
     gafisCase.save()
     val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){

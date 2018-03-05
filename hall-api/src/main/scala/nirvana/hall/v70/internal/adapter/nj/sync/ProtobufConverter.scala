@@ -41,16 +41,16 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.cardId = caseInfo.getStrCaseID
     val text = caseInfo.getText
     gafisCase.remark = text.getStrComment
-    gafisCase.caseClassCode = DictCode6Map7.caseClasses_nj(text.getStrCaseType1)
-    gafisCase.caseClassCode2 = DictCode6Map7.caseClasses_nj(text.getStrCaseType2)
+    gafisCase.caseClassCode = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType1).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType1))
+    gafisCase.caseClassCode2 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType2).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType2))
     gafisCase.caseClassCode3 = text.getStrCaseType3
     gafisCase.caseOccurDate = text.getStrCaseOccurDate
     gafisCase.caseOccurPlaceDetail = text.getStrCaseOccurPlace
     gafisCase.extractUnitCode = text.getStrExtractUnitCode
-    gafisCase.assistLevel = DictCode6Map7.assistLevel_nj.get(text.getNSuperviseLevel)
-    gafisCase.suspiciousAreaCode = DictCode6Map7.areaClasses_nj(text.getStrSuspArea1Code)
-    gafisCase.suspiciousAreaCode2 = DictCode6Map7.areaClasses_nj(text.getStrSuspArea2Code)
-    gafisCase.suspiciousAreaCode3 = DictCode6Map7.areaClasses_nj(text.getStrSuspArea3Code)
+    gafisCase.assistLevel = getCode7to6(DictCode6Map7.assistLevel_nj.toMap,text.getNSuperviseLevel.toString)
+    gafisCase.suspiciousAreaCode = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrSuspArea1Code)
+    gafisCase.suspiciousAreaCode2 = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrSuspArea2Code)
+    gafisCase.suspiciousAreaCode3 = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrSuspArea3Code)
     gafisCase.amount = text.getStrMoneyLost
     gafisCase.extractor = text.getStrExtractor
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
@@ -885,4 +885,13 @@ object ProtobufConverter extends LoggerSupport{
       }
     }
   }
+
+  private def getCode7to6(map:Map[String,String],code:String): String ={
+    if(map.keys.toList.contains(code)){
+      map.get(code).get
+    }else{
+      code
+    }
+  }
+
 }
