@@ -513,9 +513,11 @@ object galoclpConverter extends LoggerSupport{
     * @return
     */
   def appendCaseNoHeadLetter(caseId: String): String = {
-    if (!caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
-      HallApiConstants.LPCARDNO_HEAD_LETTER.concat(caseId.toUpperCase)
-    else
+    if (!caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER)) {
+      var newCaseId = HallApiConstants.LPCARDNO_HEAD_LETTER.concat(caseId.toUpperCase)
+      newCaseId
+    }else {
       caseId.toUpperCase
+    }
   }
 }
