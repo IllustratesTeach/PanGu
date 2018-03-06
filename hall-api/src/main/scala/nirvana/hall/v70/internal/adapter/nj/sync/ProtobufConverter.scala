@@ -709,7 +709,7 @@ object ProtobufConverter extends LoggerSupport{
               Gafis70Constants.PALM_THUMB_L_LOW.toString
             case PalmFgp.PALM_THUMB_L_UP =>
               Gafis70Constants.PALM_THUMB_L_UP.toString
-            case PalmFgp.PALM_UNKNOWN => 0
+            case PalmFgp.PALM_UNKNOWN => "0"
           }
           other.gatherData = blob.getStOriginalImageBytes.toByteArray
           other.gatherType = Gafis70Constants.PALM
@@ -734,7 +734,7 @@ object ProtobufConverter extends LoggerSupport{
               Gafis70Constants.PALM_THUMB_L_LOW.toString
             case PalmFgp.PALM_THUMB_L_UP =>
               Gafis70Constants.PALM_THUMB_L_UP.toString
-            case PalmFgp.PALM_UNKNOWN => 0
+            case PalmFgp.PALM_UNKNOWN => "0"
           }
           other.gatherData = blob.getStImageBytes.toByteArray
           other.gatherType = Gafis70Constants.PALM
@@ -759,7 +759,7 @@ object ProtobufConverter extends LoggerSupport{
               Gafis70Constants.PALM_THUMB_L_LOW.toString
             case PalmFgp.PALM_THUMB_L_UP =>
               Gafis70Constants.PALM_THUMB_L_UP.toString
-            case PalmFgp.PALM_UNKNOWN => 0
+            case PalmFgp.PALM_UNKNOWN => "0"
           }
           other.gatherData = blob.getStBinBytes.toByteArray
           other.gatherType = Gafis70Constants.PALM
