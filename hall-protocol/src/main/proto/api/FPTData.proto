@@ -146,7 +146,6 @@ enum	ImageType
 	IMAGETYPE_FOURPRINT = 6;	//四连指
 	IMAGETYPE_KNUCKLEPRINTS = 7;//指节纹
 	IMAGETYPE_FULLPALM = 8;//全掌
-	//nj 7抓6数据同步追加信息
 	IMAGETYPE_SIGNATURE = 9;//签名压缩图
 	IMAGETYPE_CARDINFO = 10;//卡片信息
 
@@ -233,6 +232,8 @@ message	TPCard
 		optional PalmFgp		palmfgp = 10 [default = PALM_UNKNOWN];	//掌位
 		optional string			stBin = 11;								//纹线数据
 		optional string 		stOriginalImage = 12;					//原始图像数据
+		optional SignatureCpr	sigcprfgp = 13;							//签名压缩图
+		optional CardInfo		cardinfofgp = 14;						//卡片信息
 	}
 
 	required string		strCardID = 1;      //捺印卡号

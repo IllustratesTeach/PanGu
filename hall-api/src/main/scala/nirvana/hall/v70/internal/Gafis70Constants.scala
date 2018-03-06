@@ -67,6 +67,16 @@ object Gafis70Constants {
   val FACE_RIGHT = "2"  //右侧
   val FACE_LEFT = "3"   //左侧
   val FACE_UNKNOWN = "0" //未知
+  //南京新增
+  val Criminal_Cpr = "1"  //现场嫌疑人签名压缩图
+  val Printer_Cpr = "2"  //捺印嫌疑人签名压缩图
+
+  val CARDINFO_1 = "1"   //卡片信息1
+  val CARDINFO_2 = "2" //卡片信息2
+  val CARDINFO_3 = "3" //卡片信息3
+
+  val GatherType_Cpr = "04"   //签名压缩图
+  val GatherType_Cinfo = "05" //卡片信息
 
   //南京默认采集类型
   val NJ_GATHER_TYPE_ID_DEFAULT = "8a20fb6666baa8488884bab86f2d0066"

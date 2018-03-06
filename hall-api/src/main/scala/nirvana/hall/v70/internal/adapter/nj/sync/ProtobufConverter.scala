@@ -447,11 +447,11 @@ object ProtobufConverter extends LoggerSupport{
     val text = tpCard.getText
     person.remark = text.getStrComment//备注
     person.idcardno = text.getStrIdentityNum//身份证号码
-    person.address = DictCode6Map7.areaClasses_nj(text.getStrAddrCode)//现住址代码(转码)
+    person.address = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrAddrCode)//现住址代码(转码)
     person.addressdetail = text.getStrAddr//现住址
     person.doordetail = text.getStrHuKouPlaceTail//户口所在地--户籍地详细住址
     person.gatherdepartname = text.getStrPrintUnitName//捺印人单位--采集单位名称
-    person.nationCode = DictCode6Map7.nation_nj(text.getStrRace)//民族(字典)
+    person.nationCode = getCode7to6(DictCode6Map7.nation_nj.toMap,text.getStrRace)//民族(字典)
     person.micUpdateUsername = text.getStrMicUpdatorUsername//特征更改用户
     person.micUpdateUnitcode = text.getStrMicUpdatorUnitcode//特征更改单位
     person.psisNo = text.getStrPsisNo //警务平台编号
@@ -460,17 +460,21 @@ object ProtobufConverter extends LoggerSupport{
     person.name = text.getStrName//姓名
     person.spellname = text.getStrSpellName//姓名拼音
     person.aliasname = text.getStrAliasName//别名绰号
-    person.birthdayst = text.getStrBirthDate//出生日期起
-    person.caseClasses = DictCode6Map7.caseClasses_nj(text.getStrCaseType1)//案件类别
-    person.caseClasses2 = DictCode6Map7.caseClasses_nj(text.getStrCaseType2)
-    person.caseClasses3 = DictCode6Map7.caseClasses_nj(text.getStrCaseType3)
-    person.door = DictCode6Map7.areaClasses_nj(text.getStrHuKouPlaceCode)//户籍地代码(区域)
-    person.personType = DictCode6Map7.personType_nj(text.getStrPersonClassCode)//人员类别
-    person.gatherDate = text.getStrPrintDate//采集时间
+    if(text.getStrBirthDate != null){
+      person.birthdayst = DateConverter.convertString2Date(text.getStrBirthDate, "yyyyMMdd") //出生日期起
+    }
+    person.caseClasses = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType1).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType1))//案件类别
+    person.caseClasses2 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType2).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType2))
+    person.caseClasses3 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType3).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType3))
+    person.door = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrHuKouPlaceCode)//户籍地代码(区域)
+    person.personType = getCode7to6(DictCode6Map7.personType_nj.toMap,text.getStrPersonClassCode)//人员类别代码
+    if(text.getStrPrintDate != null){
+      person.gatherDate = DateConverter.convertString2Date(text.getStrPrintDate, "yyyyMMddHHmmss") //采集时间
+    }
     person.gatherusername = text.getStrPrinter//采集人name
     person.gatherdepartcode = text.getStrPrintUnitCode//采集单位
     person.nativeplaceCode = text.getStrNation//籍贯国籍(字典)
-    person.certificatetype = DictCode6Map7.certificatetype_nj(text.getStrCertifType)//证件类型code_zjzl
+    person.certificatetype = getCode7to6(DictCode6Map7.certificatetype_nj.toMap,text.getStrCertifType)//证件类型code_zjzl
     person.certificateid = text.getStrCertifID//证件号码
     person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 0.toChar//前科库标识 1：有；0：无
     person.recordsituation = text.getStrCriminalRecordDesc//前科劣迹情况
@@ -562,7 +566,7 @@ object ProtobufConverter extends LoggerSupport{
         if(originalData.size() >0){
           val original = new GafisGatherFinger()
           original.personId = personId
-          original.gatherData = imageData.toByteArray
+          original.gatherData = originalData.toByteArray
           original.fgp = blob.getFgp.getNumber.toShort
           original.fgpCase = if(blob.getBPlain) Gafis70Constants.FGP_CASE_PLAIN.toString else Gafis70Constants.FGP_CASE_ROLL.toString
           original.groupId = Gafis70Constants.GROUP_ID_JPG
@@ -588,24 +592,107 @@ object ProtobufConverter extends LoggerSupport{
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
-      if(blob.getType == ImageType.IMAGETYPE_FACE && blob.getStImageBytes.size() > 0){
-        val portrait = new GafisGatherPortrait()
-        //指纹系统人像字典对应
-        portrait.fgp = blob.getFacefgp match {
-          case FaceFgp.FACE_FRONT =>
-            Gafis70Constants.FACE_FRONT
-          case FaceFgp.FACE_RIGHT =>
-            Gafis70Constants.FACE_RIGHT
-          case FaceFgp.FACE_LEFT=>
-            Gafis70Constants.FACE_LEFT
+      if(blob.getType == ImageType.IMAGETYPE_FACE){
+        //原图
+        val originalData = blob.getStOriginalImageBytes
+        if(originalData.size() >0){
+          val portrait = new GafisGatherPortrait()
+          //指纹系统人像字典对应
+          portrait.fgp = blob.getFacefgp match {
+            case FaceFgp.FACE_FRONT =>
+              Gafis70Constants.FACE_FRONT
+            case FaceFgp.FACE_RIGHT =>
+              Gafis70Constants.FACE_RIGHT
+            case FaceFgp.FACE_LEFT=>
+              Gafis70Constants.FACE_LEFT
+          }
+          portrait.gatherData = blob.getStOriginalImageBytes.toByteArray
+          portrait.personid = personId
+          portaitList += portrait
         }
-        portrait.gatherData = blob.getStImageBytes.toByteArray
-        portrait.personid = personId
-
-        portaitList += portrait
+        //特征
+        val mntData = blob.getStMntBytes
+        if(mntData.size() >0){
+          val portrait = new GafisGatherPortrait()
+          //指纹系统人像字典对应
+          portrait.fgp = blob.getFacefgp match {
+            case FaceFgp.FACE_FRONT =>
+              Gafis70Constants.FACE_FRONT
+            case FaceFgp.FACE_RIGHT =>
+              Gafis70Constants.FACE_RIGHT
+            case FaceFgp.FACE_LEFT=>
+              Gafis70Constants.FACE_LEFT
+          }
+          portrait.gatherData = blob.getStMntBytes.toByteArray
+          portrait.personid = personId
+          portaitList += portrait
+        }
+        //压缩图
+        val imageData = blob.getStImageBytes
+        if(imageData.size() >0){
+          val portrait = new GafisGatherPortrait()
+          //指纹系统人像字典对应
+          portrait.fgp = blob.getFacefgp match {
+            case FaceFgp.FACE_FRONT =>
+              Gafis70Constants.FACE_FRONT
+            case FaceFgp.FACE_RIGHT =>
+              Gafis70Constants.FACE_RIGHT
+            case FaceFgp.FACE_LEFT=>
+              Gafis70Constants.FACE_LEFT
+          }
+          portrait.gatherData = blob.getStImageBytes.toByteArray
+          portrait.personid = personId
+          portaitList += portrait
+        }
       }
     }
     portaitList
+  }
+
+  /**
+    * 其他BLOB转换
+    *
+    * @param tpCard
+    * @return
+    */
+  def convertTPCard2GafisPersonOther(tpCard: TPCard): Seq[GafisPersonOther]={
+    val otherList = new ArrayBuffer[GafisPersonOther]()
+    val personId = tpCard.getStrCardID
+    val blobIter = tpCard.getBlobList.iterator()
+    while (blobIter.hasNext){
+      val blob = blobIter.next()
+      if(blob.getType == ImageType.IMAGETYPE_SIGNATURE && blob.getStImageBytes.size() > 0){
+        val other = new GafisPersonOther()
+        other.fgp = blob.getSigcprfgp match {
+          case SignatureCpr.CriminalCpr =>
+            Gafis70Constants.Criminal_Cpr
+          case SignatureCpr.PrinterCpr =>
+            Gafis70Constants.Printer_Cpr
+        }
+        other.gatherData = blob.getStImageBytes.toByteArray
+        other.gatherType = Gafis70Constants.GatherType_Cpr
+        other.imageType = Gafis70Constants.GROUP_ID_CPR
+        other.personId = personId
+        otherList += other
+      }
+      if(blob.getType == ImageType.IMAGETYPE_CARDINFO && blob.getStImageBytes.size() > 0){
+        val other = new GafisPersonOther()
+        other.fgp = blob.getCardinfofgp match {
+          case CardInfo.CARDINFO1 =>
+            Gafis70Constants.CARDINFO_1
+          case CardInfo.CARDINFO2 =>
+            Gafis70Constants.CARDINFO_2
+          case CardInfo.CARDINFO3 =>
+            Gafis70Constants.CARDINFO_3
+        }
+        other.gatherData = blob.getStImageBytes.toByteArray
+        other.gatherType = Gafis70Constants.GatherType_Cinfo
+        other.imageType = Gafis70Constants.GROUP_ID_CPR
+        other.personId = personId
+        otherList += other
+      }
+    }
+    otherList
   }
 
   /**
@@ -648,8 +735,14 @@ object ProtobufConverter extends LoggerSupport{
           mnt.personId = personId
           mnt.gatherData = mntData.toByteArray
           mnt.fgp = blob.getPalmfgp match {
-            case PalmFgp.PALM_RIGHT => 11
-            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
+            case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
+            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
+            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
+            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
+            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
+            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
+            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
             case PalmFgp.PALM_UNKNOWN => 0
           }
           mnt.groupId = Gafis70Constants.GROUP_ID_MNT
@@ -664,13 +757,39 @@ object ProtobufConverter extends LoggerSupport{
           bin.personId = personId
           bin.gatherData = binData.toByteArray
           bin.fgp = blob.getPalmfgp match{
-            case PalmFgp.PALM_RIGHT => 11
-            case PalmFgp.PALM_LEFT => 12
+            case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
+            case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
+            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
+            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
+            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
+            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
+            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
+            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
             case PalmFgp.PALM_UNKNOWN => 0
           }
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
           bin.lobtype = Gafis70Constants.LOBTYPE_MNT
-
+          palmList += bin
+        }
+        //原图
+        val originalData = blob.getStOriginalImageBytes
+        if(originalData.size() >0){
+          val bin = new GafisGatherPalm()
+          bin.personId = personId
+          bin.gatherData = originalData.toByteArray
+          bin.fgp = blob.getPalmfgp match{
+            case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
+            case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
+            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
+            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
+            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
+            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
+            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
+            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          bin.groupId = Gafis70Constants.LOBTYPE_DATA
+          bin.lobtype = Gafis70Constants.GROUP_ID_JPG
           palmList += bin
         }
       }
