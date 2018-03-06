@@ -75,8 +75,9 @@ object Gafis70Constants {
   val CARDINFO_2 = "2" //卡片信息2
   val CARDINFO_3 = "3" //卡片信息3
 
-  val GatherType_Cpr = "04"   //签名压缩图
-  val GatherType_Cinfo = "05" //卡片信息
+  val GatherType_Cpr = "4"   //签名压缩图
+  val GatherType_Cinfo = "5" //卡片信息
+  val PALM = "6" //掌纹
 
   //南京默认采集类型
   val NJ_GATHER_TYPE_ID_DEFAULT = "8a20fb6666baa8488884bab86f2d0066"

@@ -691,6 +691,83 @@ object ProtobufConverter extends LoggerSupport{
         other.personId = personId
         otherList += other
       }
+      if(blob.getType == ImageType.IMAGETYPE_PALM) {
+        //原图
+        val originalData = blob.getStOriginalImageBytes
+        if (originalData.size() > 0) {
+          val other = new GafisPersonOther()
+          other.fgp = blob.getPalmfgp match {
+            case PalmFgp.PALM_FINGER_R =>
+              Gafis70Constants.PALM_FINGER_R.toString
+            case PalmFgp.PALM_FINGER_L =>
+              Gafis70Constants.PALM_FINGER_L.toString
+            case PalmFgp.PALM_THUMB_R_LOW =>
+              Gafis70Constants.PALM_THUMB_R_LOW.toString
+            case PalmFgp.PALM_THUMB_R_UP =>
+              Gafis70Constants.PALM_THUMB_R_UP.toString
+            case PalmFgp.PALM_THUMB_L_LOW =>
+              Gafis70Constants.PALM_THUMB_L_LOW.toString
+            case PalmFgp.PALM_THUMB_L_UP =>
+              Gafis70Constants.PALM_THUMB_L_UP.toString
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          other.gatherData = blob.getStOriginalImageBytes.toByteArray
+          other.gatherType = Gafis70Constants.PALM
+          other.imageType = Gafis70Constants.GROUP_ID_CPR
+          other.personId = personId
+          otherList += other
+        }
+        //压缩图
+        val imageData = blob.getStImageBytes
+        if (imageData.size() > 0) {
+          val other = new GafisPersonOther()
+          other.fgp = blob.getPalmfgp match {
+            case PalmFgp.PALM_FINGER_R =>
+              Gafis70Constants.PALM_FINGER_R.toString
+            case PalmFgp.PALM_FINGER_L =>
+              Gafis70Constants.PALM_FINGER_L.toString
+            case PalmFgp.PALM_THUMB_R_LOW =>
+              Gafis70Constants.PALM_THUMB_R_LOW.toString
+            case PalmFgp.PALM_THUMB_R_UP =>
+              Gafis70Constants.PALM_THUMB_R_UP.toString
+            case PalmFgp.PALM_THUMB_L_LOW =>
+              Gafis70Constants.PALM_THUMB_L_LOW.toString
+            case PalmFgp.PALM_THUMB_L_UP =>
+              Gafis70Constants.PALM_THUMB_L_UP.toString
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          other.gatherData = blob.getStImageBytes.toByteArray
+          other.gatherType = Gafis70Constants.PALM
+          other.imageType = Gafis70Constants.GROUP_ID_CPR
+          other.personId = personId
+          otherList += other
+        }
+        //纹线信息
+        val binData = blob.getStBinBytes
+        if (binData.size() > 0) {
+          val other = new GafisPersonOther()
+          other.fgp = blob.getPalmfgp match {
+            case PalmFgp.PALM_FINGER_R =>
+              Gafis70Constants.PALM_FINGER_R.toString
+            case PalmFgp.PALM_FINGER_L =>
+              Gafis70Constants.PALM_FINGER_L.toString
+            case PalmFgp.PALM_THUMB_R_LOW =>
+              Gafis70Constants.PALM_THUMB_R_LOW.toString
+            case PalmFgp.PALM_THUMB_R_UP =>
+              Gafis70Constants.PALM_THUMB_R_UP.toString
+            case PalmFgp.PALM_THUMB_L_LOW =>
+              Gafis70Constants.PALM_THUMB_L_LOW.toString
+            case PalmFgp.PALM_THUMB_L_UP =>
+              Gafis70Constants.PALM_THUMB_L_UP.toString
+            case PalmFgp.PALM_UNKNOWN => 0
+          }
+          other.gatherData = blob.getStBinBytes.toByteArray
+          other.gatherType = Gafis70Constants.PALM
+          other.imageType = Gafis70Constants.GROUP_ID_CPR
+          other.personId = personId
+          otherList += other
+        }
+      }
     }
     otherList
   }
@@ -714,12 +791,8 @@ object ProtobufConverter extends LoggerSupport{
           palm.fgp = blob.getPalmfgp match {
             case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
             case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
-            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
-            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
-            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
-            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
-            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
-            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
+            case PalmFgp.PALM_FOUR_PRINT_RIGHT => Gafis70Constants.PALM_FOUR_PRINT_RIGHT
+            case PalmFgp.PALM_FOUR_PRINT_LEFT => Gafis70Constants.PALM_FOUR_PRINT_LEFT
             case PalmFgp.PALM_UNKNOWN => 0
           }
           palm.personId = personId
@@ -737,12 +810,8 @@ object ProtobufConverter extends LoggerSupport{
           mnt.fgp = blob.getPalmfgp match {
             case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
             case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
-            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
-            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
-            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
-            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
-            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
-            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
+            case PalmFgp.PALM_FOUR_PRINT_RIGHT => Gafis70Constants.PALM_FOUR_PRINT_RIGHT
+            case PalmFgp.PALM_FOUR_PRINT_LEFT => Gafis70Constants.PALM_FOUR_PRINT_LEFT
             case PalmFgp.PALM_UNKNOWN => 0
           }
           mnt.groupId = Gafis70Constants.GROUP_ID_MNT
@@ -759,12 +828,8 @@ object ProtobufConverter extends LoggerSupport{
           bin.fgp = blob.getPalmfgp match{
             case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
             case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
-            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
-            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
-            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
-            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
-            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
-            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
+            case PalmFgp.PALM_FOUR_PRINT_RIGHT => Gafis70Constants.PALM_FOUR_PRINT_RIGHT
+            case PalmFgp.PALM_FOUR_PRINT_LEFT => Gafis70Constants.PALM_FOUR_PRINT_LEFT
             case PalmFgp.PALM_UNKNOWN => 0
           }
           bin.groupId = Gafis70Constants.GROUP_ID_BIN
@@ -780,12 +845,8 @@ object ProtobufConverter extends LoggerSupport{
           bin.fgp = blob.getPalmfgp match{
             case PalmFgp.PALM_RIGHT => Gafis70Constants.PALM_RIGHT
             case PalmFgp.PALM_LEFT => Gafis70Constants.PALM_LEFT
-            case PalmFgp.PALM_FINGER_R => Gafis70Constants.PALM_FINGER_R
-            case PalmFgp.PALM_FINGER_L => Gafis70Constants.PALM_FINGER_L
-            case PalmFgp.PALM_THUMB_R_LOW => Gafis70Constants.PALM_THUMB_R_LOW
-            case PalmFgp.PALM_THUMB_R_UP => Gafis70Constants.PALM_THUMB_R_UP
-            case PalmFgp.PALM_THUMB_L_LOW => Gafis70Constants.PALM_THUMB_L_LOW
-            case PalmFgp.PALM_THUMB_L_UP => Gafis70Constants.PALM_THUMB_L_UP
+            case PalmFgp.PALM_FOUR_PRINT_RIGHT => Gafis70Constants.PALM_FOUR_PRINT_RIGHT
+            case PalmFgp.PALM_FOUR_PRINT_LEFT => Gafis70Constants.PALM_FOUR_PRINT_LEFT
             case PalmFgp.PALM_UNKNOWN => 0
           }
           bin.groupId = Gafis70Constants.LOBTYPE_DATA
