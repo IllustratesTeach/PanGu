@@ -57,8 +57,8 @@ class GafisPerson extends ActiveRecord {
   var gatherOrgCode: java.lang.String = _
   @Column(name = "IPADDRESS", length = 15)
   var ipaddress: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "GATHER_DATE", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "GATHER_DATE", length = 14)
   var gatherDate: java.util.Date = _
   @Column(name = "GATHER_TYPE_ID", length = 32)
   var gatherTypeId: java.lang.String = _
@@ -70,13 +70,13 @@ class GafisPerson extends ActiveRecord {
   var annex: java.lang.String = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 14)
   var inputtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 14)
   var modifiedtime: java.util.Date = _
   @Column(name = "DELETAG", length = 1)
   var deletag: java.lang.String = _
@@ -108,7 +108,7 @@ class GafisPerson extends ActiveRecord {
   var gatherFingerTime: java.util.Date = _
   @Column(name = "CASE_BRIEF_CONTENTS", length = 1500)
   var caseBriefContents: java.lang.String = _
-  @Column(name = "DATA_SOURCES", precision = 1, scale = 0)
+  @Column(name = "DATA_SOURCES", precision = 2, scale = 0)
   var dataSources: java.lang.Long = _
   @Column(name = "CITY_CODE", length = 6)
   var cityCode: java.lang.String = _
@@ -180,9 +180,11 @@ class GafisPerson extends ActiveRecord {
   var inputUsername:java.lang.String =  _
   @Column(name="MODIFY_USERNAME", length=60)
   var modifyUsername:java.lang.String =  _
-  @Column(name="TLDATE", length=8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="TLDATE", length=14)
   var tldate:java.util.Date =  _
-  @Column(name="TTDATE", length=8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="TTDATE", length=14)
   var ttdate:java.util.Date =  _
   @Column(name="MODIFY_UNIT_CODE", length=50)
   var modifyUnitCode:java.lang.String =  _
