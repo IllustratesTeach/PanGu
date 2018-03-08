@@ -102,6 +102,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       val otherList = ProtobufConverter.convertTPCard2GafisPersonOther(tpCard)
       GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
       otherList.foreach{other=>
+        other.uuid = CommonUtils.getUUID()
         other.save()
       }
     }
@@ -201,6 +202,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val otherList = ProtobufConverter.convertTPCard2GafisPersonOther(tpCard)
     GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
     otherList.foreach{other=>
+      other.uuid = CommonUtils.getUUID()
       other.save()
     }
 }

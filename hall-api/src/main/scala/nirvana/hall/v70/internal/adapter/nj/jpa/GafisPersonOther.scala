@@ -3,10 +3,8 @@ package nirvana.hall.v70.internal.adapter.nj.jpa
 // Generated 2018-3-6 10:50:31 by Stark Activerecord generator 4.3.1.Final
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import stark.activerecord.services.ActiveRecord;
+import javax.persistence.{Column, Entity, Id, Table}
+import stark.activerecord.services.ActiveRecord
 import stark.activerecord.services.ActiveRecordInstance;
 
 /**
@@ -15,10 +13,14 @@ import stark.activerecord.services.ActiveRecordInstance;
 object GafisPersonOther extends ActiveRecordInstance[GafisPersonOther]
 
 @Entity
+@Table(name = "GAFIS_PERSON_OTHER"
+)
 class GafisPersonOther extends ActiveRecord {
 
       @Id
-      @Column(name = "PERSONID", unique = true, nullable = false, length = 23)
+      @Column(name = "UUID", unique = true, nullable = false, length = 32)
+      var uuid:java.lang.String =  _
+      @Column(name = "PERSON_ID", length = 32)
       var personId:java.lang.String =  _
       @Column(name="GATHER_TYPE", length=2)
       var gatherType:java.lang.String =  _
@@ -41,12 +43,13 @@ class GafisPersonOther extends ActiveRecord {
 
 
 	
-    def this(personId:java.lang.String) {
+    def this(uuid:java.lang.String) {
         this()
-        this.personId = personId
+        this.uuid = uuid
     }
-    def this(personId:java.lang.String, gatherType:java.lang.String, fgp:java.lang.String, width:java.lang.String, height:java.lang.String, dpi:java.lang.String, compressMethod:java.lang.String, nfiqQuality:java.lang.String, gatherData: Array[Byte], imageType:java.lang.Short) {
+    def this(uuid:java.lang.String, personId:java.lang.String, gatherType:java.lang.String, fgp:java.lang.String, width:java.lang.String, height:java.lang.String, dpi:java.lang.String, compressMethod:java.lang.String, nfiqQuality:java.lang.String, gatherData: Array[Byte], imageType:java.lang.Short) {
       this()
+      this.uuid = uuid
       this.personId = personId
       this.gatherType = gatherType
       this.fgp = fgp
