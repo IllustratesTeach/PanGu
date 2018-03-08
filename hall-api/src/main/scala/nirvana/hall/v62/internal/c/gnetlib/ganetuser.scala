@@ -21,9 +21,9 @@ trait ganetuser {
         if(nOp == gnopcode.OP_USER_DEL || nOp == gnopcode.OP_USER_GETUSERINFO){
           pReq.bnData = pstUser.stInfo.szName.getBytes
         }
-         NETREQ_SetOpClass(pReq, gnopcode.OP_CLASS_USER);
-         NETREQ_SetOpCode(pReq, nOp);
-         NETOP_SENDREQ(pstCon, pReq);
+         NETREQ_SetOpClass(pReq, gnopcode.OP_CLASS_USER)
+         NETREQ_SetOpCode(pReq, nOp)
+         NETOP_SENDREQ(pstCon, pReq)
         if(nOp == gnopcode.OP_USER_ADD || nOp == gnopcode.OP_USER_UPDATE){
           NETOP_SENDDATA(pstCon,pstUser)
         }
@@ -52,6 +52,6 @@ trait ganetuser {
                            pstUser:GAFIS_USERSTRUCT,
                            nOption:Int=0
                           ):Unit=
-    NET_GAFIS_USER_UTIL_Op(nDBID, nTableID, pstUser, gnopcode.OP_USER_GETUSERINFO);
+    NET_GAFIS_USER_UTIL_Op(nDBID, nTableID, pstUser, gnopcode.OP_USER_GETUSERINFO)
 
 }

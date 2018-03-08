@@ -17,13 +17,12 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @return
    */
   override def addLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
-    val lpCardHandled = lpCard.toBuilder.setStrCardID(galoclpConverter.dropCaseNoHeadLetter(lpCard.getStrCardID)).build()
     //转换为c的结构
-    val gLPCard= galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCardHandled)
+    val gLPCard= galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
     //调用实现方法
     facade.NET_GAFIS_FLIB_Add(getDBID(dbId),
       V62Facade.TID_LATFINGER,
-      lpCardHandled.getStrCardID, gLPCard)
+      lpCard.getStrCardID, gLPCard)
   }
 
   /**
@@ -33,9 +32,8 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    */
   override def getLPCard(cardId: String, dbId: Option[String]): LPCard = {
     val gCard = new GLPCARDINFOSTRUCT
-    facade.NET_GAFIS_FLIB_Get(getDBID(dbId), V62Facade.TID_LATFINGER, galoclpConverter.dropCaseNoHeadLetter(cardId), gCard, null, 3)
-    val card = galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard)
-    card.toBuilder.setStrCardID(galoclpConverter.appendCaseNoHeadLetter(card.getStrCardID)).build()
+    facade.NET_GAFIS_FLIB_Get(getDBID(dbId), V62Facade.TID_LATFINGER, cardId, gCard, null, 3)
+    galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard)
   }
 
   /**
@@ -44,11 +42,8 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @return
    */
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
-    val lpCardHandled = lpCard.toBuilder.setStrCardID(galoclpConverter.dropCaseNoHeadLetter(lpCard.getStrCardID)).build()
-    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCardHandled)
-    facade.NET_GAFIS_FLIB_Update(getDBID(dbId),
-      V62Facade.TID_LATFINGER,
-      lpCardHandled.getStrCardID, gLPCard)
+    val gLPCard = galoclpConverter.convertProtoBuf2GLPCARDINFOSTRUCT(lpCard)
+    facade.NET_GAFIS_FLIB_Update(getDBID(dbId), V62Facade.TID_LATFINGER, lpCard.getStrCardID, gLPCard)
   }
 
   /**
@@ -57,11 +52,11 @@ class LPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends LPCardSer
    * @return
    */
   override def delLPCard(cardId: String, dbId: Option[String]): Unit = {
-    facade.NET_GAFIS_FLIB_Del(getDBID(dbId), V62Facade.TID_LATFINGER, galoclpConverter.dropCaseNoHeadLetter(cardId))
+    facade.NET_GAFIS_FLIB_Del(getDBID(dbId), V62Facade.TID_LATFINGER, cardId)
   }
 
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_LATFINGER, galoclpConverter.dropCaseNoHeadLetter(cardId))
+    facade.NET_GAFIS_FLIB_Exist(getDBID(dbId), V62Facade.TID_LATFINGER, cardId)
   }
 
   /**

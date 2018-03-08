@@ -493,31 +493,4 @@ object galoclpConverter extends LoggerSupport{
 
     caseInfo.build()
   }
-
-  /**
-    * 去掉6.2案件号头字母A
-    *
-    * @param caseId
-    * @return
-    */
-  def dropCaseNoHeadLetter(caseId: String): String = {
-    if (caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER))
-      caseId.toUpperCase.drop(1)
-    else caseId.toUpperCase
-  }
-
-  /**
-    * 添加6.2案件号头字母A
-    *
-    * @param caseId
-    * @return
-    */
-  def appendCaseNoHeadLetter(caseId: String): String = {
-    if (!caseId.toUpperCase.startsWith(HallApiConstants.LPCARDNO_HEAD_LETTER)) {
-      var newCaseId = HallApiConstants.LPCARDNO_HEAD_LETTER.concat(caseId.toUpperCase)
-      newCaseId
-    }else {
-      caseId.toUpperCase
-    }
-  }
 }
