@@ -220,6 +220,7 @@ object galoctpConverter extends LoggerSupport{
       card.setStrMisPersonID(data.stAdmData.szPersonID)
     }
     val text = card.getTextBuilder
+    val admData = card.getAdmDataBuilder
     //采集原因代码
     val array = scala.collection.mutable.ArrayBuffer[String]()
     data.pstText_Data.foreach{ item =>
@@ -248,9 +249,8 @@ object galoctpConverter extends LoggerSupport{
               text.setStrAddrCode(textContent)
             case "AddressTail" =>
               text.setStrAddr(textContent)
-            case "PersonClassCode" =>
-              text.setStrPersonType(textContent)
-              array += textContent
+//            case "PersonType" =>        //移动到下方赋值
+//              text.setStrPersonType(data.stAdmData.szPersonType)
             case "CaseClass1Code" =>
               text.setStrCaseType1(textContent)
             case "CaseClass2Code" =>
@@ -277,20 +277,23 @@ object galoctpConverter extends LoggerSupport{
             case "CertificateType" =>
               text.setStrCertifType(textContent)
             case "IsCriminalRecord" =>
-              text.setBHasCriminalRecord("1".equals(textContent))
+              text.setBHasCriminalRecord("1".equals(textContent)||"49".equals(textContent))  //南京前科标识转换
             case "CriminalRecordDesc" =>
               text.setStrCriminalRecordDesc(textContent)
             case "CreatorUnitCode" =>
-              card.getAdmDataBuilder.setCreateUnitCode(textContent)
+              admData.setCreateUnitCode(textContent)
             case "UpdatorUnitCode" =>
-              card.getAdmDataBuilder.setUpdateUnitCode(textContent)
+              admData.setUpdateUnitCode(textContent)
             //FPT5.0新增
-            case "SrcSysCaseRelatePersonNO" =>
-              card.setStrMisPersonID(textContent)  //原始系统_案事件相关人员编号
+//            case "SrcSysCaseRelatePersonNO" =>      //移动到下方赋值
+//              card.setStrMisPersonID(textContent)  //原始系统_案事件相关人员编号
             case "PoliceIntegratedPersonNO" =>
               card.setStrJingZongPersonId(textContent) //警综人员编号
             case "CaseRelatePersonNO" =>
               card.setStrCasePersonID(textContent) //案事件相关人员编号
+            case "PersonClassCode" =>
+              text.setStrPersonClassCode(textContent) //人员类别代码
+              array += textContent
             case "PersonClassCode2" =>
               array += textContent
             case "PersonClassCode3" =>
@@ -309,6 +312,10 @@ object galoctpConverter extends LoggerSupport{
               text.setStrMicUpdatorUsername(textContent) //特征更改用户
             case "MicbUpdatorUnitCode" =>
               text.setStrMicUpdatorUnitcode(textContent) //特征更改单位
+            case "MISConnectPersonID" =>
+              text.setStrPsisNo(textContent)  //警务平台编号
+            case "NamePinYin" =>
+              text.setStrSpellName(textContent) //姓名拼音
             case other =>
               warn("{} not mapped", other)
           }
@@ -326,6 +333,9 @@ object galoctpConverter extends LoggerSupport{
         //压缩图像
         if(mic.pstCpr_Data != null && mic.pstCpr_Data.length > 64)
           micDataBuilder.setStImageBytes(ByteString.copyFrom(mic.pstCpr_Data))
+        //原图
+        if(mic.pstImg_Data != null && mic.pstImg_Data.length > 64)
+          micDataBuilder.setStOriginalImageBytes(ByteString.copyFrom(mic.pstImg_Data))
         //纹线
         if(mic.pstBin_Data != null && mic.pstBin_Data.length > 64)
           micDataBuilder.setStBinBytes(ByteString.copyFrom(mic.pstBin_Data))
@@ -356,6 +366,8 @@ object galoctpConverter extends LoggerSupport{
             micDataBuilder.setPalmfgp(FgpConverter.convertGTPIO_ITEMINDEX2PalmFgp(mic.nItemData))
           case glocdef.GAMIC_ITEMTYPE_VOICE =>
             micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
+          case glocdef.GAMIC_ITEMTYPE_SIGNATURE =>
+            micDataBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
           case other =>
             logger.error("mic type {} not supported for {}",other,data.szCardID)
             micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
@@ -367,12 +379,18 @@ object galoctpConverter extends LoggerSupport{
     }
 
     //操作信息
-    val admData = card.getAdmDataBuilder
     val stAdmData = data.stAdmData
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
     admData.setCreator(stAdmData.szCUserName)
     admData.setUpdator(stAdmData.szMUserName)
+    admData.setStrTlDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTLDate))
+    admData.setStrTtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTTDate))
+    admData.setNTtCount(stAdmData.nAccuTTCount)
+    admData.setNTlCount(stAdmData.nAccuTLCount)
+    admData.setNEditCount(stAdmData.nEditCount)
+    text.setStrPersonType(stAdmData.szPersonType)    //人员类型
+    card.setStrMisPersonID(stAdmData.szMISPersonID)  //原始系统_案事件相关人员编号
 
     //数据校验和转换
     DictCodeConverter.convertTPCardText6to7(card.getTextBuilder)

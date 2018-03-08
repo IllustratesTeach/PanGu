@@ -40,15 +40,12 @@ object DictCodeConverter {
     checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCertifType, textBuilder.getStrCertifType, 3,
       "证件类型", textBuilder)
     //人员类型
-    convertCode(textBuilder.getStrPersonType, DictCode6Map7.personType, textBuilder.setStrPersonType,
-      "人员类型", textBuilder.getStrComment, textBuilder.setStrComment)
+//    convertCode(textBuilder.getStrPersonType, DictCode6Map7.personType, textBuilder.setStrPersonType,
+//      "人员类型", textBuilder.getStrComment, textBuilder.setStrComment)
 
     //出生日期
     checkNormalDateOfTPCardTextBuilder(textBuilder.setStrBirthDate, textBuilder.getStrBirthDate, 8,
       "出生日期", textBuilder)
-    //采集日期
-    checkNormalDateOfTPCardTextBuilder(textBuilder.setStrPrintDate, textBuilder.getStrPrintDate, 8,
-      "采集日期", textBuilder)
   }
 
   /**

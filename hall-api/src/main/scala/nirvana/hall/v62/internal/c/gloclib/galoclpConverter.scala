@@ -228,7 +228,7 @@ object galoclpConverter extends LoggerSupport{
     admData.setUpdator(stAdmData.szMUserName)
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
-    admData.setStrLtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLLDate)) //LT发送时间
+    admData.setStrLtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLTDate)) //LT发送时间
     admData.setStrLlDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLLDate)) //LL发送时间
     admData.setStrLtUser(stAdmData.szLTUserName)  //LT发送用户
     admData.setStrLlUser(stAdmData.szLLUserName)  //LT发送用户
