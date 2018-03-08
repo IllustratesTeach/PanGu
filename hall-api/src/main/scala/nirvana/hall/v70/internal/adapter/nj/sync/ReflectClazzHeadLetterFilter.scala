@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
   * Created by yuchen on 2018/3/5.
   * 在同步数据的过程中，如果案件caseid、现场cardid，开头带有A，那么必须将A去掉.
   */
-  class ReflectClazzHeadLetterFiler[T <: ActiveRecord:ClassTag](t:T) {
+  class ReflectClazzHeadLetterFilter[T <: ActiveRecord:ClassTag](t:T) {
     def reflectFilterHeadLetter(): T ={
       val obj = t.asInstanceOf[T]
       obj.getClass.getDeclaredFields.foreach(handler(_,obj))
