@@ -128,8 +128,7 @@ object ProtobufConverter extends LoggerSupport{
     caseFinger.micUpdateUsername = text.getStrMicbUpdatorUserName
     caseFinger.micUpdateUnitcode = text.getStrMicbUpdatorUnitCode
     caseFinger.developMethod = text.getStrCaptureMethod
-    caseFinger.seq = text.getStrSeq.asInstanceOf[Long]
-    //TODO 候选指位
+    //TODO 候选指位 根据7.0不做实现
 
     //操作信息
     val admData = lpCard.getAdmData
@@ -153,7 +152,7 @@ object ProtobufConverter extends LoggerSupport{
       caseFinger.modifyUsername = admData.getUpdator
       caseFinger.ltCount = admData.getNLtCount.toLong
       caseFinger.creatorUnitCode = admData.getCreateUnitCode
-      caseFinger.micUpdateUnitcode = admData.getUpdateUnitCode
+      caseFinger.updatorUnitCode = admData.getUpdateUnitCode
       caseFinger.llCount = admData.getNLlCount.toLong
     }
 
@@ -266,7 +265,7 @@ object ProtobufConverter extends LoggerSupport{
       casePalm.ltUsername = admData.getStrLtUser
       casePalm.modifyUsername = admData.getUpdator
       casePalm.creatorUnitCode = admData.getCreateUnitCode
-      casePalm.micUpdateUnitcode = admData.getUpdateUnitCode
+      casePalm.updatorUnitCode = admData.getUpdateUnitCode
       casePalm.llCount = admData.getNLlCount.toLong
     }
 
