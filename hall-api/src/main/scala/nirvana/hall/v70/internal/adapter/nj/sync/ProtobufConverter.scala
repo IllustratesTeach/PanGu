@@ -675,17 +675,17 @@ object ProtobufConverter extends LoggerSupport{
         other.personId = personId
         otherList += other
       }
-      if(blob.getType == ImageType.IMAGETYPE_CARDINFO && blob.getStImageBytes.size() > 0){
+      if(blob.getType == ImageType.IMAGETYPE_CARDIMG && blob.getStBinBytes.size() > 0){
         val other = new GafisPersonOther()
-        other.fgp = blob.getCardinfofgp match {
-          case CardInfo.CARDINFO1 =>
+        other.fgp = blob.getCardimgfgp match {
+          case CARDIMG.CARDINFO1 =>
             Gafis70Constants.CARDINFO_1
-          case CardInfo.CARDINFO2 =>
+          case CARDIMG.CARDINFO2 =>
             Gafis70Constants.CARDINFO_2
-          case CardInfo.CARDINFO3 =>
+          case CARDIMG.CARDINFO3 =>
             Gafis70Constants.CARDINFO_3
         }
-        other.gatherData = blob.getStImageBytes.toByteArray
+        other.gatherData = blob.getStBinBytes.toByteArray
         other.gatherType = Gafis70Constants.GatherType_Cinfo
         other.imageType = Gafis70Constants.GROUP_ID_CPR
         other.personId = personId

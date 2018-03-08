@@ -127,11 +127,16 @@ enum	SignatureCpr
 };
 
 //卡片信息
-enum	CardInfo
+enum	CARDIMG
 {
 	CARDINFO1	= 1;	// 卡片信息1
 	CARDINFO2	= 2;	// 卡片信息2
 	CARDINFO3	= 3;	// 卡片信息3
+	CARDINFO4	= 4;	// 卡片信息4
+	CARDINFO5	= 5;	// 卡片信息5
+	CARDINFO6	= 6;	// 卡片信息6
+	CARDINFO7	= 7;	// 卡片信息7
+	CARDINFO8	= 8;	// 卡片信息8
 };
 
 //类型
@@ -147,7 +152,6 @@ enum	ImageType
 	IMAGETYPE_KNUCKLEPRINTS = 7;//指节纹
 	IMAGETYPE_FULLPALM = 8;//全掌
 	IMAGETYPE_SIGNATURE = 9;//签名压缩图
-	IMAGETYPE_CARDINFO = 10;//卡片信息
 
 }
 
@@ -233,7 +237,7 @@ message	TPCard
 		optional string			stBin = 11;								//纹线数据
 		optional string 		stOriginalImage = 12;					//原始图像数据
 		optional SignatureCpr	sigcprfgp = 13;							//签名压缩图
-		optional CardInfo		cardinfofgp = 14;						//卡片信息
+		optional CARDIMG		cardimgfgp = 14;						//卡片信息 文字框
 	}
 
 	required string		strCardID = 1;      //捺印卡号
