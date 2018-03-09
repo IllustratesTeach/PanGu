@@ -68,8 +68,8 @@ object Gafis70Constants {
   val FACE_LEFT = "3"   //左侧
   val FACE_UNKNOWN = "0" //未知
   //南京新增
-  val Criminal_Cpr = "1"  //现场嫌疑人签名压缩图
-  val Printer_Cpr = "2"  //捺印嫌疑人签名压缩图
+  val Printer_Cpr = "1"  //捺印嫌疑人签名压缩图
+  val Criminal_Cpr = "2"  //现场嫌疑人签名压缩图
 
   val CARDINFO_1 = "1"   //卡片信息1
   val CARDINFO_2 = "2" //卡片信息2

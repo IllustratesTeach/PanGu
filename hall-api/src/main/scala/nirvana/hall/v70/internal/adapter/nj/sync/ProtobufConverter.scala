@@ -440,7 +440,7 @@ object ProtobufConverter extends LoggerSupport{
     * @return
     */
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
-    person.personid = tpCard.getStrCardID
+    person.personid = tpCard.getStrPersonID
     person.cardid = tpCard.getStrCardID
     person.fingerrepeatno = tpCard.getStrMisPersonID//人员信息编号(重卡)
     val text = tpCard.getText
@@ -475,7 +475,7 @@ object ProtobufConverter extends LoggerSupport{
     person.nativeplaceCode = text.getStrNation//籍贯国籍(字典)
     person.certificatetype = getCode7to6(DictCode6Map7.certificatetype_nj.toMap,text.getStrCertifType)//证件类型code_zjzl
     person.certificateid = text.getStrCertifID//证件号码
-    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 0.toChar//前科库标识 1：有；0：无
+    person.recordmark = if(text.getBHasCriminalRecord) '1' else '0' //前科库标识 1：有；0：无
     person.recordsituation = text.getStrCriminalRecordDesc//前科劣迹情况
 
 //    if(person.idcardno.length > 18){
@@ -518,7 +518,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherFinger(tpCard: TPCard): Seq[GafisGatherFinger] = {
     val fingerList = new ArrayBuffer[GafisGatherFinger]()
-    val personId = tpCard.getStrCardID
+    val personId = tpCard.getStrPersonID
     val iter = tpCard.getBlobList.iterator()
     while (iter.hasNext){
       val blob = iter.next()
@@ -587,7 +587,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherPortrait(tpCard: TPCard): Seq[GafisGatherPortrait]={
     val portaitList = new ArrayBuffer[GafisGatherPortrait]()
-    val personId = tpCard.getStrCardID
+    val personId = tpCard.getStrPersonID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
@@ -656,7 +656,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisPersonOther(tpCard: TPCard): Seq[GafisPersonOther]={
     val otherList = new ArrayBuffer[GafisPersonOther]()
-    val personId = tpCard.getStrCardID
+    val personId = tpCard.getStrPersonID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
@@ -674,7 +674,7 @@ object ProtobufConverter extends LoggerSupport{
         other.personId = personId
         otherList += other
       }
-      if(blob.getType == ImageType.IMAGETYPE_CARDIMG && blob.getStBinBytes.size() > 0){
+      if(blob.getType == ImageType.IMAGETYPE_CARDIMG && blob.getStOriginalImageBytes.size() > 0){
         val other = new GafisPersonOther()
         other.fgp = blob.getCardimgfgp match {
           case CARDIMG.CARDINFO1 =>
@@ -684,9 +684,9 @@ object ProtobufConverter extends LoggerSupport{
           case CARDIMG.CARDINFO3 =>
             Gafis70Constants.CARDINFO_3
         }
-        other.gatherData = blob.getStBinBytes.toByteArray
+        other.gatherData = blob.getStOriginalImageBytes.toByteArray
         other.gatherType = Gafis70Constants.GatherType_Cinfo
-        other.imageType = Gafis70Constants.GROUP_ID_CPR
+        other.imageType = Gafis70Constants.GROUP_ID_JPG
         other.personId = personId
         otherList += other
       }
@@ -791,7 +791,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherPalm(tpCard: TPCard): Seq[GafisGatherPalm] ={
     val palmList = new ArrayBuffer[GafisGatherPalm]()
-    val personId = tpCard.getStrCardID
+    val personId = tpCard.getStrPersonID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()

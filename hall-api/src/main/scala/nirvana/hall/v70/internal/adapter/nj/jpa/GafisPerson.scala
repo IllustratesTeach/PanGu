@@ -119,7 +119,7 @@ class GafisPerson extends ActiveRecord {
   @Column(name = "CARDID", length = 23)
   var cardid: java.lang.String = _
   @Column(name = "RECORDMARK", length = 1)
-  var recordmark: java.lang.Character = _
+  var recordmark: Char = _
   @Column(name = "RECORDSITUATION", length = 3072)
   var recordsituation: java.lang.String = _
   @Column(name = "ASSIST_LEVEL", length = 1)

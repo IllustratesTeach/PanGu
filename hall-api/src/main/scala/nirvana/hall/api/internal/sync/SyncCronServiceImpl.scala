@@ -127,7 +127,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         while (iterator.hasNext) {
           val syncTPCard = iterator.next()
           var tpCard = syncTPCard.getTpCard
-          cardId = tpCard.getStrCardID
+          cardId = tpCard.getStrPersonID
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //读取策略信息,设置DataSource

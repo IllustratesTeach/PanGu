@@ -118,7 +118,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val gafisPerson = GafisPerson.find(cardId)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
     gafisPerson.save()
-    /*//删除指纹
+    //删除指纹
     GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除掌纹
     GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
@@ -127,7 +127,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     //删除逻辑库
     GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
-    GafisPerson.find(cardId).delete()*/
+    GafisPerson.find(cardId).delete()
   }
 
   /**
@@ -137,8 +137,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit ={
-    info("updateTPCard cardId:{}", tpCard.getStrCardID)
-    val person = GafisPerson.find(tpCard.getStrCardID)
+    info("updateTPCard personId:{} cardId:{}", tpCard.getStrPersonID, tpCard.getStrCardID)
+    val person = GafisPerson.find(tpCard.getStrPersonID)
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
     val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
     person.sid = sid
@@ -153,6 +153,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     person.cityCode = if(person.gatherdepartcode.length > 6)
       person.gatherdepartcode.substring(0,5) else person.gatherdepartcode
 
+    GafisPerson.find_by_personid(tpCard.getStrPersonID).foreach(f=> f.delete())
     person.save()
     //删除原来的逻辑库
     GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
