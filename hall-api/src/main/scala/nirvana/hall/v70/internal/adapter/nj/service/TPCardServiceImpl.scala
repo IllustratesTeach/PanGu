@@ -113,7 +113,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @param cardId
    * @return
    */
-  @Transactional
   override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
     val gafisPerson = GafisPerson.find(cardId)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL

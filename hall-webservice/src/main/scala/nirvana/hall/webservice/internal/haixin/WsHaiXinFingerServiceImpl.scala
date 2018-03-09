@@ -72,8 +72,12 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       strategyService.checkFingerCardIsExist(personid,IAConstant.SET_FINGER)
       val fpt = strategyService.checkFptIsVaild(personid,dh)
       queryId = Some(fpt.sid)
+      var cardId = ""
       fpt.logic02Recs.foreach{
-        t => fptService.addLogic02Res(t,Some(hallWebserviceConfig.templateFingerDBId))
+        t =>
+          cardId = t.cardId.toUpperCase
+          if(cardId.startsWith("R")) t.cardId = cardId.drop(1)
+          fptService.addLogic02Res(t,Some(hallWebserviceConfig.templateFingerDBId))
       }
       strategyService.fingerBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS
