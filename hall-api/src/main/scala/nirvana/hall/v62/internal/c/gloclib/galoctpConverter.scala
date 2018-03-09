@@ -361,7 +361,7 @@ object galoctpConverter extends LoggerSupport{
             }
           case glocdef.GAMIC_ITEMTYPE_DATA =>
             micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
-            micDataBuilder.setCardinfofgp(CardInfo.valueOf(mic.nItemData))
+            micDataBuilder.setCardimgfgp(CARDIMG.valueOf(mic.nItemData))
           case glocdef.GAMIC_ITEMTYPE_PALM =>
             micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
             micDataBuilder.setPalmfgp(FgpConverter.convertGTPIO_ITEMINDEX2PalmFgp(mic.nItemData))
