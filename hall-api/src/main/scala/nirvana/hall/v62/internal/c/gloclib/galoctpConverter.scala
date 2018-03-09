@@ -361,6 +361,7 @@ object galoctpConverter extends LoggerSupport{
             }
           case glocdef.GAMIC_ITEMTYPE_DATA =>
             micDataBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
+            micDataBuilder.setCardinfofgp(CardInfo.valueOf(mic.nItemData))
           case glocdef.GAMIC_ITEMTYPE_PALM =>
             micDataBuilder.setType(ImageType.IMAGETYPE_PALM)
             micDataBuilder.setPalmfgp(FgpConverter.convertGTPIO_ITEMINDEX2PalmFgp(mic.nItemData))
@@ -368,6 +369,7 @@ object galoctpConverter extends LoggerSupport{
             micDataBuilder.setType(ImageType.IMAGETYPE_VOICE)
           case glocdef.GAMIC_ITEMTYPE_SIGNATURE =>
             micDataBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
+            micDataBuilder.setSigcprfgp(SignatureCpr.valueOf(mic.nItemData))
           case other =>
             logger.error("mic type {} not supported for {}",other,data.szCardID)
             micDataBuilder.setType(ImageType.IMAGETYPE_UNKNOWN)
@@ -390,7 +392,6 @@ object galoctpConverter extends LoggerSupport{
     admData.setNTlCount(stAdmData.nAccuTLCount)
     admData.setNEditCount(stAdmData.nEditCount)
     text.setStrPersonType(stAdmData.szPersonType)    //人员类型
-    card.setStrMisPersonID(stAdmData.szMISPersonID)  //原始系统_案事件相关人员编号
 
     //数据校验和转换
     DictCodeConverter.convertTPCardText6to7(card.getTextBuilder)

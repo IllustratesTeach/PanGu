@@ -122,8 +122,8 @@ enum	FaceFgp
 //签名压缩图
 enum	SignatureCpr
 {
-	CriminalCpr	= 0;	// 嫌疑人签名压缩图（5）
 	PrinterCpr	= 1;	// 捺印人签名压缩图
+	CriminalCpr	= 2;	// 嫌疑人签名压缩图（5）
 };
 
 //卡片信息
