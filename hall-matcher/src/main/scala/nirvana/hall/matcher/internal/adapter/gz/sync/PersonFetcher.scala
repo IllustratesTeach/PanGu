@@ -33,8 +33,11 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     ", t.gather_date " + COL_NAME_GATHERDATE +
     ", t.data_sources " + COL_NAME_DATASOURCES +
     ", t.case_classes " + COL_NAME_CASECLASS +
-    ", t.deletag  from gafis_person t  where t.seq > ? and t.seq <= ? order by t.seq"
-  private val personCols: Array[String] = Array[String](COL_NAME_NAME, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS)
+    ", t.deletag " +
+    ", db.logic_db_pkid as " + COL_NAME_LOGICDB +
+    " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid " +
+    " where t.seq > ? and t.seq <= ? order by t.seq"
+  private val personCols: Array[String] = Array[String](COL_NAME_NAME, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, COL_NAME_LOGICDB)
   /**
     * 读取人员信息
     * @param syncDataResponse

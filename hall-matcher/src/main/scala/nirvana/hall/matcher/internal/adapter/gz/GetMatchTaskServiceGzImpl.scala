@@ -99,6 +99,18 @@ class GetMatchTaskServiceGzImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         if(personidGroupQuery != null){
           textQuery.addQueryBuilder().setName(PERSONID).setExtension(GroupQuery.query, personidGroupQuery)
         }
+        //逻辑库
+        if(json.has(COL_NAME_LOGICDB)){
+          val logicDB = json.getString(COL_NAME_LOGICDB)
+          val values = logicDB.split("\\|")
+          val groupQuery = GroupQuery.newBuilder()
+          values.foreach{value =>
+            val keywordQuery = KeywordQuery.newBuilder()
+            keywordQuery.setValue(value)
+            groupQuery.addClauseQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(KeywordQuery.query, keywordQuery.build()).setOccur(Occur.SHOULD)
+          }
+          textQuery.addQueryBuilder().setName(COL_NAME_LOGICDB).setExtension(GroupQuery.query, groupQuery.build())
+        }
       }
       catch {
         case e: Exception =>

@@ -36,6 +36,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
                   updateFingerRepeatNoByPersonid(personidRepeatNo._1, repeatNo)
                 } else if(personidRepeatNo._2.equals(repeatNo)){
                   //已经存在相同的重卡组号
+                  info("已经存在重卡组号:{}", repeatNo)
                 }else{
                   //存在不相同的重卡组号，异常
                   error("重卡归并任务号：{}，人员编号：{}，{} 存在不相同的重卡组号", queryQue.oraSid, queryQue.keyId, personidRepeatNo._1)
