@@ -3,7 +3,8 @@ package nirvana.hall.v70.internal.adapter.nj.jpa
 // Generated 2018-3-6 10:50:31 by Stark Activerecord generator 4.3.1.Final
 
 
-import javax.persistence.{Column, Entity, Id, Table}
+import javax.persistence.{TemporalType, _}
+
 import stark.activerecord.services.ActiveRecord
 import stark.activerecord.services.ActiveRecordInstance;
 
@@ -40,6 +41,16 @@ class GafisPersonOther extends ActiveRecord {
       var gatherData: Array[Byte] =  _
       @Column(name="IMAGE_TYPE", length=2)
       var imageType:java.lang.Short =  _
+      @Column(name = "INPUTPSN", length = 32)
+      var inputpsn: java.lang.String = _
+      @Temporal(TemporalType.TIMESTAMP)
+      @Column(name = "INPUTTIME", nullable = false, length = 23)
+      var inputtime: java.util.Date = _
+      @Column(name = "MODIFIEDPSN", length = 32)
+      var modifiedpsn: java.lang.String = _
+      @Temporal(TemporalType.TIMESTAMP)
+      @Column(name = "MODIFIEDTIME", length = 23)
+      var modifiedtime: java.util.Date = _
 
 
 	
@@ -47,7 +58,7 @@ class GafisPersonOther extends ActiveRecord {
         this()
         this.uuid = uuid
     }
-    def this(uuid:java.lang.String, personId:java.lang.String, gatherType:java.lang.String, fgp:java.lang.String, width:java.lang.String, height:java.lang.String, dpi:java.lang.String, compressMethod:java.lang.String, nfiqQuality:java.lang.String, gatherData: Array[Byte], imageType:java.lang.Short) {
+    def this(uuid:java.lang.String, personId:java.lang.String, gatherType:java.lang.String, fgp:java.lang.String, width:java.lang.String, height:java.lang.String, dpi:java.lang.String, compressMethod:java.lang.String, nfiqQuality:java.lang.String, gatherData: Array[Byte], imageType:java.lang.Short, inputpsn: java.lang.String, inputtime: java.util.Date, modifiedpsn: java.lang.String, modifiedtime: java.util.Date) {
       this()
       this.uuid = uuid
       this.personId = personId
@@ -60,6 +71,10 @@ class GafisPersonOther extends ActiveRecord {
       this.nfiqQuality = nfiqQuality
       this.gatherData = gatherData
       this.imageType = imageType
+      this.inputpsn = inputpsn
+      this.inputtime = inputtime
+      this.modifiedpsn = modifiedpsn
+      this.modifiedtime = modifiedtime
     }
 }
 

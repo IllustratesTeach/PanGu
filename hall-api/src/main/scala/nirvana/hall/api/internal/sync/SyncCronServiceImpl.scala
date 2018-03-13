@@ -111,6 +111,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     info("syncTPCard name:{} current-seq:{}", fetchConfig.name, fetchConfig.seq)
     val uuid = UUID.randomUUID().toString
     var cardId = ""
+    var personId = ""
     var seq = fetchConfig.seq
     var typ_add=""
     try {
@@ -127,7 +128,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         while (iterator.hasNext) {
           val syncTPCard = iterator.next()
           var tpCard = syncTPCard.getTpCard
-          cardId = tpCard.getStrPersonID
+          cardId = tpCard.getStrCardID
+          personId = tpCard.getStrPersonID
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //读取策略信息,设置DataSource
@@ -142,24 +144,24 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {
                 tpCardService.updateTPCard(tpCard, destDBID)
-                info("update TPCard:{}", cardId)
+                info("update TPCard:{};PersonId:{}", cardId, personId)
                 typ_add = HallApiConstants.UPDATE
               }
             } else {
               tpCardService.addTPCard(tpCard, destDBID)
-              info("add TPCard:{}", cardId)
-              typ_add = HallApiConstants.PUT
+              info("add TPCard:{};PersonId:{}", cardId, personId)
+                typ_add = HallApiConstants.PUT
             }
 
           } else if(syncTPCard.getOperationType == OperationType.DEL) {
             if(tpCardService.isExist(cardId, destDBID)){
               tpCardService.delTPCard(cardId, destDBID)
-              info("delete TPCard:{}", cardId)
+              info("delete TPCard:{};PersonId:{}", cardId, personId)
               typ_add = HallApiConstants.DELETE
             }
           }
           seq = syncTPCard.getSeq
-          info("TP-RequestData success,cardId:{}",cardId)
+          info("TP-RequestData success,cardId:{};PersonId:{}", cardId, personId)
 
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7,
               fetchConfig.url.length - 5)
@@ -179,12 +181,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        error("TP-RequestData fail,uuid:{};cardId:{};PersonId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,personId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH +
           HallApiConstants.SYNC_TYPE_TPCARD)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
+        error("TP-RequestData fail,uuid:{};cardId:{};PersonId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,personId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
           HallApiConstants.SYNC_TYPE_TPCARD)
     }
@@ -496,6 +498,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
     * 抓取比中关系
+    *
     * @param fetchConfig
     */
   def  fetchMatchRelation(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
@@ -689,7 +692,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
    * 根据捺印卡号查找所在DBID
-   * @param cardId
+    *
+    * @param cardId
    * @param dbidList
    * @return
    */
@@ -763,6 +767,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
   /**
     * 通过查询类型获得keyid和Tcode的值
     * 在数据库中比中关系表中由于根据不同的查询类型，存的列不固定，所以需要判断一下
+    *
     * @param matchRelationInfo
     * @return
     */
@@ -791,6 +796,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
 
   /**
     * 更新6.2任务表中对应这条认定的候选信息的候选状态,暂时先写到这里
+    *
     * @param oraSid
     * @param taskType
     * @param keyId

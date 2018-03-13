@@ -103,6 +103,10 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
       otherList.foreach{other=>
         other.uuid = CommonUtils.getUUID()
+        other.inputtime = person.inputtime
+        other.inputpsn = person.inputUsername
+        other.inputtime = person.modifiedtime
+        other.inputpsn = person.modifyUsername
         other.save()
       }
     }
@@ -114,19 +118,20 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
-    val gafisPerson = GafisPerson.find(cardId)
+    val gafisPerson = new GafisPerson
+    GafisPerson.find_by_cardid(cardId).foreach(f=> gafisPerson)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
     gafisPerson.save()
     //删除指纹
-    GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
+    GafisGatherFinger.find_by_personId(gafisPerson.personid).foreach(f=> f.delete())
     //删除掌纹
-    GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
+    GafisGatherPalm.find_by_personId(gafisPerson.personid).foreach(f=> f.delete())
     //删除人像
-    GafisGatherPortrait.find_by_personid(cardId).foreach(f=> f.delete())
+    GafisGatherPortrait.find_by_personid(gafisPerson.personid).foreach(f=> f.delete())
     //删除逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(gafisPerson.personid).foreach(_.delete())
     //删除人员信息
-    GafisPerson.find(cardId).delete()
+    GafisPerson.find(gafisPerson.personid).delete()
   }
 
   /**
@@ -203,6 +208,10 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
     otherList.foreach{other=>
       other.uuid = CommonUtils.getUUID()
+      other.inputtime = person.inputtime
+      other.inputpsn = person.inputUsername
+      other.inputtime = person.modifiedtime
+      other.inputpsn = person.modifyUsername
       other.save()
     }
 }
@@ -213,7 +222,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    GafisPerson.findOption(cardId).nonEmpty
+    GafisPerson.find_by_cardid(cardId).nonEmpty
   }
 
   /**
