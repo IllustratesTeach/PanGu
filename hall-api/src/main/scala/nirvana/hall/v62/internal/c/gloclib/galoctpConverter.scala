@@ -390,6 +390,8 @@ object galoctpConverter extends LoggerSupport{
     admData.setStrTtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTTDate))
     admData.setNTtCount(stAdmData.nAccuTTCount)
     admData.setNTlCount(stAdmData.nAccuTLCount)
+    admData.setStrTtUser(stAdmData.szTLUserName)
+    admData.setStrTlUser(stAdmData.szTTUserName)
     admData.setNEditCount(stAdmData.nEditCount)
     text.setStrPersonType(stAdmData.szPersonType)    //人员类型
 

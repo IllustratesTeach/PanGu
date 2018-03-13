@@ -436,13 +436,15 @@ message AdminfoData {
     optional string	strTtDate = 8;                  //TT发送时间
     optional int32	nTtCount = 9;                   //TT累计发送次数
     optional int32	nTlCount = 10;                  //TL累计发送次数
-    optional string	strLtDate = 11;		            //LT发送时间
-    optional string	strLlDate = 12;		            //LL发送时间
-    optional string	strLtUser = 13;		            //LT发送用户
-    optional string	strLlUser = 14;		            //LL发送用户
-    optional int32	nEditCount = 15;		        //编辑次数
-    optional int32	nLtCount = 16;                  //LT累计查案次数
-    optional int32	nLlCount = 17;                  //LL累计串查次数
+	optional string	strTtUser = 11;		            //TT发送用户
+	optional string	strTlUser = 12;		            //TL发送用户
+    optional string	strLtDate = 13;		            //LT发送时间
+    optional string	strLlDate = 14;		            //LL发送时间
+    optional string	strLtUser = 15;		            //LT发送用户
+    optional string	strLlUser = 16;		            //LL发送用户
+    optional int32	nEditCount = 17;		        //编辑次数
+    optional int32	nLtCount = 18;                  //LT累计查案次数
+    optional int32	nLlCount = 19;                  //LL累计串查次数
 }
 
 

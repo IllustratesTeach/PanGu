@@ -506,6 +506,8 @@ object ProtobufConverter extends LoggerSupport{
       person.editCount = admData.getNEditCount.toString
       person.modifyUsername = admData.getUpdator
       person.tlcount = admData.getNTlCount.toString
+      person.ttUsername = admData.getStrTtUser
+      person.tlUsername = admData.getStrTlUser
     }
     person
   }
