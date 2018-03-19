@@ -489,7 +489,7 @@ object galoclpConverter extends LoggerSupport{
     caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)  //警务平台编号
 
     //数据校验
-    DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
+    DictCodeConverter.convertCaseInfoText6to7(caseInfo)
 
     caseInfo.build()
   }

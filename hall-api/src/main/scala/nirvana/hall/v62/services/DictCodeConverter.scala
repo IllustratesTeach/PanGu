@@ -2,7 +2,7 @@ package nirvana.hall.v62.services
 
 import nirvana.hall.protocol.api.FPTProto.Case.CaseText
 import nirvana.hall.protocol.api.FPTProto.LPCard.LPCardText
-import nirvana.hall.protocol.api.FPTProto.TPCard
+import nirvana.hall.protocol.api.FPTProto.{AdminfoData, Case, TPCard}
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardText
 
 import scala.collection.Map
@@ -39,20 +39,26 @@ object DictCodeConverter {
     //证件类型
     checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrCertifType, textBuilder.getStrCertifType, 3,
       "证件类型", textBuilder)
-    //人员类型
-//    convertCode(textBuilder.getStrPersonType, DictCode6Map7.personType, textBuilder.setStrPersonType,
-//      "人员类型", textBuilder.getStrComment, textBuilder.setStrComment)
+    //人员类别
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrPersonClassCode, textBuilder.getStrPersonClassCode, 3,
+      "人员类别", textBuilder)
 
     //出生日期
     checkNormalDateOfTPCardTextBuilder(textBuilder.setStrBirthDate, textBuilder.getStrBirthDate, 8,
       "出生日期", textBuilder)
+    //人员类型
+    checkNormalCodeOfTPCardTextBuilder(textBuilder.setStrPersonType, textBuilder.getStrPersonType, 3,
+      "人员类型", textBuilder)
+
   }
+
 
   /**
    * 校验案件文字信息
-   * @param textBuilder
+   * @param caseInfo
    */
-  def convertCaseInfoText6to7(textBuilder: CaseText.Builder): Unit ={
+  def convertCaseInfoText6to7(caseInfo: Case.Builder): Unit ={
+     val textBuilder = caseInfo.getTextBuilder
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6,
       "案件类别1", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6,
@@ -73,6 +79,9 @@ object DictCodeConverter {
       "奖金", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrXieChaRequestUnitCode, textBuilder.getStrXieChaRequestUnitCode, 12,
       "协查单位", textBuilder)
+    //警务平台编号
+    checkNormalCodeOfCaseTextBuilder(caseInfo.setStrMisConnectCaseId, caseInfo.getStrMisConnectCaseId, 32,
+      "警务平台编号", textBuilder)
 
   }
 

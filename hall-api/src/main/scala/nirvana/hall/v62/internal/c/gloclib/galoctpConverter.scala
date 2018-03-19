@@ -227,6 +227,7 @@ object galoctpConverter extends LoggerSupport{
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
       if (bytes != null){
         val textContent = new String(bytes, AncientConstants.GBK_ENCODING).trim
+        text.setStrComment("")  //增加备注初始值，用于南京性别匹配同步，未匹配则在case时直接赋值
         if(textContent.length > 0){
           item szItemName match{
             case "Name" =>
@@ -234,8 +235,17 @@ object galoctpConverter extends LoggerSupport{
             case "Alias" =>
               text.setStrAliasName(textContent)
             case "SexCode" =>
-              if(textContent.matches("\\d"))
-                text.setNSex(Integer.parseInt(textContent))
+              if(textContent.matches("\\d")) {
+                if(textContent.equals("1") || textContent.equals("2"))
+                  text.setNSex(Integer.parseInt(textContent))
+                else {
+                  text.setNSex(0)
+                  text.setStrComment(text.getStrComment + "性别：" +textContent)
+                }
+              }else{
+                text.setNSex(0)
+                text.setStrComment(text.getStrComment + "性别："+ textContent)
+              }
             case "BirthDate" =>
               if(textContent.matches("\\d{8}"))
                 text.setStrBirthDate(textContent)
@@ -267,7 +277,7 @@ object galoctpConverter extends LoggerSupport{
               if(textContent.matches("\\d{8}"))
                 text.setStrPrintDate(textContent+"000000")
             case "Comment" =>
-              text.setStrComment(textContent)
+              text.setStrComment(textContent + text.getStrComment())
             case "Nationality" =>
               text.setStrNation(textContent)
             case "RaceCode" =>
@@ -277,7 +287,7 @@ object galoctpConverter extends LoggerSupport{
             case "CertificateType" =>
               text.setStrCertifType(textContent)
             case "IsCriminalRecord" =>
-              text.setBHasCriminalRecord("1".equals(textContent)||"49".equals(textContent))  //南京前科标识转换
+              text.setBHasCriminalRecord("49".equals(textContent))  //南京前科标识转换
             case "CriminalRecordDesc" =>
               text.setStrCriminalRecordDesc(textContent)
             case "CreatorUnitCode" =>
@@ -390,8 +400,8 @@ object galoctpConverter extends LoggerSupport{
     admData.setStrTtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTTDate))
     admData.setNTtCount(stAdmData.nAccuTTCount)
     admData.setNTlCount(stAdmData.nAccuTLCount)
-    admData.setStrTtUser(stAdmData.szTLUserName)
-    admData.setStrTlUser(stAdmData.szTTUserName)
+    admData.setStrTtUser(stAdmData.szTTUserName)
+    admData.setStrTlUser(stAdmData.szTLUserName)
     admData.setNEditCount(stAdmData.nEditCount)
     text.setStrPersonType(stAdmData.szPersonType)    //人员类型
 
