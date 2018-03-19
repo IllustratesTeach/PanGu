@@ -111,7 +111,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     info("syncTPCard name:{} current-seq:{}", fetchConfig.name, fetchConfig.seq)
     val uuid = UUID.randomUUID().toString
     var cardId = ""
-    var personId = ""
     var seq = fetchConfig.seq
     var typ_add=""
     try {
@@ -129,7 +128,6 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
           val syncTPCard = iterator.next()
           var tpCard = syncTPCard.getTpCard
           cardId = tpCard.getStrCardID
-          personId = tpCard.getStrPersonID
           if (syncTPCard.getOperationType == OperationType.PUT &&
             validateTPCardByWriteStrategy(tpCard, fetchConfig.writeStrategy)) {
             //读取策略信息,设置DataSource
@@ -144,24 +142,24 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {
                 tpCardService.updateTPCard(tpCard, destDBID)
-                info("update TPCard:{};PersonId:{}", cardId, personId)
+                info("update TPCard:{}", cardId)
                 typ_add = HallApiConstants.UPDATE
               }
             } else {
               tpCardService.addTPCard(tpCard, destDBID)
-              info("add TPCard:{};PersonId:{}", cardId, personId)
-                typ_add = HallApiConstants.PUT
+              info("add TPCard:{}", cardId)
+              typ_add = HallApiConstants.PUT
             }
 
           } else if(syncTPCard.getOperationType == OperationType.DEL) {
             if(tpCardService.isExist(cardId, destDBID)){
               tpCardService.delTPCard(cardId, destDBID)
-              info("delete TPCard:{};PersonId:{}", cardId, personId)
+              info("delete TPCard:{}", cardId)
               typ_add = HallApiConstants.DELETE
             }
           }
           seq = syncTPCard.getSeq
-          info("TP-RequestData success,cardId:{};PersonId:{}", cardId, personId)
+          info("TP-RequestData success,cardId:{}",cardId)
 
             syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, cardId, fetchConfig.typ + typ_add, fetchConfig.url.substring(7,
               fetchConfig.url.length - 5)
@@ -181,12 +179,12 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
     } catch {
       case e: nirvana.hall.support.internal.CallRpcException =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        error("TP-RequestData fail,uuid:{};cardId:{};PersonId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,personId,eInfo,e.getMessage)
+        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH +
           HallApiConstants.SYNC_TYPE_TPCARD)
       case e: Exception =>
         val eInfo = ExceptionUtil.getStackTraceInfo(e)
-        error("TP-RequestData fail,uuid:{};cardId:{};PersonId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,personId,eInfo,e.getMessage)
+        error("TP-RequestData fail,uuid:{};cardId:{};错误堆栈信息:{};错误信息:{}",uuid,cardId,eInfo,e.getMessage)
         syncInfoLogManageService.recordSyncDataLog(uuid, cardId, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
           HallApiConstants.SYNC_TYPE_TPCARD)
     }

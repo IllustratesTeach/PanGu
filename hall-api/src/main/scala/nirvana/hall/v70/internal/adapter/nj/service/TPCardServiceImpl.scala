@@ -118,20 +118,19 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def delTPCard(cardId: String, dbId: Option[String]): Unit = {
-    val gafisPerson = new GafisPerson
-    GafisPerson.find_by_cardid(cardId).foreach(f=> gafisPerson)
+    val gafisPerson = GafisPerson.find(cardId)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
     gafisPerson.save()
-    //删除指纹
-    GafisGatherFinger.find_by_personId(gafisPerson.personid).foreach(f=> f.delete())
+    /*//删除指纹
+    GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
     //删除掌纹
-    GafisGatherPalm.find_by_personId(gafisPerson.personid).foreach(f=> f.delete())
+    GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
     //删除人像
-    GafisGatherPortrait.find_by_personid(gafisPerson.personid).foreach(f=> f.delete())
+    GafisGatherPortrait.find_by_personid(cardId).foreach(f=> f.delete())
     //删除逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid(gafisPerson.personid).foreach(_.delete())
+    GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
     //删除人员信息
-    GafisPerson.find(gafisPerson.personid).delete()
+    GafisPerson.find(cardId).delete()*/
   }
 
   /**
@@ -141,8 +140,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    */
   @Transactional
   override def updateTPCard(tpCard: TPCard, dbId: Option[String]): Unit ={
-    info("updateTPCard personId:{} cardId:{}", tpCard.getStrPersonID, tpCard.getStrCardID)
-    val person = GafisPerson.find(tpCard.getStrPersonID)
+    info("updateTPCard cardId:{}", tpCard.getStrCardID)
+    val person = GafisPerson.find(tpCard.getStrCardID)
     ProtobufConverter.convertTPCard2GafisPerson(tpCard, person)
     val sid = java.lang.Long.parseLong(entityManager.createNativeQuery("select gafis_person_sid_seq.nextval from dual").getResultList.get(0).toString)
     person.sid = sid
@@ -222,7 +221,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
    * @return
    */
   override def isExist(cardId: String, dbId: Option[String]): Boolean = {
-    GafisPerson.find_by_cardid(cardId).nonEmpty
+    GafisPerson.findOption(cardId).nonEmpty
   }
 
   /**

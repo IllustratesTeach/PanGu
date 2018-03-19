@@ -440,7 +440,7 @@ object ProtobufConverter extends LoggerSupport{
     * @return
     */
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
-    person.personid = tpCard.getStrPersonID
+    person.personid = tpCard.getStrCardID
     person.cardid = tpCard.getStrCardID
     person.fingerrepeatno = tpCard.getStrMisPersonID//人员信息编号(重卡)
     val text = tpCard.getText
@@ -520,7 +520,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherFinger(tpCard: TPCard): Seq[GafisGatherFinger] = {
     val fingerList = new ArrayBuffer[GafisGatherFinger]()
-    val personId = tpCard.getStrPersonID
+    val personId = tpCard.getStrCardID
     val iter = tpCard.getBlobList.iterator()
     while (iter.hasNext){
       val blob = iter.next()
@@ -589,7 +589,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherPortrait(tpCard: TPCard): Seq[GafisGatherPortrait]={
     val portaitList = new ArrayBuffer[GafisGatherPortrait]()
-    val personId = tpCard.getStrPersonID
+    val personId = tpCard.getStrCardID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
@@ -658,7 +658,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisPersonOther(tpCard: TPCard): Seq[GafisPersonOther]={
     val otherList = new ArrayBuffer[GafisPersonOther]()
-    val personId = tpCard.getStrPersonID
+    val personId = tpCard.getStrCardID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
@@ -806,7 +806,7 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisGatherPalm(tpCard: TPCard): Seq[GafisGatherPalm] ={
     val palmList = new ArrayBuffer[GafisGatherPalm]()
-    val personId = tpCard.getStrPersonID
+    val personId = tpCard.getStrCardID
     val blobIter = tpCard.getBlobList.iterator()
     while (blobIter.hasNext){
       val blob = blobIter.next()
