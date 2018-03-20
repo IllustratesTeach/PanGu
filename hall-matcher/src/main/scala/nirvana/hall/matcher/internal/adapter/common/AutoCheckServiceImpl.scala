@@ -23,6 +23,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
   /**
     * TT自动认定,在比对返回候选的时候自动认定
     * @param matchResultRequest
+    * @param queryQue
     */
   override def ttAutoCheck(matchResultRequest: MatchResultRequest, queryQue: QueryQueVo): Unit = {
     if(hallMatcherConfig.autoCheck != null){
@@ -90,6 +91,9 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
               checkinInfoVo.registerUser = personInfo.get._1 //查中登记用户
               checkinInfoVo.registerOrg = personInfo.get._2 //查中登记单位
               createMatchRelation(checkinInfoVo,submittSystem)
+            }else{
+              //已存在比中关系，当前候选不认定
+              newFlag = 0
             }
           }else if(cand.nScore < hallMatcherConfig.autoCheck.denyScore){
             //小于自动否定分数
@@ -284,15 +288,17 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
             ps.setInt(2,checkInNum)
             ps.setString(3,personInfo.get("pkId").get)
         }
-        val insertSysMegSql = "insert into SYS_MEG t (t.pk_id,t.person_id,t.person_name,t.gather_user_id,t.meg_type,t.message,t.look_status," +
-          "t.inputtime,t.gather_depart_code) values (?,?,?,?,2,'TT自动认定',0,sysdate,?)"
-        JdbcDatabase.update(insertSysMegSql){
-          ps =>
-            ps.setString(1,generatorPkId())
-            ps.setString(2,personId)
-            ps.setString(3,personInfo.get("name").getOrElse(""))
-            ps.setString(4,personInfo.get("gatherUserid").getOrElse(""))
-            ps.setString(5,personInfo.get("gatherOrgCode").getOrElse(""))
+        if(verifyResult == 98){
+          val insertSysMegSql = "insert into SYS_MEG t (t.pk_id,t.person_id,t.person_name,t.gather_user_id,t.meg_type,t.message,t.look_status," +
+            "t.inputtime,t.gather_depart_code) values (?,?,?,?,2,'TT自动认定',0,sysdate,?)"
+          JdbcDatabase.update(insertSysMegSql){
+            ps =>
+              ps.setString(1,generatorPkId())
+              ps.setString(2,personId)
+              ps.setString(3,personInfo.get("name").getOrElse(""))
+              ps.setString(4,personInfo.get("gatherUserid").getOrElse(""))
+              ps.setString(5,personInfo.get("gatherOrgCode").getOrElse(""))
+          }
         }
       }
     }
