@@ -2,7 +2,6 @@ package nirvana.hall.v62.internal.c.gloclib
 
 import com.google.protobuf.{ByteString, ProtocolStringList}
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
@@ -124,7 +123,7 @@ object galoclpConverter extends LoggerSupport{
   /**
    * convert GLPCARDINFOSTRUCT object to LPCard object
    */
-  def convertGLPCARDINFOSTRUCT2ProtoBuf(gCard: GLPCARDINFOSTRUCT): LPCard = {
+  def convertGLPCARDINFOSTRUCT2ProtoBuf(gCard: GLPCARDINFOSTRUCT,groupname: String): LPCard = {
     val card = LPCard.newBuilder()
     card.setStrCardID(gCard.szCardID)
     val text = card.getTextBuilder
@@ -235,6 +234,7 @@ object galoclpConverter extends LoggerSupport{
     admData.setNLtCount(stAdmData.nAccuLTCount)   //LT累计发送次数
     admData.setNLlCount(stAdmData.nAccuLLCount)   //LL累计发送次数
     admData.setNEditCount(stAdmData.nEditCount.toInt)   //编辑次数
+    admData.setStrGroupName(groupname)   //现场关联组号
     card.setNLtStatus(stAdmData.bIsLTBroken)      //查案比中状态：1：比中；0：未比中 ; 6.2:是否LT破案
     //数据字典校验
     DictCodeConverter.convertLPCardText6to7(card.getTextBuilder)

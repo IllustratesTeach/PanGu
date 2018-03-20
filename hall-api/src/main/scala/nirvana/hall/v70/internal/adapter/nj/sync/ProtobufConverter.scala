@@ -154,6 +154,7 @@ object ProtobufConverter extends LoggerSupport{
       caseFinger.creatorUnitCode = admData.getCreateUnitCode
       caseFinger.updatorUnitCode = admData.getUpdateUnitCode
       caseFinger.llCount = admData.getNLlCount.toLong
+      caseFinger.fingerGroupNo = admData.getStrGroupName
     }
 
     val blob = lpCard.getBlob
@@ -267,6 +268,7 @@ object ProtobufConverter extends LoggerSupport{
       casePalm.creatorUnitCode = admData.getCreateUnitCode
       casePalm.updatorUnitCode = admData.getUpdateUnitCode
       casePalm.llCount = admData.getNLlCount.toLong
+      casePalm.palmGroupNo = admData.getStrGroupName
     }
 
     val blob = lpCard.getBlob
@@ -508,6 +510,7 @@ object ProtobufConverter extends LoggerSupport{
       person.tlcount = admData.getNTlCount.toString
       person.ttUsername = admData.getStrTtUser
       person.tlUsername = admData.getStrTlUser
+      person.caseFingerGroupNo = admData.getStrGroupName
     }
     person
   }

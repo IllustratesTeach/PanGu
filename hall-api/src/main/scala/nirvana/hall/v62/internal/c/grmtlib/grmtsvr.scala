@@ -68,7 +68,7 @@ trait grmtsvr {
         //n 为保存成功的个数
         var n = 0
         stTPCardOpt.map{tpCard=>
-          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
+          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard,"")
         }.foreach{ card =>
             findTPCardService.addTPCard(card)
             n += 1
@@ -85,7 +85,7 @@ trait grmtsvr {
         var n = 0
         val stTPCardOpt = GAFIS_PKG_GetTpCard(pstRecvPkg)
         stTPCardOpt.map{ tpCard=>
-          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard)
+          galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tpCard,"")
         }.foreach{ card=>
           findTPCardService.updateTPCard(card)
           n += 1
@@ -233,7 +233,7 @@ trait grmtsvr {
         val stLPCard = GAFIS_PKG_GetLpCard(pstRecvPkg)
         var n = 0
         stLPCard.map{ lpCard=>
-          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
+          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard,"")
         }.foreach{ card =>
           findLPCardService.addLPCard(card)
           n += 1
@@ -257,7 +257,7 @@ trait grmtsvr {
         val stLPCard = GAFIS_PKG_GetLpCard(pstRecvPkg)
         var n = 0
         stLPCard.map{ lpCard=>
-          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard)
+          galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(lpCard,"")
         }.foreach{ card =>
           findLPCardService.updateLPCard(card)
           n += 1

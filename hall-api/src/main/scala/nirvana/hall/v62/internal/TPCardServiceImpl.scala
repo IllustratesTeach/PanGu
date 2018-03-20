@@ -1,10 +1,10 @@
 package nirvana.hall.v62.internal
 
-import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.TPCardService
 import nirvana.hall.c.services.gfpt4lib.FPT4File
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic02Rec
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
+import nirvana.hall.c.services.gloclib.gatplpassociate.GAFIS_TPLP_ASSOCIATE
 import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.V62SqlHelper
@@ -71,7 +71,16 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     facade.NET_GAFIS_FLIB_Get(tdbId, V62Facade.TID_TPCARDINFO,
       cardId, tp, null, 3)
 
-    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp)
+    val mapper = Map(
+      g_stCN.stNuminaCol.pszSID -> "nSID",
+      g_stCN.stTPLPAssociate.pszLPGroupID -> "szLPGroupID"
+    )
+    var statement = "(1=1)"
+    statement += V62SqlHelper.andSQL("TPPERSONID",tp.stAdmData.szPersonID)
+    val tpLpAssocaites = facade.queryV62Table[GAFIS_TPLP_ASSOCIATE](dbid.get.toShort, V62Facade.TID_TPCARDINFO, mapper, Option
+    (statement), 1)
+
+    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp,tpLpAssocaites.head.szLPGroupID)
   }
 
   /**
