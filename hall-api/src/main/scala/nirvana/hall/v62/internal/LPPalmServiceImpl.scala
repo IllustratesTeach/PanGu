@@ -5,6 +5,7 @@ import nirvana.hall.c.services.gloclib.galoclp.GLPCARDINFOSTRUCT
 import nirvana.hall.protocol.api.FPTProto.LPCard
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.c.gloclib.galoclpConverter
+import nirvana.hall.v62.internal.c.gloclib.gcolnames._
 
 /**
  * 现场掌纹service实现
@@ -26,6 +27,19 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config) extends LPPalmSer
   }
 
   /**
+    * 获取现场关联
+    * @param cardId
+    */
+  private def getGroupName(cardId: String, dbId: Option[String]): String ={
+    val data = facade.NET_GAFIS_COL_GetByKey(getDBID(dbId), V62Facade.TID_LATPALM, cardId, g_stCN.stLAdm.pszGroupName)
+    if(data != null && data.length > 0){
+      new String(data)
+    }else{
+      ""
+    }
+  }
+
+  /**
    * 获取现场卡片
    * @param cardId
    * @return
@@ -33,7 +47,7 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config) extends LPPalmSer
   override def getLPCard(cardId: String, dbId: Option[String]): LPCard = {
     val gCard = new GLPCARDINFOSTRUCT
     facade.NET_GAFIS_FLIB_Get(getDBID(dbId), V62Facade.TID_LATPALM,cardId, gCard, null, 3)
-    galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard)
+    galoclpConverter.convertGLPCARDINFOSTRUCT2ProtoBuf(gCard,getGroupName(cardId,dbId))
   }
 
   /**

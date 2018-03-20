@@ -445,6 +445,7 @@ message AdminfoData {
     optional int32	nEditCount = 17;		        //编辑次数
     optional int32	nLtCount = 18;                  //LT累计查案次数
     optional int32	nLlCount = 19;                  //LL累计串查次数
+	optional string	strGroupName = 20;              //现场关联组号
 }
 
 

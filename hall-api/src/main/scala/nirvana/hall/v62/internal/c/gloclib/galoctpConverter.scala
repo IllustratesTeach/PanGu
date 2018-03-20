@@ -212,7 +212,7 @@ object galoctpConverter extends LoggerSupport{
     * @param data
    * @return
    */
-  def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT): TPCard = {
+  def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT,groupname: String): TPCard = {
     val card = TPCard.newBuilder()
     card.setStrCardID(data.szCardID)
     card.setStrPersonID(data.stAdmData.szMISPersonID)
@@ -404,6 +404,7 @@ object galoctpConverter extends LoggerSupport{
     admData.setStrTlUser(stAdmData.szTLUserName)
     admData.setNEditCount(stAdmData.nEditCount)
     text.setStrPersonType(stAdmData.szPersonType)    //人员类型
+    admData.setStrGroupName(groupname) //现场关联组号
 
     //数据校验和转换
     DictCodeConverter.convertTPCardText6to7(card.getTextBuilder)
