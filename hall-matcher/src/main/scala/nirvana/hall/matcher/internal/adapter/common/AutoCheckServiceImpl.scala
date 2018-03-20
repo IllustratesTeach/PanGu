@@ -35,7 +35,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
       val queryDetailInfo = getQueryDetailInfo(queryQue.oraSid)
       //获取查询卡的文字信息
       val personInfo = getPerosnInfoByPersonId(queryQue.keyId)
-      if(candList.nonEmpty && candList.get.size > 0 && personInfo.nonEmpty && queryDetailInfo.nonEmpty){
+      if(candList.size > 0 && personInfo.nonEmpty && queryDetailInfo.nonEmpty){
         //当前比对任务是否认定成功
         var verifyResult = 99
         //重卡比中个数
@@ -43,7 +43,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
         //比对任务提交系统 1：指纹系统，2：标采系统
         val submittSystem = queryDetailInfo.get._2
         val candByteArray = new ByteArrayOutputStream()
-        candList.get.foreach{cand =>
+        candList.foreach{cand =>
           var newFlag = 7 //新的候选比中状态，默认7：已否定
           //大于自动认定分数，自动认定
           if(cand.nScore >= hallMatcherConfig.autoCheck.confirmScore){
@@ -171,7 +171,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
     * @param oraSid
     * @return
     */
-  private def getCandListArrayByOraSid(oraSid : Int) : Option[List[GAQUERYCANDSTRUCT]] = {
+  private def getCandListArrayByOraSid(oraSid : Int) : List[GAQUERYCANDSTRUCT] = {
     val candList = mutable.ListBuffer[GAQUERYCANDSTRUCT]()
     var candArray:Option[Array[Byte]] = None
     val sql = "select t.candlist from gafis_normalquery_queryque t where t.ora_sid = ?"
@@ -189,7 +189,7 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
         candList += gaCand
       }
     }
-    Some(candList.toList)
+    candList.toList
   }
 
   /**
