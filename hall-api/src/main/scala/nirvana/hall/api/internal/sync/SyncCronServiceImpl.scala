@@ -88,6 +88,7 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
         case HallApiConstants.SYNC_TYPE_LPCARD =>
           fetchLPCard(fetchConfig, update)
         case HallApiConstants.SYNC_TYPE_CASEINFO =>
+          fetchCase(fetchConfig, update)
         case HallApiConstants.SYNC_TYPE_LPPALM =>
           fetchLPPalm(fetchConfig, update)
         case HallApiConstants.SYNC_TYPE_MATCH_TASK =>
@@ -327,6 +328,90 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
       }
     }
   }
+
+  def fetchCase(fetchConfig: HallFetchConfig, update: Boolean): Unit ={
+    info("syncCase name:{} current-seq:{}", fetchConfig.name, fetchConfig.seq)
+    val uuid = UUID.randomUUID().toString
+    var caseid = ""
+    var seq = fetchConfig.seq
+    var typ_add=""
+    try {
+      val request = SyncCaseRequest.newBuilder()
+      request.setSize(SYNC_BATCH_SIZE)
+      request.setSeq(seq)
+      request.setDbid(fetchConfig.dbid)
+      request.setUuid(uuid)
+      val baseResponse = rpcHttpClient.call(fetchConfig.url, SyncCaseRequest.cmd, request.build())
+      if(baseResponse.getStatus == CommandStatus.OK){
+        val response = baseResponse.getExtension(SyncCaseResponse.cmd)
+        val destDBID = Option(fetchConfig.destDbid)
+        val iterator = response.getSyncCaseList.iterator()
+        while (iterator.hasNext) {
+          val syncCase = iterator.next()
+          var cases = syncCase.getCaseInfo
+          caseid = cases.getStrCaseID
+          if (syncCase.getOperationType == OperationType.PUT &&
+            validateCaseByWriteStrategy(cases, fetchConfig.writeStrategy)) {
+            //读取策略信息,设置DataSource
+            val strategy = new JSONObject(fetchConfig.writeStrategy)
+            if(strategy.has("setdatasource")){
+              cases = cases.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
+            }
+
+            //逻辑分库处理 青岛使用
+            //destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
+            //验证本地是否存在
+            if (caseInfoService.isExist(caseid, destDBID)) {
+              if (update) {
+                caseInfoService.updateCaseInfo(cases, destDBID)
+                info("update Case:{}", caseid)
+                typ_add = HallApiConstants.UPDATE
+              }
+            } else {
+              caseInfoService.addCaseInfo(cases, destDBID)
+              info("add Case:{}", caseid)
+              typ_add = HallApiConstants.PUT
+            }
+
+          } else if(syncCase.getOperationType == OperationType.DEL) {
+            if(caseInfoService.isExist(caseid, destDBID)){
+              caseInfoService.delCaseInfo(caseid, destDBID)
+              info("delete Case:{}", caseid)
+              typ_add = HallApiConstants.DELETE
+            }
+          }
+          seq = syncCase.getSeq
+          info("Case-RequestData success,caseId:{}",caseid)
+
+          syncInfoLogManageService.recordSyncDataIdentifyLog(uuid, caseid, fetchConfig.typ + typ_add, fetchConfig.url.substring(7,
+            fetchConfig.url.length - 5)
+            , HallApiConstants.MESSAGE_SEND, HallApiConstants.MESSAGE_RECEIVE_OR_SEND_SUCCESS)
+        }
+        seq = response.getSeq
+        if(seq > 0 && fetchConfig.seq != seq){
+          //更新配置seq
+          fetchConfig.seq = seq
+          updateSeq(fetchConfig)
+          fetchTPCard(fetchConfig, update)
+        }
+      } else {
+        syncInfoLogManageService.recordSyncDataLog(uuid, caseid, seq.toString, baseResponse.getMsg, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_RETURN_FAIL +
+          HallApiConstants.SYNC_TYPE_TPCARD)
+      }
+    } catch {
+      case e: nirvana.hall.support.internal.CallRpcException =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("Case-RequestData fail,uuid:{};caseId:{};错误堆栈信息:{};错误信息:{}",uuid,caseid,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, caseid, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_FETCH +
+          HallApiConstants.SYNC_TYPE_TPCARD)
+      case e: Exception =>
+        val eInfo = ExceptionUtil.getStackTraceInfo(e)
+        error("Case-RequestData fail,uuid:{};caseId:{};错误堆栈信息:{};错误信息:{}",uuid,caseid,eInfo,e.getMessage)
+        syncInfoLogManageService.recordSyncDataLog(uuid, caseid, seq.toString, eInfo, HallApiConstants.LOG_ERROR_TYPE, SyncErrorConstants.SYNC_REQUEST_UNKNOWN +
+          HallApiConstants.SYNC_TYPE_TPCARD)
+    }
+  }
+
 
   /**
     * 抓取现场掌纹

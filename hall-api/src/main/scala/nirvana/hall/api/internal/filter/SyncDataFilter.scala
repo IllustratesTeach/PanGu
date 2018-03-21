@@ -226,6 +226,7 @@ class SyncDataFilter(httpServletRequest: HttpServletRequest,
           val caseIdList = fetchCaseInfoService.fetchCaseId(request.getSeq, request.getSize, dbId)
           count=caseIdList.length
           caseIdList.foreach { caseId =>
+            responseBuilder.setSeq(caseId._2)
             if (caseInfoService.isExist(caseId._1, dbId)) {
               val caseInfo = caseInfoService.getCaseInfo(caseId._1, dbId)
               card_id=caseInfo.getStrCaseID

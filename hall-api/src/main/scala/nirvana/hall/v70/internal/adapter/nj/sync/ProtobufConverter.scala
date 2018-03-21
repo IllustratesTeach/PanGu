@@ -477,7 +477,7 @@ object ProtobufConverter extends LoggerSupport{
     person.nativeplaceCode = text.getStrNation//籍贯国籍(字典)
     person.certificatetype = getCode7to6(DictCode6Map7.certificatetype_nj.toMap,text.getStrCertifType)//证件类型code_zjzl
     person.certificateid = text.getStrCertifID//证件号码
-    person.recordmark = if(text.getBHasCriminalRecord) '1' else '0' //前科库标识 1：有；0：无
+    person.recordmark = if(text.getBHasCriminalRecord) '1'.toString else '0'.toString //前科库标识 1：有；0：无
     person.recordsituation = text.getStrCriminalRecordDesc//前科劣迹情况
 
 //    if(person.idcardno.length > 18){

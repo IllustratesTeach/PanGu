@@ -39,7 +39,7 @@
           <xs:documentation>破案的数据库表</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element type="databaseTableType" name="code_unit_table" minOccurs="1" maxOccurs="1">
+      <xs:element type="databaseTableType" name="code_unit_table" minOccurs="0" maxOccurs="1">
         <xs:annotation>
           <xs:documentation>单位代码数据库表</xs:documentation>
         </xs:annotation>

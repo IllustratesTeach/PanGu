@@ -1,6 +1,6 @@
 package nirvana.hall.api.services.sync
 
-import nirvana.hall.protocol.api.FPTProto.{LPCard, TPCard}
+import nirvana.hall.protocol.api.FPTProto.{Case, LPCard, TPCard}
 import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import org.apache.tapestry5.json.JSONObject
@@ -45,6 +45,21 @@ trait SyncCronService {
         flag = !cardId.startsWith(cardStrategy.substring(1,cardStrategy.length))
       }else{
         flag = cardId.startsWith(cardStrategy)
+      }
+    }
+    flag
+  }
+
+  def validateCaseByWriteStrategy(cases: Case, writeStrategy: String): Boolean = {
+    var flag = true
+    val strategy = new JSONObject(writeStrategy)
+    if (strategy.has("caseid")){
+      val caseid = cases.getStrCaseID
+      val cardStrategy = strategy.getString("caseid")
+      if(cardStrategy.startsWith("!")){
+        flag = !caseid.startsWith(cardStrategy.substring(1,cardStrategy.length))
+      }else{
+        flag = caseid.startsWith(cardStrategy)
       }
     }
     flag
