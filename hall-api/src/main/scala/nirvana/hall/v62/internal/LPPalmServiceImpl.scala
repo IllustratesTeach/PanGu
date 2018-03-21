@@ -33,7 +33,7 @@ class LPPalmServiceImpl(facade:V62Facade,config:HallV62Config) extends LPPalmSer
   private def getGroupName(cardId: String, dbId: Option[String]): String ={
     val data = facade.NET_GAFIS_COL_GetByKey(getDBID(dbId), V62Facade.TID_LATPALM, cardId, g_stCN.stLAdm.pszGroupName)
     if(data != null && data.length > 0){
-      new String(data)
+      new String(data).trim
     }else{
       ""
     }

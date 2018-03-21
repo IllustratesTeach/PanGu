@@ -77,8 +77,7 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     )
     var statement = "(1=1)"
     statement += V62SqlHelper.andSQL("TPPERSONID",tp.stAdmData.szPersonID)
-    val tpLpAssocaites = facade.queryV62Table[GAFIS_TPLP_ASSOCIATE](dbid.get.toShort, V62Facade.TID_TPCARDINFO, mapper, Option
-    (statement), 1)
+    val tpLpAssocaites = facade.queryV62Table[GAFIS_TPLP_ASSOCIATE](21, 340, mapper, Option(statement), 1)
 
     galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp,tpLpAssocaites.head.szLPGroupID)
   }
