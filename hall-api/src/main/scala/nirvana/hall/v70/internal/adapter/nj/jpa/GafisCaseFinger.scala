@@ -64,11 +64,11 @@ class GafisCaseFinger extends ActiveRecord {
   var llCountModMnt: java.lang.Long = _
   @Column(name = "EDIT_COUNT")
   var editCount: java.lang.Long = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "LT_DATE", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "LT_DATE", length = 14)
   var ltDate: java.util.Date = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "LL_DATE", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "LL_DATE", length = 14)
   var llDate: java.util.Date = _
   @Column(name = "LT_OPERATOR", length = 32)
   var ltOperator: java.lang.String = _
@@ -82,13 +82,13 @@ class GafisCaseFinger extends ActiveRecord {
   var creatorUnitCode: java.lang.String = _
   @Column(name = "UPDATOR_UNIT_CODE", length = 12)
   var updatorUnitCode: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "MODIFIEDTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "MODIFIEDTIME", length = 14)
   var modifiedtime: java.util.Date = _
   @Column(name = "MODIFIEDPSN", length = 32)
   var modifiedpsn: java.lang.String = _
-  @Temporal(TemporalType.DATE)
-  @Column(name = "INPUTTIME", length = 8)
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "INPUTTIME", length = 14)
   var inputtime: java.util.Date = _
   @Column(name = "INPUTPSN", length = 32)
   var inputpsn: java.lang.String = _
