@@ -484,10 +484,14 @@ object galoclpConverter extends LoggerSupport{
       admData.setCreator(extractInfo.szOrgScanner)
       admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
     }
-    caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)  //警务平台编号
+    //警务平台编号校验赋值
+    if(gCase.szMISCaseID.length>32)
+      text.setStrComment(text.getStrComment + "警务平台编号：" + gCase.szMISCaseID)
+    else
+      caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)
 
     //数据校验
-    DictCodeConverter.convertCaseInfoText6to7(caseInfo)
+    DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
 
     caseInfo.build()
   }

@@ -55,10 +55,9 @@ object DictCodeConverter {
 
   /**
    * 校验案件文字信息
-   * @param caseInfo
+   * @param textBuilder
    */
-  def convertCaseInfoText6to7(caseInfo: Case.Builder): Unit ={
-     val textBuilder = caseInfo.getTextBuilder
+  def convertCaseInfoText6to7(textBuilder: CaseText.Builder): Unit ={
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType1, textBuilder.getStrCaseType1, 6,
       "案件类别1", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrCaseType2, textBuilder.getStrCaseType2, 6,
@@ -79,9 +78,6 @@ object DictCodeConverter {
       "奖金", textBuilder)
     checkNormalCodeOfCaseTextBuilder(textBuilder.setStrXieChaRequestUnitCode, textBuilder.getStrXieChaRequestUnitCode, 12,
       "协查单位", textBuilder)
-    //警务平台编号
-    checkNormalCodeOfCaseTextBuilder(caseInfo.setStrMisConnectCaseId, caseInfo.getStrMisConnectCaseId, 32,
-      "警务平台编号", textBuilder)
 
   }
 
