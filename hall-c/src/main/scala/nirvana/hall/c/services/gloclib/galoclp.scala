@@ -219,9 +219,9 @@ object galoclp {
   var nGuessedFingerIndex:String = _ ;	// guessed finger index, if the correspond byte is non-zero, for palm using first two bytes
   var nItemFlag3:Short = _ ;				// LPADMIN_ITEMFLAG3_0_XXX, to here is 80 bytes long.
   @Length(16)
-  var szCUserName:String = _ ;		// user name of create this record
+  var szCUserName:Array[Byte] = _ ;		// user name of create this record
   @Length(16)
-  var szMUserName:String = _ ;		// user name of modify this record, to here is 112 bytes
+  var szMUserName:Array[Byte] = _ ;		// user name of modify this record, to here is 112 bytes
   var tCDateTime = new AFISDateTime;		// create date time
   var tMDateTime = new AFISDateTime;		// modify date time
   var nFgGroup:Byte = _ ;
@@ -261,9 +261,9 @@ object galoclp {
     var tSubmitLTDate = new AFISDateTime;
     var tSubmitLLDate = new AFISDateTime;
     @Length(16)
-    var szLTUserName:String = _ ;
+    var szLTUserName:Array[Byte] = _ ;
     @Length(16)
-    var szLLUserName:String = _ ;
+    var szLLUserName:Array[Byte] = _ ;
   } // GLPCARDADMINFOSTRUCT;		// size of this structure is 256 bytes
 
   // GLPCARDADMINFOSTRUCT::nItemFlag

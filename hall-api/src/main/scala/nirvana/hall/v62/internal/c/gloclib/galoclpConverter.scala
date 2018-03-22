@@ -34,8 +34,8 @@ object galoclpConverter extends LoggerSupport{
     data.szCardID = card.getStrCardID
     //TODO 案件编号,操作信息
     data.stAdmData.szCaseID = card.getText.getStrCaseId
-    data.stAdmData.szCUserName = card.getAdmData.getCreator
-    data.stAdmData.szMUserName = card.getAdmData.getUpdator
+    data.stAdmData.szCUserName = card.getAdmData.getCreator.getBytes()
+    data.stAdmData.szMUserName = card.getAdmData.getUpdator.getBytes()
 //    data.stAdmData.tCDateTime =
 
     if(card.hasText) {
@@ -223,14 +223,14 @@ object galoclpConverter extends LoggerSupport{
     }
     //操作信息
     val stAdmData = gCard.stAdmData
-    admData.setCreator(stAdmData.szCUserName)
-    admData.setUpdator(stAdmData.szMUserName)
+    admData.setCreator(new String(stAdmData.szCUserName,"GBK").trim)
+    admData.setUpdator(new String(stAdmData.szMUserName,"GBK").trim)
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
     admData.setStrLtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLTDate)) //LT发送时间
     admData.setStrLlDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitLLDate)) //LL发送时间
-    admData.setStrLtUser(stAdmData.szLTUserName)  //LT发送用户
-    admData.setStrLlUser(stAdmData.szLLUserName)  //LT发送用户
+    admData.setStrLtUser(new String(stAdmData.szLTUserName,"GBK").trim)  //LT发送用户
+    admData.setStrLlUser(new String(stAdmData.szLLUserName,"GBK").trim)  //LT发送用户
     admData.setNLtCount(stAdmData.nAccuLTCount)   //LT累计发送次数
     admData.setNLlCount(stAdmData.nAccuLLCount)   //LL累计发送次数
     admData.setNEditCount(stAdmData.nEditCount.toInt)   //编辑次数
