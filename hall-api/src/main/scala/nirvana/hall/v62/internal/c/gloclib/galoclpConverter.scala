@@ -375,6 +375,8 @@ object galoclpConverter extends LoggerSupport{
     val admData = caseInfo.getAdmDataBuilder
     text.setBPersonKilled(gCase.bHasPersonKilled == 49)
     text.setNCancelFlag(gCase.pstText_Data.length)
+    caseInfo.setNBrokenStatus(gCase.bIsBroken.toInt)
+    caseInfo.setNThanStateLt(gCase.bIsLTBroken.toInt)
     gCase.pstText_Data.foreach{ item=>
       val bytes = if (item.bIsPointer == 1) item.stData.textContent else item.stData.bnData
       if (bytes != null){
@@ -453,10 +455,6 @@ object galoclpConverter extends LoggerSupport{
             case "CaseSource" =>
               caseInfo.setStrCaseSource(textContent.toInt) //案件来源
              //hall7抓6新增
-            case "IsBroken" =>
-              caseInfo.setNBrokenStatus(textContent.toInt) //是否破案
-            case "IsLTBroken" =>
-              caseInfo.setNThanStateLt(textContent.toInt) //是否LT破案/正查比中状态
             case "UpdateUserName" =>
               admData.setCreator(textContent) //
             case "UpdatorUnitCode" =>
