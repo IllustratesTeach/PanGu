@@ -485,10 +485,7 @@ object galoclpConverter extends LoggerSupport{
       admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
     }
     //警务平台编号校验赋值
-    if(gCase.szMISCaseID == null && gCase.szMISCaseID.length>32)
-      text.setStrComment(text.getStrComment + "警务平台编号：" + gCase.szMISCaseID)
-    else
-      caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)
+    caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)
 
     //数据校验
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)

@@ -78,8 +78,12 @@ class TPCardServiceImpl(facade:V62Facade,config:HallV62Config) extends TPCardSer
     var statement = "(1=1)"
     statement += V62SqlHelper.andSQL("TPPERSONID",tp.stAdmData.szPersonID)
     val tpLpAssocaites = facade.queryV62Table[GAFIS_TPLP_ASSOCIATE](21, 340, mapper, Option(statement), 1)
+    val groupId =
+      if(null!=tpLpAssocaites && tpLpAssocaites.size>0)
+        tpLpAssocaites.head.szLPGroupID
+      else ""
 
-    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp,tpLpAssocaites.head.szLPGroupID)
+    galoctpConverter.convertGTPCARDINFOSTRUCT2ProtoBuf(tp,groupId)
   }
 
   /**
