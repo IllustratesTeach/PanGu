@@ -60,7 +60,7 @@ object galoclp {
     var bnRes2:Array[Byte] = _ ;
     // to here is 48+32=80 bytes long. above buffer should be used for store pointer.
     @Length(16)
-    var szOrgScanner:String = _ ;
+    var szOrgScanner:Array[Byte] = _ ;
     @Length(16)
     var szOrgScanUnitCode:String = _ ;
     var szOrgAFISType:Int = _ ;		// fill in AFIS type code.
@@ -123,7 +123,7 @@ object galoclp {
   @Length(16)
   var bnUUID:Array[Byte] = _ ;		// UUID, readonly
   @Length(32)
-  var szMISCaseID:String = _ ;
+  var szMISCaseID:Array[Byte] = _ ;
     var nFingerIDLen:Int = _ ;	// temp use
   var nPalmIDLen:Int = _ ;		// temp use
   @Length(SID_SIZE)

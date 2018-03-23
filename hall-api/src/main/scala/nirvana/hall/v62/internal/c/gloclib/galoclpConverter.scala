@@ -481,11 +481,11 @@ object galoclpConverter extends LoggerSupport{
     //原始创建人信息
     val extractInfo = gCase.pstExtraInfo_Data
     if(extractInfo != null){
-      admData.setCreator(extractInfo.szOrgScanner)
+      admData.setCreator(new String(extractInfo.szOrgScanner,"GBK").trim)
       admData.setCreateUnitCode(extractInfo.szOrgScanUnitCode)
     }
     //警务平台编号校验赋值
-    caseInfo.setStrMisConnectCaseId(gCase.szMISCaseID)
+    caseInfo.setStrMisConnectCaseId(new String(gCase.szMISCaseID,"GBK").trim)
 
     //数据校验
     DictCodeConverter.convertCaseInfoText6to7(caseInfo.getTextBuilder)
