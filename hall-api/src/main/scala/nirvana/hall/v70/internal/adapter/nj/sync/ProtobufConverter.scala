@@ -40,7 +40,7 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseId = caseInfo.getStrCaseID
     gafisCase.cardId = caseInfo.getStrCaseID
     val text = caseInfo.getText
-    gafisCase.remark = text.getStrComment
+    gafisCase.remark = text.getStrComment + gafisCase.remark
     gafisCase.caseClassCode = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType1).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType1))
     gafisCase.caseClassCode2 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType2).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType2))
     gafisCase.caseClassCode3 = text.getStrCaseType3
@@ -60,7 +60,11 @@ object ProtobufConverter extends LoggerSupport{
     gafisCase.caseState = text.getNCaseState.toString
 
     //nj 7抓6数据同步追加信息
-    gafisCase.psisNo = caseInfo.getStrMisConnectCaseId //警务平台编号
+    gafisCase.psisNo = if(caseInfo.getStrMisConnectCaseId!=null&&caseInfo.getStrMisConnectCaseId.length<=32)
+      caseInfo.getStrMisConnectCaseId else {
+      gafisCase.remark = gafisCase.remark + "(警务平台编号:"+caseInfo.getStrMisConnectCaseId+")"
+      ""
+    }//警务平台编号
     gafisCase.brokenStatus = caseInfo.getNBrokenStatus.toShort //是否破案
     gafisCase.thanStateLt = caseInfo.getNThanStateLt.toString//正查比中状态；是否LT破案
 
