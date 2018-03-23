@@ -57,7 +57,7 @@ class CaseInfoServiceImpl(userService: UserService) extends CaseInfoService{
     gafisCase.save()
 
     //删除原来的逻辑库
-    GafisLogicDbCase.find_by_casePkid(gafisCase.caseId).foreach(_.delete())
+    GafisLogicDbCase.find_by_casePkid_and_logicDbPkid(gafisCase.caseId,dbId.get).foreach(_.delete())
     //保存逻辑库
     val logicDb:GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       GafisLogicDb.where(GafisLogicDb.logicCategory === "1").and(GafisLogicDb.logicIsdefaulttag === "1").headOption.get

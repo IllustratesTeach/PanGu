@@ -159,7 +159,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     GafisPerson.find_by_personid(tpCard.getStrPersonID).foreach(f=> f.delete())
     person.save()
     //删除原来的逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
+    GafisLogicDbFingerprint.find_by_fingerprintPkid_and_logicDbPkid(person.personid,dbId.get).foreach(_.delete())
     //保存逻辑库
     val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       //如果没有指定逻辑库，使用默认库
