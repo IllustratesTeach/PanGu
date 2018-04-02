@@ -16,7 +16,7 @@ import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask.LatentMatchDa
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
-import nirvana.hall.v62.services.DictCode6Map7
+import nirvana.hall.v62.services.{DictCode6Map7, DictCode7Map6}
 import nirvana.hall.v70.internal.adapter.nj.jpa._
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
@@ -87,31 +87,55 @@ object ProtobufConverter extends LoggerSupport{
   def convertGafisCase2Case(caseInfo: GafisCase, fingerIds: Seq[String]): Case = {
     val caseBuilder = Case.newBuilder()
     caseBuilder.setStrCaseID(caseInfo.caseId)
-    caseBuilder.setStrDataSource(caseInfo.caseSource)
-
     val textBuilder = caseBuilder.getTextBuilder
-    magicSet(caseInfo.caseClassCode, textBuilder.setStrCaseType1)
-    magicSet(caseInfo.caseOccurDate, textBuilder.setStrCaseOccurDate)
-    magicSet(caseInfo.caseOccurPlaceCode, textBuilder.setStrCaseOccurPlaceCode)
-    magicSet(caseInfo.caseOccurPlaceDetail, textBuilder.setStrCaseOccurPlace)
-
     magicSet(caseInfo.remark, textBuilder.setStrComment)
-    if("1".equals(caseInfo.isMurder))
-      textBuilder.setBPersonKilled(true)
-    magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
+    if (caseInfo.caseClassCode != null)
+      textBuilder.setStrCaseType1(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,caseInfo.caseClassCode))
+    if (caseInfo.caseClassCode2 != null)
+      textBuilder.setStrCaseType2(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,caseInfo.caseClassCode2))
+    if (caseInfo.caseClassCode2 != null)
+      textBuilder.setStrCaseType3(caseInfo.caseClassCode3)
+    magicSet(caseInfo.caseOccurDate, textBuilder.setStrCaseOccurDate)
+    magicSet(caseInfo.caseOccurPlaceDetail, textBuilder.setStrCaseOccurPlace)
     magicSet(caseInfo.extractUnitCode, textBuilder.setStrExtractUnitCode)
-    magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
-    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
-    magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
+    if (caseInfo.assistLevel != null)
+      textBuilder.setNSuperviseLevel(getCode7to6(DictCode7Map6.assistLevel_nj.toMap,caseInfo.assistLevel))
     magicSet(caseInfo.suspiciousAreaCode, textBuilder.setStrSuspArea1Code)
-    textBuilder.setNSuperviseLevel(caseInfo.assistLevel)
-    magicSet(caseInfo.assistDeptCode, textBuilder.setStrXieChaRequestUnitCode)
-    magicSet(caseInfo.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
-    magicSet(caseInfo.assistDate, textBuilder.setStrXieChaDate)
+    if (caseInfo.suspiciousAreaCode != null)
+      textBuilder.setStrSuspArea1Code(getCode7to6(DictCode6Map7.areaClasses_nj.toMap,caseInfo.suspiciousAreaCode))
+    if (caseInfo.suspiciousAreaCode2 != null)
+      textBuilder.setStrSuspArea2Code(getCode7to6(DictCode7Map6.areaClasses_nj.toMap,caseInfo.suspiciousAreaCode2))
+    if (caseInfo.suspiciousAreaCode3 != null)
+      textBuilder.setStrSuspArea3Code(getCode7to6(DictCode7Map6.areaClasses_nj.toMap,caseInfo.suspiciousAreaCode3))
+    magicSet(caseInfo.amount, textBuilder.setStrMoneyLost)
+    magicSet(caseInfo.extractor, textBuilder.setStrExtractor)
+    magicSet(caseInfo.caseOccurPlaceCode, textBuilder.setStrCaseOccurPlaceCode)
+    magicSet(caseInfo.extractUnitName, textBuilder.setStrExtractUnitName)
     magicSet(caseInfo.assistBonus, textBuilder.setStrPremium)
-    textBuilder.setNCaseState(caseInfo.assistSign)
-    textBuilder.setNCancelFlag(caseInfo.assistRevokeSign)
-    textBuilder.setNCaseState(caseInfo.caseState)
+    magicSet(caseInfo.extractDate, textBuilder.setStrExtractDate)
+    if (isNonBlank(caseInfo.caseState))
+      textBuilder.setNCaseState(Integer.parseInt(caseInfo.caseState))
+
+    //nj 7抓6数据同步追加信息
+    magicSet(caseInfo.psisNo, caseBuilder.setStrMisConnectCaseId)
+    if (caseInfo.brokenStatus != null)
+      caseBuilder.setNBrokenStatus(caseInfo.brokenStatus.toInt) //是否破案
+    if (isNonBlank(caseInfo.thanStateLt))
+      caseBuilder.setNThanStateLt(Integer.parseInt(caseInfo.thanStateLt)) //正查比中状态；是否LT破案
+
+
+    //操作信息
+    val admDataBuilder = caseBuilder.getAdmDataBuilder
+    if(caseInfo.inputtime != null){
+      admDataBuilder.setCreateDatetime(DateConverter.convertDate2String(caseInfo.inputtime, "yyyyMMddHHmmss"))
+    }
+    if(caseInfo.modifiedtime != null){
+      admDataBuilder.setUpdateDatetime(DateConverter.convertDate2String(caseInfo.modifiedtime, "yyyyMMddHHmmss"))
+    }
+    magicSet(caseInfo.inputUsername, admDataBuilder.setCreator)
+    magicSet(caseInfo.createUnitCode, admDataBuilder.setCreateUnitCode)
+    magicSet(caseInfo.modifyUsername, admDataBuilder.setUpdator)
+    magicSet(caseInfo.modifyUnitCode, admDataBuilder.setUpdateUnitCode)
 
     if(fingerIds != null)
       fingerIds.foreach(f => caseBuilder.addStrFingerID(f))
@@ -194,22 +218,53 @@ object ProtobufConverter extends LoggerSupport{
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(caseFinger.fingerId)
     val textBuilder = lpCard.getTextBuilder
-    magicSet(caseFinger.caseId, textBuilder.setStrCaseId)
+    magicSet(caseFinger.remark, textBuilder.setStrComment)
     magicSet(caseFinger.seqNo, textBuilder.setStrSeq)
-    if ("1".equals(caseFinger.isCorpse))
-      textBuilder.setBDeadBody(true)
-    magicSet(caseFinger.corpseNo, textBuilder.setStrDeadPersonNo)
-    magicSet(caseFinger.remainPlace, textBuilder.setStrRemainPlace)
+    if (isNonBlank(caseFinger.ltStatus))
+      lpCard.setNLtStatus(Integer.parseInt(caseFinger.ltStatus))
+    magicSet(caseFinger.caseId, textBuilder.setStrCaseId)
     magicSet(caseFinger.ridgeColor, textBuilder.setStrRidgeColor)
-    magicSet(caseFinger.mittensBegNo, textBuilder.setStrStart)
-    magicSet(caseFinger.mittensEndNo, textBuilder.setStrEnd)
-    textBuilder.setNXieChaState(caseFinger.isAssist)
-    textBuilder.setNBiDuiState(caseFinger.matchStatus)
+    magicSet(caseFinger.remainPlace, textBuilder.setStrRemainPlace)
+    magicSet(caseFinger.micUpdateUsername, textBuilder.setStrMicbUpdatorUserName)
+    magicSet(caseFinger.micUpdateUnitcode, textBuilder.setStrMicbUpdatorUnitCode)
+    magicSet(caseFinger.developMethod, textBuilder.setStrCaptureMethod)
+    //操作信息
+    val admDataBuilder = lpCard.getAdmDataBuilder
+    if(caseFinger.inputtime != null){
+      admDataBuilder.setCreateDatetime(DateConverter.convertDate2String(caseFinger.inputtime, "yyyyMMddHHmmss"))
+    }
+    if(caseFinger.modifiedtime != null){
+      admDataBuilder.setUpdateDatetime(DateConverter.convertDate2String(caseFinger.modifiedtime, "yyyyMMddHHmmss"))
+    }
+    if(caseFinger.ltDate != null){
+      admDataBuilder.setStrLtDate(DateConverter.convertDate2String(caseFinger.ltDate, "yyyyMMddHHmmss"))
+    }
+    if(caseFinger.llDate != null){
+      admDataBuilder.setStrLlDate(DateConverter.convertDate2String(caseFinger.llDate, "yyyyMMddHHmmss"))
+    }
+    magicSet(caseFinger.ltUsername, admDataBuilder.setStrLtUser)
+    magicSet(caseFinger.llUsername, admDataBuilder.setStrLlUser)
+    magicSet(caseFinger.inputUsername, admDataBuilder.setCreator)
+    if (caseFinger.editCount != null)
+      admDataBuilder.setNEditCount(caseFinger.editCount.toInt)
+    magicSet(caseFinger.modifyUsername, admDataBuilder.setUpdator)
+    if (caseFinger.ltCount != null)
+      admDataBuilder.setNLtCount(caseFinger.ltCount.toInt)
+    magicSet(caseFinger.creatorUnitCode, admDataBuilder.setCreateUnitCode)
+    magicSet(caseFinger.updatorUnitCode, admDataBuilder.setUpdateUnitCode)
+    if (caseFinger.llCount != null)
+      admDataBuilder.setNLlCount(caseFinger.llCount.toInt)
+    magicSet(caseFinger.fingerGroupNo, admDataBuilder.setStrGroupName)
+
 
     val blobBuilder = lpCard.getBlobBuilder
     blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-    //    magicSet(caseFinger.developMethod, blobBuilder.setStrMntExtractMethod)
-    blobBuilder.setStImageBytes(ByteString.copyFrom(caseFinger.fingerImg))
+    if(caseFinger.fingerImg != null)
+      blobBuilder.setStImageBytes(ByteString.copyFrom(caseFinger.fingerImg))
+    //压缩图
+    blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
+    if(caseFinger.fingerCpr != null)
+      blobBuilder.setStCprImageBytes(ByteString.copyFrom(caseFinger.fingerCpr))
     //特征
     if(caseFingerMnt.fingerMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(caseFingerMnt.fingerMnt))
@@ -306,18 +361,53 @@ object ProtobufConverter extends LoggerSupport{
     val lpCard = LPCard.newBuilder()
     lpCard.setStrCardID(casePalm.palmId)
     val textBuilder = lpCard.getTextBuilder
+    magicSet(casePalm.remark, textBuilder.setStrComment)
     magicSet(casePalm.seqNo, textBuilder.setStrSeq)
-    if ("1".equals(casePalm.isCorpse))
-      textBuilder.setBDeadBody(true)
-    magicSet(casePalm.corpseNo, textBuilder.setStrDeadPersonNo)
-    magicSet(casePalm.remainPlace, textBuilder.setStrRemainPlace)
+    if (isNonBlank(casePalm.ltStatus))
+      lpCard.setNLtStatus(Integer.parseInt(casePalm.ltStatus))
+    magicSet(casePalm.caseId, textBuilder.setStrCaseId)
     magicSet(casePalm.ridgeColor, textBuilder.setStrRidgeColor)
-    textBuilder.setNXieChaState(casePalm.isAssist)
-    textBuilder.setNBiDuiState(casePalm.matchStatus)
+    magicSet(casePalm.remainPlace, textBuilder.setStrRemainPlace)
+    magicSet(casePalm.micUpdateUsername, textBuilder.setStrMicbUpdatorUserName)
+    magicSet(casePalm.micUpdateUnitcode, textBuilder.setStrMicbUpdatorUnitCode)
+    magicSet(casePalm.developMethod, textBuilder.setStrCaptureMethod)
+    //操作信息
+    val admDataBuilder = lpCard.getAdmDataBuilder
+    if(casePalm.inputtime != null){
+      admDataBuilder.setCreateDatetime(DateConverter.convertDate2String(casePalm.inputtime, "yyyyMMddHHmmss"))
+    }
+    if(casePalm.modifiedtime != null){
+      admDataBuilder.setUpdateDatetime(DateConverter.convertDate2String(casePalm.modifiedtime, "yyyyMMddHHmmss"))
+    }
+    if(casePalm.ltDate != null){
+      admDataBuilder.setStrLtDate(DateConverter.convertDate2String(casePalm.ltDate, "yyyyMMddHHmmss"))
+    }
+    if(casePalm.llDate != null){
+      admDataBuilder.setStrLlDate(DateConverter.convertDate2String(casePalm.llDate, "yyyyMMddHHmmss"))
+    }
+    magicSet(casePalm.ltUsername, admDataBuilder.setStrLtUser)
+    magicSet(casePalm.llUsername, admDataBuilder.setStrLlUser)
+    magicSet(casePalm.inputUsername, admDataBuilder.setCreator)
+    if (casePalm.editCount != null)
+      admDataBuilder.setNEditCount(casePalm.editCount.toInt)
+    magicSet(casePalm.modifyUsername, admDataBuilder.setUpdator)
+    if (casePalm.ltCount != null)
+      admDataBuilder.setNLtCount(casePalm.ltCount.toInt)
+    magicSet(casePalm.creatorUnitCode, admDataBuilder.setCreateUnitCode)
+    magicSet(casePalm.updatorUnitCode, admDataBuilder.setUpdateUnitCode)
+    if (casePalm.llCount != null)
+      admDataBuilder.setNLlCount(casePalm.llCount.toInt)
+    magicSet(casePalm.palmGroupNo, admDataBuilder.setStrGroupName)
+
 
     val blobBuilder = lpCard.getBlobBuilder
-    blobBuilder.setType(ImageType.IMAGETYPE_FINGER)
-    blobBuilder.setStImageBytes(ByteString.copyFrom(casePalm.palmImg))
+    blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+    if(casePalm.palmImg != null)
+      blobBuilder.setStImageBytes(ByteString.copyFrom(casePalm.palmImg))
+    //压缩图
+    blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+    if(casePalm.palmCpr != null)
+      blobBuilder.setStCprImageBytes(ByteString.copyFrom(casePalm.palmCpr))
     //特征
     if(casePalmMnt.palmMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
@@ -343,51 +433,81 @@ object ProtobufConverter extends LoggerSupport{
     * @param palmList
     * @return
     */
-  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm]): TPCard={
+  def convertGafisPerson2TPCard(person: GafisPerson,photoList: Seq[GafisGatherPortrait], fingerList: Seq[GafisGatherFinger], palmList: Seq[GafisGatherPalm], otherList: Seq[GafisPersonOther]): TPCard={
     val tpCard = TPCard.newBuilder()
     tpCard.setStrCardID(person.personid)
-    tpCard.setStrPersonID(person.personid)
-    tpCard.setStrDataSource(person.dataSources.toString)
+    if (person.fingerrepeatno != null)
+      tpCard.setStrMisPersonID(person.fingerrepeatno)  //人员信息编号(重卡)
 
     //文本信息
     val textBuilder = tpCard.getTextBuilder
-    magicSet(person.name, textBuilder.setStrName)
-    magicSet(person.aliasname, textBuilder.setStrAliasName)
+    magicSet(person.remark, textBuilder.setStrComment) //备注
+    magicSet(person.idcardno, textBuilder.setStrIdentityNum)
+    if (person.address!= null)
+      textBuilder.setStrAddrCode(getCode7to6(DictCode7Map6.areaClasses_nj.toMap,person.address))//现住址代码  (转码)
+    magicSet(person.addressdetail, textBuilder.setStrAddr)//现住址
+    magicSet(person.doordetail, textBuilder.setStrHuKouPlaceTail)//户口所在地--户籍地详细住址
+    magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)//捺印人单位--采集单位名称
+    if (person.nationCode!= null)
+      textBuilder.setStrRace(getCode7to6(DictCode7Map6.nation_nj.toMap,person.nationCode))//民族  (字典)(转码)
+    magicSet(person.micUpdateUsername, textBuilder.setStrMicUpdatorUsername)//特征更改用户
+    magicSet(person.micUpdateUnitcode, textBuilder.setStrMicUpdatorUnitcode)//特征更改单位
+    magicSet(person.psisNo, textBuilder.setStrPsisNo)//警务平台编号
     if (isNonBlank(person.sexCode))
       textBuilder.setNSex(Integer.parseInt(person.sexCode))
-    magicSet(person.idcardno, textBuilder.setStrIdentityNum)
-    textBuilder.setStrBirthDate(person.birthdayst)
-    magicSet(person.door, textBuilder.setStrHuKouPlaceCode)
-    magicSet(person.doordetail, textBuilder.setStrHuKouPlaceTail)
-    magicSet(person.nationCode, textBuilder.setStrRace)
-    magicSet(person.nativeplaceCode, textBuilder.setStrNation)
-    magicSet(person.caseClasses, textBuilder.setStrCaseType1)
-    magicSet(person.caseClasses2, textBuilder.setStrCaseType2)
-    magicSet(person.caseClasses3, textBuilder.setStrCaseType3)
-    magicSet(person.address, textBuilder.setStrAddrCode)
-    magicSet(person.addressdetail, textBuilder.setStrAddr)
-    magicSet(person.personType, textBuilder.setStrPersonType)
-
-    magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)
-    magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)
-    magicSet(person.gatherusername, textBuilder.setStrPrinter)
+    magicSet(person.personCategory, textBuilder.setStrPersonType)//人员类型
+    magicSet(person.name, textBuilder.setStrName)//姓名
+    magicSet(person.spellname, textBuilder.setStrSpellName)//姓名拼音
+    magicSet(person.aliasname, textBuilder.setStrAliasName)//别名绰号
+    textBuilder.setStrBirthDate(person.birthdayst) //出生日期起
+    if (person.caseClasses!= null)
+      textBuilder.setStrCaseType1(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,person.caseClasses))
+    if (person.caseClasses2!= null)
+      textBuilder.setStrCaseType2(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,person.caseClasses2))
+    if (person.caseClasses3!= null)
+      textBuilder.setStrCaseType3(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,person.caseClasses3))
+    if (person.door!= null)
+      textBuilder.setStrHuKouPlaceCode(getCode7to6(DictCode7Map6.areaClasses_nj.toMap,person.door))//户籍地代码(区域)
+    if (person.personType!= null)
+      textBuilder.setStrPersonClassCode(getCode7to6(DictCode7Map6.areaClasses_nj.toMap,person.personType))//人员类别代码
     textBuilder.setStrPrintDate(person.gatherDate)
-    magicSet(person.remark, textBuilder.setStrComment)
+    magicSet(person.gatherdepartcode, textBuilder.setStrPrintUnitCode)//采集单位
+    magicSet(person.gatherdepartname, textBuilder.setStrPrintUnitName)//采集人name
+    magicSet(person.nativeplaceCode, textBuilder.setStrNation)//籍贯国籍(字典)
+    if (person.certificatetype!= null)
+      textBuilder.setStrCertifType(getCode7to6(DictCode6Map7.certificatetype_nj.toMap,person.certificatetype))//证件类型code_zjzl
+    magicSet(person.certificateid, textBuilder.setStrCertifID)//证件号码
+    if (isNonBlank(person.recordmark))
+      textBuilder.setBHasCriminalRecord(if(person.recordmark == "1") true else false)
+    magicSet(person.recordsituation, textBuilder.setStrCriminalRecordDesc)//前科劣迹情况
+    //文本信息
+    val admData = tpCard.getAdmDataBuilder
+    if(person.inputtime != null){
+      admData.setCreateDatetime(person.inputtime)
+    }
+    if(admData.getUpdateDatetime != null){
+      admData.setUpdateDatetime(person.modifiedtime)
+    }
+    if(person.tldate != null){
+      admData.setStrTlDate(person.tldate)
+    }
+    if(person.ttdate != null){
+      admData.setStrTtDate(person.ttdate)
+    }
+    magicSet(person.gatherOrgCode, admData.setCreateUnitCode)
+    magicSet(person.modifyUnitCode, admData.setUpdateUnitCode)
+    if (isNonBlank(person.ttcount))
+      admData.setNTtCount(Integer.parseInt(person.ttcount))
+    magicSet(person.inputUsername, admData.setCreator)
+    if (isNonBlank(person.editCount))
+      admData.setNEditCount(Integer.parseInt(person.editCount))
+    magicSet(person.modifyUsername, admData.setUpdator)
+    if (isNonBlank(person.tlcount))
+      admData.setNTlCount(Integer.parseInt(person.tlcount))
+    magicSet(person.ttUsername, admData.setStrTtUser)
+    magicSet(person.tlUsername, admData.setStrTlUser)
+    magicSet(person.caseFingerGroupNo, admData.setStrGroupName)
 
-    //协查信息
-    textBuilder.setNXieChaFlag(person.assistSign)
-    textBuilder.setNXieChaLevel(person.assistLevel)
-    magicSet(person.assistBonus, textBuilder.setStrPremium)
-    magicSet(person.assistDate, textBuilder.setStrXieChaDate)
-    magicSet(person.assistDeptCode, textBuilder.setStrXieChaRequestUnitCode)
-    magicSet(person.assistDeptName, textBuilder.setStrXieChaRequestUnitName)
-    magicSet(person.assistPurpose, textBuilder.setStrXieChaForWhat)
-    magicSet(person.assistRefPerson, textBuilder.setStrRelPersonNo)
-    magicSet(person.assistRefCase, textBuilder.setStrRelCaseNo)
-    magicSet(person.assistValidDate, textBuilder.setStrXieChaTimeLimit)
-    magicSet(person.assistContacts, textBuilder.setStrXieChaContacter)
-    magicSet(person.assistNumber, textBuilder.setStrXieChaTelNo)
-    magicSet(person.assistApproval, textBuilder.setStrShenPiBy)
 
     //指纹数据
     val mntMap = fingerList.filter(_.groupId == 0).map(f => ((f.fgpCase, f.fgp), f.gatherData)).toMap[(String, Short), Array[Byte]]
@@ -412,7 +532,8 @@ object ProtobufConverter extends LoggerSupport{
     //人像数据
     photoList.foreach{ photo =>
       val blobBuilder = tpCard.addBlobBuilder()
-      blobBuilder.setStImageBytes(ByteString.copyFrom(photo.gatherData))
+      if (photo.gatherData != null)
+        blobBuilder.setStImageBytes(ByteString.copyFrom(photo.gatherData))
       blobBuilder.setType(ImageType.IMAGETYPE_FACE)
       photo.fgp match {
         case Gafis70Constants.FACE_FRONT => blobBuilder.setFacefgp(FaceFgp.FACE_FRONT)
@@ -425,12 +546,131 @@ object ProtobufConverter extends LoggerSupport{
     if (palmList != null){
       palmList.foreach{ palm =>
         val blobBuilder = tpCard.addBlobBuilder()
-        blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
+        if (palm.gatherData != null)
+          blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
         blobBuilder.setType(ImageType.IMAGETYPE_PALM)
         palm.fgp match {
           case 11 => blobBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
           case 12 => blobBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
           case other => blobBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
+        }
+      }
+    }
+
+    //其他图像数据
+    if (otherList != null){
+      otherList.foreach{ other =>
+        val blobBuilder = tpCard.addBlobBuilder()
+        if (0 == other.imageType ){
+          if (other.gatherData != null)
+            blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
+          if ("05" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
+            other.fgp match {
+              case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
+              case "2" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO2)
+              case "3" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO3)
+              case "4" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO4)
+              case "5" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO5)
+              case "6" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO6)
+              case "7" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO7)
+              case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
+            }
+          }
+          if ("04" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
+            other.fgp match {
+              case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
+              case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
+            }
+          }
+          if ("06" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+            other.fgp match {
+              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+            }
+          }
+        }
+        if (1 == other.imageType ){
+          if (other.gatherData != null)
+            blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
+          if ("05" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
+            other.fgp match {
+              case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
+              case "2" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO2)
+              case "3" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO3)
+              case "4" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO4)
+              case "5" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO5)
+              case "6" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO6)
+              case "7" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO7)
+              case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
+            }
+          }
+          if ("04" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
+            other.fgp match {
+              case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
+              case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
+            }
+          }
+          if ("06" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+            other.fgp match {
+              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+            }
+          }
+        }
+        if (2 == other.imageType ){
+          if (other.gatherData != null)
+            blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
+          if ("05" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
+            other.fgp match {
+              case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
+              case "2" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO2)
+              case "3" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO3)
+              case "4" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO4)
+              case "5" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO5)
+              case "6" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO6)
+              case "7" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO7)
+              case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
+            }
+          }
+          if ("04" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
+            other.fgp match {
+              case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
+              case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
+            }
+          }
+          if ("06" == other.gatherType){
+            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+            other.fgp match {
+              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+            }
+          }
         }
       }
     }

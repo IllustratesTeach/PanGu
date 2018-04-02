@@ -26,8 +26,9 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val photoList = GafisGatherPortrait.find_by_personid(personId).toSeq
     val fingerList = GafisGatherFinger.find_by_personId(personId).toSeq
     val palmList = GafisGatherPalm.find_by_personId(personId).toSeq
+    val otherList = GafisPersonOther.find_by_personId(personId).toSeq
 
-    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, palmList)
+    ProtobufConverter.convertGafisPerson2TPCard(person, photoList, fingerList, palmList, otherList)
   }
 
   /**
