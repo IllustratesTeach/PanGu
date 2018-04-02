@@ -54,8 +54,6 @@ object galoclpConverter extends LoggerSupport{
       galoclp.LPADMIN_ITEMFLAG_GUESSEDFI + galoclp.LPADMIN_ITEMFLAG_CUSERNAME + galoclp.LPADMIN_ITEMFLAG_MUSERNAME + galoclp.LPADMIN_ITEMFLAG_EDITCOUNT ).toByte
     data.pstExtraInfo_Data = new GAFIS_LP_EXTRAINFO()
     data.pstExtraInfo_Data.nItemFlag = (galoclp.LP_EXTRAINFO_ITEMFLAG_ORGSCANNER + galoclp.LP_EXTRAINFO_ITEMFLAG_ORGSCANUNIT + galoclp.LP_EXTRAINFO_ITEMFLAG_ORGAFISTYPE + galoclp.LP_EXTRAINFO_ITEMFLAG_DIGITIZEMETHOD + galoclp. LP_EXTRAINFO_ITEMFLAG_GROUPID).toByte
-    data.pstExtraInfo_Data.szOrgScanner = "zhaoyang"
-    data.pstExtraInfo_Data.szOrgScanUnitCode = admData.getCreateUnitCode
     if(card.hasText) {
       val text = card.getText
 
