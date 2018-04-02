@@ -99,26 +99,26 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         }
       })
       //推送比对任务
-      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "sync-cron-sendHitResult", new Runnable {
-        override def run(): Unit = {
-          try {
-            info("begin sendHitResult")
-            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
-              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
-                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
-                  sendHitResult
-                }
-              }
-            }
-            info("end sendHitResult")
-          } catch {
-            case ex: Exception =>
-              error("sendHitResult-error:{},currentTime:{}"
-                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
-              )
-          }
-        }
-      })
+//      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "sync-cron-sendHitResult", new Runnable {
+//        override def run(): Unit = {
+//          try {
+//            info("begin sendHitResult")
+//            if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
+//              hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
+//                V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+//                  sendHitResult
+//                }
+//              }
+//            }
+//            info("end sendHitResult")
+//          } catch {
+//            case ex: Exception =>
+//              error("sendHitResult-error:{},currentTime:{}"
+//                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+//              )
+//          }
+//        }
+//      })
     }
   }
 
