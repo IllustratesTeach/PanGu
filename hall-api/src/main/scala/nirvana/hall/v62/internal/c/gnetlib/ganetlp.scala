@@ -1,5 +1,7 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
+import java.nio.ByteBuffer
+
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.ghpcbase.gnopcode._
 import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_LPGROUPSTRUCT, GCASEINFOSTRUCT}
@@ -71,7 +73,12 @@ trait ganetlp {
     pReq.nTableID = nTableID
     pReq.nOpClass = OP_CLASS_CASE.asInstanceOf[Short]
     pReq.nOpCode = OP_CASE_ADD.asInstanceOf[Short]
-
+    pReq.bnData =  new Array[Byte](64)
+    val bytes = "$version=002$".getBytes()
+    for(i <- 0 until bytes.length){
+      ByteBuffer.wrap(pReq.bnData).put(i+48,bytes(i))
+    }
+//    ByteBuffer.wrap(pReq.bnData).put.put("$version=002$".getBytes(),48,"$version=002$".getBytes().length)
     channel.writeMessage[NoneResponse](pReq)
 
     GAFIS_NETSCR_SendCaseInfo(channel, pstCase)

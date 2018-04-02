@@ -5,8 +5,8 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
-import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
-import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GAFIS_LP_EXTRAINFO, GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.{galoclp, glocdef}
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGESTRUCT, GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
 import nirvana.hall.protocol.api.FPTProto
@@ -36,7 +36,7 @@ object galoclpConverter extends LoggerSupport{
     data.stAdmData.szCaseID = card.getText.getStrCaseId
     val admData = card.getAdmData
 
-    data.stAdmData.szCUserName = admData.getCreator.getBytes()
+    data.stAdmData.szCUserName = admData.getCreator.getBytes("GBK")
     data.stAdmData.szMUserName = admData.getUpdator.getBytes()
     data.stAdmData.tCDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
     data.stAdmData.tMDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
@@ -49,6 +49,13 @@ object galoclpConverter extends LoggerSupport{
     data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
     data.stAdmData.bIsLTBroken = card.getNLtStatus.asInstanceOf[Byte]
 
+    data.nItemFlag = (galoclp.LPCARDINFO_ITEMFLAG_ADMDATA + galoclp.LPCARDINFO_ITEMFLAG_EXTRAINFO).toByte
+    data.stAdmData.nItemFlag =  (galoclp.LPADMIN_ITEMFLAG_FGGROUP + galoclp.LPADMIN_ITEMFLAG_FGINDEX + galoclp.LPADMIN_ITEMFLAG_CASEID +
+      galoclp.LPADMIN_ITEMFLAG_GUESSEDFI + galoclp.LPADMIN_ITEMFLAG_CUSERNAME + galoclp.LPADMIN_ITEMFLAG_MUSERNAME + galoclp.LPADMIN_ITEMFLAG_EDITCOUNT ).toByte
+    data.pstExtraInfo_Data = new GAFIS_LP_EXTRAINFO()
+    data.pstExtraInfo_Data.nItemFlag = (galoclp.LP_EXTRAINFO_ITEMFLAG_ORGSCANNER + galoclp.LP_EXTRAINFO_ITEMFLAG_ORGSCANUNIT + galoclp.LP_EXTRAINFO_ITEMFLAG_ORGAFISTYPE + galoclp.LP_EXTRAINFO_ITEMFLAG_DIGITIZEMETHOD + galoclp. LP_EXTRAINFO_ITEMFLAG_GROUPID).toByte
+    data.pstExtraInfo_Data.szOrgScanner = "zhaoyang"
+    data.pstExtraInfo_Data.szOrgScanUnitCode = admData.getCreateUnitCode
     if(card.hasText) {
       val text = card.getText
 
@@ -318,6 +325,7 @@ object galoclpConverter extends LoggerSupport{
     val extraInfo_Data = new GAFIS_CASE_EXTRAINFO
 
     gafisCase.nItemFlag = (1 + 2 + 4 + 8 + 16).asInstanceOf[Byte]
+    gafisCase.nItemFlagEx = galoclp.GCIS_ITEMFLAGEX_EXTRAINFO.toByte
     gafisCase.szCaseID = protoCase.getStrCaseID
 
     gafisCase.pstFingerID_Data = convertAsKeyArray(protoCase.getStrFingerIDList)
@@ -328,6 +336,7 @@ object galoclpConverter extends LoggerSupport{
 
     gafisCase.bIsBroken = protoCase.getNBrokenStatus.asInstanceOf[Byte]  //是否破案
     gafisCase.bIsLTBroken = protoCase.getNThanStateLt.asInstanceOf[Byte] //是否LT破案
+
 
     val admData = protoCase.getAdmData //操作信息数据proto
 
@@ -386,14 +395,15 @@ object galoclpConverter extends LoggerSupport{
     gafisCase.tCreateDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
     gafisCase.tUpdateDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
     if(null!= admData.getCreator){
-      extraInfo_Data.szOrgScanner = admData.getCreator.getBytes
+      extraInfo_Data.szOrgScanner = admData.getCreator.getBytes("GBK")
     }
     extraInfo_Data.szOrgScanUnitCode = admData.getCreateUnitCode
     if(null!= protoCase.getStrMisConnectCaseId) {
       gafisCase.szMISCaseID = protoCase.getStrMisConnectCaseId.getBytes
     }
     gafisCase.pstExtraInfo_Data = extraInfo_Data
-
+    gafisCase.pstExtraInfo_Data.nItemFlag = (galoclp.CASE_EXTRAINFO_ITEMFLAG_CASEGROUPID + galoclp.CASE_EXTRAINFO_ITEMFLAG_ITEMENTRY + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANNER + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANUNIT + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGAFISTYPE + galoclp.CASE_EXTRAINFO_ITEMFLAG_MISCASEID).toByte
+    gafisCase.nExtraInfoLen = gafisCase.pstExtraInfo_Data.getDataSize.toShort
     gafisCase
   }
 
