@@ -35,8 +35,9 @@ object galoctpConverter extends LoggerSupport{
   def convertProtoBuf2GTPCARDINFOSTRUCT(card: TPCard): GTPCARDINFOSTRUCT={
     val data = new GTPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
-    data.stAdmData.szMISPersonID = card.getStrMisPersonID //人员编号
-//    data.stAdmData.szPersonID = card.getStrPersonID//重卡组号
+    data.stAdmData.szMISPersonID = card.getStrPersonID //人员编号
+    data.stAdmData.szPersonID = card.getStrMisPersonID  //重卡组号
+    val admData = card.getAdmData  //操作信息数据 proto
 
     if(card.hasText) {
       val text = card.getText
@@ -68,20 +69,29 @@ object galoctpConverter extends LoggerSupport{
       appendTextStruct(buffer, "RaceCode",text.getStrRace)
       appendTextStruct(buffer, "CertificateCode",text.getStrCertifID)
       appendTextStruct(buffer, "CertificateType",text.getStrCertifType)
+      appendTextStruct(buffer, "CreatorUnitCode",admData.getCreateUnitCode) //创建单位代码
+      appendTextStruct(buffer, "UpdatorUnitCode",admData.getUpdateUnitCode) //创建单位代码
+      appendTextStruct(buffer, "MicbUpdatorUserName",text.getStrMicUpdatorUsername) //特征更改用户
+      appendTextStruct(buffer, "MicbUpdatorUnitCode",text.getStrMicUpdatorUnitcode) //特征更改单位
+      appendTextStruct(buffer, "MISConnectPersonID",text.getStrPsisNo) //7:警务平台编号；6:工作过程号
+      appendTextStruct(buffer, "NamePinYin",text.getStrSpellName) //姓名拼音
+
       //FPT5.0新增
       appendTextStruct(buffer, "srcSysCaseRelatePersonNO",card.getStrMisPersonID)  //原始系统_案事件相关人员编号
       appendTextStruct(buffer, "policeIntegratedPersonNO",card.getStrJingZongPersonId) //警综人员编号
       appendTextStruct(buffer, "caseRelatePersonNO",card.getStrCasePersonID) //案事件相关人员编号
+
       //采集原因代码
-      val captureInfoReasonCode = card.getCaptureInfoReasonCode.split(",")
-      captureInfoReasonCode.foreach{
-        code =>
-          if (captureInfoReasonCode.indexOf(code) == 0){
-            appendTextStruct(buffer, "personClassCode",code)
-          } else{
-            appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
-          }
-      }
+//      val captureInfoReasonCode = card.getCaptureInfoReasonCode.split(",")
+//      captureInfoReasonCode.foreach{
+//        code =>
+//          if (captureInfoReasonCode.indexOf(code) == 0){
+//            appendTextStruct(buffer, "personClassCode",code)
+//          } else{
+//            appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
+//          }
+//      }
+      appendTextStruct(buffer, "personClassCode",text.getStrPersonClassCode) //捺印人员身份证号码
       appendTextStruct(buffer, "printerID",text.getStrPrinterIdCardNo) //捺印人员身份证号码
       appendTextStruct(buffer, "printerPhone",text.getStrPrinterPhone) //捺印人员联系电话
       appendTextStruct(buffer, "PrintDateTime",text.getStrPrintDate) //新增FPT5.0捺印时间
@@ -110,7 +120,21 @@ object galoctpConverter extends LoggerSupport{
 
       data.pstText_Data = buffer.toArray
       data.nTextItemCount = data.pstText_Data.length.asInstanceOf[Byte]
+      data.stAdmData.szPersonType = card.getText.getStrPersonType  //人员类型
+
     }
+
+    data.stAdmData.tCDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
+    data.stAdmData.tMDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
+    data.stAdmData.szCUserName = admData.getCreator
+    data.stAdmData.szMUserName = admData.getUpdator
+    data.stAdmData.tSubmitTLDate = DateConverter.convertString2AFISDateTime(admData.getStrTlDate)
+    data.stAdmData.tSubmitTTDate = DateConverter.convertString2AFISDateTime(admData.getStrTtDate)
+    data.stAdmData.nAccuTLCount = admData.getNTlCount.asInstanceOf[Byte]
+    data.stAdmData.nAccuTTCount = admData.getNTtCount.asInstanceOf[Byte]
+    data.stAdmData.szTLUserName = admData.getStrTlUser
+    data.stAdmData.szTTUserName = admData.getStrTtUser
+    data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
 
     //mic TODO 人像7.0存在有头和没头数据，暂时不处理人像
     val mics = card.getBlobList.filter(_.getType != ImageType.IMAGETYPE_FACE).map{blob=>
@@ -191,6 +215,8 @@ object galoctpConverter extends LoggerSupport{
           mic.nItemData = FgpConverter.convertPalmFgp2GTPIO_ITEMINDEX(blob.getPalmfgp)
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
+        case FPTProto.ImageType.IMAGETYPE_SIGNATURE =>
+          mic.nItemType = glocdef.GAMIC_ITEMTYPE_SIGNATURE.asInstanceOf[Byte]
         case other =>
           error("mic type {} not supported for {}",other,data.szCardID)
 //          new UnsupportedOperationException("item type "+other+" not supported ")

@@ -5,7 +5,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
-import nirvana.hall.c.services.gloclib.galoclp.{GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
+import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_CASE_EXTRAINFO, GCASEINFOSTRUCT, GLPCARDINFOSTRUCT}
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.{GAFISIMAGESTRUCT, GAFISMICSTRUCT, GATEXTITEMSTRUCT}
 import nirvana.hall.c.services.kernel.mnt_def.FINGERLATMNTSTRUCT
@@ -34,9 +34,20 @@ object galoclpConverter extends LoggerSupport{
     data.szCardID = card.getStrCardID
     //TODO 案件编号,操作信息
     data.stAdmData.szCaseID = card.getText.getStrCaseId
-    data.stAdmData.szCUserName = card.getAdmData.getCreator.getBytes()
-    data.stAdmData.szMUserName = card.getAdmData.getUpdator.getBytes()
-//    data.stAdmData.tCDateTime =
+    val admData = card.getAdmData
+
+    data.stAdmData.szCUserName = admData.getCreator.getBytes()
+    data.stAdmData.szMUserName = admData.getUpdator.getBytes()
+    data.stAdmData.tCDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
+    data.stAdmData.tMDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
+    data.stAdmData.tSubmitLTDate = DateConverter.convertString2AFISDateTime(admData.getStrLtDate)
+    data.stAdmData.tSubmitLLDate = DateConverter.convertString2AFISDateTime(admData.getStrLlDate)
+    data.stAdmData.nAccuLTCount = admData.getNLtCount.asInstanceOf[Byte]
+    data.stAdmData.nAccuLLCount = admData.getNLlCount.asInstanceOf[Byte]
+    data.stAdmData.szLTUserName = admData.getStrLtUser.getBytes
+    data.stAdmData.szLLUserName = admData.getStrLlUser.getBytes
+    data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
+    data.stAdmData.bIsLTBroken = card.getNLtStatus.asInstanceOf[Byte]
 
     if(card.hasText) {
       val text = card.getText
@@ -59,6 +70,10 @@ object galoclpConverter extends LoggerSupport{
 
       appendTextStruct(buffer, "Comment",text.getStrComment)
       appendTextStruct(buffer, "CaptureMethod",text.getStrCaptureMethod)
+      appendTextStruct(buffer, "CreatorUnitCode",admData.getCreateUnitCode)
+      appendTextStruct(buffer, "UpdatorUnitCode",admData.getUpdateUnitCode)
+      appendTextStruct(buffer, "MicbUpdatorUserName",text.getStrMicbUpdatorUserName)
+      appendTextStruct(buffer, "MicbUpdatorUnitCode",text.getStrMicbUpdatorUnitCode)
 
       //FPT5.0新增
       appendTextStruct(buffer, "EvidenceNo",card.getStrPhysicalId) //现场物证编号
@@ -300,6 +315,8 @@ object galoclpConverter extends LoggerSupport{
   def convertProtobuf2GCASEINFOSTRUCT(protoCase:Case):GCASEINFOSTRUCT = {
     //TODO 添加数据长度校验
     val gafisCase = new GCASEINFOSTRUCT
+    val extraInfo_Data = new GAFIS_CASE_EXTRAINFO
+
     gafisCase.nItemFlag = (1 + 2 + 4 + 8 + 16).asInstanceOf[Byte]
     gafisCase.szCaseID = protoCase.getStrCaseID
 
@@ -309,6 +326,10 @@ object galoclpConverter extends LoggerSupport{
     gafisCase.pstPalmID_Data= convertAsKeyArray(protoCase.getStrPalmIDList)
     gafisCase.nPalmCount = gafisCase.pstPalmID_Data.length.asInstanceOf[Short]
 
+    gafisCase.bIsBroken = protoCase.getNBrokenStatus.asInstanceOf[Byte]  //是否破案
+    gafisCase.bIsLTBroken = protoCase.getNThanStateLt.asInstanceOf[Byte] //是否LT破案
+
+    val admData = protoCase.getAdmData //操作信息数据proto
 
     if (protoCase.hasText) {
       val text = protoCase.getText
@@ -347,6 +368,8 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "XieChaDate", text.getStrXieChaDate)
       appendTextStruct(buffer, "XieChaRequestUnitName", text.getStrXieChaRequestUnitName)
       appendTextStruct(buffer, "XieChaRequestUnitCode", text.getStrXieChaRequestUnitCode)
+      appendTextStruct(buffer, "UpdateUserName", admData.getUpdator)
+      appendTextStruct(buffer, "UpdatorUnitCode", admData.getUpdateUnitCode)
 
       //FPT5.0新增
       appendTextStruct(buffer, "XKID", protoCase.getStrSurveyId) //现场勘验编号
@@ -359,6 +382,18 @@ object galoclpConverter extends LoggerSupport{
       gafisCase.pstText_Data = buffer.toArray
       gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
     }
+
+    gafisCase.tCreateDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
+    gafisCase.tUpdateDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
+    if(null!= admData.getCreator){
+      extraInfo_Data.szOrgScanner = admData.getCreator.getBytes
+    }
+    extraInfo_Data.szOrgScanUnitCode = admData.getCreateUnitCode
+    if(null!= protoCase.getStrMisConnectCaseId) {
+      gafisCase.szMISCaseID = protoCase.getStrMisConnectCaseId.getBytes
+    }
+    gafisCase.pstExtraInfo_Data = extraInfo_Data
+
     gafisCase
   }
 
@@ -456,9 +491,9 @@ object galoclpConverter extends LoggerSupport{
               caseInfo.setStrCaseSource(textContent.toInt) //案件来源
              //hall7抓6新增
             case "UpdateUserName" =>
-              admData.setCreator(textContent) //
+              admData.setUpdator(textContent) //
             case "UpdatorUnitCode" =>
-              admData.setCreateUnitCode(textContent) //
+              admData.setUpdateUnitCode(textContent) //
             case other =>
               warn("{} not mapped", other)
           }
