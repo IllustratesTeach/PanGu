@@ -29,8 +29,8 @@ class HallWebserviceConfig
   @XmlElement(name = "handprintService")
   var handprintService:HandprintServiceConfig = new HandprintServiceConfig
 
-  @XmlElement(name = "XingZhuanSetting")
-  var XingZhuanSetting: XingZhuanSetting = new XingZhuanSetting
+  @XmlElement(name = "xing_zhuan")
+  var XingZhuan: XingZhuanConfig = new XingZhuanConfig
   @XmlElement(name = "local_tenprint_path")
   var localTenprintPath:String = _
   @XmlElement(name = "local_latent_path")
@@ -142,10 +142,12 @@ class Survey_shhConfig{
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "XingZhuanSetting")
-class XingZhuanSetting{
-  @XmlElement(name = "isAutoQuery")
-  var isAutoQuery: String = _
-  @XmlElement(name = "cron")
-  var cron: String = _
+@XmlType(name = "XingZhuanConfig")
+class XingZhuanConfig{
+  @XmlElement(name = "url")
+  var url: String = _
+  @XmlElement(name = "user")
+  var user: String = _
+  @XmlElement(name = "password")
+  var password: String = _
 }
