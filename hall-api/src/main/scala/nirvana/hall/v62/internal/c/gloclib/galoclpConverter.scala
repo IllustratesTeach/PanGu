@@ -37,15 +37,15 @@ object galoclpConverter extends LoggerSupport{
     val admData = card.getAdmData
 
     data.stAdmData.szCUserName = admData.getCreator.getBytes("GBK")
-    data.stAdmData.szMUserName = admData.getUpdator.getBytes()
+    data.stAdmData.szMUserName = admData.getUpdator.getBytes("GBK")
     data.stAdmData.tCDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
     data.stAdmData.tMDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
     data.stAdmData.tSubmitLTDate = DateConverter.convertString2AFISDateTime(admData.getStrLtDate)
     data.stAdmData.tSubmitLLDate = DateConverter.convertString2AFISDateTime(admData.getStrLlDate)
     data.stAdmData.nAccuLTCount = admData.getNLtCount.asInstanceOf[Byte]
     data.stAdmData.nAccuLLCount = admData.getNLlCount.asInstanceOf[Byte]
-    data.stAdmData.szLTUserName = admData.getStrLtUser.getBytes
-    data.stAdmData.szLLUserName = admData.getStrLlUser.getBytes
+    data.stAdmData.szLTUserName = admData.getStrLtUser.getBytes("GBK")
+    data.stAdmData.szLLUserName = admData.getStrLlUser.getBytes("GBK")
     data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
     data.stAdmData.bIsLTBroken = card.getNLtStatus.asInstanceOf[Byte]
 
@@ -397,8 +397,9 @@ object galoclpConverter extends LoggerSupport{
     }
     extraInfo_Data.szOrgScanUnitCode = admData.getCreateUnitCode
     if(null!= protoCase.getStrMisConnectCaseId) {
-      gafisCase.szMISCaseID = protoCase.getStrMisConnectCaseId.getBytes
+      gafisCase.szMISCaseID = protoCase.getStrMisConnectCaseId.getBytes("GBK")
     }
+    gafisCase.nItemFlag = galoclp.GCIS_ITEMFLAG_MISCASEID.toByte
     gafisCase.pstExtraInfo_Data = extraInfo_Data
     gafisCase.pstExtraInfo_Data.nItemFlag = (galoclp.CASE_EXTRAINFO_ITEMFLAG_CASEGROUPID + galoclp.CASE_EXTRAINFO_ITEMFLAG_ITEMENTRY + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANNER + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANUNIT + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGAFISTYPE + galoclp.CASE_EXTRAINFO_ITEMFLAG_MISCASEID).toByte
     gafisCase.nExtraInfoLen = gafisCase.pstExtraInfo_Data.getDataSize.toShort

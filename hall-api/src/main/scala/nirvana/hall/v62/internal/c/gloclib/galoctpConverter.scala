@@ -7,7 +7,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.galoctp.GTPCARDINFOSTRUCT
-import nirvana.hall.c.services.gloclib.glocdef
+import nirvana.hall.c.services.gloclib.{galoctp, glocdef}
 import nirvana.hall.c.services.gloclib.glocdef._
 import nirvana.hall.protocol.api.FPTProto
 import nirvana.hall.protocol.api.FPTProto.TPCard.TPCardBlob
@@ -63,7 +63,9 @@ object galoctpConverter extends LoggerSupport{
       appendTextStruct(buffer, "PrinterUnitCode",text.getStrPrintUnitCode)
       appendTextStruct(buffer, "PrinterUnitNameTail",text.getStrPrintUnitName)
       appendTextStruct(buffer, "PrinterName",text.getStrPrinter)
-      appendTextStruct(buffer, "PrintDate",text.getStrPrintDate.substring(0,8))
+      if(null != text.getStrPrintDate && text.getStrPrintDate.length >0){
+        appendTextStruct(buffer, "PrintDate",text.getStrPrintDate.substring(0,8))
+      }
       appendTextStruct(buffer, "Comment",text.getStrComment)
       appendTextStruct(buffer, "Nationality",text.getStrNation)
       appendTextStruct(buffer, "RaceCode",text.getStrRace)
@@ -132,9 +134,14 @@ object galoctpConverter extends LoggerSupport{
     data.stAdmData.tSubmitTTDate = DateConverter.convertString2AFISDateTime(admData.getStrTtDate)
     data.stAdmData.nAccuTLCount = admData.getNTlCount.asInstanceOf[Byte]
     data.stAdmData.nAccuTTCount = admData.getNTtCount.asInstanceOf[Byte]
+    data.stAdmData.nTLCount = admData.getNTlCount.asInstanceOf[Byte]
+    data.stAdmData.nTTCount = admData.getNTtCount.asInstanceOf[Byte]
     data.stAdmData.szTLUserName = admData.getStrTlUser
     data.stAdmData.szTTUserName = admData.getStrTtUser
     data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
+
+    data.nItemFlag = (galoctp.TPCARDINFO_ITEMFLAG_ADMDATA + galoctp.TPCARDINFO_ITEMFLAG_SINGLEITEM).toByte
+    data.stAdmData.nItemFlag = 1972224 //
 
     //mic TODO 人像7.0存在有头和没头数据，暂时不处理人像
     val mics = card.getBlobList.filter(_.getType != ImageType.IMAGETYPE_FACE).map{blob=>
@@ -210,12 +217,14 @@ object galoctpConverter extends LoggerSupport{
           }
         case FPTProto.ImageType.IMAGETYPE_CARDIMG =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
+          mic.nItemData = blob.getCardimgfgp.getNumber.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
           mic.nItemData = FgpConverter.convertPalmFgp2GTPIO_ITEMINDEX(blob.getPalmfgp)
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_VOICE.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_SIGNATURE =>
+          mic.nItemData = blob.getSigcprfgp.getNumber.asInstanceOf[Byte]
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_SIGNATURE.asInstanceOf[Byte]
         case other =>
           error("mic type {} not supported for {}",other,data.szCardID)

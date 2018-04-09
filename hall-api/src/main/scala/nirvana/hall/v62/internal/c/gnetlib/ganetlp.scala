@@ -56,6 +56,9 @@ trait ganetlp {
     pReq.nTableID = nTableID
     pReq.nOpClass = OP_CLASS_CASE.asInstanceOf[Short]
     pReq.nOpCode = OP_CASE_UPDATE.asInstanceOf[Short]
+    pReq.bnData =  new Array[Byte](64)
+    val bytes = "$version=002$".getBytes()
+    (0 until bytes.length).foreach(i =>ByteBuffer.wrap(pReq.bnData).put(i+48,bytes(i)))
 
     channel.writeMessage[NoneResponse](pReq)
 
@@ -75,9 +78,7 @@ trait ganetlp {
     pReq.nOpCode = OP_CASE_ADD.asInstanceOf[Short]
     pReq.bnData =  new Array[Byte](64)
     val bytes = "$version=002$".getBytes()
-    for(i <- 0 until bytes.length){
-      ByteBuffer.wrap(pReq.bnData).put(i+48,bytes(i))
-    }
+    (0 until bytes.length).foreach(i =>ByteBuffer.wrap(pReq.bnData).put(i+48,bytes(i)))
 //    ByteBuffer.wrap(pReq.bnData).put.put("$version=002$".getBytes(),48,"$version=002$".getBytes().length)
     channel.writeMessage[NoneResponse](pReq)
 

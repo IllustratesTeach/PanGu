@@ -59,7 +59,9 @@ object DateConverter extends LoggerSupport{
     val min = dateTime.tTime.tMin
     val sec = dateTime.tTime.convertAsJavaSecs()
 
-    "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
+    val date = "%04d%02d%02d%02d%02d%02d".format(year, month, day, hour, min, sec)
+    if(date.equals("00000100000000")) ""    //00000100000000 时间为空 String 转Date时会发生转换错误
+    else date
   }
   /**
     * 将gafis日期转换为字符串 yyyy-MM-dd HH:mm:ss
@@ -92,6 +94,14 @@ object DateConverter extends LoggerSupport{
       dateTime.tTime.tHour = date.getHours.toByte
       dateTime.tTime.tMin = date.getMinutes.toByte
       dateTime.tTime.setJavaSecs(date.getSeconds)
+
+      dateTime
+    }else if(str.length == 8){
+      val date = convertString2Date(str, "yyyyMMdd")
+      val dateTime = new GAFIS_DATETIME
+      dateTime.tDate.setJavaYear(date.getYear + 1900)
+      dateTime.tDate.tMonth = date.getMonth.toByte
+      dateTime.tDate.tDay = date.getDate.toByte
 
       dateTime
     }else{
