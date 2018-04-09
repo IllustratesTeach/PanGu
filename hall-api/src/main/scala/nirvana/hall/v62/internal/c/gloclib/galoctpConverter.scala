@@ -141,7 +141,8 @@ object galoctpConverter extends LoggerSupport{
     data.stAdmData.nEditCount = admData.getNEditCount.asInstanceOf[Byte]
 
     data.nItemFlag = (galoctp.TPCARDINFO_ITEMFLAG_ADMDATA + galoctp.TPCARDINFO_ITEMFLAG_SINGLEITEM).toByte
-    data.stAdmData.nItemFlag = 1972224 //
+    data.stAdmData.nItemFlag = 1972224 // (galoctp.TPADMIN_ITEMFLAG_1_ACCUTLCOUNT + galoctp.TPADMIN_ITEMFLAG_1_ACCUTTCOUNT + galoctp.TPADMIN_ITEMFLAG_1_TLCOUNT + galoctp.TPADMIN_ITEMFLAG_1_TTCOUNT)*65536
+                                     // (galoctp.TPADMIN_ITEMFLAG_2_SUBMITTLDATE + galoctp.TPADMIN_ITEMFLAG_2_SUBMITTTDATE) * 256
 
     //mic TODO 人像7.0存在有头和没头数据，暂时不处理人像
     val mics = card.getBlobList.filter(_.getType != ImageType.IMAGETYPE_FACE).map{blob=>
