@@ -544,15 +544,17 @@ object ProtobufConverter extends LoggerSupport{
 
     //掌纹数据
     if (palmList != null){
-      palmList.foreach{ palm =>
-        val blobBuilder = tpCard.addBlobBuilder()
-        if (palm.gatherData != null)
-          blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
-        blobBuilder.setType(ImageType.IMAGETYPE_PALM)
-        palm.fgp match {
-          case 11 => blobBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
-          case 12 => blobBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
-          case other => blobBuilder.setPalmfgp(PalmFgp.PALM_UNKNOWN)
+      palmList.foreach { palm =>
+        if (palm.fgp == PalmFgp.PALM_RIGHT || palm.fgp == PalmFgp.PALM_LEFT) {
+          val blobBuilder = tpCard.addBlobBuilder()
+          if (palm.gatherData != null)
+            blobBuilder.setStImageBytes(ByteString.copyFrom(palm.gatherData))
+          blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+
+          palm.fgp match {
+            case 11 => blobBuilder.setPalmfgp(PalmFgp.PALM_RIGHT)
+            case 12 => blobBuilder.setPalmfgp(PalmFgp.PALM_LEFT)
+          }
         }
       }
     }
@@ -564,7 +566,7 @@ object ProtobufConverter extends LoggerSupport{
         if (0 == other.imageType ){
           if (other.gatherData != null)
             blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
-          if ("05" == other.gatherType){
+          if ("5" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
             other.fgp match {
               case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
@@ -577,31 +579,33 @@ object ProtobufConverter extends LoggerSupport{
               case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
             }
           }
-          if ("04" == other.gatherType){
+          if ("4" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
             other.fgp match {
               case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
               case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
             }
           }
-          if ("06" == other.gatherType){
-            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
-            other.fgp match {
-              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
-              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
-              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
-              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
-              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
-              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
-              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
-              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+          if ("6" == other.gatherType) {
+            if (other.fgp != "1" || other.fgp != "2") {
+              blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+              other.fgp match {
+                case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+                case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+                case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+                case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+                case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+                case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+                case "11" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+                case "12" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+              }
             }
           }
         }
         if (1 == other.imageType ){
           if (other.gatherData != null)
             blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
-          if ("05" == other.gatherType){
+          if ("5" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
             other.fgp match {
               case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
@@ -614,31 +618,33 @@ object ProtobufConverter extends LoggerSupport{
               case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
             }
           }
-          if ("04" == other.gatherType){
+          if ("4" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
             other.fgp match {
               case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
               case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
             }
           }
-          if ("06" == other.gatherType){
-            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
-            other.fgp match {
-              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
-              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
-              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
-              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
-              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
-              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
-              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
-              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+          if ("6" == other.gatherType){
+            if (other.fgp != "1" || other.fgp != "2") {
+              blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+              other.fgp match {
+                case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+                case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+                case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+                case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+                case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+                case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+                case "11" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+                case "12" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+              }
             }
           }
         }
-        if (2 == other.imageType ){
+        if (3 == other.imageType ){
           if (other.gatherData != null)
             blobBuilder.setStImageBytes(ByteString.copyFrom(other.gatherData))
-          if ("05" == other.gatherType){
+          if ("5" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_CARDIMG)
             other.fgp match {
               case "1" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO1)
@@ -651,24 +657,26 @@ object ProtobufConverter extends LoggerSupport{
               case "8" => blobBuilder.setCardimgfgp(CARDIMG.CARDINFO8)
             }
           }
-          if ("04" == other.gatherType){
+          if ("4" == other.gatherType){
             blobBuilder.setType(ImageType.IMAGETYPE_SIGNATURE)
             other.fgp match {
               case "2" => blobBuilder.setSigcprfgp(SignatureCpr.CriminalCpr)
               case "1" => blobBuilder.setSigcprfgp(SignatureCpr.PrinterCpr)
             }
           }
-          if ("06" == other.gatherType){
-            blobBuilder.setType(ImageType.IMAGETYPE_PALM)
-            other.fgp match {
-              case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
-              case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
-              case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
-              case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
-              case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
-              case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
-              case "13" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
-              case "14" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+          if ("6" == other.gatherType) {
+            if (other.fgp != "1" || other.fgp != "2") {
+              blobBuilder.setType(ImageType.IMAGETYPE_PALM)
+              other.fgp match {
+                case "3" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_R)
+                case "4" => blobBuilder.setPalmfgp(PalmFgp.PALM_FINGER_L)
+                case "5" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_LOW)
+                case "6" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_R_UP)
+                case "7" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_LOW)
+                case "8" => blobBuilder.setPalmfgp(PalmFgp.PALM_THUMB_L_UP)
+                case "11" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_RIGHT)
+                case "12" => blobBuilder.setPalmfgp(PalmFgp.PALM_FOUR_PRINT_LEFT)
+              }
             }
           }
         }

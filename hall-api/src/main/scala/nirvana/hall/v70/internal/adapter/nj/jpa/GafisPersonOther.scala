@@ -44,7 +44,7 @@ class GafisPersonOther extends ActiveRecord {
       @Column(name = "INPUTPSN", length = 32)
       var inputpsn: java.lang.String = _
       @Temporal(TemporalType.TIMESTAMP)
-      @Column(name = "INPUTTIME", nullable = false, length = 23)
+      @Column(name = "INPUTTIME", length = 23)
       var inputtime: java.util.Date = _
       @Column(name = "MODIFIEDPSN", length = 32)
       var modifiedpsn: java.lang.String = _

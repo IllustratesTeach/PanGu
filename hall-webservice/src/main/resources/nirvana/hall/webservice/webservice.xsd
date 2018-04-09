@@ -42,9 +42,9 @@
                 </xs:annotation>
             </xs:element>
 
-            <xs:element type="XingZhuanSetting" name="XingZhuanSetting" minOccurs="0" maxOccurs="1">
+            <xs:element type="xingZhuanConfigType" name="xing_zhuan" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>配置是否根据任务自动发送查询相关参数</xs:documentation>
+                    <xs:documentation>刑专接口配置</xs:documentation>
                 </xs:annotation>
             </xs:element>
 
@@ -303,16 +303,21 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="XingZhuanSetting">
+    <xs:complexType name="xingZhuanConfigType">
         <xs:sequence>
-            <xs:element type="xs:string" name="isAutoQuery" minOccurs="0" maxOccurs="1">
+            <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>配置是否根据任务自动发送查询 0不发送 1发送</xs:documentation>
+                    <xs:documentation>url</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
+            <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>获取协查任务定时计划</xs:documentation>
+                    <xs:documentation>userId</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>password</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
