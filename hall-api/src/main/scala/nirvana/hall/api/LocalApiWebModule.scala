@@ -27,6 +27,7 @@ object LocalApiWebModule {
     configuration.addInstance("QueryFilter", classOf[QueryFilter])
     configuration.addInstance("SyncDataFilter", classOf[SyncDataFilter])
     configuration.addInstance("MatchRelationFilter", classOf[MatchRelationFilter])
+    configuration.addInstance("FPTTransFilter",classOf[FPTTransFilter])
   }
   //增加EagerLoad,避免出现deadlock
   @EagerLoad
