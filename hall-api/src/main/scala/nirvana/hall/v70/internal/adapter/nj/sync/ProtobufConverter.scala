@@ -93,7 +93,7 @@ object ProtobufConverter extends LoggerSupport{
       textBuilder.setStrCaseType1(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,caseInfo.caseClassCode))
     if (caseInfo.caseClassCode2 != null)
       textBuilder.setStrCaseType2(getCode7to6(DictCode7Map6.caseClasses_nj.toMap,caseInfo.caseClassCode2))
-    if (caseInfo.caseClassCode2 != null)
+    if (caseInfo.caseClassCode3 != null)
       textBuilder.setStrCaseType3(caseInfo.caseClassCode3)
     magicSet(caseInfo.caseOccurDate, textBuilder.setStrCaseOccurDate)
     magicSet(caseInfo.caseOccurPlaceDetail, textBuilder.setStrCaseOccurPlace)
