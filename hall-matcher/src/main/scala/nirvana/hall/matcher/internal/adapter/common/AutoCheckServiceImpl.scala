@@ -64,7 +64,8 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
                     //已经存在相同的重卡组号
                     info("已经存在重卡组号:{}", repeatNo)
                   }else{
-                    error("重卡归并任务号：{}，人员编号：{}，{} 存在不相同的重卡组号", queryQue.oraSid, queryQue.keyId, personidRepeatNo)
+                    //不同重卡组进行归并
+                    mergeFingerRepeat(repeatNo,personidRepeatNo)
                   }
                 case None =>
                   if(personidRepeatNo != null){
@@ -138,6 +139,19 @@ class AutoCheckServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val da
     JdbcDatabase.update(sql){ps=>
       ps.setString(1, fingerRepeatNo)
       ps.setString(2, personid)
+    }
+  }
+
+  /**
+    * 重卡组合并
+    * @param afterMergeFingerRepeatNo 合并后的重卡组号
+    * @param beMergeFingerRepeatNo 被合并的重卡组号
+    */
+  private def mergeFingerRepeat(afterMergeFingerRepeatNo:String,beMergeFingerRepeatNo:String):Unit = {
+    val sql = "update gafis_person t set t.fingerrepeatno = ? WHERE t.fingerrepeatno = ?"
+    JdbcDatabase.update(sql){ps=>
+      ps.setString(1,afterMergeFingerRepeatNo)
+      ps.setString(2,beMergeFingerRepeatNo)
     }
   }
 
