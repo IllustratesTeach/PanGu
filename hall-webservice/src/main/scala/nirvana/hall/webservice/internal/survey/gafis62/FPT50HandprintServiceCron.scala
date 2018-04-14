@@ -175,7 +175,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     //获取待发送现场指掌纹数量
     val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj)
     info("latentCount number:{}",latentCount)
-    if(latentCount.toInt > 0){
+    if(latentCount.toInt > 1){
       var nIndex = surveyConfig.nSeq
       val step = 9
       Range(nIndex, latentCount,10).foreach{i =>
@@ -216,8 +216,50 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           }
         }
       }
-    }else{
-      //没有获取到数据，设置开始时间为结束时间, 开始位置0，结束时间为空,下次任务会以系统时间为结束时间
+      try {
+        surveyConfig.szStartTime = fPT50HandprintServiceClient.getSystemDateTime()
+        surveyConfig.szEndTime = ""
+        surveyConfigService.updateSurveyConfig(surveyConfig)
+      } catch {
+        case ex: Exception =>
+          error("getSystemDateTime:{},currentTime:{}"
+            , ExceptionUtil.getStackTraceInfo(ex), DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT)
+          )
+      }
+    }else if(latentCount == 1){
+      val fingerPrintListResponse = fPT50HandprintServiceClient.getLatentList(surveyConfig.szUnitCode, FPT50HandprintServiceConstants.ZZHWLX_ALL, "", kssj, jssj, 1, 1)
+      if(fingerPrintListResponse.nonEmpty){
+        info("单位代码:{} 现场列表大小:{}",surveyConfig.szUnitCode,fingerPrintListResponse.get.list.length)
+        try {
+          fingerPrintListResponse.get.list.foreach { k =>
+            val xckybh = k.xckybh
+            //根据现堪编号获取接警编号
+            val receptionNo = fPT50HandprintServiceClient.getReceptionNo(xckybh)
+            //插入SURVEY_RECORD
+            val surveyRecord = new SURVEYRECORD
+            surveyRecord.szKNo = k.xckybh
+            surveyRecord.szCaseName = k.ajmc
+            surveyRecord.szPhyEvidenceNo = k.xcwzbh
+            surveyRecord.szJieJingNo = receptionNo
+            surveyRecord.nState = survey.SURVEY_STATE_DEFAULT
+            surveyRecord.nJieJingState = if(StringUtils.isNotEmpty(receptionNo) && StringUtils.isNotBlank(receptionNo))
+              survey.SURVEY_STATE_SUCCESS
+            else survey.SURVEY_STATE_DEFAULT
+
+            surveyRecordService.addSurveyRecord(surveyRecord)
+            surveyConfig.szStartTime = fPT50HandprintServiceClient.getSystemDateTime()
+            surveyConfig.szEndTime = ""
+            surveyConfigService.updateSurveyConfig(surveyConfig)
+          }
+        }catch {
+          case ex: Exception=>
+            error("getLatentList-error:{},currentTime:{}"
+              ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+            )
+        }
+      }
+    } else{
+      //没有获取到数据，设置开始时间为结束时间, 开始位置1，结束时间为空,下次任务会以系统时间为结束时间
       surveyConfig.nSeq = 1
       surveyConfig.szStartTime = jssj
       surveyConfig.szEndTime = ""
@@ -239,12 +281,13 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
           val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
           if (latentPackageOp.nonEmpty) {
             var resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
-            if (null == latentPackageOp.get.caseMsg.caseId) {
-              //更新状态
-              warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
-              record.nState = survey.SURVEY_STATE_FAIL
-              resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
-            } else {
+            //根据客户要求去掉按事件编号判断
+//            if (null == latentPackageOp.get.caseMsg.caseId) {
+//              //更新状态
+//              warn("该现场物证编号{} 无案事件编号", record.szPhyEvidenceNo)
+//              record.nState = survey.SURVEY_STATE_FAIL
+//              resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
+//            } else {
               //保存数据
               fPT5Service.addLatentPackage(latentPackageOp.get)
               info("入库成功，现场物证编号：" + record.szPhyEvidenceNo)
@@ -252,7 +295,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               if(Option(latentPackageOp.get.latentFingers).nonEmpty){
                 latentPackageOp.get.latentFingers.foreach { finger =>
                   if (record.szPhyEvidenceNo.equals(finger.latentFingerImageMsg.latentPhysicalId)) {
-                    record.szFingerid = latentPackageOp.get.caseMsg.caseId + finger.latentFingerImageMsg.latentPhysicalId.substring(finger.latentFingerImageMsg.latentPhysicalId.length-2)
+                    record.szFingerid = finger.latentFingerImageMsg.latentPhysicalId
                     //更新状态
                     record.nState = survey.SURVEY_STATE_SUCCESS
                 }
@@ -261,13 +304,13 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
               if (Option(latentPackageOp.get.latentPalms).nonEmpty) {
                 latentPackageOp.get.latentPalms.foreach { palm =>
                   if (record.szPhyEvidenceNo.equals(palm.latentPalmImageMsg.latentPalmPhysicalId)) {
-                    record.szFingerid = latentPackageOp.get.caseMsg.caseId + palm.latentPalmImageMsg.latentPalmPhysicalId.substring(palm.latentPalmImageMsg.latentPalmPhysicalId.length-2)
+                    record.szFingerid = palm.latentPalmImageMsg.latentPalmPhysicalId
                     //更新状态
                     record.nState = survey.SURVEY_STATE_SUCCESS
                   }
                 }
               }
-            }
+            //}
             surveyRecordService.updateSurveyRecord(record)
             fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, resultType)
           } else {
@@ -278,6 +321,8 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
             error("fPT50HandprintServiceClient-getLatentPackage:{},currentTime:{}"
               ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
             )
+            record.nState = survey.SURVEY_STATE_FAIL
+            surveyRecordService.updateSurveyRecord(record)
         }
       }
       getLatentPackage

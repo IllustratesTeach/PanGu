@@ -318,7 +318,9 @@ object FPT5Converter {
     val caseInfo = Case.newBuilder()
     val textBuilder = caseInfo.getTextBuilder
     caseInfo.setStrCaseID(dropHeadLetter(latentPackage.caseMsg.originalSystemCaseId,HallApiConstants.LPCARDNO_HEAD_LETTER))
-    caseInfo.setStrJingZongCaseId(latentPackage.caseMsg.caseId) //警综案事件编号
+    if(Option(latentPackage.caseMsg.caseId).nonEmpty){
+      caseInfo.setStrJingZongCaseId(latentPackage.caseMsg.caseId) //警综案事件编号
+    }
     caseInfo.setStrSurveyId(latentPackage.caseMsg.latentSurveyId) //现场勘验编号
     if(null != latentPackage.latentFingers){
       caseInfo.setNCaseFingerCount(latentPackage.latentFingers.length) //现场指纹个数

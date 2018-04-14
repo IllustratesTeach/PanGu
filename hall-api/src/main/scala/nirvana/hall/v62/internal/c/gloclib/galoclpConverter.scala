@@ -322,7 +322,7 @@ object galoclpConverter extends LoggerSupport{
     val gafisCase = new GCASEINFOSTRUCT
     val extraInfo_Data = new GAFIS_CASE_EXTRAINFO
 
-    gafisCase.nItemFlag = (1 + 2 + 4 + 8 + 16).asInstanceOf[Byte]
+    gafisCase.nItemFlag = (1 + 2 + 4 + 8 + 16 + 32).asInstanceOf[Byte]
     gafisCase.nItemFlagEx = galoclp.GCIS_ITEMFLAGEX_EXTRAINFO.toByte
     gafisCase.szCaseID = protoCase.getStrCaseID
 
@@ -399,7 +399,6 @@ object galoclpConverter extends LoggerSupport{
     if(null!= protoCase.getStrMisConnectCaseId) {
       gafisCase.szMISCaseID = protoCase.getStrMisConnectCaseId.getBytes("GBK")
     }
-    gafisCase.nItemFlag = galoclp.GCIS_ITEMFLAG_MISCASEID.toByte
     gafisCase.pstExtraInfo_Data = extraInfo_Data
     gafisCase.pstExtraInfo_Data.nItemFlag = (galoclp.CASE_EXTRAINFO_ITEMFLAG_CASEGROUPID + galoclp.CASE_EXTRAINFO_ITEMFLAG_ITEMENTRY + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANNER + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGSCANUNIT + galoclp.CASE_EXTRAINFO_ITEMFLAG_ORGAFISTYPE + galoclp.CASE_EXTRAINFO_ITEMFLAG_MISCASEID).toByte
     gafisCase.nExtraInfoLen = gafisCase.pstExtraInfo_Data.getDataSize.toShort

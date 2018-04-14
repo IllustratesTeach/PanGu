@@ -30,7 +30,6 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
                       lPCardService: LPCardService,
                       lPPalmService: LPPalmService,
                       matchRelationService: MatchRelationService,
-                      fptExchangeService: FPTExchangeService,
                       extractor: FeatureExtractor) extends FPT5Service{
   JniLoaderUtil.loadExtractorJNI()
   JniLoaderUtil.loadImageJNI()
@@ -207,145 +206,19 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
 
   override def addPrintTaskPackage(printtaskPackage: PrinttaskPackage): Unit = ???
 
-  override def getLTResultPackage(taskId: String): LtResultPackage = {
-    val (ltResultPackage,matchResult) = fptExchangeService.getLTResultPackage(taskId)
-    if(matchResult.nonEmpty){
-      val lTResultMsgs = new ArrayBuffer[LTResultMsg]()
-      matchResult.foreach{
-        result =>
-          val it = result.getCandidateResultList.iterator()
-          var index = 1
-          while(it.hasNext){
-            val lTResultMsg = new LTResultMsg()
-            val result = it.next()
-            val tpCard = tPCardService.getTPCard(result.getObjectId)
-            lTResultMsg.resultRanking = index
-            lTResultMsg.resultScore = result.getScore
-            lTResultMsg.resultOriginalSystemPersonId = tpCard.getStrMisPersonID
-            lTResultMsg.resultJingZongPersonId = tpCard.getStrJingZongPersonId
-            lTResultMsg.resultPersonId = tpCard.getStrCasePersonID
-            lTResultMsg.resultCardId = tpCard.getStrCardID
-            if(result.getPos.toString.matches("^([1-9])$")){
-              lTResultMsg.resultFingerPalmPostionCode = ("0"+result.getPos.toString)
-            } else {
-              if(result.getPos > 20 ){
-                lTResultMsg.resultFingerPalmPostionCode = (result.getPos-10).toString
-              }else{
-                lTResultMsg.resultFingerPalmPostionCode = result.getPos.toString
-              }
-            }
-            lTResultMsgs += lTResultMsg
-            index += 1
-          }
-          val  ltResultMsgSet = new LTResultMsgSet()
-          ltResultMsgSet.resultMsg = lTResultMsgs.toArray
-          ltResultPackage.ltResultMsgSet = ltResultMsgSet
-      }
-    }
-    ltResultPackage
-  }
+  override def getLTResultPackage(taskId: String): LtResultPackage = ???
 
   override def addLTResultPackage(ltResultPackage: LtResultPackage): Unit = ???
 
-  override def getTlResultPackage(taskId: String): TlResultPackage = {
-    val (tlResultPackage,matchResult) = fptExchangeService.getTlResultPackage(taskId)
-    if(matchResult.nonEmpty){
-      val tlResultMsgs = new ArrayBuffer[TLResultMsg]()
-      matchResult.foreach{
-        result =>
-          val it = result.getCandidateResultList.iterator()
-          var index = 1
-          while(it.hasNext){
-            val tlResultMsg = new TLResultMsg()
-            val result = it.next()
-            val caseid = result.getObjectId.substring(0,result.getObjectId.length-2)
-            val caseInfo = caseInfoService.getCaseInfo(caseid)
-            val lpcard = lPCardService.getLPCard(result.getObjectId)
-              tlResultMsg.resultRanking = index
-              tlResultMsg.resultScore = result.getScore
-              tlResultMsg.resultOriginalSystemCaseId = caseInfo.getStrCaseID
-              tlResultMsg.resultCaseId = caseInfo.getStrJingZongCaseId
-              tlResultMsg.resultLatentSurveyId = caseInfo.getStrSurveyId
-              tlResultMsg.resultOriginalSystemLatentFingerPalmId = lpcard.getStrCardID
-              tlResultMsg.resultLatentPhysicalId = lpcard.getStrPhysicalId
-              tlResultMsg.resultCardId = " "
-              tlResultMsg.resultFingerPalmPostionCode = if(result.getPos.toString.matches("^([1-9])$")) ("0"+result.getPos.toString) else (result.getPos.toString)
-              tlResultMsgs += tlResultMsg
-              index += 1
-          }
-      }
-      val tlResultMsgSet = new TLResultMsgSet()
-      tlResultMsgSet.resultMsg = tlResultMsgs.toArray
-      tlResultPackage.tlResultMsgSet = tlResultMsgSet
-    }
-    tlResultPackage
-  }
+  override def getTlResultPackage(taskId: String): TlResultPackage = ???
 
   override def addTlResultPackage(tlResultPackage: TlResultPackage): Unit = ???
 
-  override def getTTResultPackage(taskId: String): TtResultPackage = {
-    val (ttResultPackage, matchResult) = fptExchangeService.getTTResultPackage(taskId)
-    if(matchResult.nonEmpty){
-      val ttResultMsgs =  new ArrayBuffer[TTResultMsg]()
-      matchResult.foreach{
-        result  =>
-          val it = result.getCandidateResultList.iterator()
-          var index = 1
-          while(it.hasNext){
-            val ttResultMsg = new TTResultMsg
-            val result = it.next()
-            val tpCard = tPCardService.getTPCard(result.getObjectId)
-            ttResultMsg.resultRanking = index
-            ttResultMsg.resultScore = result.getScore
-            ttResultMsg.resultOriginalSystemPersonId = tpCard.getStrMisPersonID
-            ttResultMsg.resultJingZongPersonId = tpCard.getStrJingZongPersonId
-            ttResultMsg.resultPersonId = tpCard.getStrCasePersonID
-            ttResultMsg.resultCardId = tpCard.getStrCardID
-            ttResultMsg.ttHitTypeCode = fpt5util.TT_MATCHED_MIRROR
-            ttResultMsgs += ttResultMsg
-            index += 1
-          }
-      }
-      val ttResultMsgSet = new TtResultMsgSet
-      ttResultMsgSet.resultMsg = ttResultMsgs.toArray
-      ttResultPackage.ttResultMsgSet = ttResultMsgSet
-    }
-    ttResultPackage
-  }
+  override def getTTResultPackage(taskId: String): TtResultPackage = ???
 
   override def addTTResultPackage(ttResultPackage: TtResultPackage): Unit = ???
 
-  override def getLLResultPackage(taskId: String): LlResultPackage = {
-    val (llResultPackage,matchResult) = fptExchangeService.getLLResultPackage(taskId)
-    if(matchResult.nonEmpty){
-      val llResultMsgs = new ArrayBuffer[LLResultMsg]()
-      matchResult.foreach{
-        result =>
-          val it = result.getCandidateResultList.iterator()
-          var index = 1
-          while(it.hasNext){
-            val llResultMsg = new LLResultMsg
-            val result = it.next()
-            val caseid = result.getObjectId.substring(0,result.getObjectId.length-2)
-            val caseinfo = caseInfoService.getCaseInfo(caseid)
-            val lpcard = lPCardService.getLPCard(result.getObjectId)
-            llResultMsg.resultRanking = index
-            llResultMsg.resultScore = result.getScore
-            llResultMsg.resultOriginalSystemCaseId = caseinfo.getStrCaseID
-            llResultMsg.resultCaseId = caseinfo.getStrJingZongCaseId
-            llResultMsg.resultLatentSurveyId = caseinfo.getStrSurveyId
-            llResultMsg.resultLatentPhysicalId = lpcard.getStrPhysicalId
-            llResultMsg.resultOriginalSystemLatentFingerId = lpcard.getStrCardID
-            llResultMsgs += llResultMsg
-            index += 1
-          }
-      }
-      val llResultMsgSet = new LlResultMsgSet
-      llResultMsgSet.resultMsg = llResultMsgs.toArray
-      llResultPackage.llResultMsgSet = llResultMsgSet
-    }
-    llResultPackage
-  }
+  override def getLLResultPackage(taskId: String): LlResultPackage = ???
 
   override def addLLResultPackage(llResultPackage: LlResultPackage): Unit = ???
 
