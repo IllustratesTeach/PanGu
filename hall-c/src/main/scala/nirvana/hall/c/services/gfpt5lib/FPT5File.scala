@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import javax.xml.bind.annotation.{XmlElement, _}
 
+import nirvana.hall.c.services.gfpt4lib.fpt4code
+
 /**
   * Created by yuchen on 2017/10/17.
   */
@@ -28,6 +30,18 @@ class FPT5File {
     final val OTHER_SYSTEM = "QT"
 
     final val EMPTY_STRING = ""
+
+
+    def build(fPT5File: FPT5File,sendUnitCode:String,sendUnitName:String,sendPersonName:String,sendPersonIdCard:String,sendPersonTel:String): FPT5File ={
+        fPT5File.packageHead.originSystem = AFIS_SYSTEM
+        fPT5File.packageHead.sendUnitCode = sendUnitCode
+        fPT5File.packageHead.sendUnitName = sendUnitName
+        fPT5File.packageHead.sendPersonName = sendPersonName
+        fPT5File.packageHead.sendPersonIdCard = sendPersonIdCard
+        fPT5File.packageHead.sendPersonTel = sendPersonTel
+        fPT5File.packageHead.sendUnitSystemType = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+        fPT5File
+    }
 
   /**
     * 头部信息
@@ -99,15 +113,6 @@ class FPT5File {
     */
   @XmlElement(name = "cancellatentPackage")
     var customdataPackage: Array[customDataPackage] = _
-
-    /**
-      * 构建fpt对象，校验数据，设置head信息，计算逻辑记录长度，fileLength
-      *
-      * @return
-      */
-    def build(fpt5File: FPT5File): FPT5File = {
-        fpt5File
-    }
 }
 
     @XmlAccessorType(XmlAccessType.FIELD)

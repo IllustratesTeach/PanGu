@@ -8,19 +8,23 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt4lib.fpt4code
-import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, fpt5util}
+import nirvana.hall.c.services.gfpt5lib.{FPT5File, LlHitResultPackage, LtHitResultPackage, fpt5util}
 import nirvana.hall.c.services.ghpcbase.gnopcode
 import nirvana.hall.c.services.gloclib.gacodetb.GAFIS_CODE_ENTRYSTRUCT
 import nirvana.hall.c.services.gloclib.gafisusr.{GAFIS_USERINFOSTRUCT, GAFIS_USERSTRUCT}
 import nirvana.hall.c.services.gloclib.galoclp.{GAFIS_LPGROUPENTRY, GAFIS_LPGROUPSTRUCT}
 import nirvana.hall.c.services.gloclib.survey.SURVEYHITRESULTRECORD
+import nirvana.hall.protocol.api.FPTProto.CaseSource
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.BreakInfos
 import nirvana.hall.v62.internal.c.gloclib.gcolnames.g_stCN
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
+import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.SurveyHitResultRecordService
+
+import scala.collection.mutable.ArrayBuffer
 /**
   * Created by songpeng on 2018/1/18.
   */
@@ -33,6 +37,12 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
                                        , lPCardService: LPCardService) extends SurveyHitResultRecordService{
   val LATENT = true
   val NOT_LATENT = false
+
+  val sendUnitCode = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendUnitCode
+  val sendUnitName = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendUnitName
+  val sendPersonName = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonName
+  val sendPersonIdCard = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonIdCard
+  val sendPersonTel = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonTel
 
   /**
     * 添加现勘比中信息
@@ -67,17 +77,33 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
   override def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD): Option[DataHandler] = {
     val fingerId = hitResult.szFingerID
     val hitFingerId = hitResult.szHitFingerID
+    val fpt5File = new FPT5File
     hitResult.nQueryType match {
       case QueryConstants.QUERY_TYPE_LT =>
-        val ltHitPkg = getLTHitResultPackage(fingerId,hitFingerId,hitResult)
-        val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(ltHitPkg,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath)
-        Option(dataHandler)
+        val lTHitResultPackage = new ArrayBuffer[LtHitResultPackage]
+        val ltHitResultPackage = getLTHitResultPackage(fingerId,hitFingerId,hitResult)
+        ltHitResultPackage match {
+          case Some(ltHitResultPackage) =>
+            lTHitResultPackage += ltHitResultPackage
+            fpt5File.ltHitResultPackage = lTHitResultPackage.toArray
+            fpt5File.build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+            val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
+            Option(dataHandler)
+          case _ => None
+        }
       case QueryConstants.QUERY_TYPE_LL =>
-        val llHitPkg = getLLHitResultPackage(fingerId,hitFingerId,hitResult)
-        val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(llHitPkg,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath)
-        Option(dataHandler)
-      case _ =>
-        None
+        val llHitResultPackage = new ArrayBuffer[LlHitResultPackage]
+        val hitResultPackage = getLLHitResultPackage(fingerId,hitFingerId,hitResult)
+        hitResultPackage match{
+          case Some(hitResultPackage) =>
+            llHitResultPackage += hitResultPackage
+            fpt5File.llHitResultPackage = llHitResultPackage.toArray
+            fpt5File.build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+            val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
+            Option(dataHandler)
+          case _ => None
+        }
+      case _ => None
     }
   }
 
@@ -88,50 +114,54 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     * @param hitResult 比中结果消息对象
     * @return
     */
-  private def getLTHitResultPackage(fingerId:String,hitFingerId:String,hitResult: SURVEYHITRESULTRECORD): LtHitResultPackage ={
+  private def getLTHitResultPackage(fingerId:String,hitFingerId:String,hitResult: SURVEYHITRESULTRECORD): Option[LtHitResultPackage] ={
     val caseInfo = caseInfoService.getCaseInfo(getCaseIdOrTPCardIdByFingerId(fingerId,LATENT))
-    val lPCard = lPCardService.getLPCard(fingerId)
-    val fingerCardId = getCaseIdOrTPCardIdByFingerId(hitFingerId,NOT_LATENT)
-    val tpCard = tPCardService.getTPCard(fingerCardId)
-    val ltHitPkg = new LtHitResultPackage
-    ltHitPkg.taskId = hitResult.nOraSID.toString
-    ltHitPkg.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
-    ltHitPkg.fingerPrintCardId = hitFingerId
-    ltHitPkg.latentFingerCaseId = caseInfo.getStrJingZongCaseId
-    ltHitPkg.latentFingerOriginalSystemCaseId = caseInfo.getStrCaseID
-    ltHitPkg.latentFingerLatentSurveyId = caseInfo.getStrSurveyId
-    ltHitPkg.latentFingerOriginalSystemFingerId = fingerId
-    ltHitPkg.latentFingerLatentPhysicalId = lPCard.getStrPhysicalId
-    //ltHitPkg.latentFingerCardId = 系统自用,建议不赋值
-    ltHitPkg.fingerPrintOriginalSystemPersonId = tpCard.getStrMisPersonID
-    ltHitPkg.fingerPrintJingZongPersonId = tpCard.getStrJingZongPersonId
-    ltHitPkg.fingerPrintPersonId = tpCard.getStrCasePersonID
-    ltHitPkg.fingerPrintCardId = fingerCardId
-    ltHitPkg.fingerPrintPostionCode = hitResult.nHitFgp.toString
-    ltHitPkg.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_LT
+    if(caseInfo.getStrCaseSource == CaseSource.SURVEY_VALUE){
+      val lPCard = lPCardService.getLPCard(fingerId)
+      val fingerCardId = getCaseIdOrTPCardIdByFingerId(hitFingerId,NOT_LATENT)
+      val tpCard = tPCardService.getTPCard(fingerCardId)
+      val ltHitPkg = new LtHitResultPackage
+      ltHitPkg.taskId = new String(hitResult.nOraSID).trim
+      ltHitPkg.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+      ltHitPkg.fingerPrintCardId = hitFingerId
+      ltHitPkg.latentFingerCaseId = caseInfo.getStrJingZongCaseId
+      ltHitPkg.latentFingerOriginalSystemCaseId = caseInfo.getStrCaseID
+      ltHitPkg.latentFingerLatentSurveyId = caseInfo.getStrSurveyId
+      ltHitPkg.latentFingerOriginalSystemFingerId = fingerId
+      ltHitPkg.latentFingerLatentPhysicalId = lPCard.getStrPhysicalId
+      //ltHitPkg.latentFingerCardId = 系统自用,建议不赋值
+      ltHitPkg.fingerPrintOriginalSystemPersonId = tpCard.getStrMisPersonID
+      ltHitPkg.fingerPrintJingZongPersonId = tpCard.getStrJingZongPersonId
+      ltHitPkg.fingerPrintPersonId = tpCard.getStrCasePersonID
+      ltHitPkg.fingerPrintCardId = fingerCardId
+      ltHitPkg.fingerPrintPostionCode = hitResult.nHitFgp.toString
+      ltHitPkg.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_LT
 
-    val breakInfos = getHitHistory(fingerCardId,NOT_LATENT)
-    if(breakInfos.nonEmpty){
-      breakInfos.get.breakRecords.filter(_.tprCardID.equals(hitFingerId)).foreach{
-        t =>
-          val hitUserInfo = getUserInfoStruct(t.breakUserName)
-          ltHitPkg.hitUnitCode = t.breakUnitCode
-          ltHitPkg.hitUnitName = getUnitNameByUnitCode(t.breakUnitCode)
-          ltHitPkg.hitPersonName = t.breakUserName
-          ltHitPkg.hitPersonIdCard = hitUserInfo.szMail
-          ltHitPkg.hitPersonTel = hitUserInfo.szPhone
-          ltHitPkg.hitDateTime = t.breakDateTime
-          ltHitPkg.checkUnitCode = t.reCheckUnitCode
-          ltHitPkg.checkUnitName = getUnitNameByUnitCode(t.reCheckUnitCode)
-          ltHitPkg.checkPersonName = t.reCheckUserName
-          val reCheckUserInfo = getUserInfoStruct(t.reCheckUserName)
-          ltHitPkg.checkPersonIdCard = reCheckUserInfo.szMail
-          ltHitPkg.checkPersonTel = reCheckUserInfo.szPhone
-          ltHitPkg.checkDateTime = t.reCheckDate
-          ltHitPkg.memo = ""
+      val breakInfos = getHitHistory(fingerCardId,NOT_LATENT)
+      if(breakInfos.nonEmpty){
+        breakInfos.get.breakRecords.filter(_.tprCardID.equals(hitFingerId)).foreach{
+          t =>
+            val hitUserInfo = getUserInfoStruct(t.breakUserName)
+            ltHitPkg.hitUnitCode = t.breakUnitCode
+            ltHitPkg.hitUnitName = getUnitNameByUnitCode(Option(t.reCheckUnitCode).getOrElse(throw new Exception("breakUnitCode is null")),"Code_UnitTable")
+            ltHitPkg.hitPersonName = t.breakUserName
+            ltHitPkg.hitPersonIdCard = hitUserInfo.szMail
+            ltHitPkg.hitPersonTel = hitUserInfo.szPhone
+            ltHitPkg.hitDateTime = t.breakDateTime
+            ltHitPkg.checkUnitCode = t.reCheckUnitCode
+            ltHitPkg.checkUnitName = getUnitNameByUnitCode(Option(t.reCheckUnitCode).getOrElse(throw new Exception("reCheckUnitCode is null")),"Code_UnitTable")
+            ltHitPkg.checkPersonName = t.reCheckUserName
+            val reCheckUserInfo = getUserInfoStruct(t.reCheckUserName)
+            ltHitPkg.checkPersonIdCard = reCheckUserInfo.szMail
+            ltHitPkg.checkPersonTel = reCheckUserInfo.szPhone
+            ltHitPkg.checkDateTime = t.reCheckDate
+            ltHitPkg.memo = ""
+        }
       }
+      Some(ltHitPkg)
+    }else{
+      None
     }
-    ltHitPkg
   }
 
   /**
@@ -141,46 +171,54 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     * @param hitResult 比中结果消息对象
     * @return
     */
-  private def getLLHitResultPackage(fingerId:String,hitFingerId:String,hitResult: SURVEYHITRESULTRECORD): LlHitResultPackage ={
+  private def getLLHitResultPackage(fingerId:String,hitFingerId:String,hitResult: SURVEYHITRESULTRECORD): Option[LlHitResultPackage] ={
     val sourceCaseInfo = caseInfoService.getCaseInfo(getCaseIdOrTPCardIdByFingerId(fingerId,LATENT))
-    val sourceLPCard = lPCardService.getLPCard(fingerId)
-    val destCaseInfo = caseInfoService.getCaseInfo(getCaseIdOrTPCardIdByFingerId(hitFingerId,LATENT))
-    val destLPCard = lPCardService.getLPCard(hitFingerId)
-    val llHitPkg = new LlHitResultPackage
-    llHitPkg.taskId = hitResult.nOraSID.toString
-    llHitPkg.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
-    llHitPkg.originalSystemCaseId = sourceCaseInfo.getStrCaseID
-    llHitPkg.caseId = sourceCaseInfo.getStrJingZongCaseId
-    llHitPkg.latentSurveyId = sourceCaseInfo.getStrSurveyId
-    llHitPkg.latentPhysicalId = sourceLPCard.getStrPhysicalId
-    llHitPkg.cardId = fingerId
-    llHitPkg.resultOriginalSystemCaseId = destCaseInfo.getStrCaseID
-    llHitPkg.resultCaseId = destCaseInfo.getStrJingZongCaseId
-    llHitPkg.resultLatentSurveyId = destCaseInfo.getStrSurveyId
-    llHitPkg.resultLatentPhysicalId = destLPCard.getStrPhysicalId
-    llHitPkg.resultCardId = hitFingerId
+    if(sourceCaseInfo.getStrCaseSource == CaseSource.SURVEY_VALUE){
+      val sourceLPCard = lPCardService.getLPCard(fingerId)
+      val destCaseInfo = caseInfoService.getCaseInfo(getCaseIdOrTPCardIdByFingerId(hitFingerId,LATENT))
+      val destLPCard = lPCardService.getLPCard(hitFingerId)
+      val llHitPkg = new LlHitResultPackage
+      llHitPkg.taskId = new String(hitResult.nOraSID)
+      llHitPkg.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+      llHitPkg.originalSystemCaseId = sourceCaseInfo.getStrCaseID
+      llHitPkg.caseId = sourceCaseInfo.getStrJingZongCaseId
+      llHitPkg.latentSurveyId = sourceCaseInfo.getStrSurveyId
+      llHitPkg.latentPhysicalId = sourceLPCard.getStrPhysicalId
+      llHitPkg.cardId = fingerId
+      llHitPkg.resultOriginalSystemCaseId = destCaseInfo.getStrCaseID
+      llHitPkg.resultCaseId = destCaseInfo.getStrJingZongCaseId
+      llHitPkg.resultLatentSurveyId = destCaseInfo.getStrSurveyId
+      llHitPkg.resultLatentPhysicalId = destLPCard.getStrPhysicalId
+      llHitPkg.resultCardId = hitFingerId
 
-    val groupName = getGroupName(hitFingerId)
-    getGAFIS_LPGROUPSTRUCT(groupName).pstKeyList_Data.filter(_.szKey.equals(hitFingerId)).foreach{
-      t =>
-        val hitPersonInfoAndRecheckInfo = getHitPersonInfoAndRecheckInfoForLLHitResult(t)
+      val groupName = getGroupName(hitFingerId).trim
 
-        llHitPkg.hitUnitCode = hitPersonInfoAndRecheckInfo.hitUnitCode
-        llHitPkg.hitUnitName = hitPersonInfoAndRecheckInfo.hitUnitName
-        llHitPkg.hitPersonName = hitPersonInfoAndRecheckInfo.hitPersonName
-        llHitPkg.hitPersonIdCard = hitPersonInfoAndRecheckInfo.hitPersonIdCard
-        llHitPkg.hitPersonTel = hitPersonInfoAndRecheckInfo.hitPersonTel
-        llHitPkg.hitDateTime = hitPersonInfoAndRecheckInfo.hitDateTime
+      val keyList_data = getGAFIS_LPGROUPSTRUCT(groupName).pstKeyList_Data
+      keyList_data.foreach{
+        t =>
+          if(t.szKey.equals(hitFingerId)){
+            val hitPersonInfoAndRecheckInfo = getHitPersonInfoAndRecheckInfoForLLHitResult(t)
 
-        llHitPkg.checkUnitCode = hitPersonInfoAndRecheckInfo.checkUnitCode
-        llHitPkg.checkUnitName = hitPersonInfoAndRecheckInfo.checkUnitName
-        llHitPkg.checkPersonName = hitPersonInfoAndRecheckInfo.checkPersonName
-        llHitPkg.checkPersonIdCard = hitPersonInfoAndRecheckInfo.checkPersonIdCard
-        llHitPkg.checkPersonTel = hitPersonInfoAndRecheckInfo.checkPersonTel
-        llHitPkg.checkDateTime = hitPersonInfoAndRecheckInfo.checkDateTime
-        llHitPkg.memo = ""
+            llHitPkg.hitUnitCode = hitPersonInfoAndRecheckInfo.hitUnitCode
+            llHitPkg.hitUnitName = hitPersonInfoAndRecheckInfo.hitUnitName
+            llHitPkg.hitPersonName = hitPersonInfoAndRecheckInfo.hitPersonName
+            llHitPkg.hitPersonIdCard = hitPersonInfoAndRecheckInfo.hitPersonIdCard
+            llHitPkg.hitPersonTel = hitPersonInfoAndRecheckInfo.hitPersonTel
+            llHitPkg.hitDateTime = hitPersonInfoAndRecheckInfo.hitDateTime
+
+            llHitPkg.checkUnitCode = hitPersonInfoAndRecheckInfo.checkUnitCode
+            llHitPkg.checkUnitName = hitPersonInfoAndRecheckInfo.checkUnitName
+            llHitPkg.checkPersonName = hitPersonInfoAndRecheckInfo.checkPersonName
+            llHitPkg.checkPersonIdCard = hitPersonInfoAndRecheckInfo.checkPersonIdCard
+            llHitPkg.checkPersonTel = hitPersonInfoAndRecheckInfo.checkPersonTel
+            llHitPkg.checkDateTime = hitPersonInfoAndRecheckInfo.checkDateTime
+            llHitPkg.memo = ""
+          }
+      }
+      Some(llHitPkg)
+    }else{
+      None
     }
-    llHitPkg
   }
 
   /**
@@ -197,7 +235,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       queryVal = g_stCN.stLCsID.pszName //案件编号
     }
     val data = v62Facade.NET_GAFIS_COL_GetByKey(db.dbId.toShort, db.tableId.toShort, fingerId, queryVal)
-    new String(data)
+    new String(data).trim
   }
 
   /**
@@ -212,7 +250,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     }
     val data = v62Facade.NET_GAFIS_COL_GetByKey(db.dbId.toShort, db.tableId.toShort, cardId, g_stCN.stTCardText.pszHitHistory)
     if(data != null && data.length > 0){
-      Option(XmlLoader.parseXML[BreakInfos](new String(data)))
+      Option(XmlLoader.parseXML[BreakInfos](new String(data).trim))
     }else{
       None
     }
@@ -223,14 +261,14 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     * @param unitCode 单位代码
     * @return
     */
-  private def getUnitNameByUnitCode(unitCode:String):String ={
+  private def getUnitNameByUnitCode(unitCode:String,tableName:String):String ={
 
      val db = v62Config.codeUnitTable
      val codeEntryStruct = new GAFIS_CODE_ENTRYSTRUCT
      codeEntryStruct.szCode = unitCode
      v62Facade.NET_GAFIS_CODETB_INFO(db.dbId.toShort
        , db.tableId.toShort
-       , "Code_UnitTable".getBytes
+       , tableName.getBytes
        ,codeEntryStruct
        ,gnopcode.OP_CODETABLE_GET)
     new String(codeEntryStruct.szName,"GBK").trim
@@ -285,7 +323,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
                                         ,checkUnitCode:String,checkUnitName:String,checkPersonName:String,checkPersonIdCard:String,checkPersonTel:String,checkDateTime:String)
   private def getHitPersonInfoAndRecheckInfoForLLHitResult(lPGROUPENTRY:GAFIS_LPGROUPENTRY): HitPersonInfoAndRecheckInfo ={
     val hitUserInfo = getUserInfoStruct(lPGROUPENTRY.szUserName)
-    val unitName = getUnitNameByUnitCode(lPGROUPENTRY.szUnitCode)
+    val unitName = getUnitNameByUnitCode(lPGROUPENTRY.szUnitCode,"Code_UnitTable")
     new HitPersonInfoAndRecheckInfo(
        lPGROUPENTRY.szUnitCode
       ,unitName

@@ -90,6 +90,7 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="union4pfmipType">
         <xs:sequence>
             <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
@@ -180,7 +181,6 @@
         </xs:sequence>
     </xs:complexType>
 
-
     <xs:complexType name="handprintServiceType">
         <xs:sequence>
             <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
@@ -228,8 +228,14 @@
                     <xs:documentation>现勘6.2应用服务器配置</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="surveyHitResultHeadPackageInfo" name = "survey_hit_result_head_info" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>比中关系头信息</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="surveyV62ServerConfigType">
         <xs:sequence>
             <xs:element type="V62ServerType" name="app_server" minOccurs="1" maxOccurs="1">
@@ -244,6 +250,7 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="V62ServerType">
         <xs:sequence>
             <xs:element type="xs:string" name="host" minOccurs="1" maxOccurs="1">
@@ -278,6 +285,7 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="surveyConfigType">
         <xs:sequence>
             <xs:element type="xs:string" name="unit_code" minOccurs="1" maxOccurs="1">
@@ -318,6 +326,36 @@
             <xs:element type="xs:string" name="password" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>password</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="surveyHitResultHeadPackageInfo">
+        <xs:sequence>
+            <xs:element type="xs:string" name="send_unit_code" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>发送单位代码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="send_unit_name" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>发送单位名称</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="send_person_name" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>发送人姓名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="send_person_idcard" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>发送人身份证号</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="send_person_tel" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>发送人联系电话</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

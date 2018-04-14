@@ -37,4 +37,8 @@ object SurveyConstant {
   final val  FPT_PARSE_FAIL = "9"
   final val  IMAGE_UNQUALIFIED = "8"
 
+
+  final val EXPORT_XML_FILE = ".xml"
+  final val EXPORT_FPTX_FILE = ".fptx"
+
 }

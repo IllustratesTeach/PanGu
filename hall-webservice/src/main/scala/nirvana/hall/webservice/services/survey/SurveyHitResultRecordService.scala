@@ -39,8 +39,8 @@ trait SurveyHitResultRecordService {
     */
   def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD): Option[DataHandler]
 
-  protected def getZipDataHandlerOfString(xml: String, fileName: String, path: String): DataHandler = {
-    val xmlFile = new File(path + File.separator + fileName + ".xml")
+  protected def getZipDataHandlerOfString(xml: String, fileName: String, path: String,exportFileType:String): DataHandler = {
+    val xmlFile = new File(path + File.separator + fileName + exportFileType)
     val zipFilePath = path + File.separator + fileName + ".zip"
     FileUtils.writeByteArrayToFile(xmlFile, xml.getBytes())
     FPT5Utils.zipFile(xmlFile, zipFilePath)

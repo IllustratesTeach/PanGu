@@ -71,6 +71,27 @@ class HandprintServiceConfig{
   var isDeleteFileZip:Boolean = false
   @XmlElement(name = "survey_v62_server")
   var surveyV62ServiceConfig :Array[SurveyV62ServerConfig] = _
+  @XmlElement(name = "survey_hit_result_head_info")
+  var surveyHitResultHeadPackageInfo = new SurveyHitResultHeadPackageInfo
+}
+
+/**
+  * 比中关系导出时需要写入FPT5.0标准要求的HeadPackage信息，而这些信息一般均为固定值
+  * 所以在此设置配置项
+  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SurveyHitResultHeadPackageInfo")
+class SurveyHitResultHeadPackageInfo{
+   @XmlElement(name = "send_unit_code")
+   var sendUnitCode:String = _
+   @XmlElement(name = "send_unit_name")
+   var sendUnitName:String = _
+   @XmlElement(name = "send_person_name")
+   var sendPersonName:String = _
+   @XmlElement(name = "send_person_idcard")
+   var sendPersonIdCard:String = _
+   @XmlElement(name = "send_person_tel")
+   var sendPersonTel:String = _
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
