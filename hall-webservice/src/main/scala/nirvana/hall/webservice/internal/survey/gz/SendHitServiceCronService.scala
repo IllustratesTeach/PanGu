@@ -38,6 +38,12 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
   final var BATCH_SIZE = 10
 
+  val sendUnitCode = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendUnitCode
+  val sendUnitName = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendUnitName
+  val sendPersonName = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonName
+  val sendPersonIdCard = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonIdCard
+  val sendPersonTel = hallWebserviceConfig.handprintService.surveyHitResultHeadPackageInfo.sendPersonTel
+
   /**
     * 定时器，调用海鑫现勘接口
     * 定时发送比中上报，导出和上报功能（4.0上报现勘  5.0上报刑专）
@@ -129,28 +135,14 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
   private def getFPT5HitLTPackage(hitLTPackageSeq : Seq[LtHitResultPackage]) : FPT5File = {
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File)
-    fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
-    fPT5File.packageHead.sendUnitCode = "520000050000"
-    fPT5File.packageHead.sendUnitName = "贵州省公安厅刑事侦查总队"
-    fPT5File.packageHead.sendPersonName = "system"
-    fPT5File.packageHead.sendPersonIdCard = "000000000000000000"
-    fPT5File.packageHead.sendPersonTel = "000"
-    fPT5File.packageHead.sendUnitSystemType = "1900"
+    fPT5File.build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
     fPT5File.ltHitResultPackage = hitLTPackageSeq.toArray
     fPT5File
   }
 
   private def getFPT5HitLLPackage(hitLLPackageSeq : Seq[LlHitResultPackage]) : FPT5File = {
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File)
-    fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
-    fPT5File.packageHead.sendUnitCode = "520000050000"
-    fPT5File.packageHead.sendUnitName = "贵州省公安厅刑事侦查总队"
-    fPT5File.packageHead.sendPersonName = "system"
-    fPT5File.packageHead.sendPersonIdCard = "000000000000000000"
-    fPT5File.packageHead.sendPersonTel = "000"
-    fPT5File.packageHead.sendUnitSystemType = "1900"
+    fPT5File.build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
     fPT5File.llHitResultPackage = hitLLPackageSeq.toArray
     fPT5File
   }
