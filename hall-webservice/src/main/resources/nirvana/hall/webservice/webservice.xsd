@@ -318,6 +318,11 @@
                     <xs:documentation>url</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="target_namespace" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>targetNamespace</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:string" name="user" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>userId</xs:documentation>

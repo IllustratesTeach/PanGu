@@ -167,6 +167,8 @@ class Survey_shhConfig{
 class XingZhuanConfig{
   @XmlElement(name = "url")
   var url: String = _
+  @XmlElement(name = "target_namespace")
+  var targetNamespace: String = _
   @XmlElement(name = "user")
   var user: String = _
   @XmlElement(name = "password")
