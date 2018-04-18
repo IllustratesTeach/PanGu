@@ -25,7 +25,7 @@ class FingerPalmAppServerResponse{
 }
 
 @XmlRootElement(name = "statusChanges")
-class SendStatusChangesRequest{
+class StatusChanges{
   @XmlElement(name = "type")
   var typ: String = _
   @XmlElement(name = "task")

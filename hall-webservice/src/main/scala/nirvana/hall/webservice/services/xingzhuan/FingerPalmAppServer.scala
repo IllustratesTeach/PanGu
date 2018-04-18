@@ -191,7 +191,7 @@ trait FingerPalmAppServer {
     * @param password 请求方密码,请求方在请求服务系统上注册的识别密码
     * @return 一个现场指掌纹交换文件,如无可获取的现场指掌纹信息则返回一个空现场指掌纹交换文件
     */
-  @WebMethod def getNationlLatent(userID: String, password: String): DataHandler
+  @WebMethod def getNationalLatent(userID: String, password: String): DataHandler
 
   /**
     * 获取现场指掌纹撤销信息服务

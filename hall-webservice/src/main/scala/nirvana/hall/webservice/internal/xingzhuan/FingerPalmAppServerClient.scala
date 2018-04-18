@@ -106,7 +106,7 @@ class FingerPalmAppServerClient(xingZhuanConfig: XingZhuanConfig) extends Logger
     false
   }
 
-  def sendStatusChanges(statusChanges: SendStatusChangesRequest): Unit ={
+  def sendStatusChanges(statusChanges: StatusChanges): Unit ={
     if(statusChanges != null){
       val xml = XmlLoader.toXml(statusChanges)
       val dataHandler = new DataHandler(new ByteArrayDataSource(ZipUtils.compress(xml).getBytes))
@@ -136,6 +136,92 @@ class FingerPalmAppServerClient(xingZhuanConfig: XingZhuanConfig) extends Logger
     }
 
     false
+  }
+
+  def getFingerPrint(IDType: Int, peronsid: String): FPT5File ={
+    val dataHandler = fingerPalmAppServer.getFingerPrint(username, password, IDType, new DataHandler(new ByteArrayDataSource(ZipUtils.compress(peronsid).getBytes)))
+    val str = ZipUtils.unCompress(Source.fromInputStream(dataHandler.getInputStream).mkString)
+    XmlLoader.parseXML[FPT5File](str)
+  }
+
+  def getLatent(IDType: Int, peronsid: String): FPT5File ={
+    val dataHandler = fingerPalmAppServer.getLatent(username, password, IDType, new DataHandler(new ByteArrayDataSource(ZipUtils.compress(peronsid).getBytes)))
+    val str = ZipUtils.unCompress(Source.fromInputStream(dataHandler.getInputStream).mkString)
+    XmlLoader.parseXML[FPT5File](str)
+  }
+
+  def getNewPrint(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getNewPrint)
+  }
+
+  def getNewLatent(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getNewLatent)
+  }
+
+  def getNationalLatent(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getNationalLatent)
+  }
+
+  def getNationalCancelLatent(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getNationalCancelLatent)
+  }
+
+
+  def getLTTask(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLTTask)
+  }
+
+  def getTLTask(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getTLTask)
+  }
+
+  def getTTTask(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getTTTask)
+  }
+
+  def getLLTask(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLLTask)
+  }
+
+  def getLTResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLTResult)
+  }
+
+  def getTLResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getTLResult)
+  }
+
+  def getTTResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getTTResult)
+  }
+
+  def getLLResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLLResult)
+  }
+
+  def getLTHitResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLTHitResult)
+  }
+
+  def getTTHitResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getTTHitResult)
+  }
+
+  def getLLHitResult(): FPT5File ={
+    getFPT5File(fingerPalmAppServer.getLLHitResult)
+  }
+
+  private def getFPT5File(f:(String, String)=> DataHandler): FPT5File ={
+    val dataHandler = f(username, password)
+    val str = ZipUtils.unCompress(Source.fromInputStream(dataHandler.getInputStream).mkString)
+    XmlLoader.parseXML[FPT5File](str)
+  }
+
+  def getStatusChanges(statusType: String): StatusChanges ={
+    val dataHandler = new DataHandler(new ByteArrayDataSource(ZipUtils.compress("<statusType><type>"+statusType+"</type></statusType>").getBytes))
+    val result = fingerPalmAppServer.getStatusChanges(username, password, dataHandler)
+    val resultStr = ZipUtils.unCompress(Source.fromInputStream(result.getInputStream).mkString)
+    XmlLoader.parseXML[StatusChanges](resultStr)
   }
 
 }
