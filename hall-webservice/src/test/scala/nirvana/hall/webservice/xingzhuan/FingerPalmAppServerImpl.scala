@@ -239,7 +239,7 @@ class FingerPalmAppServerImpl extends FingerPalmAppServer{
     * @return 一个现场指掌纹交换文件,如无可获取的现场指掌纹信息则返回一个空现场指掌纹交换文件
     */
   @WebMethod
-  override def getNationlLatent(userID: String, password: String): DataHandler = ???
+  override def getNationalLatent(userID: String, password: String): DataHandler = ???
 
   /**
     * 获取现场指掌纹撤销信息服务
