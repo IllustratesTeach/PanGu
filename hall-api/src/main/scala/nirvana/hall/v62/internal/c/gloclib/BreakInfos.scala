@@ -68,7 +68,7 @@ class BreakRecord {
   var caseMemo: String = _
   @XmlElement(name="BreakUserName")
   var breakUserName: String = _
-  @XmlElement(name="BreakUnitCode")
+  @XmlElement(name="BreakerUnitCode")
   var breakUnitCode: String = _
   @XmlElement(name="BreakDateTime")
   var breakDateTime: String = _

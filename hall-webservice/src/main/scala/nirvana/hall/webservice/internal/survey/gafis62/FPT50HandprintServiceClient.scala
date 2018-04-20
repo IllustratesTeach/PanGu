@@ -185,16 +185,11 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     */
   def sendHitResult(xckybh: String, queryType: Int, hitResultDh:DataHandler): Unit ={
     info("sendHitResult 发送比中信息:现勘编号：{},查询类型：{}",xckybh,queryType)
-    getInputStreamByDataHandler(hitResultDh,handprintServiceConfig.localStoreDir + File.separator
-      + "sendHitResult", xckybh, xckybh.substring(1,7))
     try{
-      val latentPackageStr = Source.fromInputStream(hitResultDh.getInputStream).mkString
       queryType match {
         case QueryConstants.QUERY_TYPE_TL | QueryConstants.QUERY_TYPE_LT =>
-          val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/LTHitResult.xsd")), basePath= "/nirvana/hall/fpt5/"))
           fPT50HandprintService.sendLTHitResult(userID, password, xckybh, hitResultDh)
         case QueryConstants.QUERY_TYPE_LL =>
-          val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/LLHitResult.xsd")), basePath= "/nirvana/hall/fpt5/"))
           fPT50HandprintService.sendLLHitResult(userID, password, xckybh, hitResultDh)
         case other =>
       }
