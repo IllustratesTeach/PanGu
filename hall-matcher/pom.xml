@@ -25,6 +25,10 @@
             <artifactId>hall-extractor</artifactId>
         </dependency>
         <dependency>
+            <groupId>nirvana</groupId>
+            <artifactId>hall-image</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ganshane.monad</groupId>
             <artifactId>monad-support</artifactId>
         </dependency>

@@ -22,6 +22,7 @@ object HallMatcherGzServiceModule {
     binder.bind(classOf[MatchTaskCronService], classOf[MatchTaskCronServiceImpl]).eagerLoad()
     //特征转换service
     binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
+//    binder.bind(classOf[AutoExtractFeatureService], classOf[AutoExtractFeatureServiceImpl]).eagerLoad()
   }
 
 }
