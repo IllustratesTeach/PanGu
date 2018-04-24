@@ -3,7 +3,7 @@ package nirvana.hall.matcher
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.internal.adapter.common.{AutoCheckServiceImpl, MatchTaskCronServiceImpl, PutMatchProgressServiceImpl, PutMatchResultServiceImpl}
-import nirvana.hall.matcher.internal.adapter.gz.{GetMatchTaskServiceGzImpl, SyncDataServiceImpl}
+import nirvana.hall.matcher.internal.adapter.gz.{AutoExtractFeatureServiceImpl, GetMatchTaskServiceGzImpl, SyncDataServiceImpl}
 import nirvana.hall.matcher.service._
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -22,7 +22,8 @@ object HallMatcherGzServiceModule {
     binder.bind(classOf[MatchTaskCronService], classOf[MatchTaskCronServiceImpl]).eagerLoad()
     //特征转换service
     binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
-//    binder.bind(classOf[AutoExtractFeatureService], classOf[AutoExtractFeatureServiceImpl]).eagerLoad()
+    //自动重提特征
+    binder.bind(classOf[AutoExtractFeatureService], classOf[AutoExtractFeatureServiceImpl]).eagerLoad()
   }
 
 }

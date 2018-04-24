@@ -50,6 +50,11 @@
                     <xs:documentation>候选条码过滤条件配置</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="autoExtractFeatureConfig" name="auto_extract_feature" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>候选条码过滤条件配置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="mntType">
@@ -140,5 +145,19 @@
         </xs:sequence>
         <xs:attribute type="xs:boolean" name="reverse" use="required"/>
         <xs:attribute type="xs:int" name="count" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="autoExtractFeatureConfig">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>定时任务</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="sql" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>sql 用于查询需要提取特征的sql,使用sysdate,返回personid列表</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>

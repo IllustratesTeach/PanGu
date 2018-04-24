@@ -27,6 +27,8 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
   var autoCheck: AutoCheckConfig = _
   @XmlElement(name = "cand_key_filter")
   var candKeyFilters: Array[CandKeyFilterConfig] = _
+  @XmlElement(name = "auto_extract_feature")
+  var autoExtractFeature: AutoExtractFeatureConfig = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MntSizeConfig")
@@ -82,4 +84,11 @@ class CandKeyFilterConfigItem{
   @XmlElement(name = "key_wild")
   var keyWild: String = _
 }
-
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "AutoExtractFeatureConfig")
+class AutoExtractFeatureConfig{
+  @XmlElement(name = "cron")
+  var cron:String = "0 0 0 * * ? *"
+  @XmlElement(name = "timeout")
+  var sql: String = ""
+}

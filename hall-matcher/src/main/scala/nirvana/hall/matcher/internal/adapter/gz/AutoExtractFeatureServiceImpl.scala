@@ -3,6 +3,7 @@ package nirvana.hall.matcher.internal.adapter.gz
 import java.io.File
 import javax.sql.DataSource
 
+import monad.core.MonadCoreSymbols
 import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
 import nirvana.hall.c.AncientConstants
@@ -23,25 +24,29 @@ import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 class AutoExtractFeatureServiceImpl(config: HallMatcherConfig, featureExtractor: FeatureExtractor, implicit val dataSource: DataSource) extends AutoExtractFeatureService with  LoggerSupport {
-  nirvana.hall.image.jni.JniLoader.loadJniLibrary("support", config.logFile)
-  val firmDecoder = new FirmDecoderImpl("support",new HallImageConfig)
+  val serverHome = System.getProperty(MonadCoreSymbols.SERVER_HOME, "support")
+  nirvana.hall.image.jni.JniLoader.loadJniLibrary(serverHome, config.logFile)
+  val firmDecoder = new FirmDecoderImpl(serverHome,new HallImageConfig)
+
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor, autoExtractorService: AutoExtractFeatureService): Unit = {
     //先处理配置的人员编号
     val personidList = getPersonIdByFile()
     personidList.foreach(reExtractFeature)
-    periodicExecutor.addJob(new CronScheduleWithStartModel("0 0 0 * * ? *", StartAtDelay), "AutoExtractFeatureService-cron", new Runnable {
-      override def run(): Unit = {
-        val personidList = getPersonIdByDB()
-        personidList.foreach(reExtractFeature)
-      }
-    })
+    if(config.autoExtractFeature != null){
+      periodicExecutor.addJob(new CronScheduleWithStartModel(config.autoExtractFeature.cron, StartAtDelay), "AutoExtractFeatureService-cron", new Runnable {
+        override def run(): Unit = {
+          val personidList = getPersonIdByDB()
+          personidList.foreach(reExtractFeature)
+        }
+      })
+    }
   }
   case class FingerImageData(fgp: Int, fgpCase: Int, imageData: Array[Byte])
 
   private def deleteFingerMntData(personId: String): Unit={
-    logger.info("deleteFingerMntData personid:{}", personId)
-    val sql = "delete from gafis_gather_finger t where t.logtype=2 and t.person_id=?"
+    info("deleteFingerMntData personid:{}", personId)
+    val sql = "delete from gafis_gather_finger t where t.lobtype=2 and t.person_id=?"
     JdbcDatabase.update(sql){ps=>ps.setString(1, personId)}
   }
   private def getFingerImageData(personId: String): Seq[FingerImageData]={
@@ -59,11 +64,12 @@ class AutoExtractFeatureServiceImpl(config: HallMatcherConfig, featureExtractor:
   }
 
   override def reExtractFeature(personid: String): Unit = {
-    logger.info("reExtractFeature personid:{}", personid)
+    info("reExtractFeature personid:{}", personid)
     deleteFingerMntData(personid)
     val fingerImages = getFingerImageData(personid)
     fingerImages.foreach{img=>
       try {
+        info("reExtractFeature personid:{} fgp:{} fgpCase:{}", personid, img.fgp, img.fgpCase)
         val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(img.imageData)
         gafisImage.stHead.nCompressMethod match {
           case glocdef.GAIMG_CPRMETHOD_DEFAULT |
@@ -92,20 +98,20 @@ class AutoExtractFeatureServiceImpl(config: HallMatcherConfig, featureExtractor:
               ps.setBytes(4, mntData._2.toByteArray(AncientConstants.GBK_ENCODING))
             }
           case other =>
-            logger.warn("unsupport compressMethod:{} personid:{}", other, personid)
+            warn("unsupport compressMethod:{} personid:{} fpg:{}", other, personid, img.fgp)
         }
       } catch {
-        case e: Exception =>
-          logger.error("reExtractFeature personid:{} msg:{}", personid,e.getMessage)
+        case e: RuntimeException=>
+          error("err personid:{} fgp:{} fpgCase:{} msg:{}", personid, img.fgp,img.fgpCase, e.getMessage)
       }
     }
   }
 
   private def getPersonIdByFile(): Seq[String]={
     val personids = new ArrayBuffer[String]()
-    val file = new File("support/config/extract_personid_list.txt")
+    val file = new File(serverHome+"/config/extract_personid_list.txt")
     if(file.exists()){
-      logger.info("reExtractFeature by file:"+ file.getPath)
+      info("reExtractFeature by file:"+ file.getPath)
       val personIdList= Source.fromFile(file).getLines()
       for(personid <- personIdList){
         if(personid.toString.trim.length > 0){
@@ -113,32 +119,25 @@ class AutoExtractFeatureServiceImpl(config: HallMatcherConfig, featureExtractor:
         }
       }
       //文件重命名
-      file.renameTo(new File("support/config/extract_personid_list.txt.ok"))
+      file.renameTo(new File(serverHome+"/config/extract_personid_list.txt.ok"))
+    }else{
+      info(serverHome+"/config/extract_personid_list.txt not exist")
     }
 
     personids
   }
   private def getPersonIdByDB(): Seq[String]={
     val personids = new ArrayBuffer[String]()
-    val sql = "SELECT P.PERSONID" +
-      "  FROM GAFIS_PERSON P, SYS_DEPART D" +
-      " WHERE P.GATHER_ORG_CODE = D.CODE" +
-      "   AND D.INTEGRATION_TYPE <> '01'" +
-      "   AND P.PERSONID IN" +
-      "       (SELECT A.PERSON_ID" +
-      "          FROM (SELECT F.PERSON_ID, F.LOBTYPE" +
-      "                  FROM GAFIS_GATHER_FINGER F" +
-      "                 WHERE F.INPUTTIME >= (sysdate - 2)" +
-      "                 AND F.INPUTTIME < sysdate "+
-      "                 GROUP BY F.PERSON_ID, F.LOBTYPE) A" +
-      "         GROUP BY A.PERSON_ID" +
-      "        HAVING COUNT(*) < 2)" +
-      "   AND P.DELETAG = 1"
-    JdbcDatabase.queryWithPsSetter(sql){ps=>
-    }{rs=>
-      personids += rs.getString("personid")
+    try{
+      val sql = config.autoExtractFeature.sql
+      JdbcDatabase.queryWithPsSetter(sql){ps=>
+      }{rs=>
+        personids += rs.getString("personid")
+      }
+    }catch{
+      case e: Exception=>
+        error("autoExtractFeature sql:{} msg:{}", config.autoExtractFeature.sql, e.getMessage)
     }
-
     personids
   }
 }
