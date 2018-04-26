@@ -568,6 +568,42 @@ trait gnetcsr {
     }
   }
 
+  def GAFIS_NETSCR_SendPersonInfo(pstCon:ChannelOperator,pReq:GNETREQUESTHEADOBJECT ,
+                                  pAns:GNETANSWERHEADOBJECT , pstPerson:GPERSONINFOSTRUCT): Int ={
+    var retval = -1
+    NETOP_SENDDATA(pstCon,pstPerson)
+    NETOP_RECVANS(pstCon,pAns)
+    if(NETANS_GetRetVal(pAns) < 0){
+      return retval
+    }
+    val n = pstPerson.nTextItemCount
+    val nc = pstPerson.nCardCount
+
+
+    if(nc >0){
+
+      NETOP_SENDDATA(pstCon,pstPerson.pstID_Data)
+    }
+    if ( n>0 ) {
+      NETOP_SENDDATA(pstCon, pstPerson.pstText_Data)
+    }
+    NETOP_RECVANS(pstCon,pAns)
+    if(NETANS_GetRetVal(pAns)<0){
+      return retval
+    }
+
+    if(n>0){
+      (0 until n).foreach{
+        i =>
+          if(pstPerson.pstText_Data(i).bIsPointer.toInt == 1){
+            NETOP_SENDDATA(pstCon,pstPerson.pstText_Data(i).stData.textContent)
+          }
+      }
+    }
+    retval = 1
+    retval
+  }
+
   protected def GAFIS_NETSCR_SendSelResult(pstCon:ChannelOperator,pReq:GNETREQUESTHEADOBJECT, pAns:GNETANSWERHEADOBJECT, pstRes:GADB_SELRESULT): Unit ={
     GAFIS_NETSCR_SendSelResultEx(pstCon, pReq, pAns, pstRes, true)
   }

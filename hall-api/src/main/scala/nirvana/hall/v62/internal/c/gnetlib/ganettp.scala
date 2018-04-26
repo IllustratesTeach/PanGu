@@ -46,6 +46,9 @@ trait ganettp {
       if ( retval<0 ) stErrIndicator.bErrorAtOtherSide = 1;
       break;
       */
+        if(GAFIS_NETSCR_SendPersonInfo(pstCon,pReq,pAns,pstPer)< 0){
+          return
+        }
       case	OP_PERSON_DEL | OP_PERSON_EXIST =>
         /*
         NETOP_RECVANS(pstCon, pAns);
@@ -53,6 +56,10 @@ trait ganettp {
       if ( retval<0 ) stErrIndicator.bErrorAtOtherSide = 1;
       break;
       */
+        NETOP_RECVANS(pstCon, pAns)
+        if(NETANS_GetRetVal(pAns) < 0 ){
+          return
+        }
       case	OP_PERSON_GET =>
         NETOP_RECVANS(pstCon, pAns);
         validateResponse(pstCon,pAns)
@@ -91,4 +98,18 @@ trait ganettp {
     nOption:Int=0
     ):Unit=
     NET_GAFIS_PERSON_Op(nDBID, nTableID, pstPersonData, null, null, nOption, OP_PERSON_GET);
+
+
+  /**
+    * 更新normaltp_personinfo 重卡组信息
+    * @param nDBID
+    * @param nTableID
+    * @param pstPersonData
+    * @param nOption
+    */
+  def NET_GAFIS_PERSON_Update(nDBID:Short,
+                              nTableID:Short,
+                              pstPersonData:GPERSONINFOSTRUCT,
+                              nOption:Int=0):Unit =
+    NET_GAFIS_PERSON_Op(nDBID, nTableID, pstPersonData, null, null, nOption, OP_PERSON_UPDATE);
 }
