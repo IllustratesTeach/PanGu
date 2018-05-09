@@ -130,9 +130,9 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       ltHitPkg.latentFingerOriginalSystemFingerId = fingerId
       ltHitPkg.latentFingerLatentPhysicalId = lPCard.getStrPhysicalId
       ltHitPkg.latentFingerCardId = "" //系统自用,建议不赋值
-      ltHitPkg.fingerPrintOriginalSystemPersonId = appendPersonNoHeadLetter(tpCard.getStrMisPersonID)
+      ltHitPkg.fingerPrintOriginalSystemPersonId = appendPersonNoHeadLetter(tpCard.getStrPersonID)
       ltHitPkg.fingerPrintJingZongPersonId = tpCard.getStrJingZongPersonId
-      ltHitPkg.fingerPrintPersonId = appendPersonNoHeadLetter(tpCard.getStrMisPersonID).replace("R","P")
+      ltHitPkg.fingerPrintPersonId = appendPersonNoHeadLetter(tpCard.getStrPersonID).replace("R","P")
       ltHitPkg.fingerPrintCardId = fingerCardId
       ltHitPkg.fingerPrintPostionCode = hitFgpconvert(hitResult.nHitFgp.toString.toInt)
       ltHitPkg.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_LT
