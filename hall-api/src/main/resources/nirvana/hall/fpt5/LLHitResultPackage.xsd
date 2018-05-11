@@ -52,7 +52,7 @@
 						<xs:documentation>原始系统_案事件编号</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
-						<xs:restriction base="type_asjbh">
+						<xs:restriction base="type_ysxt_asjbh">
 							<xs:length value="23"/>
 						</xs:restriction>
 					</xs:simpleType>
@@ -106,7 +106,7 @@
 						<xs:documentation>比中结果_原始系统_案事件编号</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
-						<xs:restriction base="type_asjbh">
+						<xs:restriction base="type_ysxt_asjbh">
 							<xs:length value="23"/>
 						</xs:restriction>
 					</xs:simpleType>

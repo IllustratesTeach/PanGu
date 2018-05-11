@@ -32,7 +32,7 @@
 									<xs:documentation>原始系统_案事件编号</xs:documentation>
 								</xs:annotation>
 								<xs:simpleType>
-									<xs:restriction base="type_asjbh">
+									<xs:restriction base="type_ysxt_asjbh">
 										<xs:length value="23"/>
 									</xs:restriction>
 								</xs:simpleType>
@@ -214,7 +214,7 @@
 				<xs:element name="fingers" minOccurs="0" maxOccurs="1000">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="fingerImageMsg" maxOccurs="unbounded">
+							<xs:element name="fingerImageMsg" minOccurs="0" maxOccurs="1">
 								<xs:complexType>
 									<xs:all>
 										<xs:element name="ysxt_xczzhwbh" minOccurs="0">
@@ -399,7 +399,7 @@
 									</xs:all>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="fingerFeatureMsg" minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="fingerFeatureMsg" minOccurs="0" maxOccurs="1000">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="ysxt_xczzhwbh" minOccurs="0">
@@ -802,7 +802,7 @@
 				<xs:element name="palms" minOccurs="0" maxOccurs="1000">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="palmImageMsg" maxOccurs="unbounded">
+							<xs:element name="palmImageMsg" minOccurs="0" maxOccurs="1">
 								<xs:complexType>
 									<xs:all>
 										<xs:element name="xczhw_xczzhwbh" minOccurs="0">
@@ -937,7 +937,7 @@
 									</xs:all>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="palmFeatureMsg" minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="palmFeatureMsg" minOccurs="0" maxOccurs="1000">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="xczhw_xczzhwbh" minOccurs="0">

@@ -65,7 +65,7 @@
 						<xs:documentation>原始系统_案事件相关人员编号</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
-						<xs:restriction base="type_jzrybh">
+						<xs:restriction base="type_ysxt_asjxgrybh">
 							<xs:maxLength value="23"/>
 						</xs:restriction>
 					</xs:simpleType>
@@ -111,7 +111,7 @@
 						<xs:documentation>比中结果_原始系统_案事件相关人员编号</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
-						<xs:restriction base="type_jzrybh">
+						<xs:restriction base="type_ysxt_asjxgrybh">
 							<xs:length value="23"/>
 						</xs:restriction>
 					</xs:simpleType>
