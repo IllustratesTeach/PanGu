@@ -24,8 +24,8 @@ object FPTConverter {
   def convertLogic02Rec2TPCard(logic02Rec: Logic02Rec): TPCard = {
     val tpCard = TPCard.newBuilder()
     val textBuilder = tpCard.getTextBuilder
-    tpCard.setStrCardID(logic02Rec.personId)
-    tpCard.setStrMisPersonID(logic02Rec.personId)
+    tpCard.setStrCardID(logic02Rec.cardId)
+    tpCard.setStrPersonID(logic02Rec.personId)
     textBuilder.setStrName(logic02Rec.personName)
     textBuilder.setStrAliasName(logic02Rec.alias)
     if (logic02Rec.gender != null && logic02Rec.gender.length > 0) {
