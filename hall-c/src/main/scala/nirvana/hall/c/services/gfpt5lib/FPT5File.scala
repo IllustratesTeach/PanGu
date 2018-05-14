@@ -31,18 +31,6 @@ class FPT5File {
 
     final val EMPTY_STRING = ""
 
-
-    def build(fPT5File: FPT5File,sendUnitCode:String,sendUnitName:String,sendPersonName:String,sendPersonIdCard:String,sendPersonTel:String): FPT5File ={
-        fPT5File.packageHead.originSystem = AFIS_SYSTEM
-        fPT5File.packageHead.sendUnitCode = sendUnitCode
-        fPT5File.packageHead.sendUnitName = sendUnitName
-        fPT5File.packageHead.sendPersonName = sendPersonName
-        fPT5File.packageHead.sendPersonIdCard = sendPersonIdCard
-        fPT5File.packageHead.sendPersonTel = sendPersonTel
-        fPT5File.packageHead.sendUnitSystemType = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
-        fPT5File
-    }
-
   /**
     * 头部信息
     */

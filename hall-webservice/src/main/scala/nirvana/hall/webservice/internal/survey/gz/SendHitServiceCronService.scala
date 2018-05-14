@@ -8,6 +8,7 @@ import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.fpt.FPT5Service
+import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, LlHitResultPackage, LtHitResultPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
@@ -135,15 +136,26 @@ class SendHitServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
   private def getFPT5HitLTPackage(hitLTPackageSeq : Seq[LtHitResultPackage]) : FPT5File = {
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+    build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
     fPT5File.ltHitResultPackage = hitLTPackageSeq.toArray
     fPT5File
   }
 
   private def getFPT5HitLLPackage(hitLLPackageSeq : Seq[LlHitResultPackage]) : FPT5File = {
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+    build(fPT5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
     fPT5File.llHitResultPackage = hitLLPackageSeq.toArray
+    fPT5File
+  }
+
+  def build(fPT5File: FPT5File,sendUnitCode:String,sendUnitName:String,sendPersonName:String,sendPersonIdCard:String,sendPersonTel:String): FPT5File ={
+    fPT5File.packageHead.originSystem = "AFIS"
+    fPT5File.packageHead.sendUnitCode = sendUnitCode
+    fPT5File.packageHead.sendUnitName = sendUnitName
+    fPT5File.packageHead.sendPersonName = sendPersonName
+    fPT5File.packageHead.sendPersonIdCard = sendPersonIdCard
+    fPT5File.packageHead.sendPersonTel = sendPersonTel
+    fPT5File.packageHead.sendUnitSystemType = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     fPT5File
   }
 }

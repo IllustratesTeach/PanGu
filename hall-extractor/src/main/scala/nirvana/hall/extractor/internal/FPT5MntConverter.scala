@@ -10,7 +10,7 @@ import nirvana.hall.c.services.gfpt5lib.{LatentFingerFeatureMsg, LatentPalmFeatu
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.c.services.kernel.mnt_checker_def.{AFISCOREDELTASTRUCT, AFISMNTPOINTSTRUCT, MNTDISPSTRUCT}
-import nirvana.hall.c.services.kernel.mnt_def.{PALMLATMNTSTRUCT, PALMMNTSTRUCT}
+import nirvana.hall.c.services.kernel.mnt_def.{PALMLATMNTSTRUCT}
 import nirvana.hall.extractor.jni.NativeExtractor
 
 import scala.collection.mutable.ArrayBuffer
@@ -346,14 +346,15 @@ object FPT5MntConverter {
       val deltaSet = new DeltaSet
       for(i <- 0 until mntDisp.stPm.nPatternDeltaCnt){
         val t = mntDisp.stPm.PatternDelta(i)
+        val triangleInfo = convertAFISCOREDELTASTRUCT2CoreDelta(t,UTIL_COREDELTA_TYPE_RDELTA)
         var deltaDirectionArray  = new ArrayBuffer[DeltaDirection]
         delta = new Delta
-        delta.palmTrianglePointFeatureXCoordinate = t.x
-        delta.palmTrianglePointFeatureYCoordinate = t.y
-        delta.palmTrianglePointFeatureCoodinateRange = t.z
+        delta.palmTrianglePointFeatureXCoordinate = triangleInfo.x
+        delta.palmTrianglePointFeatureYCoordinate = triangleInfo.y
+        delta.palmTrianglePointFeatureCoodinateRange = triangleInfo.featureDirection
         deltaDirection = new DeltaDirection
-        deltaDirection.palmTrianglePointFeatureDirection = t.nRadius
-        deltaDirection.palmTrianglePointFeatureDirectionRange = t.nzVarRange
+        deltaDirection.palmTrianglePointFeatureDirection = triangleInfo.nRadius
+        deltaDirection.palmTrianglePointFeatureDirectionRange = triangleInfo.featureDirectionRange
         deltaDirectionArray += deltaDirection
         delta.deltaDirection = deltaDirectionArray.toArray
         deltaArray += delta

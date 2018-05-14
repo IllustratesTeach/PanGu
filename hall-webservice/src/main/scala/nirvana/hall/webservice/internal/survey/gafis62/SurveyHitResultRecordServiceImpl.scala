@@ -86,7 +86,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
           case Some(ltHitResultPackage) =>
             lTHitResultPackage += ltHitResultPackage
             fpt5File.ltHitResultPackage = lTHitResultPackage.toArray
-            fpt5File.build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+            build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
             val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
             Option(dataHandler)
           case _ => None
@@ -98,7 +98,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
           case Some(hitResultPackage) =>
             llHitResultPackage += hitResultPackage
             fpt5File.llHitResultPackage = llHitResultPackage.toArray
-            fpt5File.build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
+            build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
             val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
             Option(dataHandler)
           case _ => None
@@ -377,5 +377,17 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       ""
     }
 
+  }
+
+
+  def build(fPT5File: FPT5File,sendUnitCode:String,sendUnitName:String,sendPersonName:String,sendPersonIdCard:String,sendPersonTel:String): FPT5File ={
+    fPT5File.packageHead.originSystem = "AFIS"
+    fPT5File.packageHead.sendUnitCode = sendUnitCode
+    fPT5File.packageHead.sendUnitName = sendUnitName
+    fPT5File.packageHead.sendPersonName = sendPersonName
+    fPT5File.packageHead.sendPersonIdCard = sendPersonIdCard
+    fPT5File.packageHead.sendPersonTel = sendPersonTel
+    fPT5File.packageHead.sendUnitSystemType = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+    fPT5File
   }
 }
