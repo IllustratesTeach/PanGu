@@ -17,7 +17,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="type_asjbh">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="|(A[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"/>
+			<xs:pattern value="|((A|Z)[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="type_ysxt_asjbh">
@@ -32,7 +32,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="type_xcwzbh">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="\*|\*\*|\*\*\*|(F[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}110[1-4][0-9]{3})|(F0000000000000000000000110[1-4][0-9]{3})"/>
+			<xs:pattern value="F[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}11(0[1-4]|[99])[0-9]{3}"/>
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
