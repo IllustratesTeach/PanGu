@@ -8,7 +8,7 @@ import nirvana.hall.spark.services.FptPropertiesConverter.PersonConvert
 object WSQPropertiesConverter {
 
   def wsqInfoToPersonConvert(wsqFilePath:String): PersonConvert ={
-    val personId = wsqFilePath.split("_")(0)
+    val personId = wsqFilePath.split("_")(0).split("/")(1)
     val personInfo = new PersonConvert
     personInfo.personId = personId
     personInfo.cardId = personId

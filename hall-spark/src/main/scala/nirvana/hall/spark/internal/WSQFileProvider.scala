@@ -1,11 +1,13 @@
 package nirvana.hall.spark.internal
 
+import java.io.File
+
 import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.spark.config.NirvanaSparkConfig
 import nirvana.hall.spark.services.FptPropertiesConverter.TemplateFingerConvert
-import nirvana.hall.spark.services.{ImageProvider, SparkFunctions, WSQPropertiesConverter}
+import nirvana.hall.spark.services.{ImageProvider, SparkFunctions, SysProperties, WSQPropertiesConverter}
 import nirvana.hall.spark.services.SparkFunctions.StreamEvent
 
 import scala.collection.mutable.ArrayBuffer
@@ -15,8 +17,9 @@ import scala.collection.mutable.ArrayBuffer
   */
 class WSQFileProvider extends ImageProvider{
 
+  private lazy val imageFileServer = SysProperties.getPropertyOption("fpt.file.server")
 
-  val REGEX = s"^[R][0-9]+(_)(\\d{2})(.wsq)"
+  val REGEX = s"[R][0-9]+(_)(\\d{2})(.wsq)"
   /**
     * 请求图像数据
     *
@@ -27,11 +30,11 @@ class WSQFileProvider extends ImageProvider{
   override def requestImage(parameter: NirvanaSparkConfig, message: String): Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
     def fetchWSQFile():Seq[(StreamEvent, GAFISIMAGESTRUCT)] = {
       var arrayBuffer = ArrayBuffer[(StreamEvent, GAFISIMAGESTRUCT)]()
-      if(message.matches(REGEX)){
-        val wsqFilePath = message
-        val wsqFileData = SparkFunctions.httpClient.download(wsqFilePath)
-        val personId = wsqFilePath.split("_")(0)
-        val fgp = getFingerPosition(wsqFilePath.split("_")(1).toInt)
+      if(!message.startsWith("http") && !"None".equals(imageFileServer.get)){
+        val wsqFilePath =  message
+        val wsqFileData = SparkFunctions.httpClient.download(imageFileServer.get + File.separator+ wsqFilePath)
+        val personId = wsqFilePath.split("_")(0).split("/")(1)
+        val fgp = getFingerPosition(wsqFilePath.split("_")(1).split("\\.")(0).toInt)
         val hasPerson = GafisPartitionRecordsDakuSaver.queryPersonById(personId)
         if (hasPerson.isEmpty) {
           val person = WSQPropertiesConverter.wsqInfoToPersonConvert(wsqFilePath)
