@@ -23,6 +23,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
   /** 同步人员基本信息 */
   override val SYNC_SQL: String = "select t.sid, t.seq" +
     ", t.personid " + COL_NAME_PERSONID +
+    ", t.fingerrepeatno " + COL_NAME_FINGERREPEATNO +
     ", t.name " + COL_NAME_NAME +
     ", t.sex_code " + COL_NAME_SEXCODE +
     ", t.birthdayst " + COL_NAME_BIRTHDAY +
@@ -37,7 +38,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     ", db.logic_db_pkid as " + COL_NAME_LOGICDB +
     " from gafis_person t left join gafis_logic_db_fingerprint db on t.personid=db.fingerprint_pkid " +
     " where t.seq > ? and t.seq <= ? order by t.seq"
-  private val personCols: Array[String] = Array[String](COL_NAME_NAME, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, COL_NAME_LOGICDB)
+  private val personCols: Array[String] = Array[String](COL_NAME_FINGERREPEATNO, COL_NAME_NAME, COL_NAME_GATHERCATEGORY, COL_NAME_GATHERTYPE, COL_NAME_DOOR, COL_NAME_ADDRESS, COL_NAME_SEXCODE, COL_NAME_DATASOURCES, COL_NAME_CASECLASS, COL_NAME_LOGICDB)
   /**
     * 读取人员信息
     * @param syncDataResponse
