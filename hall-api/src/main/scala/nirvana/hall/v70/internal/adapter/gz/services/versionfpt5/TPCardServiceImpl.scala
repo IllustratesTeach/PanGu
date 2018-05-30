@@ -72,7 +72,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
       //保存指纹--包括平指、滚指、指节纹
       val fingerList = ProtobufConverterForFPT5.convertTPCard2GafisGatherFinger(tpCard)
-      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
       fingerList.foreach{finger =>
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = new Date()
@@ -83,7 +83,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
       //掌纹--包括掌心、四联指、全掌
       val palmList = ProtobufConverterForFPT5.convertTPCard2GafisGatherPalm(tpCard)
-      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
       palmList.foreach{palm=>
         palm.pkId = CommonUtils.getUUID()
         palm.inputtime = new Date()

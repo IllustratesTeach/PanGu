@@ -73,7 +73,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       logicDbFingerprint.save()
       //保存指纹
       val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
       fingerList.foreach{finger =>
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = person.inputtime
@@ -82,7 +82,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
       //掌纹
       val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
       palmList.foreach{palm=>
         palm.pkId = CommonUtils.getUUID()
         palm.inputtime = person.inputtime
@@ -91,7 +91,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
       //保存人像
       val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-      GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+      GafisGatherPortrait.delete.where(GafisGatherPortrait.personId === person.personid)
       portraitList.foreach{ portrait =>
         portrait.pkId = CommonUtils.getUUID()
         portrait.inputpsn = person.inputUsername
@@ -101,7 +101,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
       //其他BLOB
       val otherList = ProtobufConverter.convertTPCard2GafisPersonOther(tpCard)
-      GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisPersonOther.delete.where(GafisPersonOther.personId === person.personid)
       otherList.foreach{other=>
         other.uuid = CommonUtils.getUUID()
         other.inputtime = person.inputtime
@@ -122,16 +122,6 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     val gafisPerson = GafisPerson.find(cardId)
     gafisPerson.deletag = Gafis70Constants.DELETAG_DEL
     gafisPerson.save()
-    /*//删除指纹
-    GafisGatherFinger.find_by_personId(cardId).foreach(f=> f.delete())
-    //删除掌纹
-    GafisGatherPalm.find_by_personId(cardId).foreach(f=> f.delete())
-    //删除人像
-    GafisGatherPortrait.find_by_personid(cardId).foreach(f=> f.delete())
-    //删除逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid(cardId).foreach(_.delete())
-    //删除人员信息
-    GafisPerson.find(cardId).delete()*/
   }
 
   /**
@@ -157,10 +147,10 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     person.cityCode = if(person.gatherdepartcode.length > 6)
       person.gatherdepartcode.substring(0,5) else person.gatherdepartcode
 
-    GafisPerson.find_by_personid(tpCard.getStrPersonID).foreach(f=> f.delete())
+    GafisPerson.delete.where(GafisPerson.personid === tpCard.getStrPersonID)
     person.save()
     //删除原来的逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid_and_logicDbPkid(person.personid,dbId.get).foreach(_.delete())
+    GafisLogicDbFingerprint.delete.where(GafisLogicDbFingerprint.fingerprintPkid === person.personid)
     //保存逻辑库
     val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       //如果没有指定逻辑库，使用默认库
@@ -175,7 +165,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     logicDbFingerprint.save()
     //指纹
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-    GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
     fingerList.foreach{finger =>
       finger.pkId = CommonUtils.getUUID()
       finger.inputtime = person.inputtime
@@ -184,7 +174,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
     }
     //掌纹
     val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-    GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
     palmList.foreach{palm=>
       palm.pkId = CommonUtils.getUUID()
       palm.inputtime = person.inputtime
@@ -194,7 +184,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
     //人像
     val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-    GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+    GafisGatherPortrait.delete.where(GafisGatherPortrait.personId === person.personid)
     portraitList.foreach{portrait=>
       portrait.pkId = CommonUtils.getUUID()
       portrait.inputpsn = person.inputUsername
@@ -205,7 +195,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
     //其他BLOB
     val otherList = ProtobufConverter.convertTPCard2GafisPersonOther(tpCard)
-    GafisPersonOther.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisPersonOther.delete.where(GafisPersonOther.personId === person.personid)
     otherList.foreach{other=>
       other.uuid = CommonUtils.getUUID()
       other.inputtime = person.inputtime

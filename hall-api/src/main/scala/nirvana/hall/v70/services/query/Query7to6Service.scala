@@ -25,5 +25,6 @@ trait Query7to6Service {
   /**
    * 读取任务队列，处理发送查询任务
    */
+  @Transactional
   def doWork
 }

@@ -70,7 +70,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       logicDbFingerprint.save()
       //保存指纹
       val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
       fingerList.foreach{finger =>
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = new Date()
@@ -79,7 +79,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
       //掌纹
       val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
       palmList.foreach{palm=>
         palm.pkId = CommonUtils.getUUID()
         palm.inputtime = new Date()
@@ -192,7 +192,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
       logicDbFingerprint.save()
       //保存指纹
       val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-      GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
       fingerList.foreach{finger =>
         finger.pkId = CommonUtils.getUUID()
         finger.inputtime = new Date()
@@ -201,7 +201,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
       }
       //掌纹
       val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-      GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+      GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
       palmList.foreach{palm=>
         palm.pkId = CommonUtils.getUUID()
         palm.inputtime = new Date()
@@ -265,7 +265,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     person.deletag = Gafis70Constants.DELETAG_USE
     person.save()
     //删除原来的逻辑库
-    GafisLogicDbFingerprint.find_by_fingerprintPkid(person.personid).foreach(_.delete())
+    GafisLogicDbFingerprint.delete.where(GafisLogicDbFingerprint.fingerprintPkid === person.personid)
     //保存逻辑库
     val logicDb: GafisLogicDb = if(dbId == None || dbId.get.length <= 0){
       //如果没有指定逻辑库，使用默认库
@@ -280,7 +280,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     logicDbFingerprint.save()
     //指纹
     val fingerList = ProtobufConverter.convertTPCard2GafisGatherFinger(tpCard)
-    GafisGatherFinger.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherFinger.delete.where(GafisGatherFinger.personId === person.personid)
     fingerList.foreach{finger =>
       finger.pkId = CommonUtils.getUUID()
 //      finger.inputtime = new Date()
@@ -291,7 +291,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
     }
     //掌纹
     val palmList = ProtobufConverter.convertTPCard2GafisGatherPalm(tpCard)
-    GafisGatherPalm.find_by_personId(person.personid).foreach(f=> f.delete())
+    GafisGatherPalm.delete.where(GafisGatherPalm.personId === person.personid)
     palmList.foreach{palm=>
       palm.pkId = CommonUtils.getUUID()
       palm.inputtime = new Date()
@@ -301,7 +301,7 @@ override def delTPCard(cardId: String, dbId: Option[String]): Unit = ???
 
     //人像
     val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-    GafisGatherPortrait.find_by_personid(person.personid).foreach(f=> f.delete())
+    GafisGatherPortrait.delete.where(GafisGatherPortrait.personId === person.personid)
     portraitList.foreach{portrait=>
       portrait.pkId = CommonUtils.getUUID()
       portrait.inputtime = new Date()
