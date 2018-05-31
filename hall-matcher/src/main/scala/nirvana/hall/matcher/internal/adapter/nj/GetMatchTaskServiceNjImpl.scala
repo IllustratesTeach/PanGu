@@ -34,10 +34,11 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
 
   private val personCols: Array[String] = Array[String](
     COL_NAME_DOOR,COL_NAME_ADDRESS,COL_NAME_ASSISTLEVEL,COL_NAME_NAME,COL_NAME_SPELLNAME,COL_NAME_ALIASNAME,COL_NAME_ALIASSPELL,COL_NAME_IDCARDNO,
-    COL_NAME_SEXCODE,COL_NAME_FINGERREPEATNO,COL_NAME_NATIONCODE,COL_NAME_GATHERUSERNAME,COL_NAME_NATIVEPLACECODE)
+    COL_NAME_SEXCODE,COL_NAME_FINGERREPEATNO,COL_NAME_NATIONCODE,COL_NAME_GATHERUSERNAME,COL_NAME_NATIVEPLACECODE,COL_NAME_DOORDETAIL,COL_NAME_ADDRESSDETAIL,COL_NAME_GATHERDEPART,
+    COL_NAME_GATHERDEPARTCODE,COL_NAME_PERSONTYPE)
   private val caseCols: Array[String] = Array[String](
     COL_NAME_CASEOCCURPLACECODE, COL_NAME_CASEOCCURPLACEDETAIL,COL_NAME_SUSPICIOUSAREACODE,COL_NAME_ASSISTLEVEL, COL_NAME_ISMURDER, COL_NAME_CASESTATE,
-    COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTUNITCODE)
+    COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTUNITCODE,COL_NAME_REMARK,COL_NAME_CASEBRIEFDETAIL)
 
   /**
    * 获取捺印文本查询条件
@@ -73,8 +74,8 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
         if(json.has("caseClasses")){
           val value = json.getString("caseClasses")
-          if(value.indexOf(",")>0){
-            val values = value.split("\\,")
+          if(value.indexOf("|")>0){
+            val values = value.split("\\|")
             val groupQuery = GroupQuery.newBuilder()
             values.foreach{value =>
               val keywordQuery = KeywordQuery.newBuilder()
@@ -115,13 +116,25 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
             textQuery.addQueryBuilder().setName(COL_NAME_NAME).setExtension(KeywordQuery.query, keywordQuery.build())
           }
         }
-        //时间段
-        val dateCols = Array("gatherDate")
+        //时间段 出生日期
+        val dateCols = Array("gatherDate",COL_NAME_PERSONBIRTHDAY)
         dateCols.foreach{col =>
-          if (json.has(col + "ST") && json.has(col + "ED")) {
+          if (json.has(col + "ST") || json.has(col + "ED")) {
+            var dateST = ""
+            var dateED = ""
+            if (json.has(col + "ST")) {
+              dateST = json.getString(col + "ST")
+            } else {
+              dateST = "0001-01-01"
+            }
+            if (json.has(col + "ED")) {
+              dateED = json.getString(col + "ED")
+            } else {
+              dateED = "2100-01-01"
+            }
             val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+            longQuery.setMin(DateConverter.convertStr2Date(dateST, "yyyy-MM-dd").getTime).setMinInclusive(true)
+            longQuery.setMax(DateConverter.convertStr2Date(dateED, "yyyy-MM-dd").getTime).setMaxInclusive(true)
             textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
           }
         }
@@ -194,8 +207,8 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
         //处理classcode，需要同时在classcode1，classcode2，classcode3中查询
         if(json.has("caseClassCode")){
           val value = json.getString("caseClassCode")
-          if(value.indexOf(",")>0){
-            val values = value.split("\\,")
+          if(value.indexOf("|")>0){
+            val values = value.split("\\|")
             val groupQuery = GroupQuery.newBuilder()
             values.foreach{value =>
               val keywordQuery = KeywordQuery.newBuilder()
@@ -216,12 +229,24 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
           }
         }
         //时间段
-        val dateCols = Array("caseOccurDate", "extractDateST")
+        val dateCols = Array("caseOccurDate", "extractDate",COL_NAME_INPUTTIME,COL_NAME_MODIFIEDTIME)
         dateCols.foreach{col =>
-          if (json.has(col + "ST") && json.has(col + "ED")) {
+          if (json.has(col + "ST") || json.has(col + "ED")) {
+            var dateST = ""
+            var dateED = ""
+            if (json.has(col + "ST")) {
+              dateST = json.getString(col + "ST")
+            } else {
+              dateST = "0001-01-01"
+            }
+            if (json.has(col + "ED")) {
+              dateED = json.getString(col + "ED")
+            } else {
+              dateED = "2100-01-01"
+            }
             val longQuery = LongRangeQuery.newBuilder()
-            longQuery.setMin(DateConverter.convertStr2Date(json.getString(col + "ST"), "yyyy-MM-dd").getTime).setMinInclusive(true)
-            longQuery.setMax(DateConverter.convertStr2Date(json.getString(col + "ED"), "yyyy-MM-dd").getTime).setMaxInclusive(true)
+            longQuery.setMin(DateConverter.convertStr2Date(dateST, "yyyy-MM-dd").getTime).setMinInclusive(true)
+            longQuery.setMax(DateConverter.convertStr2Date(dateED, "yyyy-MM-dd").getTime).setMaxInclusive(true)
             textQuery.addQueryBuilder().setName(col).setExtension(LongRangeQuery.query, longQuery.build())
           }
         }

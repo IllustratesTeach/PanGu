@@ -18,8 +18,8 @@ import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
 
 /**
- * Created by songpeng on 16/4/8.
- */
+  * Created by songpeng on 16/4/8.
+  */
 class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
@@ -28,7 +28,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     s", c.CASE_OCCUR_DATE " + COL_NAME_CASEOCCURDATE +
     s", c.CASE_OCCUR_PLACE_CODE " +  COL_NAME_CASEOCCURPLACECODE +
     s", c.CASE_OCCUR_PLACE_DETAIL " + COL_NAME_CASEOCCURPLACEDETAIL +
-    s", c.CASE_BRIEF_DETAIL " +
+    s", c.CASE_BRIEF_DETAIL " + COL_NAME_CASEBRIEFDETAIL +
     s", c.IS_MURDER " + COL_NAME_ISMURDER +
     s", c.AMOUNT " +
     s", c.EXTRACT_UNIT_CODE " + COL_NAME_EXTRACTUNITCODE +
@@ -38,9 +38,9 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     s", c.SUSPICIOUS_AREA_CODE " + COL_NAME_SUSPICIOUSAREACODE +
     s", c.CASE_STATE " + COL_NAME_CASESTATE +
     s", c.INPUTPSN " +
-    s", c.INPUTTIME " +
+    s", c.INPUTTIME " + COL_NAME_INPUTTIME +
     s", c.MODIFIEDPSN " +
-    s", c.MODIFIEDTIME " +
+    s", c.MODIFIEDTIME " + COL_NAME_MODIFIEDTIME +
     s", c.DELETAG " +
     s", c.BROKEN_STATUs" +
     s", c.CASE_SOURCE " +
@@ -65,6 +65,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     s", c.CASE_CLASS_CODE3 " + COL_NAME_CASECLASSCODE3 +
     s", c.SUSPICIOUS_AREA_CODE2 " +
     s", c.SUSPICIOUS_AREA_CODE3 " +
+    s", c.REMARK " + COL_NAME_REMARK +
     s", t.SID " +
     s", t.CASE_ID " +
     s", t.CARDID " +
@@ -75,10 +76,10 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     s", t.LT_STATUs" +
     s", t.CREATOR_UNIT_CODE " +
     s", t.UPDATOR_UNIT_CODE " +
-//    s", t.INPUTPSN " +
-//    s", t.INPUTTIME " +
-//    s", t.MODIFIEDPSN " +
-//    s", t.MODIFIEDTIME " +
+    //    s", t.INPUTPSN " +
+    //    s", t.INPUTTIME " +
+    //    s", t.MODIFIEDPSN " +
+    //    s", t.MODIFIEDTIME " +
     s", db.LOGIC_DB_PKID " + COL_NAME_LOGICDB +
     " FROM (SELECT f.sid sid, f.case_id case_id, f.finger_id cardid, f.is_assist is_assist, f.seq seq, f.deletag, '0' as is_palm, f.lt_status, f.creator_unit_code, f.updator_unit_code, f.inputpsn, f.inputtime, f.modifiedpsn, f.modifiedtime from gafis_case_finger f   where f.seq >=? and f.seq <=?  " +
     " UNION ALL SELECT p.sid, p.case_id case_id, p.palm_id cardid, p.is_assist is_assist,p.seq seq, p.deletag, '1' as is_palm, p.lt_status, p.creator_unit_code, p.updator_unit_code, p.inputpsn, p.inputtime, p.modifiedpsn, p.modifiedtime from gafis_case_palm p   where p.seq >=? and p.seq <=?) t " +
@@ -86,8 +87,9 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
     " LEFT JOIN gafis_logic_db_case db ON db.case_pkid = c.case_id order by t.seq"
 
   private val caseCols: Array[String] = Array[String](COL_NAME_LOGICDB,COL_NAME_CASECLASSCODE,COL_NAME_CASECLASSCODE2,COL_NAME_CASECLASSCODE3,
-  COL_NAME_CARDID,COL_NAME_CASEOCCURPLACECODE,COL_NAME_CASEOCCURPLACEDETAIL,COL_NAME_ISMURDER,COL_NAME_EXTRACTUNITCODE,
-  COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTDATE,COL_NAME_SUSPICIOUSAREACODE,COL_NAME_CASESTATE,COL_NAME_ASSISTLEVEL)
+    COL_NAME_CARDID,COL_NAME_CASEOCCURPLACECODE,COL_NAME_CASEOCCURPLACEDETAIL,COL_NAME_ISMURDER,COL_NAME_EXTRACTUNITCODE,
+    COL_NAME_EXTRACTUNITNAME,COL_NAME_EXTRACTDATE,COL_NAME_SUSPICIOUSAREACODE,COL_NAME_CASESTATE,COL_NAME_ASSISTLEVEL,
+    COL_NAME_REMARK,COL_NAME_CASEBRIEFDETAIL)
 
   override def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long): Unit ={
     implicit val ds = dataSource
@@ -139,7 +141,7 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
       }
 
       //日期类型
-      val dateCols = Array(COL_NAME_CASEOCCURDATE, COL_NAME_EXTRACTDATE)
+      val dateCols = Array(COL_NAME_CASEOCCURDATE, COL_NAME_EXTRACTDATE,COL_NAME_INPUTTIME,COL_NAME_MODIFIEDTIME)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0

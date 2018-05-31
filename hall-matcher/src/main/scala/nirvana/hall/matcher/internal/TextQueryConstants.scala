@@ -153,6 +153,12 @@ object TextQueryConstants {
   val COL_NAME_GATHERFINGERTIME = "gatherFingerTime"
   val COL_NAME_EXTRACTDATE = "extractDate"
 
+  //南京追加
+  val COL_NAME_GATHERDEPART = "gatherdepart"
+  val COL_NAME_PERSONBIRTHDAY = "personBirthday"
+  val COL_NAME_REMARK = "remark"
+  val COL_NAME_CASEBRIEFDETAIL = "caseBriefDetail"
+
   //gafis6.2字段
   val GAFIS_KEYLIST_GetName = "KeyList"
   val GAFIS_QRYPARAM_GetName = "QryParam"

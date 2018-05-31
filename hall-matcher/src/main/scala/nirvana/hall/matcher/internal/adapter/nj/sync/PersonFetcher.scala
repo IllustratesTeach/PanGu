@@ -30,11 +30,11 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     s", t.sex_code " + COL_NAME_SEXCODE +
     s", t.nativeplace_code " + COL_NAME_NATIVEPLACECODE +
     s", t.nation_code " + COL_NAME_NATIONCODE +
-    s", t.birthdayst " +
+    s", t.birthdayst " + COL_NAME_PERSONBIRTHDAY +
     s", t.door " + COL_NAME_DOOR +
-    s", t.doordetail " +
+    s", t.doordetail " + COL_NAME_DOORDETAIL +
     s", t.address " + COL_NAME_ADDRESS +
-    s", t.addressdetail " +
+    s", t.addressdetail " + COL_NAME_ADDRESSDETAIL +
     s", t.gather_org_code " +
     s", t.ipaddress" +
     s", t.gather_date " + COL_NAME_GATHERDATE +
@@ -55,7 +55,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     s", t.gather_finger_mode " +
     s", t.gather_finger_num " +
     s", t.finger_remark " +
-    s", t.gatherdepartcode " +
+    s", t.gatherdepartcode " + COL_NAME_GATHERDEPARTCODE +
     s", t.gatheruserid " +
     s", t.gather_finger_time " +
     s", t.case_brief_contents" +
@@ -80,11 +80,11 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     s", t.assist_number " +
     s", t.assist_approval " +
     s", t.assist_sign " +
-    s", t.gatherdepartname " +
+    s", t.gatherdepartname " + COL_NAME_GATHERDEPART +
     s", t.gatherusername " + COL_NAME_GATHERUSERNAME +
     s", t.certificatetype " +
     s", t.certificateid " +
-    s", t.person_type " +
+    s", t.person_type " + COL_NAME_PERSONTYPE +
     s", t.case_classes " + COL_NAME_CASECLASS +
     s", t.case_classes2 " + COL_NAME_CASECLASS2 +
     s", t.case_classes3 " + COL_NAME_CASECLASS3 +
@@ -93,8 +93,9 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
     s" FROM gafis_person t LEFT JOIN gafis_logic_db_fingerprint db ON t.personid=db.fingerprint_pkid" +
     s" WHERE t.seq >= ? AND t.seq <= ? ORDER BY t.seq"
   private val personCols: Array[String] = Array[String](COL_NAME_LOGICDB,COL_NAME_CASECLASS,COL_NAME_CASECLASS2,COL_NAME_CASECLASS3,
-  COL_NAME_IDCARDNO,COL_NAME_NAME,COL_NAME_ALIASNAME,COL_NAME_SEXCODE,COL_NAME_NATIVEPLACECODE,
-  COL_NAME_NATIONCODE,COL_NAME_DOOR,COL_NAME_ADDRESS,COL_NAME_FINGERREPEATNO,COL_NAME_ASSISTLEVEL,COL_NAME_GATHERUSERNAME)
+    COL_NAME_IDCARDNO,COL_NAME_NAME,COL_NAME_ALIASNAME,COL_NAME_SEXCODE,COL_NAME_NATIVEPLACECODE,
+    COL_NAME_NATIONCODE,COL_NAME_DOOR,COL_NAME_ADDRESS,COL_NAME_FINGERREPEATNO,COL_NAME_ASSISTLEVEL,COL_NAME_GATHERUSERNAME,
+    COL_NAME_DOORDETAIL,COL_NAME_ADDRESSDETAIL,COL_NAME_GATHERDEPART,COL_NAME_GATHERDEPARTCODE,COL_NAME_PERSONTYPE)
 
   /**
     * 读取人员信息
@@ -135,7 +136,7 @@ class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource
       TextQueryUtil.getColDataByPersonid(personId).foreach(textData.addCol(_))
 
       //日期类型
-      val dateCols = Array(COL_NAME_GATHERDATE)
+      val dateCols = Array(COL_NAME_GATHERDATE,COL_NAME_PERSONBIRTHDAY)
       for (col <- dateCols) {
         val value = rs.getDate(col)
         val time = if (value != null) value.getTime else 0
