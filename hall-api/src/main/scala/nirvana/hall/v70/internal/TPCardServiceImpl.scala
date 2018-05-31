@@ -184,7 +184,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
 
     //人像
     val portraitList = ProtobufConverter.convertTPCard2GafisGatherPortrait(tpCard)
-    GafisGatherPortrait.delete.where(GafisGatherPortrait.personId === person.personid)
+    GafisGatherPortrait.delete.where(GafisGatherPortrait.personid === person.personid)
     portraitList.foreach{portrait=>
       portrait.pkId = CommonUtils.getUUID()
       portrait.inputtime = new Date()
