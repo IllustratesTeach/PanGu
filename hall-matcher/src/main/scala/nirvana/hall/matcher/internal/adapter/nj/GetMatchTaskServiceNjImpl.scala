@@ -5,17 +5,13 @@ import javax.sql.DataSource
 import net.sf.json.JSONObject
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
-import nirvana.hall.matcher.config.{CandKeyFilterConfig, CandKeyFilterConfigItem, HallMatcherConfig}
+import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.TextQueryConstants._
 import nirvana.hall.matcher.internal.adapter.common.GetMatchTaskServiceImpl
 import nirvana.hall.matcher.internal.{DateConverter, PinyinConverter, TextQueryUtil}
-import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.TextQueryProto
 import nirvana.protocol.TextQueryProto.TextQueryData
 import nirvana.protocol.TextQueryProto.TextQueryData.{GroupQuery, KeywordQuery, LongRangeQuery, Occur}
-import org.apache.tapestry5.ioc.annotations.PostInjection
-
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by songpeng on 16/4/8.
@@ -268,21 +264,21 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
   /**
     * 初始化条码过滤配置,如果数据库没有配置信息，使用hall-matcher.xml中的配置
     */
-  @PostInjection
+  /*@PostInjection
   def initCandKeyFilterConfig(): Unit ={
     val candKeyFilterConfigList = getCandKeyFilterConfigList
     if(candKeyFilterConfigList.nonEmpty){
       info("initCandKeyFilterConfig by database")
       hallMatcherConfig.candKeyFilters = candKeyFilterConfigList.toArray
     }
-  }
+  }*/
 
   /**
     * 读取gafis_candkeyfilter_config（候选过滤配置表）信息
     * item结构：{'items':[{'reverse':false,'count':20, 'keywild':'31'}]}
     * @return
     */
-  private def getCandKeyFilterConfigList: Seq[CandKeyFilterConfig] ={
+/*  private def getCandKeyFilterConfigList: Seq[CandKeyFilterConfig] ={
     val candKeyFilterConfigList = new ArrayBuffer[CandKeyFilterConfig]()
     try {
       val sql = "select querytype, ispercent, item from gafis_candkeyfilter_config t where t.deletag =1"
@@ -317,5 +313,5 @@ class GetMatchTaskServiceNjImpl(hallMatcherConfig: HallMatcherConfig, featureExt
     }
 
     candKeyFilterConfigList
-  }
+  }*/
 }

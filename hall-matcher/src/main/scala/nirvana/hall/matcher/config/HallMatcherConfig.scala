@@ -25,8 +25,6 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
   var matchTimeout: MatchTimeoutConfig = _
   @XmlElement(name = "auto_check")
   var autoCheck: AutoCheckConfig = _
-  @XmlElement(name = "cand_key_filter")
-  var candKeyFilters: Array[CandKeyFilterConfig] = _
   @XmlElement(name = "auto_extract_feature")
   var autoExtractFeature: AutoExtractFeatureConfig = _
 }
@@ -63,26 +61,6 @@ class AutoCheckConfig{
   var confirmScore = 60
   @XmlElement(name = "deny_score")
   var denyScore = 30
-}
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlElement(name = "CandKeyFilterConfig")
-class CandKeyFilterConfig{
-  @XmlAttribute(name = "query_type")
-  var queryType: Int = _
-  @XmlAttribute(name = "is_percent")
-  var isPercent: Boolean = false
-  @XmlElement(name = "item")
-  var items:Array[CandKeyFilterConfigItem] = _
-}
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlElement(name = "CandKeyFilterConfigItem")
-class CandKeyFilterConfigItem{
-  @XmlAttribute(name = "reverse")
-  var reverse: Boolean = false
-  @XmlAttribute(name = "count")
-  var count: Int = 0
-  @XmlElement(name = "key_wild")
-  var keyWild: String = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlElement(name = "AutoExtractFeatureConfig")

@@ -45,11 +45,6 @@
                     <xs:documentation>tt自动认定参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="candKeyFilterConfig" name="cand_key_filter" minOccurs="0" maxOccurs="1" >
-                <xs:annotation>
-                    <xs:documentation>候选条码过滤条件配置</xs:documentation>
-                </xs:annotation>
-            </xs:element>
             <xs:element type="autoExtractFeatureConfig" name="auto_extract_feature" minOccurs="0" maxOccurs="1" >
                 <xs:annotation>
                     <xs:documentation>候选条码过滤条件配置</xs:documentation>
@@ -123,28 +118,6 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="candKeyFilterConfig">
-        <xs:sequence>
-            <xs:element type="candKeyFilterConfigItem" name="item" minOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>候选过滤条件,可以使多个</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:int" name="query_type" use="required"/>
-        <xs:attribute type="xs:boolean" name="is_percent" use="required"/>
-    </xs:complexType>
-    <xs:complexType name="candKeyFilterConfigItem">
-        <xs:sequence>
-            <xs:element type="xs:string" name="key_wild" minOccurs="1" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>编号</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:boolean" name="reverse" use="required"/>
-        <xs:attribute type="xs:int" name="count" use="required"/>
     </xs:complexType>
     <xs:complexType name="autoExtractFeatureConfig">
         <xs:sequence>

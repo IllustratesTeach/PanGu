@@ -72,19 +72,6 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     val textSql = rs.getString("textsql")
     var topN = rs.getInt("maxcandnum")
     if (topN <= 0) topN = 50 //最大候选队列默认50
-    //如果有候选过滤配置, 同时没有屏蔽候选参数,候选+1000
-    if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
-      if(textSql != null){
-        val jsonObj = JSONObject.fromObject(textSql)
-        if(hallMatcherConfig.candKeyFilters != null && hallMatcherConfig.candKeyFilters.exists(_.queryType == queryType)){
-          if(!(jsonObj.has(TextQueryConstants.SHIELD_CANDKEYFILTER) && "1".equals(jsonObj.getString(TextQueryConstants.SHIELD_CANDKEYFILTER)))){
-            topN += 1000
-          }
-        }
-      }else{
-        topN += 1000
-      }
-    }
     matchTaskBuilder.setObjectId(getObjectIdByCardId(keyId, queryType, isPalm))
     matchTaskBuilder.setTopN(topN)
     matchTaskBuilder.setScoreThreshold(rs.getInt("minscore"))
@@ -150,6 +137,11 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
     }
     //文本查询
     if (textSql != null) {
+      //如果有候选过滤配置, 同时没有屏蔽候选参数,候选+1000
+      val jsonObj = JSONObject.fromObject(textSql)
+      if(jsonObj.has(TextQueryConstants.SHIELD_CANDKEYFILTER)) {
+        matchTaskBuilder.setEnableCandkeyFilter("1".equals(jsonObj.getString(TextQueryConstants.SHIELD_CANDKEYFILTER)))
+      }
       queryType match {
         case HallMatcherConstants.QUERY_TYPE_TT =>
           val textQueryData = getTextQueryDataOfTemplate(textSql)
