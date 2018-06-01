@@ -101,7 +101,7 @@ class PutMatchResultServiceImpl(autoCheckService: AutoCheckService, implicit val
     val batchSize = 100 //每100条执行一次sql
     matchResultRequest.getCandidateResultList.foreach {cand=>
       if(cand.hasKeyId){
-        map.put(cand.getObjectId, cand.getKeyId)
+        map.put(cand.getObjectId, cand.getKeyId.toUpperCase())
       }else{
         sids += cand.getObjectId + ","
         i += 1
