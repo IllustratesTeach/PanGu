@@ -24,58 +24,55 @@ class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) 
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
   override val SYNC_SQL: String = s"select c.CASE_ID " + COL_NAME_CASEID +
-    s", c.CARD_ID " + COL_NAME_CARDID +
+    s", t.CARDID " + COL_NAME_CARDID +
     s", c.CASE_OCCUR_DATE " + COL_NAME_CASEOCCURDATE +
     s", c.CASE_OCCUR_PLACE_CODE " +  COL_NAME_CASEOCCURPLACECODE +
     s", c.CASE_OCCUR_PLACE_DETAIL " + COL_NAME_CASEOCCURPLACEDETAIL +
     s", c.CASE_BRIEF_DETAIL " + COL_NAME_CASEBRIEFDETAIL +
     s", c.IS_MURDER " + COL_NAME_ISMURDER +
-    s", c.AMOUNT " +
     s", c.EXTRACT_UNIT_CODE " + COL_NAME_EXTRACTUNITCODE +
     s", c.EXTRACT_UNIT_NAME " + COL_NAME_EXTRACTUNITNAME +
     s", c.EXTRACT_DATE " + COL_NAME_EXTRACTDATE +
-    s", c.EXTRACTOR " +
     s", c.SUSPICIOUS_AREA_CODE " + COL_NAME_SUSPICIOUSAREACODE +
     s", c.CASE_STATE " + COL_NAME_CASESTATE +
-    s", c.INPUTPSN " +
     s", c.INPUTTIME " + COL_NAME_INPUTTIME +
-    s", c.MODIFIEDPSN " +
     s", c.MODIFIEDTIME " + COL_NAME_MODIFIEDTIME +
-    s", c.DELETAG " +
-    s", c.BROKEN_STATUs" +
-    s", c.CASE_SOURCE " +
-    s", c.CREATE_UNIT_CODE " +
     s", c.ASSIST_LEVEL " + COL_NAME_ASSISTLEVEL +
-    s", c.IS_CHECKED " +
-    //s", c.SID " +
-    s", c.ASSIST_BONUs" +
-    s", c.ASSIST_DEPT_CODE " +
-    s", c.ASSIST_DEPT_NAME " +
-    s", c.ASSIST_DATE " +
-    s", c.ASSIST_SIGN " +
-    s", c.ASSIST_REVOKE_SIGN " +
-    s", c.CS_NO " +
-    s", c.PSIS_NO " +
-    s", c.THAN_STATE_TL " +
-    s", c.THAN_STATE_LT " +
-    s", c.THAN_STATE_LL " +
-    //s", c.SEQ " +
+    s", c.ASSIST_LEVEL " + COL_NAME_ASSISTLEVEL +
     s", c.CASE_CLASS_CODE " + COL_NAME_CASECLASSCODE +
     s", c.CASE_CLASS_CODE2 " + COL_NAME_CASECLASSCODE2 +
     s", c.CASE_CLASS_CODE3 " + COL_NAME_CASECLASSCODE3 +
-    s", c.SUSPICIOUS_AREA_CODE2 " +
-    s", c.SUSPICIOUS_AREA_CODE3 " +
     s", c.REMARK " + COL_NAME_REMARK +
     s", t.SID " +
-    s", t.CASE_ID " +
-    s", t.CARDID " +
-    s", t.IS_ASSIST " +
     s", t.SEQ " +
-    s", t.DELETAG " +
-    s", t.IS_PALM " +
-    s", t.LT_STATUs" +
-    s", t.CREATOR_UNIT_CODE " +
-    s", t.UPDATOR_UNIT_CODE " +
+    s", c.DELETAG " +
+//    s", c.INPUTPSN " +
+//    s", c.MODIFIEDPSN " +
+//    s", c.BROKEN_STATUs" +
+//    s", c.CASE_SOURCE " +
+//    s", c.CREATE_UNIT_CODE " +
+//    s", c.AMOUNT " +
+//    s", c.EXTRACTOR " +
+//    s", c.IS_CHECKED " +
+//    s", c.ASSIST_BONUs" +
+//    s", c.ASSIST_DEPT_CODE " +
+//    s", c.ASSIST_DEPT_NAME " +
+//    s", c.ASSIST_DATE " +
+//    s", c.ASSIST_SIGN " +
+//    s", c.ASSIST_REVOKE_SIGN " +
+//    s", c.CS_NO " +
+//    s", c.PSIS_NO " +
+//    s", c.THAN_STATE_TL " +
+//    s", c.THAN_STATE_LT " +
+//    s", c.THAN_STATE_LL " +
+//    s", c.SUSPICIOUS_AREA_CODE2 " +
+//    s", c.SUSPICIOUS_AREA_CODE3 " +
+//    s", t.IS_ASSIST " +
+//    s", t.DELETAG " +
+//    s", t.IS_PALM " +
+//    s", t.LT_STATUs" +
+//    s", t.CREATOR_UNIT_CODE " +
+//    s", t.UPDATOR_UNIT_CODE " +
     //    s", t.INPUTPSN " +
     //    s", t.INPUTTIME " +
     //    s", t.MODIFIEDPSN " +
