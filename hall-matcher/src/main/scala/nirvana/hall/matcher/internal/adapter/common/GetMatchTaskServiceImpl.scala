@@ -140,7 +140,7 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
       //如果有候选过滤配置, 同时没有屏蔽候选参数,候选+1000
       val jsonObj = JSONObject.fromObject(textSql)
       if(jsonObj.has(TextQueryConstants.SHIELD_CANDKEYFILTER)) {
-        matchTaskBuilder.setEnableCandkeyFilter("1".equals(jsonObj.getString(TextQueryConstants.SHIELD_CANDKEYFILTER)))
+        matchTaskBuilder.setEnableCandkeyFilter("0".equals(jsonObj.getString(TextQueryConstants.SHIELD_CANDKEYFILTER)))
       }
       queryType match {
         case HallMatcherConstants.QUERY_TYPE_TT =>
