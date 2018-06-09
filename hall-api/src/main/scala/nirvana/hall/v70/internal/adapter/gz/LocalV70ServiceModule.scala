@@ -1,6 +1,5 @@
 package nirvana.hall.v70.internal.adapter.gz
 
-import nirvana.hall.api.internal.fpt.exchange.FPTExchangeServiceImpl
 import nirvana.hall.api.services._
 import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
@@ -26,7 +25,6 @@ object LocalV70ServiceModule {
     binder.bind(classOf[LPCardService], classOf[LPCardServiceImpl])
     binder.bind(classOf[LPPalmService], classOf[LPPalmServiceImpl])
     binder.bind(classOf[GetPKIDService], classOf[GetPKIDServiceImpl])
-    binder.bind((classOf[FPTExchangeService]),classOf[FPTExchangeServiceImpl])
     binder.bind(classOf[QueryServiceImpl],classOf[QueryServiceImpl])
     binder.bind(classOf[SyncInfoLogManageService],classOf[SyncInfoLogManageServiceImpl])
     binder.bind(classOf[MatchRelationServiceImpl],classOf[MatchRelationServiceImpl])
