@@ -79,7 +79,6 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
     val service = getService[MatchRelationService]
     val matchRelationInfo = service.getLtHitResultPackageByOraSid(oraSid)
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File)
     fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
     fPT5File.packageHead.sendUnitCode = "000000000000"
     fPT5File.packageHead.sendUnitName = "aaa"
@@ -104,7 +103,6 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
     val service = getService[MatchRelationService]
     val matchRelationInfo = service.getLlHitResultPackageByOraSid(oraSid)
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File)
     fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
     fPT5File.packageHead.sendUnitCode = "000000000000"
     fPT5File.packageHead.sendUnitName = "aaa"
@@ -127,7 +125,6 @@ class MatchRelationServiceImplTest extends BaseV70TestCase{
     val service = getService[MatchRelationService]
     val matchRelationInfo = service.getTtHitResultPackageByOraSid(oraSid)
     val fPT5File = new FPT5File
-    fPT5File.build(fPT5File)
     fPT5File.packageHead.originSystem = fPT5File.AFIS_SYSTEM
     fPT5File.packageHead.sendUnitCode = "000000000000"
     fPT5File.packageHead.sendUnitName = "aaa"

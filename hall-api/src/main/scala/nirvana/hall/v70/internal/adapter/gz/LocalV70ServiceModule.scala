@@ -1,7 +1,6 @@
 package nirvana.hall.v70.internal.adapter.gz
 
 import nirvana.hall.api.services._
-import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.api.services.sync.{FetchMatchRelationService, _}
 import nirvana.hall.support.internal.RpcHttpClientImpl
 import nirvana.hall.support.services.RpcHttpClient
