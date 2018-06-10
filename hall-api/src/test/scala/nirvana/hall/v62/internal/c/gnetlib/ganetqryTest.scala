@@ -1,13 +1,13 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
-import nirvana.hall.v62.config.HallV62Config
-import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.c.services.gbaselib.gitempkg.{GBASE_ITEMPKG_ITEMHEADSTRUCT, GBASE_ITEMPKG_PKGHEADSTRUCT}
 import nirvana.hall.c.services.gloclib.gadbprop.GADBIDSTRUCT
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYSTRUCT
 import nirvana.hall.c.services.gloclib.glocdef.GAFISMICSTRUCT
 import nirvana.hall.c.services.gloclib.gqrycond.GAFIS_QRYPARAM
 import nirvana.hall.c.services.gloclib.{gaqryque, glocdef}
+import nirvana.hall.v62.config.HallV62Config
+import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
 import nirvana.hall.v62.services.AncientEnum.MatchType
 import nirvana.hall.v62.services.{DatabaseTable, MatchOptions, SelfMatchTask}
@@ -125,12 +125,15 @@ class ganetqryTest {
   @Test
   def test_NET_GAFIS_QUERY_Get: Unit ={
     val config = new HallV62Config
-    config.appServer.host = "192.168.1.17"
+    config.appServer.host = "127.0.0.1"
     config.appServer.port = 6898
     config.appServer.user = "afisadmin"
 
     val facade = new V62Facade(config)
-//    facade.NET_GAFIS_QUERY_Get()
+    val pstQry = gaqryqueConverter.convertQueryId2GAQUERYSTRUCT(1)
+    val gaQry = facade.NET_GAFIS_QUERY_Get(20,2, pstQry)
+
+    println(gaQry.stSimpQry.szKeyID)
 
   }
 }
