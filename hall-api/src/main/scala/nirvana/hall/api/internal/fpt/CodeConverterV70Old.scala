@@ -1818,11 +1818,11 @@ object CodeConverterV70Old {
         //查重
 
         case "1" =>
-          queryType = "1"
+          queryType = "2"
         //倒查
 
         case "2" =>
-          queryType = "2"
+          queryType = "1"
         //正查
 
         case "3" =>

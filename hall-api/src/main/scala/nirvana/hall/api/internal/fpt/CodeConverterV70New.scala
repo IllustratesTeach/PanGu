@@ -2316,11 +2316,11 @@ object CodeConverterV70New {
         //查重
 
         case "1" =>
-          queryType = "1"
+          queryType = "2"
         //倒查
 
         case "2" =>
-          queryType = "2"
+          queryType = "1"
         //正查
 
         case "3" =>
@@ -3392,7 +3392,7 @@ object CodeConverterV70New {
         case "030457" =>
           caseClass = "03041900"
         //编造并传播证券、期货交易虚假信息案
-
+        case "030488" =>
         case "030458" =>
           caseClass = "03042000"
         //诱骗投资者买卖证券、期货合约案
@@ -4719,7 +4719,7 @@ object CodeConverterV70New {
         case "060201" =>
           caseClass = "06020100"
         //伪证案
-
+        case "060213" =>
         case "060211" =>
           caseClass = "06020300"
         //辩护人、诉讼代理人毁灭证据、伪造证据、妨害作证案
@@ -5469,11 +5469,11 @@ object CodeConverterV70New {
         case "06090000" =>
           caseClass = "06090000"
         //制作、贩卖、传播淫秽物品案
-
+        case "060892" =>
         case "060900" =>
           caseClass = "06090100"
         //制作、复制、出版、贩卖、传播淫秽物品牟利案
-
+        case "060890" =>
         case "060910" =>
           caseClass = "06090101"
         //制作淫秽物品牟利案
@@ -5485,7 +5485,7 @@ object CodeConverterV70New {
         case "060930" =>
           caseClass = "06090103"
         //出版淫秽物品牟利案
-
+        case "060891" =>
         case "060940" =>
           caseClass = "06090104"
         //贩卖淫秽物品牟利案
