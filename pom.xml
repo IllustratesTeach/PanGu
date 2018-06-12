@@ -8,6 +8,7 @@
   <name>Nirvana Hall Application Platform</name>
   <description>Nirvana Hall Application Server</description>
   <modules>
+    <module>hall-database</module>
     <module>hall-matcher</module>
     <module>hall-api</module>
     <module>hall-webservice</module>
