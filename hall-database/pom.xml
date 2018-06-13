@@ -50,19 +50,15 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>5.0.3</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <type>jar</type>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -179,13 +175,13 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <artifactSet>
+                            <!--<artifactSet>
                                 <excludes>
                                     <exclude>org.scala-lang:*</exclude>
                                     <exclude>org.slf4j:*</exclude>
                                     <exclude>log4j:*</exclude>
                                 </excludes>
-                            </artifactSet>
+                            </artifactSet>-->
                         </configuration>
                     </execution>
                 </executions>
