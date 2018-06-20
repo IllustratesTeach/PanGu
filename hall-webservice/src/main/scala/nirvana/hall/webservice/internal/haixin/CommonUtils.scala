@@ -7,12 +7,6 @@ import org.apache.commons.lang.StringUtils
   */
 object CommonUtils {
 
-  def isNullOrEmpty(str:String):Boolean = {
-      var bStr = false
-      if(StringUtils.isEmpty(str) || StringUtils.isBlank(str)){
-        bStr = true
-      }
-    bStr
-  }
+  def isNullOrEmpty(str:String):Boolean = (StringUtils.isEmpty(str) || StringUtils.isBlank(str))
 
 }

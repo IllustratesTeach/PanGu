@@ -10,7 +10,8 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.{LoggerSupport, XmlLoader}
-import nirvana.hall.api.internal.ExceptionUtil
+import nirvana.hall.api.HallApiConstants
+import nirvana.hall.api.internal.{ExceptionUtil, JniLoaderUtil}
 import nirvana.hall.api.services.{ExportRelationService, QueryService, TPCardService}
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.remote.HallImageRemoteService
@@ -39,6 +40,8 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
                                 ,extractor: FeatureExtractor
                                 ,exportRelationService:ExportRelationService
                                 ,hallWebserviceConfig: HallWebserviceConfig) extends WsHaiXinFingerService with LoggerSupport{
+  JniLoaderUtil.loadExtractorJNI()
+  JniLoaderUtil.loadImageJNI()
   /**
     * 接口01:捺印指纹信息录入
     *
@@ -397,21 +400,21 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
     var result = IAConstant.ADD_QUEUE_FAIL
     val uuid = UUID.randomUUID().toString.replace("-",IAConstant.EMPTY)
     try{
-      val paramMap = new scala.collection.mutable.HashMap[String,Any]
-      paramMap.put("collectsrc",collectsrc)
-      paramMap.put("userid",userid)
-      paramMap.put("unitcode",unitcode)
-      paramMap.put("palmid",palmid)
-      paramMap.put("palmtype",palmtype)
-      paramMap.put("personid",personid)
-      paramMap.put("dh",dh)
+//      val paramMap = new scala.collection.mutable.HashMap[String,Any]
+//      paramMap.put("collectsrc",collectsrc)
+//      paramMap.put("userid",userid)
+//      paramMap.put("unitcode",unitcode)
+//      paramMap.put("palmid",palmid)
+//      paramMap.put("palmtype",palmtype)
+//      paramMap.put("personid",personid)
+//      paramMap.put("dh",dh)
+//
+//      strategyService.inputParamIsNullOrEmpty(paramMap)
+//      strategyService.checkCollectSrcIsVaild(collectsrc)
+//      strategyService.checkUserIsVaild(userid,unitcode)
+//      strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM)
 
-      strategyService.inputParamIsNullOrEmpty(paramMap)
-      strategyService.checkCollectSrcIsVaild(collectsrc)
-      strategyService.checkUserIsVaild(userid,unitcode)
-      strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM)
-
-      //addPalmTpCard(personid,dh,palmtype)
+      addPalmTpCard(personid,dh,palmtype)
 
       strategyService.palmBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS
@@ -499,7 +502,7 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       strategyService.checkUserIsVaild(userid,unitcode)
       strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM_AGAIN)
 
-      //addPalmTpCard(personid,dh,palmtype)
+      addPalmTpCard(personid,dh,palmtype)
 
       strategyService.palmBusinessFinishedHandler(uuid,collectsrc,userid,unitcode
         ,IAConstant.ADD_QUEUE_SUCCESS
@@ -516,7 +519,8 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
     }
     result
   }
-  private def addPalmTpCard(personid:String,dh:Array[Byte],palmtype:Int): Unit ={
+
+  private def addPalmTpCard(personid:String,palmImage:Array[Byte],palmType:Int): Unit ={
     var tpCard = TPCard.newBuilder()
     if(tpCardService.isExist(personid)){
       tpCard = tpCardService.getTPCard(personid).toBuilder
@@ -525,14 +529,14 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
         val blob = iter.next()
         blob.getType match {
           case ImageType.IMAGETYPE_PALM =>
-            blob.setStImageBytes(ByteString.copyFrom(FPTImageConverter.convert2GafisPalmImage(dh,palmtype).toByteArray()))
-          case other =>
+            blob.setStImageBytes(ByteString.copyFrom(FPTImageConverter.convert2GafisPalmImage(palmImage,palmType).toByteArray()))
+          case _ =>
         }
       }
       tpCardService.updateTPCard(tpCard.build())
     }else{
       val textBuilder = tpCard.getTextBuilder
-      tpCard.setStrCardID(personid)
+      tpCard.setStrCardID(if(personid.toUpperCase.startsWith(HallApiConstants.TPCARDNO_HEAD_LETTER)) personid.drop(1) else personid)
       tpCard.setStrPersonID(personid)
       textBuilder.setStrName("")
       textBuilder.setStrAliasName("")
@@ -573,30 +577,16 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
       textBuilder.setStrXieChaTelNo("")
       textBuilder.setStrShenPiBy("")
 
-      loadJni()
-      val originalImage = hallImageRemoteService.decodeGafisImage(FPTImageConverter.convert2GafisPalmImage(dh,palmtype))
+      val originalImage = hallImageRemoteService.decodeGafisImage(FPTImageConverter.convert2GafisPalmImage(palmImage,palmType))
       val mntData = extractByGAFISIMG(originalImage, false)
-      val blobBuilder = tpCard.addBlobBuilder()
+      val blobBuilder = tpCard.addBlobBuilder
       blobBuilder.setStMntBytes(ByteString.copyFrom(mntData._1.toByteArray()))
-      blobBuilder.setPalmfgp(fgpParesProtoBuffer(palmtype.toString))
+      blobBuilder.setPalmfgp(fgpParesProtoBuffer(palmType.toString))
       blobBuilder.setStBinBytes(ByteString.copyFrom(mntData._2.toByteArray()))
-      blobBuilder.setStImageBytes(ByteString.copyFrom(FPTImageConverter.convert2GafisPalmImage(dh,palmtype).toByteArray()))
+      blobBuilder.setStImageBytes(ByteString.copyFrom(FPTImageConverter.convert2GafisPalmImage(palmImage,palmType).toByteArray()))
       blobBuilder.setType(ImageType.IMAGETYPE_PALM)
 
       tpCardService.addTPCard(tpCard.build())
-    }
-  }
-
-  //加载jni
-  def loadJni() {
-    val file = new File("support")
-    if (file.exists()){
-      nirvana.hall.extractor.jni.JniLoader.loadJniLibrary("support", "stderr")
-      nirvana.hall.image.jni.JniLoader.loadJniLibrary("support", "stderr")
-    }
-    else{
-      nirvana.hall.extractor.jni.JniLoader.loadJniLibrary(".", "stderr")
-      nirvana.hall.image.jni.JniLoader.loadJniLibrary(".", "stderr")
     }
   }
 

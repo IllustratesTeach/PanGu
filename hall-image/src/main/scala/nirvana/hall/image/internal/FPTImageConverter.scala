@@ -49,13 +49,14 @@ object FPTImageConverter {
 
 
   def convert2GafisPalmImage(palmData: Array[Byte],fgp:Int): GAFISIMAGESTRUCT={
+
     val gafisImg = new GAFISIMAGESTRUCT
     gafisImg.stHead.nCompressMethod = 102
     gafisImg.stHead.bIsCompressed = 1
 
     gafisImg.stHead.nImageType = glocdef.GAIMG_IMAGETYPE_PALM.toByte
-    gafisImg.stHead.nWidth = 640
-    gafisImg.stHead.nHeight = 640
+    gafisImg.stHead.nWidth = 2304
+    gafisImg.stHead.nHeight = 2304
     gafisImg.stHead.nBits = 8
     gafisImg.stHead.nResolution = 500
     gafisImg.bnData = palmData
