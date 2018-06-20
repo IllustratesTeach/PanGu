@@ -400,19 +400,19 @@ class WsHaiXinFingerServiceImpl(implicit dataSource: DataSource
     var result = IAConstant.ADD_QUEUE_FAIL
     val uuid = UUID.randomUUID().toString.replace("-",IAConstant.EMPTY)
     try{
-//      val paramMap = new scala.collection.mutable.HashMap[String,Any]
-//      paramMap.put("collectsrc",collectsrc)
-//      paramMap.put("userid",userid)
-//      paramMap.put("unitcode",unitcode)
-//      paramMap.put("palmid",palmid)
-//      paramMap.put("palmtype",palmtype)
-//      paramMap.put("personid",personid)
-//      paramMap.put("dh",dh)
-//
-//      strategyService.inputParamIsNullOrEmpty(paramMap)
-//      strategyService.checkCollectSrcIsVaild(collectsrc)
-//      strategyService.checkUserIsVaild(userid,unitcode)
-//      strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM)
+      val paramMap = new scala.collection.mutable.HashMap[String,Any]
+      paramMap.put("collectsrc",collectsrc)
+      paramMap.put("userid",userid)
+      paramMap.put("unitcode",unitcode)
+      paramMap.put("palmid",palmid)
+      paramMap.put("palmtype",palmtype)
+      paramMap.put("personid",personid)
+      paramMap.put("dh",dh)
+
+      strategyService.inputParamIsNullOrEmpty(paramMap)
+      strategyService.checkCollectSrcIsVaild(collectsrc)
+      strategyService.checkUserIsVaild(userid,unitcode)
+      strategyService.checkPalmIsExist(palmid,palmtype,IAConstant.SET_PALM)
 
       addPalmTpCard(personid,dh,palmtype)
 
