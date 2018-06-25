@@ -6,6 +6,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataChecker, DataConverter}
+import nirvana.hall.matcher.service.TemplateFingerFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -14,7 +15,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 /**
  * gafis6.2捺印指纹分库
  */
-class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig,override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
   val hasRidge = hallMatcherConfig.mnt.hasRidge
 //  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))}  from normaltp_tpcardinfo t "
 //  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t where ${wrapUpdateTimeAsLong()}  >"

@@ -6,14 +6,14 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
+import nirvana.hall.matcher.service.TemplatePalmFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 
 /**
  * Created by songpeng on 16/4/26.
  */
-class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class TemplatePalmFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplatePalmFetcher{
   //是否对纹线分库
   val hasRidge = hallMatcherConfig.mnt.hasRidge
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_gather_palm t "

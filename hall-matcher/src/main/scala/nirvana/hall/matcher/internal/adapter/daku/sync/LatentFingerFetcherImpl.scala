@@ -5,7 +5,8 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
+import nirvana.hall.matcher.internal.adapter.common.sync.SyncDataFetcher
+import nirvana.hall.matcher.service.LatentFingerFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
@@ -13,7 +14,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
 /**
   * Created by songpeng on 16/3/29.
   )*/
-class LatentFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class LatentFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with LatentFingerFetcher{
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_case_finger t "
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_case_finger t where t.seq >"
   /** 同步现场指纹 */

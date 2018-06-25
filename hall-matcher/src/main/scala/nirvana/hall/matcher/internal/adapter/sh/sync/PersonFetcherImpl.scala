@@ -7,17 +7,18 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, TextQueryUtil}
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 import nirvana.protocol.TextQueryProto.TextData
 import nirvana.protocol.TextQueryProto.TextData.ColType
 import nirvana.hall.matcher.internal.TextQueryConstants._
+import nirvana.hall.matcher.internal.adapter.common.sync.SyncDataFetcher
+import nirvana.hall.matcher.service.PersonFetcher
 
 /**
   * Created by songpeng on 16/3/29.
   */
-class PersonFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class PersonFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with PersonFetcher{
   override val MAX_SEQ_SQL: String = "select max(t.seq) from gafis_person t"
   override val MIN_SEQ_SQL: String = "select min(t.seq) from gafis_person t where t.seq > "
   /** 同步人员基本信息 */

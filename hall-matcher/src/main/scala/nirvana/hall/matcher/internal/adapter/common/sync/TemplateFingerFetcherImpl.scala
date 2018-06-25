@@ -8,14 +8,14 @@ import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
+import nirvana.hall.matcher.service.TemplateFingerFetcher
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 
 /**
  * Created by songpeng on 16/4/6.
  */
-class TemplateFingerFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
   //是否对纹线分库
   val hasRidge = hallMatcherConfig.mnt.hasRidge
 

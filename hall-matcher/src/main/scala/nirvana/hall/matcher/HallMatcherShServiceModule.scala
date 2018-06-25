@@ -2,8 +2,10 @@ package nirvana.hall.matcher
 
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.services.FeatureExtractor
-import nirvana.hall.matcher.internal.adapter.common.{AutoCheckServiceImpl, MatchTaskCronServiceImpl, PutMatchProgressServiceImpl, PutMatchResultServiceImpl}
-import nirvana.hall.matcher.internal.adapter.sh.{GetMatchTaskServiceShImpl, SyncDataServiceImpl}
+import nirvana.hall.matcher.internal.adapter.common.sync.{LatentFingerFetcherImpl, LatentPalmFetcherImpl, TemplateFingerFetcherImpl, TemplatePalmFetcherImpl}
+import nirvana.hall.matcher.internal.adapter.common._
+import nirvana.hall.matcher.internal.adapter.sh.sync.{CaseFetcherImpl, PersonFetcherImpl}
+import nirvana.hall.matcher.internal.adapter.sh.GetMatchTaskServiceShImpl
 import nirvana.hall.matcher.service._
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -12,6 +14,12 @@ import org.apache.tapestry5.ioc.ServiceBinder
  */
 object HallMatcherShServiceModule {
   def bind(binder: ServiceBinder): Unit = {
+    binder.bind(classOf[PersonFetcher], classOf[PersonFetcherImpl])
+    binder.bind(classOf[CaseFetcher], classOf[CaseFetcherImpl])
+    binder.bind(classOf[TemplateFingerFetcher], classOf[TemplateFingerFetcherImpl])
+    binder.bind(classOf[TemplatePalmFetcher], classOf[TemplatePalmFetcherImpl])
+    binder.bind(classOf[LatentFingerFetcher], classOf[LatentFingerFetcherImpl])
+    binder.bind(classOf[LatentPalmFetcher], classOf[LatentPalmFetcherImpl])
     binder.bind(classOf[SyncDataService], classOf[SyncDataServiceImpl])
     binder.bind(classOf[GetMatchTaskService], classOf[GetMatchTaskServiceShImpl])
     binder.bind(classOf[PutMatchResultService], classOf[PutMatchResultServiceImpl])

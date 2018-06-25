@@ -7,6 +7,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, TextQueryConstants, TextQueryUtil}
+import nirvana.hall.matcher.service.CaseFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -17,7 +18,7 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 /**
   * Created by songpeng on 2017/12/4.
   */
-class CaseFetcher (hallMatcherConfig: HallMatcherConfig,override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class CaseFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with CaseFetcher{
   override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
   override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t where ${wrapModTimeAsLong()}  >"
 

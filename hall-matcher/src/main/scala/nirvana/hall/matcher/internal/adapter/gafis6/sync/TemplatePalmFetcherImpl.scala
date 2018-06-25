@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
+import nirvana.hall.matcher.service.TemplatePalmFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -12,7 +13,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 /**
  * gafis6.2捺印掌纹分库
  */
-class TemplatePalmFetcher(hallMatcherConfig: HallMatcherConfig,override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class TemplatePalmFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplatePalmFetcher{
 //  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normaltp_tpcardinfo t "
 //  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t " +
 //    s"where ${wrapUpdateTimeAsLong()} >"

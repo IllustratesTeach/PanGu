@@ -14,3 +14,13 @@ trait SyncDataService {
    */
   def syncData( syncDataRequest:SyncDataRequest):SyncDataResponse
 }
+
+protected trait Fetcher{
+  def doFetch(syncDataResponse: SyncDataResponse.Builder, size: Int, from: Long):Unit
+}
+trait PersonFetcher extends Fetcher
+trait CaseFetcher extends Fetcher
+trait TemplateFingerFetcher extends Fetcher
+trait TemplatePalmFetcher extends Fetcher
+trait LatentFingerFetcher extends Fetcher
+trait LatentPalmFetcher extends Fetcher

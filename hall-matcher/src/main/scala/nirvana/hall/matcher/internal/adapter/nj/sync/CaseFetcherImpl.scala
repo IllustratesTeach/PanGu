@@ -8,8 +8,9 @@ import com.google.protobuf.ByteString
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.TextQueryConstants._
-import nirvana.hall.matcher.internal.adapter.SyncDataFetcher
+import nirvana.hall.matcher.internal.adapter.common.sync.SyncDataFetcher
 import nirvana.hall.matcher.internal.{DataConverter, TextQueryUtil}
+import nirvana.hall.matcher.service.CaseFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -20,7 +21,7 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 /**
   * Created by songpeng on 16/4/8.
   */
-class CaseFetcher(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource){
+class CaseFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig ,dataSource) with CaseFetcher{
   override val MAX_SEQ_SQL: String = "select max(seq) from (select max(seq) seq from gafis_case_finger union all select max(seq) seq from gafis_case_palm)"
   override val MIN_SEQ_SQL: String ="select min(seq) from (select min(seq) seq from gafis_case_finger f where f.seq >? union all select min(seq) seq from gafis_case_palm p where p.seq >? )"
   override val SYNC_SQL: String = s"select c.CASE_ID " + COL_NAME_CASEID +

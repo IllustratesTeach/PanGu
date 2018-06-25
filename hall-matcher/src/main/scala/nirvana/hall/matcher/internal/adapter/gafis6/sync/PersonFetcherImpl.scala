@@ -7,6 +7,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, TextQueryConstants, TextQueryUtil}
+import nirvana.hall.matcher.service.PersonFetcher
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.protocol.SyncDataProto.SyncDataResponse
 import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
@@ -17,7 +18,7 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
 /**
   * Created by songpeng on 2017/11/25.
   */
-class PersonFetcher(hallMatcherConfig: HallMatcherConfig,override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource){
+class PersonFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with PersonFetcher{
   override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normaltp_tpcardinfo_mod t "
   override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()}  >"
   override val SYNC_SQL =  s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
