@@ -3,9 +3,9 @@ package nirvana.hall.matcher
 import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.internal.adapter.common._
-import nirvana.hall.matcher.internal.adapter.common.sync.{LatentFingerFetcherImpl, LatentPalmFetcherImpl, TemplateFingerFetcherImpl, TemplatePalmFetcherImpl}
+import nirvana.hall.matcher.internal.adapter.common.sync.{TemplateFingerFetcherImpl, TemplatePalmFetcherImpl}
 import nirvana.hall.matcher.internal.adapter.nj.GetMatchTaskServiceNjImpl
-import nirvana.hall.matcher.internal.adapter.nj.sync.{CaseFetcherImpl, PersonFetcherImpl}
+import nirvana.hall.matcher.internal.adapter.nj.sync.{CaseFetcherImpl, LatentFingerFetcherImpl, LatentPalmFetcherImpl, PersonFetcherImpl}
 import nirvana.hall.matcher.service._
 import org.apache.tapestry5.ioc.ServiceBinder
 
