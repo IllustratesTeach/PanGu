@@ -278,7 +278,7 @@ trait AncientData{
   private def internalProcessField:Seq[FieldDataType]={
     var members = reflectCaches.get(getClass)
     if(members == null) {
-      members = clazzType.members
+      members = clazzType.members.toStream
         .filter(_.isTerm)
         .filter(_.asTerm.isVar)
         .filterNot(_.annotations.exists(typeOf[IgnoreTransfer] =:= _.tree.tpe))
