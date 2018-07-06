@@ -9,7 +9,7 @@ import nirvana.hall.c.annotations.Length
 import nirvana.hall.c.services.AncientData
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.image.config.HallImageConfig
-import nirvana.hall.image.jni.JniLoader
+import nirvana.hall.image.jni.{JniLoader, NativeImageConverter}
 
 /**
   * Created by songpeng on 2017/1/10.
@@ -52,6 +52,26 @@ object GafisImageConverter{
     }else{//原图
       out.write(gafisImage.bnData)
     }
+
+    out.toByteArray
+  }
+
+  /**
+    * 将标准wsq文件转为bmp
+    * @param wsq
+    * @return
+    */
+  def convertWSQ2BMP(wsq: Array[Byte]): Array[Byte]={
+    val width = 640
+    val height = 640
+    val bmpHeader = initBmpHeader(width, height)
+    val headerData = bmpHeader.toByteArray(byteOrder = ByteOrder.LITTLE_ENDIAN)
+
+    val out = new ByteArrayOutputStream()
+    out.write(headerData)
+    loadJNI()
+    val img = NativeImageConverter.decodeByWSQ(wsq)
+    out.write(img.getData)
 
     out.toByteArray
   }
