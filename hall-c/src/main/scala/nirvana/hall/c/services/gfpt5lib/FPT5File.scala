@@ -4,8 +4,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import javax.xml.bind.annotation.{XmlElement, _}
 
-import nirvana.hall.c.services.gfpt4lib.fpt4code
-
 /**
   * Created by yuchen on 2017/10/17.
   */
@@ -402,167 +400,171 @@ class FPT5File {
         @XmlElement(name = "zwfx_tzfx")
         var fingerFeatureDirection:Int = _ //指纹方向-特征方向
         /**
-          * 指纹方向_特征方向
+          * 指纹方向-特征方向-范围
           */
         @XmlElement(name = "zwfx_tzfxfw")
         var fingerFeatureDirectionRange:Int = _ //指纹方向-特征方向-范围
         /**
-          * 指纹指位代码
+          * 指纹中心点特征X坐标
           */
         @XmlElement(name = "zwzxd_tzxzb")
         var fingerCenterPointFeatureXCoordinate:Int = _ //指纹中心点特征X坐标
         /**
-          * 指纹指位代码
+          * 指纹中心点特征Y坐标
           */
         @XmlElement(name = "zwzxd_tzyzb")
         var fingerCenterPointFeatureYCoordinate:Int = _ //指纹中心点特征Y坐标
         /**
-          * 指纹指位代码
+          * 指纹中心点特征坐标范围
           */
         @XmlElement(name = "zwzxd_tzzbfw")
         var fingerCenterPointFeatureCoordinateRange:Int = _ //指纹中心点特征坐标范围
         /**
-          * 指纹指位代码
+          * 指纹中心点特征特征方向
           */
         @XmlElement(name = "zwzxd_tzfx")
         var fingerCenterPointFeatureDirection:Int = _ //指纹中心点特征特征方向
         /**
-          * 指纹指位代码
+          * 指纹中心点特征特征方向范围
           */
         @XmlElement(name = "zwzxd_tzfxfw")
         var fingerCenterPointFeatureDirectionRange:Int = _ //指纹中心点特征特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹中心点可靠度
           */
         @XmlElement(name = "zwzxd_tzkkd")
         var fingerCenterPointFeatureReliabilityLevel:Int = _ //指纹中心点可靠度
         /**
-          * 指纹指位代码
+          * 指纹副中心特征X坐标
           */
         @XmlElement(name = "zwfzx_tzxzb")
         var fingerSlaveCenterFeatureXCoordinate:Int = _ //指纹副中心特征X坐标
         /**
-          * 指纹指位代码
+          * 指纹副中心特征Y坐标
           */
         @XmlElement(name = "zwfzx_tzyzb")
         var fingerSlaveCenterFeatureYCoordinate:Int = _ //指纹副中心特征Y坐标
         /**
-          * 指纹指位代码
+          * 指纹副中心特征坐标范围
           */
         @XmlElement(name = "zwfzx_tzzbfw")
         var fingerSlaveCenterFeatureCoordinateRange:Int = _ //指纹副中心特征坐标范围
         /**
-          * 指纹指位代码
+          * 指纹副中心特征方向
           */
         @XmlElement(name = "zwfzx_tzfx")
         var fingerSlaveCenterFeatureDirection:Int = _ //指纹副中心特征方向
         /**
-          * 指纹指位代码
+          * 指纹副中心特征方向范围
           */
         @XmlElement(name = "zwfzx_tzfxfw")
         var fingerSlaveCenterFeatureDirectionRange:Int = _ //指纹副中心特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹副中心特征可靠度
           */
         @XmlElement(name = "zwfzx_tzkkd")
         var fingerSlaveCenterFeatureReliabilityLevel:Int = _ //指纹副中心特征可靠度
         /**
-          * 指纹指位代码
+          * 指纹左三角特征X坐标
           */
         @XmlElement(name = "zwzsj_tzxzb")
         var fingerLeftTriangleFeatureXCoordinate:Int = _ //指纹左三角特征X坐标
         /**
-          * 指纹指位代码
+          * 指纹左三角特征Y坐标
           */
         @XmlElement(name = "zwzsj_tzyzb")
         var fingerLeftTriangleFeatureYCoordinate:Int = _ //指纹左三角特征Y坐标
         /**
-          * 指纹指位代码
+          * 指纹左三角特征坐标范围
           */
         @XmlElement(name = "zwzsj_tzzbfw")
         var fingerLeftTriangleFeatureCoordinateRange:Int = _ //指纹左三角特征坐标范围
         /**
-          * 指纹指位代码
+          * 指纹左三角特征方向
           */
         @XmlElement(name = "zwzsj_tzfx")
         var fingerLeftTriangleFeatureDirection:Int = _ //指纹左三角特征方向
         /**
-          * 指纹指位代码
+          * 指纹左三角特征方向范围
           */
         @XmlElement(name = "zwzsj_tzfxfw")
         var fingerLeftTriangleFeatureDirectionRange:Int = _ //指纹左三角特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹左三角特征方向范围
           */
         @XmlElement(name = "zwzsj_tzkkd")
         var fingerLeftTriangleFeatureReliabilityLevel:Int = _ //指纹左三角特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹右三角特征X坐标
           */
         @XmlElement(name = "zwysj_tzxzb")
         var fingerRightTriangleFeatureXCoordinate:Int = _ //指纹右三角特征X坐标
         /**
-          * 指纹指位代码
+          * 指纹右三角特征Y坐标
           */
         @XmlElement(name = "zwysj_tzyzb")
         var fingerRightTriangleFeatureYCoordinate:Int = _ //指纹右三角特征Y坐标
         /**
-          * 指纹指位代码
+          * 指纹右三角特征坐标范围
           */
         @XmlElement(name = "zwysj_tzzbfw")
         var fingerRightTriangleFeatureCoordinateRange:Int = _ //指纹右三角特征坐标范围
         /**
-          * 指纹指位代码
+          * 指纹右三角特征方向
           */
         @XmlElement(name = "zwysj_tzfx")
         var fingerRightTriangleFeatureDirection:Int = _ //指纹右三角特征方向
         /**
-          * 指纹指位代码
+          * 指纹右三角特征方向范围
           */
         @XmlElement(name = "zwysj_tzfxfw")
         var fingerRightTriangleFeatureDirectionRange:Int = _ //指纹右三角特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹右三角特征方向范围
           */
         @XmlElement(name = "zwysj_tzkkd")
         var fingerRightTriangleFeatureReliabilityLevel:Int = _ //指纹右三角特征方向范围
         /**
-          * 指纹指位代码
+          * 指纹特征点信息
           */
         @XmlElement(name = "minutiaSet")
         var fingerMinutiaSet = new FingerMinutiaSet
         /**
-          * 指纹指位代码
+          * 指纹_自定义信息
           */
         @XmlElement(name = "zw_zdyxx")
         var fingerCustomInfo:Array[Byte] = _
         /**
-          * 指纹指位代码
+          * 指纹_图像水平方向长度
           */
         @XmlElement(name = "zw_txspfxcd")
         var fingerImageHorizontalDirectionLength:Int = _
         /**
-          * 指纹指位代码
+          * 指纹_图像垂直方向长度
           */
         @XmlElement(name = "zw_txczfxcd")
         var fingerImageVerticalDirectionLength:Int = _
         /**
-          * 指纹指位代码
+          * 指纹_图像分辨率
           */
         @XmlElement(name = "zw_txfbl")
         var fingerImageRatio:Int = _
         /**
+          * 指纹_图像压缩方法描述
           * 0000表示无压缩，其他值前2个字节数字代表系统产品生产的单位代码，
           * 后2个字节数字代表系统产品的版本，从00开始递增，对于WSQ压缩方法，
           * 前2个数字固定为14，后两个数字代表系统产品生产的单位代码
           */
-        /**
-          * 指纹指位代码
-          */
         @XmlElement(name = "zw_txysffms")
         var fingerImageCompressMethodDescript:String = _
+        /**
+          * 指纹_图像质量
+          */
         @XmlElement(name = "zw_txzl")
         var fingerImageQuality:Int = _
+        /**
+          * 指纹_图像数据
+          */
         @XmlElement(name = "zw_txsj")
         var fingerImageData:Array[Byte] = _
     }
