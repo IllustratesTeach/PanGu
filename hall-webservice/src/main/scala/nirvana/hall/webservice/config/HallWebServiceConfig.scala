@@ -65,6 +65,8 @@ class HandprintServiceConfig{
   var password: String = _
   @XmlElement(name = "local_store_dir")
   var localStoreDir: String = _
+  @XmlElement(name = "data_type")
+  var dataType: String = _
   @XmlElement(name = "is_delete_list_zip")
   var isDeleteListZip:Boolean = false
   @XmlElement(name = "is_delete_file_zip")
