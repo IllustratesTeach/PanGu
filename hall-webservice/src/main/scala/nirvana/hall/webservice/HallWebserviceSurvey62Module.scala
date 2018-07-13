@@ -12,8 +12,11 @@ object HallWebserviceSurvey62Module {
   def bind(binder: ServiceBinder): Unit = {
     binder.bind(classOf[FPT50HandprintServiceClient],classOf[FPT50HandprintServiceClient])
     binder.bind(classOf[FPT50HandprintServiceCron], classOf[FPT50HandprintServiceCron]).eagerLoad()
+    binder.bind(classOf[FPT50HandprintLatentPackageCron], classOf[FPT50HandprintLatentPackageCron]).eagerLoad()
+    binder.bind(classOf[FPT50HandprintSendHitResultCron], classOf[FPT50HandprintSendHitResultCron]).eagerLoad()
     binder.bind(classOf[SurveyConfigService], classOf[SurveyConfigServiceImpl])
     binder.bind(classOf[SurveyRecordService], classOf[SurveyRecordServiceImpl])
     binder.bind(classOf[SurveyHitResultRecordService], classOf[SurveyHitResultRecordServiceImpl])
+    binder.bind(classOf[SurveyTableMainService],classOf[SurveyTableMainService])
   }
 }

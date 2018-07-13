@@ -11,6 +11,7 @@ import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HandprintServiceConfig
+import nirvana.hall.webservice.internal.survey.SurveyException.{DataPackageNotAvailableException, ImageException}
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipFile
@@ -107,25 +108,22 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
   def getLatentPackage(xcwzbh: String):Option[LatentPackage]={
     info("getFingerPrint：现场物证编号:{}",xcwzbh)
     val unitcode = xcwzbh.substring(1,7)
-    try{
-      val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
-      if(dataHandler.getInputStream.available() > 0){
-        val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator
-          + "getfingerprint", xcwzbh, unitcode)
-        if(handprintServiceConfig.isDeleteFileZip){
-          //TODO 删除ZIP文件操作
-          print(handprintServiceConfig.localStoreDir + File.pathSeparator + xcwzbh + ".zip")
-        }
-        val latentPackageStr = Source.fromInputStream(inputStream).mkString
-        val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
-        Option(fPT5File.get.latentPackage(0))
-      }else{
-        warn("getLatentPackage {} dataHandler is empty", xcwzbh)
-        None
+    val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
+    if(dataHandler.getInputStream.available() > 0){
+      val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator
+        + "getfingerprint", xcwzbh, unitcode)
+      if(handprintServiceConfig.isDeleteFileZip){
+        //TODO 删除ZIP文件操作
+        print(handprintServiceConfig.localStoreDir + File.pathSeparator + xcwzbh + ".zip")
       }
-    }catch {
-      case e:Exception =>
-        throw new Exception("调用-getFingerPrint-接口异常：" + e.getMessage())
+      val latentPackageStr = Source.fromInputStream(inputStream).mkString
+      val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
+      if(fPT5File.get.latentPackage.head.latentFingers.head.latentFingerImageMsg.latentFingerImageData.length != 512 *512){
+        throw new ImageException
+      }
+      Option(fPT5File.get.latentPackage(0))
+    }else{
+      throw new DataPackageNotAvailableException
     }
 
   }
@@ -137,7 +135,7 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     * @return FPT50HandprintServiceConstants.SEND_FBUSE_CONDITION_RESPONSE_XXX
     */
   def sendFBUseCondition(xcwzbh: String, resultType: String): String={
-    info("sendFBUseCondition：现场物证编号:{}",xcwzbh)
+    info("现场物证编号:{},sendFBUseCondition:{}",xcwzbh,resultType)
     try{
       fPT50HandprintService.sendFBUseCondition(userID, password, xcwzbh, resultType)
     }catch {

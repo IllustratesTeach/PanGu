@@ -194,10 +194,10 @@ trait FPT50HandprintService {
     *         0：发送失败
     *         1：发送成功
     */
-  @WebMethod def sendLTHitResult(@WebParam(name = "arg0") userID: String,
-                                 @WebParam(name = "arg1") password: String,
-                                 @WebParam(name = "arg2") xckybh: String,
-                                 @WebParam(name = "arg3") LTHitResultdh: DataHandler): String
+  @WebMethod def sendLTHitResult(@WebParam(name = "userID") userID: String,
+                                 @WebParam(name = "password") password: String,
+                                 @WebParam(name = "xckybh") xckybh: String,
+                                 @WebParam(name = "LTHitResultdh") LTHitResultdh: DataHandler): String
 
   /**
     * 发送现场指掌纹串查比中信息服务的接口
@@ -209,8 +209,8 @@ trait FPT50HandprintService {
     *         0：发送失败
     *         1：发送成功
     */
-  @WebMethod def sendLLHitResult(@WebParam(name = "arg0") userID: String,
-                                 @WebParam(name = "arg1") password: String,
-                                 @WebParam(name = "arg2") xckybh: String,
-                                 @WebParam(name = "arg3") LLHitResultdh: DataHandler): String
+  @WebMethod def sendLLHitResult(@WebParam(name = "userID") userID: String,
+                                 @WebParam(name = "password") password: String,
+                                 @WebParam(name = "xckybh") xckybh: String,
+                                 @WebParam(name = "LLHitResultdh") LLHitResultdh: DataHandler): String
 }
