@@ -22,7 +22,8 @@
     </union4pfmip>
     <handprintService>
         <cron>0 * * * * ? *</cron>
-        <url>http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl</url>
+        <get_caseno_cron></get_caseno_cron>
+        <url>http://localhost:8080/xckyservice_cxf/ws/FPT50HandprintService?wsdl</url>
         <target_namespace>http://xckyservice.hisign.com/</target_namespace>
         <user>AFIS_JZ</user>
         <password>AFIS_JZ</password>
@@ -40,8 +41,18 @@
                 <end_time>2018-02-01 00:00:00</end_time>
             </survey_config>
         </survey_v62_server>
+        <survey_hit_result_head_info>
+            <send_unit_code>362300000000</send_unit_code>
+            <send_unit_name>上饶市公安局</send_unit_name>
+            <send_person_name>沈炎</send_person_name>
+            <send_person_idcard>429021198503300019</send_person_idcard>
+            <send_person_tel>18270338955</send_person_tel>
+        </survey_hit_result_head_info>
     </handprintService>
     <hall_image_url>http://192.168.1.214:9001</hall_image_url>
     <local_tenprint_path>support/fpt</local_tenprint_path>
     <local_latent_path>support/fpt</local_latent_path>
+    <local_hit_result_path>/Users/yuchen/</local_hit_result_path>
+    <is_save_fpt>1</is_save_fpt>
+    <template_finger_database_id>1</template_finger_database_id>
 </hall_webservice>

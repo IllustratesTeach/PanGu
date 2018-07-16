@@ -1,6 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
 import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
+import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.SURVEYRECORD
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.services.survey.SurveyRecordService
@@ -46,16 +47,57 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
   }
 
   /**
-    * 获取物证编号
+    * 获取现场勘验编号
     * @param fingerId 指纹编号
     * @return
     */
-  override def getPhyEvidenceNoByFingerId(fingerId: String): Option[String] = {
+  override def getKNoByFingerId(fingerId: String): Option[String] = {
     val statement = Option("(fingerid='%s')".format(fingerId))
     val mapper = Map("kno"->"szKey")
     val result = v62Facade.queryV62Table[GAKEYSTRUCT](
       V62Facade.DBID_SURVEY,
       V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      1)
+
+    if(result.nonEmpty){
+      Option(result.head.szKey)
+    }else{
+      None
+    }
+  }
+
+  /**
+    * 获取不存在警综案事件编号的surveyRecord
+    *
+    * @return
+    */
+  override def getSurveyRecordWithPoliceIncidentIsNotExist: Seq[SURVEYRECORD] = {
+    val statement = Option("(POLICEINCIDENTEXIST='%s')".format(survey.POLICE_INCIDENT_NOTExist))
+    val mapper = Map("kno"->"szKNo"
+      ,"fingerid"->"szFingerid"
+      ,"physicalevidenceno" -> "szPhyEvidenceNo"
+      ,"casename" -> "szCaseName"
+      ,"jiejingstate" -> "nJieJingState"
+      ,"jiejingnumber" -> "szJieJingNo"
+      ,"STATE" -> "nState"
+      ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
+
+    v62Facade.queryV62Table[SURVEYRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      10)
+  }
+
+  override def getCaseIdByKNo(kNo:String): Option[String] ={
+    val statement = Option("(xkid='%s')".format(kNo))
+    val mapper = Map("CASEID"->"szKey")
+    val result = v62Facade.queryV62Table[GAKEYSTRUCT](
+      V62Facade.DBID_LP_DEFAULT,
+      V62Facade.TID_CASE,
       mapper,
       statement,
       1)

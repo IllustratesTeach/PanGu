@@ -64,7 +64,7 @@ class FPT50HandprintSendHitResultCron(hallWebserviceConfig: HallWebserviceConfig
       hitResultList.foreach{hitResult=>
         try{
           info("hitResultList,szFingerID{}",hitResult.szFingerID)
-          val xckybh = surveyRecordService.getPhyEvidenceNoByFingerId(hitResult.szFingerID)
+          val xckybh = surveyRecordService.getKNoByFingerId(hitResult.szFingerID)
           //info("导出比中关系,现场勘验编号{}",xckybh.get)
           if (xckybh.nonEmpty) {
             info("获取比中关系包")

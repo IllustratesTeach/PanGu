@@ -113,7 +113,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     //获取待发送现场指掌纹数量
     val latentCount = fPT50HandprintServiceClient.getLatentCount(surveyConfig.szUnitCode, hallWebserviceConfig.handprintService.dataType, "", minusDateTime(kssj), jssj)
     info("latentCount number:{}",latentCount)
-    if(latentCount.toInt > 1){
+    if(latentCount > 1){
       var nIndex = surveyConfig.nSeq
       val step = 9
       Range(nIndex, latentCount,10).foreach{i =>

@@ -36,9 +36,22 @@ trait SurveyRecordService {
   def getSurveyRecordListByJieJingState(jiejingState: Byte, limit: Int): Seq[SURVEYRECORD]
 
   /**
-    * 获取现堪记录物证编号
+    * 获取现堪编号
     * @param fingerId 指纹编号
     * @return
     */
-  def getPhyEvidenceNoByFingerId(fingerId: String): Option[String]
+  def getKNoByFingerId(fingerId: String): Option[String]
+
+  /**
+    * 获取不存在警综案事件编号的surveyRecord
+    * @return
+    */
+  def getSurveyRecordWithPoliceIncidentIsNotExist:Seq[SURVEYRECORD]
+
+  /**
+    * 通过现勘号查询CASEID
+    * @param kNo
+    * @return
+    */
+  def getCaseIdByKNo(kNo:String): Option[String]
 }

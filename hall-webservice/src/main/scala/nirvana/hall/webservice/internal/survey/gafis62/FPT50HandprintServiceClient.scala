@@ -118,8 +118,10 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
       }
       val latentPackageStr = Source.fromInputStream(inputStream).mkString
       val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
-      if(fPT5File.get.latentPackage.head.latentFingers.head.latentFingerImageMsg.latentFingerImageData.length != 512 *512){
-        throw new ImageException
+      if(!Option(fPT5File.get.latentPackage.head.latentFingers).isEmpty){
+        if(fPT5File.get.latentPackage.head.latentFingers.head.latentFingerImageMsg.latentFingerImageData.length != 512 *512){
+          throw new ImageException
+        }
       }
       Option(fPT5File.get.latentPackage(0))
     }else{

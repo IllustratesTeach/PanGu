@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gnetlib
 
 import junit.framework.Assert
+import nirvana.hall.c.services.gbaselib.gbasedef.GAKEYSTRUCT
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYHITRESULTRECORD, SURVEYRECORD}
 import nirvana.hall.v62.config.HallV62Config
@@ -15,10 +16,10 @@ import org.junit.Test
 class gnetsurveyTest {
 
   val config = new HallV62Config
-  config.appServer.host = "192.168.1.119"
-  config.appServer.port = 6898
+  config.appServer.host = "192.168.1.80"
+  config.appServer.port = 6798
   config.appServer.user = "afisadmin"
-  config.appServer.password="helloafis"
+  config.appServer.password=""
   val facade = new V62Facade(config)
 
   @Test
@@ -29,6 +30,7 @@ class gnetsurveyTest {
     record.szJieJingNo = "jiejing01"
     record.szKNo = "k00001"
     record.szPhyEvidenceNo = "phyevidenceno01"
+    record.PoliceIncidentExist = 0
     facade.NET_GAFIS_SURVEYRECORD_ADD(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD,record)
   }
 
@@ -38,9 +40,11 @@ class gnetsurveyTest {
     record.cbSize = record.toByteArray().length
     record.nSID = gaqryqueConverter.convertLongAsSixByteArray(0)
     record.szCaseName = "casename2"
-    record.szKNo = "k00002"
-    record.szPhyEvidenceNo = "phyevidenceno02"
+    record.szKNo = "k00001"
+    record.szPhyEvidenceNo = "phyevidenceno01"
     record.nState = 1
+    record.szJieJingNo = "jiejing01"
+    record.PoliceIncidentExist = survey.POLICE_INCIDENT_Exist
     facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYRECORD,record)
   }
 
@@ -109,5 +113,96 @@ class gnetsurveyTest {
   def test_NET_GAFIS_SURVEYHITRESULTRECORD_Get(): Unit ={
     val recordList = facade.NET_GAFIS_SURVEYHITRESULTRECORD_GET_BY_STATE(V62Facade.DBID_SURVEY, V62Facade.TID_SURVEYHITRESULTRECORD, survey.SURVEY_STATE_DEFAULT)
     Assert.assertTrue(recordList.nonEmpty)
+  }
+
+  @Test
+  def test_NET_GAFIS_SURVEYRECORD_LIST_GET_BY_STATE(): Unit ={
+
+    val statement = Option("(physicalevidenceno='%s')".format("F13010000000020180100091101002"))
+    val mapper = Map("kno"->"szKNo"
+                    ,"fingerid"->"szFingerid"
+                    ,"physicalevidenceno" -> "szPhyEvidenceNo"
+                    ,"casename" -> "szCaseName"
+                    ,"jiejingstate" -> "nJieJingState"
+                    ,"jiejingnumber" -> "szJieJingNo"
+                    ,"STATE" -> "nState")
+
+    val result = facade.queryV62Table[SURVEYRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      1)
+    result.headOption.getOrElse(throw new Exception("not get struts")).nState = 1.toByte
+    println("")
+    facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY
+      , V62Facade.TID_SURVEYRECORD
+      ,result.head)
+
+
+  }
+
+  @Test
+  def test_ModifySurveyRecordState: Unit ={
+    val statement = Option("($$SID=%s)".format("0"))
+    val mapper = Map("kno"->"szKNo"
+      ,"fingerid"->"szFingerid"
+      ,"physicalevidenceno" -> "szPhyEvidenceNo"
+      ,"casename" -> "szCaseName"
+      ,"jiejingstate" -> "nJieJingState"
+      ,"jiejingnumber" -> "szJieJingNo"
+      ,"STATE" -> "nState"
+      ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
+
+    val result = facade.queryV62Table[SURVEYRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      1)
+    result.headOption.getOrElse(throw new Exception("not get struts")).nState = 1.toByte
+    println("")
+
+    var a = new SURVEYRECORD
+    a = result.head
+    a.nState = survey.SURVEY_STATE_SUCCESS
+
+    facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY
+      , V62Facade.TID_SURVEYRECORD
+      ,a)
+  }
+
+  @Test
+  def getSurveyRecordWithPoliceIncidentIsNotExist: Unit = {
+    val statement = Option("(POLICEINCIDENTEXIST='%s')".format(survey.POLICE_INCIDENT_NOTExist))
+    val mapper = Map("kno"->"szKNo"
+      ,"fingerid"->"szFingerid"
+      ,"physicalevidenceno" -> "szPhyEvidenceNo"
+      ,"casename" -> "szCaseName"
+      ,"jiejingstate" -> "nJieJingState"
+      ,"jiejingnumber" -> "szJieJingNo"
+      ,"STATE" -> "nState"
+      ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
+
+    val result = facade.queryV62Table[SURVEYRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      10)
+    println(result.size)
+  }
+
+  @Test
+  def getCaseIdByKNo: Unit ={
+    val statement = Option("(xkid='%s')".format("K5001030000002018050081"))
+    val mapper = Map("CASEID"->"szKey")
+    val result = facade.queryV62Table[GAKEYSTRUCT](
+      V62Facade.DBID_LP_DEFAULT,
+      V62Facade.TID_CASE,
+      mapper,
+      statement,
+      1)
+    Assert.assertEquals("5001030000002018050081",result.head.szKey)
   }
 }

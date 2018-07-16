@@ -193,11 +193,4 @@ trait StrategyService {
     * @return
     */
   def getPersonInfo(idcard: String) : util.ArrayList[PersonInfoItem]
-
-  /**
-    * 处理字符串，不为空返回原字符串，为空返回 ""
-    * @param str
-    * @return
-    */
-  def nvlString(str:String) : String
 }

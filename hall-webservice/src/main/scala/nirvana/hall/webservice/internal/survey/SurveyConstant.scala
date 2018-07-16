@@ -1,7 +1,6 @@
 package nirvana.hall.webservice.internal.survey
 
 /**
-  * 标采与指纹系统对接变量设置
   * Created by ssj on 2017/11/17.
   */
 object SurveyConstant {
@@ -40,5 +39,8 @@ object SurveyConstant {
 
   final val EXPORT_XML_FILE = ".xml"
   final val EXPORT_FPTX_FILE = ".fptx"
+
+  //GAB 警综案事件编号的正则校验表达式
+  final val REGEX_ASJBH = "|((A|Z)[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"
 
 }

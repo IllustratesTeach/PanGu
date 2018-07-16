@@ -812,11 +812,5 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * @param str
     * @return
     */
-  override def nvlString(str: String) : String = {
-    if(StringUtils.isEmpty(str) ||StringUtils.isBlank(str)){
-      ""
-    }else{
-      str
-    }
-  }
+  private def nvlString(str: String) : String = if(CommonUtils.isNullOrEmpty(str)) "" else str
 }
