@@ -14,6 +14,7 @@ object HallWebserviceSurvey62Module {
     binder.bind(classOf[FPT50HandprintServiceCron], classOf[FPT50HandprintServiceCron]).eagerLoad()
     binder.bind(classOf[FPT50HandprintLatentPackageCron], classOf[FPT50HandprintLatentPackageCron]).eagerLoad()
     binder.bind(classOf[FPT50HandprintSendHitResultCron], classOf[FPT50HandprintSendHitResultCron]).eagerLoad()
+    binder.bind(classOf[FPT50HandPrintGetCaseNoCron], classOf[FPT50HandPrintGetCaseNoCron]).eagerLoad()
     binder.bind(classOf[SurveyConfigService], classOf[SurveyConfigServiceImpl])
     binder.bind(classOf[SurveyRecordService], classOf[SurveyRecordServiceImpl])
     binder.bind(classOf[SurveyHitResultRecordService], classOf[SurveyHitResultRecordServiceImpl])
