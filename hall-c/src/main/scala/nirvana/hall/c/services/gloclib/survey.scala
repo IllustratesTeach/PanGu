@@ -30,6 +30,12 @@ object survey {
   final val SURVEY_STATE_SUCCESS: Byte = 1
   final val SURVEY_STATE_FAIL: Byte = 2
 
+  //警综案事件编号不存在
+  final val POLICE_INCIDENT_NOTExist:Byte = 0
+  //警综案事件编号存在
+  final val POLICE_INCIDENT_Exist:Byte = 1
+
+
   // 根据任务号获取记录
   class SURVEYRECORD extends AncientData {
     var cbSize: Int = _
@@ -52,6 +58,8 @@ object survey {
     @Length(32)
     var szJieJingNo: String = _ // 接警编号
     var nState: Byte = _ //状态
+    var PoliceIncidentExist:Byte = POLICE_INCIDENT_NOTExist //默认 不存在
+    //标识警综案事件编号是否存在
   }
 
   //SURVEYRECORD,*PSURVEYRECORD
