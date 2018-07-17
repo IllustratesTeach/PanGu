@@ -18,6 +18,6 @@ object HallWebserviceSurvey62Module {
     binder.bind(classOf[SurveyConfigService], classOf[SurveyConfigServiceImpl])
     binder.bind(classOf[SurveyRecordService], classOf[SurveyRecordServiceImpl])
     binder.bind(classOf[SurveyHitResultRecordService], classOf[SurveyHitResultRecordServiceImpl])
-    binder.bind(classOf[SurveyTableMainService],classOf[SurveyTableMainService])
+    binder.bind(classOf[SurveyTableMaintenanceService],classOf[SurveyTableMaintenanceService])
   }
 }

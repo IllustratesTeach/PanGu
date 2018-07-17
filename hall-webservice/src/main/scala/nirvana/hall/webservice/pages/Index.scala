@@ -2,7 +2,7 @@ package nirvana.hall.webservice.pages
 
 import javax.inject.Inject
 
-import nirvana.hall.webservice.internal.survey.gafis62.SurveyTableMainService
+import nirvana.hall.webservice.internal.survey.gafis62.{SurveyTableMaintenanceService}
 import org.apache.tapestry5.annotations.Environmental
 import org.apache.tapestry5.services.Request
 import org.apache.tapestry5.util.TextStreamResponse
@@ -20,7 +20,7 @@ class Index {
   private var request:Request= _
 
   @Inject
-  private var surveyTableMainService:SurveyTableMainService = _
+  private var surveyTableMaintenanceService:SurveyTableMaintenanceService = _
 
 
 
@@ -45,7 +45,7 @@ class Index {
       if(null == values || values.length <=0){
         throw new Exception("v can not empty")
       }
-      surveyTableMainService.updateSurveyHitResultStateByOraSid(dbid.toShort,tableid.toShort,orasid,values)
+      surveyTableMaintenanceService.updateSurveyHitResultStateByOraSid(dbid.toShort,tableid.toShort,orasid,values)
       result = "OK"
     }catch{
       case e:Exception =>
