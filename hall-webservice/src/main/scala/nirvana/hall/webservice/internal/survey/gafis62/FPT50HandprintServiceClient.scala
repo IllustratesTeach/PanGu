@@ -6,7 +6,7 @@ import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
-import nirvana.hall.api.internal.fpt.{FPT5Utils, ZipUtils}
+import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
@@ -110,13 +110,14 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     val unitcode = xcwzbh.substring(1,7)
     val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
     if(dataHandler.getInputStream.available() > 0){
-      getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator + "getfingerprint", xcwzbh, unitcode)
+      val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator
+        + "getfingerprint", xcwzbh, unitcode)
       if(handprintServiceConfig.isDeleteFileZip){
         //TODO 删除ZIP文件操作
         print(handprintServiceConfig.localStoreDir + File.pathSeparator + xcwzbh + ".zip")
       }
-      val xml = ZipUtils.unCompress(Source.fromInputStream(dataHandler.getInputStream).mkString)
-      val fPT5File = Option(XmlLoader.parseXML[FPT5File](xml, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
+      val latentPackageStr = Source.fromInputStream(inputStream).mkString
+      val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
       if(!Option(fPT5File.get.latentPackage.head.latentFingers).isEmpty){
         if(fPT5File.get.latentPackage.head.latentFingers.head.latentFingerImageMsg.latentFingerImageData.length != 512 *512){
           throw new ImageException
