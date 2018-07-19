@@ -55,19 +55,31 @@ class FPT50HandPrintGetCaseNoCron(hallWebserviceConfig: HallWebserviceConfig
   private def getCaseNo: Unit ={
     try{
       surveyRecordService.getSurveyRecordWithPoliceIncidentIsNotExist.foreach{
+            info("call v62-1")
         surveyRecord =>
+          if(null ==surveyRecord.szKNo){
+            info("surveyRecord.szKNo是NULL===================null")
+          }
           val kNo = surveyRecord.szKNo
           val caseNo = fPT50HandPrintServiceClient.getCaseNo(kNo)
-          if(caseNo.matches(SurveyConstant.REGEX_ASJBH)){
-            info("call surveyServer getCaseNo success and pass regex,caseNo:{}",caseNo)
-            val caseId = surveyRecordService.getCaseIdByKNo(kNo).getOrElse(throw new Exception("get caseId fail,kNo is " + kNo))
-            caseInfoService.updateCaseInfo(caseInfoService.getCaseInfo(caseId).toBuilder.setStrJingZongCaseId(caseNo).build)
-            surveyRecord.PoliceIncidentExist = survey.POLICE_INCIDENT_Exist
-            surveyRecordService.updateSurveyRecord(surveyRecord)
-          }else{throw new Exception("call surveyServer getCaseNo success,but not pass regex,caseNo:" + caseNo)}
+          if(null == caseNo){
+            info("现勘获得的编号是NULL===================null")
+          }
+          if(null != caseNo){
+            if(caseNo.matches(SurveyConstant.REGEX_ASJBH)){
+              info("call surveyServer getCaseNo success and pass regex,caseNo:{}",caseNo)
+              val caseId = surveyRecordService.getCaseIdByKNo(kNo).getOrElse(throw new Exception("get caseId fail,kNo is " + kNo))
+              info("call v62-2")
+              caseInfoService.updateCaseInfo(caseInfoService.getCaseInfo(caseId).toBuilder.setStrJingZongCaseId(caseNo).build)
+              info("call v62-3")
+              surveyRecord.PoliceIncidentExist = survey.POLICE_INCIDENT_Exist
+              surveyRecordService.updateSurveyRecord(surveyRecord)
+              info("call v62-4")
+            }else{throw new Exception("call surveyServer getCaseNo success,but not pass regex,caseNo:" + caseNo)}
+          }
       }
     }catch{
-      case NonFatal(e) => error("getCaseNo error:{}",e.toString)
+      case NonFatal(e) => error("getCaseNo error:{},Error:{}",e.toString,ExceptionUtil.getStackTraceInfoByThrowAble(e))
     }
   }
 }

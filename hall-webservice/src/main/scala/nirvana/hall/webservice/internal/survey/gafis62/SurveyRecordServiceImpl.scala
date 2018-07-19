@@ -74,7 +74,7 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
     * @return
     */
   override def getSurveyRecordWithPoliceIncidentIsNotExist: Seq[SURVEYRECORD] = {
-    val statement = Option("(POLICEINCIDENTEXIST='%s')".format(survey.POLICE_INCIDENT_NOTExist))
+    val statement = Option("(POLICEINCIDENTEXIST=%d)".format(survey.POLICE_INCIDENT_NOTExist))
     val mapper = Map("kno"->"szKNo"
       ,"fingerid"->"szFingerid"
       ,"physicalevidenceno" -> "szPhyEvidenceNo"
@@ -84,12 +84,20 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
       ,"STATE" -> "nState"
       ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
 
-    v62Facade.queryV62Table[SURVEYRECORD](
+    val a = v62Facade.queryV62Table[SURVEYRECORD](
       V62Facade.DBID_SURVEY,
       V62Facade.TID_SURVEYRECORD,
       mapper,
       statement,
       10)
+    a.foreach{
+      t =>
+        if(null == t.szKNo){
+          println("getSurveyRecordWithPoliceIncidentIsNotExist null")
+        }
+        println("kNO:" + t.szKNo)
+    }
+    a
   }
 
   override def getCaseIdByKNo(kNo:String): Option[String] ={
@@ -107,5 +115,24 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
     }else{
       None
     }
+  }
+
+  override def isExistSurveyRecord(physicalevidenceno:String):Boolean = {
+    val statement = Option("(physicalevidenceno='%s')".format(physicalevidenceno))
+    val mapper = Map("kno"->"szKNo"
+      ,"fingerid"->"szFingerid"
+      ,"physicalevidenceno" -> "szPhyEvidenceNo"
+      ,"casename" -> "szCaseName"
+      ,"jiejingstate" -> "nJieJingState"
+      ,"jiejingnumber" -> "szJieJingNo"
+      ,"STATE" -> "nState"
+      ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
+
+    v62Facade.queryV62Table[SURVEYRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
+      mapper,
+      statement,
+      10).size > 0
   }
 }

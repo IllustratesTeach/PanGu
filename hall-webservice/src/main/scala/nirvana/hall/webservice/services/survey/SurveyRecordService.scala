@@ -54,4 +54,11 @@ trait SurveyRecordService {
     * @return
     */
   def getCaseIdByKNo(kNo:String): Option[String]
+
+  /**
+    * 通过physicalevidenceno查询SurveyRecord的个数,用于判断是否已存在
+    * @param physicalevidenceno
+    * @return
+    */
+  def isExistSurveyRecord(physicalevidenceno:String):Boolean
 }

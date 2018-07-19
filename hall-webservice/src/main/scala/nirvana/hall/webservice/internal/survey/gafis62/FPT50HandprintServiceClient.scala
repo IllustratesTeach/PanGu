@@ -12,6 +12,7 @@ import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HandprintServiceConfig
 import nirvana.hall.webservice.internal.survey.SurveyException.{DataPackageNotAvailableException, ImageException}
+import nirvana.hall.webservice.services.survey.DictAdministrativeCode
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipFile
@@ -114,7 +115,6 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
         + "getfingerprint", xcwzbh, unitcode)
       if(handprintServiceConfig.isDeleteFileZip){
         //TODO 删除ZIP文件操作
-        print(handprintServiceConfig.localStoreDir + File.pathSeparator + xcwzbh + ".zip")
       }
       val latentPackageStr = Source.fromInputStream(inputStream).mkString
       val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
@@ -123,9 +123,15 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
           throw new ImageException
         }
       }
+      if(DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.packageHead.sendUnitCode)){
+        throw new DataPackageNotAvailableException("FPTX发送单位代码不在行政区划6_28规定的范围内,fsdw_gajgjgdm:" + fPT5File.get.packageHead.sendUnitCode)
+      }
+      if(DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.latentPackage(0).latentCollectInfoMsg.extractUnitCode)){
+        throw new DataPackageNotAvailableException("FPTX提取单位公安机关机构代码不在行政区划6_28规定的范围内,tqdw_gajgjgdm:" + fPT5File.get.latentPackage(0).latentCollectInfoMsg.extractUnitCode)
+      }
       Option(fPT5File.get.latentPackage(0))
     }else{
-      throw new DataPackageNotAvailableException
+      throw new DataPackageNotAvailableException("FPTX数据包可读长度不符合要求")
     }
 
   }

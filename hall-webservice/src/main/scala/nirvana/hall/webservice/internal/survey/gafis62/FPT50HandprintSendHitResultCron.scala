@@ -30,7 +30,7 @@ class FPT50HandprintSendHitResultCron(hallWebserviceConfig: HallWebserviceConfig
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
 
-    if(hallWebserviceConfig.handprintService.cron!= null){
+    if(hallWebserviceConfig.handprintService.sendHitCron!= null){
       //推送比对任务
       periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "sync-cron-sendHitResult", new Runnable {
         override def run(): Unit = {

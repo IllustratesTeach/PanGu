@@ -193,6 +193,11 @@
                     <xs:documentation>调用现勘服务获取caseno的定时计划</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="cronType" name="send_hit_cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>调用现勘服务推送比中关系的定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>URL配置</xs:documentation>

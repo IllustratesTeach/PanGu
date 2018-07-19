@@ -57,6 +57,8 @@ class HandprintServiceConfig{
   var cron: String = _
   @XmlElement(name = "get_caseno_cron")
   var getCaseNoCron: String = _
+  @XmlElement(name = "send_hit_cron")
+  var sendHitCron: String = _
   @XmlElement(name = "url")
   var url: String = _
   @XmlElement(name = "target_namespace")
