@@ -644,12 +644,4 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
     * @return
     */
   override def getPersonInfo(idcard: String) = ???
-
-  /**
-    * 处理字符串，不为空返回原字符串，为空返回 ""
-    *
-    * @param str
-    * @return
-    */
-  override def nvlString(str: String) = ???
 }
