@@ -228,6 +228,11 @@
                     <xs:documentation>查询指掌纹类型</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:boolean" name="is_check_asjbh" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>是否校验警综案事件编号</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:boolean" name="is_delete_list_zip" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>是否删除现勘列表压缩包</xs:documentation>

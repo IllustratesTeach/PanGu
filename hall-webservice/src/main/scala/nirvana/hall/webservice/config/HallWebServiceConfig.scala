@@ -1,6 +1,6 @@
 package nirvana.hall.webservice.config
 
-import javax.xml.bind.annotation._
+import javax.xml.bind.annotation.{XmlElement, _}
 
 import monad.core.config.{HeartbeatConfigSupport, LocalStoreConfigSupport, LogFileSupport}
 import monad.support.services.WebServerConfigSupport
@@ -71,6 +71,8 @@ class HandprintServiceConfig{
   var localStoreDir: String = _
   @XmlElement(name = "data_type")
   var dataType: String = _
+  @XmlElement(name = "is_check_asjbh")
+  var isCheckAsjbh:Boolean = false
   @XmlElement(name = "is_delete_list_zip")
   var isDeleteListZip:Boolean = false
   @XmlElement(name = "is_delete_file_zip")

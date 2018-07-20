@@ -123,17 +123,29 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       val ltHitPkg = new LtHitResultPackage
       ltHitPkg.taskId = "%23s".format(gaqryqueConverter.convertSixByteArrayToLong(hitResult.nOraSID).toString).replace(" ","0")
       ltHitPkg.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
+      //捺印指纹_指掌纹卡编号--nyzw_zzhwkbh  maxLength value="23"
       ltHitPkg.fingerPrintCardId = hitFingerId
-      ltHitPkg.latentFingerCaseId = caseInfo.getStrJingZongCaseId
+      //现场指纹_案事件编号--xczw_asjbh |((A|Z)[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}) length=23
+      ltHitPkg.latentFingerCaseId = caseInfo.getStrJingZongCaseId //加校验，不处理
+      //现场指纹_原始系统_案事件编号--xczw_ysxt_asjbh (A[0-9A-Z]{22}) //加校验，不处理
       ltHitPkg.latentFingerOriginalSystemCaseId = appendCaseNoHeadLetter(caseInfo.getStrCaseID)
+      //现场指纹_现场勘验编号--xczw_xckybh (K[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})|(K0000000000000000000000) //加校验，不处理
       ltHitPkg.latentFingerLatentSurveyId = caseInfo.getStrSurveyId
+      //现场指纹_原始系统_现场指掌纹编号--xczw_ysxt_xczzhwbh maxLength value="30" //加校验，不处理
       ltHitPkg.latentFingerOriginalSystemFingerId = fingerId
+      //现场指纹_现场物证编号--xczw_xcwzbh F[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}11(0[1-4]|[99])[0-9]{3} //加校验，不处理
       ltHitPkg.latentFingerLatentPhysicalId = lPCard.getStrPhysicalId
+      //现场指纹_现场指掌纹卡编号--xczw_xczzhwkbh maxLength value="23 //加校验，不处理
       ltHitPkg.latentFingerCardId = "" //系统自用,建议不赋值
+      //捺印指纹_原始系统_案事件相关人员编号--nyzw_ysxt_asjxgrybh (R[0-9A-Z]{22}) //加校验，处理
       ltHitPkg.fingerPrintOriginalSystemPersonId = appendPersonNoHeadLetter(tpCard.getStrPersonID)
+      //捺印指纹_警综人员编号--nyzw_jzrybh |(R[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}) //加校验，如果不为空就校验，不符合要求就修改
       ltHitPkg.fingerPrintJingZongPersonId = tpCard.getStrJingZongPersonId
+      //捺印指纹_案事件相关人员编号--nyzw_asjxgrybh |(P[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}) //加校验，如果不为空就校验，不符合要求就修改
       ltHitPkg.fingerPrintPersonId = appendPersonNoHeadLetter(tpCard.getStrPersonID).replace("R","P")
+      //捺印指纹_指掌纹卡编号--nyzw_zzhwkbh maxLength value="23"
       ltHitPkg.fingerPrintCardId = fingerCardId
+      //捺印指纹_指掌位代码--nyzw_zzhwdm
       ltHitPkg.fingerPrintPostionCode = hitFgpconvert(hitResult.nHitFgp.toString.toInt)
       ltHitPkg.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_LT
 
