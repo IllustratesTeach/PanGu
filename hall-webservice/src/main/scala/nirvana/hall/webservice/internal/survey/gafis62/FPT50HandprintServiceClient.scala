@@ -132,10 +132,10 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
           throw new ImageException
         }
       }
-      if(DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.packageHead.sendUnitCode)){
+      if(!DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.packageHead.sendUnitCode)){
         throw new DataPackageNotAvailableException("FPTX发送单位代码不在行政区划6_28规定的范围内,fsdw_gajgjgdm:" + fPT5File.get.packageHead.sendUnitCode)
       }
-      if(DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.latentPackage(0).latentCollectInfoMsg.extractUnitCode)){
+      if(!DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.latentPackage(0).latentCollectInfoMsg.extractUnitCode)){
         throw new DataPackageNotAvailableException("FPTX提取单位公安机关机构代码不在行政区划6_28规定的范围内,tqdw_gajgjgdm:" + fPT5File.get.latentPackage(0).latentCollectInfoMsg.extractUnitCode)
       }
       Option(fPT5File.get.latentPackage(0))
