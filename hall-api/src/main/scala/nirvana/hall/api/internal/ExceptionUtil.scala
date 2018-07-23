@@ -12,7 +12,7 @@ object ExceptionUtil {
     *
     * @param e 异常
     */
-  def getStackTraceInfo(e: Exception): String = {
+  def getStackTraceInfo[A<:Throwable](e: A): String = {
     var info = ""
     val writer = new StringWriter
     val printWriter = new PrintWriter(writer,true)
@@ -22,27 +22,6 @@ object ExceptionUtil {
         printWriter.flush
         writer.flush
       }
-    catch {
-      case exception: Exception => {
-        exception.printStackTrace()
-      }
-    } finally {
-      if (printWriter != null) printWriter.close()
-      if (writer != null) writer.close()
-    }
-    info
-  }
-
-  def getStackTraceInfoByThrowAble(throwAble:Throwable):String ={
-    var info = ""
-    val writer = new StringWriter
-    val printWriter = new PrintWriter(writer,true)
-    try{
-      throwAble.printStackTrace(printWriter)
-      info = writer.toString
-      printWriter.flush
-      writer.flush
-    }
     catch {
       case exception: Exception => {
         exception.printStackTrace()

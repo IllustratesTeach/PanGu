@@ -79,7 +79,7 @@ class FPT50HandPrintGetCaseNoCron(hallWebserviceConfig: HallWebserviceConfig
           }
       }
     }catch{
-      case NonFatal(e) => error("getCaseNo error:{},Error:{}",e.toString,ExceptionUtil.getStackTraceInfoByThrowAble(e))
+      case NonFatal(e) => error("getCaseNo error:{},Error:{}",e.toString,ExceptionUtil.getStackTraceInfo(e))
     }
   }
 }

@@ -198,7 +198,7 @@ override def checkFingerCardIsExist(personId: String, bussType: Int): Unit = {
       JdbcDatabase.update(sql_t3){ps=>
         ps.setString(1, UUID.randomUUID().toString.replace("-",""))
         ps.setString(2,uuid)
-        ps.setString(3,ExceptionUtil.getStackTraceInfoByThrowAble(throwAble.get)
+        ps.setString(3,ExceptionUtil.getStackTraceInfo(throwAble.get)
           + "&&" + throwAble.get.fillInStackTrace
           + "&&" + throwAble.get.getLocalizedMessage)
       }

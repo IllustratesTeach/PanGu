@@ -108,7 +108,7 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
             if(SurveyFatal.unapply(ex)){
               fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
             }
-            error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}",ExceptionUtil.getStackTraceInfoByThrowAble(ex)
+            error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}",ExceptionUtil.getStackTraceInfo(ex)
               ,new String(phyEvidenceNo)
               ,DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT))
             record.nState = survey.SURVEY_STATE_FAIL
