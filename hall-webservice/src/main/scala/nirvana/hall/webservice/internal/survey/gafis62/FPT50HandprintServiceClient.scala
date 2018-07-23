@@ -129,7 +129,7 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
 
       if(!Option(fPT5File.get.latentPackage.head.latentFingers).isEmpty){
         if(fPT5File.get.latentPackage.head.latentFingers.head.latentFingerImageMsg.latentFingerImageData.length != 512 *512){
-          throw new ImageException
+          throw new ImageException("image is error")
         }
       }
       if(!DictAdministrativeCode.loadAdministrativeCode.get.contains(fPT5File.get.packageHead.sendUnitCode)){
