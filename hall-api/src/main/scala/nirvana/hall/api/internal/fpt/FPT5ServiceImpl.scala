@@ -67,6 +67,18 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
       tPCardService.addTPCard(getTpCardBuilder(fingerprintPackage).build,dbId)
   }
 
+  /**
+    * 捺印一体化采集FPT5.0导入(不提取特征)
+    * @param fingerprintPackage
+    * @param dbId
+    */
+  override def addQualityFingerprintPackage(fingerprintPackage: FingerprintPackage, dbId: Option[String]): Unit = {
+    val tpCard = getQualityTpCardBuilder(fingerprintPackage).build
+    if(tPCardService.isExist(tpCard.getStrCardID)){
+      throw new Exception("人员编号记录已存在！")
+    }
+    tPCardService.addTPCard(tpCard,dbId)
+  }
 
 
   /**
@@ -195,6 +207,16 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
           }
         }
     }
+    tpCardBuilder
+  }
+
+  /**
+    * Quality 一体化采集 捺印proto
+    * @param fingerprintPackage
+    * @return
+    */
+  private def  getQualityTpCardBuilder(fingerprintPackage: FingerprintPackage) = {
+    val tpCardBuilder = FPT5Converter.convertFingerprintPackage2TPCard(fingerprintPackage).toBuilder
     tpCardBuilder
   }
 

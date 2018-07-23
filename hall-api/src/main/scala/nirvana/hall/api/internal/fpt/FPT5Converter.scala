@@ -188,6 +188,15 @@ object FPT5Converter {
               blobBuilder.setBPlain(false)
               blobBuilder.setFgp(FingerFgp.valueOf(t.fingerPositionCode.toInt))
             }
+            //自定义信息中保存捺印特征
+            if(t.fingerCustomInfo != null && t.fingerCustomInfo.length > 0){
+              val gafisImage = new GAFISIMAGESTRUCT().fromByteArray(t.fingerCustomInfo)
+              if(gafisImage.stHead.nWidth == 640 && gafisImage.stHead.nHeight == 640 && gafisImage.stHead.nSize == 64){
+                blobBuilder.setStMntBytes(ByteString.copyFrom(t.fingerCustomInfo))
+              }else{
+                throw new Exception ("特征格式不符合gafis特征格式")
+              }
+            }
             blobBuilder.setStImageBytes(ByteString.copyFrom(FPT5ImageConverter.convertTPFingerImageData2GafisImage(t).toByteArray(AncientConstants.GBK_ENCODING)))
           }
       }

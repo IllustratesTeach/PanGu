@@ -29,6 +29,13 @@ trait FPT5Service {
   def addFingerprintPackage(fingerprintPackage:FingerprintPackage,dbId: Option[String] = None):Unit
 
   /**
+    * 一体化采集捺印指纹导入(不提取特征)
+    * @param fingerprintPackage
+    * @param dbId
+    */
+  def addQualityFingerprintPackage(fingerprintPackage:FingerprintPackage,dbId: Option[String] = None):Unit
+
+  /**
     * 现场指纹导入
     * @param latentPackage
     */
