@@ -4,7 +4,6 @@ import java.io.File
 import java.util.Date
 import javax.activation.DataHandler
 
-import monad.support.services.MonadException
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.support.services.XmlLoader
@@ -18,7 +17,7 @@ import scala.io.Source
 
 
 /**
-  * Created by yuchen on 2017/7/24.
+  * Created by mengxin on 2018/7/24.
   */
 class WsQualityScoreServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
                                 fpt5Service: FPT5Service,
@@ -63,7 +62,7 @@ class WsQualityScoreServiceImpl(hallWebserviceConfig: HallWebserviceConfig,
         responseInfo.MSG = e.getMessage
         //记录错误日志
         error(e.getMessage)
-      case ex:MonadException =>
+      case ex: Throwable =>
         responseInfo.STATUS = "FAIL"
         responseInfo.MSG = "xsd校验未通过"+ ex.getMessage
       //记录错误日志

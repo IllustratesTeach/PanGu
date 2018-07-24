@@ -1,9 +1,9 @@
 package nirvana.hall.webservice.internal.quality
 
-import javax.xml.bind.annotation.{XmlAccessType, XmlAccessorType, XmlAttribute, XmlRootElement}
+import javax.xml.bind.annotation.{XmlAccessType, XmlAccessorType, XmlRootElement}
 
 /**
-  * Created by mx on 2017/11/22.
+  * Created by mx on 2018/7/17.
   */
 @XmlRootElement(name = "RESPONSE")
 @XmlAccessorType(XmlAccessType.FIELD)

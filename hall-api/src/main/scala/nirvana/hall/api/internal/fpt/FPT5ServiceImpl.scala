@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream
 import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
 import nirvana.hall.api.services.fpt.FPT5Service
-import nirvana.hall.api.services.fpt.exchange.FPTExchangeService
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{MatchRelationService, TPCardService, _}
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -19,7 +18,6 @@ import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
 
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by songpeng on 2017/11/3.
