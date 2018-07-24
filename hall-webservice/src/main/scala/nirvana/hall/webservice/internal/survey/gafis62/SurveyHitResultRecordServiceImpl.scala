@@ -142,7 +142,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       //捺印指纹_警综人员编号--nyzw_jzrybh |(R[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}) //加校验，如果不为空就校验，不符合要求就修改
       ltHitPkg.fingerPrintJingZongPersonId = tpCard.getStrJingZongPersonId
       //捺印指纹_案事件相关人员编号--nyzw_asjxgrybh |(P[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4}) //加校验，如果不为空就校验，不符合要求就修改
-      ltHitPkg.fingerPrintPersonId = appendPersonNoHeadLetter(tpCard.getStrPersonID).replace("R","P")
+      ltHitPkg.fingerPrintPersonId = ""//appendPersonNoHeadLetter(tpCard.getStrPersonID).replace("R","P")
       //捺印指纹_指掌纹卡编号--nyzw_zzhwkbh maxLength value="23"
       ltHitPkg.fingerPrintCardId = fingerCardId
       //捺印指纹_指掌位代码--nyzw_zzhwdm

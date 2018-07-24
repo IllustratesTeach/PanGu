@@ -1,7 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
 
-import nirvana.hall.c.services.gloclib.survey.SURVEYRECORD
+import nirvana.hall.c.services.gloclib.survey.{SURVEYHITRESULTRECORD, SURVEYRECORD}
 import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 
@@ -11,9 +11,9 @@ import nirvana.hall.v62.internal.V62Facade
 class SurveyTableMaintenanceService(v62Facade: V62Facade
                              , v62Config: HallV62Config) {
 
-  def updateSurveyHitResultStateByOraSid(dbid:Short,tid:Short,oraSid:String,value:String): Unit ={
+  def updateSurveyRecordStateByOraSid(sid:String,value:String): Unit ={
 
-    val statement = Option("($$SID=%s)".format(oraSid))
+    val statement = Option("($$SID=%s)".format(sid))
     val mapper = Map("kno"->"szKNo"
       ,"fingerid"->"szFingerid"
       ,"physicalevidenceno" -> "szPhyEvidenceNo"
@@ -24,8 +24,8 @@ class SurveyTableMaintenanceService(v62Facade: V62Facade
       ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
 
     val result = v62Facade.queryV62Table[SURVEYRECORD](
-      dbid,
-      tid,
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYRECORD,
       mapper,
       statement,
       1)
@@ -37,5 +37,31 @@ class SurveyTableMaintenanceService(v62Facade: V62Facade
     v62Facade.NET_GAFIS_SURVEYRECORD_UPDATE(V62Facade.DBID_SURVEY
       , V62Facade.TID_SURVEYRECORD
       ,surveyRecord)
+  }
+
+
+  def updateSurveyHitResultStateByOraSid(sid:String,value:String): Unit ={
+    val statement = Option("($$SID=%s)".format(sid))
+    val mapper = Map("FINGERID"->"szFingerid"
+      ,"HITFINGERID" -> "szHitFingerID"
+      ,"ORASID" -> "nOraSID"
+      ,"QUEUETYPE" -> "nQueryType"
+      ,"STATE" -> "nState"
+      ,"HITFGP" -> "nHitFgp")
+
+    val result = v62Facade.queryV62Table[SURVEYHITRESULTRECORD](
+      V62Facade.DBID_SURVEY,
+      V62Facade.TID_SURVEYHITRESULTRECORD,
+      mapper,
+      statement,
+      1)
+
+    var surveyHitResultRecord = new SURVEYHITRESULTRECORD
+    surveyHitResultRecord = result.headOption.getOrElse(throw new Exception("not get struts"))
+    surveyHitResultRecord.nState = value.toInt.toByte
+
+    v62Facade.NET_GAFIS_SURVEYHITRESULTRECORD_UPDATE(V62Facade.DBID_SURVEY
+      , V62Facade.TID_SURVEYHITRESULTRECORD
+      ,surveyHitResultRecord)
   }
 }

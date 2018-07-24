@@ -23,29 +23,33 @@ class Index {
   private var surveyTableMaintenanceService:SurveyTableMaintenanceService = _
 
 
-
+  private val LIST:String = "list"
+  private val HIT:String = "hit"
 
   def onActivate: StreamResponse = {
     var result = ""
-    val dbid = request.getParameter("dbid")
-    val tableid = request.getParameter("tid")
-    val orasid = request.getParameter("sid")
+    val modifyType = request.getParameter("type")
+    val sid = request.getParameter("sid")
     val values = request.getParameter("v")
 
     try{
-      if(null == dbid || dbid.length <=0){
-        throw new Exception("dbid can not empty")
+      if(Option(modifyType).isEmpty || Option(modifyType.trim).get.isEmpty){
+        throw new Exception("type can not empty")
       }
-      if(null == tableid || tableid.length <=0){
-        throw new Exception("tid can not empty")
-      }
-      if(null == orasid || orasid.length <=0){
+      if(Option(sid).isEmpty || Option(sid.trim).get.isEmpty){
         throw new Exception("sid can not empty")
       }
-      if(null == values || values.length <=0){
+      if(Option(values).isEmpty || Option(values.trim).get.isEmpty){
         throw new Exception("v can not empty")
       }
-      surveyTableMaintenanceService.updateSurveyHitResultStateByOraSid(dbid.toShort,tableid.toShort,orasid,values)
+      if(modifyType.equals(LIST)){
+        surveyTableMaintenanceService.updateSurveyRecordStateByOraSid(sid,values)
+      }else if(modifyType.equals(HIT)){
+        surveyTableMaintenanceService.updateSurveyHitResultStateByOraSid(sid,values)
+      }else{
+        throw new Exception("input's type error:" + modifyType);
+      }
+
       result = "OK"
     }catch{
       case e:Exception =>
