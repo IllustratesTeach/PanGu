@@ -386,6 +386,7 @@ object galoclpConverter extends LoggerSupport{
       appendTextStruct(buffer, "CaseIncidentNo", protoCase.getStrJingZongCaseId) //案事件编号
       appendTextStruct(buffer, "ExtractDateTime", text.getStrExtractDate) // 提取时间日期时间类型
       appendTextStruct(buffer, "CaseSource", protoCase.getStrCaseSource.toString) //案件来源
+      appendTextStruct(buffer, "Comment", text.getStrBriefCase) //简要案情 5.0
       gafisCase.pstText_Data = buffer.toArray
       gafisCase.nTextItemCount = gafisCase.pstText_Data.length.asInstanceOf[Short]
     }

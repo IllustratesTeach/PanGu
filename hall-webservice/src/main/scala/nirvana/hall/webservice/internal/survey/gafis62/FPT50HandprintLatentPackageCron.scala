@@ -33,7 +33,7 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
 
     if(hallWebserviceConfig.handprintService.getLatentPackageCron!= null){
       //根据现勘列表获取现场指纹FPT5数据
-      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.cron, StartAtDelay), "survey-cron-getLatentPackage", new Runnable {
+      periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.getLatentPackageCron, StartAtDelay), "survey-cron-getLatentPackage", new Runnable {
         override def run(): Unit = {
           try {
             info("begin getLatentPackage")
