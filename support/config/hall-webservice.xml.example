@@ -23,7 +23,10 @@
     <upload_checkin_cron>30 * * * * ? *</upload_checkin_cron>
 </union4pfmip>
     <handprintService>
-        <cron>0 * * * * ? *</cron>
+        <cron>0 0/1 * * * ? *</cron>
+        <get_caseno_cron>0 0/5 * * * ? *</get_caseno_cron>
+        <send_hit_cron>0 0/10 * * * ? *</send_hit_cron>
+        <get_latent_package_cron>0 0/3 * * * ? *</get_latent_package_cron>
         <url>http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl</url>
         <target_namespace>http://xckyservice.hisign.com/</target_namespace>
         <user>AFIS_JZ</user>
