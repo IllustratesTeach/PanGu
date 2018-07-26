@@ -137,15 +137,37 @@ object TextQueryUtil extends LoggerSupport{
       if(json.has(endKey)){
         end = json.getString(endKey).trim
       }
-      if(beg.nonEmpty || end.nonEmpty){//如果有人员编号区间
-        if(isLatent){
-          return getCaseidGroupQuery(beg, end)
-        }else{
-          return getPersonidGroupQuery(beg, end)
-        }
-      }
+
+      getGroupQuery(beg, end, isLatent)
+    }else{
+      null
     }
-    null
+  }
+
+  /**
+    * 根据人员编号或者案件编号的值，一个区间，使用GroupQuery包裹
+    * @param startKey 开始条码
+    * @param endKey 结束条码
+    * @param isLatent 是否现场
+    * @return
+    */
+  def getGroupQuery(startKey: String, endKey: String, isLatent: Boolean): GroupQuery={
+    if(startKey == null && endKey == null){
+      return null
+    }
+    //这里赋值为空字符串，为了减少对null的判断
+    var keyBeg = startKey
+    var keyEnd = endKey
+    if(keyBeg == null)
+      keyBeg = ""
+    if(keyEnd == null)
+      keyEnd = ""
+
+    if(isLatent){
+      getCaseidGroupQuery(keyBeg, keyEnd)
+    }else{
+      getPersonidGroupQuery(keyBeg, keyEnd)
+    }
   }
 
   /**

@@ -23,6 +23,7 @@
       <finger_latent_size>640</finger_latent_size>
       <!-- 是否转换新特征 -->
       <is_new_feature>false</is_new_feature>
+      <has_ridge>true</has_ridge>
     </mnt>
 </hall_matcher>
 

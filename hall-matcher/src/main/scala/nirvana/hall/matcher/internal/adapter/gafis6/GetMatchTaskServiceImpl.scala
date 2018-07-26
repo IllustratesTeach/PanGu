@@ -214,8 +214,8 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
   }
 
   private def getGroupQuery(startKey1: String, endKey1: String, startKey2: String, endKey2: String, isLatent: Boolean): GroupQuery={
-    val groupQuery1 = getGroupQuery(startKey1, endKey1, isLatent)
-    val groupQuery2 = getGroupQuery(startKey2, endKey2, isLatent)
+    val groupQuery1 = TextQueryUtil.getGroupQuery(startKey1, endKey1, isLatent)
+    val groupQuery2 = TextQueryUtil.getGroupQuery(startKey2, endKey2, isLatent)
     if(groupQuery1 != null || groupQuery2 != null){
       val groupQuery = GroupQuery.newBuilder()
       if(groupQuery1 != null){
@@ -230,25 +230,5 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
       null
     }
   }
-
-  private def getGroupQuery(startKey: String, endKey: String, isLatent: Boolean): GroupQuery={
-    if(startKey == null && endKey == null){
-      return null
-    }
-    //这里赋值为空字符串，为了减少对null的判断
-    var keyBeg = startKey
-    var keyEnd = endKey
-    if(keyBeg == null)
-      keyBeg = ""
-    if(keyEnd == null)
-      keyEnd = ""
-
-    if(isLatent){
-      TextQueryUtil.getCaseidGroupQuery(keyBeg, keyEnd)
-    }else{
-      TextQueryUtil.getPersonidGroupQuery(keyBeg, keyEnd)
-    }
-  }
-
 
  }
