@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, GafisConverter, TextQueryUtil}
@@ -19,7 +20,7 @@ import org.jboss.netty.buffer.ChannelBuffers
 /**
   * Created by songpeng on 16/4/8.
   */
-class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
+class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtractor: FeatureExtractor, implicit val dataSource: DataSource) extends GetMatchTaskService with LoggerSupport{
    /** 获取比对任务  */
   private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag, t.startkey1, t.endkey1, t.startkey2, t.endkey2 " +
   " from NORMALQUERY_QUERYQUE t where rowid in " +
@@ -110,11 +111,22 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, implicit val
          }
          val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
          val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
-         val mnt = micStruct.pstMnt_Data
+         var mnt = micStruct.pstMnt_Data
+         //TT，TL查询老特征转新特征
+         if (hallMatcherConfig.mnt.isNewFeature && !isPalm && (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL)) {
+           mnt = featureExtractor.ConvertMntOldToNew(ByteString.copyFrom(mnt).newInput()).get
+         }
          tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
          //纹线数据
-         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
-           tdata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
+           val binData = ByteString.copyFrom(micStruct.pstBin_Data)
+           val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
+           if(binData.size != dataSizeExpected && binData.size - dataSizeExpected < 4){
+             tdata.setRidge(binData.substring(0, dataSizeExpected))
+           }else{
+             tdata.setRidge(binData)
+           }
+         }
        }
      }
      //条码区间查询

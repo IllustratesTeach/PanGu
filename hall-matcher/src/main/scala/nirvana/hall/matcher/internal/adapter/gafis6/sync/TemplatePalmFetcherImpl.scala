@@ -14,13 +14,12 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
  * gafis6.2捺印掌纹分库
  */
 class TemplatePalmFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplatePalmFetcher{
-//  override val MAX_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("max"))} from normaltp_tpcardinfo t "
-//  override val MIN_SEQ_SQL: String = s"select ${wrapUpdateTimeAsLong(Some("min"))} from normaltp_tpcardinfo t " +
-//    s"where ${wrapUpdateTimeAsLong()} >"
+//  override val MAX_SEQ_SQL: String = s"select max(seq) from normaltp_tpcardinfo_seq t "
+//  override val MIN_SEQ_SQL: String = s"select min(seq) from normaltp_tpcardinfo_seq t where seq >"
+//  override val SYNC_SQL = s"select t.ora_sid as sid, seq from normaltp_tpcardinfo_mod t where seq >? and seq <=? order by seq"
   override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))} from normaltp_tpcardinfo_mod t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod t " +
-    s"where ${wrapModTimeAsLong()} >"
-  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
+  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))} from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >"
+  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normaltp_tpcardinfo_mod t where ${wrapModTimeAsLong()} >? and ${wrapModTimeAsLong()} <=? order by seq"
   val SELECT_PALM_SQL: String = s"select t.ora_sid as sid, t.palmlmnt, t.palmrmnt from normaltp_tpcardinfo t where t.ora_sid =? "
 
   override def readResultSet(syncDataResponse: SyncDataResponse.Builder, rs: ResultSet, size: Int): Unit = {
