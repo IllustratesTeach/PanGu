@@ -33,4 +33,25 @@ class SyncDataServiceImplTest extends BaseHallMatcherTestCase{
     println(TextData.parseFrom(response.getSyncData(0).getData))
     Assert.assertTrue(response.getSyncDataCount >=5)
   }
+  @Test
+  def test_syncTemplateFinger: Unit ={
+    val service = getService[SyncDataService]
+    val request = SyncDataRequest.newBuilder()
+    request.setSize(10)
+    request.setTimestamp(0)
+    request.setSyncDataType(SyncDataType.TEMPLATE_FINGER)
+    val response = service.syncData(request.build())
+    Assert.assertTrue(response.getSyncDataCount >= 10)
+    request.setSyncDataType(SyncDataType.TEMPLATE_PALM)
+  }
+  @Test
+  def test_syncLatentFinger: Unit ={
+    val service = getService[SyncDataService]
+    val request = SyncDataRequest.newBuilder()
+    request.setSize(5)
+    request.setTimestamp(0)
+    request.setSyncDataType(SyncDataType.LATENT_FINGER)
+    val response = service.syncData(request.build())
+    Assert.assertTrue(response.getSyncDataCount > 1)
+  }
 }

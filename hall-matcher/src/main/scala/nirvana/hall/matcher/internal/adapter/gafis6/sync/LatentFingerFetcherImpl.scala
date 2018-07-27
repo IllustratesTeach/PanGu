@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.matcher.HallMatcherSymobls
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.service.LatentFingerFetcher
 import nirvana.hall.support.services.JdbcDatabase
@@ -15,12 +16,22 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.OperationType
  * gafis6.2现场指纹分库
   */
 class LatentFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with LatentFingerFetcher{
-//  override val MAX_SEQ_SQL: String = s"select max(seq)  from normallp_latfinger_seq t "
-//  override val MIN_SEQ_SQL: String = s"select min(seq)  from normallp_latfinger_seq t where seq >"
-//  override val SYNC_SQL = s"select t.ora_sid as sid, seq from normallp_latfinger_seq t where seq >? and seq<=? order by seq"
-  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >"
-  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >? and ${wrapModTimeAsLong()} <=? order by seq"
+  private val fast = hallMatcherConfig.module.equals(HallMatcherSymobls.MODULE_GAFIS6FAST)
+  override val MAX_SEQ_SQL: String = if (fast) {
+    s"select max(seq) from normallp_latfinger_seq t "
+  } else {
+    s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
+  }
+  override val MIN_SEQ_SQL: String = if (fast) {
+    s"select min(seq)  from normallp_latfinger_seq t where seq >"
+  } else {
+    s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >"
+  }
+  override val SYNC_SQL = if (fast) {
+    s"select t.ora_sid as sid, seq from normallp_latfinger_seq t where seq >=? and seq<=? order by seq"
+  } else {
+    s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
+  }
   /** 同步现场指纹 */
   val SELECT_LPCARD_SQL: String = s"select t.ora_sid as sid, t.fingermnt, t.fingerbin from normallp_latfinger t where t.ora_sid =?"
 

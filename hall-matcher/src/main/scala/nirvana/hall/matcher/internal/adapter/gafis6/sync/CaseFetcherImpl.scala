@@ -5,6 +5,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.matcher.HallMatcherSymobls
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.{DataConverter, TextQueryConstants, TextQueryUtil}
 import nirvana.hall.matcher.service.CaseFetcher
@@ -19,10 +20,22 @@ import nirvana.protocol.TextQueryProto.TextData.ColType
   * Created by songpeng on 2017/12/4.
   */
 class CaseFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with CaseFetcher{
-  override val MAX_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
-  override val MIN_SEQ_SQL: String = s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t where ${wrapModTimeAsLong()}  >"
-
-  override val SYNC_SQL = s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
+  private val fast = hallMatcherConfig.module.equals(HallMatcherSymobls.MODULE_GAFIS6FAST)
+  override val MAX_SEQ_SQL: String = if(fast){
+    s"select max(seq) from normallp_latfinger_seq t "
+  }else{
+    s"select ${wrapModTimeAsLong(Some("max"))}  from normallp_latfinger_mod t "
+  }
+  override val MIN_SEQ_SQL: String = if(fast){
+    s"select min(seq) from normallp_latfinger_seq t where seq >"
+  }else{
+    s"select ${wrapModTimeAsLong(Some("min"))}  from normallp_latfinger_mod t where ${wrapModTimeAsLong()}  >"
+  }
+  override val SYNC_SQL = if (fast) {
+    s"select t.ora_sid as sid, seq from normallp_latfinger_seq t where seq >=? and seq<=? order by seq"
+  } else {
+    s"select t.ora_sid as sid, ${wrapModTimeAsLong()} as seq from normallp_latfinger_mod t where ${wrapModTimeAsLong()} >=? and ${wrapModTimeAsLong()} <=? order by seq"
+  }
 
   val SELECT_LPCARD_TEXT_SQL: String = s"select t.ora_sid as sid " +
     s", t.FingerID " + TextQueryConstants.COL_NAME6_FINGERID +
