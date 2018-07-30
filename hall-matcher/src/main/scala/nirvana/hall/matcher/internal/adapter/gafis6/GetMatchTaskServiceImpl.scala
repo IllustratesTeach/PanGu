@@ -24,7 +24,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
    /** 获取比对任务  */
   private val MATCH_TASK_QUERY: String = "select t.ora_sid ora_sid, t.keyid, t.querytype, t.maxcandnum, t.minscore, t.priority, t.mic, t.qrycondition, t.flag, t.startkey1, t.endkey1, t.startkey2, t.endkey2 " +
   " from NORMALQUERY_QUERYQUE t where rowid in " +
-  " (select rid from (select rowid rid from NORMALQUERY_QUERYQUE t1 where t1.status = 0 order by t1.priority desc, t1.ora_sid) tt where rownum <= ?)"
+  " (select rid from (select rowid rid from NORMALQUERY_QUERYQUE t1 where t1.status = 0 and t1.rmtflag in (0,2) order by t1.priority desc, t1.ora_sid) tt where rownum <= ?)"
 
   /** 获取sid根据卡号（人员编号） */
    private val GET_SID_BY_PERSONID: String = "select t.ora_sid from normaltp_tpcardinfo t where t.cardid=?"

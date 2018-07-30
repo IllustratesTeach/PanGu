@@ -131,11 +131,23 @@ class PersonFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit 
       //其他字段
       val birthdate = rs.getString(TextQueryConstants.COL_NAME6_BIRTHDATE)
       if(birthdate != null && birthdate.length > 0){
-        textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_BIRTHDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(birthdate.toLong)))
+        try{
+          val value = DataConverter.long2Bytes(birthdate.toLong)
+          textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_BIRTHDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(value))
+        }catch {
+          case e: Exception =>
+            warn("ora_sid {} col {} value {}", sid, TextQueryConstants.COL_NAME6_BIRTHDATE, birthdate)
+        }
       }
       val printdate= rs.getString(TextQueryConstants.COL_NAME6_PRINTDATE)
       if(printdate != null && printdate.length > 0){
-        textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_PRINTDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(printdate.toLong)))
+        try{
+          val value = DataConverter.long2Bytes(printdate.toLong)
+          textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_PRINTDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(value))
+        }catch {
+          case e: Exception =>
+            warn("ora_sid {} col {} value {}", sid, TextQueryConstants.COL_NAME6_PRINTDATE, printdate)
+        }
       }
       //人员编号
       val cardId = rs.getString(TextQueryConstants.COL_NAME6_CARDID)

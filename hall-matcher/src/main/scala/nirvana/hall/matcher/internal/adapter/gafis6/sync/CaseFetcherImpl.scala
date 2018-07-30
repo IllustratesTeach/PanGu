@@ -118,11 +118,23 @@ class CaseFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit va
       //其他字段
       val caseOccorDate = rs.getString(TextQueryConstants.COL_NAME6_CASEOCCURDATE)
       if(caseOccorDate != null && caseOccorDate.length > 0){
-        textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_CASEOCCURDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(caseOccorDate.toLong)))
+        try{
+          val value = DataConverter.long2Bytes(caseOccorDate.toLong)
+          textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_CASEOCCURDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(value))
+        }catch {
+          case e: Exception =>
+            warn("ora_sid {} col {} value {}", sid, TextQueryConstants.COL_NAME6_CASEOCCURDATE, caseOccorDate)
+        }
       }
       val brokenDate= rs.getString(TextQueryConstants.COL_NAME6_BROKENDATE)
       if(brokenDate != null && brokenDate.length > 0){
-        textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_BROKENDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(DataConverter.long2Bytes(brokenDate.toLong)))
+        try{
+          val value = DataConverter.long2Bytes(brokenDate.toLong)
+          textData.addColBuilder().setColName(TextQueryConstants.COL_NAME6_BROKENDATE).setColType(ColType.LONG).setColValue(ByteString.copyFrom(value))
+        }catch {
+          case e: Exception =>
+            warn("ora_sid {} col {} value {}", sid, TextQueryConstants.COL_NAME6_BROKENDATE, brokenDate)
+        }
       }
       //案件编号
       val caseId = rs.getString(TextQueryConstants.COL_NAME6_CASEID)
