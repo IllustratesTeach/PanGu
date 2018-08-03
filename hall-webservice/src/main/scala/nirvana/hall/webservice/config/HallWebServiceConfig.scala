@@ -83,6 +83,8 @@ class HandprintServiceConfig{
   var surveyV62ServiceConfig :Array[SurveyV62ServerConfig] = _
   @XmlElement(name = "survey_hit_result_head_info")
   var surveyHitResultHeadPackageInfo = new SurveyHitResultHeadPackageInfo
+  @XmlElement(name = "platform_operatorinfo_provider_class")
+  var platformOperatorInfoProviderClass: String = _
 }
 
 /**

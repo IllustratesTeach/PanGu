@@ -12,7 +12,7 @@ import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.config.{HallWebserviceConfig, SurveyConfig}
-import nirvana.hall.webservice.internal.survey.{SurveyConstant, SurveyFatal}
+import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant, SurveyFatal}
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
@@ -30,6 +30,12 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
                                 fPT5Service: FPT5Service) extends LoggerSupport{
 
   val fPT50HandprintServiceClient = new FPT50HandprintServiceClient(hallWebserviceConfig.handprintService)
+  var provider:Option[PlatformOperatorInfoProvider] = None
+  if(hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass != null){
+    provider = Option(PlatformOperatorInfoProviderLoader.createProvider)
+  }
+
+
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
 

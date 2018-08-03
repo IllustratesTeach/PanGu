@@ -258,6 +258,11 @@
                     <xs:documentation>比中关系头信息</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="platform_operatorinfo_provider_class" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>平台操作信息提供类</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 
