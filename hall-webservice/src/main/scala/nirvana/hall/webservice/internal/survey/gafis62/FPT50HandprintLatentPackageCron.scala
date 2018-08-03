@@ -62,15 +62,17 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
   def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 10)
     info("获取recordlist数量:{}",recordList.size)
-    var phyEvidenceNo = Array.emptyByteArray
+    var phyEvidenceNo = ""
     if (recordList.nonEmpty) {
       recordList.foreach { record =>
         try {
-          phyEvidenceNo = record.szPhyEvidenceNo.getBytes()
+          phyEvidenceNo = record.szPhyEvidenceNo
           val latentPackageOp = fPT50HandprintServiceClient.getLatentPackage(record.szPhyEvidenceNo)
           if (latentPackageOp.nonEmpty) {
+            info("success return DataPackage================================")
             val resultType = FPT50HandprintServiceConstants.RESULT_TYPE_ADD
             //保存数据
+            info("start save 6.2==============================")
             fPT5Service.addLatentPackage(latentPackageOp.get)
             info("入库成功，现场物证编号：" + record.szPhyEvidenceNo)
 
@@ -106,13 +108,15 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
         }catch {
           case ex: Throwable =>
             if(SurveyFatal.unapply(ex)){
-              fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
+              val result = fPT50HandprintServiceClient.sendFBUseCondition(record.szPhyEvidenceNo, FPT50HandprintServiceConstants.RESULT_TYPE_ERROR)
+              info("sendFBUseCondition method return value:" + result)
             }
             error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}",ExceptionUtil.getStackTraceInfo(ex)
               ,new String(phyEvidenceNo)
               ,DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT))
             record.nState = survey.SURVEY_STATE_FAIL
             surveyRecordService.updateSurveyRecord(record)
+            info("Gafis state Modify success")
         }
       }
       getLatentPackage

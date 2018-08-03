@@ -84,20 +84,12 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
       ,"STATE" -> "nState"
       ,"POLICEINCIDENTEXIST" -> "PoliceIncidentExist")
 
-    val a = v62Facade.queryV62Table[SURVEYRECORD](
+    v62Facade.queryV62Table[SURVEYRECORD](
       V62Facade.DBID_SURVEY,
       V62Facade.TID_SURVEYRECORD,
       mapper,
       statement,
       10)
-    a.foreach{
-      t =>
-        if(null == t.szKNo){
-          println("getSurveyRecordWithPoliceIncidentIsNotExist null")
-        }
-        println("kNO:" + t.szKNo)
-    }
-    a
   }
 
   override def getCaseIdByKNo(kNo:String): Option[String] ={

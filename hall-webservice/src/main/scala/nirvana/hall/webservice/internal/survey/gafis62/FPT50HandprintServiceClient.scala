@@ -109,17 +109,17 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
   def getLatentPackage(xcwzbh: String):Option[LatentPackage]={
     info("getFingerPrint：现场物证编号:{}",xcwzbh)
     val unitcode = xcwzbh.substring(1,7)
+    info("start request DataPackage ============")
     val dataHandler = fPT50HandprintService.getFingerPrint(userID, password, xcwzbh)
+    info("end request DataPackage completed ============")
     if(dataHandler.getInputStream.available() > 0){
       val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator
         + "getfingerprint", xcwzbh, unitcode)
-      if(handprintServiceConfig.isDeleteFileZip){
-        //TODO 删除ZIP文件操作
-      }
       val latentPackageStr = Source.fromInputStream(inputStream).mkString
       val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/"))
-
+      info("saved and pass xsd check")
       if(handprintServiceConfig.isCheckAsjbh){
+        info("in asjbh check.....")
         if(Option(fPT5File.get.latentPackage.head.caseMsg.caseId).isEmpty
           && Option(fPT5File.get.latentPackage.head.caseMsg.caseId).get.isEmpty){
           throw new DataPackageNotAvailableException("asjbh is Empty")
@@ -150,6 +150,11 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     * @param xcwzbh 现场物证编号，必填
     * @param resultType 反馈信息，必填 FPT50HandprintServiceConstants.RESULT_TYPE_XXX
     * @return FPT50HandprintServiceConstants.SEND_FBUSE_CONDITION_RESPONSE_XXX
+    *
+    *  -1：现场物证编号不存在
+        0：反馈失败
+        1：反馈成功
+    *
     */
   def sendFBUseCondition(xcwzbh: String, resultType: String): String={
     info("现场物证编号:{},sendFBUseCondition:{}",xcwzbh,resultType)
