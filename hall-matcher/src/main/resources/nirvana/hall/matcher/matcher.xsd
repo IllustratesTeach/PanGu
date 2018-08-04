@@ -50,6 +50,11 @@
                     <xs:documentation>候选条码过滤条件配置</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="resetSeqConfig" name="reset_seq" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>SYNC分库seq值重置</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="mntType">
@@ -131,6 +136,16 @@
                     <xs:documentation>sql 用于查询需要提取特征的sql,使用sysdate,返回personid列表</xs:documentation>
                 </xs:annotation>
             </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="resetSeqConfig">
+        <xs:sequence>
+            <xs:element type="xs:int" name="person_seq" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:int" name="case_seq" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:int" name="finger_template_seq" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:int" name="palm_template_seq" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:int" name="finger_latent_seq" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:int" name="palm_latent_seq" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
