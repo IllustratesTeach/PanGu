@@ -130,8 +130,13 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
         tdata.setMinutia(ByteString.copyFrom(mnt)).setPos(pos)
         //纹线数据
         if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
-          val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
-          tdata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
+          val binData = ByteString.copyFrom(micStruct.pstBin_Data)
+          val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
+          if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
+            tdata.setRidge(binData.substring(0, dataSizeExpected))
+          }else{
+            tdata.setRidge(binData)
+          }
         }
       }
     }

@@ -5,6 +5,7 @@ import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
+import nirvana.hall.c.services.gloclib.glocdef
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
@@ -110,7 +111,12 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
            tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
          }
          val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
-         val pos = DataConverter.fingerPos6to8(micStruct.nItemData)//掌纹1，2 使用指纹指位转换没有问题
+         var nItemData = micStruct.nItemData
+         if(micStruct.nItemType == glocdef.GAMIC_ITEMTYPE_PLAINFINGER){
+           //如果是平面指纹,+10
+           nItemData += 10
+         }
+         val pos = DataConverter.fingerPos6to8(nItemData)//掌纹1，2 使用指纹指位转换没有问题
          var mnt = micStruct.pstMnt_Data
          //TT，TL查询老特征转新特征
          if (hallMatcherConfig.mnt.isNewFeature && !isPalm && (queryType == HallMatcherConstants.QUERY_TYPE_TT || queryType == HallMatcherConstants.QUERY_TYPE_TL)) {
@@ -121,7 +127,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
          if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
            val binData = ByteString.copyFrom(micStruct.pstBin_Data)
            val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
-           if(binData.size != dataSizeExpected && binData.size - dataSizeExpected < 4){
+           if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
              tdata.setRidge(binData.substring(0, dataSizeExpected))
            }else{
              tdata.setRidge(binData)
