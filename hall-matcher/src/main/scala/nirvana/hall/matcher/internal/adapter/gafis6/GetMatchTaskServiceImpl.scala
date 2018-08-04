@@ -112,7 +112,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
          }
          val tdata = tdataBuilderMap(index).addMinutiaDataBuilder()
          var nItemData = micStruct.nItemData.toInt
-         if(micStruct.nItemType == glocdef.GAMIC_ITEMTYPE_PLAINFINGER){
+         if(micStruct.nItemType == glocdef.GAMIC_ITEMTYPE_TPLAIN){
            //如果是平面指纹,+10
            nItemData += 10
          }
