@@ -50,8 +50,13 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig,
       while (it.hasNext){
         val syncData = it.next()
         if(syncData.getMinutiaType == MinutiaType.FINGER){
-          val mnt = featureExtractor.ConvertMntOldToNew(syncData.getData.newInput()).get
-          syncData.setData(ByteString.copyFrom(mnt))
+          try{
+            val mnt = featureExtractor.ConvertMntOldToNew(syncData.getData.newInput()).get
+            syncData.setData(ByteString.copyFrom(mnt))
+          }catch {
+            case e:Exception=>
+              error("ConvertMntOldToNew error {}",e.getMessage)
+          }
         }
       }
     }

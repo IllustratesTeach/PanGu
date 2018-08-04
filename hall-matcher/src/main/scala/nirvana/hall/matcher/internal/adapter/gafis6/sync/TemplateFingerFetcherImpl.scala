@@ -90,7 +90,7 @@ class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override i
             //纹线数据处理
             val binData = ByteString.copyFrom(bin)
             val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
-            if(binData.size != dataSizeExpected && binData.size - dataSizeExpected < 4){
+            if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
               syncData.setData(binData.substring(0, dataSizeExpected))
             }else{
               syncData.setData(binData)
