@@ -27,6 +27,8 @@ class HallMatcherConfig extends LogFileSupport with LocalStoreConfigSupport with
   var autoCheck: AutoCheckConfig = _
   @XmlElement(name = "auto_extract_feature")
   var autoExtractFeature: AutoExtractFeatureConfig = _
+  @XmlElement(name = "reset_seq")
+  var resetSeq: ResetSeqConfig = _
 }
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MntSizeConfig")
@@ -69,4 +71,21 @@ class AutoExtractFeatureConfig{
   var cron:String = "0 0 0 * * ? *"
   @XmlElement(name = "timeout")
   var sql: String = ""
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlElement(name = "ResetSeqConfig")
+class ResetSeqConfig{
+  @XmlElement(name = "person_seq")
+  var personSeq = 0
+  @XmlElement(name = "case_seq")
+  var caseSeq = 0
+  @XmlElement(name = "finger_template_seq")
+  var fingerTemplateSeq = 0
+  @XmlElement(name = "palm_template_seq")
+  var palmTemplateSeq = 0
+  @XmlElement(name = "finger_latent_seq")
+  var fingerLatentSeq = 0
+  @XmlElement(name = "palm_latent_seq")
+  var palmLatentSeq = 0
 }

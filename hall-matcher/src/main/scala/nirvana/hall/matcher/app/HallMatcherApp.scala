@@ -35,6 +35,7 @@ with BootstrapTextSupport{
       case "sh" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_SH)
       case "gafis6"|"gafis6fast" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_GAFIS6)
       case "nj" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_NJ)
+      case "reset" => Class.forName(HallMatcherSymobls.SERVICE_MODULE_RESET)
       case other =>
         throw new UnsupportedOperationException(" module "+other.toString+" unsupported")
     }
