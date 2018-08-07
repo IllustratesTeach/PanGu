@@ -459,7 +459,6 @@ object TextQueryUtil extends LoggerSupport{
                  TextQueryConstants.COL_NAME6_ADDRESSCODE |
                  TextQueryConstants.COL_NAME6_ADDRESSTAIL |
                  TextQueryConstants.COL_NAME6_HUKOUPLACECODE |
-                 TextQueryConstants.COL_NAME6_HUKOUPLACECODE |
                  TextQueryConstants.COL_NAME6_PERSONSTATE |
                  TextQueryConstants.COL_NAME6_PRINTERUNITNAMETAIL |
                  TextQueryConstants.COL_NAME6_PRINTERUNITCODE |
