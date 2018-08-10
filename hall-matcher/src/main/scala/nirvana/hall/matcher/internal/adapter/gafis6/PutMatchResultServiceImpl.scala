@@ -32,7 +32,14 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
     if (matchResultRequest.getStatus.getCode == 0) {
-      addMatchResult(matchResultRequest)
+      val matchId = matchResultRequest.getMatchId
+      //如果正在比对任务列表包含该任务，则记录结果，否则直接返回
+      if(MatchScheduler.matchingJobs.contains(matchId)){
+        MatchScheduler.matchingJobs.remove(matchId)
+        addMatchResult(matchResultRequest)
+      }else{
+        warn("PutMatchResultServiceImpl unknown oraSid {} ", matchId)
+      }
     } else {
       updateMatchStatusFail(matchResultRequest.getMatchId, matchResultRequest.getStatus)
     }

@@ -45,7 +45,15 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
      } { rs =>
        val oraSid = rs.getString("ora_sid")
        try {
-         matchTaskQueryResponse.addMatchTask(readMatchTask(rs))
+         if(MatchScheduler.matchingJobs.contains(oraSid)){
+           warn("ora_sid {} is matching", oraSid)
+         }else{
+           val matchTask = readMatchTask(rs)
+           //更新status
+           updateStatusMatching(oraSid)
+           MatchScheduler.matchingJobs + oraSid
+           matchTaskQueryResponse.addMatchTask(matchTask)
+         }
        }
        catch {
          case e: Exception =>
@@ -177,9 +185,6 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
            f._2.setTextQuery(textQueryDataBuilder)
          }
      }
-
-     //更新status
-     updateStatusMatching(oraSid)
 
      matchTaskBuilder.build()
    }

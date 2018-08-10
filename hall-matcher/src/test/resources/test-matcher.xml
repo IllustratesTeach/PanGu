@@ -15,7 +15,7 @@
     <password>gafis</password>
     <url>jdbc:oracle:thin:@127.0.0.1:1521:xe</url>
   </database>
-  <module>gz</module>
+  <module>reset</module>
   <mnt>
     <header_size>64</header_size>
     <finger_template_size>640</finger_template_size>
@@ -30,10 +30,13 @@
   <auto_check>
     <confirm_score>60</confirm_score>
   </auto_check>
-  <cand_key_filter query_type="2" is_percent="false">
-    <item reverse="false" count="20">
-      <key_wild>31*</key_wild>
-    </item>
-  </cand_key_filter>
+  <reset_seq>
+    <person_seq>1</person_seq>
+    <case_seq>2</case_seq>
+    <finger_template_seq>3</finger_template_seq>
+    <palm_template_seq>4</palm_template_seq>
+    <finger_latent_seq>5</finger_latent_seq>
+    <palm_latent_seq>6</palm_latent_seq>
+  </reset_seq>
 </hall_matcher>
 
