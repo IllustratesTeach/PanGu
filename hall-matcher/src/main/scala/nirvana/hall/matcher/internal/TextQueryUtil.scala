@@ -432,7 +432,7 @@ object TextQueryUtil extends LoggerSupport{
           //TODO 处理日期
         }else{
           //删除（）' 等字符，替换%为*
-          val a = f.replace("(","").replace(")", "").replace("'","").replace("%","*").split(" ")
+          val a = f.replace("(","").replace(")", "").replace("'","").replace("%","*").replace("_","?").split(" ")
           val column = a(0)
           val value = a(2)
           /* 统一处理所有LIKE，= 为KeywordQuery
@@ -445,7 +445,11 @@ object TextQueryUtil extends LoggerSupport{
           //先根据字段来处理
           column match {
             //Keyword
-            case TextQueryConstants.COL_NAME6_CARDID |
+            case TextQueryConstants.COL_NAME6_CARDID =>
+              textQueryBuilder.addQueryBuilder().setName(TextQueryConstants.PERSONID).setExtension(KeywordQuery.query, KeywordQuery.newBuilder().setValue(value).build())
+            case TextQueryConstants.COL_NAME6_CASEID=>
+              textQueryBuilder.addQueryBuilder().setName(TextQueryConstants.CASEID).setExtension(KeywordQuery.query, KeywordQuery.newBuilder().setValue(value).build())
+            case
                  TextQueryConstants.COL_NAME6_NAME |
                  TextQueryConstants.COL_NAME6_NAMEPINYIN |
                  TextQueryConstants.COL_NAME6_ALIAS |

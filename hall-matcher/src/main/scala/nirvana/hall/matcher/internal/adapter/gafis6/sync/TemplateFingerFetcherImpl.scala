@@ -88,15 +88,20 @@ class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override i
             syncData.setMinutiaType(MinutiaType.RIDGE)
             syncData.setTimestamp(seq)
             //纹线数据处理
-            val binData = ByteString.copyFrom(bin)
-            val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
-            if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
-              syncData.setData(binData.substring(0, dataSizeExpected))
-            }else{
-              syncData.setData(binData)
-            }
-            if (validSyncData(syncData.build, false)) {
-              syncDataResponse.addSyncData(syncData.build)
+            try{
+              val binData = ByteString.copyFrom(bin)
+              val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
+              if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
+                syncData.setData(binData.substring(0, dataSizeExpected))
+              }else{
+                syncData.setData(binData)
+              }
+              if (validSyncData(syncData.build, false)) {
+                syncDataResponse.addSyncData(syncData.build)
+              }
+            }catch {
+              case e:Exception=>
+                error("sid {} pos {} ridge error msg {}",sid, pos,e.getMessage)
             }
           }
           pos += 1

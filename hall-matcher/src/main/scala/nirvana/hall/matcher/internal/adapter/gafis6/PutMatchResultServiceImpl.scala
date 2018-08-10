@@ -2,6 +2,7 @@ package nirvana.hall.matcher.internal.adapter.gafis6
 
 import javax.sql.DataSource
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.c.services.ghpcbase.ghpcdef.AFISDateTime
 import nirvana.hall.c.services.gloclib.gaqryque.GAQUERYCANDHEADSTRUCT
 import nirvana.hall.matcher.HallMatcherConstants
@@ -18,9 +19,9 @@ import scala.collection.JavaConversions._
 /**
  * 保存比对结果service
  */
-class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService {
+class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatchResultService with LoggerSupport{
   val UPDATE_MATCH_RESULT_SQL = "update NORMALQUERY_QUERYQUE t set t.status="+HallMatcherConstants.QUERY_STATUS_SUCCESS+", t.curcandnum=?, t.candhead=?, t.candlist=?, t.hitpossibility=?,  t.FINISHTIME=sysdate where t.ora_sid=?"
-  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from NORMALQUERY_QUERYQUE t where t.ora_sid=?"
+  val GET_QUERY_QUE_SQL = "select t.keyid, t.querytype, t.flag, t.maxcandnum from NORMALQUERY_QUERYQUE t where t.status="+HallMatcherConstants.QUERY_STATUS_MATCHING+" and t.ora_sid=?"
 
   /**
    * 推送比对结果
@@ -43,6 +44,12 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     val candNum = matchResultRequest.getCandidateNum
     var maxScore = matchResultRequest.getMaxScore
     val queryQue = getQueryQueVo(oraSid.toInt)
+    if (queryQue.queryType != HallMatcherConstants.QUERY_TYPE_TT) {
+      maxScore = maxScore / 10
+    }else if(maxScore > 100){//如果查重候选分数大于100，比对任务不对应
+      error("error addMatchResult sid {} queryType {} maxScore{}", oraSid, queryQue.queryType, maxScore)
+      return
+    }
 
     var candList:Array[Byte] = null
     if(candNum > 0){
@@ -51,9 +58,6 @@ class PutMatchResultServiceImpl(implicit dataSource: DataSource) extends PutMatc
     }
     val candHead = getCandHead(matchResultRequest, queryQue)
 
-    if (queryQue.queryType != 0) {
-      maxScore = maxScore / 10
-    }
     JdbcDatabase.update(UPDATE_MATCH_RESULT_SQL) { ps =>
       ps.setInt(1, candNum)
       ps.setBytes(2, candHead)
