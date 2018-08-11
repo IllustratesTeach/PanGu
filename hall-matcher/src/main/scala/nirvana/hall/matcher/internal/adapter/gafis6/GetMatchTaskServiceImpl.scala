@@ -51,7 +51,7 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
            val matchTask = readMatchTask(rs)
            //更新status
            updateStatusMatching(oraSid)
-           MatchScheduler.matchingJobs + oraSid
+           MatchScheduler.matchingJobs += oraSid
            matchTaskQueryResponse.addMatchTask(matchTask)
          }
        }
