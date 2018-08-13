@@ -55,6 +55,7 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig,
             syncData.setData(ByteString.copyFrom(mnt))
           }catch {
             case e:Exception=>
+              responseBuilder.getSyncDataBuilderList.remove(syncData)
               error("ConvertMntOldToNew error {}",e.getMessage)
           }
         }
