@@ -4,6 +4,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 import com.google.protobuf.ByteString
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherSymobls
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
@@ -16,7 +17,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 /**
  * gafis6.2捺印指纹分库
  */
-class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
+class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig,featureExtractor: FeatureExtractor, override implicit val dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
   private val hasRidge = hallMatcherConfig.mnt.hasRidge
   private val fast = hallMatcherConfig.module.equals(HallMatcherSymobls.MODULE_GAFIS6FAST)
   override val MAX_SEQ_SQL: String = if(fast){
@@ -70,6 +71,16 @@ class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, override i
           syncData.setOperationType(SyncData.OperationType.PUT)
           syncData.setMinutiaType(MinutiaType.FINGER)
           syncData.setTimestamp(seq)
+
+          if(hallMatcherConfig.mnt.isNewFeature){
+            try{
+              val mnt = featureExtractor.ConvertMntOldToNew(syncData.getData.newInput()).get
+              syncData.setData(ByteString.copyFrom(mnt))
+            }catch {
+              case e:Exception=>
+                error("ConvertMntOldToNew error {}",e.getMessage)
+            }
+          }
           if (validSyncData(syncData.build, false)) {
             syncDataResponse.addSyncData(syncData.build)
           }

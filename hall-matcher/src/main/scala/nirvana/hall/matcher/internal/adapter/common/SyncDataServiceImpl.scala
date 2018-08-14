@@ -1,12 +1,10 @@
 package nirvana.hall.matcher.internal.adapter.common
 
-import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.service._
 import nirvana.protocol.NirvanaTypeDefinition.SyncDataType
-import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData.MinutiaType
 import nirvana.protocol.SyncDataProto.{SyncDataRequest, SyncDataResponse}
 
 /**
@@ -44,23 +42,6 @@ class SyncDataServiceImpl(hallMatcherConfig: HallMatcherConfig,
 
     if(fetcher != null)
       fetcher.doFetch(responseBuilder, size, timestamp)
-    //捺印指纹老特征转新特征
-    if(hallMatcherConfig.mnt.isNewFeature && syncDataType == SyncDataType.TEMPLATE_FINGER){
-      val it = responseBuilder.getSyncDataBuilderList.iterator()
-      while (it.hasNext){
-        val syncData = it.next()
-        if(syncData.getMinutiaType == MinutiaType.FINGER){
-          try{
-            val mnt = featureExtractor.ConvertMntOldToNew(syncData.getData.newInput()).get
-            syncData.setData(ByteString.copyFrom(mnt))
-          }catch {
-            case e:Exception=>
-              responseBuilder.getSyncDataBuilderList.remove(syncData)
-              error("ConvertMntOldToNew error {}",e.getMessage)
-          }
-        }
-      }
-    }
     info("{} data fetched with timestamp:{}",responseBuilder.getSyncDataCount,timestamp)
     responseBuilder.build()
   }

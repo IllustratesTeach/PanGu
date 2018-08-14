@@ -6,6 +6,7 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import nirvana.hall.c.AncientConstants
 import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
+import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.config.HallMatcherConfig
 import nirvana.hall.matcher.internal.DataConverter
 import nirvana.hall.matcher.service.TemplateFingerFetcher
@@ -15,7 +16,7 @@ import nirvana.protocol.SyncDataProto.SyncDataResponse.SyncData
 /**
  * Created by songpeng on 16/4/6.
  */
-class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
+class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig,featureExtractor: FeatureExtractor, dataSource: DataSource) extends SyncDataFetcher(hallMatcherConfig, dataSource) with TemplateFingerFetcher{
   //是否对纹线分库
   val hasRidge = hallMatcherConfig.mnt.hasRidge
 
@@ -47,6 +48,15 @@ class TemplateFingerFetcherImpl(hallMatcherConfig: HallMatcherConfig, dataSource
           syncDataBuilder.setData(ByteString.copyFrom(gafisImage.toByteArray(AncientConstants.GBK_ENCODING)))
         }
       } else {
+        if(hallMatcherConfig.mnt.isNewFeature){
+          try{
+            val mnt = featureExtractor.ConvertMntOldToNew(syncDataBuilder.getData.newInput()).get
+            syncDataBuilder.setData(ByteString.copyFrom(mnt))
+          }catch {
+            case e:Exception=>
+              error("ConvertMntOldToNew error {}",e.getMessage)
+          }
+        }
         syncDataBuilder.setMinutiaType(SyncData.MinutiaType.FINGER)
       }
       //是否是删除
