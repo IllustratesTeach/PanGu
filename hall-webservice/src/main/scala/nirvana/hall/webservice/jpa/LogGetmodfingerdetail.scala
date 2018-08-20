@@ -23,31 +23,34 @@ object LogGetmodfingerdetail extends ActiveRecordInstance[LogGetmodfingerdetail]
 class LogGetmodfingerdetail extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="USERNAME", length=20)
-     var username:java.lang.String =  _
-          @Column(name="YSXT_ASJBH", length=23)
-     var ysxtAsjbh:java.lang.String =  _
-          @Column(name="XCKYBH", length=23)
-     var xckybh:java.lang.String =  _
-          @Column(name="ASJFSDD_XZQHDM", precision=12, scale=0)
-     var asjfsddXzqhdm:java.lang.Long =  _
-     @Temporal(TemporalType.DATE)     @Column(name="CALLTIME", length=10)
-     var calltime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="RETURNTIME", length=10)
-     var returntime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="SAVETIME", length=10)
-     var savetime:java.util.Date =  _
-          @Column(name="SAVESTATUS", length=1)
-     var savestatus:java.lang.String =  _
-          @Column(name="FPTPATH", length=500)
-     var fptpath:java.lang.String =  _
-          @Column(name="RETURNSTATUS", length=1)
-     var returnstatus:java.lang.String =  _
-          @Column(name="ERRORMSG")
-     var errormsg:java.sql.Clob =  _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "USERNAME", length = 20)
+    var username: java.lang.String = _
+    @Column(name = "YSXT_ASJBH", length = 23)
+    var ysxtAsjbh: java.lang.String = _
+    @Column(name = "XCKYBH", length = 23)
+    var xckybh: java.lang.String = _
+    @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
+    var asjfsddXzqhdm: java.lang.Long = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CALLTIME", length = 10)
+    var calltime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "RETURNTIME", length = 10)
+    var returntime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "SAVETIME", length = 10)
+    var savetime: java.util.Date = _
+    @Column(name = "SAVESTATUS", length = 1)
+    var savestatus: java.lang.String = _
+    @Column(name = "FPTPATH", length = 500)
+    var fptpath: java.lang.String = _
+    @Column(name = "RETURNSTATUS", length = 1)
+    var returnstatus: java.lang.String = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -55,7 +58,7 @@ class LogGetmodfingerdetail extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, username:java.lang.String, ysxtAsjbh:java.lang.String, xckybh:java.lang.String, asjfsddXzqhdm:java.lang.Long, calltime:java.util.Date, returntime:java.util.Date, savetime:java.util.Date, savestatus:java.lang.String, fptpath:java.lang.String, returnstatus:java.lang.String, errormsg:java.sql.Clob) {
+    def this(pkId:java.lang.String, username:java.lang.String, ysxtAsjbh:java.lang.String, xckybh:java.lang.String, asjfsddXzqhdm:java.lang.Long, calltime:java.util.Date, returntime:java.util.Date, savetime:java.util.Date, savestatus:java.lang.String, fptpath:java.lang.String, returnstatus:java.lang.String, errormsg:java.lang.String) {
        this()
        this.pkId = pkId
        this.username = username

@@ -23,33 +23,37 @@ object LogGetfingerlist extends ActiveRecordInstance[LogGetfingerlist]
 class LogGetfingerlist extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="USERID", length=20)
-     var userid:java.lang.String =  _
-          @Column(name="ASJFSDD_XZQHDM", precision=12, scale=0)
-     var asjfsddXzqhdm:java.lang.Long =  _
-          @Column(name="XCKYBH", length=23)
-     var xckybh:java.lang.String =  _
-          @Column(name="ZZHWLX", length=3)
-     var zzhwlx:java.lang.String =  _
-     @Temporal(TemporalType.DATE)     @Column(name="KSSJ", length=10)
-     var kssj:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="JSSJ", length=10)
-     var jssj:java.util.Date =  _
-          @Column(name="KS", precision=65535, scale=32767)
-     var ks:java.math.BigDecimal =  _
-          @Column(name="JS", precision=65535, scale=32767)
-     var js:java.math.BigDecimal =  _
-     @Temporal(TemporalType.DATE)     @Column(name="CALLTIME", length=10)
-     var calltime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="RETURNTIME", length=10)
-     var returntime:java.util.Date =  _
-          @Column(name="RETURNXML")
-     var returnxml:java.sql.Clob =  _
-          @Column(name="ERRORMSG")
-     var errormsg:java.lang.String = _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "USERID", length = 20)
+    var userid: java.lang.String = _
+    @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
+    var asjfsddXzqhdm: java.lang.Long = _
+    @Column(name = "XCKYBH", length = 23)
+    var xckybh: java.lang.String = _
+    @Column(name = "ZZHWLX", length = 3)
+    var zzhwlx: java.lang.String = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "KSSJ", length = 10)
+    var kssj: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "JSSJ", length = 10)
+    var jssj: java.util.Date = _
+    @Column(name = "KS", precision = 65535, scale = 32767)
+    var ks: java.lang.Integer = _
+    @Column(name = "JS", precision = 65535, scale = 32767)
+    var js: java.lang.Integer = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CALLTIME", length = 10)
+    var calltime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "RETURNTIME", length = 10)
+    var returntime: java.util.Date = _
+    @Column(name = "RETURNXML")
+    var returnxml: java.lang.String = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -57,7 +61,7 @@ class LogGetfingerlist extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, userid:java.lang.String, asjfsddXzqhdm:java.lang.Long, xckybh:java.lang.String, zzhwlx:java.lang.String, kssj:java.util.Date, jssj:java.util.Date, ks:java.math.BigDecimal, js:java.math.BigDecimal, calltime:java.util.Date, returntime:java.util.Date, returnxml:java.sql.Clob, errormsg:java.lang.String) {
+    def this(pkId:java.lang.String, userid:java.lang.String, asjfsddXzqhdm:java.lang.Long, xckybh:java.lang.String, zzhwlx:java.lang.String, kssj:java.util.Date, jssj:java.util.Date, ks:java.lang.Integer, js:java.lang.Integer, calltime:java.util.Date, returntime:java.util.Date, returnxml:java.lang.String, errormsg:java.lang.String) {
        this()
        this.pkId = pkId
        this.userid = userid

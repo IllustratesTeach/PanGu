@@ -23,55 +23,56 @@ object LogEditrecord extends ActiveRecordInstance[LogEditrecord]
 class LogEditrecord extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="OLD_XCZW_ASJBH", length=30)
-     var oldXczwAsjbh:java.lang.String =  _
-          @Column(name="OLD_XCZW_YSXT_ASJBH", length=23)
-     var oldXczwYsxtAsjbh:java.lang.String =  _
-          @Column(name="OLD_XCZW_XCKYBH", length=23)
-     var oldXczwXckybh:java.lang.String =  _
-          @Column(name="OLD_XCZW_YSXT_XCZZHWBH", length=30)
-     var oldXczwYsxtXczzhwbh:java.lang.String =  _
-          @Column(name="OLD_XCZW_XCWZBH", length=30)
-     var oldXczwXcwzbh:java.lang.String =  _
-          @Column(name="OLD_XCZW_XCZZHWKBH", length=23)
-     var oldXczwXczzhwkbh:java.lang.String =  _
-          @Column(name="OLD_NYZW_YSXT_ASJXGRYBH", length=23)
-     var oldNyzwYsxtAsjxgrybh:java.lang.String =  _
-          @Column(name="OLD_NYZW_JZRYBH", length=23)
-     var oldNyzwJzrybh:java.lang.String =  _
-          @Column(name="OLD_NYZW_ASJXGRYBH", length=23)
-     var oldNyzwAsjxgrybh:java.lang.String =  _
-          @Column(name="OLD_NYZW_ZZHWKBH", length=23)
-     var oldNyzwZzhwkbh:java.lang.String =  _
-          @Column(name="OLD_NYZW_ZZHWDM", length=2)
-     var oldNyzwZzhwdm:java.lang.String =  _
-     @Temporal(TemporalType.DATE)     @Column(name="MODIFYTIME", length=10)
-     var modifytime:java.util.Date =  _
-          @Column(name="NEW_XCZW_ASJBH", length=30)
-     var newXczwAsjbh:java.lang.String =  _
-          @Column(name="NEW_XCZW_YSXT_ASJBH", length=23)
-     var newXczwYsxtAsjbh:java.lang.String =  _
-          @Column(name="NEW_XCZW_XCKYBH", length=23)
-     var newXczwXckybh:java.lang.String =  _
-          @Column(name="NEW_XCZW_YSXT_XCZZHWBH", length=30)
-     var newXczwYsxtXczzhwbh:java.lang.String =  _
-          @Column(name="NEW_XCZW_XCWZBH", length=30)
-     var newXczwXcwzbh:java.lang.String =  _
-          @Column(name="NEW_XCZW_XCZZHWKBH", length=23)
-     var newXczwXczzhwkbh:java.lang.String =  _
-          @Column(name="NEW_NYZW_YSXT_ASJXGRYBH", length=23)
-     var newNyzwYsxtAsjxgrybh:java.lang.String =  _
-          @Column(name="NEW_NYZW_JZRYBH", length=23)
-     var newNyzwJzrybh:java.lang.String =  _
-          @Column(name="NEW_NYZW_ASJXGRYBH", length=23)
-     var newNyzwAsjxgrybh:java.lang.String =  _
-          @Column(name="NEW_NYZW_ZZHWKBH", length=23)
-     var newNyzwZzhwkbh:java.lang.String =  _
-          @Column(name="NEW_NYZW_ZZHWDM", length=2)
-     var newNyzwZzhwdm:java.lang.String =  _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "OLD_XCZW_ASJBH", length = 30)
+    var oldXczwAsjbh: java.lang.String = _
+    @Column(name = "OLD_XCZW_YSXT_ASJBH", length = 23)
+    var oldXczwYsxtAsjbh: java.lang.String = _
+    @Column(name = "OLD_XCZW_XCKYBH", length = 23)
+    var oldXczwXckybh: java.lang.String = _
+    @Column(name = "OLD_XCZW_YSXT_XCZZHWBH", length = 30)
+    var oldXczwYsxtXczzhwbh: java.lang.String = _
+    @Column(name = "OLD_XCZW_XCWZBH", length = 30)
+    var oldXczwXcwzbh: java.lang.String = _
+    @Column(name = "OLD_XCZW_XCZZHWKBH", length = 23)
+    var oldXczwXczzhwkbh: java.lang.String = _
+    @Column(name = "OLD_NYZW_YSXT_ASJXGRYBH", length = 23)
+    var oldNyzwYsxtAsjxgrybh: java.lang.String = _
+    @Column(name = "OLD_NYZW_JZRYBH", length = 23)
+    var oldNyzwJzrybh: java.lang.String = _
+    @Column(name = "OLD_NYZW_ASJXGRYBH", length = 23)
+    var oldNyzwAsjxgrybh: java.lang.String = _
+    @Column(name = "OLD_NYZW_ZZHWKBH", length = 23)
+    var oldNyzwZzhwkbh: java.lang.String = _
+    @Column(name = "OLD_NYZW_ZZHWDM", length = 2)
+    var oldNyzwZzhwdm: java.lang.String = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "MODIFYTIME", length = 10)
+    var modifytime: java.util.Date = _
+    @Column(name = "NEW_XCZW_ASJBH", length = 30)
+    var newXczwAsjbh: java.lang.String = _
+    @Column(name = "NEW_XCZW_YSXT_ASJBH", length = 23)
+    var newXczwYsxtAsjbh: java.lang.String = _
+    @Column(name = "NEW_XCZW_XCKYBH", length = 23)
+    var newXczwXckybh: java.lang.String = _
+    @Column(name = "NEW_XCZW_YSXT_XCZZHWBH", length = 30)
+    var newXczwYsxtXczzhwbh: java.lang.String = _
+    @Column(name = "NEW_XCZW_XCWZBH", length = 30)
+    var newXczwXcwzbh: java.lang.String = _
+    @Column(name = "NEW_XCZW_XCZZHWKBH", length = 23)
+    var newXczwXczzhwkbh: java.lang.String = _
+    @Column(name = "NEW_NYZW_YSXT_ASJXGRYBH", length = 23)
+    var newNyzwYsxtAsjxgrybh: java.lang.String = _
+    @Column(name = "NEW_NYZW_JZRYBH", length = 23)
+    var newNyzwJzrybh: java.lang.String = _
+    @Column(name = "NEW_NYZW_ASJXGRYBH", length = 23)
+    var newNyzwAsjxgrybh: java.lang.String = _
+    @Column(name = "NEW_NYZW_ZZHWKBH", length = 23)
+    var newNyzwZzhwkbh: java.lang.String = _
+    @Column(name = "NEW_NYZW_ZZHWDM", length = 2)
+    var newNyzwZzhwdm: java.lang.String = _
 
 
 	

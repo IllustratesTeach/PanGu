@@ -23,29 +23,33 @@ object LogGetfingercount extends ActiveRecordInstance[LogGetfingercount]
 class LogGetfingercount extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="USERID", length=20)
-     var userid:java.lang.String =  _
-          @Column(name="ASJFSDD_XZQHDM", precision=12, scale=0)
-     var asjfsddXzqhdm:java.lang.Long =  _
-          @Column(name="XCKYBH", length=23)
-     var xckybh:java.lang.String =  _
-          @Column(name="ZZHWLX", length=3)
-     var zzhwlx:java.lang.String =  _
-     @Temporal(TemporalType.DATE)     @Column(name="KSSJ", length=10)
-     var kssj:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="JSSJ", length=10)
-     var jssj:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="CALLTIME", length=10)
-     var calltime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="RETURNTIME", length=10)
-     var returntime:java.util.Date =  _
-          @Column(name="FINGERCOUNT", precision=65535, scale=32767)
-     var fingercount:java.math.BigDecimal =  _
-          @Column(name="ERRORMSG")
-     var errormsg:java.sql.Clob =  _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "USERID", length = 20)
+    var userid: java.lang.String = _
+    @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
+    var asjfsddXzqhdm: java.lang.Long = _
+    @Column(name = "XCKYBH", length = 23)
+    var xckybh: java.lang.String = _
+    @Column(name = "ZZHWLX", length = 3)
+    var zzhwlx: java.lang.String = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "KSSJ", length = 10)
+    var kssj: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "JSSJ", length = 10)
+    var jssj: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CALLTIME", length = 10)
+    var calltime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "RETURNTIME", length = 10)
+    var returntime: java.util.Date = _
+    @Column(name = "FINGERCOUNT", precision = 65535, scale = 32767)
+    var fingercount: java.lang.Integer = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -53,7 +57,7 @@ class LogGetfingercount extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, userid:java.lang.String, asjfsddXzqhdm:java.lang.Long, xckybh:java.lang.String, zzhwlx:java.lang.String, kssj:java.util.Date, jssj:java.util.Date, calltime:java.util.Date, returntime:java.util.Date, fingercount:java.math.BigDecimal, errormsg:java.sql.Clob) {
+    def this(pkId:java.lang.String, userid:java.lang.String, asjfsddXzqhdm:java.lang.Long, xckybh:java.lang.String, zzhwlx:java.lang.String, kssj:java.util.Date, jssj:java.util.Date, calltime:java.util.Date, returntime:java.util.Date, fingercount:java.lang.Integer, errormsg:java.lang.String) {
        this()
        this.pkId = pkId
        this.userid = userid

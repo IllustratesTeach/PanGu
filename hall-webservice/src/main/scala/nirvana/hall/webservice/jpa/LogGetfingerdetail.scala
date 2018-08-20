@@ -20,44 +20,47 @@ object LogGetfingerdetail extends ActiveRecordInstance[LogGetfingerdetail]
 @Entity
 @Table(name="LOG_GETFINGERDETAIL"
 )
-class LogGetfingerdetail extends ActiveRecord {
+ class LogGetfingerdetail extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="USERID", length=20)
-     var userid:java.lang.String =  _
-          @Column(name="XCWZBH", length=30)
-     var xcwzbh:java.lang.String =  _
-          @Column(name="ASJBH", length=23)
-     var asjbh:java.lang.String =  _
-          @Column(name="YSXT_ASJBH", length=30)
-     var ysxtAsjbh:java.lang.String =  _
-          @Column(name="XCKYBH", length=30)
-     var xckybh:java.lang.String =  _
-          @Column(name="ASJFSDD_XZQHDM", precision=12, scale=0)
-     var asjfsddXzqhdm:java.lang.Long =  _
-     @Temporal(TemporalType.DATE)     @Column(name="CALLTIME", length=10)
-     var calltime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="RETURNTIME", length=10)
-     var returntime:java.util.Date =  _
-     @Temporal(TemporalType.DATE)     @Column(name="SAVETIME", length=10)
-     var savetime:java.util.Date =  _
-          @Column(name="CHECKSTATUS", length=1)
-     var checkstatus:java.lang.String =  _
-          @Column(name="CHECKMESSAGE")
-     var checkmessage:java.sql.Clob =  _
-          @Column(name="SAVESTATUS", length=1)
-     var savestatus:java.lang.String =  _
-          @Column(name="STATUS", length=1)
-     var status:java.lang.String =  _
-          @Column(name="FPTPATH", length=500)
-     var fptpath:java.lang.String =  _
-          @Column(name="HITRECORD_REPORT_STATUS", length=1)
-     var hitrecordReportStatus:java.lang.String =  _
-          @Column(name="ERRORMSG")
-     var errormsg:java.sql.Clob =  _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "USERID", length = 20)
+    var userid: java.lang.String = _
+    @Column(name = "XCWZBH", length = 30)
+    var xcwzbh: java.lang.String = _
+    @Column(name = "ASJBH", length = 23)
+    var asjbh: java.lang.String = _
+    @Column(name = "YSXT_ASJBH", length = 30)
+    var ysxtAsjbh: java.lang.String = _
+    @Column(name = "XCKYBH", length = 30)
+    var xckybh: java.lang.String = _
+    @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
+    var asjfsddXzqhdm: java.lang.Long = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CALLTIME", length = 14)
+    var calltime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "RETURNTIME", length = 14)
+    var returntime: java.util.Date = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "SAVETIME", length = 14)
+    var savetime: java.util.Date = _
+    @Column(name = "CHECKSTATUS", length = 1)
+    var checkstatus: java.lang.String = _
+    @Column(name = "CHECKMESSAGE")
+    var checkmessage: java.lang.String = _
+    @Column(name = "SAVESTATUS", length = 1)
+    var savestatus: java.lang.String = _
+    @Column(name = "STATUS", length = 1)
+    var status: java.lang.String = _
+    @Column(name = "FPTPATH", length = 500)
+    var fptpath: java.lang.String = _
+    @Column(name = "HITRECORD_REPORT_STATUS", length = 1)
+    var hitrecordReportStatus: java.lang.String = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -65,7 +68,7 @@ class LogGetfingerdetail extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, userid:java.lang.String, xcwzbh:java.lang.String, asjbh:java.lang.String, ysxtAsjbh:java.lang.String, xckybh:java.lang.String, asjfsddXzqhdm:java.lang.Long, calltime:java.util.Date, returntime:java.util.Date, savetime:java.util.Date, checkstatus:java.lang.String, checkmessage:java.sql.Clob, savestatus:java.lang.String, status:java.lang.String, fptpath:java.lang.String, hitrecordReportStatus:java.lang.String, errormsg:java.sql.Clob) {
+    def this(pkId:java.lang.String, userid:java.lang.String, xcwzbh:java.lang.String, asjbh:java.lang.String, ysxtAsjbh:java.lang.String, xckybh:java.lang.String, asjfsddXzqhdm:java.lang.Long, calltime:java.util.Date, returntime:java.util.Date, savetime:java.util.Date, checkstatus:java.lang.String, checkmessage:java.lang.String, savestatus:java.lang.String, status:java.lang.String, fptpath:java.lang.String, hitrecordReportStatus:java.lang.String, errormsg:java.lang.String) {
        this()
        this.pkId = pkId
        this.userid = userid

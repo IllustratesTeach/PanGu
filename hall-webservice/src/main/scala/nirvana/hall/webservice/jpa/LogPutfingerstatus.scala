@@ -23,23 +23,25 @@ object LogPutfingerstatus extends ActiveRecordInstance[LogPutfingerstatus]
 class LogPutfingerstatus extends ActiveRecord {
 
 
-      @Id 
-         @Column(name="PK_ID", unique=true, nullable=false, length=32)
-     var pkId:java.lang.String =  _
-          @Column(name="USERNAME", length=20)
-     var username:java.lang.String =  _
-          @Column(name="XCWZBH", length=30)
-     var xcwzbh:java.lang.String =  _
-          @Column(name="RESULTTYPE", length=1)
-     var resulttype:java.lang.String =  _
-     @Temporal(TemporalType.DATE)     @Column(name="CALLTIME", length=10)
-     var calltime:java.util.Date =  _
-          @Column(name="RETURNSTATUS", length=1)
-     var returnstatus:java.lang.String =  _
-     @Temporal(TemporalType.DATE)     @Column(name="RETURNTIME", length=10)
-     var returntime:java.util.Date =  _
-          @Column(name="ERRORMSG")
-     var errormsg:java.sql.Clob =  _
+    @Id
+    @Column(name = "PK_ID", unique = true, nullable = false, length = 32)
+    var pkId: java.lang.String = _
+    @Column(name = "USERNAME", length = 20)
+    var username: java.lang.String = _
+    @Column(name = "XCWZBH", length = 30)
+    var xcwzbh: java.lang.String = _
+    @Column(name = "RESULTTYPE", length = 1)
+    var resulttype: java.lang.String = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CALLTIME", length = 10)
+    var calltime: java.util.Date = _
+    @Column(name = "RETURNSTATUS", length = 1)
+    var returnstatus: java.lang.String = _
+    @Temporal(TemporalType.DATE)
+    @Column(name = "RETURNTIME", length = 10)
+    var returntime: java.util.Date = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -47,7 +49,7 @@ class LogPutfingerstatus extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, username:java.lang.String, xcwzbh:java.lang.String, resulttype:java.lang.String, calltime:java.util.Date, returnstatus:java.lang.String, returntime:java.util.Date, errormsg:java.sql.Clob) {
+    def this(pkId:java.lang.String, username:java.lang.String, xcwzbh:java.lang.String, resulttype:java.lang.String, calltime:java.util.Date, returnstatus:java.lang.String, returntime:java.util.Date, errormsg:java.lang.String) {
        this()
        this.pkId = pkId
        this.username = username
