@@ -74,7 +74,7 @@ class SurveyRecordServiceImpl(v62Facade: V62Facade) extends SurveyRecordService{
     * @return
     */
   override def getSurveyRecordWithPoliceIncidentIsNotExist: Seq[SURVEYRECORD] = {
-    val statement = Option("(POLICEINCIDENTEXIST=%d)".format(survey.POLICE_INCIDENT_NOTExist))
+    val statement = Option("(POLICEINCIDENTEXIST=%d AND STATE= %d)".format(survey.POLICE_INCIDENT_NOTExist,survey.SURVEY_STATE_SUCCESS))
     val mapper = Map("kno"->"szKNo"
       ,"fingerid"->"szFingerid"
       ,"physicalevidenceno" -> "szPhyEvidenceNo"
