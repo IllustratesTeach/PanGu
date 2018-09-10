@@ -101,9 +101,9 @@ END;
 ---gafis6fast 触发器和序列
 create sequence normaltp_tpcardinfo_seq_seq
 	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
-create sequence normallp_latentfinger_seq_seq
+create sequence normallp_latfinger_seq_seq
 	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
-create sequence normallp_latentpalm_seq_seq
+create sequence normallp_latpalm_seq_seq
 	minvalue 1 maxvalue 999999999999999999999999999 start with 1 increment by 1 cache 100;
 
 create table NORMALTP_TPCARDINFO_SEQ
@@ -146,7 +146,7 @@ BEGIN
 		sid := :OLD.ORA_SID;
 	END IF;
 	DELETE FROM NORMALTP_TPCARDINFO_SEQ WHERE NORMALTP_TPCARDINFO_SEQ.ORA_SID = sid;
-	INSERT INTO NORMALTP_TPCARDINFO_SEQ select sid, NORMALTP_TPCARDINFO_SEQ.nextval from dual;
+	INSERT INTO NORMALTP_TPCARDINFO_SEQ select sid, NORMALTP_TPCARDINFO_SEQ_SEQ.nextval from dual;
 END;
 \
 CREATE OR REPLACE TRIGGER NORMALLP_LATFINGER_TRIGGER
