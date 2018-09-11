@@ -203,6 +203,16 @@
                     <xs:documentation>调用现勘服务现场数据FPT包的定时计划</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="cronType" name="check_haixin_service_cron" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>检查现勘服务是否正常的定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="area" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>所属区域</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>URL配置</xs:documentation>
@@ -228,7 +238,7 @@
                     <xs:documentation>数据存储路径(zip，xml)</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="xs:string" name="data_type" minOccurs="1" maxOccurs="1">
+            <xs:element type="xs:string" name="data_type" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>查询指掌纹类型</xs:documentation>
                 </xs:annotation>
