@@ -28,6 +28,12 @@ trait nettable {
     var pAns = channel.writeMessage[GNETANSWERHEADOBJECT](pReq)
     validateResponse(channel,pAns)
 
+    pstRes.pstItem_Data.foreach{
+      t =>
+        //FileUtils.writeStringToFile(new File(""),t.szItemName)
+        println("SurveyRecord结构体名字:"+t.szItemName)
+    }
+
     GAFIS_NETSCR_SendSelItemToSelect(channel, pstRes)
 
     pAns = channel.writeMessage[GNETANSWERHEADOBJECT](pstStmt)
