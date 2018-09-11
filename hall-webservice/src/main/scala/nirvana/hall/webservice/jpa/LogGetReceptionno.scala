@@ -30,13 +30,11 @@ class LogGetReceptionno extends ActiveRecord {
     var username: java.lang.String = _
     @Column(name = "XCKYBH", length = 23)
     var xckybh: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CALLTIME", length = 10)
+    @Column(name = "CALLTIME")
     var calltime: java.util.Date = _
     @Column(name = "RETURN_JJBH", length = 30)
     var returnJjbh: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RETURNTIME", length = 10)
+    @Column(name = "RETURNTIME")
     var returntime: java.util.Date = _
     @Column(name = "ERRORMSG")
     var errormsg: java.lang.String = _

@@ -34,14 +34,11 @@ class LogGetmodfingerdetail extends ActiveRecord {
     var xckybh: java.lang.String = _
     @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
     var asjfsddXzqhdm: java.lang.Long = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CALLTIME", length = 10)
+    @Column(name = "CALLTIME")
     var calltime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RETURNTIME", length = 10)
+    @Column(name = "RETURNTIME")
     var returntime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "SAVETIME", length = 10)
+    @Column(name = "SAVETIME")
     var savetime: java.util.Date = _
     @Column(name = "SAVESTATUS", length = 1)
     var savestatus: java.lang.String = _

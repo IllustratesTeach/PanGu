@@ -1,6 +1,6 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
-import java.util.Date
+import java.util.{Date, UUID}
 
 import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
@@ -8,9 +8,12 @@ import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.c.services.gloclib.survey
+import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.SurveyConstant
+import nirvana.hall.webservice.jpa.LogInterfacestatus
 import nirvana.hall.webservice.services.survey.SurveyRecordService
+import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
 
@@ -33,6 +36,8 @@ class FPT50HandPrintGetCaseNoCron(hallWebserviceConfig: HallWebserviceConfig
         override def run(): Unit = {
           try {
             info("begin FPT50HandPrintGetCaseNoCron")
+            //检查金指获取案事件编号服务
+            checkJinZhiGetCaseNoService
             if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
               hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
                 V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
@@ -57,8 +62,8 @@ class FPT50HandPrintGetCaseNoCron(hallWebserviceConfig: HallWebserviceConfig
       surveyRecordService.getSurveyRecordWithPoliceIncidentIsNotExist.foreach{
             info("call v62-1")
         surveyRecord =>
-          if(null ==surveyRecord.szKNo){
-            info("surveyRecord.szKNo是NULL===================null")
+          if(null ==surveyRecord.szKNo || surveyRecord.szKNo.trim == ""){
+            info("surveyRecord.szKNo是NULL或者空串")
           }
           val kNo = surveyRecord.szKNo
           val caseNo = fPT50HandPrintServiceClient.getCaseNo(kNo)
@@ -81,5 +86,25 @@ class FPT50HandPrintGetCaseNoCron(hallWebserviceConfig: HallWebserviceConfig
     }catch{
       case NonFatal(e) => error("getCaseNo error:{},Error:{}",e.toString,ExceptionUtil.getStackTraceInfo(e))
     }
+  }
+
+  def checkJinZhiGetCaseNoService:Unit = {
+    info("start checkJinZhiGetCaseNoService")
+    if(hallWebserviceConfig.handprintService.area != null && StringUtils.isEmpty(hallWebserviceConfig.handprintService.area)){
+      if(LogInterfacestatus.find_by_asjfsddXzqhdm_and_interfacename(hallWebserviceConfig.handprintService.area.toInt,"getCaseNo").nonEmpty){
+        info("update-logInterfaceStatus,行政区划{},接口名称{}",hallWebserviceConfig.handprintService.area,"getCaseNo")
+        LogInterfacestatus.update.set(calltime = new Date()).where(LogInterfacestatus.asjfsddXzqhdm === hallWebserviceConfig.handprintService.area.toInt and LogInterfacestatus.interfacename === "getCaseNo").execute
+      }else{
+        info("insert-logInterfaceStatus,行政区划{},接口名称{}",hallWebserviceConfig.handprintService.area,"getCaseNo")
+        val logInterfaceStatus = new LogInterfacestatus()
+        logInterfaceStatus.pkId = UUID.randomUUID().toString.replace("-","")
+        logInterfaceStatus.interfacename = "getCaseNo"
+        logInterfaceStatus.schedule = CronExpParser.translate(hallWebserviceConfig.handprintService.getCaseNoCron)
+        logInterfaceStatus.asjfsddXzqhdm = hallWebserviceConfig.handprintService.area.toInt
+        logInterfaceStatus.calltime = new Date()
+        logInterfaceStatus.save()
+      }
+    }
+    info("end checkJinZhiGetCaseNoService")
   }
 }

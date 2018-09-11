@@ -30,10 +30,10 @@ object HallWebserviceApp
 
     val classes = List[Class[_]](
       //v62
-//      Class.forName("nirvana.hall.v62.LocalV62Module"),
-//      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
-//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-//      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
+      Class.forName("nirvana.hall.v62.LocalV62Module"),
+      Class.forName("nirvana.hall.v62.LocalV62ServiceModule"),
+      Class.forName("stark.activerecord.StarkActiveRecordModule"),
+      Class.forName("nirvana.hall.v62.LocalV62DataSourceModule"),
       //v70
 //      Class.forName("nirvana.hall.v70.LocalV70Module"),
 //      Class.forName("nirvana.hall.v70.LocalV70ServiceModule"),
@@ -45,6 +45,7 @@ object HallWebserviceApp
 //      Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.webservice.HallWebserviceSurveyModule"),
+      Class.forName("nirvana.hall.webservice.HallWebserviceSurvey62Module"),
 
       //公用
       Class.forName("monad.rpc.LocalRpcModule"),

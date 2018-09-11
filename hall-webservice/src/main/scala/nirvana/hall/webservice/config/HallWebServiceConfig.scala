@@ -61,6 +61,10 @@ class HandprintServiceConfig{
   var sendHitCron: String = _
   @XmlElement(name = "get_latent_package_cron")
   var getLatentPackageCron: String = _
+  @XmlElement(name = "check_haixin_service_cron")
+  var checkHaiXinServiceCron: String = _
+  @XmlElement(name = "area")
+  var area: String = _
   @XmlElement(name = "url")
   var url: String = _
   @XmlElement(name = "target_namespace")

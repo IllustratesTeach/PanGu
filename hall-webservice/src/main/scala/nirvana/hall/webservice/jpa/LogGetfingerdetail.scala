@@ -38,14 +38,11 @@ object LogGetfingerdetail extends ActiveRecordInstance[LogGetfingerdetail]
     var xckybh: java.lang.String = _
     @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
     var asjfsddXzqhdm: java.lang.Long = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CALLTIME", length = 14)
+    @Column(name = "CALLTIME")
     var calltime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RETURNTIME", length = 14)
+    @Column(name = "RETURNTIME")
     var returntime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "SAVETIME", length = 14)
+    @Column(name = "SAVETIME")
     var savetime: java.util.Date = _
     @Column(name = "CHECKSTATUS", length = 1)
     var checkstatus: java.lang.String = _

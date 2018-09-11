@@ -32,13 +32,11 @@ class LogPutfingerstatus extends ActiveRecord {
     var xcwzbh: java.lang.String = _
     @Column(name = "RESULTTYPE", length = 1)
     var resulttype: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CALLTIME", length = 10)
+    @Column(name = "CALLTIME")
     var calltime: java.util.Date = _
-    @Column(name = "RETURNSTATUS", length = 1)
+    @Column(name = "RETURNSTATUS", length = 2)
     var returnstatus: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RETURNTIME", length = 10)
+    @Column(name = "RETURNTIME")
     var returntime: java.util.Date = _
     @Column(name = "ERRORMSG")
     var errormsg: java.lang.String = _

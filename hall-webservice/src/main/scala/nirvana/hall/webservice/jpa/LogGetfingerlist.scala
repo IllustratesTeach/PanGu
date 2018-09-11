@@ -34,21 +34,17 @@ class LogGetfingerlist extends ActiveRecord {
     var xckybh: java.lang.String = _
     @Column(name = "ZZHWLX", length = 3)
     var zzhwlx: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "KSSJ", length = 10)
+    @Column(name = "KSSJ")
     var kssj: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "JSSJ", length = 10)
+    @Column(name = "JSSJ")
     var jssj: java.util.Date = _
     @Column(name = "KS", precision = 65535, scale = 32767)
     var ks: java.lang.Integer = _
     @Column(name = "JS", precision = 65535, scale = 32767)
     var js: java.lang.Integer = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CALLTIME", length = 10)
+    @Column(name = "CALLTIME")
     var calltime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "RETURNTIME", length = 10)
+    @Column(name = "RETURNTIME")
     var returntime: java.util.Date = _
     @Column(name = "RETURNXML")
     var returnxml: java.lang.String = _

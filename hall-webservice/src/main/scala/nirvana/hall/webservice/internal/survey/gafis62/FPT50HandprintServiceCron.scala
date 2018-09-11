@@ -1,7 +1,7 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{Calendar, Date, UUID}
 
 import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
@@ -11,8 +11,10 @@ import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.c.services.gloclib.survey.{SURVEYCONFIG, SURVEYRECORD}
 import nirvana.hall.v62.internal.V62Facade
+import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.{HallWebserviceConfig, SurveyConfig}
 import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant, SurveyFatal}
+import nirvana.hall.webservice.jpa.LogInterfacestatus
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection
@@ -32,7 +34,7 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
   val fPT50HandprintServiceClient = new FPT50HandprintServiceClient(hallWebserviceConfig.handprintService)
   var provider:Option[PlatformOperatorInfoProvider] = None
   if(hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass != null){
-    provider = Option(PlatformOperatorInfoProviderLoader.createProvider)
+    provider = Option(PlatformOperatorInfoProviderLoader.createProvider(hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass))
   }
 
 
@@ -45,6 +47,8 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
         override def run(): Unit = {
           try {
             info("begin getLatentList")
+            //检查金指获取列表服务
+            checkJinZhiGetLatentListService
             //根据配置里的62应用服务器地址，使用动态变量访问
             if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
               hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
@@ -223,5 +227,25 @@ class FPT50HandprintServiceCron(hallWebserviceConfig: HallWebserviceConfig,
     rightNow.setTime(date)
     rightNow.add(Calendar.DAY_OF_YEAR, -5)  // 日期减5天
     myFmt.format(rightNow.getTime)
+  }
+
+  def checkJinZhiGetLatentListService:Unit = {
+    info("start checkJinZhiGetLatentListService")
+    if(hallWebserviceConfig.handprintService.area != null ){
+      if(LogInterfacestatus.find_by_asjfsddXzqhdm_and_interfacename(hallWebserviceConfig.handprintService.area.toInt,"getLatentList").nonEmpty){
+        info("update-logInterfaceStatus,行政区划{},接口名称{}",hallWebserviceConfig.handprintService.area,"getLatentList")
+        LogInterfacestatus.update.set(calltime = new Date()).where(LogInterfacestatus.asjfsddXzqhdm === hallWebserviceConfig.handprintService.area.toInt and LogInterfacestatus.interfacename === "getLatentList").execute
+      }else{
+        val logInterfaceStatus = new LogInterfacestatus()
+        info("insert-logInterfaceStatus,行政区划{},接口名称{}",hallWebserviceConfig.handprintService.area,"getLatentList")
+        logInterfaceStatus.pkId = UUID.randomUUID().toString.replace("-","")
+        logInterfaceStatus.interfacename = "getLatentList"
+        logInterfaceStatus.schedule = CronExpParser.translate(hallWebserviceConfig.handprintService.cron)
+        logInterfaceStatus.asjfsddXzqhdm = hallWebserviceConfig.handprintService.area.toInt
+        logInterfaceStatus.calltime = new Date()
+        logInterfaceStatus.save()
+      }
+    }
+    info("end checkJinZhiGetLatentListService")
   }
 }

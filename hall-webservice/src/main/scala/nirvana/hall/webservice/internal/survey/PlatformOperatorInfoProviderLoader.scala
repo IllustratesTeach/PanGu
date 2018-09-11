@@ -5,10 +5,11 @@ package nirvana.hall.webservice.internal.survey
   */
 object PlatformOperatorInfoProviderLoader {
 
-  private lazy val provider:PlatformOperatorInfoProvider = createProvider
+  private lazy val provider:PlatformOperatorInfoProvider = createProvider(providerClassName)
   private var providerClassName:String = _
 
-  def createProvider:PlatformOperatorInfoProvider={
+  def createProvider(className:String):PlatformOperatorInfoProvider={
+    providerClassName = className
     Thread.currentThread().getContextClassLoader
       .loadClass(providerClassName).newInstance().asInstanceOf[PlatformOperatorInfoProvider]
   }

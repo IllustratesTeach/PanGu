@@ -48,8 +48,7 @@ class LogEditrecord extends ActiveRecord {
     var oldNyzwZzhwkbh: java.lang.String = _
     @Column(name = "OLD_NYZW_ZZHWDM", length = 2)
     var oldNyzwZzhwdm: java.lang.String = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "MODIFYTIME", length = 10)
+    @Column(name = "MODIFYTIME")
     var modifytime: java.util.Date = _
     @Column(name = "NEW_XCZW_ASJBH", length = 30)
     var newXczwAsjbh: java.lang.String = _
