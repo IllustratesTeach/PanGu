@@ -30,24 +30,40 @@ class LogPuthitresult extends ActiveRecord {
     var username: java.lang.String = _
     @Column(name = "HITRESULT_TYPE", length = 2)
     var hitresultType: java.lang.String = _
+    @Column(name = "XCZW_ASJBH", length = 30)
+    var xczwAsjbh: java.lang.String = _
+    @Column(name = "XCZW_YSXT_ASJBH", length = 23)
+    var xczwYsxtAsjbh: java.lang.String = _
     @Column(name = "XCZW_XCKYBH", length = 23)
     var xczwXckybh: java.lang.String = _
+    @Column(name = "XCZW_YSXT_XCZZHWBH", length = 30)
+    var xczwYsxtXczzhwbh: java.lang.String = _
     @Column(name = "XCZW_XCWZBH", length = 30)
     var xczwXcwzbh: java.lang.String = _
+    @Column(name = "XCZW_XCZZHWKBH", length = 23)
+    var xczwXczzhwkbh: java.lang.String = _
     @Column(name = "NYZW_YSXT_ASJXGRYBH", length = 23)
     var nyzwYsxtAsjxgrybh: java.lang.String = _
+    @Column(name = "NYZW_JZRYBH", length = 23)
+    var nyzwJzrybh: java.lang.String = _
+    @Column(name = "NYZW_ASJXGRYBH", length = 23)
+    var nyzwAsjxgrybh: java.lang.String = _
+    @Column(name = "NYZW_ZZHWKBH", length = 23)
+    var nyzwZzhwkbh: java.lang.String = _
     @Column(name = "NYZW_ZZHWDM", length = 2)
     var nyzwZzhwdm: java.lang.String = _
     @Column(name = "ASJFSDD_XZQHDM", precision = 12, scale = 0)
     var asjfsddXzqhdm: java.lang.Long = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "CREATETIME", length = 10)
-    var createtime: java.util.Date = _
-    @Temporal(TemporalType.DATE)
-    @Column(name = "UPDATETIME", length = 10)
-    var updatetime: java.util.Date = _
-    @Column(name = "SENDHITRESULTCOUNT SENDHITRESULTCOUNT")
-    var sendHitResultCount: java.lang.Integer = _
+    @Column(name = "CALLTIME")
+    var calltime: java.util.Date = _
+    @Column(name = "RETURNTIME")
+    var returntime: java.util.Date = _
+    @Column(name = "FPTPATH", length = 500)
+    var fptpath: java.lang.String = _
+    @Column(name = "RETURNSTATUS", length = 3)
+    var returnstatus: java.lang.String = _
+    @Column(name = "ERRORMSG")
+    var errormsg: java.lang.String = _
 
 
 	
@@ -55,19 +71,28 @@ class LogPuthitresult extends ActiveRecord {
         this()
         this.pkId = pkId
     }
-    def this(pkId:java.lang.String, username:java.lang.String, hitresultType:java.lang.String, xczwAsjbh:java.lang.String, xczwYsxtAsjbh:java.lang.String, xczwXckybh:java.lang.String, xczwYsxtXczzhwbh:java.lang.String, xczwXcwzbh:java.lang.String, xczwXczzhwkbh:java.lang.String, nyzwYsxtAsjxgrybh:java.lang.String, nyzwJzrybh:java.lang.String, nyzwAsjxgrybh:java.lang.String, nyzwZzhwkbh:java.lang.String, nyzwZzhwdm:java.lang.String, asjfsddXzqhdm:java.lang.Long, createtime:java.util.Date, updatetime:java.util.Date, fptpath:java.lang.String, returnstatus:java.lang.String, sendHitResultCount:java.lang.Integer) {
+    def this(pkId:java.lang.String, username:java.lang.String, hitresultType:java.lang.String, xczwAsjbh:java.lang.String, xczwYsxtAsjbh:java.lang.String, xczwXckybh:java.lang.String, xczwYsxtXczzhwbh:java.lang.String, xczwXcwzbh:java.lang.String, xczwXczzhwkbh:java.lang.String, nyzwYsxtAsjxgrybh:java.lang.String, nyzwJzrybh:java.lang.String, nyzwAsjxgrybh:java.lang.String, nyzwZzhwkbh:java.lang.String, nyzwZzhwdm:java.lang.String, asjfsddXzqhdm:java.lang.Long, calltime:java.util.Date, returntime:java.util.Date, fptpath:java.lang.String, returnstatus:java.lang.String, errormsg:String) {
        this()
        this.pkId = pkId
        this.username = username
        this.hitresultType = hitresultType
+       this.xczwAsjbh = xczwAsjbh
+       this.xczwYsxtAsjbh = xczwYsxtAsjbh
        this.xczwXckybh = xczwXckybh
+       this.xczwYsxtXczzhwbh = xczwYsxtXczzhwbh
        this.xczwXcwzbh = xczwXcwzbh
+       this.xczwXczzhwkbh = xczwXczzhwkbh
        this.nyzwYsxtAsjxgrybh = nyzwYsxtAsjxgrybh
+       this.nyzwJzrybh = nyzwJzrybh
+       this.nyzwAsjxgrybh = nyzwAsjxgrybh
+       this.nyzwZzhwkbh = nyzwZzhwkbh
        this.nyzwZzhwdm = nyzwZzhwdm
        this.asjfsddXzqhdm = asjfsddXzqhdm
-       this.createtime = createtime
-       this.updatetime = updatetime
-       this.sendHitResultCount = sendHitResultCount
+       this.calltime = calltime
+       this.returntime = returntime
+       this.fptpath = fptpath
+       this.returnstatus = returnstatus
+       this.errormsg = errormsg
     }
    
 
