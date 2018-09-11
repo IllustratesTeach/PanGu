@@ -43,4 +43,11 @@ object SurveyConstant {
   //GAB 警综案事件编号的正则校验表达式
   final val REGEX_ASJBH = "|((A|Z)[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"
 
+  final val FPTX_INPUT_SUCCESS = "1"
+  final val FPTX_INPUT_FAIL = "0"
+
+  final val HAIXIN_SERVICE_NORMAL_STATUS:java.lang.Integer = 1
+  final val HAIXIN_SERVICE_EXCEPTION_STATUS:java.lang.Integer = 0
+  final val GET_HITRESULT_PACKAGE_EXCEPTION = "9"
+
 }

@@ -1,10 +1,13 @@
 package nirvana.hall.webservice.internal.survey.gafis62
 
+import java.io.File
+import java.util.regex.Pattern
+import java.util.{Date, UUID}
 import javax.activation.DataHandler
 
 import monad.support.MonadSupportConstants
 import monad.support.services.XmlLoader
-import nirvana.hall.api.internal.DateConverter
+import nirvana.hall.api.internal.{DataConverter, DateConverter}
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, TPCardService}
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.c.services.gfpt4lib.fpt4code
@@ -22,7 +25,9 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames.g_stCN
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.SurveyConstant
+import nirvana.hall.webservice.jpa.{LogEditrecord, LogPuthitresult}
 import nirvana.hall.webservice.services.survey.SurveyHitResultRecordService
+import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable.ArrayBuffer
 /**
@@ -74,7 +79,7 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     * @param hitResult SURVEYHITRESULTRECORD
     * @return
     */
-  override def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD): Option[DataHandler] = {
+  override def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD,logPutHitResult:LogPuthitresult): Option[DataHandler] = {
     val fingerId = hitResult.szFingerID
     val hitFingerId = hitResult.szHitFingerID
     val fpt5File = new FPT5File
@@ -86,6 +91,23 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
           case Some(ltHitResultPackage) =>
             lTHitResultPackage += ltHitResultPackage
             fpt5File.ltHitResultPackage = lTHitResultPackage.toArray
+            logPutHitResult.calltime = new Date()
+            logPutHitResult.hitresultType = "LT"
+            val ltHitResult = fpt5File.ltHitResultPackage.head
+            logPutHitResult.xczwAsjbh = ltHitResult.latentFingerCaseId
+            logPutHitResult.xczwYsxtAsjbh = ltHitResult.latentFingerOriginalSystemCaseId
+            logPutHitResult.xczwXckybh = ltHitResult.latentFingerLatentSurveyId
+            logPutHitResult.xczwYsxtXczzhwbh = ltHitResult.latentFingerOriginalSystemFingerId
+            logPutHitResult.xczwXcwzbh = ltHitResult.latentFingerLatentPhysicalId
+            logPutHitResult.xczwXczzhwkbh = ltHitResult.latentFingerCardId
+            logPutHitResult.nyzwYsxtAsjxgrybh = ltHitResult.fingerPrintOriginalSystemPersonId
+            logPutHitResult.nyzwJzrybh = ltHitResult.fingerPrintJingZongPersonId
+            logPutHitResult.nyzwAsjxgrybh = ltHitResult.fingerPrintPersonId
+            logPutHitResult.nyzwZzhwkbh = ltHitResult.fingerPrintCardId
+            logPutHitResult.nyzwZzhwdm = ltHitResult.fingerPrintPostionCode
+            logPutHitResult.asjfsddXzqhdm = ltHitResult.hitUnitCode.take(6).toLong
+            val fileName = ltHitResultPackage.latentFingerLatentSurveyId + "-" + ltHitResultPackage.fingerPrintOriginalSystemPersonId
+            logPutHitResult.fptpath = hallWebserviceConfig.localHitResultPath + File.separator + DateConverter.convertDate2String(new Date(), "yyyyMMdd") + File.separator + fileName +".fptx"
             build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
             val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
             Option(dataHandler)
@@ -98,6 +120,8 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
           case Some(hitResultPackage) =>
             llHitResultPackage += hitResultPackage
             fpt5File.llHitResultPackage = llHitResultPackage.toArray
+            logPutHitResult.calltime = new Date()
+            logPutHitResult.hitresultType = "LL"
             build(fpt5File,sendUnitCode,sendUnitName,sendPersonName,sendPersonIdCard,sendPersonTel)
             val dataHandler = getZipDataHandlerOfString(XmlLoader.toXml(fpt5File,MonadSupportConstants.UTF8_ENCODING), fingerId +"-"+ hitFingerId, hallWebserviceConfig.localHitResultPath,SurveyConstant.EXPORT_FPTX_FILE)
             Option(dataHandler)
@@ -148,7 +172,8 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
       //捺印指纹_指掌位代码--nyzw_zzhwdm
       ltHitPkg.fingerPrintPostionCode = hitFgpconvert(hitResult.nHitFgp.toString.toInt)
       ltHitPkg.fingerPrintComparisonMethodCode = fpt5util.QUERY_TYPE_LT
-
+      //存储记录修改前后的比中关系信息
+      storeModifyRecord(ltHitPkg)
       val breakInfos = getHitHistory(fingerCardId,NOT_LATENT)
       if(breakInfos.nonEmpty){
         breakInfos.get.breakRecords.filter(_.tprCardID.equals(hitFingerId)).foreach{
@@ -401,5 +426,58 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
     fPT5File.packageHead.sendPersonTel = sendPersonTel
     fPT5File.packageHead.sendUnitSystemType = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     fPT5File
+  }
+  private def storeModifyRecord(ltHitResultPackage: LtHitResultPackage): Unit = {
+    val logEditRecord = new LogEditrecord()
+    logEditRecord.pkId = UUID.randomUUID().toString.replace("-","")
+    logEditRecord.oldXczwAsjbh = ltHitResultPackage.latentFingerCaseId
+    logEditRecord.oldXczwYsxtAsjbh = ltHitResultPackage.latentFingerOriginalSystemCaseId
+    logEditRecord.oldXczwXckybh = ltHitResultPackage.latentFingerLatentSurveyId
+    logEditRecord.oldXczwYsxtXczzhwbh = ltHitResultPackage.latentFingerOriginalSystemFingerId
+    logEditRecord.oldXczwXcwzbh = ltHitResultPackage.latentFingerLatentPhysicalId
+    logEditRecord.oldXczwXczzhwkbh = ltHitResultPackage.latentFingerCardId
+    logEditRecord.oldNyzwYsxtAsjxgrybh = ltHitResultPackage.fingerPrintOriginalSystemPersonId
+    //校验原始系统案事件相关人员编号
+    if(!Pattern.compile("R[0-9A-Z]{22}").matcher(ltHitResultPackage.fingerPrintOriginalSystemPersonId).matches()){
+      ltHitResultPackage.fingerPrintOriginalSystemPersonId = ltHitResultPackage.latentFingerCaseId.replace("A","R")
+      logEditRecord.newNyzwJzrybh = ltHitResultPackage.fingerPrintOriginalSystemPersonId
+    }
+    logEditRecord.oldNyzwJzrybh = ltHitResultPackage.fingerPrintJingZongPersonId
+    //校验警综人员编号
+    if(!StringUtils.equals("",ltHitResultPackage.fingerPrintJingZongPersonId)){
+      val regEx = "(R[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"
+      val pattern = Pattern.compile(regEx)
+      val matcher = pattern.matcher(ltHitResultPackage.fingerPrintJingZongPersonId)
+      if(!matcher.matches()){
+        ltHitResultPackage.fingerPrintJingZongPersonId = ltHitResultPackage.latentFingerCaseId.replace("A","R")
+        logEditRecord.newNyzwJzrybh = ltHitResultPackage.fingerPrintJingZongPersonId
+      }
+    }
+    logEditRecord.oldNyzwAsjxgrybh = ltHitResultPackage.fingerPrintPersonId
+    //校验案事件相关人员编号
+    if(!StringUtils.equals("",ltHitResultPackage.fingerPrintPersonId)){
+      val regEx = "(R[0-9]{6}([0-9]|[A-Z]){6}[0-9]{4}(0[1-9]|1[0-2])([0-9]|[A-Z]){4})"
+      val pattern = Pattern.compile(regEx)
+      val matcher = pattern.matcher(ltHitResultPackage.fingerPrintPersonId)
+      if(!matcher.matches()){
+        ltHitResultPackage.fingerPrintPersonId = ltHitResultPackage.latentFingerCaseId.replace("A","R")
+        logEditRecord.newNyzwJzrybh = ltHitResultPackage.fingerPrintPersonId
+      }
+    }
+    logEditRecord.oldNyzwZzhwkbh = ltHitResultPackage.fingerPrintCardId
+    logEditRecord.oldNyzwZzhwdm = ltHitResultPackage.fingerPrintPostionCode
+    logEditRecord.modifytime = new Date()
+    logEditRecord.newXczwAsjbh = ltHitResultPackage.latentFingerCaseId
+    logEditRecord.newXczwYsxtAsjbh = ltHitResultPackage.latentFingerOriginalSystemCaseId
+    logEditRecord.newXczwXckybh = ltHitResultPackage.latentFingerLatentSurveyId
+    logEditRecord.newXczwYsxtXczzhwbh = ltHitResultPackage.latentFingerOriginalSystemFingerId
+    logEditRecord.newXczwXcwzbh = ltHitResultPackage.latentFingerLatentPhysicalId
+    logEditRecord.newXczwXczzhwkbh = ltHitResultPackage.latentFingerCardId
+    logEditRecord.newNyzwYsxtAsjxgrybh =ltHitResultPackage.fingerPrintOriginalSystemPersonId
+
+    logEditRecord.newNyzwAsjxgrybh = ltHitResultPackage.fingerPrintPersonId
+    logEditRecord.newNyzwZzhwkbh = ltHitResultPackage.fingerPrintCardId
+    logEditRecord.newNyzwZzhwdm = ltHitResultPackage.fingerPrintPostionCode
+    logEditRecord.save()
   }
 }

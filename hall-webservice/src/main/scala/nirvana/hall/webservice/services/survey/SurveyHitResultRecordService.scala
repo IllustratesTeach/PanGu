@@ -5,6 +5,7 @@ import javax.activation.{DataHandler, FileDataSource}
 
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gloclib.survey.SURVEYHITRESULTRECORD
+import nirvana.hall.webservice.jpa.LogPuthitresult
 import org.apache.commons.io.FileUtils
 
 /**
@@ -37,7 +38,7 @@ trait SurveyHitResultRecordService {
     * @param hitResult SURVEYHITRESULTRECORD
     * @return
     */
-  def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD): Option[DataHandler]
+  def getDataHandlerOfLtOrLlHitResultPackage(hitResult: SURVEYHITRESULTRECORD,logPutHitResult:LogPuthitresult): Option[DataHandler]
 
   protected def getZipDataHandlerOfString(xml: String, fileName: String, path: String,exportFileType:String): DataHandler = {
     val xmlFile = new File(path + File.separator + fileName + exportFileType)
