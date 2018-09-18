@@ -3,10 +3,10 @@ package nirvana.hall.webservice.internal.survey
 import java.io.File
 import java.util
 
-import nirvana.hall.api.internal.fpt.FPT5ValidUtil
 import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.support.services.XmlLoader
+import nirvana.hall.webservice.FPT5ValidUtil
 import nirvana.hall.webservice.jpa.{LogGetfingerdetail, LogInterfacestatus, _}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
@@ -19,10 +19,6 @@ import scala.collection.JavaConversions
   * Created by yuchen on 2018/8/3.
   */
 class PlatformOperatorInfoProvider{
-  private var hasLoad = false
-  private val codeMap = new util.HashMap[String, util.List[String]]
-  private val regexMap = new util.HashMap[String, String]
-  private val regexXsd = Array("date.xsd", "float.xsd", "int.xsd", "regex.xsd", "sfzh.xsd", "time.xsd", "regex.xsd")
 
   /**
     * 添加调用现勘系统获取指掌纹数量记录
@@ -102,9 +98,11 @@ class PlatformOperatorInfoProvider{
   }
 
   def validLatentPrintPackage(latentPackageStr:String): Seq[String] = {
-    val serverHome = System.getProperty("server.home","fpt5")
+    val serverHome = System.getProperty("server.home","support")
     System.setProperty("server.home",serverHome)
-    FPT5ValidUtil.loadXsd(serverHome)
+    FPT5ValidUtil.loadXsd(this.getClass.getResource("/").getPath+"/fpt5")
+    println("dangqianlujing"+this.getClass.getResource("/").getPath)
+    println("dangqianlujing"+this.getClass.getResource("").getPath)
     val fPT5File = Option(XmlLoader.parseXML[FPT5File](latentPackageStr))
     val result = new util.ArrayList[String]
     val caseMsg = fPT5File.get.latentPackage.head.caseMsg
@@ -403,27 +401,5 @@ class PlatformOperatorInfoProvider{
     }
     JavaConversions.asScalaBuffer(stringListTrim(result))
 
-  }
-
-  def loadXSD():Unit = {
-    val serverHome = System.getProperty("server.home","fpt5")
-    System.setProperty("server.home",serverHome)
-    val fileList = new File(serverHome).listFiles
-    if( fileList.nonEmpty && fileList.size >0 ) {
-      fileList.foreach{
-        xsd =>
-          val fileName: String = xsd.getName
-          if (fileName.endsWith(".xsd")) if (fileName.startsWith("code_")) codeMap.put(fileName.replaceAll(".xsd", ""), FPT5ValidUtil.readXsdCode(xsd.getAbsolutePath))
-          else if (FPT5ValidUtil.inArray(regexXsd, fileName)) {
-            //正则校验xsd
-            regexMap.putAll(FPT5ValidUtil.readRegex(xsd.getAbsolutePath))
-          }
-          else {
-          }
-      }
-    }else{
-      println("weihuoqudao")
-    }
-    println("fdsa")
   }
 }
