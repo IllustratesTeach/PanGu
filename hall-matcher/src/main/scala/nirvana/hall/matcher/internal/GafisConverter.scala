@@ -104,11 +104,16 @@ object GafisConverter {
       if (keyId.nonEmpty) {
         var fgp = cand.getPos
         //指位转换，TT查询指位0
-        if(fgp > 0 || !isPalm){
-          fgp = DataConverter.fingerPos8to6(cand.getPos)
+        if(fgp > 0){
+          if(!isPalm){
+            fgp = DataConverter.fingerPos8to6(cand.getPos)
+          }
           if(isGafis6){
             if(fgp > 10){//gafis6.2中平指指位[21,30]
               fgp += 10
+            }
+            if(isPalm){//6.2候选掌位11，12
+              fgp = DataConverter.palmPos8to6(fgp)
             }
           }
         }
