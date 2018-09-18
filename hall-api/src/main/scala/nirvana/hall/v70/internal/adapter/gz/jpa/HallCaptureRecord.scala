@@ -1,5 +1,4 @@
-package nirvana.hall.v70.internal.adapter.gz.jpa;
-
+package nirvana.hall.v70.internal.adapter.gz.jpa
 
 import javax.persistence.{Column, Entity, Id, Table}
 

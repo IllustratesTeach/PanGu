@@ -1,8 +1,10 @@
 
 package nirvana.hall.webservice.survey.gz.client;
 
+import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -16,10 +18,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="arg0" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="arg1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="arg2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="arg3" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
+ *         &lt;element name="userID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="xckybh" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="modiFingerPrint" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -30,110 +32,113 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "sendModiFingerPrint", propOrder = {
-    "arg0",
-    "arg1",
-    "arg2",
-    "arg3"
+    "userID",
+    "password",
+    "xckybh",
+    "modiFingerPrint"
 })
 public class SendModiFingerPrint {
 
-    protected String arg0;
-    protected String arg1;
-    protected String arg2;
-    protected byte[] arg3;
+    protected String userID;
+    protected String password;
+    protected String xckybh;
+    @XmlMimeType("*/*")
+    protected DataHandler modiFingerPrint;
 
     /**
-     * Gets the value of the arg0 property.
+     * Gets the value of the userID property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getArg0() {
-        return arg0;
+    public String getUserID() {
+        return userID;
     }
 
     /**
-     * Sets the value of the arg0 property.
+     * Sets the value of the userID property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setArg0(String value) {
-        this.arg0 = value;
+    public void setUserID(String value) {
+        this.userID = value;
     }
 
     /**
-     * Gets the value of the arg1 property.
+     * Gets the value of the password property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getArg1() {
-        return arg1;
+    public String getPassword() {
+        return password;
     }
 
     /**
-     * Sets the value of the arg1 property.
+     * Sets the value of the password property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setArg1(String value) {
-        this.arg1 = value;
+    public void setPassword(String value) {
+        this.password = value;
     }
 
     /**
-     * Gets the value of the arg2 property.
+     * Gets the value of the xckybh property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getArg2() {
-        return arg2;
+    public String getXckybh() {
+        return xckybh;
     }
 
     /**
-     * Sets the value of the arg2 property.
+     * Sets the value of the xckybh property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setArg2(String value) {
-        this.arg2 = value;
+    public void setXckybh(String value) {
+        this.xckybh = value;
     }
 
     /**
-     * Gets the value of the arg3 property.
+     * Gets the value of the modiFingerPrint property.
      * 
      * @return
      *     possible object is
-     *     byte[]
+     *     {@link DataHandler }
+     *     
      */
-    public byte[] getArg3() {
-        return arg3;
+    public DataHandler getModiFingerPrint() {
+        return modiFingerPrint;
     }
 
     /**
-     * Sets the value of the arg3 property.
+     * Sets the value of the modiFingerPrint property.
      * 
      * @param value
      *     allowed object is
-     *     byte[]
+     *     {@link DataHandler }
+     *     
      */
-    public void setArg3(byte[] value) {
-        this.arg3 = value;
+    public void setModiFingerPrint(DataHandler value) {
+        this.modiFingerPrint = value;
     }
 
 }

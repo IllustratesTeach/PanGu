@@ -1,18 +1,16 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import java.io.{ByteArrayInputStream, File, FileInputStream}
+import java.io.{File, FileInputStream}
 import java.util.Date
+import javax.activation.DataHandler
 
-import monad.support.services.LoggerSupport
+import monad.support.services.{LoggerSupport, MonadException}
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.services.fpt.FPT5Service
-import nirvana.hall.c.services.AncientData.AncientDataException
-import nirvana.hall.c.services.gfpt4lib.FPTFile.FPTParseException
 import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.config.HallWebserviceConfig
-import nirvana.hall.webservice.internal.survey.SurveyConstant
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 import nirvana.hall.webservice.survey.gz.client.FPT50HandprintServiceService
 import org.apache.commons.codec.digest.DigestUtils
@@ -63,7 +61,7 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
           }catch{
             case ex:Exception =>
               error("GetDateServiceCronService-error:{},currentTime:{}"
-                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+                ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,Constant.DATETIME_FORMAT)
               )
           }
         }
@@ -74,8 +72,8 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
 
 
   def doWork {
-    val xkCodeList = surveyRecordService.getSurveyRecordbyState(SurveyConstant.INIT, BATCH_SIZE)
-    info("现堪号列表长度：------"+xkCodeList.length)
+    val xkCodeList = surveyRecordService.getSurveyRecordbyState(Constant.INIT, BATCH_SIZE)
+    info("现堪号列表：------"+xkCodeList)
     xkCodeList.foreach {
       kNo =>
         if(checkCaseNo(kNo)){
@@ -98,57 +96,91 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
   private def checkCaseNo(kNo:String):Boolean= {
     var bStr = false
     val caseNo = fpt50handprintServicePort.getCaseNo(userID,password,kNo)
-    surveyRecordService.saveSurveyLogRecord (SurveyConstant.GET_CASE_NO
+    surveyRecordService.saveSurveyLogRecord (Constant.GET_CASE_NO
       , kNo
-      , SurveyConstant.EMPTY
+      , Constant.EMPTY
       , CommonUtil.appendParam ("userID:" + userID, "password:" + password, "xckybh:" + kNo)
       , caseNo
-      , SurveyConstant.EMPTY)
+      , Constant.EMPTY)
     info("现堪编号："+kNo+"-----查询的案件编号："+caseNo)
     if (! CommonUtil.isNullOrEmpty (caseNo) ) {
       bStr = true
     }else{
-      surveyRecordService.updateSurveyRecordStateByKno(SurveyConstant.SURVEY_CODE_KNO_FAIL,kNo)
+      surveyRecordService.updateSurveyRecordStateByKno(Constant.SURVEY_CODE_KNO_FAIL,kNo)
     }
     bStr
   }
 
   private def getPFTPackage(xcwzbh:String ,uuid : String): Boolean ={
     var bStr = false
-    val fpt = fpt50handprintServicePort.getFingerPrint(userID,password,xcwzbh)
+    info("开始获取"+xcwzbh+"现勘数据包")
+    var fpt : DataHandler = null
+    try {
+      fpt = fpt50handprintServicePort.getFingerPrint(userID, password, xcwzbh)
+    }catch {
+      case ex: Exception =>
+        surveyRecordService.saveSurveyLogRecord("getFingerPrint"
+          , Constant.EMPTY
+          , xcwzbh
+          , Constant.EMPTY
+          , Constant.EMPTY
+          , ex.getMessage)
+      //获取现勘fpt包失败状态为-4
+        surveyRecordService.updateRecordStateByXCWZBH(Constant.SURVEY_CODE_FILE_ERROR,xcwzbh)
+    }
+    info("获取"+xcwzbh+"现勘数据包完成")
     val path = hallWebserviceConfig.localLatentPath+"/" + xcwzbh
-    surveyRecordService.saveSurveyLogRecord(SurveyConstant.GET_ORIGINAL_DATA
-                                            ,SurveyConstant.EMPTY
+    surveyRecordService.saveSurveyLogRecord(Constant.GET_ORIGINAL_DATA
+                                            ,Constant.EMPTY
                                             ,xcwzbh
                                             ,CommonUtil.appendParam("userID:" + userID
                                                                   , "password:" + password
                                                                   , "xcwzbh:" + xcwzbh)
                                             ,path
-                                            ,SurveyConstant.EMPTY)
+                                            ,Constant.EMPTY)
     //判断返回数据包是否为空
-    if(IOUtils.toByteArray(fpt.getInputStream).length>0){
+    if(null!= fpt && IOUtils.toByteArray(fpt.getInputStream).length>0){
 //      if(hallWebserviceConfig.saveFPTFlag.equals("1")){
         FileUtils.writeByteArrayToFile(new File(path+".zip"), IOUtils.toByteArray(fpt.getInputStream))
 //      }
       FPT5Utils.unzipFile(new ZipFile(path+".zip"),path +".xml")
       val fileInputStream = new FileInputStream(path + ".xml")
       val content = Source.fromInputStream(fileInputStream).mkString
-      val fpt5File = XmlLoader.parseXML[FPT5File](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/")
       try{
+        val fpt5File = XmlLoader.parseXML[FPT5File](content, xsd = Some(getClass.getResourceAsStream("/nirvana/hall/fpt5/latent.xsd")), basePath= "/nirvana/hall/fpt5/")
         for(i <- 0 until fpt5File.latentPackage.size){
+          info("开始保存"+ xcwzbh + "现场信息")
           fPT5Service.addLatentPackage(fpt5File.latentPackage(i))
-          surveyRecordService.updateRecordStateByXCWZBH(SurveyConstant.SNO_SUCCESS,uuid)
-          sendFBUseCondition(xcwzbh,SurveyConstant.FPT_PARSE_SUCCESS,"")
+          info( xcwzbh + "现场信息保存完成")
+          surveyRecordService.updateRecordStateByXCWZBH(Constant.SNO_SUCCESS,xcwzbh)
+          sendFBUseCondition(xcwzbh,Constant.FPT_PARSE_SUCCESS,"")
         }
         bStr = true
       }catch {
-        case ex:AncientDataException =>
-          sendFBUseCondition(xcwzbh,SurveyConstant.FPT_PARSE_FAIL,ExceptionUtil.getStackTraceInfo(ex))
-        case exx:FPTParseException =>
-          sendFBUseCondition(xcwzbh,SurveyConstant.FPT_PARSE_FAIL,ExceptionUtil.getStackTraceInfo(exx))
+        case ex:MonadException =>
+          surveyRecordService.saveSurveyLogRecord("getPFTPackage"
+            ,Constant.EMPTY
+            ,xcwzbh
+            ,Constant.EMPTY
+            ,Constant.EMPTY
+            ,ex.getMessage)
+          //解析失败修改record表状态为9
+          surveyRecordService.updateRecordStateByXCWZBH(Constant.SURVEY_CODE_DATA_FAIL,xcwzbh)
+          sendFBUseCondition(xcwzbh,Constant.FPT_PARSE_FAIL,ExceptionUtil.getStackTraceInfo(ex))
+        case e : Exception =>
+          error(e.getMessage)
+          error(ExceptionUtil.getStackTraceInfo(e))
+          surveyRecordService.saveSurveyLogRecord("getPFTPackage"
+            ,Constant.EMPTY
+            ,xcwzbh
+            ,Constant.EMPTY
+            ,Constant.EMPTY
+            ,e.getMessage + ExceptionUtil.getStackTraceInfo(e))
+          ExceptionUtil
+          surveyRecordService.updateRecordStateByXCWZBH(Constant.SURVEY_CODE_FAIL,xcwzbh)
       }
     }else{
-      surveyRecordService.updateRecordStateByXCWZBH(SurveyConstant.SURVEY_CODE_CASEID_REPEAT,uuid)
+      surveyRecordService.updateRecordStateByXCWZBH(Constant.SURVEY_CODE_CASEID_REPEAT,xcwzbh)
       info("返回空数据包！")
       bStr = false
     }
@@ -161,23 +193,23 @@ class GetDateServiceCronService(hallWebserviceConfig: HallWebserviceConfig,
     */
   private def getReceptionNo(kNo:String) = {
     val receptionNO = fpt50handprintServicePort.getReceptionNo(userID,password,kNo)
-    surveyRecordService.saveSurveyLogRecord(SurveyConstant.GET_RECEPTION_NO,kNo
-      ,SurveyConstant.EMPTY
+    surveyRecordService.saveSurveyLogRecord(Constant.GET_RECEPTION_NO,kNo
+      ,Constant.EMPTY
       ,CommonUtil.appendParam("userID:"+userID,"password:"+password,"xckybh:"+kNo)
-      ,receptionNO,SurveyConstant.EMPTY)
+      ,receptionNO,Constant.EMPTY)
     if(CommonUtil.isNullOrEmpty(receptionNO)){
-      surveyRecordService.updateRecordStateByKno(SurveyConstant.SURVEY_CODE_CASEID_ERROR,kNo)
+      surveyRecordService.updateRecordStateByKno(Constant.SURVEY_CODE_CASEID_ERROR,kNo)
     }else{
       surveyRecordService.updateCasePeception(receptionNO,kNo)
-      surveyRecordService.updateRecordStateByKno(SurveyConstant.SURVEY_CODE_CASEID_SUCCESS,kNo)
+      surveyRecordService.updateRecordStateByKno(Constant.SURVEY_CODE_CASEID_SUCCESS,kNo)
     }
   }
 
   private def sendFBUseCondition(xcwzbh:String,resultType:String,exceptionInfo:String): Unit ={
     val responses = fpt50handprintServicePort.sendFBUseCondition(userID,password,xcwzbh,resultType)
     info("callFBUseCondition返回信息：---"+responses)
-    surveyRecordService.saveSurveyLogRecord(SurveyConstant.FBUSECONDITION
-      ,SurveyConstant.EMPTY
+    surveyRecordService.saveSurveyLogRecord(Constant.FBUSECONDITION
+      ,Constant.EMPTY
       ,xcwzbh
       ,CommonUtil.appendParam("userID:" + userID
         , "password:" + password

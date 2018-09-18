@@ -2,6 +2,7 @@ package nirvana.hall.v70.internal.adapter.gz.services.versionfpt5
 
 import java.text.SimpleDateFormat
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.fpt.CodeConverterV70New
 import nirvana.hall.api.services.MatchRelationService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{Logic04Rec, Logic05Rec, Logic06Rec}
@@ -9,15 +10,12 @@ import nirvana.hall.c.services.gfpt4lib.fpt4code
 import nirvana.hall.c.services.gfpt5lib.{LlHitResultPackage, LtHitResultPackage, TtHitResultPackage, fpt5util}
 import nirvana.hall.protocol.api.FPTProto.MatchRelationInfo
 import nirvana.hall.protocol.api.HallMatchRelationProto.{MatchRelationGetRequest, MatchRelationGetResponse}
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.adapter.gz.jpa._
-import nirvana.hall.v70.internal.adapter.gz.jpa.GafisCheckinInfo
 
 import scala.collection.mutable.ArrayBuffer
 
 
-
-class MatchRelationServiceImpl extends MatchRelationService{
+class MatchRelationServiceImpl extends MatchRelationService with LoggerSupport{
   /**
    * 获取比对关系
    * 查询比中关系表获取比中关系信息
@@ -157,6 +155,10 @@ class MatchRelationServiceImpl extends MatchRelationService{
     val gafisCaseFinger = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.code).headOption.get
     val gafisCase = GafisCase.where(GafisCase.caseId === gafisCaseFinger.caseId).headOption.get
     val gafisPerson = GafisPerson.where(GafisPerson.personid === gafisCheckinInfo.tcode).headOption.get
+    //通过现场物证编号查询对应现勘号（存在一个案件对应多个现勘的情况）
+    val fnoKnoConn = SurveyFnoKnoConn.where(SurveyFnoKnoConn.physicalEvidenceNo === gafisCaseFinger.physicalEvidenceNo).headOption
+    //人员编号不符合fpt5的xsd校验标准，重新生成的人员编号关联
+    val personidConn = PersonidConnFPT5.where(PersonidConnFPT5.personid === gafisPerson.personid).headOption
 
     val ltHitResultPackage = new LtHitResultPackage
     var ora_sid = oraSid
@@ -167,14 +169,14 @@ class MatchRelationServiceImpl extends MatchRelationService{
     ltHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     ltHitResultPackage.latentFingerCaseId = gafisCase.caseSystemId
     ltHitResultPackage.latentFingerOriginalSystemCaseId = gafisCase.caseId
-    ltHitResultPackage.latentFingerLatentSurveyId = gafisCase.sceneSurveyId
+    ltHitResultPackage.latentFingerLatentSurveyId = if(fnoKnoConn.size>0) fnoKnoConn.get.sceneSurveyId else gafisCase.sceneSurveyId
     ltHitResultPackage.latentFingerOriginalSystemFingerId = gafisCheckinInfo.code
     ltHitResultPackage.latentFingerLatentPhysicalId = GafisCaseFinger.where(GafisCaseFinger.fingerId === gafisCheckinInfo.code).headOption.get.physicalEvidenceNo
     ltHitResultPackage.latentFingerCardId = gafisCaseFinger.caseId
-    ltHitResultPackage.fingerPrintOriginalSystemPersonId  = gafisPerson.personid
+    ltHitResultPackage.fingerPrintOriginalSystemPersonId  = if(personidConn.size>0) personidConn.get.personid_FPT5 else gafisPerson.personid.replaceAll("P","R")
     ltHitResultPackage.fingerPrintJingZongPersonId = gafisPerson.jingZongPersonId
-    ltHitResultPackage.fingerPrintPersonId = gafisPerson.casePersonid
-    ltHitResultPackage.fingerPrintCardId = gafisPerson.personid
+    ltHitResultPackage.fingerPrintPersonId = if(null != gafisPerson.casePersonid && gafisPerson.casePersonid.length > 0) gafisPerson.casePersonid.replaceAll("R","P") else null //gafisPerson.personid.replaceAll("R","P")
+    ltHitResultPackage.fingerPrintCardId = if(personidConn.size>0) personidConn.get.personid_FPT5 else gafisPerson.personid.replaceAll("P","R")
     var fptFgp = ""
     if(gafisCheckinInfo.fgp.toInt > 10){
       fptFgp = CodeConverterV70New.converFingerFgp(CodeConverterV70New.PLANE_FINGER,(gafisCheckinInfo.fgp.toInt -10).toString)
@@ -192,7 +194,8 @@ class MatchRelationServiceImpl extends MatchRelationService{
     ltHitResultPackage.hitUnitCode = gafisCheckinInfo.registerOrg
     ltHitResultPackage.hitUnitName = SysDepart.find_by_code(gafisCheckinInfo.registerOrg).headOption.get.name
     ltHitResultPackage.hitPersonName = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.trueName
-    ltHitResultPackage.hitPersonIdCard = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.idcard
+    ltHitResultPackage.hitPersonIdCard = if(null == SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.idcard)
+      "" else SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.idcard.replaceAll("x","X")
     ltHitResultPackage.hitPersonTel = SysUser.find_by_pkId(gafisCheckinInfo.registerUser).headOption.get.phone
     ltHitResultPackage.hitDateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(gafisCheckinInfo.registerTime)
 
@@ -241,7 +244,9 @@ class MatchRelationServiceImpl extends MatchRelationService{
     val gafisCaseSource = GafisCase.where(GafisCase.caseId === gafisCaseFingerSource.caseId).headOption.get
     val gafisCaseDest = GafisCase.where(GafisCase.caseId === gafisCaseFingerDest.caseId).headOption.get
 
-
+    //通过现场物证编号查询对应现勘号（存在一个案件对应多个现勘的情况）
+    val fnoKnoConnSource = SurveyFnoKnoConn.where(SurveyFnoKnoConn.physicalEvidenceNo === gafisCaseFingerSource.physicalEvidenceNo).headOption
+    val fnoKnoConnDest = SurveyFnoKnoConn.where(SurveyFnoKnoConn.physicalEvidenceNo === gafisCaseFingerDest.physicalEvidenceNo).headOption
 
     val llHitResultPackage = new LlHitResultPackage
     var ora_sid = oraSid
@@ -252,14 +257,14 @@ class MatchRelationServiceImpl extends MatchRelationService{
     llHitResultPackage.comparisonSystemTypeDescript = fpt4code.GAIMG_CPRMETHOD_EGFS_CODE
     llHitResultPackage.originalSystemCaseId = gafisCaseFingerSource.caseId
     llHitResultPackage.caseId = gafisCaseSource.caseSystemId
-    llHitResultPackage.latentSurveyId = gafisCaseSource.sceneSurveyId
+    llHitResultPackage.latentSurveyId = if(fnoKnoConnSource.size>0) fnoKnoConnSource.get.sceneSurveyId else gafisCaseSource.sceneSurveyId
     llHitResultPackage.originalSystemLatentFingerId = gafisCaseFingerSource.fingerId
     llHitResultPackage.latentPhysicalId = gafisCaseFingerSource.physicalEvidenceNo
     llHitResultPackage.cardId = gafisCaseSource.caseId
 
     llHitResultPackage.resultOriginalSystemCaseId = gafisCaseFingerDest.caseId
     llHitResultPackage.resultCaseId = gafisCaseDest.caseSystemId
-    llHitResultPackage.resultLatentSurveyId = gafisCaseDest.sceneSurveyId
+    llHitResultPackage.resultLatentSurveyId = if(fnoKnoConnDest.size>0) fnoKnoConnDest.get.sceneSurveyId else gafisCaseDest.sceneSurveyId
     llHitResultPackage.resultOriginalSystemLatentPersonId = gafisCaseFingerDest.fingerId
     llHitResultPackage.resultLatentPhysicalId = gafisCaseFingerDest.physicalEvidenceNo
     llHitResultPackage.resultCardId = gafisCaseDest.caseId

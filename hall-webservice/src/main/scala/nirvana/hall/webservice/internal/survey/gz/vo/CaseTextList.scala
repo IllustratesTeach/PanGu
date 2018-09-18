@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.{XmlAccessType, XmlAccessorType, XmlRootElement
 class CaseTextList{
   var K = new util.ArrayList[ListCaseNode]()
 }
+
 @XmlAccessorType(XmlAccessType.FIELD)
 class ListCaseNode{
   var CaseID :String = _

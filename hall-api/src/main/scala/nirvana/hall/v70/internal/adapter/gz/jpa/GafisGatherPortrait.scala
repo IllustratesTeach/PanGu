@@ -1,4 +1,5 @@
 package nirvana.hall.v70.internal.adapter.gz.jpa
+
 // Generated Jan 6, 2016 6:08:10 PM by hall orm generator 4.3.1.Final
 
 

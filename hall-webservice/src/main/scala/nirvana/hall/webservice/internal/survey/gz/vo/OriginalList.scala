@@ -11,6 +11,7 @@ import javax.xml.bind.annotation._
 class OriginalList{
   var k = new util.ArrayList[ListNode]()
 }
+
 @XmlAccessorType(XmlAccessType.FIELD)
 class ListNode{
   var AJMC :String = _      //案件名称

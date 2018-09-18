@@ -1,21 +1,23 @@
 
 package nirvana.hall.webservice.survey.gz.client;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for getFingerPrintListResponse complex type.
+ * <p>Java class for csResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="getFingerPrintListResponse">
+ * &lt;complexType name="csResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
+ *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -25,24 +27,23 @@ import javax.xml.bind.annotation.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "getFingerPrintListResponse", propOrder = {
+@XmlType(name = "csResponse", propOrder = {
     "_return"
 })
-public class GetFingerPrintListResponse {
+public class CsResponse {
 
     @XmlElement(name = "return")
-    @XmlMimeType("*/*")
-    protected DataHandler _return;
+    protected String _return;
 
     /**
      * Gets the value of the return property.
      * 
      * @return
      *     possible object is
-     *     {@link DataHandler }
+     *     {@link String }
      *     
      */
-    public DataHandler getReturn() {
+    public String getReturn() {
         return _return;
     }
 
@@ -51,10 +52,10 @@ public class GetFingerPrintListResponse {
      * 
      * @param value
      *     allowed object is
-     *     {@link DataHandler }
+     *     {@link String }
      *     
      */
-    public void setReturn(DataHandler value) {
+    public void setReturn(String value) {
         this._return = value;
     }
 
