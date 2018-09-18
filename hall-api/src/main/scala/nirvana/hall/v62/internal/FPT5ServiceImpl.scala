@@ -1,9 +1,10 @@
-package nirvana.hall.api.internal.fpt
+package nirvana.hall.v62.internal
 
 import java.io.ByteArrayInputStream
 
 import com.google.protobuf.ByteString
 import nirvana.hall.api.internal.JniLoaderUtil
+import nirvana.hall.api.internal.fpt.FPT5Converter
 import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{MatchRelationService, TPCardService, _}
@@ -15,7 +16,6 @@ import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.protocol.api.FPTProto.ImageType
 import nirvana.hall.protocol.extract.ExtractProto.ExtractRequest.FeatureType
 import nirvana.hall.protocol.extract.ExtractProto.FingerPosition
-
 
 import scala.collection.JavaConversions._
 
