@@ -28,18 +28,20 @@ public class ObjectFactory {
     private final static QName _GetFingerPrintResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrintResponse");
     private final static QName _SendLTHitResultResponse_QNAME = new QName("http://xckyservice.hisign.com/", "sendLTHitResultResponse");
     private final static QName _SendLLHitResultResponse_QNAME = new QName("http://xckyservice.hisign.com/", "sendLLHitResultResponse");
+    private final static QName _Cs_QNAME = new QName("http://xckyservice.hisign.com/", "cs");
     private final static QName _GetCaseNo_QNAME = new QName("http://xckyservice.hisign.com/", "getCaseNo");
     private final static QName _GetFingerPrint_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrint");
     private final static QName _GetFingerPrintListResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrintListResponse");
     private final static QName _SendLTHitResult_QNAME = new QName("http://xckyservice.hisign.com/", "sendLTHitResult");
     private final static QName _GetReceptionNo_QNAME = new QName("http://xckyservice.hisign.com/", "getReceptionNo");
     private final static QName _GetFingerPrintList_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrintList");
-    private final static QName _GetSystemDateTimeResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getSystemDateTimeResponse");
     private final static QName _GetSystemDateTime_QNAME = new QName("http://xckyservice.hisign.com/", "getSystemDateTime");
+    private final static QName _GetSystemDateTimeResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getSystemDateTimeResponse");
     private final static QName _SendModiFingerPrint_QNAME = new QName("http://xckyservice.hisign.com/", "sendModiFingerPrint");
     private final static QName _SendModiFingerPrintResponse_QNAME = new QName("http://xckyservice.hisign.com/", "sendModiFingerPrintResponse");
     private final static QName _SendLLHitResult_QNAME = new QName("http://xckyservice.hisign.com/", "sendLLHitResult");
     private final static QName _GetFingerPrintCount_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrintCount");
+    private final static QName _CsResponse_QNAME = new QName("http://xckyservice.hisign.com/", "csResponse");
     private final static QName _GetFingerPrintCountResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getFingerPrintCountResponse");
     private final static QName _SendFBUseConditionResponse_QNAME = new QName("http://xckyservice.hisign.com/", "sendFBUseConditionResponse");
     private final static QName _GetReceptionNoResponse_QNAME = new QName("http://xckyservice.hisign.com/", "getReceptionNoResponse");
@@ -117,6 +119,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Cs }
+     * 
+     */
+    public Cs createCs() {
+        return new Cs();
+    }
+
+    /**
      * Create an instance of {@link GetCaseNo }
      * 
      */
@@ -173,19 +183,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetSystemDateTime }
-     * 
-     */
-    public GetSystemDateTime createGetSystemDateTime() {
-        return new GetSystemDateTime();
-    }
-
-    /**
      * Create an instance of {@link GetSystemDateTimeResponse }
      * 
      */
     public GetSystemDateTimeResponse createGetSystemDateTimeResponse() {
         return new GetSystemDateTimeResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetSystemDateTime }
+     * 
+     */
+    public GetSystemDateTime createGetSystemDateTime() {
+        return new GetSystemDateTime();
     }
 
     /**
@@ -202,6 +212,14 @@ public class ObjectFactory {
      */
     public GetFingerPrintCount createGetFingerPrintCount() {
         return new GetFingerPrintCount();
+    }
+
+    /**
+     * Create an instance of {@link CsResponse }
+     * 
+     */
+    public CsResponse createCsResponse() {
+        return new CsResponse();
     }
 
     /**
@@ -246,6 +264,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "sendLLHitResultResponse")
     public JAXBElement<SendLLHitResultResponse> createSendLLHitResultResponse(SendLLHitResultResponse value) {
         return new JAXBElement<SendLLHitResultResponse>(_SendLLHitResultResponse_QNAME, SendLLHitResultResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Cs }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "cs")
+    public JAXBElement<Cs> createCs(Cs value) {
+        return new JAXBElement<Cs>(_Cs_QNAME, Cs.class, null, value);
     }
 
     /**
@@ -303,21 +330,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetSystemDateTimeResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "getSystemDateTimeResponse")
-    public JAXBElement<GetSystemDateTimeResponse> createGetSystemDateTimeResponse(GetSystemDateTimeResponse value) {
-        return new JAXBElement<GetSystemDateTimeResponse>(_GetSystemDateTimeResponse_QNAME, GetSystemDateTimeResponse.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetSystemDateTime }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "getSystemDateTime")
     public JAXBElement<GetSystemDateTime> createGetSystemDateTime(GetSystemDateTime value) {
         return new JAXBElement<GetSystemDateTime>(_GetSystemDateTime_QNAME, GetSystemDateTime.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetSystemDateTimeResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "getSystemDateTimeResponse")
+    public JAXBElement<GetSystemDateTimeResponse> createGetSystemDateTimeResponse(GetSystemDateTimeResponse value) {
+        return new JAXBElement<GetSystemDateTimeResponse>(_GetSystemDateTimeResponse_QNAME, GetSystemDateTimeResponse.class, null, value);
     }
 
     /**
@@ -354,6 +381,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "getFingerPrintCount")
     public JAXBElement<GetFingerPrintCount> createGetFingerPrintCount(GetFingerPrintCount value) {
         return new JAXBElement<GetFingerPrintCount>(_GetFingerPrintCount_QNAME, GetFingerPrintCount.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CsResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://xckyservice.hisign.com/", name = "csResponse")
+    public JAXBElement<CsResponse> createCsResponse(CsResponse value) {
+        return new JAXBElement<CsResponse>(_CsResponse_QNAME, CsResponse.class, null, value);
     }
 
     /**

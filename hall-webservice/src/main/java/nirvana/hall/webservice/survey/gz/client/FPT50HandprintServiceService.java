@@ -1,14 +1,10 @@
 
 package nirvana.hall.webservice.survey.gz.client;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebEndpoint;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
 
 
 /**
@@ -17,7 +13,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "FPT50HandprintServiceService", targetNamespace = "http://xckyservice.hisign.com/", wsdlLocation = "http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl")
+@WebServiceClient(name = "FPT50HandprintServiceService", targetNamespace = "http://xckyservice.hisign.com/", wsdlLocation = "http://10.160.121.188:8090/xckyservice_cxf/ws/FPT50HandprintService?wsdl")
 public class FPT50HandprintServiceService
     extends Service
 {
@@ -30,7 +26,7 @@ public class FPT50HandprintServiceService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://211.157.146.7:9000/xckyservice_cxf/ws/FPT50HandprintService?wsdl");
+            url = new URL("http://10.160.121.188:8090/xckyservice_cxf/ws/FPT50HandprintService?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

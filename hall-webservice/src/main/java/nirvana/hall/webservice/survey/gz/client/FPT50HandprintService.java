@@ -26,10 +26,10 @@ public interface FPT50HandprintService {
 
     /**
      * 
-     * @param arg3
-     * @param arg2
-     * @param arg1
-     * @param arg0
+     * @param xckybh
+     * @param userID
+     * @param llHitResultdh
+     * @param password
      * @return
      *     returns java.lang.String
      */
@@ -38,14 +38,14 @@ public interface FPT50HandprintService {
     @RequestWrapper(localName = "sendLLHitResult", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendLLHitResult")
     @ResponseWrapper(localName = "sendLLHitResultResponse", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendLLHitResultResponse")
     public String sendLLHitResult(
-            @WebParam(name = "arg0", targetNamespace = "")
-                    String arg0,
-            @WebParam(name = "arg1", targetNamespace = "")
-                    String arg1,
-            @WebParam(name = "arg2", targetNamespace = "")
-                    String arg2,
-            @WebParam(name = "arg3", targetNamespace = "")
-                    byte[] arg3);
+            @WebParam(name = "userID", targetNamespace = "")
+                    String userID,
+            @WebParam(name = "password", targetNamespace = "")
+                    String password,
+            @WebParam(name = "xckybh", targetNamespace = "")
+                    String xckybh,
+            @WebParam(name = "LLHitResultdh", targetNamespace = "")
+                    DataHandler llHitResultdh);
 
     /**
      * 
@@ -87,10 +87,10 @@ public interface FPT50HandprintService {
 
     /**
      * 
-     * @param arg3
-     * @param arg2
-     * @param arg1
-     * @param arg0
+     * @param xckybh
+     * @param userID
+     * @param password
+     * @param ltHitResultdh
      * @return
      *     returns java.lang.String
      */
@@ -99,14 +99,28 @@ public interface FPT50HandprintService {
     @RequestWrapper(localName = "sendLTHitResult", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendLTHitResult")
     @ResponseWrapper(localName = "sendLTHitResultResponse", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendLTHitResultResponse")
     public String sendLTHitResult(
-            @WebParam(name = "arg0", targetNamespace = "")
-                    String arg0,
-            @WebParam(name = "arg1", targetNamespace = "")
-                    String arg1,
-            @WebParam(name = "arg2", targetNamespace = "")
-                    String arg2,
-            @WebParam(name = "arg3", targetNamespace = "")
-                    byte[] arg3);
+            @WebParam(name = "userID", targetNamespace = "")
+                    String userID,
+            @WebParam(name = "password", targetNamespace = "")
+                    String password,
+            @WebParam(name = "xckybh", targetNamespace = "")
+                    String xckybh,
+            @WebParam(name = "LTHitResultdh", targetNamespace = "")
+                    DataHandler ltHitResultdh);
+
+    /**
+     * 
+     * @param xcwzbh
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "cs", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.Cs")
+    @ResponseWrapper(localName = "csResponse", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.CsResponse")
+    public String cs(
+            @WebParam(name = "xcwzbh", targetNamespace = "")
+                    String xcwzbh);
 
     /**
      * 
@@ -130,10 +144,10 @@ public interface FPT50HandprintService {
 
     /**
      * 
-     * @param arg3
-     * @param arg2
-     * @param arg1
-     * @param arg0
+     * @param modiFingerPrint
+     * @param xckybh
+     * @param userID
+     * @param password
      * @return
      *     returns java.lang.String
      */
@@ -142,14 +156,14 @@ public interface FPT50HandprintService {
     @RequestWrapper(localName = "sendModiFingerPrint", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendModiFingerPrint")
     @ResponseWrapper(localName = "sendModiFingerPrintResponse", targetNamespace = "http://xckyservice.hisign.com/", className = "nirvana.hall.webservice.survey.gz.client.SendModiFingerPrintResponse")
     public String sendModiFingerPrint(
-            @WebParam(name = "arg0", targetNamespace = "")
-                    String arg0,
-            @WebParam(name = "arg1", targetNamespace = "")
-                    String arg1,
-            @WebParam(name = "arg2", targetNamespace = "")
-                    String arg2,
-            @WebParam(name = "arg3", targetNamespace = "")
-                    byte[] arg3);
+            @WebParam(name = "userID", targetNamespace = "")
+                    String userID,
+            @WebParam(name = "password", targetNamespace = "")
+                    String password,
+            @WebParam(name = "xckybh", targetNamespace = "")
+                    String xckybh,
+            @WebParam(name = "modiFingerPrint", targetNamespace = "")
+                    DataHandler modiFingerPrint);
 
     /**
      * 

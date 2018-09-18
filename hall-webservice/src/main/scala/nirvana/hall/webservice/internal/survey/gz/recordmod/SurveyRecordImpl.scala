@@ -3,16 +3,17 @@ package nirvana.hall.webservice.internal.survey.gz.recordmod
 import java.sql.Timestamp
 import java.util.{Date, UUID}
 import javax.sql.DataSource
+
 import nirvana.hall.api.internal.{DateConverter, JniLoaderUtil}
 import nirvana.hall.api.services.remote.HallImageRemoteService
 import nirvana.hall.api.services.{CaseInfoService, LPCardService, LPPalmService}
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.webservice.internal.survey.SurveyConstant
-import nirvana.hall.webservice.internal.survey.gz.vo.{TimeConfig}
+import nirvana.hall.webservice.internal.survey.gz.Constant
+import nirvana.hall.webservice.internal.survey.gz.vo.TimeConfig
 import nirvana.hall.webservice.services.survey.gz.SurveyRecordService
 
 import scala.collection.mutable
-import scala.collection.mutable.{ListBuffer}
+import scala.collection.mutable.ListBuffer
 
 /**
   * Created by ssj on 2017/11/16.
@@ -30,12 +31,12 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   override def isSleep(haiXinServerTime:Long ,startTime :Long ,increments :String):(Boolean,TimeConfig) = {
     var bStr = false
     val timeConfig = new TimeConfig
-    val endTime = startTime + increments.toLong*60*1000
-    if(haiXinServerTime <= endTime){
+//    val endTime = startTime + increments.toLong*60*1000
+    if(haiXinServerTime <= startTime){
       bStr = true
     }else{
-      timeConfig.startTime = DateConverter.convertDate2String(new Date(startTime),SurveyConstant.DATETIME_FORMAT)
-      timeConfig.endTime = DateConverter.convertDate2String(new Date(endTime),SurveyConstant.DATETIME_FORMAT)
+      timeConfig.startTime = DateConverter.convertDate2String(new Date(startTime- 24*60*60*1000),Constant.DATETIME_FORMAT)
+      timeConfig.endTime = DateConverter.convertDate2String(new Date(haiXinServerTime),Constant.DATETIME_FORMAT)
     }
 //    throw new Exception("time config empty or error")
     (bStr,timeConfig)
@@ -77,7 +78,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   }
 
   /**
-    * 存入现勘现场数据入记录表操作
+    * 判断现场物证编号再现勘记录表中是否存在
     * @param xcwzbh
     */
   def isSurvey(xcwzbh:String): Boolean={
@@ -174,13 +175,13 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
   /**
     * 更新现勘现场数据状态，根据xcwzbh
     * @param state
-    * @param uuid
+    * @param xcwzbh
     */
-  def updateRecordStateByXCWZBH(state: Int,uuid : String): Unit = {
-    val sql = s"UPDATE survey_record SET state = ?,updatetime = sysdate WHERE UUID = ?"
+  def updateRecordStateByXCWZBH(state: Int,xcwzbh : String): Unit = {
+    val sql = s"UPDATE survey_record SET state = ?,updatetime = sysdate WHERE physical_evidence_no = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1,state)
-      ps.setString(2,uuid)
+      ps.setString(2,xcwzbh)
     }
   }
 
@@ -246,7 +247,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     */
   def getSurveyHit(batchSize: Int): ListBuffer[mutable.HashMap[String,Any]] = {
     val sql = s"SELECT * " +
-      s"FROM SURVEY_HITRESULT_RECORD t where state = 0 and rownum <= ?"
+      s"FROM SURVEY_HITRESULT_RECORD t where state = 255 and PHYSICAL_EVIDENCE_NO is not null and rownum <= ?"
     val resultList = new mutable.ListBuffer[mutable.HashMap[String,Any]]
 
     JdbcDatabase.queryWithPsSetter2(sql){ps=>
@@ -270,7 +271,7 @@ class SurveyRecordImpl(hallImageRemoteService: HallImageRemoteService,
     */
   def updateSurveyHitState(state: String, uuid : String): Unit = {
     val sql = s"update survey_hitresult_record " +
-      s"set state = ? where uuid = ?"
+      s"set state = ? ,updatetime = sysdate where uuid = ?"
     JdbcDatabase.update(sql){ps=>
       ps.setInt(1,Integer.parseInt(state))
       ps.setString(2,uuid)

@@ -1,7 +1,8 @@
 package nirvana.hall.webservice.services.survey.gz
 
 import java.sql.Timestamp
-import nirvana.hall.webservice.internal.survey.gz.vo.{ TimeConfig}
+
+import nirvana.hall.webservice.internal.survey.gz.vo.TimeConfig
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -31,7 +32,7 @@ trait SurveyRecordService {
   def updateSurveyConfig(endTime : Timestamp ,unitcode :String): Unit
 
   /**
-    * 判断现勘号再现勘记录表中是否存在
+    * 判断现场物证编号再现勘记录表中是否存在
     * @param xcwzbh
     * @return
     */
@@ -72,9 +73,9 @@ trait SurveyRecordService {
   /**
     * 更新现勘现场数据状态，根据uuid
     * @param state
-    * @param uuid
+    * @param xcwzbh
     */
-  def updateRecordStateByXCWZBH(state: Int, uuid : String): Unit
+  def updateRecordStateByXCWZBH(state: Int, xcwzbh : String): Unit
 
   /**
     * 更新现勘现场数据状态，根据kno

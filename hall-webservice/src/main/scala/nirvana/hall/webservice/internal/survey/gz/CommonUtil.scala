@@ -1,6 +1,5 @@
 package nirvana.hall.webservice.internal.survey.gz
 
-import nirvana.hall.webservice.internal.survey.SurveyConstant
 import org.apache.commons.lang.StringUtils
 
 /**
@@ -9,7 +8,7 @@ import org.apache.commons.lang.StringUtils
 object CommonUtil {
 
   def appendParam(param:String*): String ={
-    var paramStr = SurveyConstant.EMPTY
+    var paramStr = Constant.EMPTY
     for(i<-param) {
       paramStr += i.concat("|")
     }

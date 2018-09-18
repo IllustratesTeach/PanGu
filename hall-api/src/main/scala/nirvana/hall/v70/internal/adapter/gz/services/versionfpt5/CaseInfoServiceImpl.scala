@@ -3,20 +3,20 @@ package nirvana.hall.v70.internal.adapter.gz.services.versionfpt5
 import java.text.SimpleDateFormat
 import java.util.Date
 
+import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.CaseInfoService
 import nirvana.hall.c.services.gfpt4lib.FPT4File.Logic03Rec
 import nirvana.hall.protocol.api.FPTProto.Case
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
+import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm, SysUser}
+//import nirvana.hall.v70.gz.sys.UserService
 import nirvana.hall.v70.internal.Gafis70Constants
-import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCase, GafisCaseFinger, GafisCasePalm}
-import nirvana.hall.v70.services.sys.UserService
 
 /**
   * Created by songpeng on 2017/6/29.
   */
-class CaseInfoServiceImpl(hallV70Config: HallV70Config,userService: UserService) extends CaseInfoService{
+class CaseInfoServiceImpl(hallV70Config: HallV70Config) extends CaseInfoService with LoggerSupport{
 
   /**
     * 新增案件信息
@@ -27,8 +27,8 @@ class CaseInfoServiceImpl(hallV70Config: HallV70Config,userService: UserService)
   override def addCaseInfo(caseInfo: Case, dbId: Option[String]): Unit = {
     val gafisCase = convertCase2GafisCase(caseInfo)
 
-    val user = Option(SysUser.find(hallV70Config.server.users))
 
+    val user = Option(SysUser.find(hallV70Config.server.users))
     gafisCase.inputtime = new Date
     gafisCase.inputpsn = user.get.pkId
     gafisCase.createUnitCode = user.get.departCode
@@ -56,13 +56,20 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     val gafisCase = GafisCase.find(caseInfo.getStrCaseID)
     convertCase2GafisCase(caseInfo, gafisCase)
 
-    val modUser = Option(SysUser.find(hallV70Config.server.users))
+    val user = Option(SysUser.find(hallV70Config.server.users))
+
+//    gafisCase.inputtime = new Date
+//    gafisCase.inputpsn = user.get.pkId
+//    gafisCase.createUnitCode = user.get.departCode
+
+    //val modUser = Option(SysUser.find(hallV70Config.server.users))
 
     gafisCase.modifiedtime = new Date
-    gafisCase.modifiedpsn = modUser.get.pkId
+    gafisCase.modifiedpsn = user.get.pkId
 
     gafisCase.deletag = Gafis70Constants.DELETAG_USE
-    gafisCase.caseSource = caseInfo.getStrDataSource
+    //gafisCase.caseSource = caseInfo.getStrDataSource
+    gafisCase.caseSource = Gafis70Constants.DATA_SOURCE_SURVEY.toString
     gafisCase.save()
   }
 
@@ -180,10 +187,16 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     * @return
     */
   def convertCase2GafisCase(caseInfo: Case, gafisCase: GafisCase = new GafisCase()): GafisCase = {
+    info("开始处理案件信息")
     gafisCase.caseId = caseInfo.getStrCaseID
     gafisCase.cardId = caseInfo.getStrCaseID
     val text = caseInfo.getText
-    gafisCase.caseClassCode = text.getStrCaseType1
+    if(text.getStrCaseType1.length == 8){
+      gafisCase.caseClassCodeFPT5 = text.getStrCaseType1
+      gafisCase.caseClassCode = text.getStrCaseType1
+    }else{
+      gafisCase.caseClassCode = text.getStrCaseType1
+    }
     gafisCase.suspiciousAreaCode = text.getStrSuspArea1Code
     gafisCase.caseOccurDate = DateConverter.convertString2Date(text.getStrCaseOccurDate, "yyyyMMddHHmmss")
     gafisCase.caseOccurPlaceCode = text.getStrCaseOccurPlaceCode
@@ -203,8 +216,18 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     gafisCase.assistDeptCode = text.getStrXieChaRequestUnitCode
     gafisCase.assistDeptName = text.getStrXieChaRequestUnitName
     //新增
-    gafisCase.caseClassCode2 = text.getStrCaseType2
-    gafisCase.caseClassCode3 = text.getStrCaseType3
+    if(text.getStrCaseType2.length == 8){
+      gafisCase.caseClassCode2FPT5 = text.getStrCaseType2
+      gafisCase.caseClassCode2 =text.getStrCaseType2
+    }else{
+      gafisCase.caseClassCode2 = text.getStrCaseType2
+    }
+    if(text.getStrCaseType3.length == 8){
+      gafisCase.caseClassCode3FPT5 = text.getStrCaseType3
+      gafisCase.caseClassCode3 = text.getStrCaseType3
+    }else{
+      gafisCase.caseClassCode3 = text.getStrCaseType3
+    }
     gafisCase.suspiciousAreaCode2 = text.getStrSuspArea2Code
     gafisCase.suspiciousAreaCode3 = text.getStrSuspArea3Code
     //gafisCase.bonus = text.getStrPremium
@@ -214,7 +237,15 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
     //fpt5.0新增
     gafisCase.caseBriefDetail = text.getStrBriefCase
     gafisCase.caseSystemId = caseInfo.getStrJingZongCaseId
-    gafisCase.sceneSurveyId = caseInfo.getStrSurveyId
+    if(gafisCase.sceneSurveyId != null && gafisCase.sceneSurveyId != "" ) {
+      if(gafisCase.sceneSurveyIdMulti == null) gafisCase.sceneSurveyIdMulti = gafisCase.sceneSurveyId
+      if(gafisCase.sceneSurveyIdMulti.indexOf(caseInfo.getStrSurveyId)<0){
+        gafisCase.sceneSurveyIdMulti = gafisCase.sceneSurveyIdMulti + "," + caseInfo.getStrSurveyId
+      }
+    }else {
+      gafisCase.sceneSurveyId = caseInfo.getStrSurveyId
+      gafisCase.sceneSurveyIdMulti = caseInfo.getStrSurveyId
+    }
     gafisCase.extractorIdcardNo = text.getStrExtractorIdCard
     gafisCase.extractorPhone = text.getStrExtractorTel
 
@@ -233,6 +264,7 @@ override def delCaseInfo(caseId: String, dbId: Option[String]): Unit = ???
         gafisCase.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
     }
+    info("结束处理案件信息")
     gafisCase
   }
 

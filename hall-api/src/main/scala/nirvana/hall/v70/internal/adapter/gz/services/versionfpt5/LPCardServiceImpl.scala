@@ -10,12 +10,11 @@ import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPCardService
 import nirvana.hall.protocol.api.FPTProto.{FingerFgp, ImageType, LPCard, PatternType}
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.adapter.gz.Constant
-import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt}
-import nirvana.hall.v70.internal.adapter.gz.sync.ProtobufConverter
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.internal.adapter.gz.Constant
+import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCaseFinger, GafisCaseFingerMnt, SysUser}
+import nirvana.hall.v70.internal.adapter.gz.sync.ProtobufConverter
 import nirvana.hall.v70.services.sys.UserService
 
 import scala.collection.mutable
@@ -37,15 +36,13 @@ class LPCardServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
     caseFinger.sid = sid
     var seqNo = getCardSeq(caseFinger.caseId)
-    if(Integer.parseInt(seqNo) >= Integer.parseInt(caseFinger.seqNo)){
-      seqNo = (Integer.parseInt(seqNo)+1).toString
-      if((Integer.parseInt(seqNo)+1).toString.length == 1){  //如果seqNo<10 前面补0
-        seqNo = "0" + (Integer.parseInt(seqNo)+1)
-      }
-      caseFinger.seqNo = seqNo
-      caseFinger.fingerId = caseFinger.caseId + seqNo
-      caseFingerMnt.fingerId = caseFinger.caseId + seqNo
+    seqNo = (Integer.parseInt(seqNo)+1).toString
+    if(Integer.parseInt(seqNo).toString.length == 1){  //如果seqNo<10 前面补0
+      seqNo = "0" + Integer.parseInt(seqNo)
     }
+    caseFinger.seqNo = seqNo
+    caseFinger.fingerId = caseFinger.caseId + seqNo
+    caseFingerMnt.fingerId = caseFinger.caseId + seqNo
 
     val user = Option(SysUser.find(hallV70Config.server.users))
 
@@ -56,7 +53,10 @@ class LPCardServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     caseFinger.save()
 
     caseFingerMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
+
     caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.inputtime = new Date
+
     caseFingerMnt.deletag = Gafis70Constants.DELETAG_USE
     caseFingerMnt.save()
   }
@@ -76,22 +76,34 @@ override def delLPCard(cardId: String, dbId: Option[String]): Unit = ???
     * @return
     */
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
-    val caseFinger = GafisCaseFinger.find(lpCard.getStrCardID)
+    val caseFinger = GafisCaseFinger.find(lpCard.getStrPhysicalId)
     val fingerId = caseFinger.fingerId
     val seqNo = caseFinger.seqNo
     convertLPCard2GafisCaseFinger(lpCard, caseFinger)
     caseFinger.fingerId = fingerId
     caseFinger.seqNo = seqNo
 
-    val modUser = Option(SysUser.find(hallV70Config.server.users))
+    val user = Option(SysUser.find(hallV70Config.server.users))
+
+    caseFinger.inputpsn = user.get.pkId
+    caseFinger.inputtime = new Date
+    caseFinger.creatorUnitCode = user.get.departCode
+
+    //val modUser = Option(SysUser.find(hallV70Config.server.users))
 
     caseFinger.modifiedtime = new Date
-    caseFinger.modifiedpsn = modUser.get.pkId
-    caseFinger.updatorUnitCode= modUser.get.departCode
+    caseFinger.modifiedpsn = user.get.pkId
+    caseFinger.updatorUnitCode= user.get.departCode
     caseFinger.deletag = Gafis70Constants.DELETAG_USE
     caseFinger.save()
 
     val caseFingerMnt = ProtobufConverter.convertLPCard2GafisCaseFingerMnt(lpCard)
+
+    caseFingerMnt.inputpsn = user.get.pkId
+    caseFingerMnt.inputtime = new Date
+    caseFingerMnt.modifiedpsn = user.get.pkId
+    caseFingerMnt.modifiedtime =  new Date
+
     caseFingerMnt.fingerId = fingerId
     //先删除，后插入
     GafisCaseFingerMnt.delete.where(GafisCaseFingerMnt.fingerId === caseFinger.fingerId).execute

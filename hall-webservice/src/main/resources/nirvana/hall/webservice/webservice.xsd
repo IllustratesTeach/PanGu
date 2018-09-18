@@ -36,12 +36,6 @@
                 </xs:annotation>
             </xs:element>
 
-            <xs:element type="survey_shhType" name="survey_shh" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>配置上海现勘Webservice服务器相关参数</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-
             <xs:element type="xingZhuanConfigType" name="xing_zhuan" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>刑专接口配置</xs:documentation>
@@ -141,41 +135,6 @@
             <xs:element type="xs:string" name="upload_checkin_cron" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>获取上报比对关系任务定时计划</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="survey_shhType">
-        <xs:sequence>
-            <xs:element type="cronType" name="cron" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>比中关系上报定时计划</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element type="cronType" name="getSendMatchCron" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>获取现勘查询任务定时计划</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element type="xs:string" name="url" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>URL配置</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element type="xs:string" name="target_namespace" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>targetNamespace配置</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element type="xs:string" name="user" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>用户名</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element type="xs:string" name="password" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>密码</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

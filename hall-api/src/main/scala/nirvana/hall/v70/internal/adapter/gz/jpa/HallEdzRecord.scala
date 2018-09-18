@@ -3,6 +3,7 @@ package nirvana.hall.v70.internal.adapter.gz.jpa
 import javax.persistence.{Column, Entity, Id, Table}
 
 import stark.activerecord.services.{ActiveRecord, ActiveRecordInstance}
+
 /**
   * Created by Administrator on 2017/10/17.
   */

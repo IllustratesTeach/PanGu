@@ -8,14 +8,14 @@ import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import nirvana.hall.api.internal.DateConverter
 import nirvana.hall.api.services.LPPalmService
-import nirvana.hall.protocol.api.FPTProto._
+import nirvana.hall.protocol.api.FPTProto.{ImageType, LPCard, PalmFgp, PatternType}
 import nirvana.hall.support.services.JdbcDatabase
-import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.config.HallV70Config
-import nirvana.hall.v70.internal.adapter.gz.Constant
-import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCasePalm, GafisCasePalmMnt}
-import nirvana.hall.v70.internal.adapter.gz.sync._
 import nirvana.hall.v70.internal.Gafis70Constants
+import nirvana.hall.v70.internal.adapter.gz.Constant
+import nirvana.hall.v70.internal.adapter.gz.jpa.{GafisCasePalm, GafisCasePalmMnt, SysUser}
+import nirvana.hall.v70.internal.adapter.gz.sync.ProtobufConverter
+import nirvana.hall.v70.internal.adapter.gz.sync._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,15 +40,13 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     val sid = java.lang.Long.parseLong(nativeQuery.getResultList.get(0).toString)
     casePalm.sid = sid
     var seqNo = getCardSeq(casePalm.caseId)
-    if(Integer.parseInt(seqNo) >= Integer.parseInt(casePalm.seqNo)){
-      seqNo = (Integer.parseInt(seqNo)+1).toString
-      if((Integer.parseInt(seqNo)+1).toString.length == 1){  //如果seqNo<10 前面补0
-        seqNo = "0" + (Integer.parseInt(seqNo)+1)
-      }
-      casePalm.seqNo = seqNo
-      casePalm.palmId = casePalm.caseId + seqNo
-      casePalmMnt.palmId = casePalm.caseId + seqNo
+    seqNo = (Integer.parseInt(seqNo)+1).toString
+    if(Integer.parseInt(seqNo).toString.length == 1){  //如果seqNo<10 前面补0
+      seqNo = "0" + Integer.parseInt(seqNo)
     }
+    casePalm.seqNo = seqNo
+    casePalm.palmId = casePalm.caseId + seqNo
+    casePalmMnt.palmId = casePalm.caseId + seqNo
 
     val user = Option(SysUser.find(hallV70Config.server.users))
 
@@ -60,6 +58,7 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
 
     casePalmMnt.pkId = UUID.randomUUID().toString.replace("-",Constant.EMPTY)
     casePalmMnt.inputpsn = user.get.pkId
+    casePalmMnt.inputtime = new Date
     casePalmMnt.isMainMnt = Gafis70Constants.IS_MAIN_MNT
     casePalmMnt.deletag = Gafis70Constants.DELETAG_USE
     casePalmMnt.save()
@@ -86,22 +85,34 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     */
   @Transactional
   override def updateLPCard(lpCard: LPCard, dbId: Option[String]): Unit = {
-    val casePalm = GafisCasePalm.find(lpCard.getStrCardID)
+    val casePalm = GafisCasePalm.find(lpCard.getStrPhysicalId)
     val palmId = casePalm.palmId
     val seqNo = casePalm.seqNo
     convertLPCard2GafisCasePalm(lpCard, casePalm)
     casePalm.palmId = palmId
     casePalm.seqNo = seqNo
 
-    val modUser = Option(SysUser.find(hallV70Config.server.users))
+    val user = Option(SysUser.find(hallV70Config.server.users))
+
+    casePalm.inputpsn = user.get.pkId
+    casePalm.inputtime = new Date
+    casePalm.creatorUnitCode = user.get.departCode
+
+    //val modUser = Option(SysUser.find(hallV70Config.server.users))
 
     casePalm.modifiedtime = new Date
-    casePalm.modifiedpsn = modUser.get.pkId
-    casePalm.updatorUnitCode= modUser.get.departCode
+    casePalm.modifiedpsn = user.get.pkId
+    casePalm.updatorUnitCode= user.get.departCode
     casePalm.deletag = Gafis70Constants.DELETAG_USE
     casePalm.save()
 
     val casePalmMnt = ProtobufConverter.convertLPCard2GafisCasePalmMnt(lpCard)
+
+    casePalmMnt.inputpsn = user.get.pkId
+    casePalmMnt.inputtime = new Date
+    casePalmMnt.modifiedpsn = user.get.pkId
+    casePalmMnt.modifiedtime = new Date
+
     casePalmMnt.palmId = palmId
     //先删除，后插入
     GafisCasePalmMnt.delete.where(GafisCasePalmMnt.palmId === casePalm.palmId).execute
@@ -160,9 +171,6 @@ class LPPalmServiceImpl(hallV70Config: HallV70Config,entityManager: EntityManage
     //特征
     if(casePalmMnt.palmMnt != null)
       blobBuilder.setStMntBytes(ByteString.copyFrom(casePalmMnt.palmMnt))
-    //纹线
-    if(casePalmMnt.palmRidge != null)
-      blobBuilder.setStBinBytes(ByteString.copyFrom(casePalmMnt.palmRidge))
     textBuilder.setStrFeatureGroupIdentifier(casePalmMnt.mntCombinationCode)
     textBuilder.setStrFeatureGroupDscriptInfo(casePalmMnt.mntCombinationMessage)
     magicSet(casePalmMnt.captureMethod, blobBuilder.setStrMntExtractMethod)

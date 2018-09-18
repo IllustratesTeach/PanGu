@@ -23,9 +23,6 @@ class HallWebserviceConfig
   @XmlElement(name = "union4pfmip")
   var union4pfmip: Union4pfmipConfig = new Union4pfmipConfig
 
-  @XmlElement(name = "survey_shh")
-  var survey_shh: Survey_shhConfig = new Survey_shhConfig
-
   @XmlElement(name = "handprintService")
   var handprintService:HandprintServiceConfig = new HandprintServiceConfig
 
@@ -157,26 +154,6 @@ class Union4pfmipConfig{
   @XmlElement(name = "upload_checkin_cron")
   var uploadCheckinCron: String = _
 }
-
-
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Survey_shh")
-class Survey_shhConfig{
-  @XmlElement(name = "cron")
-  var cron: String = _
-  @XmlElement(name = "getSendMatchCron")
-  var getSendMatchCron: String = _
-  @XmlElement(name = "url")
-  var url: String = _
-  @XmlElement(name = "target_namespace")
-  var targetNamespace: String = _
-  @XmlElement(name = "user")
-  var user: String = _
-  @XmlElement(name = "password")
-  var password: String = _
-}
-
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "XingZhuanConfig")
