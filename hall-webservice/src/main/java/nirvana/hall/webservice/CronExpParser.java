@@ -37,7 +37,7 @@ public class CronExpParser {
             {
                 if(!tmpCorns[3].equals("*"))
                 {
-                    number = String.valueOf(Integer.valueOf(tmpCorns[2]) * 1440);
+                    number = String.valueOf(Integer.valueOf(tmpCorns[3]) * 1440);
                 }
             }
 
