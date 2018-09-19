@@ -95,6 +95,7 @@ class FPT5ServiceImpl(hallImageRemoteService: HallImageRemoteService,
     */
   override def addLatentPackage(latentPackage: LatentPackage, dbId: Option[String]): Unit = {
     val caseInfo = FPT5Converter.convertLatentPackage2Case(latentPackage)
+    caseInfo.toBuilder.setStrCaseID(latentPackage.caseMsg.caseId)  //caseInfo的转换中caseId是原始系统案事件编号，在6.2中使用，此处在7.0中替换成案事件编号
     if(!caseInfoService.isExist(caseInfo.getStrCaseID)){
       caseInfoService.addCaseInfo(caseInfo)
     }else{

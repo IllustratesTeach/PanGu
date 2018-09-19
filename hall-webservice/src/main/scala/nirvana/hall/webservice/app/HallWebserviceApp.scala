@@ -40,11 +40,13 @@ object HallWebserviceApp
 //      Class.forName("stark.activerecord.StarkActiveRecordModule"),
 //      Class.forName("nirvana.hall.v70.LocalDataSourceModule"),
 
-//      Class.forName("nirvana.hall.v70.gz.LocalV70Module"),
-//      Class.forName("nirvana.hall.v70.gz.LocalV70ServiceModule"),
-//      Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
-//      Class.forName("stark.activerecord.StarkActiveRecordModule"),
-//      Class.forName("nirvana.hall.webservice.HallWebserviceSurveyModule"),
+      //v70贵州现勘
+//     Class.forName("nirvana.hall.v70.gz.LocalV70Module"),
+//     Class.forName("nirvana.hall.v70.gz.LocalV70ServiceModule"),
+//     Class.forName("nirvana.hall.v70.gz.LocalDataSourceModule"),
+//     Class.forName("stark.activerecord.StarkActiveRecordModule"),
+//     Class.forName("nirvana.hall.webservice.HallWebserviceSurveyModule"),
+
       Class.forName("nirvana.hall.webservice.HallWebserviceSurvey62Module"),
 
       //公用
