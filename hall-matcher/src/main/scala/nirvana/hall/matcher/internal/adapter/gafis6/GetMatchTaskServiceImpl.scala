@@ -112,8 +112,15 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
          }
          val ldata = ldataBuilderMap(index)
          ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-         if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0)
-           ldata.setRidge(ByteString.copyFrom(micStruct.pstBin_Data))
+         if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
+           val binData = ByteString.copyFrom(micStruct.pstBin_Data)
+           val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
+           if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
+             ldata.setRidge(binData.substring(0, dataSizeExpected))
+           }else{
+             ldata.setRidge(binData)
+           }
+         }
        }else{
          if(tdataBuilderMap.get(index).isEmpty){
            tdataBuilderMap.put(index, matchTaskBuilder.addTDataBuilder())
