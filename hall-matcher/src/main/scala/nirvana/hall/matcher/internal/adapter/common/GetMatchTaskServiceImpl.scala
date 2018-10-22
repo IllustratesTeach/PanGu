@@ -6,8 +6,6 @@ import javax.sql.DataSource
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
 import net.sf.json.JSONObject
-import nirvana.hall.c.AncientConstants
-import nirvana.hall.c.services.gloclib.glocdef.GAFISIMAGESTRUCT
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.HallMatcherConstants
 import nirvana.hall.matcher.config.HallMatcherConfig
@@ -112,9 +110,14 @@ abstract class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, fea
         }
         val ldata = ldataBuilderMap(index)
         ldata.setMinutia(ByteString.copyFrom(micStruct.pstMnt_Data))
-        if (hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
-          val bin = new GAFISIMAGESTRUCT().fromByteArray(micStruct.pstBin_Data)
-          ldata.setRidge(ByteString.copyFrom(bin.toByteArray(AncientConstants.GBK_ENCODING)))
+        if(hallMatcherConfig.mnt.hasRidge && micStruct.pstBin_Data.length > 0){
+          val binData = ByteString.copyFrom(micStruct.pstBin_Data)
+          val dataSizeExpected = DataConverter.readGAFISIMAGESTRUCTDataLength(binData) + hallMatcherConfig.mnt.headerSize
+          if(binData.size > dataSizeExpected && binData.size - dataSizeExpected < 4){
+            ldata.setRidge(binData.substring(0, dataSizeExpected))
+          }else{
+            ldata.setRidge(binData)
+          }
         }
       } else {
         if(tdataBuilderMap.get(index).isEmpty){
