@@ -137,8 +137,8 @@ class SyncCronServiceImpl(apiConfig: HallApiConfig,
               tpCard = tpCard.toBuilder.setStrDataSource(strategy.getString("setdatasource")).build()
             }
 
-            //逻辑分库处理 青岛使用
-            //destDBID = logicDBJudgeService.logicJudge(cardId,Option(fetchConfig.destDbid),HallApiConstants.SYNC_TYPE_TPCARD)
+            //TODO 逻辑分库处理 青岛使用
+
             //验证本地是否存在
             if (tpCardService.isExist(cardId, destDBID)) {
               if (update) {

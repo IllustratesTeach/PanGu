@@ -2,7 +2,8 @@ package nirvana.hall.v70.services
 
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.protocol.api.FPTProto.TPCard
-import nirvana.hall.v70.internal.{BaseV70TestCase, LogicDBJudgeServiceImpl}
+import nirvana.hall.v70.internal.BaseV70TestCase
+import nirvana.hall.v70.internal.adapter.common.service.LogicDBJudgeServiceImpl
 import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbFingerprint, GafisLogicDbRule}
 import org.junit.Test
 
