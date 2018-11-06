@@ -46,4 +46,11 @@
             </survey_config>
         </survey_v62_server>
     </handprintService>
+<quickMatchService>
+    <send_package_cron>0 0/1 * * * ? *</send_package_cron>
+    <get_hitresult_cron>0 0/1 * * * ? *</get_hitresult_cron>
+    <create_user>kuabi</create_user>
+    <create_unit_code>500101</create_unit_code>
+    <kb_name>cqgq</kb_name>
+</quickMatchService>
 </hall_webservice>
