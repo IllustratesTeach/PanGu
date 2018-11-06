@@ -25,6 +25,8 @@ class HallWebserviceConfig
 
   @XmlElement(name = "handprintService")
   var handprintService:HandprintServiceConfig = new HandprintServiceConfig
+  @XmlType(name = "quickMatchService")
+  var quickMatchService:QuickMatchServiceConfig = new QuickMatchServiceConfig
 
   @XmlElement(name = "xing_zhuan")
   var XingZhuan: XingZhuanConfig = new XingZhuanConfig
@@ -42,6 +44,21 @@ class HallWebserviceConfig
   var templateFingerDBId:String = _
   @XmlElement(name = "local_xkFinger_list_path")
   var localXKFingerListPath:String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "quickMatchService")
+class QuickMatchServiceConfig{
+  @XmlElement(name = "send_package_cron")
+  var sendPackageCron: String = _
+  @XmlElement(name = "get_hitresult_cron")
+  var getHitResultCron: String = _
+  @XmlElement(name = "create_user")
+  var createUser: String = _
+  @XmlElement(name = "create_unit_code")
+  var createUnitCode: String = _
+  @XmlElement(name = "kb_name")
+  var kbName: String = _
 }
 
 /**

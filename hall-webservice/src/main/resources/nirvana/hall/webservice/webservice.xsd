@@ -35,7 +35,11 @@
                     <xs:documentation>配置Webservice服务器相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
-
+            <xs:element type="quickMatchServiceType" name="quickMatchService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>重庆快比指纹系统对接服务相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xingZhuanConfigType" name="xing_zhuan" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>刑专接口配置</xs:documentation>
@@ -360,6 +364,36 @@
             <xs:element type="xs:string" name="send_person_tel" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>发送人联系电话</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="quickMatchServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="send_package_cron" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>推送现场数据服务的定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="get_hitresult_cron" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>获得比中关系服务的定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="create_user" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>快比系统创建人</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="create_unit_code" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>快比系统创建人单位代码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="kb_name" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>快比系统客户名称</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
