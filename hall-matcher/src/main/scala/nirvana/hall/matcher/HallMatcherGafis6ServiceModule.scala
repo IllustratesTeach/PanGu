@@ -4,7 +4,7 @@ import nirvana.hall.extractor.internal.FeatureExtractorImpl
 import nirvana.hall.extractor.services.FeatureExtractor
 import nirvana.hall.matcher.internal.adapter.common.SyncDataServiceImpl
 import nirvana.hall.matcher.internal.adapter.gafis6.sync._
-import nirvana.hall.matcher.internal.adapter.gafis6.{GetMatchTaskServiceImpl, PutMatchProgressServiceImpl, PutMatchResultServiceImpl}
+import nirvana.hall.matcher.internal.adapter.gafis6.{GetMatchTaskServiceImpl, MatchTaskCronServiceImpl, PutMatchProgressServiceImpl, PutMatchResultServiceImpl}
 import nirvana.hall.matcher.service._
 import org.apache.tapestry5.ioc.ServiceBinder
 
@@ -26,5 +26,7 @@ object HallMatcherGafis6ServiceModule {
     binder.bind(classOf[PutMatchProgressService], classOf[PutMatchProgressServiceImpl])
     //特征转换service
     binder.bind(classOf[FeatureExtractor], classOf[FeatureExtractorImpl])
+
+    binder.bind(classOf[MatchTaskCronService], classOf[MatchTaskCronServiceImpl]).eagerLoad()
   }
 }

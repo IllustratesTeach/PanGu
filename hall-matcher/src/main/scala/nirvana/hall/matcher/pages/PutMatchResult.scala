@@ -1,7 +1,6 @@
 package nirvana.hall.matcher.pages
 
 import java.io.{ByteArrayInputStream, InputStream}
-import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import monad.support.services.LoggerSupport
@@ -33,14 +32,15 @@ class PutMatchResult extends LoggerSupport{
    * TimeUnit keepAliveTime时间单位----TimeUnit.MINUTES
    * workQueue 阻塞队列
    */
-  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(10, 30, 10, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
+//  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(100, 200, 60, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
 
   def onActivate: StreamResponse = {
     val matchResultRequest = MatchResultRequest.parseFrom(request.getInputStream)
     info("PutMatchResult matchId:{} candNum:{}", matchResultRequest.getMatchId, matchResultRequest.getCandidateNum)
 //    val matchResultResponse = putMatchResultService.putMatchResult(matchResultRequest)
     //异步处理
-    executor.execute(new PutMatchResultThread(matchResultRequest))
+//    executor.execute(new PutMatchResultThread(matchResultRequest))
+    new PutMatchResultThread(matchResultRequest).start()
     val matchResultResponse = MatchResultResponse.newBuilder()
     matchResultResponse.setStatus(MatchResultResponseStatus.OK)
 

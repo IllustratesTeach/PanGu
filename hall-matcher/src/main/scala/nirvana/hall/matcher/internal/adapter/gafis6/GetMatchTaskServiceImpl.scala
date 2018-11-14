@@ -41,13 +41,13 @@ class GetMatchTaskServiceImpl(hallMatcherConfig: HallMatcherConfig, featureExtra
      val matchTaskQueryResponse = MatchTaskQueryResponse.newBuilder()
      val size = matchTaskQueryRequest.getSize
      JdbcDatabase.queryWithPsSetter(MATCH_TASK_QUERY) { ps =>
-       ps.setInt(1, size)
+       ps.setInt(1, size + 20)//这里+20，防止查询任务被删除后,新任务在队列里被重新获取，影响其他任务比对
      } { rs =>
        val oraSid = rs.getString("ora_sid")
        try {
          if(MatchScheduler.matchingJobs.contains(oraSid)){
            warn("ora_sid {} is matching", oraSid)
-         }else{
+         }else if(matchTaskQueryResponse.getMatchTaskList.size < size){
            val matchTask = readMatchTask(rs)
            //更新status
            updateStatusMatching(oraSid)
