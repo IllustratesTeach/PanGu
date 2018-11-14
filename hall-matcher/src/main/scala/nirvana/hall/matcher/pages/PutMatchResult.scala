@@ -5,7 +5,8 @@ import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.matcher.service.PutMatchResultService
+import nirvana.hall.matcher.service.{PutMatchProgressService, PutMatchResultService}
+import nirvana.protocol.MatchProgressProto.MatchProgressRequest
 import nirvana.protocol.MatchResult.MatchResultResponse.MatchResultResponseStatus
 import nirvana.protocol.MatchResult.{MatchResultRequest, MatchResultResponse}
 import org.apache.tapestry5.StreamResponse
@@ -22,6 +23,8 @@ class PutMatchResult extends LoggerSupport{
   private var response: HttpServletResponse = _
   @Inject
   private var putMatchResultService: PutMatchResultService = _
+  @Inject
+  private var putMatchProgressService: PutMatchProgressService = _
 
   /**
    * corePoolSize 核心线程池大小
@@ -30,7 +33,7 @@ class PutMatchResult extends LoggerSupport{
    * TimeUnit keepAliveTime时间单位----TimeUnit.MINUTES
    * workQueue 阻塞队列
    */
-  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(5, 15, 10, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
+  private val executor: ThreadPoolExecutor = new ThreadPoolExecutor(10, 30, 10, TimeUnit.MINUTES,new LinkedBlockingQueue[Runnable]())
 
   def onActivate: StreamResponse = {
     val matchResultRequest = MatchResultRequest.parseFrom(request.getInputStream)
@@ -59,6 +62,12 @@ class PutMatchResult extends LoggerSupport{
    */
   class PutMatchResultThread(matchResultRequest: MatchResultRequest) extends Thread{
     override def run(){
+      //更新比对进度99%
+      val progressRequestBuilder = MatchProgressRequest.newBuilder()
+      progressRequestBuilder.setMatchId(matchResultRequest.getMatchId)
+      progressRequestBuilder.setProgress(99)
+      putMatchProgressService.putMatchProgress(progressRequestBuilder.build())
+      //写入比对结果
       putMatchResultService.putMatchResult(matchResultRequest)
     }
   }
