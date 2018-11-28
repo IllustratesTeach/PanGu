@@ -25,7 +25,7 @@ import nirvana.hall.v62.internal.c.gloclib.gcolnames.g_stCN
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.SurveyConstant
-import nirvana.hall.webservice.jpa.{LogEditrecord, LogPuthitresult}
+import nirvana.hall.webservice.jpa.survey.{LogEditrecord, LogPuthitresult}
 import nirvana.hall.webservice.services.survey.SurveyHitResultRecordService
 import org.apache.commons.lang.StringUtils
 
@@ -400,20 +400,18 @@ class SurveyHitResultRecordServiceImpl(v62Facade: V62Facade
   }
 
   private def getPhoneFromSzPhone(szPhone: String):String = {
-    if(null != szPhone){
-      val phone1 = szPhone.substring(0,24).trim
-      val phone2 = szPhone.substring(25,48).trim
-      if(null != phone1) {
-        phone1
-      } else if( null!= phone2){
-        phone2
+    if(StringUtils.isNotEmpty(szPhone)){
+      if(szPhone.length > 24){
+        szPhone.substring(0,24).trim
+      }
+      else if(szPhone.length > 48){
+        szPhone.substring(25,48).trim
       }else{
         ""
       }
     }else {
       ""
     }
-
   }
 
 
