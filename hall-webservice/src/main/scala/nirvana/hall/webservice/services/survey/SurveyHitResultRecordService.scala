@@ -5,7 +5,7 @@ import javax.activation.{DataHandler, FileDataSource}
 
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gloclib.survey.SURVEYHITRESULTRECORD
-import nirvana.hall.webservice.jpa.LogPuthitresult
+import nirvana.hall.webservice.jpa.survey.LogPuthitresult
 import org.apache.commons.io.FileUtils
 
 /**
