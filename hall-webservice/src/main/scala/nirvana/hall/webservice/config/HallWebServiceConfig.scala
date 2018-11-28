@@ -44,6 +44,9 @@ class HallWebserviceConfig
   var templateFingerDBId:String = _
   @XmlElement(name = "local_xkFinger_list_path")
   var localXKFingerListPath:String = _
+
+  @XmlElement(name = "swiftExportService")
+  var swiftExportService = new SwiftExportService
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -60,6 +63,21 @@ class QuickMatchServiceConfig{
   @XmlElement(name = "kb_name")
   var kbName: String = _
 }
+
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "swiftExportService")
+class SwiftExportService{
+  @XmlElement(name = "cron")
+  var cron:String = _
+  @XmlElement(name = "cardid_file_dir")
+  var cardIdFileDir:String = _
+  @XmlElement(name = "local_store_dir")
+  var localStoreDir:String = _
+}
+
+
+
 
 /**
   * 现勘接口配置
