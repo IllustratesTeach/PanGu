@@ -13,10 +13,14 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant, SurveyFatal}
-import nirvana.hall.webservice.jpa.{LogGetfingerdetail, LogInterfacestatus}
+import nirvana.hall.webservice.jpa.survey.{LogGetfingerdetail, LogInterfacestatus}
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by songpeng on 2017/12/24.
@@ -27,29 +31,29 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
                                       surveyRecordService: SurveyRecordService,
                                       surveyHitResultRecordService: SurveyHitResultRecordService,
                                       matchRelationService: MatchRelationService,
-                                      fPT5Service: FPT5Service) extends LoggerSupport{
+                                      fPT5Service: FPT5Service) extends LoggerSupport {
 
   val fPT50HandprintServiceClient = new FPT50HandprintServiceClient(hallWebserviceConfig.handprintService)
-  var provider:Option[PlatformOperatorInfoProvider] = None
-  if(hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass != null){
+  var provider: Option[PlatformOperatorInfoProvider] = None
+  if (hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass != null) {
     provider = Option(PlatformOperatorInfoProviderLoader.createProvider(hallWebserviceConfig.handprintService.platformOperatorInfoProviderClass))
   }
 
   @PostInjection
   def startUp(periodicExecutor: PeriodicExecutor): Unit = {
 
-    if(hallWebserviceConfig.handprintService.getLatentPackageCron!= null){
+    if (hallWebserviceConfig.handprintService.getLatentPackageCron != null) {
       //根据现勘列表获取现场指纹FPT5数据
-      try{
+      try {
         periodicExecutor.addJob(new CronScheduleWithStartModel(hallWebserviceConfig.handprintService.getLatentPackageCron, StartAtDelay), "survey-cron-getLatentPackage", new Runnable {
           override def run(): Unit = {
             try {
               info("begin getLatentPackage")
               //检查东方金指获取数据包服务
               checkJinZhiGetLatentPackageService()
-              if(hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null){
-                hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach{surveyV62ServiceConfig=>
-                  V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig){
+              if (hallWebserviceConfig.handprintService.surveyV62ServiceConfig != null) {
+                hallWebserviceConfig.handprintService.surveyV62ServiceConfig.foreach { surveyV62ServiceConfig =>
+                  V62Facade.withConfigurationServer(surveyV62ServiceConfig.v62ServerConfig) {
                     getLatentPackage
                   }
                 }
@@ -58,15 +62,15 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
             } catch {
               case ex: Exception =>
                 error("getLatentPackage-error:{},currentTime:{}"
-                  ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+                  , ExceptionUtil.getStackTraceInfo(ex), DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT)
                 )
             }
           }
         })
-      }catch {
+      } catch {
         case ex: Exception =>
           error("getLatentPackage is dead :{},currentTime:{}"
-            ,ExceptionUtil.getStackTraceInfo(ex),DateConverter.convertDate2String(new Date,SurveyConstant.DATETIME_FORMAT)
+            , ExceptionUtil.getStackTraceInfo(ex), DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT)
           )
       }
 
@@ -78,7 +82,7 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
     */
   def getLatentPackage: Unit = {
     val recordList = surveyRecordService.getSurveyRecordListByState(survey.SURVEY_STATE_DEFAULT, 1)
-    info("获取recordlist数量:{}",recordList.size)
+    info("获取recordlist数量:{}", recordList.size)
     var phyEvidenceNo = ""
     val logInterfaceStatus = new LogInterfacestatus()
     val getfingerdetail = new LogGetfingerdetail()
@@ -139,27 +143,38 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
             getfingerdetail.errormsg = ExceptionUtil.getStackTraceInfo(ex)
             getfingerdetail.savestatus = SurveyConstant.FPTX_INPUT_FAIL
             getfingerdetail.status = FPT50HandprintServiceConstants.RESULT_TYPE_ERROR
-        error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}", ExceptionUtil.getStackTraceInfo(ex)
-          , new String(phyEvidenceNo)
-          , DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT))
-        record.nState = survey.SURVEY_STATE_FAIL
-        surveyRecordService.updateSurveyRecord(record)
-        info("Gafis state Modify success")
-      }
-        if (provider.nonEmpty) {
-          info("添加getFingerDetail{}", getfingerdetail.xcwzbh)
-          getfingerdetail.userid = hallWebserviceConfig.handprintService.user
-          getfingerdetail.xcwzbh = phyEvidenceNo
-          getfingerdetail.fptpath = hallWebserviceConfig.handprintService.localStoreDir + File.separator + "getfingerprint" + File.separator + DateConverter.convertDate2String(new Date(), "yyyyMMdd") + File.separator + phyEvidenceNo.drop(1).take(6) + File.separator + phyEvidenceNo + ".xml"
-          provider.get.addLogGetFingerDetail(getfingerdetail)
+            error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}", ExceptionUtil.getStackTraceInfo(ex)
+              , new String(phyEvidenceNo)
+              , DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT))
+            record.nState = survey.SURVEY_STATE_FAIL
+            surveyRecordService.updateSurveyRecord(record)
+            info("Gafis state Modify success")
+        }
+
+        val f = Future {
+          if (provider.nonEmpty) {
+            info("添加getFingerDetail{}", getfingerdetail.xcwzbh)
+            getfingerdetail.userid = hallWebserviceConfig.handprintService.user
+            getfingerdetail.xcwzbh = phyEvidenceNo
+            getfingerdetail.fptpath = hallWebserviceConfig.handprintService.localStoreDir + File.separator + "getfingerprint" + File.separator + DateConverter.convertDate2String(new Date(), "yyyyMMdd") + File.separator + phyEvidenceNo.drop(1).take(6) + File.separator + phyEvidenceNo + ".xml"
+            provider.get.addLogGetFingerDetail(getfingerdetail)
+          }
+        }
+        f onComplete {
+          case Success(t) => info("getLatentPackage记录表插入成功", getfingerdetail.xcwzbh)
+          case Failure(t) =>
+            error("fPT50HandprintServiceClient-getLatentPackage:{},PhyEvidenceNo:{},currentTime:{}", ExceptionUtil.getStackTraceInfo(t)
+              , new String(phyEvidenceNo)
+              , DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT))
         }
       }
     }
+
   }
 
-  def checkJinZhiGetLatentPackageService():Unit = {
+  def checkJinZhiGetLatentPackageService(): Unit = {
     info("start checkJinZhiGetLatentPackageService")
-    if(hallWebserviceConfig.handprintService.area != null ){
+    if (hallWebserviceConfig.handprintService.area != null) {
       if (LogInterfacestatus.find_by_asjfsddXzqhdm_and_interfacename(hallWebserviceConfig.handprintService.area.toInt, "getLatentPackage").nonEmpty) {
         LogInterfacestatus.update.set(calltime = new Date()).where(LogInterfacestatus.asjfsddXzqhdm === hallWebserviceConfig.handprintService.area.toInt and LogInterfacestatus.interfacename === "getLatentPackage").execute
       } else {
@@ -174,5 +189,4 @@ class FPT50HandprintLatentPackageCron(hallWebserviceConfig: HallWebserviceConfig
     }
     info("end checkJinZhiGetLatentPackageService")
   }
-
 }
