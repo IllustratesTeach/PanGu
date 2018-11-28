@@ -158,6 +158,18 @@
             <artifactId>kafka-clients</artifactId>
             <version>0.8.2.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.11</artifactId>
+            <version>0.8.2.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>hall-webservice-${project.version}</finalName>
