@@ -12,7 +12,7 @@ import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant}
-import nirvana.hall.webservice.jpa.{LogGetfingerdetail, LogInterfacestatus, LogPuthitresult}
+import nirvana.hall.webservice.jpa.survey.{LogInterfacestatus, LogPuthitresult}
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor

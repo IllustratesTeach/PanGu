@@ -7,7 +7,7 @@ import nirvana.hall.c.services.gfpt5lib.FPT5File
 import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.webservice.FPT5ValidUtil
-import nirvana.hall.webservice.jpa.{LogGetfingerdetail, LogInterfacestatus, _}
+import nirvana.hall.webservice.jpa.survey._
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
 import org.dom4j.{DocumentException, Element}

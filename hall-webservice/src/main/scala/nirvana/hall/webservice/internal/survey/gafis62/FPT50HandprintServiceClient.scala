@@ -5,23 +5,25 @@ import java.util.{Date, UUID}
 import javax.activation.DataHandler
 
 import monad.support.services.LoggerSupport
-import nirvana.hall.api.internal.DateConverter
+import nirvana.hall.api.internal.{DateConverter, ExceptionUtil}
 import nirvana.hall.api.internal.fpt.FPT5Utils
 import nirvana.hall.c.services.gfpt5lib.{FPT5File, LatentPackage}
 import nirvana.hall.support.services.XmlLoader
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.webservice.CronExpParser
-import nirvana.hall.webservice.config.{HallWebserviceConfig, HandprintServiceConfig}
-import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader}
+import nirvana.hall.webservice.config.HandprintServiceConfig
+import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant}
 import nirvana.hall.webservice.internal.survey.SurveyException.{DataPackageNotAvailableException, ImageException}
-import nirvana.hall.webservice.jpa.{LogInterfacestatus, _}
+import nirvana.hall.webservice.jpa.survey._
 import nirvana.hall.webservice.services.survey.DictAdministrativeCode
 import nirvana.hall.webservice.services.xcky.FPT50HandprintService
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipFile
 import stark.webservice.services.StarkWebServiceClient
 
+import scala.concurrent.Future
 import scala.io.Source
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by songpeng on 2017/12/24.
@@ -31,7 +33,8 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
   private val userID = handprintServiceConfig.user
   handprintServiceConfig.localStoreDir
   private val password = DigestUtils.md5Hex(handprintServiceConfig.password)
-  private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+  //private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+  //private val fPT50HandprintService = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "DFJZRECEIVE.asmx", "DFJZRECEIVESoap")
   var provider:Option[PlatformOperatorInfoProvider] = None
   if(handprintServiceConfig.platformOperatorInfoProviderClass != null){
     provider = Option(PlatformOperatorInfoProviderLoader.createProvider(handprintServiceConfig.platformOperatorInfoProviderClass))
@@ -53,22 +56,29 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     logGetFingerCount.calltime = new Date()
     var latentCount = 0
     try{
-      latentCount = fPT50HandprintService.getFingerPrintCount(userID, password, unitCode, zzhwlx, xckybh, kssj, jssj).toInt
+      val fPT50HandprintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      latentCount = fPT50HandprintServiceClient.getFingerPrintCount(userID, password, unitCode, zzhwlx, xckybh, kssj, jssj).toInt
     }catch {
       case e:Exception =>
         logGetFingerCount.errormsg = e.getMessage
         throw new Exception("调用-getFingerPrintCount-接口异常：" + e.getMessage())
     }
-    if(provider.nonEmpty) {
-      logGetFingerCount.pkId = UUID.randomUUID().toString.replace("-","")
-      logGetFingerCount.userid = userID
-      logGetFingerCount.asjfsddXzqhdm = unitCode.toLong
-      logGetFingerCount.zzhwlx = zzhwlx
-      logGetFingerCount.kssj = DateConverter.convertString2Date(kssj,"yyyy-MM-dd HH:mm:ss")
-      logGetFingerCount.jssj = DateConverter.convertString2Date(jssj, "yyyy-MM-dd HH:mm:ss")
-      logGetFingerCount.returntime = new Date()
-      logGetFingerCount.fingercount = latentCount
-      provider.get.addLogGetFingerCount(logGetFingerCount)
+    val f = Future{
+      if(provider.nonEmpty) {
+        logGetFingerCount.pkId = UUID.randomUUID().toString.replace("-","")
+        logGetFingerCount.userid = userID
+        logGetFingerCount.asjfsddXzqhdm = unitCode.toLong
+        logGetFingerCount.zzhwlx = zzhwlx
+        logGetFingerCount.kssj = DateConverter.convertString2Date(kssj,"yyyy-MM-dd HH:mm:ss")
+        logGetFingerCount.jssj = DateConverter.convertString2Date(jssj,"yyyy-MM-dd HH:mm:ss")
+        logGetFingerCount.returntime = new Date()
+        logGetFingerCount.fingercount = latentCount
+        provider.get.addLogGetFingerCount(logGetFingerCount)
+      }
+    }
+    f onComplete {
+      case Success(t) => info("插入getLatentList记录表成功currentTime:{}", DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT))
+      case Failure(t) => info("插入getLatentList记录表失败currentTime:{}", DateConverter.convertDate2String(new Date, SurveyConstant.DATETIME_FORMAT))
     }
     latentCount
   }
@@ -90,7 +100,8 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     logGetFingerList.calltime = new Date()
     var fingerPrintListStr = ""
     try{
-      val dataHandler = fPT50HandprintService.getFingerPrintList(userID, password, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, jssj, ks, js)
+      val fPT50HandprintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      val dataHandler = fPT50HandprintServiceClient.getFingerPrintList(userID, password, asjfsdd_xzqhdm, zzhwlx, xckybh, kssj, jssj, ks, js)
       if(dataHandler.getInputStream.available() > 0){
         val fileName = (kssj+"-"+jssj+"-"+ks+"-"+js).replaceAll(" ","-").replaceAll(":","-")
         val inputStream = getInputStreamByDataHandler(dataHandler, handprintServiceConfig.localStoreDir + File.separator
@@ -111,17 +122,23 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
         logGetFingerList.errormsg = e.getMessage
         throw new Exception("调用-getFingerPrintList-接口异常：" + e.getMessage())
     }
-    if(provider.nonEmpty){
-      logGetFingerList.pkId = UUID.randomUUID().toString.replace("-","")
-      logGetFingerList.userid = handprintServiceConfig.user
-      logGetFingerList.asjfsddXzqhdm = asjfsdd_xzqhdm.toLong
-      logGetFingerList.zzhwlx = zzhwlx
-      logGetFingerList.kssj = DateConverter.convertString2Date(kssj,"")
-      logGetFingerList.jssj = DateConverter.convertString2Date(jssj,"")
-      logGetFingerList.ks = ks.toInt
-      logGetFingerList.js = js.toInt
-      logGetFingerList.returntime = new Date()
-      provider.get.addLogGetFingerList(logGetFingerList)
+    val f = Future{
+      if(provider.nonEmpty){
+        logGetFingerList.pkId = UUID.randomUUID().toString.replace("-","")
+        logGetFingerList.userid = handprintServiceConfig.user
+        logGetFingerList.asjfsddXzqhdm = asjfsdd_xzqhdm.toLong
+        logGetFingerList.zzhwlx = zzhwlx
+        logGetFingerList.kssj = DateConverter.convertString2Date(kssj,"yyyy-MM-dd HH:mm:ss")
+        logGetFingerList.jssj = DateConverter.convertString2Date(jssj,"yyyy-MM-dd HH:mm:ss")
+        logGetFingerList.ks = ks.toInt
+        logGetFingerList.js = js.toInt
+        logGetFingerList.returntime = new Date()
+        provider.get.addLogGetFingerList(logGetFingerList)
+      }
+    }
+    f onComplete {
+      case Success(t) => info("插入getFingerPrintList记录表成功")
+      case Failure(t) => warn("插入getFingerPrintList记录表失败")
     }
     Option(XmlLoader.parseXML[FingerPrintListResponse](fingerPrintListStr))
   }
@@ -132,12 +149,12 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     */
   def getSystemDateTime(): String={
     try{
-      fPT50HandprintService.getSystemDateTime()
+      val fPT50HandprintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      fPT50HandprintServiceClient.getSystemDateTime()
     }catch {
       case e:Exception =>
         throw new Exception("调用-getSystemDateTime-接口异常：" + e.getMessage())
     }
-
   }
 
   /**
@@ -153,6 +170,7 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     getfingerdetail.calltime = new Date()
     val fPT50HandprintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
     val dataHandler = fPT50HandprintServiceClient.getFingerPrint(userID, password, xcwzbh)
+    //val dataHandler = fPT50HandprintService.getFingerPrint(userID,password,xcwzbh)
     getfingerdetail.returntime = new Date()
     info("end request DataPackage completed ============")
     if(dataHandler.getInputStream.available() > 0){
@@ -189,7 +207,7 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
       getfingerdetail.asjbh = Option(fPT5File.get.latentPackage.head.caseMsg.caseId).getOrElse("")
       getfingerdetail.ysxtAsjbh = fPT5File.get.latentPackage.head.caseMsg.originalSystemCaseId
       getfingerdetail.xckybh = fPT5File.get.latentPackage.head.caseMsg.latentSurveyId
-      getfingerdetail.asjfsddXzqhdm = fPT5File.get.latentPackage.head.caseMsg.caseOccurAdministrativeDivisionCode.toLong
+      getfingerdetail.asjfsddXzqhdm = fPT5File.get.latentPackage(0).caseMsg.originalSystemCaseId.drop(1).take(6).toLong
       latentPackage = Option(fPT5File.get.latentPackage.head)
     }else{
       getfingerdetail.checkstatus = 0.toString
@@ -218,20 +236,27 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     var result = ""
     logPutFingerStatus.calltime = new Date()
     try{
-      result = fPT50HandprintService.sendFBUseCondition(userID, password, xcwzbh, resultType)
+      val fPT50HandPrintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      result = fPT50HandPrintServiceClient.sendFBUseCondition(userID, password, xcwzbh, resultType)
     }catch {
       case e:Exception =>
         logPutFingerStatus.errormsg = e.getMessage
         throw new Exception("调用-sendFBUseCondition-接口异常：" + e.getMessage())
     }
-    if(provider.nonEmpty){
-      logPutFingerStatus.pkId = UUID.randomUUID().toString.replace("-","")
-      logPutFingerStatus.username = userID
-      logPutFingerStatus.xcwzbh = xcwzbh
-      logPutFingerStatus.resulttype = resultType
-      logPutFingerStatus.returnstatus = result
-      logPutFingerStatus.returntime = new Date()
-      provider.get.addLogPutFingerStatus(logPutFingerStatus)
+    val f = Future{
+      if(provider.nonEmpty){
+        logPutFingerStatus.pkId = UUID.randomUUID().toString.replace("-","")
+        logPutFingerStatus.username = userID
+        logPutFingerStatus.xcwzbh = xcwzbh
+        logPutFingerStatus.resulttype = resultType
+        logPutFingerStatus.returnstatus = result
+        logPutFingerStatus.returntime = new Date()
+        provider.get.addLogPutFingerStatus(logPutFingerStatus)
+      }
+    }
+    f onComplete {
+      case Success(t) => info("插入反馈信息状态表成功：现场物证编号:{},sendFBUseCondition:{}",xcwzbh,resultType)
+      case Failure(t) => warn("插入反馈信息状态表失败：现场物证编号:{},sendFBUseCondition:{}",xcwzbh,resultType)
     }
     result
   }
@@ -246,19 +271,26 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     var result = ""
     logGetReceptionNo.calltime = new Date()
     try{
-      result = fPT50HandprintService.getReceptionNo(userID, password, xckybh)
+      val fPT50HandPrintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      result = fPT50HandPrintServiceClient.getReceptionNo(userID, password, xckybh)
     }catch {
       case e:Exception =>
         logGetReceptionNo.errormsg = e.getMessage
         throw new Exception("调用-getReceptionNo-接口异常：" + e.getMessage())
     }
-    if(provider.nonEmpty) {
-      logGetReceptionNo.pkId = UUID.randomUUID().toString.replace("-","")
-      logGetReceptionNo.username = userID
-      logGetReceptionNo.xckybh = xckybh
-      logGetReceptionNo.returnJjbh = result
-      logGetReceptionNo.returntime = new Date()
-      provider.get.addLogGetReceptionNo(logGetReceptionNo)
+    val f = Future{
+      if(provider.nonEmpty) {
+        logGetReceptionNo.pkId = UUID.randomUUID().toString.replace("-","")
+        logGetReceptionNo.username = userID
+        logGetReceptionNo.xckybh = xckybh
+        logGetReceptionNo.returnJjbh = result
+        logGetReceptionNo.returntime = new Date()
+        provider.get.addLogGetReceptionNo(logGetReceptionNo)
+      }
+    }
+    f onComplete {
+      case Success(t) => info("插入接警编号信息记录表失败：现场勘验编号:{}",xckybh)
+      case Failure(t) => warn("插入接警编号信息记录表成功：现场勘验编号:{}",xckybh)
     }
     result
   }
@@ -273,19 +305,26 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     logGetCaseNo.calltime = new Date()
     var result = ""
     try{
-      result = fPT50HandprintService.getCaseNo(userID, password, xckybh)
+      val fPT50HandPrintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
+      result = fPT50HandPrintServiceClient.getCaseNo(userID, password, xckybh)
     }catch {
       case e:Exception =>
         logGetCaseNo.errormsg = e.getMessage
         throw new Exception("调用-getCaseNo-接口异常：" + e.getMessage())
     }
-    if(provider.nonEmpty){
-      logGetCaseNo.pkId = UUID.randomUUID().toString.replace("-","")
-      logGetCaseNo.username = userID
-      logGetCaseNo.xckybh = xckybh
-      logGetCaseNo.returnAsjbh = result
-      logGetCaseNo.returntime = new Date()
-      provider.get.addLogGetCaseNo(logGetCaseNo)
+    val f = Future{
+      if(provider.nonEmpty){
+        logGetCaseNo.pkId = UUID.randomUUID().toString.replace("-","")
+        logGetCaseNo.username = userID
+        logGetCaseNo.xckybh = xckybh
+        logGetCaseNo.returnAsjbh = result
+        logGetCaseNo.returntime = new Date()
+        provider.get.addLogGetCaseNo(logGetCaseNo)
+      }
+    }
+    f onComplete {
+      case Success(t) => info("插入获取案件信息记录表成功：现场勘验编号:{}",xckybh)
+      case Failure(t) => warn("插入获取案件信息记录表失败：现场勘验编号:{}",xckybh)
     }
     result
   }
@@ -296,15 +335,16 @@ class FPT50HandprintServiceClient(handprintServiceConfig: HandprintServiceConfig
     * @param queryType 查询类型
     * @param hitResultDh 比中信息DataHandler
     */
-  def sendHitResult(xckybh: String, queryType: Int, hitResultDh:DataHandler,logPutHitResult: LogPuthitresult): Unit ={
+  def sendHitResult(xckybh: String, queryType: Int, hitResultDh:DataHandler,logPutHitResult: LogPuthitresult): Unit = {
     info("sendHitResult 发送比中信息:现勘编号：{},查询类型：{}",xckybh,queryType)
     var result = ""
+    val fPT50HandPrintServiceClient = StarkWebServiceClient.createClient(classOf[FPT50HandprintService], handprintServiceConfig.url, handprintServiceConfig.targetNamespace, "FPT50HandprintServiceService", "FPT50HandprintServicePort")
     try{
       queryType match {
         case QueryConstants.QUERY_TYPE_TL | QueryConstants.QUERY_TYPE_LT =>
-          result = fPT50HandprintService.sendLTHitResult(userID, password, xckybh, hitResultDh)
+          result = fPT50HandPrintServiceClient.sendLTHitResult(userID, password, xckybh, hitResultDh)
         case QueryConstants.QUERY_TYPE_LL =>
-         result =  fPT50HandprintService.sendLLHitResult(userID, password, xckybh, hitResultDh)
+         result =  fPT50HandPrintServiceClient.sendLLHitResult(userID, password, xckybh, hitResultDh)
         case other =>
       }
       logPutHitResult.returnstatus = result

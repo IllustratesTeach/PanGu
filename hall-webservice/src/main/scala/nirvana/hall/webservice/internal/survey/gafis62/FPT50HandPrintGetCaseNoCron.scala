@@ -11,7 +11,7 @@ import nirvana.hall.c.services.gloclib.survey
 import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.SurveyConstant
-import nirvana.hall.webservice.jpa.LogInterfacestatus
+import nirvana.hall.webservice.jpa.survey.LogInterfacestatus
 import nirvana.hall.webservice.services.survey.SurveyRecordService
 import org.apache.commons.lang.StringUtils
 import org.apache.tapestry5.ioc.annotations.PostInjection

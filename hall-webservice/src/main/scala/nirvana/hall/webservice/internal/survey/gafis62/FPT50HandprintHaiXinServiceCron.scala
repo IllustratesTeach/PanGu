@@ -11,7 +11,7 @@ import nirvana.hall.api.services.fpt.FPT5Service
 import nirvana.hall.webservice.CronExpParser
 import nirvana.hall.webservice.config.HallWebserviceConfig
 import nirvana.hall.webservice.internal.survey.{PlatformOperatorInfoProvider, PlatformOperatorInfoProviderLoader, SurveyConstant}
-import nirvana.hall.webservice.jpa.LogHaiXinservicestatus
+import nirvana.hall.webservice.jpa.survey.LogHaiXinservicestatus
 import nirvana.hall.webservice.services.survey.{SurveyConfigService, SurveyHitResultRecordService, SurveyRecordService}
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
