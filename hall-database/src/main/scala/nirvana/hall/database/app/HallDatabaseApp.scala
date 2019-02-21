@@ -31,7 +31,8 @@ object HallDatabaseApp {
     val pass = options.valueOf("pass").asInstanceOf[String]
 
     val db = new DatabaseConfig
-    db.driver = "oracle.jdbc.driver.OracleDriver"
+    //db.driver = "oracle.jdbc.driver.OracleDriver"
+    db.driver = "com.mysql.jdbc.Driver"
     db.url = url
     db.user = user
     db.password = pass
@@ -50,15 +51,16 @@ object HallDatabaseApp {
   def buildHikariDataSource(db: DatabaseConfig): HikariDataSource = {
     val hikariConfig = new HikariConfig();
     //针对heroku的mysql特别处理
-    if (db.url.startsWith("mysql")) {
-      val dbUri = new URI(db.url)
-      val username = dbUri.getUserInfo.split(":")(0)
-      val password = dbUri.getUserInfo.split(":")(1)
-      val dbUrl = "jdbc:mysql://" + dbUri.getHost + dbUri.getPath + "?useUnicode=true&characterEncoding=utf-8"
-      hikariConfig.setDriverClassName(db.driver)
+    if (db.url.startsWith("jdbc:mysql")) {
+      //val dbUri = new URI(db.url)
+      //val username = dbUri.getUserInfo.split(":")(0)
+      //val password = dbUri.getUserInfo.split(":")(1)
+      //val dbUrl = "jdbc:mysql://" + dbUri.getHost + dbUri.getPath + "?useUnicode=true&characterEncoding=utf-8"
+      val dbUrl = db.url + "?useUnicode=true&characterEncoding=utf-8"
+      hikariConfig.setDriverClassName("com.mysql.jdbc.Driver")
       hikariConfig.setJdbcUrl(dbUrl)
-      hikariConfig.setUsername(username)
-      hikariConfig.setPassword(password)
+      hikariConfig.setUsername(db.user)
+      hikariConfig.setPassword(db.password)
       hikariConfig.setConnectionTestQuery("select 1")
 
     } else {
@@ -66,7 +68,7 @@ object HallDatabaseApp {
       if(db.driver.startsWith("oracle")){
         hikariConfig.setConnectionTestQuery("select 1 from dual")
       }
-      hikariConfig.setDriverClassName(db.driver)
+      hikariConfig.setDriverClassName("oracle.jdbc.driver.OracleDriver")
       hikariConfig.setJdbcUrl(db.url)
       if (db.user != null)
         hikariConfig.setUsername(db.user);
