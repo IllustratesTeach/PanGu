@@ -128,8 +128,8 @@ object galoctpConverter extends LoggerSupport{
 
     data.stAdmData.tCDateTime = DateConverter.convertString2AFISDateTime(admData.getCreateDatetime)
     data.stAdmData.tMDateTime = DateConverter.convertString2AFISDateTime(admData.getUpdateDatetime)
-    data.stAdmData.szCUserName = admData.getCreator
-    data.stAdmData.szMUserName = admData.getUpdator
+    data.stAdmData.szCUserName = admData.getCreator.getBytes("GBK")
+    data.stAdmData.szMUserName = admData.getUpdator.getBytes("GBK")
     data.stAdmData.tSubmitTLDate = DateConverter.convertString2AFISDateTime(admData.getStrTlDate)
     data.stAdmData.tSubmitTTDate = DateConverter.convertString2AFISDateTime(admData.getStrTtDate)
     data.stAdmData.nAccuTLCount = admData.getNTlCount.asInstanceOf[Byte]
@@ -430,8 +430,8 @@ object galoctpConverter extends LoggerSupport{
     val stAdmData = data.stAdmData
     admData.setCreateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tCDateTime))
     admData.setUpdateDatetime(DateConverter.convertAFISDateTime2String(stAdmData.tMDateTime))
-    admData.setCreator(stAdmData.szCUserName)
-    admData.setUpdator(stAdmData.szMUserName)
+    admData.setCreator(new String(stAdmData.szCUserName,"GBK"))
+    admData.setUpdator(new String(stAdmData.szMUserName,"GBK"))
     admData.setStrTlDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTLDate))
     admData.setStrTtDate(DateConverter.convertAFISDateTime2String(stAdmData.tSubmitTTDate))
     admData.setNTtCount(stAdmData.nAccuTTCount)

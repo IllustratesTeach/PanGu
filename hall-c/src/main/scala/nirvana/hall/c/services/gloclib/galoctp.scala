@@ -115,9 +115,9 @@ object galoctp {
   @Length(32)
   var szMISPersonID:String = _ ;		// mis person id
   @Length(16)
-  var szCUserName:String = _ ;		// user name of create this record
+  var szCUserName:Array[Byte] = _ ;		// user name of create this record
   @Length(16)
-  var szMUserName:String = _ ;		// user name of modify this record
+  var szMUserName:Array[Byte] = _ ;		// user name of modify this record
   var tCDateTime = new AFISDateTime;		// create date time
   var tMDateTime = new AFISDateTime;		// modify date time
   @Length(12)
