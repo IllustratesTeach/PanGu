@@ -47,6 +47,15 @@ class HallWebserviceConfig
 
   @XmlElement(name = "swiftExportService")
   var swiftExportService = new SwiftExportService
+
+  @XmlElement(name = "penaltyTechService")
+  var penaltyTechService = new PenaltyTechService
+
+  @XmlElement(name = "xjConvertService")
+  var xjConvertService = new XjConvertService
+
+  @XmlElement(name = "colligateGatherService")
+  val colligateGatherService = new ColligateGatherService
 }
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -76,6 +85,57 @@ class SwiftExportService{
   var localStoreDir:String = _
 }
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "penaltyTechService")
+class PenaltyTechService{
+  @XmlElement(name = "cron_tt")
+  var cron_tt:String = _
+  @XmlElement(name = "cron_ll")
+  var cron_ll:String = _
+  @XmlElement(name = "cron_lt")
+  var cron_lt:String = _
+  @XmlElement(name = "cron_tl")
+  var cron_tl:String = _
+  @XmlElement(name = "cron_tp")
+  var cron_tp:String = _
+  @XmlElement(name = "cron_lp")
+  var cron_lp:String = _
+  @XmlElement(name = "data_transport_url")
+  var data_transport_url:String = _
+  @XmlElement(name = "tp_endtime")
+  var tp_endTime:String = _
+  @XmlElement(name = "lp_endtime")
+  var lp_endTime:String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "xjConvertService")
+class XjConvertService{
+  @XmlElement(name = "cron")
+  var cron:String = _
+  @XmlElement(name = "excel_file_dir")
+  var excelFileDir:String = _
+  @XmlElement(name = "fptx_input_dir")
+  var fptxInputDir:String = _
+  @XmlElement(name = "fptx_output_dir")
+  var fptxOutputDir:String = _
+}
+
+@XmlAccessorType(XmlAccessType.FIELD)
+class ColligateGatherService{
+  @XmlElement(name = "cron")
+  var cron:String = _
+  @XmlElement(name = "ip")
+  var ftpIp:String = _
+  @XmlElement(name = "port")
+  var port:Int = _
+  @XmlElement(name = "username")
+  var ftpUsername:String = _
+  @XmlElement(name = "password")
+  var ftpPassword:String = _
+  @XmlElement(name = "url")
+  var ftpUrl:String = _
+}
 
 
 
@@ -202,3 +262,4 @@ class XingZhuanConfig{
   @XmlElement(name = "password")
   var password: String = _
 }
+

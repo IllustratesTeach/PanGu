@@ -40,6 +40,26 @@
                     <xs:documentation>重庆快比指纹系统对接服务相关参数</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="swiftExportServiceType" name="swiftExportService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>贵州批量导出fptx文件服务相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="penaltyTechServiceType" name="penaltyTechService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>山东滨州对接服务相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xjConvertServiceType" name="xjConvertService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>新疆导出服务相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="colligateGatherServiceType" name="colligateGatherService" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>山东综采服务相关参数</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xingZhuanConfigType" name="xing_zhuan" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>刑专接口配置</xs:documentation>
@@ -394,6 +414,133 @@
             <xs:element type="xs:string" name="kb_name" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>快比系统客户名称</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="swiftExportServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="cardid_file_dir" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>卡号文件列表路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="local_store_dir" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>导出fptx文件路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="penaltyTechServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron_tt" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>TT定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="cron_ll" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>LL定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="cron_lt" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>LT定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="cron_tl" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>TL定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="cron_tp" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>TP定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="cronType" name="cron_lp" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>LP定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="data_transport_url" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>数据导出文件存放路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="tp_endtime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>捺印卡导出结束时间</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="lp_endtime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>现场卡导出结束时间</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="xjConvertServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>TT定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="excel_file_dir" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>excel读取路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="fptx_input_dir" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>fptx导入路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="fptx_output_dir" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>fptx导出路径</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="colligateGatherServiceType">
+        <xs:sequence>
+            <xs:element type="cronType" name="cron" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>定时计划</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="ip" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>ip地址</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:integer" name="port" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>port端口号</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="username" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>用户名</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="password" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>密码</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="url" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>url</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
