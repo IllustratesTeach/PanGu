@@ -6,7 +6,8 @@ import javax.activation.DataHandler
 import nirvana.hall.api.services.fpt.FPTService
 import nirvana.hall.api.services.{ExportRelationService, GetPKIDService}
 import nirvana.hall.c.services.gfpt4lib.FPT4File.{FPT4File, Logic02Rec, Logic03Rec}
-import nirvana.hall.v70.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger, SysDepart}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisCaseFinger, GafisCheckinInfo, GafisGatherFinger}
+import nirvana.hall.v70.jpa.SysDepart
 import org.apache.axiom.attachments.ByteArrayDataSource
 
 import scala.collection.mutable.ArrayBuffer

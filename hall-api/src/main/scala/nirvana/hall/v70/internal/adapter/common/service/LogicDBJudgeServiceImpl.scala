@@ -3,7 +3,7 @@ package nirvana.hall.v70.internal.adapter.common.service
 import nirvana.hall.api.HallApiConstants
 import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.jpa.{GafisLogicDb, GafisLogicDbRule}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisLogicDb, GafisLogicDbRule}
 import org.apache.tapestry5.json.JSONObject
 
 /**

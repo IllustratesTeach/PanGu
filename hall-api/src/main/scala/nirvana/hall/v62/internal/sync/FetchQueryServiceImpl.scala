@@ -16,7 +16,7 @@ import nirvana.hall.v62.config.HallV62Config
 import nirvana.hall.v62.internal.V62Facade
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
+import nirvana.hall.v70.internal.adapter.common.jpa.GafisNormalqueryQueryque
 import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable
@@ -70,10 +70,10 @@ class FetchQueryServiceImpl(facade: V62Facade, config:HallV62Config, tPCardServi
       val gaQuery = new GafisNormalqueryQueryque()
       gaQuery.oraSid = rs.getLong("ora_sid")
       gaQuery.keyid = rs.getString("keyid")
-      gaQuery.minscore = rs.getInt("minscore")
+      gaQuery.minscore = rs.getInt("minscore").toLong
       gaQuery.querytype = rs.getShort("querytype")
       gaQuery.priority = rs.getShort("priority")
-      gaQuery.maxcandnum = rs.getInt("maxcandnum")
+      gaQuery.maxcandnum = rs.getInt("maxcandnum").toLong
       gaQuery.flag = rs.getShort("flag")
       gaQuery.mic = rs.getBytes("mic")
       gaQuery.createtime = rs.getTimestamp("ora_createtime")

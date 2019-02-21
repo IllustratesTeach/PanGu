@@ -6,7 +6,7 @@ import nirvana.hall.protocol.api.FPTProto.Case
 import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.internal.adapter.common.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 

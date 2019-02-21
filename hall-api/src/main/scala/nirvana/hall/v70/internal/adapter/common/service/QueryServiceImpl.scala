@@ -20,7 +20,7 @@ import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.internal.adapter.common.jpa._
 import nirvana.hall.v70.services.sys.UserService
 import org.jboss.netty.buffer.ChannelBuffers
 
@@ -80,7 +80,7 @@ class QueryServiceImpl(entityManager: EntityManager,userService:UserService) ext
         matchResult.addCandidateResult(cand)
       }
       matchResult.setMatchId(oraSid.toString)
-      matchResult.setCandidateNum(queryQue.curcandnum)
+      matchResult.setCandidateNum(queryQue.curcandnum.toInt)
       matchResult.setTimeElapsed(queryQue.timeElapsed)
       matchResult.setRecordNumMatched(queryQue.recordNumMatched)
       matchResult.setMaxScore(queryQue.hitpossibility.toInt)
@@ -234,8 +234,8 @@ class QueryServiceImpl(entityManager: EntityManager,userService:UserService) ext
     stSimpQry.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(gafisNormalqueryQueryque.oraSid)
     stSimpQry.nPriority = gafisNormalqueryQueryque.priority.toByte
     stSimpQry.nStatus = gafisNormalqueryQueryque.status.toByte
-    stSimpQry.nCurCandidateNum = gafisNormalqueryQueryque.curcandnum
-    stSimpQry.nMaxCandidateNum = gafisNormalqueryQueryque.maxcandnum
+    stSimpQry.nCurCandidateNum = gafisNormalqueryQueryque.curcandnum.toInt
+    stSimpQry.nMaxCandidateNum = gafisNormalqueryQueryque.maxcandnum.toInt
     stSimpQry.nFlag = gafisNormalqueryQueryque.flag.toByte
     stSimpQry.nQueryType = gafisNormalqueryQueryque.querytype.toByte
 //    stSimpQry.nDestDBCount = 1  //被查数据库，目前只指定一个
@@ -271,7 +271,7 @@ class QueryServiceImpl(entityManager: EntityManager,userService:UserService) ext
         candHead.nSrcDBID = if (queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_TL) 1 else 2
         candHead.nTableID = 2
         candHead.nQueryID = gaqryqueConverter.convertLongAsSixByteArray(gafisNormalqueryQueryque.oraSid)
-        candHead.nCandidateNum = gafisNormalqueryQueryque.curcandnum
+        candHead.nCandidateNum = gafisNormalqueryQueryque.curcandnum.toInt
         candHead.tFinishTime = DateConverter.convertDate2AFISDateTime(gafisNormalqueryQueryque.finishtime)
       }
       gaQuery.pstCandHead_Data = candHead

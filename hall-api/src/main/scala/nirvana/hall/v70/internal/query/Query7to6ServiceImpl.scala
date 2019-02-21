@@ -14,7 +14,7 @@ import nirvana.hall.support.services.RpcHttpClient
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisNormalqueryQueryque, GafisQuery7to6, RemoteQueryConfig}
 import nirvana.hall.v70.services.query.Query7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor

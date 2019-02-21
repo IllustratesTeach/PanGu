@@ -10,7 +10,7 @@ import nirvana.hall.protocol.api.FPTProto.TPCard
 import nirvana.hall.v70.common.jpa.SysUser
 import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.{GafisGatherPalm, _}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisGatherPalm, _}
 import nirvana.hall.v70.services.sys.UserService
 import org.springframework.transaction.annotation.Transactional
 
@@ -63,10 +63,8 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
 
       person.deletag = Gafis70Constants.DELETAG_USE
-      person.fingershowStatus = 1.toShort
-      person.isfingerrepeat = "0"
       //person.dataSources = Gafis70Constants.DATA_SOURCE_GAFIS6
-      person.dataSources = tpCard.getStrDataSource.toShort
+      person.dataSources = tpCard.getStrDataSource.toLong
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库
@@ -256,9 +254,7 @@ class TPCardServiceImpl(entityManager: EntityManager, userService: UserService) 
       }
 
       person.deletag = Gafis70Constants.DELETAG_USE
-      person.fingershowStatus = 1.toShort
-      person.isfingerrepeat = "0"
-      person.dataSources = Gafis70Constants.DATA_SOURCE_HXZC
+      person.dataSources = Gafis70Constants.DATA_SOURCE_HXZC.toLong
       person.gatherTypeId = Gafis70Constants.GATHER_TYPE_ID_DEFAULT
       person.save()
       //保存逻辑库

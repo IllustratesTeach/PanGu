@@ -15,7 +15,8 @@ import nirvana.hall.protocol.matcher.MatchResultProto.MatchResult.MatcherStatus
 import nirvana.hall.protocol.matcher.MatchTaskQueryProto.MatchTask
 import nirvana.hall.support.services.JdbcDatabase
 import nirvana.hall.v62.internal.c.gloclib.gaqryqueConverter
-import nirvana.hall.v70.jpa.{GafisNormalqueryQueryque, GafisTask62Record, HallReadRecord}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisNormalqueryQueryque}
+import nirvana.hall.v70.jpa.{GafisTask62Record, HallReadRecord}
 import org.apache.commons.lang.StringUtils
 
 import scala.collection.mutable
@@ -66,10 +67,10 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
       val gaQuery = new GafisNormalqueryQueryque()
       gaQuery.oraSid = rs.getLong("ora_sid")
       gaQuery.keyid = rs.getString("keyid")
-      gaQuery.minscore = rs.getInt("minscore")
+      gaQuery.minscore = rs.getInt("minscore").toLong
       gaQuery.querytype = rs.getShort("querytype")
       gaQuery.priority = rs.getShort("priority")
-      gaQuery.maxcandnum = rs.getInt("maxcandnum")
+      gaQuery.maxcandnum = rs.getInt("maxcandnum").toLong
       gaQuery.flag = rs.getShort("flag")
       gaQuery.mic = rs.getBytes("mic")
       gaQuery.createtime = rs.getTimestamp("createtime")
@@ -158,7 +159,7 @@ class FetchQueryServiceImpl(implicit datasource: DataSource) extends FetchQueryS
             matchResult.addCandidateResult(cand)
           }
         }
-        matchResult.setCandidateNum(queryQue.curcandnum)
+        matchResult.setCandidateNum(queryQue.curcandnum.toInt)
         matchResult.setTimeElapsed(queryQue.timeElapsed)
         matchResult.setRecordNumMatched(queryQue.recordNumMatched)
         matchResult.setMaxScore(queryQue.hitpossibility.toInt)

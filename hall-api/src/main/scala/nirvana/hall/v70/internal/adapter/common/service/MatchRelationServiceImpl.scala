@@ -11,7 +11,7 @@ import nirvana.hall.protocol.fpt.MatchRelationProto._
 import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v70.internal.query.QueryConstants
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa.GafisCheckinInfo
+import nirvana.hall.v70.internal.adapter.common.jpa.GafisCheckinInfo
 
 
 /**

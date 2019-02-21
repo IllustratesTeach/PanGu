@@ -1,6 +1,6 @@
 package nirvana.hall.v70.services.query
 
-import nirvana.hall.v70.jpa.GafisNormalqueryQueryque
+import nirvana.hall.v70.internal.adapter.common.jpa.GafisNormalqueryQueryque
 import org.springframework.transaction.annotation.Transactional
 
 /**

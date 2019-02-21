@@ -17,9 +17,10 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.services.DictCode6Map7
+import nirvana.hall.v70.internal.adapter.common.service.TransSpellName
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants, TransSpellName}
-import nirvana.hall.v70.jpa.{GafisCheckinInfo, _}
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
+import nirvana.hall.v70.internal.adapter.common.jpa.{GafisCheckinInfo, _}
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._
@@ -329,8 +330,6 @@ object ProtobufConverter extends LoggerSupport{
       textBuilder.setNSex(Integer.parseInt(person.sexCode))
     magicSet(person.idcardno, textBuilder.setStrIdentityNum)
     textBuilder.setStrBirthDate(person.birthdayst)
-    magicSet(person.birthCode, textBuilder.setStrBirthAddrCode)
-    magicSet(person.birthdetail, textBuilder.setStrBirthAddr)
     magicSet(person.door, textBuilder.setStrHuKouPlaceCode)
     magicSet(person.doordetail, textBuilder.setStrHuKouPlaceTail)
     magicSet(person.nationCode, textBuilder.setStrRace)
@@ -431,8 +430,6 @@ object ProtobufConverter extends LoggerSupport{
     person.sexCode = text.getNSex.toString
     person.birthdayst = text.getStrBirthDate
     person.idcardno = text.getStrIdentityNum
-    person.birthCode = text.getStrBirthAddrCode
-    person.birthdetail = text.getStrBirthAddr
     person.door = text.getStrHuKouPlaceCode
     person.doordetail = text.getStrHuKouPlaceTail
     person.address = text.getStrAddrCode
@@ -451,7 +448,7 @@ object ProtobufConverter extends LoggerSupport{
     person.nationCode = text.getStrRace
     person.certificatetype = text.getStrCertifType
     person.certificateid = text.getStrCertifID
-    person.recordmark = if(text.getBHasCriminalRecord) 1.toChar else 2.toChar
+    person.recordmark = if(text.getBHasCriminalRecord) "1" else "2"
 
     //    person.assistSign = text.getNXieChaFlag.toString
     person.assistLevel = text.getNXieChaLevel.toString
@@ -468,7 +465,7 @@ object ProtobufConverter extends LoggerSupport{
     person.assistPurpose = text.getStrXieChaForWhat
     person.assistRefPerson = text.getStrRelPersonNo
     person.assistRefCase = text.getStrRelCaseNo
-    person.validDate = text.getStrXieChaTimeLimit
+    person.assistValidDate = text.getStrXieChaTimeLimit
     person.assistContacts = text.getStrXieChaContacter
     person.assistNumber = text.getStrXieChaTelNo
     person.assistApproval = text.getStrShenPiBy
@@ -663,8 +660,8 @@ object ProtobufConverter extends LoggerSupport{
 
     gafisQuery.priority = matchTask.getPriority.toShort
     gafisQuery.prioritynew = matchTask.getPriority.toShort
-    gafisQuery.minscore = matchTask.getScoreThreshold
-    gafisQuery.maxcandnum = matchTask.getTopN
+    gafisQuery.minscore = matchTask.getScoreThreshold.toLong
+    gafisQuery.maxcandnum = matchTask.getTopN.toLong
     gafisQuery.queryid = matchTask.getObjectId //记录查询任务号
     gafisQuery.status = QueryConstants.STATUS_WAIT
     gafisQuery.username = matchTask.getCommitUser
@@ -740,8 +737,8 @@ object ProtobufConverter extends LoggerSupport{
     matchTask.setMatchId(gafisQuery.keyid)
     matchTask.setObjectId(gafisQuery.oraSid)//必填项，现在用于存放oraSid
     matchTask.setPriority(gafisQuery.priority.toInt)
-    matchTask.setScoreThreshold(gafisQuery.minscore)
-    matchTask.setTopN(gafisQuery.maxcandnum)
+    matchTask.setScoreThreshold(gafisQuery.minscore.toInt)
+    matchTask.setTopN(gafisQuery.maxcandnum.toInt)
     if(null!=gafisQuery.status)matchTask.setStatus(gafisQuery.status.toInt)
     if(null!=gafisQuery.username) matchTask.setCommitUser(gafisQuery.username)
     matchTask.setComputerIp(gafisQuery.computerip)
@@ -783,7 +780,7 @@ object ProtobufConverter extends LoggerSupport{
   }
 
   def convertMatchResult2GafisNormalqueryQueryque(matchResult: MatchResult, gafisQuery: GafisNormalqueryQueryque = new GafisNormalqueryQueryque()): GafisNormalqueryQueryque ={
-    gafisQuery.curcandnum = matchResult.getCandidateNum
+    gafisQuery.curcandnum = matchResult.getCandidateNum.toLong
     gafisQuery.recordNumMatched = matchResult.getRecordNumMatched
     /*if(gafisQuery.querytype != 0){//如果不是TT查询，查中概率=最大分数/10
       gafisQuery.hitpossibility = (matchResult.getMaxScore /10).toShort
@@ -811,7 +808,7 @@ object ProtobufConverter extends LoggerSupport{
   def convertGafisCheckInfo2MatchSysInfo(gafisCheckinInfo:GafisCheckinInfo):MatchRelationInfo = {
     val matchRelationInfo = MatchRelationInfo.newBuilder
     val isPlam = !(gafisCheckinInfo.cardType1==1)
-    val queryType = gafisCheckinInfo.querytype.toInt
+    val queryType = gafisCheckinInfo.querytype
     if(queryType == QueryConstants.QUERY_TYPE_TT || queryType == QueryConstants.QUERY_TYPE_LL){
       matchRelationInfo.setSrckey(gafisCheckinInfo.code)
       matchRelationInfo.setDestkey(gafisCheckinInfo.tcode)
@@ -825,7 +822,7 @@ object ProtobufConverter extends LoggerSupport{
       throw new Exception("queryType error:" + queryType)
     }
     matchRelationInfo.setQuerytype(queryType)
-    matchRelationInfo.setQueryTaskId(GafisNormalqueryQueryque.find_by_pkId(gafisCheckinInfo.queryUUID).headOption.get.queryid.toString)
+    matchRelationInfo.setQueryTaskId(GafisNormalqueryQueryque.find_by_pkId(gafisCheckinInfo.queryUuid).headOption.get.queryid.toString)
     matchRelationInfo.setInputer(gafisCheckinInfo.registerUser)
     matchRelationInfo.setInputDate(DateConverter.convertDate2String(gafisCheckinInfo.registerTime,"yyyyMMddHHmmss"))
     matchRelationInfo.setInputUnitCode(gafisCheckinInfo.registerOrg)

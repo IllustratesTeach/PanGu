@@ -26,7 +26,7 @@ class GafisCheckinInfo extends ActiveRecord {
   @Column(name = "TCODE", length = 25)
   var tcode: java.lang.String = _
   @Column(name = "QUERYTYPE", precision = 1, scale = 0)
-  var querytype: java.lang.Boolean = _
+  var querytype: java.lang.Integer = _
   @Temporal(TemporalType.DATE)
   @Column(name = "REGISTER_TIME", length = 8)
   var registerTime: java.util.Date = _
@@ -39,7 +39,7 @@ class GafisCheckinInfo extends ActiveRecord {
   @Column(name = "PRIORITY", precision = 3, scale = 0)
   var priority: java.lang.Short = _
   @Column(name = "REVIEW_STATUS", precision = 2, scale = 0)
-  var reviewStatus: java.lang.Byte = _
+  var reviewStatus: java.lang.Short = _
   @Column(name = "REVIEW_BOUT", precision = 1, scale = 0)
   var reviewBout: java.lang.Boolean = _
   @Column(name = "APPEAL_STATUS", precision = 1, scale = 0)
@@ -87,7 +87,7 @@ class GafisCheckinInfo extends ActiveRecord {
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, code: java.lang.String, tcode: java.lang.String, querytype: java.lang.Boolean, registerTime: java.util.Date, registerUser: java.lang.String, registerOrg: java.lang.String, hitpossibility: java.lang.Short, priority: java.lang.Short, reviewStatus: java.lang.Byte, reviewBout: java.lang.Boolean, appealStatus: java.lang.Boolean, confirmStatus: java.lang.Short, confirmUser: java.lang.String, confirmTime: java.util.Date, queryUuid: java.lang.String, reviewOrg: java.lang.String, rank: java.lang.Integer, fraction: java.lang.Integer, fgp: java.lang.String, confirmOpinion: java.lang.String, cardType1: java.lang.Long, cardType2: java.lang.Long, lastHandleDate: java.util.Date, operatetype: java.lang.Long, ckSource: java.lang.String, passStatus: java.lang.Boolean, personContrDeltag: java.lang.String, removedeltag: java.lang.String) {
+  def this(pkId: java.lang.String, code: java.lang.String, tcode: java.lang.String, querytype: java.lang.Integer, registerTime: java.util.Date, registerUser: java.lang.String, registerOrg: java.lang.String, hitpossibility: java.lang.Short, priority: java.lang.Short, reviewStatus: java.lang.Short, reviewBout: java.lang.Boolean, appealStatus: java.lang.Boolean, confirmStatus: java.lang.Short, confirmUser: java.lang.String, confirmTime: java.util.Date, queryUuid: java.lang.String, reviewOrg: java.lang.String, rank: java.lang.Integer, fraction: java.lang.Integer, fgp: java.lang.String, confirmOpinion: java.lang.String, cardType1: java.lang.Long, cardType2: java.lang.Long, lastHandleDate: java.util.Date, operatetype: java.lang.Long, ckSource: java.lang.String, passStatus: java.lang.Boolean, personContrDeltag: java.lang.String, removedeltag: java.lang.String) {
     this()
     this.pkId = pkId
     this.code = code

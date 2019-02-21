@@ -17,9 +17,10 @@ import nirvana.hall.protocol.matcher.NirvanaTypeDefinition.MatchType
 import nirvana.hall.v62.internal.c.gbaselib.gitempkg
 import nirvana.hall.v62.internal.c.gloclib.{galocpkg, galoctp}
 import nirvana.hall.v62.services.DictCode6Map7
+import nirvana.hall.v70.internal.adapter.common.service.TransSpellName
 import nirvana.hall.v70.internal.adapter.gz.jpa._
 import nirvana.hall.v70.internal.query.QueryConstants
-import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants, TransSpellName}
+import nirvana.hall.v70.internal.{CommonUtils, Gafis70Constants}
 import org.jboss.netty.buffer.ChannelBuffers
 
 import scala.collection.JavaConversions._

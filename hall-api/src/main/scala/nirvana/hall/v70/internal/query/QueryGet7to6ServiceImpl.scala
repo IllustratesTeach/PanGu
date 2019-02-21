@@ -13,7 +13,7 @@ import nirvana.hall.api.services.sync.LogicDBJudgeService
 import nirvana.hall.v70.config.HallV70Config
 import nirvana.hall.v70.internal.HttpHeaderUtils
 import nirvana.hall.v70.internal.sync.ProtobufConverter
-import nirvana.hall.v70.jpa._
+import nirvana.hall.v70.internal.adapter.common.jpa._
 import nirvana.hall.v70.services.query.QueryGet7to6Service
 import org.apache.tapestry5.ioc.annotations.PostInjection
 import org.apache.tapestry5.ioc.services.cron.PeriodicExecutor
