@@ -1,6 +1,7 @@
 package nirvana.hall.v62.internal.c.gloclib
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import javax.imageio.ImageIO
 
 import com.google.protobuf.ByteString
 import monad.support.services.LoggerSupport
@@ -20,18 +21,18 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- *
- * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
- * @since 2015-11-14
- */
+  *
+  * @author <a href="mailto:jcai@ganshane.com">Jun Tsai</a>
+  * @since 2015-11-14
+  */
 object galoctpConverter extends LoggerSupport{
   /**
-   * convert protobuf object to gafis' TPCard
+    * convert protobuf object to gafis' TPCard
     *
     * @param card protobuf object
-   * @return gafis TPCard
-   * @see FPTBatchUpdater.cpp #812
-   */
+    * @return gafis TPCard
+    * @see FPTBatchUpdater.cpp #812
+    */
   def convertProtoBuf2GTPCARDINFOSTRUCT(card: TPCard): GTPCARDINFOSTRUCT={
     val data = new GTPCARDINFOSTRUCT
     data.szCardID = card.getStrCardID
@@ -84,15 +85,15 @@ object galoctpConverter extends LoggerSupport{
       appendTextStruct(buffer, "caseRelatePersonNO",card.getStrCasePersonID) //案事件相关人员编号
 
       //采集原因代码
-//      val captureInfoReasonCode = card.getCaptureInfoReasonCode.split(",")
-//      captureInfoReasonCode.foreach{
-//        code =>
-//          if (captureInfoReasonCode.indexOf(code) == 0){
-//            appendTextStruct(buffer, "personClassCode",code)
-//          } else{
-//            appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
-//          }
-//      }
+      //      val captureInfoReasonCode = card.getCaptureInfoReasonCode.split(",")
+      //      captureInfoReasonCode.foreach{
+      //        code =>
+      //          if (captureInfoReasonCode.indexOf(code) == 0){
+      //            appendTextStruct(buffer, "personClassCode",code)
+      //          } else{
+      //            appendTextStruct(buffer, "personClassCode"+(captureInfoReasonCode.indexOf(code)+1),code)
+      //          }
+      //      }
       appendTextStruct(buffer, "personClassCode",text.getStrPersonClassCode) //捺印人员身份证号码
       appendTextStruct(buffer, "printerID",text.getStrPrinterIdCardNo) //捺印人员身份证号码
       appendTextStruct(buffer, "printerPhone",text.getStrPrinterPhone) //捺印人员联系电话
@@ -142,10 +143,10 @@ object galoctpConverter extends LoggerSupport{
 
     data.nItemFlag = (galoctp.TPCARDINFO_ITEMFLAG_ADMDATA + galoctp.TPCARDINFO_ITEMFLAG_SINGLEITEM).toByte
     data.stAdmData.nItemFlag = 1972224 // (galoctp.TPADMIN_ITEMFLAG_1_ACCUTLCOUNT + galoctp.TPADMIN_ITEMFLAG_1_ACCUTTCOUNT + galoctp.TPADMIN_ITEMFLAG_1_TLCOUNT + galoctp.TPADMIN_ITEMFLAG_1_TTCOUNT)*65536
-                                     // (galoctp.TPADMIN_ITEMFLAG_2_SUBMITTLDATE + galoctp.TPADMIN_ITEMFLAG_2_SUBMITTTDATE) * 256
+    // (galoctp.TPADMIN_ITEMFLAG_2_SUBMITTLDATE + galoctp.TPADMIN_ITEMFLAG_2_SUBMITTTDATE) * 256
 
-    //mic TODO 人像7.0存在有头和没头数据，暂时不处理人像
-    val mics = card.getBlobList.filter(_.getType != ImageType.IMAGETYPE_FACE).map{blob=>
+    //TODO 人像7.0存在有头和没头数据，暂时不处理人像
+    val mics = card.getBlobList.map{blob=>
       val mic = new GAFISMICSTRUCT
       var flag = 0
       if(blob.hasStMnt){
@@ -154,26 +155,24 @@ object galoctpConverter extends LoggerSupport{
 
         flag |= glocdef.GAMIC_ITEMFLAG_MNT
       }
+
       if(blob.hasStImage){
-        val img = new GAFISIMAGESTRUCT().fromStreamReader(blob.getStImageBytes.newInput())
-//        val imgType = blob.getStImageBytes.byteAt(9) //see GAFISIMAGEHEADSTRUCT.bIsCompressed
-        val imgType = img.stHead.bIsCompressed
-        if(imgType == 1){ //image compressed
-          mic.pstCpr_Data = blob.getStImageBytes.toByteArray
-          mic.nCprLen = mic.pstCpr_Data.length
-          flag |= glocdef.GAMIC_ITEMFLAG_CPR
-        }else{
-          mic.pstImg_Data = blob.getStImageBytes.toByteArray
-          mic.nImgLen = mic.pstImg_Data.length
-          flag |= glocdef.GAMIC_ITEMFLAG_IMG
-        }
+        mic.pstCpr_Data = blob.getStImageBytes.toByteArray
+        mic.nCprLen = mic.pstCpr_Data.length
+        flag |= glocdef.GAMIC_ITEMFLAG_CPR
+      }
+      if(blob.hasStOriginalImage){
+        mic.pstImg_Data = blob.getStOriginalImageBytes.toByteArray
+        mic.nImgLen = mic.pstImg_Data.length
+
+        flag |= glocdef.GAMIC_ITEMFLAG_IMG
       }
 
       //TODO 纹线数据？
       if(blob.hasStBin){
-          mic.pstBin_Data = blob.getStBinBytes.toByteArray
-          mic.nBinLen = mic.pstBin_Data.length
-          flag |= glocdef.GAMIC_ITEMFLAG_BIN
+        mic.pstBin_Data = blob.getStBinBytes.toByteArray
+        mic.nBinLen = mic.pstBin_Data.length
+        flag |= glocdef.GAMIC_ITEMFLAG_BIN
       }
       mic.nItemData = blob.getFgp.getNumber.asInstanceOf[Byte] //指位信息
 
@@ -201,15 +200,20 @@ object galoctpConverter extends LoggerSupport{
           val sMagic = new Array[Byte](4)
           val imageBytes = blob.getStImageBytes.toByteArray
           System.arraycopy(imageBytes, 4, sMagic,0, 4)
-          if("BLOB".equals(new String(sMagic))){//gafis7
-            val headData = new Array[Byte](64)
-            System.arraycopy(imageBytes, 64, headData,0, 64)
-            val gafis7Head= new GAFIS7LOB_IMGHEADSTRUCT
-            gafis7Head.fromByteArray(headData)
-            val gafis6Head = convertHead7to6(gafis7Head)
+          if("JF".equals(new String(sMagic).trim)){
+
             val data = new ByteArrayOutputStream()
+            val in = ImageIO.read(new ByteArrayInputStream(imageBytes))
+            val gafis6Head = new GAFISIMAGEHEADSTRUCT
+            gafis6Head.nWidth =in.getWidth.toShort
+            gafis6Head.nHeight = in.getHeight.toShort
+            gafis6Head.nCompressMethod = glocdef.GAIMG_CPRMETHOD_JPG.toByte
+            gafis6Head.nImgSize = imageBytes.length
+            gafis6Head.nResolution = 500
+            gafis6Head.bIsCompressed = 0
+            gafis6Head.nCaptureMethod = glocdef.GAIMG_CPRMETHOD_JPG.toByte
             data.write(gafis6Head.toByteArray())
-            data.write(imageBytes, 128, imageBytes.length-128)
+            data.write(imageBytes)
 
             mic.pstCpr_Data = data.toByteArray
             mic.nCprLen = mic.pstCpr_Data.length
@@ -220,6 +224,7 @@ object galoctpConverter extends LoggerSupport{
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_DATA.asInstanceOf[Byte]
           mic.nItemData = blob.getCardimgfgp.getNumber.asInstanceOf[Byte]
         case FPTProto.ImageType.IMAGETYPE_PALM =>
+          //6.2 暂时不支持侧掌
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_PALM.asInstanceOf[Byte]
           mic.nItemData = FgpConverter.convertPalmFgp2GTPIO_ITEMINDEX(blob.getPalmfgp)
         case FPTProto.ImageType.IMAGETYPE_VOICE =>
@@ -229,7 +234,7 @@ object galoctpConverter extends LoggerSupport{
           mic.nItemType = glocdef.GAMIC_ITEMTYPE_SIGNATURE.asInstanceOf[Byte]
         case other =>
           error("mic type {} not supported for {}",other,data.szCardID)
-//          new UnsupportedOperationException("item type "+other+" not supported ")
+        //          new UnsupportedOperationException("item type "+other+" not supported ")
       }
       mic.bIsLatent = 0 //是否位现场数据
 
@@ -243,11 +248,11 @@ object galoctpConverter extends LoggerSupport{
   }
 
   /**
-   * convert gafis' tpcard object to protobuf
+    * convert gafis' tpcard object to protobuf
     *
     * @param data
-   * @return
-   */
+    * @return
+    */
   def convertGTPCARDINFOSTRUCT2ProtoBuf(data: GTPCARDINFOSTRUCT,groupname: String): TPCard = {
     val card = TPCard.newBuilder()
     card.setStrCardID(data.szCardID)
@@ -295,8 +300,8 @@ object galoctpConverter extends LoggerSupport{
               text.setStrAddrCode(textContent)
             case "AddressTail" =>
               text.setStrAddr(textContent)
-//            case "PersonType" =>        //移动到下方赋值
-//              text.setStrPersonType(data.stAdmData.szPersonType)
+            //            case "PersonType" =>        //移动到下方赋值
+            //              text.setStrPersonType(data.stAdmData.szPersonType)
             case "CaseClass1Code" =>
               text.setStrCaseType1(textContent)
             case "CaseClass2Code" =>
@@ -331,8 +336,8 @@ object galoctpConverter extends LoggerSupport{
             case "UpdatorUnitCode" =>
               admData.setUpdateUnitCode(textContent)
             //FPT5.0新增
-//            case "SrcSysCaseRelatePersonNO" =>      //移动到下方赋值
-//              card.setStrMisPersonID(textContent)  //原始系统_案事件相关人员编号
+            //            case "SrcSysCaseRelatePersonNO" =>      //移动到下方赋值
+            //              card.setStrMisPersonID(textContent)  //原始系统_案事件相关人员编号
             case "PoliceIntegratedPersonNO" =>
               card.setStrJingZongPersonId(textContent) //警综人员编号
             case "CaseRelatePersonNO" =>
@@ -351,7 +356,7 @@ object galoctpConverter extends LoggerSupport{
             case "PrinterID" =>
               text.setStrPrinterIdCardNo(textContent) //捺印人员身份证号码
             case "PrinterPhone" =>
-             text.setStrPrinterPhone(textContent) //捺印人员联系电话
+              text.setStrPrinterPhone(textContent) //捺印人员联系电话
             case "PrintDateTime" =>
               text.setStrPrintDate(textContent) //真对FPT5.0捺印日期时间新增字段
             case "MicbUpdatorUserName" =>
