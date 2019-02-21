@@ -69,7 +69,7 @@ class AutoCheckConfig{
 class AutoExtractFeatureConfig{
   @XmlElement(name = "cron")
   var cron:String = "0 0 0 * * ? *"
-  @XmlElement(name = "timeout")
+  @XmlElement(name = "sql")
   var sql: String = ""
 }
 
