@@ -58,8 +58,8 @@ object LocalV62DataSourceModule {
     val vendor = Vendor.forDriver(driverClassName)
     val databaseAdapter = DatabaseAdapter.forVendor(vendor, Option(config.db.user)) //Some(config.db.user))
     val migrator = new Migrator(dataSource, databaseAdapter)
-    migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
-    migrator.migrate(InstallAllMigrations, "nirvana.hall.v62.migration", searchSubPackages = false)
+    //migrator.migrate(InstallAllMigrations, "nirvana.hall.api.migration", searchSubPackages = false)
+    //migrator.migrate(InstallAllMigrations, "nirvana.hall.v62.migration", searchSubPackages = false)
 
     dataSource
   }
@@ -82,6 +82,7 @@ object LocalV62DataSourceModule {
 
   }
   def contributeEntityManagerFactory(configuration:Configuration[String]): Unit ={
-    configuration.add("nirvana.hall.api.jpa")
+    configuration.add("nirvana.hall.api.jpa.common")
+    configuration.add("nirvana.hall.api.jpa.njtxserver")
   }
 }
