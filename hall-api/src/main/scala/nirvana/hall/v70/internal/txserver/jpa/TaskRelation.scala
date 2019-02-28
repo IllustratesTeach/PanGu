@@ -1,4 +1,4 @@
-package nirvana.hall.api.jpa.njtxserver
+package nirvana.hall.v70.internal.txserver.jpa
 
 // Generated 2018-7-24 14:53:35 by Stark Activerecord generator 4.3.1.Final
 

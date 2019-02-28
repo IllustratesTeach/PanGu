@@ -1,4 +1,4 @@
-package nirvana.hall.api.jpa.common
+package nirvana.hall.api.jpa
 
 import javax.persistence.{Column, Entity, Id, Table}
 
