@@ -1,6 +1,6 @@
-package nirvana.hall.api.jpa
+package nirvana.hall.api.jpa.common
 
-import javax.persistence.{Column, Id, Table, Entity}
+import javax.persistence.{Column, Entity, Id, Table}
 
 import stark.activerecord.services.{ActiveRecord, ActiveRecordInstance}
 
