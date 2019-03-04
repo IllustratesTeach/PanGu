@@ -28,7 +28,7 @@ class TxLog extends ActiveRecord {
   @Column(name = "work_type")
   var workType: java.lang.Integer = _
   @Column(name = "msg")
-  var msg:java.sql.Clob = _
+  var msg:java.lang.String = _
   @Column(name = "flag")
   var flag:java.lang.Integer = _
   @Column(name = "init_time", length = 10)
@@ -40,7 +40,7 @@ class TxLog extends ActiveRecord {
     this.id = id
   }
 
-  def this(id: java.lang.String, levels: Int, stationCode: java.lang.String, cardNo: java.lang.String, workType: java.lang.Integer, msg:java.sql.Clob,flag:java.lang.Integer,initTime: java.util.Date) {
+  def this(id: java.lang.String, levels: Int, stationCode: java.lang.String, cardNo: java.lang.String, workType: java.lang.Integer, msg:java.lang.String,flag:java.lang.Integer,initTime: java.util.Date) {
     this()
     this.id = id
     this.levels = levels
