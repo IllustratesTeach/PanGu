@@ -27,10 +27,10 @@ class TxConfig extends ActiveRecord {
   var startTime:java.util.Date =  _
   @Column(name="flag")
   var flag:java.lang.Integer =  _
-  @Column(name="ip", length=50)
-  var ip:java.lang.String =  _
-  @Column(name="port", length=10)
-  var port:java.lang.String =  _
+  @Column(name="url", length=100)
+  var url:java.lang.String =  _
+  @Column(name="port", length=200)
+  var config:java.lang.String =  _
 
 
 
@@ -38,15 +38,15 @@ class TxConfig extends ActiveRecord {
     this()
     this.id = id
   }
-  def this(id:java.lang.String, stationName:java.lang.String, stationCode:java.lang.String, startTime:java.util.Date, flag:java.lang.Integer, ip:java.lang.String, port:java.lang.String) {
+  def this(id:java.lang.String, stationName:java.lang.String, stationCode:java.lang.String, startTime:java.util.Date, flag:java.lang.Integer, url:java.lang.String, config:java.lang.String) {
     this()
     this.id = id
     this.stationName = stationName
     this.stationCode = stationCode
     this.startTime = startTime
     this.flag = flag
-    this.ip = ip
-    this.port = port
+    this.url = url
+    this.config = config
   }
 
    
