@@ -29,7 +29,7 @@ class TxConfig extends ActiveRecord {
   var flag:java.lang.Integer =  _
   @Column(name="url", length=100)
   var url:java.lang.String =  _
-  @Column(name="port", length=200)
+  @Column(name="config", length=200)
   var config:java.lang.String =  _
 
 

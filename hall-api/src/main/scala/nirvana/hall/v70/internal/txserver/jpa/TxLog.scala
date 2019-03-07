@@ -23,7 +23,7 @@ class TxLog extends ActiveRecord {
   var levels: Int = _
   @Column(name = "staion_code", nullable = false, length = 12)
   var stationCode: java.lang.String = _
-  @Column(name = "card_no", length = 22)
+  @Column(name = "card_no", length = 23)
   var cardNo: java.lang.String = _
   @Column(name = "work_type")
   var workType: java.lang.Integer = _

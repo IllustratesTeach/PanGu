@@ -19,7 +19,7 @@ class CardLogSeven extends ActiveRecord {
   @Id
   @Column(name="id", nullable=false, length=32)
   var id:java.lang.String =  _
-  @Column(name="cardid", length=22)
+  @Column(name="cardid", length=23)
   var cardid:java.lang.String =  _
   @Column(name="station_code", length=12)
   var stationCode:java.lang.String =  _
