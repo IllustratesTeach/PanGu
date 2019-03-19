@@ -27,20 +27,25 @@ class TaskRelation extends ActiveRecord {
   var isFeedback: java.lang.Integer = _
   @Column(name = "INIT_TIME")
   var initTime: java.util.Date = _
-
+  @Column(name = "cardid", length = 23)
+  var cardid: java.lang.String = _
+  @Column(name = "task_type", length = 1)
+  var taskType: java.lang.Integer = _
 
   def this(pkId: java.lang.String) {
     this()
     this.pkId = pkId
   }
 
-  def this(pkId: java.lang.String, taskNoSix: java.lang.Long, taskNoSeven: java.lang.Long, isFeedback: java.lang.Integer, initTime: java.util.Date) {
+  def this(pkId: java.lang.String, taskNoSix: java.lang.Long, taskNoSeven: java.lang.Long, isFeedback: java.lang.Integer, initTime: java.util.Date, cardid: java.lang.String, taskType: java.lang.Integer) {
     this()
     this.pkId = pkId
     this.taskNoSix = taskNoSix
     this.taskNoSeven = taskNoSeven
     this.isFeedback = isFeedback
     this.initTime = initTime
+    this.cardid = cardid
+    this.taskType = taskType
   }
 }
 

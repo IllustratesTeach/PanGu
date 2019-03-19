@@ -20,6 +20,8 @@ class SevenReceiveRecord extends ActiveRecord{
   var stationCode :java.lang.String = _
   @Column(name = "flag")
   var flag:java.lang.Integer = _
+  @Column(name = "status")
+  var status:java.lang.String = _
   @Column(name = "cardid")
   var cardId:java.lang.String = _
   @Column(name = "input_time")
@@ -33,12 +35,14 @@ class SevenReceiveRecord extends ActiveRecord{
   def this(id:java.lang.String
            ,stationCode:java.lang.String
            ,flag:java.lang.Integer
+           ,status:java.lang.String
            ,cardId:java.lang.String
            ,inputTime:java.util.Date){
     this()
     this.id = id
     this.stationCode = stationCode
     this.flag = flag
+    this.status = status
     this.cardId = cardId
     this.inputTime = inputTime
   }
