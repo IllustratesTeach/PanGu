@@ -420,67 +420,54 @@ object ProtobufConverter extends LoggerSupport{
     */
   def convertTPCard2GafisPerson(tpCard: TPCard, person: GafisPerson = new GafisPerson()): GafisPerson={
     person.personid = tpCard.getStrCardID
-    person.cardid = tpCard.getStrPersonID
-    person.fingerrepeatno = tpCard.getStrMisPersonID
+    person.cardid = tpCard.getStrCardID
+    if(person.fingerrepeatno == null){
+      person.fingerrepeatno = tpCard.getStrMisPersonID//人员信息编号(重卡)
+    }
     val text = tpCard.getText
-
-    person.name = text.getStrName
-    person.spellname = TransSpellName.toHanyuPinyin(text.getStrName)
-    person.aliasname = text.getStrAliasName
-    person.sexCode = text.getNSex.toString
-    person.birthdayst = text.getStrBirthDate
-    person.idcardno = text.getStrIdentityNum
-    person.door = text.getStrHuKouPlaceCode
-    person.doordetail = text.getStrHuKouPlaceTail
-    person.address = text.getStrAddrCode
-    person.addressdetail = text.getStrAddr
-    person.personType = text.getStrPersonType
-    person.caseClasses = text.getStrCaseType1
-    person.caseClasses2 = text.getStrCaseType2
-    person.caseClasses3 = text.getStrCaseType3
-    person.gatherdepartcode = text.getStrPrintUnitCode
-    person.gatherdepartname = text.getStrPrintUnitName
-    person.gatherusername = text.getStrPrinter
-    person.gatherDate = text.getStrPrintDate
-    person.remark = text.getStrComment
-
-    person.nativeplaceCode = text.getStrNation
-    person.nationCode = text.getStrRace
-    person.certificatetype = text.getStrCertifType
-    person.certificateid = text.getStrCertifID
-    person.recordmark = if(text.getBHasCriminalRecord) "1" else "2"
-
-    //    person.assistSign = text.getNXieChaFlag.toString
-    person.assistLevel = text.getNXieChaLevel.toString
-    //协查状态，根据协查级别确定是否是协查
-    if(text.getNXieChaLevel > 0){
-      person.assistSign = "1"
-    }else{
-      person.assistSign = "0"
+    person.remark = text.getStrComment//备注
+    person.idcardno = text.getStrIdentityNum//身份证号码
+    person.address = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrAddrCode)//现住址代码(转码)
+    person.addressdetail = text.getStrAddr//现住址
+    person.doordetail = text.getStrHuKouPlaceTail//户口所在地--户籍地详细住址
+    person.gatherdepartname = text.getStrPrintUnitName//捺印人单位--采集单位名称
+    person.nationCode = getCode7to6(DictCode6Map7.nation_nj.toMap,text.getStrRace)//民族(字典)
+    person.micUpdateUsername = text.getStrMicUpdatorUsername//特征更改用户
+    person.micUpdateUnitcode = text.getStrMicUpdatorUnitcode//特征更改单位
+    person.psisNo = text.getStrPsisNo //警务平台编号
+    person.sexCode = text.getNSex.toString//性别(字典)
+    person.personCategory = text.getStrPersonType//人员类型
+    person.name = text.getStrName//姓名
+    person.spellname = text.getStrSpellName//姓名拼音
+    person.aliasname = text.getStrAliasName//别名绰号
+    if(text.getStrBirthDate != null){
+      person.birthdayst = DateConverter.convertString2Date(text.getStrBirthDate, "yyyyMMdd") //出生日期起
     }
-    person.assistBonus = text.getStrPremium
-    person.assistDate = text.getStrXieChaDate
-    person.assistDeptCode = text.getStrXieChaRequestUnitCode
-    person.assistDeptName = text.getStrXieChaRequestUnitName
-    person.assistPurpose = text.getStrXieChaForWhat
-    person.assistRefPerson = text.getStrRelPersonNo
-    person.assistRefCase = text.getStrRelCaseNo
-    person.assistValidDate = text.getStrXieChaTimeLimit
-    person.assistContacts = text.getStrXieChaContacter
-    person.assistNumber = text.getStrXieChaTelNo
-    person.assistApproval = text.getStrShenPiBy
-
-    //数据校验
-    if(person.idcardno.length > 18){
-      person.idcardno = person.idcardno.substring(0, 18)
+    person.caseClasses = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType1).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType1))//案件类别
+    person.caseClasses2 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType2).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType2))
+    person.caseClasses3 = DictCodeCaseClass6to7Reg.caseClassDict6to7(text.getStrCaseType3).getOrElse(getCode7to6(DictCode6Map7.caseClasses_nj.toMap,text.getStrCaseType3))
+    person.door = getCode7to6(DictCode6Map7.areaClasses_nj.toMap,text.getStrHuKouPlaceCode)//户籍地代码(区域)
+    if(text.getStrPersonClassCode != null){
+      person.personType = getCode7to6(DictCode6Map7.personType_nj.toMap,text.getStrPersonClassCode)//人员类别代码
     }
+    if(text.getStrPrintDate != null){
+      person.gatherDate = DateConverter.convertString2Date(text.getStrPrintDate, "yyyyMMddHHmmss") //采集时间
+    }
+    person.gatherusername = text.getStrPrinter//采集人name
+    person.gatherdepartcode = text.getStrPrintUnitCode//采集单位
+    person.nativeplaceCode = text.getStrNation//籍贯国籍(字典)
+    person.certificatetype = getCode7to6(DictCode6Map7.certificatetype_nj.toMap,text.getStrCertifType)//证件类型code_zjzl
+    person.certificateid = text.getStrCertifID//证件号码
+    person.recordmark = if(text.getBHasCriminalRecord) '1'.toString else '0'.toString //前科库标识 1：有；0：无
+    person.recordsituation = text.getStrCriminalRecordDesc//前科劣迹情况
+
+    //    if(person.idcardno.length > 18){
+    //      person.idcardno = person.idcardno.substring(0, 18)
+    //    }
 
     //操作信息
     val admData = tpCard.getAdmData
     if(admData != null){
-      person.inputpsn = admData.getCreator
-      person.modifiedpsn = admData.getUpdator
-      person.gatherOrgCode = admData.getCreateUnitCode
       if(admData.getCreateDatetime != null && admData.getCreateDatetime.length == 14){
         person.inputtime = DateConverter.convertString2Date(admData.getCreateDatetime, "yyyyMMddHHmmss")
       }else{
@@ -489,10 +476,15 @@ object ProtobufConverter extends LoggerSupport{
       if(admData.getUpdateDatetime != null && admData.getUpdateDatetime.length == 14){
         person.modifiedtime = DateConverter.convertString2Date(admData.getUpdateDatetime, "yyyyMMddHHmmss")
       }
-    }else{
-      person.inputtime = new Date
-    }
 
+      person.gatherOrgCode = admData.getCreateUnitCode
+      person.modifyUnitCode = admData.getUpdateUnitCode
+      person.inputUsername = admData.getCreator
+      person.modifyUsername = admData.getUpdator
+      if(person.caseFingerGroupNo == null){
+        person.caseFingerGroupNo = admData.getStrGroupName
+      }
+    }
     person
   }
 
@@ -896,6 +888,14 @@ object ProtobufConverter extends LoggerSupport{
         case other =>
           throw new IllegalArgumentException("unknown queryType:"+ queryType)
       }
+    }
+  }
+
+  private def getCode7to6(map:Map[String,String],code:String): String ={
+    if(map.keys.toList.contains(code)){
+      map.get(code).get
+    }else{
+      code
     }
   }
 }

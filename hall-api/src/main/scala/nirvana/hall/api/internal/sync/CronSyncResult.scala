@@ -1,4 +1,4 @@
-package nirvana.hall.v70.internal.txserver.sync
+package nirvana.hall.api.internal.sync
 
 import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
