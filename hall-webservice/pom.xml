@@ -204,6 +204,13 @@
             <artifactId>commons-net</artifactId>
             <version>3.6</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.esotericsoftware/kryo -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>hall-webservice-${project.version}</finalName>
