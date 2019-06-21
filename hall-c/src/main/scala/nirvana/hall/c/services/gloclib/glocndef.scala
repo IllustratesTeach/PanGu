@@ -1,5 +1,7 @@
 package nirvana.hall.c.services.gloclib
 
+import java.net.Socket
+
 import nirvana.hall.c.annotations.Length
 import nirvana.hall.c.services.AncientData
 
@@ -61,6 +63,19 @@ object glocndef {
   @Length(64)
   var bnData:Array[Byte] = _ ;			// send 64 bytes data
   } // GNETANSWERHEADOBJECT;	// size of this structure is 96 bytes
+
+  class GAPPCONNECTIONSTRUCT extends AncientData
+  {
+    var nSockfd:Socket = _;
+    //SOCKET nSockfd;  // SOCKET handle
+    //#ifndef WIN64
+    @Length(4)
+    var bnRes:Array[Byte] = _ ;
+    //#endif
+    // speed data are used only sending data
+    var nSendPercent:Int = _; //// how many percent has been sent[0, 100]
+    var nTimeUsed:Int = _ ; // time used, in CLOCKS_PER_SECOND
+  } //GAPPCONNECTIONSTRUCT;
 
 
 }
