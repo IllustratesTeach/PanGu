@@ -7,7 +7,7 @@ import org.apache.tapestry5.ioc.{Configuration, ServiceBinder}
 object HallWebserviceGreatHandTechModule {
 
   def bind(binder: ServiceBinder): Unit = {
-    binder.bind(classOf[SyncCronFingerDataService]).eagerLoad()
+    //binder.bind(classOf[SyncCronFingerDataService]).eagerLoad()
     binder.bind(classOf[ConvertImgMntService]).eagerLoad()
   }
 
