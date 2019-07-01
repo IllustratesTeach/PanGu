@@ -125,25 +125,16 @@ class ConvertImgMntService(v62Facade: V62Facade
     info("convertImg-start:fgp:{}", fgp)
     try {
       if (null != data) {
-        val gafisImage = new GAFISIMAGESTRUCT()
+        var gafisImage = new GAFISIMAGESTRUCT()
         //val is = new ByteArrayInputStream(data)
         gafisImage.fromByteArray(data)
-        if (gafisImage.stHead.bIsCompressed > 0) {
-          val originalImage = hallImageRemoteService.decodeGafisImage(gafisImage)
-          try {
-            val mntData = extractByGAFISIMG(originalImage, false)
-            result.mntData = mntData._1.toByteArray()
-            result.imgData = originalImage.toByteArray()
-          } catch {
-            case ex: Exception => error("extractByGAFISIMG-error:{}", ex.getMessage)
-              new SyncCronLog(UUID.randomUUID().toString.replace("-", "")
-                , cardId
-                , ConvertType.toString
-                , new Date()
-                , FAIL
-                , "cardid:"+cardId+"fgp:"+fgp+":"+ex.getMessage).save()
-          }
-        } else {
+        if (gafisImage.stHead.bIsCompressed > 0) {    //判断是否压缩
+          gafisImage = hallImageRemoteService.decodeGafisImage(gafisImage)
+        }
+        if(gafisImage.stHead.nWidth != 640 || gafisImage.stHead.nHeight != 640){
+          result.imgData = gafisImage.toByteArray()
+          throw new Exception("图片大小不符合640*640")
+        }else {
           val mntData = extractByGAFISIMG(gafisImage, false)
           result.mntData = mntData._1.toByteArray()
           result.imgData = gafisImage.toByteArray()
@@ -151,6 +142,12 @@ class ConvertImgMntService(v62Facade: V62Facade
       }
     } catch {
       case ex: Exception => error("convertImg-error:{}", ex.getMessage)
+        new SyncCronLog(UUID.randomUUID().toString.replace("-", "")
+          , cardId
+          , ConvertType.toString
+          , new Date()
+          , FAIL
+          , "cardid:"+cardId+"fgp:"+fgp+":"+ex.getMessage).save()
     } finally{
       result.fgp = fgp
     }

@@ -54,7 +54,7 @@ class SyncCronFingerDataService(v62Facade: V62Facade
     var cardId = ""
     try {
       info("SyncCronFingerDataService-start")
-      val startTime = SyncCronConfig.where(SyncCronConfig.typ === TEMPLATE_FINGER)
+      var startTime = SyncCronConfig.where(SyncCronConfig.typ === TEMPLATE_FINGER)
         .and(SyncCronConfig.deleteFlag === NOT_DELETE).head.startTime
       val currentTime = DateConverter.convertAFISDateTime2String2(v62Facade.NET_GAFIS_MISC_GetServerTime())
       info("SyncCronFingerDataService-startTime:{},currentTime:{}", startTime, currentTime)
@@ -312,6 +312,11 @@ class SyncCronFingerDataService(v62Facade: V62Facade
     result.map(t => t.szCardID)
   }
 
+  /**
+    * 强制通过
+    * @param data
+    * @return
+    */
   def getForcePassFlag(data:Array[Byte]):Int = {
     var result:Int = 0
     val gafisimagestruct = new GAFISIMAGESTRUCT()
