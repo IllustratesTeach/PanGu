@@ -1,7 +1,7 @@
 package nirvana.hall.webservice.internal.greathand
 
 import java.text.SimpleDateFormat
-import java.util.{Date, UUID}
+import java.util.{Calendar, Date, UUID}
 
 import monad.core.services.{CronScheduleWithStartModel, StartAtDelay}
 import monad.support.services.LoggerSupport
@@ -56,9 +56,19 @@ class SyncCronFingerDataService(v62Facade: V62Facade
       info("SyncCronFingerDataService-start")
       var startTime = SyncCronConfig.where(SyncCronConfig.typ === TEMPLATE_FINGER)
         .and(SyncCronConfig.deleteFlag === NOT_DELETE).head.startTime
+      val cal = Calendar.getInstance()
+      cal.setTime(startTime)
+      cal.add(Calendar.MONTH,1)
+      val dateTime = cal.getTime
+      var endTime:java.util.Date = null
       val currentTime = DateConverter.convertAFISDateTime2String2(v62Facade.NET_GAFIS_MISC_GetServerTime())
-      info("SyncCronFingerDataService-startTime:{},currentTime:{}", startTime, currentTime)
-      val cardIdList = getTemplateCardIdList(DateConverter.convertDate2String(startTime, "yyyyMMddHHmmss"), strFormatConvert(currentTime))
+      if(dateTime.getTime < DateConverter.convertString2Date(currentTime, "yyyy-MM-dd HH:mm:ss").getTime){
+        endTime = dateTime
+      }else{
+        endTime = DateConverter.convertString2Date(currentTime, "yyyy-MM-dd HH:mm:ss")
+      }
+      info("SyncCronFingerDataService-startTime:{},endTime:{}", startTime, DateConverter.convertDate2String(endTime, "yyyy-MM-dd HH:mm:ss"))
+      val cardIdList = getTemplateCardIdList(DateConverter.convertDate2String(startTime, "yyyyMMddHHmmss"), DateConverter.convertDate2String(endTime, "yyyyMMddHHmmss"))
       info("SyncCronFingerDataService-CardList:{}", cardIdList.size)
       if (cardIdList.nonEmpty) {
         cardIdList.foreach {
@@ -84,7 +94,7 @@ class SyncCronFingerDataService(v62Facade: V62Facade
             }
         }
       }
-      SyncCronConfig.update.set(startTime = DateConverter.convertString2Date(currentTime, "yyyy-MM-dd HH:mm:ss"), inputTime = new Date()).where(SyncCronConfig.typ === TEMPLATE_FINGER).execute
+      SyncCronConfig.update.set(startTime = endTime, inputTime = new Date()).where(SyncCronConfig.typ === TEMPLATE_FINGER).execute
     } catch {
       case ex: Exception =>
         new SyncCronLog(UUID.randomUUID().toString.replace("-", "")
@@ -175,7 +185,7 @@ class SyncCronFingerDataService(v62Facade: V62Facade
     personinfo.sex = getSexNameBySexCode(tpCard.getText.getNSex.toString, "Code_SexTable")
     personinfo.birthday = tpCard.getText.getStrBirthDate
     personinfo.idcard = tpCard.getText.getStrIdentityNum
-    personinfo.birthAddressCode = tpCard.getText.getStrBirthAddrCode
+    personinfo.birthAddressCode = tpCard.getText.getStrHuKouPlaceCode
     personinfo.birthAddress = tpCard.getText.getStrBirthAddr
     personinfo.addressCode = tpCard.getText.getStrAddrCode
     personinfo.address = tpCard.getText.getStrAddr
@@ -190,7 +200,7 @@ class SyncCronFingerDataService(v62Facade: V62Facade
       personinfo.race = tpCard.getText.getStrRace
     }
     personinfo.criminalRecord = if (tpCard.getText.getBHasCriminalRecord) 1 else 0
-    personinfo.personid = tpCard.getStrPersonID
+    personinfo.personid = tpCard.getStrCardID   //personid更改为存储cardid
     personinfo.personType = tpCard.getText.getStrPersonType
     if (tpCard.getText.getStrCaseType1.nonEmpty && DictCaseClassificationCode.loadAdministrativeCode.contains(tpCard.getText.getStrCaseType1)) {
       //personinfo.caseType1 = getCaseClassNameByCaseClassCode(tpCard.getText.getStrCaseType1, "Code_CaseClassTable")
@@ -299,7 +309,7 @@ class SyncCronFingerDataService(v62Facade: V62Facade
 
   def getTemplateCardIdList(startTime: String, endTime: String): Seq[String] = {
     println(startTime.trim+":"+endTime.trim)
-    val statement = Option("((CreateTime>=Str2DateTime('%s') ) AND (CreateTime<=Str2DateTime('%s')))"
+    val statement = Option("((CreateTime>Str2DateTime('%s') ) AND (CreateTime<=Str2DateTime('%s')))"
       .format(startTime.trim, endTime.trim))
     val mapper = Map("cardid" -> "szCardID")
 
@@ -330,9 +340,4 @@ class SyncCronFingerDataService(v62Facade: V62Facade
     result
   }
 
-  private def strFormatConvert(dateTime: String): String = {
-    val formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    val date = formater.parse(dateTime)
-    new SimpleDateFormat("yyyyMMddHHmmss").format(date)
-  }
 }
